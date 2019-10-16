@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/nav_sky">
+
+    <fragment
+        android:id="@+id/nav_sky"
+        android:name="com.rtbishop.lookingsat.ui.SkyFragment"
+        android:label="@string/menu_sky"
+        tools:layout="@layout/fragment_sky" />
+
+    <fragment
+        android:id="@+id/nav_radar"
+        android:name="com.rtbishop.lookingsat.ui.RadarFragment"
+        android:label="@string/menu_radar"
+        tools:layout="@layout/fragment_radar" />
+
+    <fragment
+        android:id="@+id/nav_map"
+        android:name="com.rtbishop.lookingsat.ui.WorldMapFragment"
+        android:label="@string/menu_map"
+        tools:layout="@layout/fragment_worldmap" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.rtbishop.lookingsat.ui.SettingsFragment"
+        android:label="@string/menu_settings" />
+
+    <fragment
+        android:id="@+id/nav_credits"
+        android:name="com.rtbishop.lookingsat.ui.CreditsFragment"
+        android:label="@string/menu_credits"
+        tools:layout="@layout/fragment_credits" />
+
+</navigation>
