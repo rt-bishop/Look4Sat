@@ -10,4 +10,6 @@
     <string name="menu_about">About</string>
     <string name="menu_github">GitHub</string>
     <string name="menu_credits">Credits</string>
+
+    <string name="placeholder">Placeholder</string>
 </resources>
