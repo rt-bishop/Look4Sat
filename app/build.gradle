@@ -54,10 +54,13 @@ dependencies {
 
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation"com.squareup.retrofit2:converter-gson:$retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit"
 
     // predict4java
     implementation "com.github.davidmoten:predict4java:$predict4java"
+
+    // location
+    implementation "com.google.android.gms:play-services-location:$google_play"
 
     // testing
     testImplementation "junit:junit:$junit"

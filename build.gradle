@@ -5,7 +5,7 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.1'
@@ -40,6 +40,8 @@ ext {
     retrofit = '2.6.2'
 
     predict4java = '1.3.1'
+
+    google_play = '17.0.0'
 
     junit = "4.12"
     runner = '1.1.1'

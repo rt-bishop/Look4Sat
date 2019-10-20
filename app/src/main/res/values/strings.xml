@@ -22,6 +22,14 @@
     <string name="height_def">64</string>
     <string name="height_summary">Ground station height in meters AMSL</string>
 
+    <string name="menu_update_location">Update location</string>
+    <string name="menu_fetch_transmitters">Fetch Transmitters</string>
+    <string name="menu_save_to_db">Save to DB</string>
+    <string name="menu_load_from_db">Load from DB</string>
+    <string name="menu_fetch_tle">Fetch TLE</string>
+    <string name="menu_load_tle">Load TLE</string>
+    <string name="menu_exit">Exit</string>
+
     <string name="next_aos_pattern">Next AOS in %02d:%02d:%02d</string>
     <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
