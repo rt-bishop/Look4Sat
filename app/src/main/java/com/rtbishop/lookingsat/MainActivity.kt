@@ -1,5 +1,6 @@
 package com.rtbishop.lookingsat
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.Menu
@@ -55,10 +56,19 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.nav_sky) {
-                timerLayout.visibility = View.VISIBLE
-            } else {
-                timerLayout.visibility = View.GONE
+            when {
+                destination.id == R.id.nav_sky -> {
+                    this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    toolbar.visibility = View.VISIBLE
+                    timerLayout.visibility = View.VISIBLE
+                }
+                destination.id == R.id.nav_map -> {
+                    this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    toolbar.visibility = View.GONE
+                }
+                else -> {
+                    timerLayout.visibility = View.GONE
+                }
             }
         }
     }

@@ -23,5 +23,6 @@
     <string name="height_summary">Ground station height in meters AMSL</string>
 
     <string name="next_aos_pattern">Next AOS in %02d:%02d:%02d</string>
+    <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
 </resources>

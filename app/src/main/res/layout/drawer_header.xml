@@ -16,7 +16,7 @@
         android:contentDescription="@string/app_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_sat_down" />
+        app:srcCompat="@drawable/ic_sat_desc_right" />
 
     <TextView
         android:id="@+id/drawer_title"

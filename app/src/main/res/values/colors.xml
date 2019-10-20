@@ -2,8 +2,8 @@
 <resources>
     <color name="colorPrimary">#000020</color>
     <color name="colorPrimaryDark">#000010</color>
-    <color name="colorAccent">#A4A4A4</color>
+    <color name="colorAccent">#C0C0C0</color>
 
-    <color name="colorDrawerText">#A4A4A4</color>
+    <color name="colorDrawerText">#C0C0C0</color>
     <color name="colorBackground">#181818</color>
 </resources>
