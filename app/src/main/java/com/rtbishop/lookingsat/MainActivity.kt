@@ -1,6 +1,9 @@
 package com.rtbishop.lookingsat
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -47,5 +50,26 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host)
         return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.fetch_trans -> Toast.makeText(
+                this,
+                "Fetching transmitters",
+                Toast.LENGTH_SHORT
+            ).show()
+            R.id.save_to_db -> Toast.makeText(this, "Saving to DB", Toast.LENGTH_SHORT).show()
+            R.id.load_from_db -> Toast.makeText(this, "Loading from DB", Toast.LENGTH_SHORT).show()
+            R.id.fetch_tle -> Toast.makeText(this, "Fetching TLE", Toast.LENGTH_SHORT).show()
+            R.id.load_tle -> Toast.makeText(this, "Loading TLE", Toast.LENGTH_SHORT).show()
+            R.id.action_exit -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
