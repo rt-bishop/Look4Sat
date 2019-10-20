@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var timeToAos: TextView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var preferences: SharedPreferences
+    private lateinit var drawerLat: TextView
+    private lateinit var drawerLon: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +53,12 @@ class MainActivity : AppCompatActivity() {
         setupComponents()
         setupNavigation()
         setupTimer()
+        updateDrawerText()
+    }
+
+    private fun updateDrawerText() {
+        drawerLat.text = preferences.getString("LATITUDE", "-180.0000")?.substring(0, 9)
+        drawerLon.text = preferences.getString("LONGITUDE", "-60.0000")?.substring(0, 9)
     }
 
     private fun setupComponents() {
@@ -67,6 +75,9 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
+        val header = navView.getHeaderView(0)
+        drawerLat = header.findViewById(R.id.drawer_lat_value)
+        drawerLon = header.findViewById(R.id.drawer_lon_value)
         val navController = findNavController(R.id.nav_host)
 
         appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky), drawerLayout)
@@ -129,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                 putString("HEIGHT", currentHeight.toString())
                 apply()
             }
+            updateDrawerText()
         }
     }
 
