@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LookingSat</string>
-    <string name="nav_header_title">L∞kingSat</string>
-    <string name="nav_header_subtitle">https://github.com/rt-bishop/LookingSat</string>
+    <string name="drawer_header_title">L∞kingSat</string>
+    <string name="drawer_header_subtitle">https://github.com/rt-bishop/LookingSat</string>
 
     <string name="menu_sky">Sky at a Glance</string>
     <string name="menu_radar">Radar View</string>
@@ -10,6 +10,11 @@
     <string name="menu_about">About</string>
     <string name="menu_github">GitHub</string>
     <string name="menu_credits">Credits</string>
+
+    <string name="latitude">Latitude:</string>
+    <string name="latitude_def">-90.0000</string>
+    <string name="longitude">Longitude:</string>
+    <string name="longitude_def">-180.0000</string>
 
     <string name="placeholder">Placeholder</string>
 </resources>

@@ -2,43 +2,98 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/side_nav_bar"
+    android:layout_height="@dimen/drawer_header_height"
+    android:background="@drawable/drawer_gradient"
     android:gravity="bottom"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/drawer_header_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:id="@+id/drawer_img"
+        android:layout_width="108dp"
+        android:layout_height="108dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:contentDescription="@string/app_name"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_header_title"
-        app:layout_constraintStart_toStartOf="@+id/drawer_header_title"
-        app:srcCompat="@drawable/ic_sat" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_sat_down" />
 
     <TextView
-        android:id="@+id/drawer_header_title"
+        android:id="@+id/drawer_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/nav_header_title"
+        android:layout_marginTop="16dp"
+        android:text="@string/drawer_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/colorText"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_header_subtitle"
-        app:layout_constraintStart_toStartOf="@+id/drawer_header_subtitle" />
+        android:textColor="@color/colorDrawerText"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/drawer_subtitle"
+        app:layout_constraintTop_toBottomOf="@+id/drawer_img" />
 
     <TextView
-        android:id="@+id/drawer_header_subtitle"
+        android:id="@+id/drawer_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/drawer_header_subtitle"
+        android:textColor="@color/colorDrawerText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drawer_title" />
+
+    <TextView
+        android:id="@+id/drawer_lat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/latitude"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/colorDrawerText"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_lat_value"
+        app:layout_constraintStart_toStartOf="@+id/drawer_lat_value"
+        app:layout_constraintTop_toTopOf="@+id/drawer_img" />
+
+    <TextView
+        android:id="@+id/drawer_lat_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/latitude_def"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/colorDrawerText"
+        android:textSize="26sp"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_lon"
+        app:layout_constraintStart_toStartOf="@+id/drawer_lon"
+        app:layout_constraintTop_toBottomOf="@+id/drawer_lat" />
+
+    <TextView
+        android:id="@+id/drawer_lon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/longitude"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/colorDrawerText"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_lon_value"
+        app:layout_constraintStart_toStartOf="@+id/drawer_lon_value"
+        app:layout_constraintTop_toBottomOf="@+id/drawer_lat_value" />
+
+    <TextView
+        android:id="@+id/drawer_lon_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/nav_header_subtitle"
-        android:textColor="@color/colorText"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/longitude_def"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/colorDrawerText"
+        android:textSize="26sp"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_img"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/drawer_img"
+        app:layout_constraintTop_toBottomOf="@+id/drawer_lon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
