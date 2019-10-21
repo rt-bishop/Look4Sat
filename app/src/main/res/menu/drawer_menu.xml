@@ -8,9 +8,6 @@
             android:id="@+id/nav_sky"
             android:title="@string/menu_sky" />
         <item
-            android:id="@+id/nav_radar"
-            android:title="@string/menu_radar" />
-        <item
             android:id="@+id/nav_map"
             android:title="@string/menu_map" />
     </group>
@@ -21,9 +18,6 @@
 
     <item android:title="@string/menu_about">
         <menu>
-            <item
-                android:id="@+id/nav_github"
-                android:title="@string/menu_github" />
             <item
                 android:id="@+id/nav_credits"
                 android:title="@string/menu_credits" />

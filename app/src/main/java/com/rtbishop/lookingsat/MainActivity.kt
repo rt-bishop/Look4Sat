@@ -1,10 +1,12 @@
 package com.rtbishop.lookingsat
 
 import android.Manifest
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.Menu
@@ -35,6 +37,7 @@ import java.util.concurrent.TimeUnit
 const val LOCATION_REQ = 101
 const val LOCATION_PERM = Manifest.permission.ACCESS_FINE_LOCATION
 const val GRANTED = PackageManager.PERMISSION_GRANTED
+const val GITHUB_URL = "https://github.com/rt-bishop/LookingSat"
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var preferences: SharedPreferences
     private lateinit var drawerLat: TextView
     private lateinit var drawerLon: TextView
+    private lateinit var drawerSubTitle: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         val header = navView.getHeaderView(0)
         drawerLat = header.findViewById(R.id.drawer_lat_value)
         drawerLon = header.findViewById(R.id.drawer_lon_value)
+        drawerSubTitle = header.findViewById(R.id.drawer_subtitle)
         val navController = findNavController(R.id.nav_host)
 
         appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky), drawerLayout)
@@ -99,6 +104,10 @@ class MainActivity : AppCompatActivity() {
                     timerLayout.visibility = View.GONE
                 }
             }
+        }
+
+        drawerSubTitle.setOnClickListener {
+            openGitHub()
         }
     }
 
@@ -142,6 +151,11 @@ class MainActivity : AppCompatActivity() {
             }
             updateDrawerText()
         }
+    }
+
+    private fun openGitHub() {
+        val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_URL))
+        startActivity(intentGitHub)
     }
 
     private fun checkPermissions() {
