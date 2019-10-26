@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/update_location"
-        android:title="@string/menu_update_location" />
     <item
         android:id="@+id/fetch_trans"
         android:title="@string/menu_fetch_transmitters" />

@@ -47,7 +47,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
     implementation "androidx.work:work-runtime-ktx:$work"
-    implementation "androidx.paging:paging-runtime:$paging"
     implementation "androidx.room:room-runtime:$room"
     implementation "androidx.room:room-ktx:$room"
     kapt "androidx.room:room-compiler:$room"

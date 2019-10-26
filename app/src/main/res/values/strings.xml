@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LookingSat</string>
-    <string name="drawer_header_title">L∞kingSat</string>
-    <string name="drawer_header_subtitle">https://github.com/rt-bishop/LookingSat</string>
+    <string name="title">L∞king</string>
+    <string name="subtitle">S@t</string>
+    <string name="drawer_header_link">https://github.com/rt-bishop/LookingSat</string>
 
     <string name="menu_sky">Sky at a Glance</string>
     <string name="menu_radar">Radar View</string>
@@ -12,14 +14,14 @@
     <string name="menu_credits">Credits</string>
 
     <string name="device_location_summary">Allow the app to get your location</string>
-    <string name="latitude">Latitude:</string>
-    <string name="latitude_def">-30.0000</string>
+    <string name="latitude">Latitude: </string>
+    <string name="latitude_def">-90.0000</string>
     <string name="latitude_summary">Ground station latitude from -90 to 90</string>
-    <string name="longitude">Longitude:</string>
-    <string name="longitude_def">-60.0000</string>
+    <string name="longitude">Longitude: </string>
+    <string name="longitude_def">-180.0000</string>
     <string name="longitude_summary">Ground station longitude from -180 to 180</string>
-    <string name="height">Height:</string>
-    <string name="height_def">64</string>
+    <string name="height">Height AMSL: </string>
+    <string name="height_def">51.0m</string>
     <string name="height_summary">Ground station height in meters AMSL</string>
 
     <string name="menu_update_location">Update location</string>

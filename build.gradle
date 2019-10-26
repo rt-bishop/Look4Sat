@@ -34,8 +34,7 @@ ext {
     navigation = '2.1.0'
     lifecycle = '2.1.0'
     work = '2.2.0'
-    paging = '2.1.0'
-    room = '2.2.0'
+    room = '2.2.1'
 
     retrofit = '2.6.2'
 

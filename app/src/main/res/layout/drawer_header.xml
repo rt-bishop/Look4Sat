@@ -8,92 +8,95 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
-        android:id="@+id/drawer_img"
-        android:layout_width="108dp"
-        android:layout_height="108dp"
-        android:layout_marginStart="16dp"
+        android:id="@+id/drawer_sat_img"
+        android:layout_width="116dp"
+        android:layout_height="116dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:contentDescription="@string/app_name"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_sat_desc_right" />
+        app:srcCompat="@drawable/ic_sat_desc_left" />
 
     <TextView
         android:id="@+id/drawer_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/drawer_header_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/colorDrawerText"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/drawer_subtitle"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_img" />
+        style="@style/DrawerHeader.Title"
+        android:layout_marginStart="8dp"
+        android:text="@string/title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/drawer_sat_img" />
 
     <TextView
         android:id="@+id/drawer_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/drawer_header_subtitle"
-        android:textColor="@color/colorDrawerText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        style="@style/DrawerHeader.Title"
+        android:text="@string/subtitle"
+        app:layout_constraintStart_toStartOf="@+id/drawer_title"
         app:layout_constraintTop_toBottomOf="@+id/drawer_title" />
 
     <TextView
         android:id="@+id/drawer_lat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/DrawerHeader.Item"
         android:text="@string/latitude"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/colorDrawerText"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_lat_value"
-        app:layout_constraintStart_toStartOf="@+id/drawer_lat_value"
-        app:layout_constraintTop_toTopOf="@+id/drawer_img" />
+        app:layout_constraintBottom_toTopOf="@+id/drawer_lon_value"
+        app:layout_constraintStart_toStartOf="@+id/drawer_lon" />
 
     <TextView
         android:id="@+id/drawer_lat_value"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/DrawerHeader.Value"
+        android:layout_marginStart="8dp"
         android:text="@string/latitude_def"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/colorDrawerText"
-        android:textSize="26sp"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_lon"
-        app:layout_constraintStart_toStartOf="@+id/drawer_lon"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_lat" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/drawer_lat"
+        app:layout_constraintStart_toEndOf="@+id/drawer_lat" />
 
     <TextView
         android:id="@+id/drawer_lon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/DrawerHeader.Item"
         android:text="@string/longitude"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/colorDrawerText"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_lon_value"
-        app:layout_constraintStart_toStartOf="@+id/drawer_lon_value"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_lat_value" />
+        app:layout_constraintBottom_toTopOf="@+id/drawer_height_value"
+        app:layout_constraintStart_toStartOf="@+id/drawer_height" />
 
     <TextView
         android:id="@+id/drawer_lon_value"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/DrawerHeader.Value"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="16dp"
         android:text="@string/longitude_def"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/colorDrawerText"
-        android:textSize="26sp"
-        app:layout_constraintBottom_toBottomOf="@+id/drawer_img"
+        app:layout_constraintBaseline_toBaselineOf="@+id/drawer_lon"
+        app:layout_constraintStart_toEndOf="@+id/drawer_lon" />
+
+    <TextView
+        android:id="@+id/drawer_height"
+        style="@style/DrawerHeader.Item"
+        android:layout_marginBottom="8dp"
+        android:text="@string/height"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_link"
+        app:layout_constraintStart_toStartOf="@+id/drawer_link" />
+
+    <TextView
+        android:id="@+id/drawer_height_value"
+        style="@style/DrawerHeader.Value"
+        android:layout_marginStart="8dp"
+        android:text="@string/height_def"
+        app:layout_constraintBaseline_toBaselineOf="@+id/drawer_height"
+        app:layout_constraintStart_toEndOf="@+id/drawer_height" />
+
+    <ImageView
+        android:id="@+id/drawer_get_location"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="32dp"
+        android:contentDescription="@string/placeholder"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_height_value"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/drawer_img"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_lon" />
+        app:layout_constraintTop_toTopOf="@+id/drawer_lat_value"
+        app:srcCompat="@drawable/ic_location" />
+
+    <TextView
+        android:id="@+id/drawer_link"
+        style="@style/DrawerHeader"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/drawer_header_link"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

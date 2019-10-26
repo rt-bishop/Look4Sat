@@ -24,11 +24,6 @@
         tools:layout="@layout/fragment_worldmap" />
 
     <fragment
-        android:id="@+id/nav_settings"
-        android:name="com.rtbishop.lookingsat.ui.SettingsFragment"
-        android:label="@string/menu_settings" />
-
-    <fragment
         android:id="@+id/nav_credits"
         android:name="com.rtbishop.lookingsat.ui.CreditsFragment"
         android:label="@string/menu_credits"

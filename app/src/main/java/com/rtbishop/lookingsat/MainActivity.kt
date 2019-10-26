@@ -12,6 +12,7 @@ import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -49,7 +50,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var preferences: SharedPreferences
     private lateinit var drawerLat: TextView
     private lateinit var drawerLon: TextView
+    private lateinit var drawerHeight: TextView
     private lateinit var drawerSubTitle: TextView
+    private lateinit var drawerGetLocation: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,12 +60,7 @@ class MainActivity : AppCompatActivity() {
         setupComponents()
         setupNavigation()
         setupTimer()
-        updateDrawerText()
-    }
-
-    private fun updateDrawerText() {
-        drawerLat.text = preferences.getString("LATITUDE", "-180.0000")?.substring(0, 9)
-        drawerLon.text = preferences.getString("LONGITUDE", "-60.0000")?.substring(0, 9)
+        updateDrawerValues()
     }
 
     private fun setupComponents() {
@@ -82,7 +80,9 @@ class MainActivity : AppCompatActivity() {
         val header = navView.getHeaderView(0)
         drawerLat = header.findViewById(R.id.drawer_lat_value)
         drawerLon = header.findViewById(R.id.drawer_lon_value)
-        drawerSubTitle = header.findViewById(R.id.drawer_subtitle)
+        drawerHeight = header.findViewById(R.id.drawer_height_value)
+        drawerSubTitle = header.findViewById(R.id.drawer_link)
+        drawerGetLocation = header.findViewById(R.id.drawer_get_location)
         val navController = findNavController(R.id.nav_host)
 
         appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky), drawerLayout)
@@ -108,6 +108,10 @@ class MainActivity : AppCompatActivity() {
 
         drawerSubTitle.setOnClickListener {
             openGitHub()
+        }
+
+        drawerGetLocation.setOnClickListener {
+            updateLocation()
         }
     }
 
@@ -138,27 +142,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateLocation() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            val currentLat = location?.latitude
-            val currentLon = location?.longitude
-            val currentHeight = location?.altitude
-
-            preferences.edit {
-                putString("LATITUDE", currentLat.toString())
-                putString("LONGITUDE", currentLon.toString())
-                putString("HEIGHT", currentHeight.toString())
-                apply()
-            }
-            updateDrawerText()
-        }
-    }
-
-    private fun openGitHub() {
-        val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_URL))
-        startActivity(intentGitHub)
-    }
-
-    private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, LOCATION_PERM) != GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, LOCATION_PERM)) {
                 Toast.makeText(this, "Missing permissions", Toast.LENGTH_LONG).show()
@@ -166,8 +149,39 @@ class MainActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(LOCATION_PERM), LOCATION_REQ)
             }
         } else {
-            updateLocation()
+            getPreciseLocation()
         }
+    }
+
+    private fun getPreciseLocation() {
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+            val lat = location?.latitude ?: 0.0
+            val lon = location?.longitude ?: 0.0
+            val height = location?.altitude ?: 0.0
+
+            preferences.edit {
+                putDouble("LATITUDE", lat)
+                putDouble("LONGITUDE", lon)
+                putDouble("HEIGHT", height)
+                apply()
+            }
+            updateDrawerValues()
+        }
+    }
+
+    private fun updateDrawerValues() {
+        val lat = preferences.getDouble("LATITUDE", 0.0)
+        val lon = preferences.getDouble("LONGITUDE", 0.0)
+        val height = preferences.getDouble("HEIGHT", 0.0)
+
+        drawerLat.text = String.format("%.4f", lat)
+        drawerLon.text = String.format("%.4f", lon)
+        drawerHeight.text = String.format("%.1fm", height)
+    }
+
+    private fun openGitHub() {
+        val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_URL))
+        startActivity(intentGitHub)
     }
 
     override fun onRequestPermissionsResult(
@@ -178,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             LOCATION_REQ -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == GRANTED) {
-                    updateLocation()
+                    getPreciseLocation()
                 }
             }
         }
@@ -196,7 +210,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.update_location -> checkPermissions()
             R.id.fetch_trans -> Toast.makeText(this, "Fetch transmit", Toast.LENGTH_SHORT).show()
             R.id.save_to_db -> Toast.makeText(this, "Saving to DB", Toast.LENGTH_SHORT).show()
             R.id.load_from_db -> Toast.makeText(this, "Loading from DB", Toast.LENGTH_SHORT).show()
@@ -207,3 +220,9 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 }
+
+fun SharedPreferences.Editor.putDouble(key: String, double: Double): SharedPreferences.Editor =
+    putLong(key, java.lang.Double.doubleToRawLongBits(double))
+
+fun SharedPreferences.getDouble(key: String, default: Double) =
+    java.lang.Double.longBitsToDouble(getLong(key, java.lang.Double.doubleToRawLongBits(default)))
