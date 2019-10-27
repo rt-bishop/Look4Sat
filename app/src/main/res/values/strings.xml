@@ -7,24 +7,18 @@
 
     <string name="menu_sky">Sky at a Glance</string>
     <string name="menu_radar">Radar View</string>
-    <string name="menu_map">Map View</string>
-    <string name="menu_settings">Settings</string>
-    <string name="menu_about">About the App</string>
-    <string name="menu_github">Go to GitHub</string>
+    <string name="menu_single_sat">Single Sat Passes</string>
+    <string name="menu_map">World Map View</string>
     <string name="menu_credits">Credits</string>
+    <string name="menu_about">About the App</string>
 
-    <string name="device_location_summary">Allow the app to get your location</string>
     <string name="latitude">Latitude: </string>
-    <string name="latitude_def">-90.0000</string>
-    <string name="latitude_summary">Ground station latitude from -90 to 90</string>
+    <string name="latitude_def">51.5074</string>
     <string name="longitude">Longitude: </string>
-    <string name="longitude_def">-180.0000</string>
-    <string name="longitude_summary">Ground station longitude from -180 to 180</string>
+    <string name="longitude_def">0.1278</string>
     <string name="height">Height AMSL: </string>
-    <string name="height_def">51.0m</string>
-    <string name="height_summary">Ground station height in meters AMSL</string>
+    <string name="height_def">48.0m</string>
 
-    <string name="menu_update_location">Update location</string>
     <string name="menu_fetch_transmitters">Fetch Transmitters</string>
     <string name="menu_save_to_db">Save to DB</string>
     <string name="menu_load_from_db">Load from DB</string>
@@ -32,7 +26,9 @@
     <string name="menu_load_tle">Load TLE</string>
     <string name="menu_exit">Exit</string>
 
-    <string name="next_aos_pattern">Next AOS in %02d:%02d:%02d</string>
+    <string name="next_aos_pattern">AOS in %02d:%02d:%02d</string>
+    <string name="drawer_locator">Drawer Locator</string>
     <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
+    <string name="about">About</string>
 </resources>

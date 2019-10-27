@@ -8,16 +8,21 @@
             android:id="@+id/nav_sky"
             android:title="@string/menu_sky" />
         <item
+            android:id="@+id/nav_single_sat"
+            android:title="@string/menu_single_sat" />
+        <item
             android:id="@+id/nav_map"
             android:title="@string/menu_map" />
     </group>
 
-    <item android:title="@string/menu_about">
+    <item android:title="@string/about">
         <menu>
             <item
                 android:id="@+id/nav_credits"
                 android:title="@string/menu_credits" />
+            <item
+                android:id="@+id/nav_about"
+                android:title="@string/menu_about" />
         </menu>
     </item>
-
 </menu>

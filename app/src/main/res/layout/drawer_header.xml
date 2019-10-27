@@ -9,10 +9,10 @@
 
     <ImageView
         android:id="@+id/drawer_sat_img"
-        android:layout_width="116dp"
-        android:layout_height="116dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/app_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,9 +21,8 @@
     <TextView
         android:id="@+id/drawer_title"
         style="@style/DrawerHeader.Title"
-        android:layout_marginStart="8dp"
         android:text="@string/title"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/drawer_lat"
         app:layout_constraintTop_toTopOf="@+id/drawer_sat_img" />
 
     <TextView
@@ -81,13 +80,15 @@
 
     <ImageView
         android:id="@+id/drawer_get_location"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="32dp"
-        android:contentDescription="@string/placeholder"
-        app:layout_constraintBottom_toBottomOf="@+id/drawer_height_value"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/drawer_lat_value"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/drawer_locator"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_lat"
+        app:layout_constraintEnd_toStartOf="@+id/drawer_sat_img"
+        app:layout_constraintStart_toEndOf="@+id/drawer_subtitle"
+        app:layout_constraintTop_toTopOf="@+id/drawer_subtitle"
         app:srcCompat="@drawable/ic_location" />
 
     <TextView

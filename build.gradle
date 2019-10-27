@@ -25,6 +25,7 @@ task clean(type: Delete) {
 }
 
 ext {
+    material = '1.2.0-alpha01'
     supportLib = '1.0.0'
     constraintLayout = '1.1.3'
 

@@ -1,10 +1,15 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
+    <style name="AppTheme" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">@color/brandLight</item>
+        <item name="colorSecondary">@color/brandLight</item>
+        <item name="colorSurface">@color/surfaceDark</item>
+        <item name="colorError">@color/colorError</item>
+
+        <item name="colorOnPrimary">@color/textOnLight</item>
+        <item name="colorOnSecondary">@color/textOnLight</item>
+        <item name="colorOnSurface">@color/textOnDark</item>
+        <item name="colorOnError">@color/textOnDark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -16,22 +21,19 @@
     <style name="DrawerHeader">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/colorDrawerText</item>
+        <item name="android:textColor">@color/textOnDark</item>
     </style>
 
     <style name="DrawerHeader.Title">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
-        <item name="android:textSize">32sp</item>
-    </style>
-
-    <style name="DrawerHeader.Item">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">36sp</item>
     </style>
 
     <style name="DrawerHeader.Value">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">27sp</item>
+    </style>
+
+    <style name="DrawerHeader.Item">
+        <item name="android:textSize">18sp</item>
     </style>
 
 </resources>

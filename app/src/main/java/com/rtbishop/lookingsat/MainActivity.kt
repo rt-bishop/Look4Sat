@@ -12,6 +12,7 @@ import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         drawerGetLocation = header.findViewById(R.id.drawer_get_location)
         val navController = findNavController(R.id.nav_host)
 
-        appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky), drawerLayout)
+        appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky, R.id.nav_single_sat), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfig)
         navView.setupWithNavController(navController)
 
@@ -110,8 +111,11 @@ class MainActivity : AppCompatActivity() {
             openGitHub()
         }
 
+        drawerGetLocation.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse))
         drawerGetLocation.setOnClickListener {
+            it.isEnabled = false
             updateLocation()
+            it.postDelayed({ it.isEnabled = true }, 3600)
         }
     }
 
@@ -155,9 +159,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun getPreciseLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            val lat = location?.latitude ?: 0.0
-            val lon = location?.longitude ?: 0.0
-            val height = location?.altitude ?: 0.0
+            val lat = location?.latitude ?: 51.5074
+            val lon = location?.longitude ?: 0.1278
+            val height = location?.altitude ?: 48.0
 
             preferences.edit {
                 putDouble("LATITUDE", lat)
@@ -166,13 +170,14 @@ class MainActivity : AppCompatActivity() {
                 apply()
             }
             updateDrawerValues()
+            Toast.makeText(this, "Location was set", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun updateDrawerValues() {
-        val lat = preferences.getDouble("LATITUDE", 0.0)
-        val lon = preferences.getDouble("LONGITUDE", 0.0)
-        val height = preferences.getDouble("HEIGHT", 0.0)
+        val lat = preferences.getDouble("LATITUDE", 51.5074)
+        val lon = preferences.getDouble("LONGITUDE", 0.1278)
+        val height = preferences.getDouble("HEIGHT", 48.0)
 
         drawerLat.text = String.format("%.4f", lat)
         drawerLon.text = String.format("%.4f", lon)

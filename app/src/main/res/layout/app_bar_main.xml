@@ -13,8 +13,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary">
+            android:layout_height="?attr/actionBarSize">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/timer_layout"
@@ -28,10 +27,9 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/next_aos_pattern"
-                    android:textSize="24sp"
+                    android:textSize="32sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

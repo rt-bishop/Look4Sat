@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#000020</color>
-    <color name="colorPrimaryDark">#000010</color>
-    <color name="colorAccent">#C0C0C0</color>
-
-    <color name="colorDrawerText">#C0C0C0</color>
-    <color name="colorBackground">#212121</color>
+    <color name="brandLight">#FFE082</color>
+    <color name="textOnLight">#101010</color>
+    <color name="surfaceDark">#080808</color>
+    <color name="textOnDark">#C0C0C0</color>
+    <color name="colorError">#800000</color>
 </resources>
