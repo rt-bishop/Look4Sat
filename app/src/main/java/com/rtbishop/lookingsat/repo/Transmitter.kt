@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName
 data class Transmitter(
     @PrimaryKey @SerializedName("uuid") val uuid: String,
     @SerializedName("description") val description: String,
+    @SerializedName("alive") val isAlive: Boolean,
     @SerializedName("uplink_low") val uplinkLow: Long?,
     @SerializedName("uplink_high") val uplinkHigh: Long?,
     @SerializedName("downlink_low") val downlinkLow: Long?,
