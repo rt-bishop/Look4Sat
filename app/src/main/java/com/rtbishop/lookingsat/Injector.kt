@@ -37,6 +37,6 @@ object Injector {
     }
 
     private fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
-        return ViewModelFactory(provideRepository(context))
+        return ViewModelFactory(context, provideRepository(context))
     }
 }
