@@ -1,4 +1,4 @@
-package com.rtbishop.lookingsat
+package com.rtbishop.lookingsat.ui
 
 import android.Manifest
 import android.content.Intent
@@ -33,6 +33,8 @@ import androidx.preference.PreferenceManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
+import com.rtbishop.lookingsat.R
+import com.rtbishop.lookingsat.vm.MainViewModel
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -86,7 +88,12 @@ class MainActivity : AppCompatActivity() {
         drawerGetLocation = header.findViewById(R.id.drawer_get_location)
         val navController = findNavController(R.id.nav_host)
 
-        appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky, R.id.nav_single_sat), drawerLayout)
+        appBarConfig = AppBarConfiguration(
+            setOf(
+                R.id.nav_sky,
+                R.id.nav_single_sat
+            ), drawerLayout
+        )
         setupActionBarWithNavController(navController, appBarConfig)
         navView.setupWithNavController(navController)
 
@@ -111,7 +118,12 @@ class MainActivity : AppCompatActivity() {
             openGitHub()
         }
 
-        drawerGetLocation.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse))
+        drawerGetLocation.startAnimation(
+            AnimationUtils.loadAnimation(
+                this,
+                R.anim.pulse
+            )
+        )
         drawerGetLocation.setOnClickListener {
             it.isEnabled = false
             updateLocation()
@@ -146,11 +158,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateLocation() {
-        if (ContextCompat.checkSelfPermission(this, LOCATION_PERM) != GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, LOCATION_PERM)) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                LOCATION_PERM
+            ) != GRANTED
+        ) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    LOCATION_PERM
+                )
+            ) {
                 Toast.makeText(this, "Missing permissions", Toast.LENGTH_LONG).show()
             } else {
-                ActivityCompat.requestPermissions(this, arrayOf(LOCATION_PERM), LOCATION_REQ)
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(LOCATION_PERM),
+                    LOCATION_REQ
+                )
             }
         } else {
             getPreciseLocation()

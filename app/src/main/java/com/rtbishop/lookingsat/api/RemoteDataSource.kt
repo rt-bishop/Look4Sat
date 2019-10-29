@@ -10,6 +10,7 @@ private const val TLE_AMATEUR = "https://celestrak.com/NORAD/elements/amateur.tx
 private const val TLE_WEATHER = "https://celestrak.com/NORAD/elements/weather.txt"
 
 class RemoteDataSource(private val api: TransmittersApi, private val client: OkHttpClient) {
+
     private val requestAmateur = Request.Builder().url(TLE_AMATEUR).build()
     private val requestWeather = Request.Builder().url(TLE_WEATHER).build()
 

@@ -1,3 +1,9 @@
 package com.rtbishop.lookingsat.repo
 
-class Repository
+import com.rtbishop.lookingsat.api.RemoteDataSource
+import com.rtbishop.lookingsat.db.LocalDataSource
+
+class Repository(
+    private val localSource: LocalDataSource,
+    private val remoteSource: RemoteDataSource
+)
