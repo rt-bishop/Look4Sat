@@ -1,9 +1,7 @@
 package com.rtbishop.lookingsat.repo
 
-import android.util.Log
 import com.rtbishop.lookingsat.api.RemoteDataSource
 import com.rtbishop.lookingsat.db.LocalDataSource
-import java.io.IOException
 import java.io.InputStream
 
 class Repository(
@@ -15,11 +13,7 @@ class Repository(
     }
 
     suspend fun updateTransmittersDatabase() {
-        try {
-            localSource.insertTransmitters(remoteSource.fetchTransmittersList())
-        } catch (exception: IOException) {
-            Log.d(this.javaClass.simpleName, exception.toString())
-        }
+        localSource.insertTransmitters(remoteSource.fetchTransmittersList())
     }
 
     suspend fun getTransmittersForSat(id: Int): List<Transmitter> {

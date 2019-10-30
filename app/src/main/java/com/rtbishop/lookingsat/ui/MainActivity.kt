@@ -2,10 +2,8 @@ package com.rtbishop.lookingsat.ui
 
 import android.Manifest
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -21,7 +19,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
@@ -29,28 +26,23 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
 import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.vm.MainViewModel
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-const val LOCATION_REQ = 101
-const val LOCATION_PERM = Manifest.permission.ACCESS_FINE_LOCATION
-const val GRANTED = PackageManager.PERMISSION_GRANTED
-const val GITHUB_URL = "https://github.com/rt-bishop/LookingSat"
-
 class MainActivity : AppCompatActivity() {
+
+    private val permLocationCode = 101
+    private val permLocation = Manifest.permission.ACCESS_FINE_LOCATION
+    private val permGranted = PackageManager.PERMISSION_GRANTED
+    private val githubUrl = "https://github.com/rt-bishop/LookingSat"
 
     private lateinit var appBarConfig: AppBarConfiguration
     private lateinit var viewModel: MainViewModel
     private lateinit var timerLayout: ConstraintLayout
     private lateinit var timeToAos: TextView
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var preferences: SharedPreferences
     private lateinit var drawerLat: TextView
     private lateinit var drawerLon: TextView
     private lateinit var drawerHeight: TextView
@@ -61,39 +53,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupComponents()
-        setupNavigation()
+        setupDrawer()
         setupTimer()
-        updateDrawerValues()
+        updateLocation()
     }
 
     private fun setupComponents() {
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
         timerLayout = findViewById(R.id.timer_layout)
         timeToAos = findViewById(R.id.time_to_aos)
-    }
 
-    private fun setupNavigation() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val header = navView.getHeaderView(0)
+
         drawerLat = header.findViewById(R.id.drawer_lat_value)
         drawerLon = header.findViewById(R.id.drawer_lon_value)
         drawerHeight = header.findViewById(R.id.drawer_height_value)
         drawerSubTitle = header.findViewById(R.id.drawer_link)
         drawerGetLocation = header.findViewById(R.id.drawer_get_location)
-        val navController = findNavController(R.id.nav_host)
 
-        appBarConfig = AppBarConfiguration(
-            setOf(
-                R.id.nav_sky,
-                R.id.nav_single_sat
-            ), drawerLayout
-        )
+        val navController = findNavController(R.id.nav_host)
+        appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky, R.id.nav_single_sat), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfig)
         navView.setupWithNavController(navController)
 
@@ -113,22 +97,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
-        drawerSubTitle.setOnClickListener {
-            openGitHub()
-        }
+    private fun setupDrawer() {
+        drawerSubTitle.setOnClickListener { goToGithub() }
 
-        drawerGetLocation.startAnimation(
-            AnimationUtils.loadAnimation(
-                this,
-                R.anim.pulse
-            )
-        )
+        drawerGetLocation.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse))
         drawerGetLocation.setOnClickListener {
             it.isEnabled = false
             updateLocation()
             it.postDelayed({ it.isEnabled = true }, 3600)
         }
+
+        viewModel.gsp.observe(this, androidx.lifecycle.Observer { gsp ->
+            drawerLat.text = String.format("%.4f", gsp.latitude)
+            drawerLon.text = String.format("%.4f", gsp.longitude)
+            drawerHeight.text = String.format("%.1fm", gsp.heightAMSL)
+        })
     }
 
     private fun setupTimer() {
@@ -158,69 +143,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateLocation() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                LOCATION_PERM
-            ) != GRANTED
-        ) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    LOCATION_PERM
-                )
-            ) {
+        if (ContextCompat.checkSelfPermission(this, permLocation) != permGranted) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permLocation)) {
                 Toast.makeText(this, "Missing permissions", Toast.LENGTH_LONG).show()
             } else {
-                ActivityCompat.requestPermissions(
-                    this, arrayOf(LOCATION_PERM),
-                    LOCATION_REQ
-                )
+                ActivityCompat.requestPermissions(this, arrayOf(permLocation), permLocationCode)
             }
         } else {
-            getPreciseLocation()
+            viewModel.updateLocation()
         }
     }
 
-    private fun getPreciseLocation() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            val lat = location?.latitude ?: 51.5074
-            val lon = location?.longitude ?: 0.1278
-            val height = location?.altitude ?: 48.0
-
-            preferences.edit {
-                putDouble("LATITUDE", lat)
-                putDouble("LONGITUDE", lon)
-                putDouble("HEIGHT", height)
-                apply()
-            }
-            updateDrawerValues()
-            Toast.makeText(this, "Location was set", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun updateDrawerValues() {
-        val lat = preferences.getDouble("LATITUDE", 51.5074)
-        val lon = preferences.getDouble("LONGITUDE", 0.1278)
-        val height = preferences.getDouble("HEIGHT", 48.0)
-
-        drawerLat.text = String.format("%.4f", lat)
-        drawerLon.text = String.format("%.4f", lon)
-        drawerHeight.text = String.format("%.1fm", height)
-    }
-
-    private fun openGitHub() {
-        val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_URL))
+    private fun goToGithub() {
+        val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
         startActivity(intentGitHub)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            LOCATION_REQ -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == GRANTED) {
-                    getPreciseLocation()
+    private fun exit() {
+        finish()
+    }
+
+    override fun onRequestPermissionsResult(reqCode: Int, perms: Array<out String>, res: IntArray) {
+        when (reqCode) {
+            permLocationCode -> {
+                if (res.isNotEmpty() && res[0] == permGranted) {
+                    viewModel.updateLocation()
                 }
             }
         }
@@ -238,19 +185,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.fetch_trans -> Toast.makeText(this, "Fetch transmit", Toast.LENGTH_SHORT).show()
-            R.id.save_to_db -> Toast.makeText(this, "Saving to DB", Toast.LENGTH_SHORT).show()
-            R.id.load_from_db -> Toast.makeText(this, "Loading from DB", Toast.LENGTH_SHORT).show()
-            R.id.fetch_tle -> Toast.makeText(this, "Fetching TLE", Toast.LENGTH_SHORT).show()
-            R.id.load_tle -> Toast.makeText(this, "Loading TLE", Toast.LENGTH_SHORT).show()
-            R.id.action_exit -> finish()
+            R.id.menu_refresh -> Toast.makeText(this, "Refresh", Toast.LENGTH_SHORT).show()
         }
         return super.onOptionsItemSelected(item)
     }
 }
-
-fun SharedPreferences.Editor.putDouble(key: String, double: Double): SharedPreferences.Editor =
-    putLong(key, java.lang.Double.doubleToRawLongBits(double))
-
-fun SharedPreferences.getDouble(key: String, default: Double) =
-    java.lang.Double.longBitsToDouble(getLong(key, java.lang.Double.doubleToRawLongBits(default)))

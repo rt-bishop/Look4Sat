@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/fetch_trans"
-        android:title="@string/menu_fetch_transmitters" />
-    <item
-        android:id="@+id/save_to_db"
-        android:title="@string/menu_save_to_db" />
-    <item
-        android:id="@+id/load_from_db"
-        android:title="@string/menu_load_from_db" />
-    <item
-        android:id="@+id/fetch_tle"
-        android:title="@string/menu_fetch_tle" />
-    <item
-        android:id="@+id/load_tle"
-        android:title="@string/menu_load_tle" />
-    <item
-        android:id="@+id/action_exit"
-        android:title="@string/menu_exit" />
+        android:id="@+id/menu_refresh"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/menu_refresh"
+        app:showAsAction="always" />
 </menu>
