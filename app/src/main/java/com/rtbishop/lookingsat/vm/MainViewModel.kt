@@ -1,7 +1,11 @@
 package com.rtbishop.lookingsat.vm
 
-import android.content.Context
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import com.rtbishop.lookingsat.Injector
 import com.rtbishop.lookingsat.repo.Repository
 
-class MainViewModel(private val context: Context, private val repository: Repository) : ViewModel()
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private var repository: Repository = Injector.provideRepository(application)
+}
