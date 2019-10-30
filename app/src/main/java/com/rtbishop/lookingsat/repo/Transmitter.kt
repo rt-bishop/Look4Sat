@@ -13,7 +13,7 @@ data class Transmitter(
     @SerializedName("uplink_high") val uplinkHigh: Long?,
     @SerializedName("downlink_low") val downlinkLow: Long?,
     @SerializedName("downlink_high") val downlinkHigh: Long?,
-    @SerializedName("mode") val mode: String,
+    @SerializedName("mode") val mode: String?,
     @SerializedName("invert") val isInverted: Boolean,
     @SerializedName("norad_cat_id") val noradCatId: Int
 )

@@ -18,16 +18,12 @@ object Injector {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(TransmittersApi::class.java)
-
         val client = OkHttpClient()
-
         return RemoteDataSource(api, client)
     }
 
     private fun provideLocalDataSource(context: Context): LocalDataSource {
-        val dao = TransmittersDatabase.getInstance(context).transmittersDao()
-
-        return LocalDataSource(dao)
+        return LocalDataSource(TransmittersDatabase.getInstance(context).transmittersDao())
     }
 
     fun provideRepository(context: Context): Repository {

@@ -19,7 +19,7 @@ abstract class TransmittersDatabase : RoomDatabase() {
         fun getInstance(context: Context): TransmittersDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
-                    context.applicationContext,
+                    context,
                     TransmittersDatabase::class.java,
                     "transmitters"
                 ).build()

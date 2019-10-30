@@ -4,8 +4,8 @@ import com.rtbishop.lookingsat.repo.Transmitter
 
 class LocalDataSource(private val transmittersDao: TransmittersDao) {
 
-    suspend fun insert(transmitters: List<Transmitter>) {
-        transmittersDao.insert(transmitters)
+    suspend fun insertTransmitters(transmitters: List<Transmitter>) {
+        transmittersDao.insertTransmitters(transmitters)
     }
 
     suspend fun getTransmittersForSat(id: Int): List<Transmitter> {

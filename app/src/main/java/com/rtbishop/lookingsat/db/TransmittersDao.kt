@@ -10,8 +10,8 @@ import com.rtbishop.lookingsat.repo.Transmitter
 interface TransmittersDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(transmitters: List<Transmitter>)
+    suspend fun insertTransmitters(transmitters: List<Transmitter>)
 
-    @Query("SELECT * FROM transmitters WHERE noradCatId = :id")
+    @Query("SELECT * FROM transmitters WHERE isAlive = 1 and noradCatId = :id")
     suspend fun getTransmittersForSat(id: Int): List<Transmitter>
 }
