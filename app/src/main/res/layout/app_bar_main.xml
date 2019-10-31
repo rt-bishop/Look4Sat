@@ -22,12 +22,9 @@
 
                 <TextView
                     android:id="@+id/time_to_aos"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    style="@style/ToolbarText"
                     android:layout_marginEnd="16dp"
-                    android:gravity="center"
                     android:text="@string/next_aos_pattern"
-                    android:textSize="30sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

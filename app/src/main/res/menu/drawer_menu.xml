@@ -6,12 +6,15 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_sky"
+            android:icon="@drawable/ic_sky"
             android:title="@string/menu_sky" />
         <item
             android:id="@+id/nav_single_sat"
+            android:icon="@drawable/ic_sat_asc_right"
             android:title="@string/menu_single_sat" />
         <item
             android:id="@+id/nav_map"
+            android:icon="@drawable/ic_map"
             android:title="@string/menu_map" />
     </group>
 
@@ -19,9 +22,11 @@
         <menu>
             <item
                 android:id="@+id/nav_credits"
+                android:icon="@drawable/ic_credits"
                 android:title="@string/menu_credits" />
             <item
                 android:id="@+id/nav_about"
+                android:icon="@drawable/ic_about"
                 android:title="@string/menu_about" />
         </menu>
     </item>

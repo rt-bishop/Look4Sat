@@ -10,8 +10,6 @@ import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -46,8 +44,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerLat: TextView
     private lateinit var drawerLon: TextView
     private lateinit var drawerHeight: TextView
-    private lateinit var drawerSubTitle: TextView
-    private lateinit var drawerGetLocation: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,8 +69,6 @@ class MainActivity : AppCompatActivity() {
         drawerLat = header.findViewById(R.id.drawer_lat_value)
         drawerLon = header.findViewById(R.id.drawer_lon_value)
         drawerHeight = header.findViewById(R.id.drawer_height_value)
-        drawerSubTitle = header.findViewById(R.id.drawer_link)
-        drawerGetLocation = header.findViewById(R.id.drawer_get_location)
 
         val navController = findNavController(R.id.nav_host)
         appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky, R.id.nav_single_sat), drawerLayout)
@@ -100,15 +94,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
-        drawerSubTitle.setOnClickListener { goToGithub() }
-
-        drawerGetLocation.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse))
-        drawerGetLocation.setOnClickListener {
-            it.isEnabled = false
-            updateLocation()
-            it.postDelayed({ it.isEnabled = true }, 3600)
-        }
-
         viewModel.gsp.observe(this, androidx.lifecycle.Observer { gsp ->
             drawerLat.text = String.format("%.4f", gsp.latitude)
             drawerLon.text = String.format("%.4f", gsp.longitude)

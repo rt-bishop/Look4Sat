@@ -25,15 +25,33 @@
     </style>
 
     <style name="DrawerHeader.Title">
-        <item name="android:textSize">36sp</item>
+        <item name="android:textSize">40sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DrawerHeader.Value">
-        <item name="android:textSize">27sp</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DrawerHeader.Item">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">21sp</item>
+        <item name="android:fontFamily">serif</item>
+    </style>
+
+    <style name="DrawerHeader.Button">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:backgroundTint">@color/brandLight</item>
+    </style>
+
+    <style name="ToolbarText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/brandLight</item>
     </style>
 
 </resources>

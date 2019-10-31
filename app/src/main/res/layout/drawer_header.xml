@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/drawer_header_height"
-    android:background="@drawable/drawer_gradient"
+    android:background="@drawable/launcher_background"
     android:gravity="bottom"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
         android:id="@+id/drawer_sat_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_width="108dp"
+        android:layout_height="108dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/app_name"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,14 +22,14 @@
         android:id="@+id/drawer_title"
         style="@style/DrawerHeader.Title"
         android:text="@string/title"
-        app:layout_constraintStart_toStartOf="@+id/drawer_lat"
+        app:layout_constraintStart_toStartOf="@+id/drawer_subtitle"
         app:layout_constraintTop_toTopOf="@+id/drawer_sat_img" />
 
     <TextView
         android:id="@+id/drawer_subtitle"
         style="@style/DrawerHeader.Title"
         android:text="@string/subtitle"
-        app:layout_constraintStart_toStartOf="@+id/drawer_title"
+        app:layout_constraintStart_toStartOf="@+id/drawer_lat"
         app:layout_constraintTop_toBottomOf="@+id/drawer_title" />
 
     <TextView
@@ -65,10 +65,11 @@
     <TextView
         android:id="@+id/drawer_height"
         style="@style/DrawerHeader.Item"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
         android:text="@string/height"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_link"
-        app:layout_constraintStart_toStartOf="@+id/drawer_link" />
+        app:layout_constraintBottom_toTopOf="@+id/drawer_btn_loc"
+        app:layout_constraintStart_toStartOf="@+id/drawer_btn_loc" />
 
     <TextView
         android:id="@+id/drawer_height_value"
@@ -78,26 +79,62 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_height"
         app:layout_constraintStart_toEndOf="@+id/drawer_height" />
 
-    <ImageView
-        android:id="@+id/drawer_get_location"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/drawer_locator"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_lat"
-        app:layout_constraintEnd_toStartOf="@+id/drawer_sat_img"
-        app:layout_constraintStart_toEndOf="@+id/drawer_subtitle"
-        app:layout_constraintTop_toTopOf="@+id/drawer_subtitle"
-        app:srcCompat="@drawable/ic_location" />
-
-    <TextView
-        android:id="@+id/drawer_link"
-        style="@style/DrawerHeader"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/drawer_header_link"
+    <ImageButton
+        android:id="@+id/drawer_btn_loc"
+        style="@style/DrawerHeader.Button"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_location"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/drawer_btn_tle"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/drawer_btn_tle"
+        style="@style/DrawerHeader.Button"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_tle"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_trans"
+        app:layout_constraintEnd_toStartOf="@+id/drawer_btn_trans"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/drawer_btn_loc"
+        app:layout_constraintTop_toTopOf="@+id/drawer_btn_trans" />
+
+    <ImageButton
+        android:id="@+id/drawer_btn_trans"
+        style="@style/DrawerHeader.Button"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_trans"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_exit"
+        app:layout_constraintEnd_toStartOf="@+id/drawer_btn_github"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/drawer_btn_tle"
+        app:layout_constraintTop_toTopOf="@+id/drawer_btn_exit" />
+
+    <ImageButton
+        android:id="@+id/drawer_btn_github"
+        style="@style/DrawerHeader.Button"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_github"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_loc"
+        app:layout_constraintEnd_toStartOf="@+id/drawer_btn_exit"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/drawer_btn_trans"
+        app:layout_constraintTop_toTopOf="@+id/drawer_btn_loc" />
+
+    <ImageButton
+        android:id="@+id/drawer_btn_exit"
+        style="@style/DrawerHeader.Button"
+        android:layout_marginEnd="4dp"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_exit"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_github"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/drawer_btn_github"
+        app:layout_constraintTop_toTopOf="@+id/drawer_btn_github" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
