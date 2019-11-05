@@ -8,7 +8,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath 'com.android.tools.build:gradle:3.5.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -33,7 +33,7 @@ ext {
     preference = '1.1.0'
 
     navigation = '2.1.0'
-    lifecycle = '2.1.0'
+    lifecycle = '2.2.0-rc01'
     work = '2.2.0'
     room = '2.2.1'
 

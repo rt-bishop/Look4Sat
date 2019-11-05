@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
-import android.widget.Toast
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -21,25 +20,38 @@ import java.io.IOException
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val keyLat = "LATITUDE"
+    private val keyLon = "LONGITUDE"
+    private val keyHeight = "HEIGHT"
+
     private val repository: Repository = Injector.provideRepository(application)
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
-    private val _gsp = MutableLiveData<GroundStationPosition>()
+    private val _debugMessage = MutableLiveData("")
+    val debugMessage: LiveData<String> = _debugMessage
+    private val _gsp = MutableLiveData<GroundStationPosition>(
+        GroundStationPosition(
+            preferences.getDouble(keyLat, 0.0),
+            preferences.getDouble(keyLon, 0.0),
+            preferences.getDouble(keyHeight, 0.0)
+        )
+    )
     val gsp: LiveData<GroundStationPosition> = _gsp
 
     fun updateLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            val lat = location?.latitude ?: 51.5074
-            val lon = location?.longitude ?: 0.1278
-            val height = location?.altitude ?: 48.0
+            val lat = location?.latitude ?: 0.0
+            val lon = location?.longitude ?: 0.0
+            val height = location?.altitude ?: 0.0
 
             preferences.edit {
-                putDouble("LATITUDE", lat)
-                putDouble("LONGITUDE", lon)
-                putDouble("HEIGHT", height)
+                putDouble(keyLat, lat)
+                putDouble(keyLon, lon)
+                putDouble(keyHeight, height)
                 apply()
             }
             _gsp.postValue(GroundStationPosition(lat, lon, height))
+            _debugMessage.postValue("Location was updated")
         }
     }
 
@@ -50,9 +62,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 getApplication<Application>().openFileOutput(fileName, Context.MODE_PRIVATE).use {
                     it.write(repository.fetchTleStream().readBytes())
                 }
-                Toast.makeText(getApplication(), "TLE file was updated", Toast.LENGTH_SHORT).show()
+                _debugMessage.postValue("TLE file was updated")
             } catch (exception: IOException) {
-                Toast.makeText(getApplication(), "Could not update TLE", Toast.LENGTH_SHORT).show()
+                _debugMessage.postValue("Couldn't update TLE file")
             }
         }
     }
@@ -61,9 +73,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateTransmittersDatabase()
-                Toast.makeText(getApplication(), "", Toast.LENGTH_SHORT).show()
+                _debugMessage.postValue("Transmitters were updated")
             } catch (exception: IOException) {
-                Toast.makeText(getApplication(), "", Toast.LENGTH_SHORT).show()
+                _debugMessage.postValue("Couldn't update transmitters")
             }
         }
     }

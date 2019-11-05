@@ -10,6 +10,7 @@ import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -44,6 +45,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerLat: TextView
     private lateinit var drawerLon: TextView
     private lateinit var drawerHeight: TextView
+    private lateinit var drawerBtnLoc: ImageButton
+    private lateinit var drawerBtnTle: ImageButton
+    private lateinit var drawerBtnTrans: ImageButton
+    private lateinit var drawerBtnGithub: ImageButton
+    private lateinit var drawerBtnExit: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +57,10 @@ class MainActivity : AppCompatActivity() {
         setupComponents()
         setupDrawer()
         setupTimer()
-        updateLocation()
     }
 
     private fun setupComponents() {
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         timerLayout = findViewById(R.id.timer_layout)
         timeToAos = findViewById(R.id.time_to_aos)
 
@@ -70,6 +75,12 @@ class MainActivity : AppCompatActivity() {
         drawerLon = header.findViewById(R.id.drawer_lon_value)
         drawerHeight = header.findViewById(R.id.drawer_height_value)
 
+        drawerBtnLoc = header.findViewById(R.id.drawer_btn_loc)
+        drawerBtnTle = header.findViewById(R.id.drawer_btn_tle)
+        drawerBtnTrans = header.findViewById(R.id.drawer_btn_trans)
+        drawerBtnGithub = header.findViewById(R.id.drawer_btn_github)
+        drawerBtnExit = header.findViewById(R.id.drawer_btn_exit)
+
         val navController = findNavController(R.id.nav_host)
         appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky, R.id.nav_single_sat), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfig)
@@ -77,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when {
-                destination.id == R.id.nav_sky -> {
+                destination.id == R.id.nav_sky || destination.id == R.id.nav_single_sat -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     toolbar.visibility = View.VISIBLE
                     timerLayout.visibility = View.VISIBLE
@@ -94,11 +105,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
+        viewModel.debugMessage.observe(this, androidx.lifecycle.Observer { debug_message ->
+            if (debug_message != "") {
+                Toast.makeText(this, debug_message, Toast.LENGTH_SHORT).show()
+            }
+        })
+
         viewModel.gsp.observe(this, androidx.lifecycle.Observer { gsp ->
             drawerLat.text = String.format("%.4f", gsp.latitude)
             drawerLon.text = String.format("%.4f", gsp.longitude)
             drawerHeight.text = String.format("%.1fm", gsp.heightAMSL)
         })
+
+        drawerBtnLoc.setOnClickListener { updateLocation() }
+        drawerBtnTle.setOnClickListener { viewModel.updateTwoLineElementFile() }
+        drawerBtnTrans.setOnClickListener { viewModel.updateTransmittersDatabase() }
+        drawerBtnGithub.setOnClickListener {
+            val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
+            startActivity(intentGitHub)
+        }
+        drawerBtnExit.setOnClickListener { finish() }
     }
 
     private fun setupTimer() {
@@ -137,15 +163,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             viewModel.updateLocation()
         }
-    }
-
-    private fun goToGithub() {
-        val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
-        startActivity(intentGitHub)
-    }
-
-    private fun exit() {
-        finish()
     }
 
     override fun onRequestPermissionsResult(reqCode: Int, perms: Array<out String>, res: IntArray) {
