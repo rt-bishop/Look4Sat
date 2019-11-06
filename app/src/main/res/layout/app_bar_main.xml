@@ -16,18 +16,25 @@
             android:layout_height="?attr/actionBarSize">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/timer_layout"
+                android:id="@+id/toolbar_layout_timer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/time_to_aos"
+                    android:id="@+id/toolbar_time_to_aos"
                     style="@style/ToolbarText"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/next_aos_pattern"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/toolbar_btn_refresh"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/toolbar_btn_refresh"
+                    style="@style/ToolbarButton"
+                    android:contentDescription="@string/placeholder"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,15 +1,15 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.MaterialComponents">
-        <item name="colorPrimary">@color/brandLight</item>
-        <item name="colorSecondary">@color/brandLight</item>
-        <item name="colorSurface">@color/surfaceDark</item>
-        <item name="colorError">@color/colorError</item>
+        <item name="colorPrimary">@color/themeAccent</item>
+        <item name="colorSecondary">@color/themeAccent</item>
+        <item name="colorSurface">@color/backgroundDark</item>
+        <item name="colorError">@color/error</item>
 
-        <item name="colorOnPrimary">@color/textOnLight</item>
-        <item name="colorOnSecondary">@color/textOnLight</item>
-        <item name="colorOnSurface">@color/textOnDark</item>
-        <item name="colorOnError">@color/textOnDark</item>
+        <item name="colorOnPrimary">@color/darkOnLight</item>
+        <item name="colorOnSecondary">@color/darkOnLight</item>
+        <item name="colorOnSurface">@color/lightOnDark</item>
+        <item name="colorOnError">@color/lightOnDark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -21,7 +21,7 @@
     <style name="DrawerHeader">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/textOnDark</item>
+        <item name="android:textColor">@color/lightOnDark</item>
     </style>
 
     <style name="DrawerHeader.Title">
@@ -42,16 +42,24 @@
     <style name="DrawerHeader.Button">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:backgroundTint">@color/brandLight</item>
+        <item name="android:backgroundTint">@color/themeAccent</item>
     </style>
 
     <style name="ToolbarText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:text">@string/next_aos_pattern</item>
         <item name="android:textSize">30sp</item>
-        <item name="android:textColor">@color/brandLight</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/themeAccent</item>
+    </style>
+
+    <style name="ToolbarButton">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:src">@drawable/ic_refresh</item>
+        <item name="android:backgroundTint">@color/toolbarButton</item>
     </style>
 
 </resources>

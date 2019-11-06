@@ -7,8 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -61,8 +59,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupComponents() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        timerLayout = findViewById(R.id.timer_layout)
-        timeToAos = findViewById(R.id.time_to_aos)
+        timerLayout = findViewById(R.id.toolbar_layout_timer)
+        timeToAos = findViewById(R.id.toolbar_time_to_aos)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -121,8 +119,7 @@ class MainActivity : AppCompatActivity() {
         drawerBtnTle.setOnClickListener { viewModel.updateTwoLineElementFile() }
         drawerBtnTrans.setOnClickListener { viewModel.updateTransmittersDatabase() }
         drawerBtnGithub.setOnClickListener {
-            val intentGitHub = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
-            startActivity(intentGitHub)
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl)))
         }
         drawerBtnExit.setOnClickListener { finish() }
     }
@@ -178,17 +175,5 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host)
         return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_refresh -> Toast.makeText(this, "Refresh", Toast.LENGTH_SHORT).show()
-        }
-        return super.onOptionsItemSelected(item)
     }
 }
