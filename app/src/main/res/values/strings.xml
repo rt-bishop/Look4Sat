@@ -3,7 +3,13 @@
     <string name="app_name">LookingSat</string>
     <string name="title">L∞king</string>
     <string name="subtitle">S@t</string>
-    <string name="drawer_header_link">https://github.com/rt-bishop/LookingSat</string>
+
+    <string name="drawer_latitude">Latitude: </string>
+    <string name="drawer_latitude_value">51.5074</string>
+    <string name="drawer_longitude">Longitude: </string>
+    <string name="drawer_longitude_value">0.1278</string>
+    <string name="drawer_height">Height AMSL: </string>
+    <string name="drawer_height_value">48.0m</string>
 
     <string name="menu_sky">Sky at a Glance</string>
     <string name="menu_radar">Radar View</string>
@@ -12,17 +18,17 @@
     <string name="menu_credits">Credits</string>
     <string name="menu_about">About the App</string>
 
-    <string name="latitude">Latitude: </string>
-    <string name="latitude_def">51.5074</string>
-    <string name="longitude">Longitude: </string>
-    <string name="longitude_def">0.1278</string>
-    <string name="height">Height AMSL: </string>
-    <string name="height_def">48.0m</string>
+    <string name="toolbar_aos_in">AOS in %02d:%02d:%02d</string>
+    <string name="toolbar_refresh">Refresh</string>
 
-    <string name="menu_refresh">Refresh</string>
+    <string name="card_sat_name">Meteor M2–2</string>
+    <string name="card_pass_vector">V: 180° -> 360°</string>
+    <string name="card_max_el">75.5°</string>
+    <string name="card_pass_aos">AOS -</string>
+    <string name="card_pass_los">LOS -</string>
+    <string name="card_pass_aos_time">13:14:15</string>
+    <string name="card_pass_los_time">16:17:18</string>
 
-    <string name="next_aos_pattern">AOS in %02d:%02d:%02d</string>
-    <string name="drawer_locator">Drawer Locator</string>
     <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
     <string name="about">About</string>

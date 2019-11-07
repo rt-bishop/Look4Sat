@@ -11,18 +11,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
+import com.github.amsacode.predict4java.PassPredictor
+import com.github.amsacode.predict4java.SatPassTime
+import com.github.amsacode.predict4java.TLE
 import com.google.android.gms.location.LocationServices
 import com.rtbishop.lookingsat.Injector
 import com.rtbishop.lookingsat.repo.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.FileNotFoundException
 import java.io.IOException
+import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val keyLat = "LATITUDE"
     private val keyLon = "LONGITUDE"
     private val keyHeight = "HEIGHT"
+    private val tleFile = "tles.txt"
 
     private val repository: Repository = Injector.provideRepository(application)
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
@@ -37,6 +43,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
     )
     val gsp: LiveData<GroundStationPosition> = _gsp
+
+    fun updateRecycler(): MutableList<SatPassTime> {
+        var satPassList = mutableListOf<SatPassTime>()
+        try {
+            val tles = TLE.importSat(getApplication<Application>().openFileInput(tleFile))
+
+            val passPredictor = PassPredictor(tles[0], _gsp.value)
+            satPassList = passPredictor.getPasses(Date(), 6, false)
+        } catch (exception: FileNotFoundException) {
+            _debugMessage.postValue("TLE file wasn't found")
+        }
+        return satPassList
+    }
 
     fun updateLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
@@ -56,10 +75,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateTwoLineElementFile() {
-        val fileName = "tles.txt"
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                getApplication<Application>().openFileOutput(fileName, Context.MODE_PRIVATE).use {
+                getApplication<Application>().openFileOutput(tleFile, Context.MODE_PRIVATE).use {
                     it.write(repository.fetchTleStream().readBytes())
                 }
                 _debugMessage.postValue("TLE file was updated")

@@ -35,7 +35,7 @@
     <TextView
         android:id="@+id/drawer_lat"
         style="@style/DrawerHeader.Item"
-        android:text="@string/latitude"
+        android:text="@string/drawer_latitude"
         app:layout_constraintBottom_toTopOf="@+id/drawer_lon_value"
         app:layout_constraintStart_toStartOf="@+id/drawer_lon" />
 
@@ -43,14 +43,14 @@
         android:id="@+id/drawer_lat_value"
         style="@style/DrawerHeader.Value"
         android:layout_marginStart="8dp"
-        android:text="@string/latitude_def"
+        android:text="@string/drawer_latitude_value"
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_lat"
         app:layout_constraintStart_toEndOf="@+id/drawer_lat" />
 
     <TextView
         android:id="@+id/drawer_lon"
         style="@style/DrawerHeader.Item"
-        android:text="@string/longitude"
+        android:text="@string/drawer_longitude"
         app:layout_constraintBottom_toTopOf="@+id/drawer_height_value"
         app:layout_constraintStart_toStartOf="@+id/drawer_height" />
 
@@ -58,7 +58,7 @@
         android:id="@+id/drawer_lon_value"
         style="@style/DrawerHeader.Value"
         android:layout_marginStart="8dp"
-        android:text="@string/longitude_def"
+        android:text="@string/drawer_longitude_value"
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_lon"
         app:layout_constraintStart_toEndOf="@+id/drawer_lon" />
 
@@ -67,7 +67,7 @@
         style="@style/DrawerHeader.Item"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"
-        android:text="@string/height"
+        android:text="@string/drawer_height"
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_loc"
         app:layout_constraintStart_toStartOf="@+id/drawer_btn_loc" />
 
@@ -75,7 +75,7 @@
         android:id="@+id/drawer_height_value"
         style="@style/DrawerHeader.Value"
         android:layout_marginStart="8dp"
-        android:text="@string/height_def"
+        android:text="@string/drawer_height_value"
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_height"
         app:layout_constraintStart_toEndOf="@+id/drawer_height" />
 

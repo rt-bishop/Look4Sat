@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onTick(millisUntilFinished: Long) {
                 timeToAos.text = String.format(
-                    resources.getString(R.string.next_aos_pattern),
+                    resources.getString(R.string.toolbar_aos_in),
                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
