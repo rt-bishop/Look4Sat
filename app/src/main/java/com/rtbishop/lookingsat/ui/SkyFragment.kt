@@ -63,5 +63,45 @@ class SkyFragment : Fragment() {
                 recView.visibility = View.VISIBLE
             }
         }
+
+        fab.setOnClickListener { showSelectSatDialog() }
+    }
+
+    private var selectedSatList: List<TLE> = emptyList()
+
+    private fun showSelectSatDialog() {
+        val tleList = mutableListOf<TLE>()
+        val listSize = viewModel.tleList.size
+        val satList = arrayOfNulls<String>(listSize)
+        val checkedSatList = BooleanArray(listSize)
+        if (selectedSatList.isEmpty()) {
+            for ((position, tle) in viewModel.tleList.withIndex()) {
+                satList[position] = tle.name
+                checkedSatList[position] = false
+            }
+        }
+
+        val builder = AlertDialog.Builder(activity as MainActivity)
+        builder.setTitle("Select satellites to track")
+
+        builder.setMultiChoiceItems(satList, checkedSatList) { _, which, isChecked ->
+            checkedSatList[which] = isChecked
+        }
+
+        builder.setPositiveButton("Select") { _, _ ->
+            for (index in checkedSatList.indices) {
+                val checked = checkedSatList[index]
+                if (checked) {
+                    tleList.add(viewModel.tleList[index])
+                }
+            }
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 }
