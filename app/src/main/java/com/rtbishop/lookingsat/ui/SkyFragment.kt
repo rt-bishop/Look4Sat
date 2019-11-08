@@ -55,7 +55,7 @@ class SkyFragment : Fragment() {
                 recView.visibility = View.INVISIBLE
                 progressBar.visibility = View.VISIBLE
                 progressBar.isIndeterminate = true
-                satPassList = viewModel.updateRecycler()
+                satPassList = viewModel.getPassesForSelectedSatellites()
                 recAdapter = SatPassAdapter(satPassList)
                 recView.adapter = recAdapter
                 progressBar.isIndeterminate = false
@@ -67,41 +67,43 @@ class SkyFragment : Fragment() {
         fab.setOnClickListener { showSelectSatDialog() }
     }
 
-    private var selectedSatList: List<TLE> = emptyList()
-
     private fun showSelectSatDialog() {
-        val tleList = mutableListOf<TLE>()
-        val listSize = viewModel.tleList.size
-        val satList = arrayOfNulls<String>(listSize)
-        val checkedSatList = BooleanArray(listSize)
-        if (selectedSatList.isEmpty()) {
-            for ((position, tle) in viewModel.tleList.withIndex()) {
-                satList[position] = tle.name
-                checkedSatList[position] = false
+        val tleSelectedMap = viewModel.tleSelectedMap
+        val tleMainListSize = viewModel.tleMainList.size
+
+        val tleNameArray = arrayOfNulls<String>(tleMainListSize)
+        val tleCheckedArray = BooleanArray(tleMainListSize)
+
+        if (tleSelectedMap.isEmpty()) {
+            for ((position, tle) in viewModel.tleMainList.withIndex()) {
+                tleNameArray[position] = tle.name
+                tleCheckedArray[position] = false
+            }
+        } else {
+            for ((position, tle) in viewModel.tleMainList.withIndex()) {
+                tleNameArray[position] = tle.name
+                tleCheckedArray[position] = viewModel.tleSelectedMap.getOrDefault(tle, false)
             }
         }
 
+        val selectionMap = mutableMapOf<TLE, Boolean>()
         val builder = AlertDialog.Builder(activity as MainActivity)
         builder.setTitle("Select satellites to track")
-
-        builder.setMultiChoiceItems(satList, checkedSatList) { _, which, isChecked ->
-            checkedSatList[which] = isChecked
-        }
-
-        builder.setPositiveButton("Select") { _, _ ->
-            for (index in checkedSatList.indices) {
-                val checked = checkedSatList[index]
-                if (checked) {
-                    tleList.add(viewModel.tleList[index])
+            .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
+                selectionMap[viewModel.tleMainList[which]] = isChecked
+            }
+            .setPositiveButton("Ok") { _, _ ->
+                for ((tle, value) in selectionMap) {
+                    tleSelectedMap[tle] = value
                 }
             }
-        }
-
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.cancel()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
+            .setNeutralButton("Clear All") { _, _ ->
+                tleSelectedMap.clear()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.cancel()
+            }
+            .create()
+            .show()
     }
 }

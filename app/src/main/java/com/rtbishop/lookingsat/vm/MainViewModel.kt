@@ -50,7 +50,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     )
     val gsp: LiveData<GroundStationPosition> = _gsp
 
-    var tleList: List<TLE> = loadTwoLineElementFile().sortedWith(compareBy { it.name })
+    var tleMainList = loadTwoLineElementFile().sortedWith(compareBy { it.name })
+    var tleSelectedMap = mutableMapOf<TLE, Boolean>()
 
     private fun loadTwoLineElementFile(): List<TLE> {
         return try {
@@ -61,25 +62,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    suspend fun updateRecycler(): List<SatPass> {
+    suspend fun getPassesForSelectedSatellites(): List<SatPass> {
         val satPassList = mutableListOf<SatPass>()
         var sortedList = listOf<SatPass>()
         withContext(Dispatchers.Default) {
-            for (tle in tleList.subList(0, 1)) {
-                try {
-                    Log.d(tag, "Trying ${tle.name}")
-                    val passPredictor = PassPredictor(tle, gsp.value)
-                    val passes = passPredictor.getPasses(Date(), 6, false)
-                    for (pass in passes) {
-                        Log.d(tag, "Trying ${pass.maxEl}")
-                        satPassList.add(SatPass(tle.name, tle.catnum, pass))
+            for ((tle, value) in tleSelectedMap) {
+                if (value) {
+                    try {
+                        Log.d(tag, "Trying ${tle.name}")
+                        val passPredictor = PassPredictor(tle, gsp.value)
+                        val passes = passPredictor.getPasses(Date(), 6, true)
+                        for (pass in passes) {
+                            Log.d(tag, "Trying ${pass.maxEl}")
+                            satPassList.add(SatPass(tle.name, tle.catnum, pass))
+                        }
+                    } catch (exception: IllegalArgumentException) {
+                        val tleProblem = "There was a problem with TLE"
+                        Log.d(tag, tleProblem)
+                        _debugMessage.postValue(tleProblem)
+                    } catch (exception: SatNotFoundException) {
+                        Log.d(tag, "Certain satellites shall not pass")
                     }
-                } catch (exception: IllegalArgumentException) {
-                    val tleProblem = "There was a problem with TLE"
-                    Log.d(tag, tleProblem)
-                    _debugMessage.postValue(tleProblem)
-                } catch (exception: SatNotFoundException) {
-                    Log.d(tag, "Certain satellites shall not pass")
                 }
             }
             sortedList = satPassList.sortedWith(compareBy { it.pass.startTime })
@@ -111,7 +114,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 getApplication<Application>().openFileOutput(tleFile, Context.MODE_PRIVATE).use {
                     it.write(stream.readBytes())
                 }
-                tleList = TLE.importSat(stream)
+                tleMainList = TLE.importSat(stream)
                 _debugMessage.postValue("TLE file was updated")
             } catch (exception: IOException) {
                 _debugMessage.postValue("Couldn't update TLE file")
