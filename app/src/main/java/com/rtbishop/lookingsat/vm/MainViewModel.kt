@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
+import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -12,13 +13,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.PassPredictor
-import com.github.amsacode.predict4java.SatPassTime
+import com.github.amsacode.predict4java.SatNotFoundException
 import com.github.amsacode.predict4java.TLE
 import com.google.android.gms.location.LocationServices
 import com.rtbishop.lookingsat.Injector
 import com.rtbishop.lookingsat.repo.Repository
+import com.rtbishop.lookingsat.repo.SatPass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
@@ -29,12 +32,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val keyLon = "LONGITUDE"
     private val keyHeight = "HEIGHT"
     private val tleFile = "tles.txt"
+    private val tag = "myTag"
 
     private val repository: Repository = Injector.provideRepository(application)
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
+
     private val _debugMessage = MutableLiveData("")
     val debugMessage: LiveData<String> = _debugMessage
+
     private val _gsp = MutableLiveData<GroundStationPosition>(
         GroundStationPosition(
             preferences.getDouble(keyLat, 0.0),
@@ -44,17 +50,41 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     )
     val gsp: LiveData<GroundStationPosition> = _gsp
 
-    fun updateRecycler(): MutableList<SatPassTime> {
-        var satPassList = mutableListOf<SatPassTime>()
-        try {
-            val tles = TLE.importSat(getApplication<Application>().openFileInput(tleFile))
+    var tleList: List<TLE> = loadTwoLineElementFile().sortedWith(compareBy { it.name })
 
-            val passPredictor = PassPredictor(tles[0], _gsp.value)
-            satPassList = passPredictor.getPasses(Date(), 6, false)
+    private fun loadTwoLineElementFile(): List<TLE> {
+        return try {
+            TLE.importSat(getApplication<Application>().openFileInput(tleFile))
         } catch (exception: FileNotFoundException) {
             _debugMessage.postValue("TLE file wasn't found")
+            emptyList()
         }
-        return satPassList
+    }
+
+    suspend fun updateRecycler(): List<SatPass> {
+        val satPassList = mutableListOf<SatPass>()
+        var sortedList = listOf<SatPass>()
+        withContext(Dispatchers.Default) {
+            for (tle in tleList.subList(0, 1)) {
+                try {
+                    Log.d(tag, "Trying ${tle.name}")
+                    val passPredictor = PassPredictor(tle, gsp.value)
+                    val passes = passPredictor.getPasses(Date(), 6, false)
+                    for (pass in passes) {
+                        Log.d(tag, "Trying ${pass.maxEl}")
+                        satPassList.add(SatPass(tle.name, tle.catnum, pass))
+                    }
+                } catch (exception: IllegalArgumentException) {
+                    val tleProblem = "There was a problem with TLE"
+                    Log.d(tag, tleProblem)
+                    _debugMessage.postValue(tleProblem)
+                } catch (exception: SatNotFoundException) {
+                    Log.d(tag, "Certain satellites shall not pass")
+                }
+            }
+            sortedList = satPassList.sortedWith(compareBy { it.pass.startTime })
+        }
+        return sortedList
     }
 
     fun updateLocation() {
@@ -77,9 +107,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateTwoLineElementFile() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val stream = repository.fetchTleStream()
                 getApplication<Application>().openFileOutput(tleFile, Context.MODE_PRIVATE).use {
-                    it.write(repository.fetchTleStream().readBytes())
+                    it.write(stream.readBytes())
                 }
+                tleList = TLE.importSat(stream)
                 _debugMessage.postValue("TLE file was updated")
             } catch (exception: IOException) {
                 _debugMessage.postValue("Couldn't update TLE file")

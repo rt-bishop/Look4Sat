@@ -5,20 +5,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ProgressBar
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.amsacode.predict4java.TLE
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.lookingsat.R
+import com.rtbishop.lookingsat.repo.SatPass
 import com.rtbishop.lookingsat.vm.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SkyFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var recView: RecyclerView
     private lateinit var recAdapter: RecyclerView.Adapter<*>
-    private lateinit var recLayoutManager: RecyclerView.LayoutManager
     private lateinit var btnRefresh: ImageButton
+    private lateinit var progressBar: ProgressBar
+    private lateinit var fab: FloatingActionButton
+
+    private var satPassList: List<SatPass> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,17 +43,25 @@ class SkyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(activity as MainActivity).get(MainViewModel::class.java)
         btnRefresh = (activity as MainActivity).findViewById(R.id.toolbar_btn_refresh)
+        progressBar = view.findViewById(R.id.sky_progressbar)
+        recView = view.findViewById(R.id.sky_recycler)
+        fab = view.findViewById(R.id.sky_fab)
+
+        recView.layoutManager = LinearLayoutManager(activity)
+        recView.setHasFixedSize(true)
 
         btnRefresh.setOnClickListener {
-            val satPassList = viewModel.updateRecycler()
-
-            recLayoutManager = LinearLayoutManager(activity)
-            recAdapter = SatPassAdapter(satPassList)
-            recView = view.findViewById(R.id.recycler_sky)
-
-            recView.setHasFixedSize(true)
-            recView.layoutManager = recLayoutManager
-            recView.adapter = recAdapter
+            lifecycleScope.launch(Dispatchers.Main) {
+                recView.visibility = View.INVISIBLE
+                progressBar.visibility = View.VISIBLE
+                progressBar.isIndeterminate = true
+                satPassList = viewModel.updateRecycler()
+                recAdapter = SatPassAdapter(satPassList)
+                recView.adapter = recAdapter
+                progressBar.isIndeterminate = false
+                progressBar.visibility = View.INVISIBLE
+                recView.visibility = View.VISIBLE
+            }
         }
     }
 }

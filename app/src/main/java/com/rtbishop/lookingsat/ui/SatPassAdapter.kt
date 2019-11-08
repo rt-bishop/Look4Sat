@@ -5,12 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.github.amsacode.predict4java.SatPassTime
 import com.rtbishop.lookingsat.R
+import com.rtbishop.lookingsat.repo.SatPass
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter(private val satPassList: MutableList<SatPassTime>) :
+class SatPassAdapter(private val satPassList: List<SatPass>) :
     RecyclerView.Adapter<SatPassAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
@@ -27,16 +27,19 @@ class SatPassAdapter(private val satPassList: MutableList<SatPassTime>) :
         val satPass = satPassList[position]
 
         val satName = holder.itemView.findViewById<TextView>(R.id.card_sat_name)
-        val passVector = holder.itemView.findViewById<TextView>(R.id.card_pass_vector)
         val maxEl = holder.itemView.findViewById<TextView>(R.id.card_max_el)
+        val passVector = holder.itemView.findViewById<TextView>(R.id.card_pass_vector)
         val passStart = holder.itemView.findViewById<TextView>(R.id.card_pass_start)
         val passEnd = holder.itemView.findViewById<TextView>(R.id.card_pass_end)
 
-        satName.text = String.format("%s", "Meteor M2-2")
-        passVector.text = String.format("V: %02d° -> %02d°", satPass.aosAzimuth, satPass.losAzimuth)
-        maxEl.text = String.format("%.1f°", satPass.maxEl)
-        passStart.text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.startTime)
-        passEnd.text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.endTime)
+        satName.text = String.format("%s", satPass.satName)
+        maxEl.text = String.format("%.1f°", satPass.pass.maxEl)
+        passVector.text =
+            String.format("V: %02d° -> %02d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
+        passStart.text =
+            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
+        passEnd.text =
+            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.endTime)
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
