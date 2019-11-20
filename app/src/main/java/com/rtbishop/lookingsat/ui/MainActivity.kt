@@ -17,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -85,13 +86,13 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            when {
-                destination.id == R.id.nav_sky || destination.id == R.id.nav_single_sat -> {
+            when (destination.id) {
+                R.id.nav_sky, R.id.nav_single_sat -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     toolbar.visibility = View.VISIBLE
                     timerLayout.visibility = View.VISIBLE
                 }
-                destination.id == R.id.nav_map -> {
+                R.id.nav_map -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                     toolbar.visibility = View.GONE
                 }
@@ -103,13 +104,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
-        viewModel.debugMessage.observe(this, androidx.lifecycle.Observer { debug_message ->
+        viewModel.debugMessage.observe(this, Observer { debug_message ->
             if (debug_message != "") {
                 Toast.makeText(this, debug_message, Toast.LENGTH_SHORT).show()
             }
         })
 
-        viewModel.gsp.observe(this, androidx.lifecycle.Observer { gsp ->
+        viewModel.gsp.observe(this, Observer { gsp ->
             drawerLat.text = String.format("%.4f", gsp.latitude)
             drawerLon.text = String.format("%.4f", gsp.longitude)
             drawerHeight.text = String.format("%.1fm", gsp.heightAMSL)
