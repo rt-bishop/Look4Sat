@@ -1,4 +1,4 @@
-package com.rtbishop.lookingsat.db
+package com.rtbishop.lookingsat.storage
 
 import com.rtbishop.lookingsat.repo.Transmitter
 

@@ -1,4 +1,4 @@
-package com.rtbishop.lookingsat.api
+package com.rtbishop.lookingsat.network
 
 import com.rtbishop.lookingsat.repo.Transmitter
 import retrofit2.http.GET

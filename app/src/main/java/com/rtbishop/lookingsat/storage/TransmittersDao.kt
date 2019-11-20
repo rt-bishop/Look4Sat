@@ -1,4 +1,4 @@
-package com.rtbishop.lookingsat.db
+package com.rtbishop.lookingsat.storage
 
 import androidx.room.Dao
 import androidx.room.Insert

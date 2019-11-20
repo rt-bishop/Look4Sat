@@ -1,7 +1,7 @@
 package com.rtbishop.lookingsat.repo
 
-import com.rtbishop.lookingsat.api.RemoteDataSource
-import com.rtbishop.lookingsat.db.LocalDataSource
+import com.rtbishop.lookingsat.network.RemoteDataSource
+import com.rtbishop.lookingsat.storage.LocalDataSource
 import java.io.InputStream
 
 class Repository(

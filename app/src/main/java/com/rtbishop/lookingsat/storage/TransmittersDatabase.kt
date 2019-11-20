@@ -1,4 +1,4 @@
-package com.rtbishop.lookingsat.db
+package com.rtbishop.lookingsat.storage
 
 import android.content.Context
 import androidx.room.Database
