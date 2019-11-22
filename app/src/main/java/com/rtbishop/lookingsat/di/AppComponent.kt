@@ -1,7 +1,7 @@
 package com.rtbishop.lookingsat.di
 
 import android.content.Context
-import com.rtbishop.lookingsat.ui.MainActivity
+import com.rtbishop.lookingsat.MainViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -15,5 +15,5 @@ interface AppComponent {
         fun create(@BindsInstance context: Context): AppComponent
     }
 
-    fun inject(activity: MainActivity)
+    fun inject(viewModel: MainViewModel)
 }

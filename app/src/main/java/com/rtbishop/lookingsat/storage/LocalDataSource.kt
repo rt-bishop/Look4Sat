@@ -1,8 +1,9 @@
 package com.rtbishop.lookingsat.storage
 
 import com.rtbishop.lookingsat.repo.Transmitter
+import javax.inject.Inject
 
-class LocalDataSource(private val transmittersDao: TransmittersDao) {
+class LocalDataSource @Inject constructor(private val transmittersDao: TransmittersDao) {
 
     suspend fun insertTransmitters(transmitters: List<Transmitter>) {
         transmittersDao.insertTransmitters(transmitters)

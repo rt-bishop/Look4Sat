@@ -3,8 +3,9 @@ package com.rtbishop.lookingsat.repo
 import com.rtbishop.lookingsat.network.RemoteDataSource
 import com.rtbishop.lookingsat.storage.LocalDataSource
 import java.io.InputStream
+import javax.inject.Inject
 
-class Repository(
+class Repository @Inject constructor(
     private val localSource: LocalDataSource,
     private val remoteSource: RemoteDataSource
 ) {

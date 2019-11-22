@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.amsacode.predict4java.TLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.rtbishop.lookingsat.MainViewModel
 import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.repo.SatPass
-import com.rtbishop.lookingsat.vm.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

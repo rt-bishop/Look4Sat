@@ -5,8 +5,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.InputStream
 import java.io.SequenceInputStream
+import javax.inject.Inject
 
-class RemoteDataSource(private val api: TransmittersApi, private val client: OkHttpClient) {
+class RemoteDataSource @Inject constructor(
+    private val api: TransmittersApi,
+    private val client: OkHttpClient
+) {
 
     fun fetchTleStream(): InputStream {
         val requestAmateur =

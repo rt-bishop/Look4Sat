@@ -7,20 +7,20 @@ import androidx.room.RoomDatabase
 import com.rtbishop.lookingsat.repo.Transmitter
 
 @Database(entities = [Transmitter::class], version = 1, exportSchema = false)
-abstract class TransmittersDatabase : RoomDatabase() {
+abstract class TransmittersDb : RoomDatabase() {
 
     abstract fun transmittersDao(): TransmittersDao
 
     companion object {
 
         @Volatile
-        private var INSTANCE: TransmittersDatabase? = null
+        private var INSTANCE: TransmittersDb? = null
 
-        fun getInstance(context: Context): TransmittersDatabase =
+        fun getInstance(context: Context): TransmittersDb =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context,
-                    TransmittersDatabase::class.java,
+                    TransmittersDb::class.java,
                     "transmitters"
                 ).build()
             }

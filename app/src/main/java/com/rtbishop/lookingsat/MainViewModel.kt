@@ -1,4 +1,4 @@
-package com.rtbishop.lookingsat.vm
+package com.rtbishop.lookingsat
 
 import android.app.Application
 import android.content.Context
@@ -16,7 +16,6 @@ import com.github.amsacode.predict4java.PassPredictor
 import com.github.amsacode.predict4java.SatNotFoundException
 import com.github.amsacode.predict4java.TLE
 import com.google.android.gms.location.LocationServices
-import com.rtbishop.lookingsat.Injector
 import com.rtbishop.lookingsat.repo.Repository
 import com.rtbishop.lookingsat.repo.SatPass
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +24,7 @@ import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
+import javax.inject.Inject
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -34,7 +34,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val tleFile = "tles.txt"
     private val tag = "myTag"
 
-    private val repository: Repository = Injector.provideRepository(application)
+    @Inject
+    lateinit var repository: Repository
+
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
@@ -52,6 +54,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var tleMainList = loadTwoLineElementFile().sortedWith(compareBy { it.name })
     var tleSelectedMap = mutableMapOf<TLE, Boolean>()
+
+    init {
+        (application as LookingSatApp).appComponent.inject(this)
+    }
 
     private fun loadTwoLineElementFile(): List<TLE> {
         return try {

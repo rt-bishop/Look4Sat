@@ -25,8 +25,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.rtbishop.lookingsat.MainViewModel
 import com.rtbishop.lookingsat.R
-import com.rtbishop.lookingsat.vm.MainViewModel
 import java.util.*
 import java.util.concurrent.TimeUnit
 
