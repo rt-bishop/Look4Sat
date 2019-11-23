@@ -12,18 +12,13 @@
             android:id="@+id/nav_map"
             android:icon="@drawable/ic_map"
             android:title="@string/menu_map" />
+        <item
+            android:id="@+id/nav_credits"
+            android:icon="@drawable/ic_credits"
+            android:title="@string/menu_credits" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_about"
+            android:title="@string/menu_about" />
     </group>
-
-    <item android:title="@string/about">
-        <menu>
-            <item
-                android:id="@+id/nav_credits"
-                android:icon="@drawable/ic_credits"
-                android:title="@string/menu_credits" />
-            <item
-                android:id="@+id/nav_about"
-                android:icon="@drawable/ic_about"
-                android:title="@string/menu_about" />
-        </menu>
-    </item>
 </menu>

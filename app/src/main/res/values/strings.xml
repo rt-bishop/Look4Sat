@@ -8,17 +8,18 @@
     <string name="drawer_latitude_value">51.5074</string>
     <string name="drawer_longitude">Longitude: </string>
     <string name="drawer_longitude_value">0.1278</string>
-    <string name="drawer_height">Height AMSL: </string>
-    <string name="drawer_height_value">48.0m</string>
+
+    <string name="update_location">Update location</string>
+    <string name="update_tle">Update TLE file</string>
+    <string name="update_transmitters">Update transmitters DB</string>
+    <string name="github">GitHub</string>
+    <string name="exit">Exit</string>
 
     <string name="menu_sky">Sky at a Glance</string>
     <string name="menu_radar">Radar View</string>
     <string name="menu_map">World Map View</string>
     <string name="menu_credits">Credits</string>
     <string name="menu_about">About the App</string>
-
-    <string name="toolbar_aos_in">AOS in %02d:%02d:%02d</string>
-    <string name="toolbar_refresh">Refresh</string>
 
     <string name="card_sat_name">Meteor M2–2</string>
     <string name="card_pass_vector">V: 180° -> 360°</string>
@@ -30,5 +31,4 @@
 
     <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
-    <string name="about">About</string>
 </resources>

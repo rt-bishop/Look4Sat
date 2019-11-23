@@ -29,14 +29,14 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="DrawerHeader.Value">
-        <item name="android:textSize">26sp</item>
-        <item name="android:textStyle">bold</item>
+    <style name="DrawerHeader.Item">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">serif</item>
     </style>
 
-    <style name="DrawerHeader.Item">
-        <item name="android:textSize">21sp</item>
-        <item name="android:fontFamily">serif</item>
+    <style name="DrawerHeader.ItemValue">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DrawerHeader.Button">
@@ -45,12 +45,16 @@
         <item name="android:backgroundTint">@color/themeAccent</item>
     </style>
 
+    <style name="DrawerHeader.ButtonText">
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">serif</item>
+    </style>
+
     <style name="ToolbarText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
-        <item name="android:text">@string/toolbar_aos_in</item>
-        <item name="android:textSize">30sp</item>
+        <item name="android:textSize">32sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/themeAccent</item>
     </style>

@@ -1,11 +1,14 @@
 package com.rtbishop.lookingsat.ui
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +22,8 @@ import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.repo.SatPass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class SkyFragment : Fragment() {
 
@@ -27,6 +32,7 @@ class SkyFragment : Fragment() {
     private lateinit var recViewFuture: RecyclerView
     private lateinit var recAdapterCurrent: RecyclerView.Adapter<*>
     private lateinit var recAdapterFuture: RecyclerView.Adapter<*>
+    private lateinit var timeToAos: TextView
     private lateinit var btnPassPrefs: ImageButton
     private lateinit var progressBar: ProgressBar
     private lateinit var fab: FloatingActionButton
@@ -42,6 +48,7 @@ class SkyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(activity as MainActivity).get(MainViewModel::class.java)
+        timeToAos = (activity as MainActivity).findViewById(R.id.toolbar_time_to_aos)
         btnPassPrefs = (activity as MainActivity).findViewById(R.id.toolbar_btn_refresh)
         progressBar = view.findViewById(R.id.sky_progressbar)
         recViewFuture = view.findViewById(R.id.sky_recycler_future)
@@ -50,6 +57,8 @@ class SkyFragment : Fragment() {
         recViewFuture.layoutManager = LinearLayoutManager(activity)
 
         fab.setOnClickListener { showSelectSatDialog() }
+
+        setupTimer()
     }
 
     private fun showSelectSatDialog() {
@@ -106,5 +115,31 @@ class SkyFragment : Fragment() {
             progressBar.visibility = View.INVISIBLE
             recViewFuture.visibility = View.VISIBLE
         }
+    }
+
+    private fun setupTimer() {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_MONTH, 1)
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val totalMillis = cal.timeInMillis - System.currentTimeMillis()
+
+        val timer = object : CountDownTimer(totalMillis, 1000) {
+            override fun onFinish() {
+                Toast.makeText(activity, "Time is up!", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                timeToAos.text = String.format(
+                    "AOS -%02d:%02d:%02d",
+                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                )
+            }
+        }
+        timer.start()
     }
 }

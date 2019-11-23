@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -20,14 +19,13 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.rtbishop.lookingsat.MainViewModel
 import com.rtbishop.lookingsat.R
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,42 +34,38 @@ class MainActivity : AppCompatActivity() {
     private val permGranted = PackageManager.PERMISSION_GRANTED
     private val githubUrl = "https://github.com/rt-bishop/LookingSat"
 
-    private lateinit var drawerLayout: DrawerLayout
     private lateinit var viewModel: MainViewModel
     private lateinit var timerLayout: ConstraintLayout
-    private lateinit var timeToAos: TextView
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerLat: TextView
     private lateinit var drawerLon: TextView
-    private lateinit var drawerHeight: TextView
     private lateinit var drawerBtnLoc: ImageButton
     private lateinit var drawerBtnTle: ImageButton
     private lateinit var drawerBtnTrans: ImageButton
     private lateinit var drawerBtnGithub: ImageButton
     private lateinit var drawerBtnExit: ImageButton
+    private lateinit var appBarConfig: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupComponents()
         setupDrawer()
-        setupTimer()
     }
 
     private fun setupComponents() {
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        timerLayout = findViewById(R.id.toolbar_layout_timer)
-        timeToAos = findViewById(R.id.toolbar_time_to_aos)
-
+        val navView: NavigationView = findViewById(R.id.nav_view)
+        val header = navView.getHeaderView(0)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        timerLayout = findViewById(R.id.toolbar_layout_timer)
         drawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
-        val header = navView.getHeaderView(0)
 
         drawerLat = header.findViewById(R.id.drawer_lat_value)
         drawerLon = header.findViewById(R.id.drawer_lon_value)
-        drawerHeight = header.findViewById(R.id.drawer_height_value)
 
         drawerBtnLoc = header.findViewById(R.id.drawer_btn_loc)
         drawerBtnTle = header.findViewById(R.id.drawer_btn_tle)
@@ -79,8 +73,13 @@ class MainActivity : AppCompatActivity() {
         drawerBtnGithub = header.findViewById(R.id.drawer_btn_github)
         drawerBtnExit = header.findViewById(R.id.drawer_btn_exit)
 
+        appBarConfig = AppBarConfiguration(
+            setOf(R.id.nav_sky, R.id.nav_map, R.id.nav_credits, R.id.nav_about),
+            drawerLayout
+        )
+
         val navController = findNavController(R.id.nav_host)
-        setupActionBarWithNavController(navController, drawerLayout)
+        setupActionBarWithNavController(navController, appBarConfig)
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -95,6 +94,8 @@ class MainActivity : AppCompatActivity() {
                     toolbar.visibility = View.GONE
                 }
                 else -> {
+                    this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    toolbar.visibility = View.VISIBLE
                     timerLayout.visibility = View.GONE
                 }
             }
@@ -111,7 +112,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.gsp.observe(this, Observer { gsp ->
             drawerLat.text = String.format("%.4f", gsp.latitude)
             drawerLon.text = String.format("%.4f", gsp.longitude)
-            drawerHeight.text = String.format("%.1fm", gsp.heightAMSL)
         })
 
         drawerBtnLoc.setOnClickListener { updateLocation() }
@@ -121,32 +121,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl)))
         }
         drawerBtnExit.setOnClickListener { finish() }
-    }
-
-    private fun setupTimer() {
-        val cal = Calendar.getInstance()
-        cal.add(Calendar.DAY_OF_MONTH, 1)
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-        val totalMillis = cal.timeInMillis - System.currentTimeMillis()
-
-        val timer = object : CountDownTimer(totalMillis, 1000) {
-            override fun onFinish() {
-                Toast.makeText(this@MainActivity, "Time is up!", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onTick(millisUntilFinished: Long) {
-                timeToAos.text = String.format(
-                    resources.getString(R.string.toolbar_aos_in),
-                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                )
-            }
-        }
-        timer.start()
     }
 
     private fun updateLocation() {
@@ -173,6 +147,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host)
-        return navController.navigateUp(drawerLayout) || super.onSupportNavigateUp()
+        return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
     }
 }
