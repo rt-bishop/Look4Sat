@@ -20,7 +20,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private val permGranted = PackageManager.PERMISSION_GRANTED
     private val githubUrl = "https://github.com/rt-bishop/LookingSat"
 
-    private lateinit var appBarConfig: AppBarConfiguration
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var viewModel: MainViewModel
     private lateinit var timerLayout: ConstraintLayout
     private lateinit var timeToAos: TextView
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val header = navView.getHeaderView(0)
 
@@ -81,13 +80,12 @@ class MainActivity : AppCompatActivity() {
         drawerBtnExit = header.findViewById(R.id.drawer_btn_exit)
 
         val navController = findNavController(R.id.nav_host)
-        appBarConfig = AppBarConfiguration(setOf(R.id.nav_sky, R.id.nav_single_sat), drawerLayout)
-        setupActionBarWithNavController(navController, appBarConfig)
+        setupActionBarWithNavController(navController, drawerLayout)
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.nav_sky, R.id.nav_single_sat -> {
+                R.id.nav_sky -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     toolbar.visibility = View.VISIBLE
                     timerLayout.visibility = View.VISIBLE
@@ -175,6 +173,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host)
-        return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
+        return navController.navigateUp(drawerLayout) || super.onSupportNavigateUp()
     }
 }

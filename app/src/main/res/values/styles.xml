@@ -58,7 +58,7 @@
     <style name="ToolbarButton">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:src">@drawable/ic_refresh</item>
+        <item name="android:src">@drawable/ic_pass_prefs</item>
         <item name="android:backgroundTint">@color/toolbarButton</item>
     </style>
 

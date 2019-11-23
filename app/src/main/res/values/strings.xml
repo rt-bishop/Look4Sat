@@ -13,7 +13,6 @@
 
     <string name="menu_sky">Sky at a Glance</string>
     <string name="menu_radar">Radar View</string>
-    <string name="menu_single_sat">Single Sat Passes</string>
     <string name="menu_map">World Map View</string>
     <string name="menu_credits">Credits</string>
     <string name="menu_about">About the App</string>

@@ -6,12 +6,8 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_sky"
-            android:icon="@drawable/ic_sky"
-            android:title="@string/menu_sky" />
-        <item
-            android:id="@+id/nav_single_sat"
             android:icon="@drawable/ic_sat_asc_right"
-            android:title="@string/menu_single_sat" />
+            android:title="@string/menu_sky" />
         <item
             android:id="@+id/nav_map"
             android:icon="@drawable/ic_map"

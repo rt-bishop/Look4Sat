@@ -12,12 +12,6 @@
         tools:layout="@layout/fragment_sky" />
 
     <fragment
-        android:id="@+id/nav_single_sat"
-        android:name="com.rtbishop.lookingsat.ui.SkyFragment"
-        android:label="@string/menu_single_sat"
-        tools:layout="@layout/fragment_sky" />
-
-    <fragment
         android:id="@+id/nav_radar"
         android:name="com.rtbishop.lookingsat.ui.RadarFragment"
         android:label="@string/menu_radar"
