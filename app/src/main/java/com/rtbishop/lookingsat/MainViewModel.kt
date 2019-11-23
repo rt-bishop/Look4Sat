@@ -77,7 +77,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         Log.d(tag, "Trying ${tle.name}")
                         val passPredictor = PassPredictor(tle, gsp.value)
-                        val passes = passPredictor.getPasses(Date(), 6, true)
+                        val passes = passPredictor.getPasses(Date(), 6, false)
                         for (pass in passes) {
                             Log.d(tag, "Trying ${pass.maxEl}")
                             satPassList.add(SatPass(tle.name, tle.catnum, pass))

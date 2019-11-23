@@ -22,7 +22,6 @@ import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.repo.SatPass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SkyFragment : Fragment() {
@@ -37,7 +36,7 @@ class SkyFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var fab: FloatingActionButton
 
-    private var satPassList: List<SatPass> = emptyList()
+    private var aosTimer: CountDownTimer? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -58,7 +57,7 @@ class SkyFragment : Fragment() {
 
         fab.setOnClickListener { showSelectSatDialog() }
 
-        setupTimer()
+        resetTimer()
     }
 
     private fun showSelectSatDialog() {
@@ -104,6 +103,7 @@ class SkyFragment : Fragment() {
     }
 
     private fun calculatePasses() {
+        var satPassList: List<SatPass>
         lifecycleScope.launch(Dispatchers.Main) {
             recViewFuture.visibility = View.INVISIBLE
             progressBar.visibility = View.VISIBLE
@@ -114,32 +114,44 @@ class SkyFragment : Fragment() {
             progressBar.isIndeterminate = false
             progressBar.visibility = View.INVISIBLE
             recViewFuture.visibility = View.VISIBLE
+            if (satPassList.isEmpty()) {
+                resetTimer()
+            } else {
+                setTimer(satPassList[0].pass.startTime.time)
+            }
         }
     }
 
-    private fun setupTimer() {
-        val cal = Calendar.getInstance()
-        cal.add(Calendar.DAY_OF_MONTH, 1)
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-        val totalMillis = cal.timeInMillis - System.currentTimeMillis()
+    private fun setTimer(passTime: Long) {
+        if (aosTimer == null) {
+            val totalMillis = passTime.minus(System.currentTimeMillis())
+            aosTimer = object : CountDownTimer(totalMillis, 1000) {
+                override fun onFinish() {
+                    Toast.makeText(activity, "Time is up!", Toast.LENGTH_SHORT).show()
+                    this.cancel()
+                    resetTimer()
+                }
 
-        val timer = object : CountDownTimer(totalMillis, 1000) {
-            override fun onFinish() {
-                Toast.makeText(activity, "Time is up!", Toast.LENGTH_SHORT).show()
+                override fun onTick(millisUntilFinished: Long) {
+                    timeToAos.text = String.format(
+                        "AOS -%02d:%02d:%02d",
+                        TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
+                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
+                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                    )
+                }
             }
-
-            override fun onTick(millisUntilFinished: Long) {
-                timeToAos.text = String.format(
-                    "AOS -%02d:%02d:%02d",
-                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                )
-            }
+            (aosTimer as CountDownTimer).start()
+        } else {
+            resetTimer()
         }
-        timer.start()
+    }
+
+    private fun resetTimer() {
+        if (aosTimer != null) {
+            (aosTimer as CountDownTimer).cancel()
+            aosTimer = null
+        }
+        timeToAos.text = String.format("AOS -%02d:%02d:%02d", 0, 0, 0)
     }
 }
