@@ -48,7 +48,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _debugMessage = MutableLiveData("")
     val debugMessage: LiveData<String> = _debugMessage
 
-    var tleMainList = loadTwoLineElementFile().sortedWith(compareBy { it.name })
+    private val _tleMainList = MutableLiveData<List<TLE>>(
+        try {
+            TLE.importSat(getApplication<Application>().openFileInput(tleFile))
+                .sortedWith(compareBy { it.name })
+        } catch (exception: FileNotFoundException) {
+            _debugMessage.postValue("TLE file wasn't found")
+            emptyList<TLE>()
+        }
+
+    )
+    val tleMainList: LiveData<List<TLE>> = _tleMainList
 
     private val _tleSelectedMap = MutableLiveData<MutableMap<TLE, Boolean>>(mutableMapOf())
     val tleSelectedMap: LiveData<MutableMap<TLE, Boolean>> = _tleSelectedMap
@@ -69,15 +79,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
     )
     val gsp: LiveData<GroundStationPosition> = _gsp
-
-    private fun loadTwoLineElementFile(): List<TLE> {
-        return try {
-            TLE.importSat(getApplication<Application>().openFileInput(tleFile))
-        } catch (exception: FileNotFoundException) {
-            _debugMessage.postValue("TLE file wasn't found")
-            emptyList()
-        }
-    }
 
     suspend fun getPasses(satMap: Map<TLE, Boolean>, hours: Int, maxEl: Double): List<SatPass> {
         val satPassList = mutableListOf<SatPass>()
@@ -138,7 +139,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 getApplication<Application>().openFileOutput(tleFile, Context.MODE_PRIVATE).use {
                     it.write(stream.readBytes())
                 }
-                tleMainList = TLE.importSat(stream)
+                _tleMainList.postValue(TLE.importSat(stream))
                 _debugMessage.postValue("TLE file was updated")
             } catch (exception: IOException) {
                 _debugMessage.postValue("Couldn't update TLE file")

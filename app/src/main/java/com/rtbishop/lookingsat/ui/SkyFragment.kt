@@ -34,6 +34,7 @@ class SkyFragment : Fragment() {
     private lateinit var btnPassPrefs: ImageButton
     private lateinit var progressBar: ProgressBar
     private lateinit var fab: FloatingActionButton
+    private lateinit var tleMainList: List<TLE>
     private lateinit var selectedSatMap: MutableMap<TLE, Boolean>
     private lateinit var satPassPrefs: SatPassPrefs
     private var aosTimer: CountDownTimer? = null
@@ -46,6 +47,12 @@ class SkyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupViews(view)
+        setupObservers()
+        resetTimer()
+    }
+
+    private fun setupViews(view: View) {
         viewModel = ViewModelProvider(activity as MainActivity).get(MainViewModel::class.java)
         timeToAos = (activity as MainActivity).findViewById(R.id.toolbar_time_to_aos)
         btnPassPrefs = (activity as MainActivity).findViewById(R.id.toolbar_btn_refresh)
@@ -59,6 +66,12 @@ class SkyFragment : Fragment() {
         fab.setOnClickListener { showSelectSatDialog() }
 
         satPassPrefs = viewModel.satPassPrefs.value ?: SatPassPrefs(8, 20.0)
+    }
+
+    private fun setupObservers() {
+        viewModel.tleMainList.observe(this, Observer {
+            tleMainList = it
+        })
 
         viewModel.tleSelectedMap.observe(this, Observer {
             selectedSatMap = it
@@ -70,7 +83,9 @@ class SkyFragment : Fragment() {
             calculatePasses()
         })
 
-        resetTimer()
+        viewModel.gsp.observe(this, Observer {
+            calculatePasses()
+        })
     }
 
     private fun showSatPassPrefsDialog() {
@@ -97,18 +112,19 @@ class SkyFragment : Fragment() {
     }
 
     private fun showSelectSatDialog() {
+        val tleList = tleMainList
         val tleSelectedMap = selectedSatMap
-        val tleMainListSize = viewModel.tleMainList.size
+        val tleMainListSize = tleList.size
         val tleNameArray = arrayOfNulls<String>(tleMainListSize)
         val tleCheckedArray = BooleanArray(tleMainListSize)
 
         if (tleSelectedMap.isEmpty()) {
-            for ((position, tle) in viewModel.tleMainList.withIndex()) {
+            tleList.withIndex().forEach { (position, tle) ->
                 tleNameArray[position] = tle.name
                 tleCheckedArray[position] = false
             }
         } else {
-            for ((position, tle) in viewModel.tleMainList.withIndex()) {
+            tleList.withIndex().forEach { (position, tle) ->
                 tleNameArray[position] = tle.name
                 tleCheckedArray[position] = tleSelectedMap.getOrDefault(tle, false)
             }
@@ -118,7 +134,7 @@ class SkyFragment : Fragment() {
         val builder = AlertDialog.Builder(activity as MainActivity)
         builder.setTitle(getString(R.string.title_select_sat))
             .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
-                selectionMap[viewModel.tleMainList[which]] = isChecked
+                selectionMap[tleList[which]] = isChecked
             }
             .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
                 for ((tle, value) in selectionMap) {
@@ -166,7 +182,6 @@ class SkyFragment : Fragment() {
                 override fun onFinish() {
                     Toast.makeText(activity, "Time is up!", Toast.LENGTH_SHORT).show()
                     this.cancel()
-                    resetTimer()
                 }
 
                 override fun onTick(millisUntilFinished: Long) {
