@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.lookingsat.MainViewModel
 import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.repo.SatPass
+import com.rtbishop.lookingsat.repo.SatPassPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -32,7 +34,8 @@ class SkyFragment : Fragment() {
     private lateinit var btnPassPrefs: ImageButton
     private lateinit var progressBar: ProgressBar
     private lateinit var fab: FloatingActionButton
-
+    private lateinit var selectedSatMap: MutableMap<TLE, Boolean>
+    private lateinit var satPassPrefs: SatPassPrefs
     private var aosTimer: CountDownTimer? = null
 
     override fun onCreateView(
@@ -54,6 +57,18 @@ class SkyFragment : Fragment() {
 
         btnPassPrefs.setOnClickListener { showSatPassPrefsDialog() }
         fab.setOnClickListener { showSelectSatDialog() }
+
+        satPassPrefs = viewModel.satPassPrefs.value ?: SatPassPrefs(8, 20.0)
+
+        viewModel.tleSelectedMap.observe(this, Observer {
+            selectedSatMap = it
+            calculatePasses()
+        })
+
+        viewModel.satPassPrefs.observe(this, Observer {
+            satPassPrefs = it
+            calculatePasses()
+        })
 
         resetTimer()
     }
@@ -82,9 +97,8 @@ class SkyFragment : Fragment() {
     }
 
     private fun showSelectSatDialog() {
-        val tleSelectedMap = viewModel.tleSelectedMap
+        val tleSelectedMap = selectedSatMap
         val tleMainListSize = viewModel.tleMainList.size
-
         val tleNameArray = arrayOfNulls<String>(tleMainListSize)
         val tleCheckedArray = BooleanArray(tleMainListSize)
 
@@ -96,7 +110,7 @@ class SkyFragment : Fragment() {
         } else {
             for ((position, tle) in viewModel.tleMainList.withIndex()) {
                 tleNameArray[position] = tle.name
-                tleCheckedArray[position] = viewModel.tleSelectedMap.getOrDefault(tle, false)
+                tleCheckedArray[position] = tleSelectedMap.getOrDefault(tle, false)
             }
         }
 
@@ -109,7 +123,7 @@ class SkyFragment : Fragment() {
             .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
                 for ((tle, value) in selectionMap) {
                     tleSelectedMap[tle] = value
-                    calculatePasses()
+                    viewModel.updateSelectedSatMap(tleSelectedMap)
                 }
             }
             .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
@@ -117,19 +131,21 @@ class SkyFragment : Fragment() {
             }
             .setNeutralButton(getString(R.string.btn_clear)) { _, _ ->
                 tleSelectedMap.clear()
-                calculatePasses()
+                viewModel.updateSelectedSatMap(tleSelectedMap)
             }
             .create()
             .show()
     }
 
     private fun calculatePasses() {
+        val hoursAhead = satPassPrefs.hoursAhead
+        val maxEl = satPassPrefs.maxEl
         var satPassList: List<SatPass>
         lifecycleScope.launch(Dispatchers.Main) {
             recViewFuture.visibility = View.INVISIBLE
             progressBar.visibility = View.VISIBLE
             progressBar.isIndeterminate = true
-            satPassList = viewModel.getPassesForSelectedSatellites()
+            satPassList = viewModel.getPasses(selectedSatMap, hoursAhead, maxEl)
             recAdapterFuture = SatPassAdapter(satPassList)
             recViewFuture.adapter = recAdapterFuture
             progressBar.isIndeterminate = false

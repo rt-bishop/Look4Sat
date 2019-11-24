@@ -41,8 +41,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
+    init {
+        (application as LookingSatApp).appComponent.inject(this)
+    }
+
     private val _debugMessage = MutableLiveData("")
     val debugMessage: LiveData<String> = _debugMessage
+
+    var tleMainList = loadTwoLineElementFile().sortedWith(compareBy { it.name })
+
+    private val _tleSelectedMap = MutableLiveData<MutableMap<TLE, Boolean>>(mutableMapOf())
+    val tleSelectedMap: LiveData<MutableMap<TLE, Boolean>> = _tleSelectedMap
 
     private val _satPassPrefs = MutableLiveData<SatPassPrefs>(
         SatPassPrefs(
@@ -61,13 +70,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     )
     val gsp: LiveData<GroundStationPosition> = _gsp
 
-    var tleMainList = loadTwoLineElementFile().sortedWith(compareBy { it.name })
-    var tleSelectedMap = mutableMapOf<TLE, Boolean>()
-
-    init {
-        (application as LookingSatApp).appComponent.inject(this)
-    }
-
     private fun loadTwoLineElementFile(): List<TLE> {
         return try {
             TLE.importSat(getApplication<Application>().openFileInput(tleFile))
@@ -77,33 +79,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    suspend fun getPassesForSelectedSatellites(): List<SatPass> {
+    suspend fun getPasses(satMap: Map<TLE, Boolean>, hours: Int, maxEl: Double): List<SatPass> {
         val satPassList = mutableListOf<SatPass>()
-        var sortedList = listOf<SatPass>()
-        val hoursAhead = satPassPrefs.value?.hoursAhead ?: 8
         withContext(Dispatchers.Default) {
-            for ((tle, value) in tleSelectedMap) {
+            satMap.forEach { (tle, value) ->
                 if (value) {
                     try {
-                        Log.d(tag, "Trying ${tle.name}")
                         val passPredictor = PassPredictor(tle, gsp.value)
-                        val passes = passPredictor.getPasses(Date(), hoursAhead, false)
-                        for (pass in passes) {
-                            Log.d(tag, "Trying ${pass.maxEl}")
-                            satPassList.add(SatPass(tle.name, tle.catnum, pass))
-                        }
+                        val passes = passPredictor.getPasses(Date(), hours, false)
+                        passes.forEach { satPassList.add(SatPass(tle.name, tle.catnum, it)) }
                     } catch (exception: IllegalArgumentException) {
-                        val tleProblem = "There was a problem with TLE"
-                        Log.d(tag, tleProblem)
-                        _debugMessage.postValue(tleProblem)
+                        Log.d(tag, "There was a problem with TLE")
                     } catch (exception: SatNotFoundException) {
                         Log.d(tag, "Certain satellites shall not pass")
                     }
                 }
             }
-            sortedList = satPassList.sortedWith(compareBy { it.pass.startTime })
+            satPassList.retainAll { it.pass.maxEl >= maxEl }
+            satPassList.sortBy { it.pass.startTime }
         }
-        return sortedList
+        return satPassList
+    }
+
+    fun updateSelectedSatMap(mutableMap: MutableMap<TLE, Boolean>) {
+        _tleSelectedMap.postValue(mutableMap)
     }
 
     fun updatePassPrefs(hoursAhead: Int, maxEl: Double) {
