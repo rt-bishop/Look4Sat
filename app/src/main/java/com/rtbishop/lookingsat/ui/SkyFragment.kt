@@ -5,10 +5,7 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -55,9 +52,33 @@ class SkyFragment : Fragment() {
 
         recViewFuture.layoutManager = LinearLayoutManager(activity)
 
+        btnPassPrefs.setOnClickListener { showSatPassPrefsDialog() }
         fab.setOnClickListener { showSelectSatDialog() }
 
         resetTimer()
+    }
+
+    private fun showSatPassPrefsDialog() {
+        val context = activity as MainActivity
+        val satPassPrefView = View.inflate(context, R.layout.sat_pass_pref, null)
+        val etHours = satPassPrefView.findViewById<EditText>(R.id.pass_pref_et_hours)
+        val etMaxEl = satPassPrefView.findViewById<EditText>(R.id.pass_pref_et_maxEl)
+        etHours.setText(viewModel.satPassPrefs.value?.hoursAhead.toString())
+        etMaxEl.setText(viewModel.satPassPrefs.value?.maxEl.toString())
+
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(getString(R.string.title_pass_pref))
+            .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
+                val hoursAhead = etHours.text.toString().toInt()
+                val maxEl = etMaxEl.text.toString().toDouble()
+                viewModel.updatePassPrefs(hoursAhead, maxEl)
+            }
+            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setView(satPassPrefView)
+            .create()
+            .show()
     }
 
     private fun showSelectSatDialog() {
@@ -81,22 +102,22 @@ class SkyFragment : Fragment() {
 
         val selectionMap = mutableMapOf<TLE, Boolean>()
         val builder = AlertDialog.Builder(activity as MainActivity)
-        builder.setTitle("Select satellites to track")
+        builder.setTitle(getString(R.string.title_select_sat))
             .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
                 selectionMap[viewModel.tleMainList[which]] = isChecked
             }
-            .setPositiveButton("Ok") { _, _ ->
+            .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
                 for ((tle, value) in selectionMap) {
                     tleSelectedMap[tle] = value
                     calculatePasses()
                 }
             }
-            .setNeutralButton("Clear All") { _, _ ->
+            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setNeutralButton(getString(R.string.btn_clear)) { _, _ ->
                 tleSelectedMap.clear()
                 calculatePasses()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.cancel()
             }
             .create()
             .show()
@@ -134,7 +155,7 @@ class SkyFragment : Fragment() {
 
                 override fun onTick(millisUntilFinished: Long) {
                     timeToAos.text = String.format(
-                        "AOS -%02d:%02d:%02d",
+                        getString(R.string.pattern_aos),
                         TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                         TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                         TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
@@ -152,6 +173,6 @@ class SkyFragment : Fragment() {
             (aosTimer as CountDownTimer).cancel()
             aosTimer = null
         }
-        timeToAos.text = String.format("AOS -%02d:%02d:%02d", 0, 0, 0)
+        timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
     }
 }

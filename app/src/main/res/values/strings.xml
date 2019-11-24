@@ -29,6 +29,19 @@
     <string name="card_pass_aos_time">13:14:15</string>
     <string name="card_pass_los_time">16:17:18</string>
 
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_clear">Clear All</string>
+
+    <string name="title_pass_pref">Passes preferences</string>
+    <string name="title_select_sat">Select satellites to track</string>
+
+    <string name="pass_pref_tv_hours">Show passes that occur within X hours</string>
+    <string name="pass_pref_hint_hours">Hours ahead</string>
+    <string name="pass_pref_tv_maxEl">Show passes with max elevation above</string>
+    <string name="pass_pref_hint_maxEl">Max elevation</string>
+
+    <string name="pattern_aos">AOS -%02d:%02d:%02d</string>
     <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
 </resources>

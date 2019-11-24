@@ -18,6 +18,7 @@ import com.github.amsacode.predict4java.TLE
 import com.google.android.gms.location.LocationServices
 import com.rtbishop.lookingsat.repo.Repository
 import com.rtbishop.lookingsat.repo.SatPass
+import com.rtbishop.lookingsat.repo.SatPassPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,6 +43,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _debugMessage = MutableLiveData("")
     val debugMessage: LiveData<String> = _debugMessage
+
+    private val _satPassPrefs = MutableLiveData<SatPassPrefs>(
+        SatPassPrefs(
+            preferences.getInt("hoursAhead", 8),
+            preferences.getDouble("maxEl", 20.0)
+        )
+    )
+    val satPassPrefs: LiveData<SatPassPrefs> = _satPassPrefs
 
     private val _gsp = MutableLiveData<GroundStationPosition>(
         GroundStationPosition(
@@ -71,13 +80,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun getPassesForSelectedSatellites(): List<SatPass> {
         val satPassList = mutableListOf<SatPass>()
         var sortedList = listOf<SatPass>()
+        val hoursAhead = satPassPrefs.value?.hoursAhead ?: 8
         withContext(Dispatchers.Default) {
             for ((tle, value) in tleSelectedMap) {
                 if (value) {
                     try {
                         Log.d(tag, "Trying ${tle.name}")
                         val passPredictor = PassPredictor(tle, gsp.value)
-                        val passes = passPredictor.getPasses(Date(), 6, false)
+                        val passes = passPredictor.getPasses(Date(), hoursAhead, false)
                         for (pass in passes) {
                             Log.d(tag, "Trying ${pass.maxEl}")
                             satPassList.add(SatPass(tle.name, tle.catnum, pass))
@@ -94,6 +104,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             sortedList = satPassList.sortedWith(compareBy { it.pass.startTime })
         }
         return sortedList
+    }
+
+    fun updatePassPrefs(hoursAhead: Int, maxEl: Double) {
+        _satPassPrefs.postValue(SatPassPrefs(hoursAhead, maxEl))
+        preferences.edit {
+            putInt("hoursAhead", hoursAhead)
+            putDouble("maxEl", maxEl)
+            apply()
+        }
     }
 
     fun updateLocation() {

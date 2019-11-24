@@ -35,7 +35,7 @@ class SatPassAdapter(private val satPassList: List<SatPass>) :
         satName.text = String.format("%s", satPass.satName)
         maxEl.text = String.format("%.1f°", satPass.pass.maxEl)
         passVector.text =
-            String.format("V: %02d° -> %02d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
+            String.format("V: %2d° -> %2d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
         passStart.text =
             SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
         passEnd.text =
