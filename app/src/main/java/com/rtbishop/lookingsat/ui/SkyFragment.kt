@@ -37,7 +37,8 @@ class SkyFragment : Fragment() {
     private lateinit var tleMainList: List<TLE>
     private lateinit var selectedSatMap: MutableMap<TLE, Boolean>
     private lateinit var satPassPrefs: SatPassPrefs
-    private var aosTimer: CountDownTimer? = null
+    private lateinit var aosTimer: CountDownTimer
+    private var isTimerSet: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -167,42 +168,37 @@ class SkyFragment : Fragment() {
             progressBar.isIndeterminate = false
             progressBar.visibility = View.INVISIBLE
             recViewFuture.visibility = View.VISIBLE
-            if (satPassList.isEmpty()) {
-                resetTimer()
-            } else {
-                setTimer(satPassList[0].pass.startTime.time)
-            }
+            if (satPassList.isNotEmpty()) setTimer(satPassList.first().pass.startTime.time)
+            else resetTimer()
         }
     }
 
     private fun setTimer(passTime: Long) {
-        if (aosTimer == null) {
-            val totalMillis = passTime.minus(System.currentTimeMillis())
-            aosTimer = object : CountDownTimer(totalMillis, 1000) {
-                override fun onFinish() {
-                    Toast.makeText(activity, "Time is up!", Toast.LENGTH_SHORT).show()
-                    this.cancel()
-                }
-
-                override fun onTick(millisUntilFinished: Long) {
-                    timeToAos.text = String.format(
-                        getString(R.string.pattern_aos),
-                        TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
-                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
-                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                    )
-                }
+        if (isTimerSet) resetTimer()
+        val totalMillis = passTime.minus(System.currentTimeMillis())
+        aosTimer = object : CountDownTimer(totalMillis, 1000) {
+            override fun onFinish() {
+                Toast.makeText(activity, "Time is up!", Toast.LENGTH_SHORT).show()
+                this.cancel()
             }
-            (aosTimer as CountDownTimer).start()
-        } else {
-            resetTimer()
+
+            override fun onTick(millisUntilFinished: Long) {
+                timeToAos.text = String.format(
+                    getString(R.string.pattern_aos),
+                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                )
+            }
         }
+        aosTimer.start()
+        isTimerSet = true
     }
 
     private fun resetTimer() {
-        if (aosTimer != null) {
-            (aosTimer as CountDownTimer).cancel()
-            aosTimer = null
+        if (isTimerSet) {
+            aosTimer.cancel()
+            isTimerSet = false
         }
         timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
     }
