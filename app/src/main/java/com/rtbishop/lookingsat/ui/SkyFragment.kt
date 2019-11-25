@@ -35,7 +35,7 @@ class SkyFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var fab: FloatingActionButton
     private lateinit var tleMainList: List<TLE>
-    private lateinit var selectedSatMap: MutableMap<TLE, Boolean>
+    private var selectedSatMap: MutableMap<TLE, Boolean> = mutableMapOf()
     private lateinit var satPassPrefs: SatPassPrefs
     private lateinit var aosTimer: CountDownTimer
     private var isTimerSet: Boolean = false
@@ -72,6 +72,8 @@ class SkyFragment : Fragment() {
     private fun setupObservers() {
         viewModel.tleMainList.observe(this, Observer {
             tleMainList = it
+            selectedSatMap.clear()
+            viewModel.updateSelectedSatMap(selectedSatMap)
         })
 
         viewModel.tleSelectedMap.observe(this, Observer {
@@ -113,42 +115,39 @@ class SkyFragment : Fragment() {
     }
 
     private fun showSelectSatDialog() {
-        val tleList = tleMainList
-        val tleSelectedMap = selectedSatMap
-        val tleMainListSize = tleList.size
-        val tleNameArray = arrayOfNulls<String>(tleMainListSize)
-        val tleCheckedArray = BooleanArray(tleMainListSize)
+        val tleNameArray = arrayOfNulls<String>(tleMainList.size)
+        val tleCheckedArray = BooleanArray(tleMainList.size)
+        val builder = AlertDialog.Builder(activity as MainActivity)
+        val selectionMap = mutableMapOf<TLE, Boolean>()
 
-        if (tleSelectedMap.isEmpty()) {
-            tleList.withIndex().forEach { (position, tle) ->
+        if (selectedSatMap.isEmpty()) {
+            tleMainList.withIndex().forEach { (position, tle) ->
                 tleNameArray[position] = tle.name
                 tleCheckedArray[position] = false
             }
         } else {
-            tleList.withIndex().forEach { (position, tle) ->
+            tleMainList.withIndex().forEach { (position, tle) ->
                 tleNameArray[position] = tle.name
-                tleCheckedArray[position] = tleSelectedMap.getOrDefault(tle, false)
+                tleCheckedArray[position] = selectedSatMap.getOrDefault(tle, false)
             }
         }
 
-        val selectionMap = mutableMapOf<TLE, Boolean>()
-        val builder = AlertDialog.Builder(activity as MainActivity)
         builder.setTitle(getString(R.string.title_select_sat))
             .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
-                selectionMap[tleList[which]] = isChecked
+                selectionMap[tleMainList[which]] = isChecked
             }
             .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
                 for ((tle, value) in selectionMap) {
-                    tleSelectedMap[tle] = value
-                    viewModel.updateSelectedSatMap(tleSelectedMap)
+                    selectedSatMap[tle] = value
+                    viewModel.updateSelectedSatMap(selectedSatMap)
                 }
             }
             .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
                 dialog.cancel()
             }
             .setNeutralButton(getString(R.string.btn_clear)) { _, _ ->
-                tleSelectedMap.clear()
-                viewModel.updateSelectedSatMap(tleSelectedMap)
+                selectedSatMap.clear()
+                viewModel.updateSelectedSatMap(selectedSatMap)
             }
             .create()
             .show()
