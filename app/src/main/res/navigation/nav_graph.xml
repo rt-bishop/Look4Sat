@@ -9,7 +9,15 @@
         android:id="@+id/nav_sky"
         android:name="com.rtbishop.lookingsat.ui.SkyFragment"
         android:label="@string/menu_sky"
-        tools:layout="@layout/fragment_sky" />
+        tools:layout="@layout/fragment_sky">
+        <action
+            android:id="@+id/action_nav_sky_to_nav_radar"
+            app:destination="@id/nav_radar"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_radar"

@@ -89,7 +89,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         val passPredictor = PassPredictor(tle, gsp.value)
                         val passes = passPredictor.getPasses(Date(), hours, false)
-                        passes.forEach { satPassList.add(SatPass(tle.name, tle.catnum, it)) }
+                        passes.forEach { satPassList.add(SatPass(tle, passPredictor, it)) }
                     } catch (exception: IllegalArgumentException) {
                         Log.d(tag, "There was a problem with TLE")
                     } catch (exception: SatNotFoundException) {
