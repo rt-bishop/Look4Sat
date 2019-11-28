@@ -25,4 +25,43 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_sky_frame" />
+
+    <TextView
+        android:id="@+id/radar_sat_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/card_sat_name"
+        app:layout_constraintEnd_toEndOf="@+id/radar_aos"
+        app:layout_constraintStart_toStartOf="@+id/radar_aos"
+        app:layout_constraintTop_toTopOf="@+id/radar_maxEl" />
+
+    <TextView
+        android:id="@+id/radar_maxEl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="@string/card_max_el"
+        app:layout_constraintEnd_toEndOf="@+id/radar_sky_frame"
+        app:layout_constraintTop_toTopOf="@+id/radar_sky_frame" />
+
+    <TextView
+        android:id="@+id/radar_aos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/card_pass_aos_time"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_sky_frame"
+        app:layout_constraintStart_toStartOf="@+id/radar_sky_frame" />
+
+    <TextView
+        android:id="@+id/radar_los"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/card_pass_los_time"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_sky_frame"
+        app:layout_constraintEnd_toEndOf="@+id/radar_sky_frame" />
 </androidx.constraintlayout.widget.ConstraintLayout>

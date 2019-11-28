@@ -71,20 +71,5 @@
             app:layout_constraintStart_toStartOf="@+id/card_pass_start"
             app:layout_constraintTop_toBottomOf="@+id/card_max_el" />
 
-        <TextView
-            android:id="@+id/card_pass_aos"
-            style="@style/CardSatPass.SideText"
-            android:layout_marginEnd="4dp"
-            android:text="@string/card_pass_aos"
-            app:layout_constraintBaseline_toBaselineOf="@+id/card_pass_start"
-            app:layout_constraintEnd_toStartOf="@+id/card_pass_start" />
-
-        <TextView
-            android:id="@+id/card_pass_los"
-            style="@style/CardSatPass.SideText"
-            android:text="@string/card_pass_los"
-            app:layout_constraintBaseline_toBaselineOf="@+id/card_pass_end"
-            app:layout_constraintEnd_toEndOf="@+id/card_pass_aos" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

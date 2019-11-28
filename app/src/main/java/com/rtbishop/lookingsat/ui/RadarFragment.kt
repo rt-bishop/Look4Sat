@@ -7,11 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.repo.SatPass
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -20,12 +22,17 @@ import kotlin.math.sin
 
 class RadarFragment : Fragment() {
 
+    private val delay = 5000L
+    private val service = Executors.newSingleThreadScheduledExecutor()
+
     private lateinit var satPass: SatPass
     private lateinit var radarView: RadarView
     private lateinit var radarSkyFrame: FrameLayout
     private lateinit var radarRecycler: RecyclerView
-    private val service = Executors.newSingleThreadScheduledExecutor()
-    private val delay = 5000L
+    private lateinit var radarSatName: TextView
+    private lateinit var radarMaxEl: TextView
+    private lateinit var radarAos: TextView
+    private lateinit var radarLos: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,8 +48,22 @@ class RadarFragment : Fragment() {
         radarSkyFrame = view.findViewById(R.id.radar_sky_frame)
         radarRecycler = view.findViewById(R.id.radar_recycler)
 
+        radarSatName = view.findViewById(R.id.radar_sat_name)
+        radarMaxEl = view.findViewById(R.id.radar_maxEl)
+        radarAos = view.findViewById(R.id.radar_aos)
+        radarLos = view.findViewById(R.id.radar_los)
+
         radarView = RadarView(activity as MainActivity)
         radarSkyFrame.addView(radarView)
+
+        val aosTime =
+            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
+        val losTime =
+            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.endTime)
+        radarSatName.text = satPass.tle.name
+        radarMaxEl.text = String.format("MaxEl: %.1f°", satPass.pass.maxEl)
+        radarAos.text = String.format("AOS - %s", aosTime)
+        radarLos.text = String.format("LOS - %s", losTime)
 
         service.scheduleAtFixedRate({ radarView.invalidate() }, delay, delay, TimeUnit.MILLISECONDS)
     }
@@ -66,7 +87,7 @@ class RadarFragment : Fragment() {
             setBitmap(bmp)
             setMatrix(mtrx)
         }
-        private val linePaint = Paint().apply {
+        private val radarPaint = Paint().apply {
             isAntiAlias = true
             color = Color.parseColor("#C0C0C0")
             style = Paint.Style.STROKE
@@ -90,19 +111,28 @@ class RadarFragment : Fragment() {
         }
         private val path: Path = Path()
 
+        private lateinit var satPos: SatPos
+        private var satPassX = 0f
+        private var satPassY = 0f
+
         override fun onDraw(canvas: Canvas) {
-            var satPos: SatPos
-            var satPassX: Float
-            var satPassY: Float
-
             bmp.eraseColor(Color.TRANSPARENT)
+            drawRadarView()
+            drawRadarText()
+            drawPassTrajectory()
+            drawSatellite()
+            canvas.drawBitmap(bmp, left.toFloat(), top.toFloat(), null)
+        }
 
-            cvs.drawLine(center - radius, center, center + radius, center, linePaint)
-            cvs.drawLine(center, center - radius, center, center + radius, linePaint)
-            cvs.drawCircle(center, center, radius, linePaint)
-            cvs.drawCircle(center, center, (radius / 3) * 2, linePaint)
-            cvs.drawCircle(center, center, radius / 3, linePaint)
+        private fun drawRadarView() {
+            cvs.drawLine(center - radius, center, center + radius, center, radarPaint)
+            cvs.drawLine(center, center - radius, center, center + radius, radarPaint)
+            cvs.drawCircle(center, center, radius, radarPaint)
+            cvs.drawCircle(center, center, (radius / 3) * 2, radarPaint)
+            cvs.drawCircle(center, center, radius / 3, radarPaint)
+        }
 
+        private fun drawRadarText() {
             cvs.drawText("N", center - txtSize / 3, center - radius - scale * 2, txtPaint)
             cvs.drawText("E", center + radius + scale * 2, center + txtSize / 3, txtPaint)
             cvs.drawText("S", center - txtSize / 3, center + radius + txtSize, txtPaint)
@@ -110,7 +140,9 @@ class RadarFragment : Fragment() {
             cvs.drawText("0°", center + scale, center - scale * 2, txtPaint)
             cvs.drawText("30°", center + scale, center - (radius / 3) - scale * 2, txtPaint)
             cvs.drawText("60°", center + scale, center - ((radius / 3) * 2) - scale * 2, txtPaint)
+        }
 
+        private fun drawPassTrajectory() {
             while (startTime.before(endTime)) {
                 satPos = satPass.predictor.getSatPos(startTime)
                 satPassX = center + sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
@@ -123,8 +155,10 @@ class RadarFragment : Fragment() {
                 startTime.time += delay
             }
             cvs.drawPath(path, passPaint)
+        }
 
-            satPos = satPass.predictor.getSatPos(getCurrentDate())
+        private fun drawSatellite() {
+            satPos = satPass.predictor.getSatPos(Date())
             if (satPos.elevation > 0) {
                 cvs.drawCircle(
                     center + sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble()),
@@ -132,7 +166,6 @@ class RadarFragment : Fragment() {
                     txtSize / 3, satPaint
                 )
             }
-            canvas.drawBitmap(bmp, left.toFloat(), top.toFloat(), null)
         }
 
         private fun sph2CartX(azimuth: Double, elevation: Double, r: Double): Float {
@@ -143,10 +176,6 @@ class RadarFragment : Fragment() {
         private fun sph2CartY(azimuth: Double, elevation: Double, r: Double): Float {
             val radius = r * (piDiv2 - elevation) / piDiv2
             return (radius * sin(piDiv2 - azimuth)).toFloat()
-        }
-
-        private fun getCurrentDate(): Date {
-            return Date()
         }
     }
 }

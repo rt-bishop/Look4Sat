@@ -36,14 +36,16 @@ class SatPassAdapter(private val satPassList: List<SatPass>) :
         val passStart = holder.itemView.findViewById<TextView>(R.id.card_pass_start)
         val passEnd = holder.itemView.findViewById<TextView>(R.id.card_pass_end)
 
-        satName.text = String.format("%s", satPass.tle.name)
+        val aosTime =
+            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
+        val losTime =
+            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.endTime)
+        satName.text = satPass.tle.name
         maxEl.text = String.format("%.1f°", satPass.pass.maxEl)
         passVector.text =
-            String.format("V: %2d° -> %2d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
-        passStart.text =
-            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
-        passEnd.text =
-            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.endTime)
+            String.format("Az: %2d° -> %2d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
+        passStart.text = String.format("AOS - %s", aosTime)
+        passEnd.text = String.format("LOS - %s", losTime)
 
         layout.setOnClickListener {
             val bundle = bundleOf("satPass" to satPass)
