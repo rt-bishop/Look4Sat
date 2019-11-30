@@ -74,7 +74,7 @@
     <style name="CardSatPass.SideText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="CardSatPass.MaxEl">

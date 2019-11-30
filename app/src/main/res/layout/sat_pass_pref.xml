@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/pass_pref_hint_maxEl"
         android:importantForAutofill="no"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="@+id/pass_pref_tv_maxEl"
         app:layout_constraintStart_toStartOf="@+id/pass_pref_tv_maxEl"
         app:layout_constraintTop_toBottomOf="@+id/pass_pref_tv_maxEl" />

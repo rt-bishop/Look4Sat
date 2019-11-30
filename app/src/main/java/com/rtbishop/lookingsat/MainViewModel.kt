@@ -45,6 +45,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         (application as LookingSatApp).appComponent.inject(this)
     }
 
+    var satPassList = emptyList<SatPass>()
+
     val gsp = MutableLiveData<GroundStationPosition>(
         GroundStationPosition(
             preferences.getDouble(keyLat, 0.0),
@@ -70,15 +72,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    suspend fun getPasses(): List<SatPass> {
-        val satPassList = mutableListOf<SatPass>()
+    suspend fun getPasses() {
+        val passList = mutableListOf<SatPass>()
         withContext(Dispatchers.Default) {
             tleSelectedMap.forEach { (tle, value) ->
                 if (value) {
                     try {
                         val predictor = PassPredictor(tle, gsp.value)
                         val passes = predictor.getPasses(Date(), passPrefs.hoursAhead, false)
-                        passes.forEach { satPassList.add(SatPass(tle, predictor, it)) }
+                        passes.forEach { passList.add(SatPass(tle, predictor, it)) }
                     } catch (exception: IllegalArgumentException) {
                         debugMessage.postValue("There was a problem with TLE")
                     } catch (exception: SatNotFoundException) {
@@ -86,10 +88,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
-            satPassList.retainAll { it.pass.maxEl >= passPrefs.maxEl }
-            satPassList.sortBy { it.pass.startTime }
+            passList.retainAll { it.pass.maxEl >= passPrefs.maxEl }
+            passList.sortBy { it.pass.startTime }
         }
-        return satPassList
+        satPassList = passList
     }
 
     fun updateSelectedSatMap(mutableMap: MutableMap<TLE, Boolean>) {
@@ -150,8 +152,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 }
 
-fun SharedPreferences.Editor.putDouble(key: String, double: Double): SharedPreferences.Editor =
-    putLong(key, java.lang.Double.doubleToRawLongBits(double))
+fun SharedPreferences.Editor.putDouble(key: String, double: Double)
+        : SharedPreferences.Editor = putLong(key, double.toRawBits())
 
 fun SharedPreferences.getDouble(key: String, default: Double) =
-    java.lang.Double.longBitsToDouble(getLong(key, java.lang.Double.doubleToRawLongBits(default)))
+    Double.fromBits(getLong(key, default.toRawBits()))
