@@ -100,7 +100,7 @@ class SkyFragment : Fragment() {
     }
 
     private fun showSelectSatDialog() {
-        val tleMainList: List<TLE> = viewModel.tleMainList
+        val tleMainList = viewModel.tleMainList
         val tleNameArray = arrayOfNulls<String>(tleMainList.size)
         val tleCheckedArray = BooleanArray(tleMainList.size)
         val selectedSatMap = viewModel.tleSelectedMap

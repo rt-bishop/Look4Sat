@@ -58,6 +58,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var tleMainList = loadTwoLineElementFile()
     var tleSelectedMap = mutableMapOf<TLE, Boolean>()
+    var selectedSingleSat = tleMainList[0]
     var passPrefs = SatPassPrefs(
         preferences.getInt(keyHours, 8),
         preferences.getDouble(keyMaxEl, 16.0)
@@ -71,6 +72,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             debugMessage.postValue("TLE file wasn't found")
             emptyList()
         }
+    }
+
+    fun updateSelectedSingleSat(sat: TLE) {
+        selectedSingleSat = sat
     }
 
     suspend fun getPasses() {

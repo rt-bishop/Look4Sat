@@ -6,13 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.WorldMapFragment">
 
-    <ImageView
-        android:id="@+id/worldmap_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/map_content"
-        android:scaleType="fitXY"
-        android:src="@drawable/map_nasa"
+    <FrameLayout
+        android:id="@+id/worldmap_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/map_nasa"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
