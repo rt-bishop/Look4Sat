@@ -12,7 +12,9 @@ import com.rtbishop.lookingsat.repo.SatPass
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.ViewHolder>() {
+class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
+
+    inner class PassHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     private var satPassList = emptyList<SatPass>()
 
@@ -24,14 +26,14 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.ViewHolder>() {
         return satPassList.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PassHolder {
         val itemView = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.sat_pass_card, parent, false)
-        return ViewHolder(itemView)
+        return PassHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PassHolder, position: Int) {
         val satPass = satPassList[position]
 
         val satName = holder.itemView.findViewById<TextView>(R.id.card_sat_name)
@@ -56,6 +58,4 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.ViewHolder>() {
             holder.itemView.findNavController().navigate(R.id.action_nav_sky_to_nav_radar, bundle)
         }
     }
-
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

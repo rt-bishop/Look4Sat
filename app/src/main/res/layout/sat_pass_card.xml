@@ -3,11 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     style="@style/CardSatPass"
-    android:layout_height="104dp"
     android:layout_marginStart="4dp"
     android:layout_marginTop="4dp"
     android:layout_marginEnd="4dp"
-    app:cardElevation="8dp">
+    app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -29,10 +28,10 @@
             style="@style/CardSatPass.SideText"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="@string/card_sat_name"
             app:layout_constraintBottom_toTopOf="@+id/card_pass_vector"
-            app:layout_constraintEnd_toEndOf="@+id/card_pass_vector"
+            app:layout_constraintEnd_toStartOf="@+id/card_max_el"
             app:layout_constraintStart_toStartOf="@+id/card_pass_vector"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,12 +39,12 @@
             android:id="@+id/card_pass_vector"
             style="@style/CardSatPass.SideText"
             android:layout_width="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="4dp"
             android:text="@string/card_pass_vector"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/card_max_el"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card_max_el" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/card_max_el"
@@ -59,17 +58,20 @@
         <TextView
             android:id="@+id/card_pass_start"
             style="@style/CardSatPass.SideText"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
             android:text="@string/card_pass_aos_time"
-            app:layout_constraintBottom_toTopOf="@+id/card_max_el"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView" />
 
         <TextView
             android:id="@+id/card_pass_end"
             style="@style/CardSatPass.SideText"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
             android:text="@string/card_pass_los_time"
-            app:layout_constraintStart_toStartOf="@+id/card_pass_start"
-            app:layout_constraintTop_toBottomOf="@+id/card_max_el" />
+            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

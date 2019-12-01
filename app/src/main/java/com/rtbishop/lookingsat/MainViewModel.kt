@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationServices
 import com.rtbishop.lookingsat.repo.Repository
 import com.rtbishop.lookingsat.repo.SatPass
 import com.rtbishop.lookingsat.repo.SatPassPrefs
+import com.rtbishop.lookingsat.repo.Transmitter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -149,6 +150,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 debugMessage.postValue("Couldn't update transmitters")
             }
         }
+    }
+
+    suspend fun getTransmittersForSat(id: Int): List<Transmitter> {
+        return repository.getTransmittersForSat(id)
     }
 }
 

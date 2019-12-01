@@ -9,10 +9,15 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.amsacode.predict4java.SatPos
+import com.rtbishop.lookingsat.MainViewModel
 import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.repo.SatPass
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
@@ -25,14 +30,22 @@ class RadarFragment : Fragment() {
     private val delay = 5000L
     private val service = Executors.newSingleThreadScheduledExecutor()
 
+    private lateinit var viewModel: MainViewModel
     private lateinit var satPass: SatPass
     private lateinit var radarView: RadarView
     private lateinit var radarSkyFrame: FrameLayout
-    private lateinit var radarRecycler: RecyclerView
+    private lateinit var transRecycler: RecyclerView
+    private lateinit var transAdapter: TransAdapter
     private lateinit var radarSatName: TextView
     private lateinit var radarMaxEl: TextView
     private lateinit var radarAos: TextView
     private lateinit var radarLos: TextView
+    private lateinit var transNoFound: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(activity as MainActivity).get(MainViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,13 +59,36 @@ class RadarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         satPass = arguments?.get("satPass") as SatPass
         radarSkyFrame = view.findViewById(R.id.radar_sky_frame)
-        radarRecycler = view.findViewById(R.id.radar_recycler)
-
+        transRecycler = view.findViewById(R.id.radar_recycler)
         radarSatName = view.findViewById(R.id.radar_sat_name)
         radarMaxEl = view.findViewById(R.id.radar_maxEl)
         radarAos = view.findViewById(R.id.radar_aos)
         radarLos = view.findViewById(R.id.radar_los)
+        transNoFound = view.findViewById(R.id.radar_trans_no_found)
 
+        setupRadarView()
+        setupTransRecycler()
+    }
+
+    private fun setupTransRecycler() {
+        transAdapter = TransAdapter()
+        transRecycler.apply {
+            layoutManager = LinearLayoutManager(activity as MainActivity)
+            adapter = transAdapter
+        }
+        lifecycleScope.launch {
+            val transList = viewModel.getTransmittersForSat(satPass.tle.catnum)
+            if (transList.isNotEmpty()) {
+                transAdapter.setList(transList)
+                transAdapter.notifyDataSetChanged()
+            } else {
+                transRecycler.visibility = View.INVISIBLE
+                transNoFound.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun setupRadarView() {
         radarView = RadarView(activity as MainActivity)
         radarSkyFrame.addView(radarView)
 

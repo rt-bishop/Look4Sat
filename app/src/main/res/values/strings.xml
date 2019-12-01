@@ -39,7 +39,29 @@
     <string name="pass_pref_tv_maxEl">Show passes with max elevation above</string>
     <string name="pass_pref_hint_maxEl">Max elevation</string>
 
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+
+    <string name="no_mode">Mode: Null</string>
+    <string name="no_uplink">Uplink: Null</string>
+    <string name="no_downlink">Downlink: Null</string>
+    <string name="no_trans">No transmitters found for this Satellite</string>
+
+    <string name="trans_description">ARGOS-3 A-DCS 465.9875MHz</string>
+    <string name="trans_downlink">Downlink: 465.9875 MHz</string>
+    <string name="trans_uplink">Uplink: 465.9875 MHz</string>
+    <string name="trans_mode">Mode: BPSK400</string>
+    <string name="trans_inverted">Inverted: Yes</string>
+    <string name="trans_header">Transmitters:</string>
+
     <string name="pattern_aos">AOS -%02d:%02d:%02d</string>
+    <string name="pattern_trans_mode">Mode: %s</string>
+    <string name="pattern_trans_inverted">Inverted: %s</string>
+    <string name="pattern_trans_uplink_low">Uplink: %.4f MHz</string>
+    <string name="pattern_trans_uplink_lowHigh">Uplink: %.4f - %.4f MHz</string>
+    <string name="pattern_trans_downlink_low">Downlink: %.4f MHz</string>
+    <string name="pattern_trans_downlink_lowHigh">Downlink: %.4f - %.4f MHz</string>
+
     <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
 </resources>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_trans"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="4dp"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/trans_description"
+            style="@style/CardTransText"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/trans_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/trans_downlink"
+            style="@style/CardTransText"
+            android:text="@string/trans_downlink"
+            app:layout_constraintStart_toStartOf="@+id/trans_description"
+            app:layout_constraintTop_toBottomOf="@+id/trans_description" />
+
+        <TextView
+            android:id="@+id/trans_uplink"
+            style="@style/CardTransText"
+            android:text="@string/trans_uplink"
+            app:layout_constraintStart_toStartOf="@+id/trans_description"
+            app:layout_constraintTop_toBottomOf="@+id/trans_downlink" />
+
+        <TextView
+            android:id="@+id/trans_mode"
+            style="@style/CardTransText"
+            android:layout_marginBottom="4dp"
+            android:text="@string/trans_mode"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/trans_description"
+            app:layout_constraintTop_toBottomOf="@+id/trans_uplink" />
+
+        <TextView
+            android:id="@+id/trans_inverted"
+            style="@style/CardTransText"
+            android:layout_marginEnd="8dp"
+            android:text="@string/trans_inverted"
+            app:layout_constraintBaseline_toBaselineOf="@+id/trans_mode"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
