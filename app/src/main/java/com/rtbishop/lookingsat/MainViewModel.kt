@@ -8,12 +8,11 @@ import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.PassPredictor
 import com.github.amsacode.predict4java.SatNotFoundException
 import com.github.amsacode.predict4java.TLE
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.rtbishop.lookingsat.repo.Repository
 import com.rtbishop.lookingsat.repo.SatPass
 import com.rtbishop.lookingsat.repo.SatPassPrefs
@@ -30,15 +29,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val keyLat = "latitude"
     private val keyLon = "longitude"
-    private val keyHeight = "height"
+    private val keyAlt = "altitude"
     private val keyHours = "hoursAhead"
     private val keyMaxEl = "maxElevation"
     private val tleFileName = "tleFile.txt"
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
-    private val locationClient = LocationServices.getFusedLocationProviderClient(application)
 
-    val debugMessage = MutableLiveData("")
-
+    @Inject
+    lateinit var locationClient: FusedLocationProviderClient
+    @Inject
+    lateinit var preferences: SharedPreferences
     @Inject
     lateinit var repository: Repository
 
@@ -46,19 +45,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         (application as LookingSatApp).appComponent.inject(this)
     }
 
-    var satPassList = emptyList<SatPass>()
-
+    val debugMessage = MutableLiveData("")
     val gsp = MutableLiveData<GroundStationPosition>(
         GroundStationPosition(
             preferences.getDouble(keyLat, 0.0),
             preferences.getDouble(keyLon, 0.0),
-            preferences.getDouble(keyHeight, 0.0)
+            preferences.getDouble(keyAlt, 0.0)
         )
     )
 
+    var satPassList = emptyList<SatPass>()
     var tleMainList = loadTwoLineElementFile()
     var tleSelectedMap = mutableMapOf<TLE, Boolean>()
-    var selectedSingleSat = tleMainList[0]
     var passPrefs = SatPassPrefs(
         preferences.getInt(keyHours, 8),
         preferences.getDouble(keyMaxEl, 16.0)
@@ -74,10 +72,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateSelectedSingleSat(sat: TLE) {
-        selectedSingleSat = sat
-    }
-
     suspend fun getPasses() {
         val passList = mutableListOf<SatPass>()
         withContext(Dispatchers.Default) {
@@ -85,12 +79,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (value) {
                     try {
                         val predictor = PassPredictor(tle, gsp.value)
-                        val passes = predictor.getPasses(Date(), passPrefs.hoursAhead, false)
+                        val passes = predictor.getPasses(Date(), passPrefs.hoursAhead, true)
                         passes.forEach { passList.add(SatPass(tle, predictor, it)) }
                     } catch (exception: IllegalArgumentException) {
-                        debugMessage.postValue("There was a problem with TLE")
+                        debugMessage.postValue("There was a problem with ${tle.name}")
                     } catch (exception: SatNotFoundException) {
-                        debugMessage.postValue("Certain satellites shall not pass")
+                        debugMessage.postValue("${tle.name} shall not pass")
                     }
                 }
             }
@@ -117,15 +111,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         locationClient.lastLocation.addOnSuccessListener { location: Location? ->
             val lat = location?.latitude ?: 0.0
             val lon = location?.longitude ?: 0.0
-            val height = location?.altitude ?: 0.0
+            val alt = location?.altitude ?: 0.0
 
             preferences.edit {
                 putDouble(keyLat, lat)
                 putDouble(keyLon, lon)
-                putDouble(keyHeight, height)
+                putDouble(keyAlt, alt)
                 apply()
             }
-            gsp.postValue(GroundStationPosition(lat, lon, height))
+            gsp.postValue(GroundStationPosition(lat, lon, alt))
             debugMessage.postValue("Location was updated")
         }
     }
