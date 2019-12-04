@@ -43,4 +43,9 @@
         android:label="@string/menu_credits"
         tools:layout="@layout/fragment_credits" />
 
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.rtbishop.lookingsat.ui.SettingsFragment"
+        android:label="@string/menu_settings" />
+
 </navigation>

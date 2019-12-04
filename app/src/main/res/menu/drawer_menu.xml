@@ -13,12 +13,16 @@
             android:icon="@drawable/ic_map"
             android:title="@string/menu_map" />
         <item
-            android:id="@+id/nav_credits"
-            android:icon="@drawable/ic_credits"
-            android:title="@string/menu_credits" />
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/menu_settings" />
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_about"
             android:title="@string/menu_about" />
+        <item
+            android:id="@+id/nav_credits"
+            android:icon="@drawable/ic_credits"
+            android:title="@string/menu_credits" />
     </group>
 </menu>

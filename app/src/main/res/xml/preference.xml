@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Ground station location settings">
+        <EditTextPreference
+            android:defaultValue="0.0"
+            android:key="lat"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Latitude" />
+        <EditTextPreference
+            android:defaultValue="0.0"
+            android:key="lon"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Longitude" />
+        <EditTextPreference
+            android:defaultValue="0.0"
+            android:key="alt"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Altitude" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Satellite pass settings">
+        <EditTextPreference
+            android:defaultValue="8"
+            android:key="hours"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="Show passes that occur within this time window"
+            android:title="Hours ahead" />
+        <EditTextPreference
+            android:defaultValue="16"
+            android:key="minEl"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="Show passes with maximum elevation above"
+            android:title="Minimum elevation" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Other settings">
+        <EditTextPreference
+            android:defaultValue="3000"
+            android:key="updateFreq"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="RadarView and MapView update frequency, ms"
+            android:title="View update interval" />
+    </PreferenceCategory>
+</PreferenceScreen>
