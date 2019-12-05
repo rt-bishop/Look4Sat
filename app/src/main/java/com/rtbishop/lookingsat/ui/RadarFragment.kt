@@ -18,7 +18,6 @@ import com.rtbishop.lookingsat.MainViewModel
 import com.rtbishop.lookingsat.R
 import com.rtbishop.lookingsat.repo.SatPass
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -27,7 +26,7 @@ import kotlin.math.sin
 
 class RadarFragment : Fragment() {
 
-    private val delay = 5000L
+    private val delay = 2000L
     private val service = Executors.newSingleThreadScheduledExecutor()
 
     private lateinit var viewModel: MainViewModel
@@ -36,11 +35,12 @@ class RadarFragment : Fragment() {
     private lateinit var radarSkyFrame: FrameLayout
     private lateinit var transRecycler: RecyclerView
     private lateinit var transAdapter: TransAdapter
-    private lateinit var radarSatName: TextView
-    private lateinit var radarMaxEl: TextView
-    private lateinit var radarAos: TextView
-    private lateinit var radarLos: TextView
+    private lateinit var radarAzimuth: TextView
+    private lateinit var radarElevation: TextView
+    private lateinit var radarRange: TextView
+    private lateinit var radarAltitude: TextView
     private lateinit var transNoFound: TextView
+    private lateinit var mainActivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,22 +58,28 @@ class RadarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         satPass = arguments?.get("satPass") as SatPass
+        mainActivity = activity as MainActivity
+        mainActivity.supportActionBar?.title = satPass.tle.name
+
         radarSkyFrame = view.findViewById(R.id.radar_sky_frame)
         transRecycler = view.findViewById(R.id.radar_recycler)
-        radarSatName = view.findViewById(R.id.radar_sat_name)
-        radarMaxEl = view.findViewById(R.id.radar_maxEl)
-        radarAos = view.findViewById(R.id.radar_aos)
-        radarLos = view.findViewById(R.id.radar_los)
-        transNoFound = view.findViewById(R.id.radar_trans_no_found)
+        radarAzimuth = view.findViewById(R.id.radar_azimuth)
+        radarElevation = view.findViewById(R.id.radar_elevation)
+        radarRange = view.findViewById(R.id.radar_range)
+        radarAltitude = view.findViewById(R.id.radar_altitude)
+        transNoFound = view.findViewById(R.id.radar_no_trans)
 
-        setupRadarView()
+        radarView = RadarView(mainActivity)
+        radarSkyFrame.addView(radarView)
+        service.scheduleAtFixedRate({ radarView.invalidate() }, 0, delay, TimeUnit.MILLISECONDS)
+
         setupTransRecycler()
     }
 
     private fun setupTransRecycler() {
         transAdapter = TransAdapter()
         transRecycler.apply {
-            layoutManager = LinearLayoutManager(activity as MainActivity)
+            layoutManager = LinearLayoutManager(mainActivity)
             adapter = transAdapter
         }
         lifecycleScope.launch {
@@ -86,22 +92,6 @@ class RadarFragment : Fragment() {
                 transNoFound.visibility = View.VISIBLE
             }
         }
-    }
-
-    private fun setupRadarView() {
-        radarView = RadarView(activity as MainActivity)
-        radarSkyFrame.addView(radarView)
-
-        val aosTime =
-            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
-        val losTime =
-            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.endTime)
-        radarSatName.text = satPass.tle.name
-        radarMaxEl.text = String.format("MaxEl: %.1f°", satPass.pass.maxEl)
-        radarAos.text = String.format("AOS - %s", aosTime)
-        radarLos.text = String.format("LOS - %s", losTime)
-
-        service.scheduleAtFixedRate({ radarView.invalidate() }, delay, delay, TimeUnit.MILLISECONDS)
     }
 
     inner class RadarView(context: Context) : View(context) {
@@ -153,11 +143,20 @@ class RadarFragment : Fragment() {
 
         override fun onDraw(canvas: Canvas) {
             bmp.eraseColor(Color.TRANSPARENT)
+            setPassText()
             drawRadarView()
             drawRadarText()
             drawPassTrajectory()
             drawSatellite()
             canvas.drawBitmap(bmp, left.toFloat(), top.toFloat(), null)
+        }
+
+        private fun setPassText() {
+            satPos = satPass.predictor.getSatPos(Date())
+            radarAzimuth.text = String.format("Azimuth: %.1f°", rad2Deg(satPos.azimuth))
+            radarElevation.text = String.format("Elevation: %.1f°", rad2Deg(satPos.elevation))
+            radarRange.text = String.format("Range: %.0f km", satPos.range)
+            radarAltitude.text = String.format("Altitude: %.0f km", satPos.altitude)
         }
 
         private fun drawRadarView() {
@@ -212,6 +211,10 @@ class RadarFragment : Fragment() {
         private fun sph2CartY(azimuth: Double, elevation: Double, r: Double): Float {
             val radius = r * (piDiv2 - elevation) / piDiv2
             return (radius * sin(piDiv2 - azimuth)).toFloat()
+        }
+
+        private fun rad2Deg(value: Double): Double {
+            return value * 180 / Math.PI
         }
     }
 }

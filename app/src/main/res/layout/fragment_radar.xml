@@ -16,33 +16,34 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/radar_sat_name"
-        style="@style/RadarText"
-        android:text="@string/card_sat_name"
-        app:layout_constraintStart_toStartOf="@+id/radar_aos"
-        app:layout_constraintTop_toTopOf="@+id/radar_maxEl" />
-
-    <TextView
-        android:id="@+id/radar_maxEl"
-        style="@style/RadarText"
-        android:layout_marginEnd="4dp"
-        android:text="@string/card_max_el"
-        app:layout_constraintEnd_toEndOf="@+id/radar_sky_frame"
-        app:layout_constraintTop_toTopOf="@+id/radar_sky_frame" />
-
-    <TextView
-        android:id="@+id/radar_aos"
+        android:id="@+id/radar_azimuth"
         style="@style/RadarText"
         android:layout_marginStart="4dp"
-        android:text="@string/card_pass_aos_time"
+        android:text="@string/radar_azimuth"
         app:layout_constraintBottom_toBottomOf="@+id/radar_sky_frame"
         app:layout_constraintStart_toStartOf="@+id/radar_sky_frame" />
 
     <TextView
-        android:id="@+id/radar_los"
+        android:id="@+id/radar_elevation"
         style="@style/RadarText"
         android:layout_marginEnd="4dp"
-        android:text="@string/card_pass_los_time"
+        android:text="@string/radar_elevation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/radar_sky_frame" />
+
+    <TextView
+        android:id="@+id/radar_altitude"
+        style="@style/RadarText"
+        android:layout_marginStart="4dp"
+        android:text="@string/radar_altitude"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/radar_sky_frame" />
+
+    <TextView
+        android:id="@+id/radar_range"
+        style="@style/RadarText"
+        android:layout_marginEnd="4dp"
+        android:text="@string/radar_range"
         app:layout_constraintBottom_toBottomOf="@+id/radar_sky_frame"
         app:layout_constraintEnd_toEndOf="@+id/radar_sky_frame" />
 
@@ -53,24 +54,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_trans_header" />
-
-    <TextView
-        android:id="@+id/radar_trans_header"
-        style="@style/RadarText"
-        android:text="@string/trans_header"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_sky_frame" />
 
     <TextView
-        android:id="@+id/radar_trans_no_found"
+        android:id="@+id/radar_no_trans"
         style="@style/RadarText"
+        android:layout_marginTop="8dp"
         android:text="@string/no_trans"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_trans_header" />
+        app:layout_constraintTop_toBottomOf="@+id/radar_sky_frame" />
 </androidx.constraintlayout.widget.ConstraintLayout>

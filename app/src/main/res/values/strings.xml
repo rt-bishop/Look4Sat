@@ -27,6 +27,11 @@
     <string name="card_pass_aos_time">AOS - 13:14:15</string>
     <string name="card_pass_los_time">LOS - 16:17:18</string>
 
+    <string name="radar_azimuth">Azimuth: 180.00°</string>
+    <string name="radar_elevation">Elevation: 75.50°</string>
+    <string name="radar_altitude">Altitude: 850 km</string>
+    <string name="radar_range">Range: 12000 km</string>
+
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_clear">Clear All</string>

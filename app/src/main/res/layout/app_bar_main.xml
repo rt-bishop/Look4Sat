@@ -13,7 +13,8 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="@color/themeAccent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/toolbar_layout_timer"
