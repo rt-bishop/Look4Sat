@@ -27,12 +27,15 @@ import javax.inject.Inject
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val keyLat = "latitude"
-    private val keyLon = "longitude"
-    private val keyAlt = "altitude"
-    private val keyHours = "hoursAhead"
-    private val keyMaxEl = "maxElevation"
-    private val tleFileName = "tleFile.txt"
+    private val defValueLoc = application.getString(R.string.def_gsp_loc)
+    private val defValueHours = application.getString(R.string.def_hours_ahead)
+    private val defValueMinEl = application.getString(R.string.def_min_el)
+    private val keyLat = application.getString(R.string.key_lat)
+    private val keyLon = application.getString(R.string.key_lon)
+    private val keyAlt = application.getString(R.string.key_alt)
+    private val keyHours = application.getString(R.string.key_hours_ahead)
+    private val keyMinEl = application.getString(R.string.key_min_el)
+    private val tleFileName = application.getString(R.string.tle_file_name)
 
     @Inject
     lateinit var locationClient: FusedLocationProviderClient
@@ -48,9 +51,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val debugMessage = MutableLiveData("")
     val gsp = MutableLiveData<GroundStationPosition>(
         GroundStationPosition(
-            preferences.getDouble(keyLat, 0.0),
-            preferences.getDouble(keyLon, 0.0),
-            preferences.getDouble(keyAlt, 0.0)
+            preferences.getString(keyLat, defValueLoc)!!.toDouble(),
+            preferences.getString(keyLon, defValueLoc)!!.toDouble(),
+            preferences.getString(keyAlt, defValueLoc)!!.toDouble()
         )
     )
 
@@ -58,8 +61,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var tleMainList = loadTwoLineElementFile()
     var tleSelectedMap = mutableMapOf<TLE, Boolean>()
     var passPrefs = SatPassPrefs(
-        preferences.getInt(keyHours, 8),
-        preferences.getDouble(keyMaxEl, 16.0)
+        preferences.getString(keyHours, defValueHours)!!.toInt(),
+        preferences.getString(keyMinEl, defValueMinEl)!!.toDouble()
     )
 
     private fun loadTwoLineElementFile(): List<TLE> {
@@ -102,9 +105,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         passPrefs = SatPassPrefs(hoursAhead, maxEl)
         preferences.edit {
             putInt(keyHours, hoursAhead)
-            putDouble(keyMaxEl, maxEl)
+            putLong(keyMinEl, maxEl.toRawBits())
             apply()
         }
+    }
+
+    fun updateGsp() {
+        val lat = preferences.getString(keyLat, defValueLoc)!!.toDouble()
+        val lon = preferences.getString(keyLon, defValueLoc)!!.toDouble()
+        val alt = preferences.getString(keyAlt, defValueLoc)!!.toDouble()
+        gsp.postValue(GroundStationPosition(lat, lon, alt))
+    }
+
+    fun updatePassPref() {
+        passPrefs = SatPassPrefs(
+            preferences.getString(keyHours, defValueHours)!!.toInt(),
+            preferences.getString(keyMinEl, defValueMinEl)!!.toDouble()
+        )
     }
 
     fun updateLocation() {
@@ -114,9 +131,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val alt = location?.altitude ?: 0.0
 
             preferences.edit {
-                putDouble(keyLat, lat)
-                putDouble(keyLon, lon)
-                putDouble(keyAlt, alt)
+                putString(keyLat, lat.toString())
+                putString(keyLon, lon.toString())
+                putString(keyAlt, alt.toString())
                 apply()
             }
             gsp.postValue(GroundStationPosition(lat, lon, alt))
@@ -155,9 +172,3 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return repository.getTransmittersForSat(id)
     }
 }
-
-fun SharedPreferences.Editor.putDouble(key: String, double: Double)
-        : SharedPreferences.Editor = putLong(key, double.toRawBits())
-
-fun SharedPreferences.getDouble(key: String, default: Double) =
-    Double.fromBits(getLong(key, default.toRawBits()))

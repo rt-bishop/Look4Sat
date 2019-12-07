@@ -39,10 +39,31 @@
     <string name="title_pass_pref">Passes preferences</string>
     <string name="title_select_sat">Select satellites to track</string>
 
-    <string name="pass_pref_tv_hours">Show passes that occur within X hours</string>
-    <string name="pass_pref_hint_hours">Hours ahead</string>
-    <string name="pass_pref_tv_maxEl">Show passes with max elevation above</string>
-    <string name="pass_pref_hint_maxEl">Max elevation</string>
+    <string name="pref_gsp_title">Ground station position settings</string>
+    <string name="pref_lat_title">Latitude</string>
+    <string name="pref_lon_title">Longitude</string>
+    <string name="pref_alt_title">Altitude</string>
+    <string name="pref_sat_pass_title">Satellite pass settings</string>
+    <string name="pref_hours_ahead_title">Hours ahead</string>
+    <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
+    <string name="pref_min_el_title">Minimum elevation</string>
+    <string name="pref_min_el_summary">Show passes with max elevation above</string>
+    <string name="pref_other_title">Other settings</string>
+    <string name="pref_update_freq_title">Update frequency</string>
+    <string name="pref_update_freq_summary">Views update interval, ms</string>
+
+    <string name="def_gsp_loc">0.0</string>
+    <string name="def_hours_ahead">8</string>
+    <string name="def_min_el">16.0</string>
+    <string name="def_update_freq">3000</string>
+
+    <string name="key_lat">latitude</string>
+    <string name="key_lon">longitude</string>
+    <string name="key_alt">altitude</string>
+    <string name="key_hours_ahead">hours_ahead</string>
+    <string name="key_min_el">min_elevation</string>
+    <string name="key_update_freq">update_freq</string>
+    <string name="tle_file_name">tleFile.txt</string>
 
     <string name="no">No</string>
     <string name="yes">Yes</string>

@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Ground station location settings">
+    <PreferenceCategory android:title="@string/pref_gsp_title">
         <EditTextPreference
-            android:defaultValue="0.0"
-            android:key="lat"
+            android:defaultValue="@string/def_gsp_loc"
+            android:key="@string/key_lat"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Latitude" />
+            android:title="@string/pref_lat_title" />
         <EditTextPreference
-            android:defaultValue="0.0"
-            android:key="lon"
+            android:defaultValue="@string/def_gsp_loc"
+            android:key="@string/key_lon"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Longitude" />
+            android:title="@string/pref_lon_title" />
         <EditTextPreference
-            android:defaultValue="0.0"
-            android:key="alt"
+            android:defaultValue="@string/def_gsp_loc"
+            android:key="@string/key_alt"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Altitude" />
+            android:title="@string/pref_alt_title" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Satellite pass settings">
+    <PreferenceCategory android:title="@string/pref_sat_pass_title">
         <EditTextPreference
-            android:defaultValue="8"
-            android:key="hours"
+            android:defaultValue="@string/def_hours_ahead"
+            android:key="@string/key_hours_ahead"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:summary="Show passes that occur within this time window"
-            android:title="Hours ahead" />
+            android:summary="@string/pref_hours_ahead_summary"
+            android:title="@string/pref_hours_ahead_title" />
         <EditTextPreference
-            android:defaultValue="16"
-            android:key="minEl"
+            android:defaultValue="@string/def_hours_ahead"
+            android:key="@string/key_min_el"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:summary="Show passes with maximum elevation above"
-            android:title="Minimum elevation" />
+            android:summary="@string/pref_min_el_summary"
+            android:title="@string/pref_min_el_title" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Other settings">
+    <PreferenceCategory android:title="@string/pref_other_title">
         <EditTextPreference
-            android:defaultValue="3000"
-            android:key="updateFreq"
+            android:defaultValue="@string/def_update_freq"
+            android:key="@string/key_update_freq"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:summary="RadarView and MapView update frequency, ms"
-            android:title="View update interval" />
+            android:summary="@string/pref_update_freq_summary"
+            android:title="@string/pref_update_freq_title" />
     </PreferenceCategory>
 </PreferenceScreen>
