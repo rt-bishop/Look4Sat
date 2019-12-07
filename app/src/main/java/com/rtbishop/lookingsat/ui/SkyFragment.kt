@@ -5,7 +5,10 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -29,7 +32,7 @@ class SkyFragment : Fragment() {
     private lateinit var recAdapterCurrent: RecyclerView.Adapter<*>
     private lateinit var recAdapterFuture: SatPassAdapter
     private lateinit var timeToAos: TextView
-    private lateinit var btnPassPrefs: ImageButton
+    private lateinit var btnRefresh: ImageButton
     private lateinit var progressBar: ProgressBar
     private lateinit var fab: FloatingActionButton
     private lateinit var aosTimer: CountDownTimer
@@ -55,7 +58,7 @@ class SkyFragment : Fragment() {
 
     private fun setupViews(view: View) {
         timeToAos = (activity as MainActivity).findViewById(R.id.toolbar_time_to_aos)
-        btnPassPrefs = (activity as MainActivity).findViewById(R.id.toolbar_btn_refresh)
+        btnRefresh = (activity as MainActivity).findViewById(R.id.toolbar_btn_refresh)
         progressBar = view.findViewById(R.id.sky_progressbar)
         recViewFuture = view.findViewById(R.id.sky_recycler_future)
         fab = view.findViewById(R.id.sky_fab)
@@ -71,32 +74,8 @@ class SkyFragment : Fragment() {
             resetTimer()
         }
 
-        btnPassPrefs.setOnClickListener { showSatPassPrefsDialog() }
+        btnRefresh.setOnClickListener { calculatePasses() }
         fab.setOnClickListener { showSelectSatDialog() }
-    }
-
-    private fun showSatPassPrefsDialog() {
-        val context = activity as MainActivity
-        val satPassPrefView = View.inflate(context, R.layout.sat_pass_pref, null)
-        val etHours = satPassPrefView.findViewById<EditText>(R.id.pass_pref_et_hours)
-        val etMaxEl = satPassPrefView.findViewById<EditText>(R.id.pass_pref_et_maxEl)
-        etHours.setText(viewModel.passPrefs.hoursAhead.toString())
-        etMaxEl.setText(viewModel.passPrefs.maxEl.toString())
-
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(getString(R.string.title_pass_pref))
-            .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
-                val hoursAhead = etHours.text.toString().toInt()
-                val maxEl = etMaxEl.text.toString().toDouble()
-                viewModel.updatePassPrefs(hoursAhead, maxEl)
-                calculatePasses()
-            }
-            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
-                dialog.cancel()
-            }
-            .setView(satPassPrefView)
-            .create()
-            .show()
     }
 
     private fun showSelectSatDialog() {
