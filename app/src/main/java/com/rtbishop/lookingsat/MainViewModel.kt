@@ -101,15 +101,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         tleSelectedMap = mutableMap
     }
 
-    fun updatePassPrefs(hoursAhead: Int, maxEl: Double) {
-        passPrefs = SatPassPrefs(hoursAhead, maxEl)
-        preferences.edit {
-            putInt(keyHours, hoursAhead)
-            putLong(keyMinEl, maxEl.toRawBits())
-            apply()
-        }
-    }
-
     fun updateGsp() {
         val lat = preferences.getString(keyLat, defValueLoc)!!.toDouble()
         val lon = preferences.getString(keyLon, defValueLoc)!!.toDouble()

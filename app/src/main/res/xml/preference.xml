@@ -29,7 +29,7 @@
             android:summary="@string/pref_hours_ahead_summary"
             android:title="@string/pref_hours_ahead_title" />
         <EditTextPreference
-            android:defaultValue="@string/def_hours_ahead"
+            android:defaultValue="@string/def_min_el"
             android:key="@string/key_min_el"
             android:selectAllOnFocus="true"
             android:singleLine="true"

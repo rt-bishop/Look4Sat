@@ -36,7 +36,6 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_clear">Clear All</string>
 
-    <string name="title_pass_pref">Passes preferences</string>
     <string name="title_select_sat">Select satellites to track</string>
 
     <string name="pref_gsp_title">Ground station position settings</string>

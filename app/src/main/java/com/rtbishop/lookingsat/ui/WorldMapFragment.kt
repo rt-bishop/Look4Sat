@@ -131,11 +131,8 @@ class WorldMapFragment : Fragment() {
             drawFootprint(canvas, frameWidth, frameHeight, footprintPositions)
             var longitude = rad2Deg(satPos.longitude)
 
-            if (longitude > 180.0) {
-                longitude -= 180.0
-            } else {
-                longitude += 180.0
-            }
+            if (longitude > 180.0) longitude -= 180.0
+            else longitude += 180.0
         }
 
         private fun drawGroundTrack(canvas: Canvas, width: Int, height: Int, list: List<SatPos>) {
@@ -151,9 +148,8 @@ class WorldMapFragment : Fragment() {
                 else trackX -= 180
 
                 trackX *= width / 360f
-                trackY = ((90.0 - rad2Deg(satPos.latitude)) * (height / 180.0))
-                    .roundToInt()
-                    .toFloat()
+                trackY =
+                    ((90.0 - rad2Deg(satPos.latitude)) * (height / 180.0)).roundToInt().toFloat()
 
                 if (index == 0 || abs(trackX - prevX) > 180) trackPath.moveTo(trackX, trackY)
                 else trackPath.lineTo(trackX, trackY)
@@ -176,9 +172,7 @@ class WorldMapFragment : Fragment() {
                 else printX -= 180f
 
                 printX *= width / 360f
-                printY = ((90.0 - position.lat) * (height / 180.0))
-                    .roundToInt()
-                    .toFloat()
+                printY = ((90.0 - position.lat) * (height / 180.0)).roundToInt().toFloat()
 
                 if (index == 0 || abs(printX - prevX) > 180) printPath.moveTo(printX, printY)
                 else printPath.lineTo(printX, printY)
