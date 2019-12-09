@@ -22,9 +22,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 import java.util.*
 import javax.inject.Inject
 
+@Suppress("UNCHECKED_CAST")
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val defValueLoc = application.getString(R.string.def_gsp_loc)
@@ -36,6 +39,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val keyHours = application.getString(R.string.key_hours_ahead)
     private val keyMinEl = application.getString(R.string.key_min_el)
     private val tleFileName = application.getString(R.string.tle_file_name)
+    private val app = application
 
     @Inject
     lateinit var locationClient: FusedLocationProviderClient
@@ -45,7 +49,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     lateinit var repository: Repository
 
     init {
-        (application as LookingSatApp).appComponent.inject(this)
+        (app as LookingSatApp).appComponent.inject(this)
     }
 
     val debugMessage = MutableLiveData("")
@@ -66,13 +70,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     )
 
     private fun loadTwoLineElementFile(): List<TLE> {
-        return try {
-            TLE.importSat(getApplication<Application>().openFileInput(tleFileName))
-                .sortedWith(compareBy { it.name })
-        } catch (exception: FileNotFoundException) {
+        try {
+            val fileInput = app.openFileInput(tleFileName)
+            val objectInput = ObjectInputStream(fileInput)
+            val tleList = objectInput.readObject()
+            return tleList as List<TLE>
+        } catch (e: FileNotFoundException) {
             debugMessage.postValue("TLE file wasn't found")
-            emptyList()
+        } catch (e: IOException) {
+            debugMessage.postValue(e.toString())
         }
+        return emptyList()
     }
 
     suspend fun getPasses() {
@@ -132,15 +140,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateTwoLineElementFile() {
+    fun updateAndSaveTleFile() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val stream = repository.fetchTleStream()
-                getApplication<Application>().openFileOutput(tleFileName, Context.MODE_PRIVATE)
-                    .use {
-                        it.write(stream.readBytes())
-                    }
-                tleMainList = loadTwoLineElementFile()
+                val inputStream = repository.fetchTleStream()
+                val tleList = TLE.importSat(inputStream).apply { sortBy { it.name } }
+                val fileOutStream = app.openFileOutput(tleFileName, Context.MODE_PRIVATE)
+                ObjectOutputStream(fileOutStream).apply {
+                    writeObject(tleList)
+                    flush()
+                    close()
+                }
+                tleMainList = tleList
                 debugMessage.postValue("TLE file was updated")
             } catch (exception: IOException) {
                 debugMessage.postValue("Couldn't update TLE file")

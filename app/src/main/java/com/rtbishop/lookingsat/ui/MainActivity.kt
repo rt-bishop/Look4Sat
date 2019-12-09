@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         drawerBtnLoc.setOnClickListener { updateLocation() }
-        drawerBtnTle.setOnClickListener { viewModel.updateTwoLineElementFile() }
+        drawerBtnTle.setOnClickListener { viewModel.updateAndSaveTleFile() }
         drawerBtnTrans.setOnClickListener { viewModel.updateTransmittersDatabase() }
         drawerBtnGithub.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl)))
