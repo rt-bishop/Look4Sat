@@ -75,46 +75,34 @@ class SkyFragment : Fragment() {
         }
 
         btnRefresh.setOnClickListener { calculatePasses() }
-        fab.setOnClickListener { showSelectSatDialog() }
+        fab.setOnClickListener {
+            showSelectSatDialog(viewModel.tleMainList, viewModel.selectionList)
+        }
     }
 
-    private fun showSelectSatDialog() {
-        val tleMainList = viewModel.tleMainList
-        val tleNameArray = arrayOfNulls<String>(tleMainList.size)
-        val tleCheckedArray = BooleanArray(tleMainList.size)
-        val selectedSatMap = viewModel.tleSelectedMap
-        val currentSelectionMap = mutableMapOf<TLE, Boolean>()
-
-        if (selectedSatMap.isEmpty()) {
-            tleMainList.withIndex().forEach { (position, tle) ->
-                tleNameArray[position] = tle.name
-                tleCheckedArray[position] = false
-            }
-        } else {
-            tleMainList.withIndex().forEach { (position, tle) ->
-                tleNameArray[position] = tle.name
-                tleCheckedArray[position] = selectedSatMap.getOrDefault(tle, false)
-            }
+    private fun showSelectSatDialog(tleMainList: List<TLE>, selectionList: MutableList<Int>) {
+        val tleNameArray = arrayOfNulls<String>(tleMainList.size).apply {
+            tleMainList.withIndex().forEach { (position, tle) -> this[position] = tle.name }
         }
-
+        val tleCheckedArray = BooleanArray(tleMainList.size).apply {
+            selectionList.forEach { this[it] = true }
+        }
         val builder = AlertDialog.Builder(activity as MainActivity)
         builder.setTitle(getString(R.string.title_select_sat))
             .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
-                currentSelectionMap[tleMainList[which]] = isChecked
+                if (isChecked) selectionList.add(which)
+                else if (selectionList.contains(which)) selectionList.remove(which)
             }
             .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
-                for ((tle, value) in currentSelectionMap) {
-                    selectedSatMap[tle] = value
-                    viewModel.updateSelectedSatMap(selectedSatMap)
-                    calculatePasses()
-                }
+                viewModel.updateAndSaveSelectionList(selectionList)
+                calculatePasses()
             }
             .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
                 dialog.cancel()
             }
             .setNeutralButton(getString(R.string.btn_clear)) { _, _ ->
-                selectedSatMap.clear()
-                viewModel.updateSelectedSatMap(selectedSatMap)
+                selectionList.clear()
+                viewModel.updateAndSaveSelectionList(selectionList)
                 calculatePasses()
             }
             .create()

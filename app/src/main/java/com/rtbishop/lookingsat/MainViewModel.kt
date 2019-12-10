@@ -27,7 +27,6 @@ import java.io.ObjectOutputStream
 import java.util.*
 import javax.inject.Inject
 
-@Suppress("UNCHECKED_CAST")
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val defValueLoc = application.getString(R.string.def_gsp_loc)
@@ -38,7 +37,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val keyAlt = application.getString(R.string.key_alt)
     private val keyHours = application.getString(R.string.key_hours_ahead)
     private val keyMinEl = application.getString(R.string.key_min_el)
-    private val tleFileName = application.getString(R.string.tle_file_name)
+    private val tleMainListFileName = application.getString(R.string.tle_main_list_file_name)
+    private val tleSelectionFileName = application.getString(R.string.tle_selection_file_name)
     private val app = application
 
     @Inject
@@ -52,6 +52,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         (app as LookingSatApp).appComponent.inject(this)
     }
 
+    private var passPrefs = SatPassPrefs(
+        preferences.getString(keyHours, defValueHours)!!.toInt(),
+        preferences.getString(keyMinEl, defValueMinEl)!!.toDouble()
+    )
     val debugMessage = MutableLiveData("")
     val gsp = MutableLiveData<GroundStationPosition>(
         GroundStationPosition(
@@ -60,54 +64,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             preferences.getString(keyAlt, defValueLoc)!!.toDouble()
         )
     )
-
     var satPassList = emptyList<SatPass>()
     var tleMainList = loadTwoLineElementFile()
-    var tleSelectedMap = mutableMapOf<TLE, Boolean>()
-    var passPrefs = SatPassPrefs(
-        preferences.getString(keyHours, defValueHours)!!.toInt(),
-        preferences.getString(keyMinEl, defValueMinEl)!!.toDouble()
-    )
-
-    private fun loadTwoLineElementFile(): List<TLE> {
-        try {
-            val fileInput = app.openFileInput(tleFileName)
-            val objectInput = ObjectInputStream(fileInput)
-            val tleList = objectInput.readObject()
-            return tleList as List<TLE>
-        } catch (e: FileNotFoundException) {
-            debugMessage.postValue("TLE file wasn't found")
-        } catch (e: IOException) {
-            debugMessage.postValue(e.toString())
-        }
-        return emptyList()
-    }
-
-    suspend fun getPasses() {
-        val passList = mutableListOf<SatPass>()
-        withContext(Dispatchers.Default) {
-            tleSelectedMap.forEach { (tle, value) ->
-                if (value) {
-                    try {
-                        val predictor = PassPredictor(tle, gsp.value)
-                        val passes = predictor.getPasses(Date(), passPrefs.hoursAhead, true)
-                        passes.forEach { passList.add(SatPass(tle, predictor, it)) }
-                    } catch (exception: IllegalArgumentException) {
-                        debugMessage.postValue("There was a problem with ${tle.name}")
-                    } catch (exception: SatNotFoundException) {
-                        debugMessage.postValue("${tle.name} shall not pass")
-                    }
-                }
-            }
-            passList.retainAll { it.pass.maxEl >= passPrefs.maxEl }
-            passList.sortBy { it.pass.startTime }
-        }
-        satPassList = passList
-    }
-
-    fun updateSelectedSatMap(mutableMap: MutableMap<TLE, Boolean>) {
-        tleSelectedMap = mutableMap
-    }
+    var selectionList = loadSelectionList()
 
     fun updateGsp() {
         val lat = preferences.getString(keyLat, defValueLoc)!!.toDouble()
@@ -145,7 +104,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val inputStream = repository.fetchTleStream()
                 val tleList = TLE.importSat(inputStream).apply { sortBy { it.name } }
-                val fileOutStream = app.openFileOutput(tleFileName, Context.MODE_PRIVATE)
+                val fileOutStream = app.openFileOutput(tleMainListFileName, Context.MODE_PRIVATE)
                 ObjectOutputStream(fileOutStream).apply {
                     writeObject(tleList)
                     flush()
@@ -170,7 +129,70 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateAndSaveSelectionList(list: MutableList<Int>) {
+        selectionList = list
+        try {
+            val fileOutputStream = app.openFileOutput(tleSelectionFileName, Context.MODE_PRIVATE)
+            ObjectOutputStream(fileOutputStream).apply {
+                writeObject(list)
+                flush()
+                close()
+            }
+        } catch (exception: IOException) {
+            debugMessage.postValue(exception.toString())
+        }
+    }
+
+    suspend fun getPasses() {
+        val passList = mutableListOf<SatPass>()
+        withContext(Dispatchers.Default) {
+            selectionList.forEach { indexOfSelection ->
+                val tle = tleMainList[indexOfSelection]
+                try {
+                    val predictor = PassPredictor(tle, gsp.value)
+                    val passes = predictor.getPasses(Date(), passPrefs.hoursAhead, true)
+                    passes.forEach { passList.add(SatPass(tle, predictor, it)) }
+                } catch (exception: IllegalArgumentException) {
+                    debugMessage.postValue("There was a problem with ${tle.name}")
+                } catch (exception: SatNotFoundException) {
+                    debugMessage.postValue("${tle.name} shall not pass")
+                }
+            }
+            passList.retainAll { it.pass.maxEl >= passPrefs.maxEl }
+            passList.sortBy { it.pass.startTime }
+        }
+        satPassList = passList
+    }
+
     suspend fun getTransmittersForSat(id: Int): List<Transmitter> {
         return repository.getTransmittersForSat(id)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun loadTwoLineElementFile(): List<TLE> {
+        try {
+            val fileInputStream = app.openFileInput(tleMainListFileName)
+            val tleList = ObjectInputStream(fileInputStream).readObject()
+            return tleList as List<TLE>
+        } catch (exception: FileNotFoundException) {
+            debugMessage.postValue("TLE file wasn't found")
+        } catch (exception: IOException) {
+            debugMessage.postValue(exception.toString())
+        }
+        return emptyList()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun loadSelectionList(): MutableList<Int> {
+        try {
+            val fileInputStream = app.openFileInput(tleSelectionFileName)
+            val selectionList = ObjectInputStream(fileInputStream).readObject()
+            return selectionList as MutableList<Int>
+        } catch (exception: FileNotFoundException) {
+            debugMessage.postValue("Selection file wasn't found")
+        } catch (exception: IOException) {
+            debugMessage.postValue(exception.toString())
+        }
+        return mutableListOf()
     }
 }

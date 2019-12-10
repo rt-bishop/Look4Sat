@@ -62,7 +62,8 @@
     <string name="key_hours_ahead">hours_ahead</string>
     <string name="key_min_el">min_elevation</string>
     <string name="key_update_freq">update_freq</string>
-    <string name="tle_file_name">tleFile.txt</string>
+    <string name="tle_main_list_file_name">tleFile.txt</string>
+    <string name="tle_selection_file_name">tleSelection</string>
 
     <string name="no">No</string>
     <string name="yes">Yes</string>
