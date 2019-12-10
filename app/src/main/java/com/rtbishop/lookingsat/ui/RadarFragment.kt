@@ -115,24 +115,24 @@ class RadarFragment : Fragment() {
         }
         private val radarPaint = Paint().apply {
             isAntiAlias = true
-            color = Color.parseColor("#C0C0C0")
+            color = resources.getColor(R.color.lightOnDark, (activity as MainActivity).theme)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val txtPaint = Paint().apply {
             isAntiAlias = true
-            color = Color.parseColor("#FFE082")
+            color = resources.getColor(R.color.themeAccent, (activity as MainActivity).theme)
             textSize = txtSize
         }
-        private val passPaint = Paint().apply {
+        private val trackPaint = Paint().apply {
             isAntiAlias = true
-            color = Color.RED
+            color = resources.getColor(R.color.satTrack, (activity as MainActivity).theme)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val satPaint = Paint().apply {
             isAntiAlias = true
-            color = Color.parseColor("#FFE082")
+            color = resources.getColor(R.color.themeAccent, (activity as MainActivity).theme)
             style = Paint.Style.FILL
         }
         private val path: Path = Path()
@@ -189,7 +189,7 @@ class RadarFragment : Fragment() {
                 }
                 startTime.time += delay
             }
-            cvs.drawPath(path, passPaint)
+            cvs.drawPath(path, trackPaint)
         }
 
         private fun drawSatellite() {

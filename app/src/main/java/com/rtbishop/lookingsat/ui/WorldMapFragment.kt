@@ -2,7 +2,6 @@ package com.rtbishop.lookingsat.ui
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.os.Bundle
@@ -102,13 +101,13 @@ class WorldMapFragment : Fragment() {
     inner class TrackView(context: Context) : View(context) {
         private val groundTrackPaint = Paint().apply {
             isAntiAlias = true
-            color = Color.RED
+            color = resources.getColor(R.color.satTrack, (activity as MainActivity).theme)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val footprintPaint = Paint().apply {
             isAntiAlias = true
-            color = Color.YELLOW
+            color = resources.getColor(R.color.satFootprint, (activity as MainActivity).theme)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
@@ -120,17 +119,12 @@ class WorldMapFragment : Fragment() {
             val frameHeight = mapFrame.measuredHeight
             val currentTime = getDateFor(System.currentTimeMillis())
             val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
-            val orbitEndTime = getDateFor(currentTime.time + orbitalPeriod * 60 * 1000)
             val satPos = predictor.getSatPos(currentTime)
             val footprintPositions = satPos.rangeCircle
-
-            var positions = predictor.getPositions(currentTime, 60, orbitalPeriod, orbitalPeriod)
-            drawGroundTrack(canvas, frameWidth, frameHeight, positions)
-            positions = predictor.getPositions(orbitEndTime, 60, 1, orbitalPeriod)
+            val positions = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
             drawGroundTrack(canvas, frameWidth, frameHeight, positions)
             drawFootprint(canvas, frameWidth, frameHeight, footprintPositions)
             var longitude = rad2Deg(satPos.longitude)
-
             if (longitude > 180.0) longitude -= 180.0
             else longitude += 180.0
         }
