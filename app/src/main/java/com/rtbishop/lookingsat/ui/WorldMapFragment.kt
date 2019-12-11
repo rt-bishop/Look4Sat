@@ -2,6 +2,7 @@ package com.rtbishop.lookingsat.ui
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.os.Bundle
@@ -111,7 +112,14 @@ class WorldMapFragment : Fragment() {
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
+        private val homeLocPaint = Paint().apply {
+            isAntiAlias = true
+            color = resources.getColor(R.color.satFootprint, (activity as MainActivity).theme)
+            style = Paint.Style.FILL
+            strokeWidth = scale
+        }
         private val scale = resources.displayMetrics.density
+        private val gsp = viewModel.gsp.value!!
 
         override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
@@ -127,6 +135,7 @@ class WorldMapFragment : Fragment() {
             var longitude = rad2Deg(satPos.longitude)
             if (longitude > 180.0) longitude -= 180.0
             else longitude += 180.0
+            drawHomeLoc(canvas, frameWidth, frameHeight)
         }
 
         private fun drawGroundTrack(canvas: Canvas, width: Int, height: Int, list: List<SatPos>) {
@@ -174,6 +183,15 @@ class WorldMapFragment : Fragment() {
                 prevX = printX
             }
             canvas.drawPath(printPath, footprintPaint)
+        }
+
+        private fun drawHomeLoc(canvas: Canvas, frameWidth: Int, frameHeight: Int) {
+            canvas.setMatrix(Matrix().apply {
+                postTranslate(frameWidth / 2f, frameHeight / 2f)
+            })
+            val cx = frameWidth / 360f * gsp.longitude.toFloat()
+            val cy = frameHeight / 180f * gsp.latitude.toFloat() * -1
+            canvas.drawCircle(cx, cy, scale * 2, homeLocPaint)
         }
 
         private fun getDateFor(value: Long): Date {
