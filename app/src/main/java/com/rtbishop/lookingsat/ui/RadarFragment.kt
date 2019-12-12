@@ -26,7 +26,6 @@ import kotlin.math.sin
 
 class RadarFragment : Fragment() {
 
-    private val delay = 2000L
     private val service = Executors.newSingleThreadScheduledExecutor()
 
     private lateinit var viewModel: MainViewModel
@@ -57,6 +56,7 @@ class RadarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val delay = viewModel.updateFreq
         satPass = arguments?.get("satPass") as SatPass
         mainActivity = activity as MainActivity
         mainActivity.supportActionBar?.title = satPass.tle.name
@@ -69,7 +69,7 @@ class RadarFragment : Fragment() {
         radarAltitude = view.findViewById(R.id.radar_altitude)
         transNoFound = view.findViewById(R.id.radar_no_trans)
 
-        radarView = RadarView(mainActivity)
+        radarView = RadarView(mainActivity, delay)
         radarSkyFrame.addView(radarView)
         service.scheduleAtFixedRate({ radarView.invalidate() }, 0, delay, TimeUnit.MILLISECONDS)
 
@@ -94,7 +94,7 @@ class RadarFragment : Fragment() {
         }
     }
 
-    inner class RadarView(context: Context) : View(context) {
+    inner class RadarView(context: Context, updateFreq: Long) : View(context) {
 
         private val radarSize = resources.displayMetrics.widthPixels
         private val scale = resources.displayMetrics.density
@@ -104,6 +104,7 @@ class RadarFragment : Fragment() {
         private val piDiv2 = Math.PI / 2.0
         private val txtSize = scale * 15
         private val center = 0f
+        private val delay = updateFreq
 
         private val bmp: Bitmap = Bitmap.createBitmap(radarSize, radarSize, Bitmap.Config.ARGB_8888)
         private val mtrx: Matrix = Matrix().apply {

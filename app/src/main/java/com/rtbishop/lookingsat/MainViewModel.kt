@@ -32,11 +32,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val defValueLoc = application.getString(R.string.def_gsp_loc)
     private val defValueHours = application.getString(R.string.def_hours_ahead)
     private val defValueMinEl = application.getString(R.string.def_min_el)
+    private val defValueUpdateFreq = application.getString(R.string.def_update_freq)
     private val keyLat = application.getString(R.string.key_lat)
     private val keyLon = application.getString(R.string.key_lon)
     private val keyAlt = application.getString(R.string.key_alt)
     private val keyHours = application.getString(R.string.key_hours_ahead)
     private val keyMinEl = application.getString(R.string.key_min_el)
+    private val keyUpdateFreq = application.getString(R.string.key_update_freq)
     private val tleMainListFileName = application.getString(R.string.tle_main_list_file_name)
     private val tleSelectionFileName = application.getString(R.string.tle_selection_file_name)
     private val app = application
@@ -67,6 +69,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var satPassList = emptyList<SatPass>()
     var tleMainList = loadTwoLineElementFile()
     var selectionList = loadSelectionList()
+    val updateFreq
+        get() = preferences.getString(keyUpdateFreq, defValueUpdateFreq)!!.toLong()
 
     fun updateGsp() {
         val lat = preferences.getString(keyLat, defValueLoc)!!.toDouble()

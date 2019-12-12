@@ -26,7 +26,6 @@ import kotlin.math.roundToInt
 
 class WorldMapFragment : Fragment() {
 
-    private val delay = 3000L
     private val service = Executors.newSingleThreadScheduledExecutor()
 
     private lateinit var viewModel: MainViewModel
@@ -55,6 +54,7 @@ class WorldMapFragment : Fragment() {
 //        fab = view.findViewById(R.id.worldmap_fab)
 //        fab.setOnClickListener { showSelectSatDialog() }
 
+        val delay = viewModel.updateFreq
         val tleString = arrayOf(
             "METEOR-M2 2",
             "1 44387U 19038A   19336.45319619 -.00000025  00000-0  80323-5 0  9996",
@@ -71,8 +71,7 @@ class WorldMapFragment : Fragment() {
 
         trackView = TrackView(activity as MainActivity)
         mapFrame.addView(trackView)
-
-        service.scheduleAtFixedRate({ trackView.invalidate() }, delay, delay, TimeUnit.MILLISECONDS)
+        service.scheduleAtFixedRate({ trackView.invalidate() }, 0, delay, TimeUnit.MILLISECONDS)
     }
 
 //    private fun showSelectSatDialog() {
