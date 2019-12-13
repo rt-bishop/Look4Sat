@@ -43,7 +43,8 @@ class RadarFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(activity as MainActivity).get(MainViewModel::class.java)
+        mainActivity = activity as MainActivity
+        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -58,7 +59,6 @@ class RadarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val delay = viewModel.updateFreq
         satPass = arguments?.get("satPass") as SatPass
-        mainActivity = activity as MainActivity
         mainActivity.supportActionBar?.title = satPass.tle.name
 
         radarSkyFrame = view.findViewById(R.id.radar_sky_frame)
@@ -71,7 +71,7 @@ class RadarFragment : Fragment() {
 
         radarView = RadarView(mainActivity, delay)
         radarSkyFrame.addView(radarView)
-        service.scheduleAtFixedRate({ radarView.invalidate() }, 0, delay, TimeUnit.MILLISECONDS)
+        service.scheduleAtFixedRate({ radarView.invalidate() }, delay, delay, TimeUnit.MILLISECONDS)
 
         setupTransRecycler()
     }
@@ -116,24 +116,24 @@ class RadarFragment : Fragment() {
         }
         private val radarPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.lightOnDark, (activity as MainActivity).theme)
+            color = resources.getColor(R.color.lightOnDark, mainActivity.theme)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val txtPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.themeAccent, (activity as MainActivity).theme)
+            color = resources.getColor(R.color.themeAccent, mainActivity.theme)
             textSize = txtSize
         }
         private val trackPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.satTrack, (activity as MainActivity).theme)
+            color = resources.getColor(R.color.satTrack, mainActivity.theme)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val satPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.themeAccent, (activity as MainActivity).theme)
+            color = resources.getColor(R.color.themeAccent, mainActivity.theme)
             style = Paint.Style.FILL
         }
         private val path: Path = Path()
