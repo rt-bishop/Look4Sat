@@ -1,7 +1,27 @@
+/*
+ * LookingSat. Amateur radio & weather satellite tracker and passes calculator.
+ * Copyright (C) 2019 Arty Bishop (bishop.arty@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     compileSdkVersion 29
@@ -31,7 +51,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.google.android.material:material:$material"
     implementation "androidx.appcompat:appcompat:$supportLib"
     implementation "androidx.legacy:legacy-support-v4:$supportLib"
@@ -47,7 +66,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
-    implementation "androidx.work:work-runtime-ktx:$work"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
+
+    // room
     implementation "androidx.room:room-runtime:$room"
     implementation "androidx.room:room-ktx:$room"
     kapt "androidx.room:room-compiler:$room"
@@ -70,4 +91,7 @@ dependencies {
     testImplementation "junit:junit:$junit"
     androidTestImplementation "androidx.test:runner:$runner"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
+
+    // licences
+    implementation "com.google.android.gms:play-services-oss-licenses:$licences"
 }
