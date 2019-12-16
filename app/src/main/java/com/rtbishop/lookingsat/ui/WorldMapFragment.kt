@@ -110,15 +110,12 @@ class WorldMapFragment : Fragment() {
 
         val builder = AlertDialog.Builder(mainActivity)
         builder.setTitle("Select Sat to track")
-            .setSingleChoiceItems(tleNameArray, checkedItem) { _, which ->
+            .setSingleChoiceItems(tleNameArray, checkedItem) { dialog, which ->
                 checkedItem = which
-            }
-            .setPositiveButton("Ok") { _, _ ->
-                selectedSat = tleMainList[selectionList[checkedItem]]
+                selectedSat = tleMainList[selectionList[which]]
                 predictor = PassPredictor(selectedSat, viewModel.gsp.value)
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.cancel()
+                trackView.invalidate()
+                dialog.dismiss()
             }
             .create()
             .show()
@@ -137,16 +134,11 @@ class WorldMapFragment : Fragment() {
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
-        private val homeLocPaint = Paint().apply {
+        private val txtPaint = Paint().apply {
             isAntiAlias = true
             color = resources.getColor(R.color.satFootprint, mainActivity.theme)
             style = Paint.Style.FILL
             strokeWidth = scale
-        }
-        private val homeTxtPaint = Paint().apply {
-            isAntiAlias = true
-            color = resources.getColor(R.color.themeAccent, mainActivity.theme)
-            style = Paint.Style.FILL
             textSize = 16f
         }
         private val scale = resources.displayMetrics.density
@@ -158,14 +150,11 @@ class WorldMapFragment : Fragment() {
             val frameHeight = mapFrame.measuredHeight
             val currentTime = getDateFor(System.currentTimeMillis())
             val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
-            val satPos = predictor.getSatPos(currentTime)
-            val footprintPositions = satPos.rangeCircle
-            val positions = predictor.getPositions(currentTime, 60, 15, orbitalPeriod * 3)
-            drawGroundTrack(canvas, frameWidth, frameHeight, positions)
-            drawFootprint(canvas, frameWidth, frameHeight, footprintPositions)
-            var longitude = rad2Deg(satPos.longitude)
-            if (longitude > 180.0) longitude -= 180.0
-            else longitude += 180.0
+            val satPosNow = predictor.getSatPos(currentTime)
+            val satPosList = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
+            val footprintPosList = satPosNow.rangeCircle
+            drawGroundTrack(canvas, frameWidth, frameHeight, satPosList)
+            drawFootprint(canvas, frameWidth, frameHeight, footprintPosList)
             drawHomeLoc(canvas, frameWidth, frameHeight)
         }
 
@@ -222,8 +211,8 @@ class WorldMapFragment : Fragment() {
             })
             val cx = frameWidth / 360f * gsp.longitude.toFloat()
             val cy = frameHeight / 180f * gsp.latitude.toFloat() * -1
-            canvas.drawCircle(cx, cy, scale * 2, homeLocPaint)
-            canvas.drawText("GSP", cx-homeTxtPaint.textSize, cy-homeTxtPaint.textSize, homeTxtPaint)
+            canvas.drawCircle(cx, cy, scale * 2, txtPaint)
+            canvas.drawText("GSP", cx - txtPaint.textSize, cy - txtPaint.textSize, txtPaint)
         }
 
         private fun getDateFor(value: Long): Date {
