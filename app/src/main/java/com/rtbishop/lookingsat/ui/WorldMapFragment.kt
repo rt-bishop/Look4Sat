@@ -143,6 +143,12 @@ class WorldMapFragment : Fragment() {
             style = Paint.Style.FILL
             strokeWidth = scale
         }
+        private val homeTxtPaint = Paint().apply {
+            isAntiAlias = true
+            color = resources.getColor(R.color.themeAccent, mainActivity.theme)
+            style = Paint.Style.FILL
+            textSize = 16f
+        }
         private val scale = resources.displayMetrics.density
         private val gsp = viewModel.gsp.value!!
 
@@ -217,6 +223,7 @@ class WorldMapFragment : Fragment() {
             val cx = frameWidth / 360f * gsp.longitude.toFloat()
             val cy = frameHeight / 180f * gsp.latitude.toFloat() * -1
             canvas.drawCircle(cx, cy, scale * 2, homeLocPaint)
+            canvas.drawText("GSP", cx-homeTxtPaint.textSize, cy-homeTxtPaint.textSize, homeTxtPaint)
         }
 
         private fun getDateFor(value: Long): Date {
