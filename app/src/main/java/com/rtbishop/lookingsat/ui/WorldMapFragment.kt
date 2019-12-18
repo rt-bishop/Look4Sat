@@ -44,7 +44,6 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
-import kotlin.math.roundToInt
 
 class WorldMapFragment : Fragment() {
 
@@ -153,12 +152,15 @@ class WorldMapFragment : Fragment() {
             val satPosNow = predictor.getSatPos(currentTime)
             val satPosList = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
             val footprintPosList = satPosNow.rangeCircle
-            drawGroundTrack(canvas, frameWidth, frameHeight, satPosList)
             drawFootprint(canvas, frameWidth, frameHeight, footprintPosList)
+            drawGroundTrack(canvas, frameWidth, frameHeight, satPosList)
             drawHomeLoc(canvas, frameWidth, frameHeight)
         }
 
         private fun drawGroundTrack(canvas: Canvas, width: Int, height: Int, list: List<SatPos>) {
+            canvas.setMatrix(Matrix().apply {
+                postTranslate(width / 2f, height / 2f)
+            })
             val trackPath = Path()
             var trackX: Float
             var trackY: Float
@@ -166,23 +168,26 @@ class WorldMapFragment : Fragment() {
 
             list.withIndex().forEach { (index, satPos) ->
                 trackX = rad2Deg(satPos.longitude).toFloat()
+                trackY = rad2Deg(satPos.latitude).toFloat() * -1
 
-                if (trackX <= 180.0) trackX += 180
-                else trackX -= 180
+                if (trackX > 180f) trackX -= 360f
 
                 trackX *= width / 360f
-                trackY =
-                    ((90.0 - rad2Deg(satPos.latitude)) * (height / 180.0)).roundToInt().toFloat()
+                trackY *= height / 180f
 
                 if (index == 0 || abs(trackX - prevX) > 180) trackPath.moveTo(trackX, trackY)
                 else trackPath.lineTo(trackX, trackY)
 
                 prevX = trackX
             }
+
             canvas.drawPath(trackPath, groundTrackPaint)
         }
 
         private fun drawFootprint(canvas: Canvas, width: Int, height: Int, list: List<Position>) {
+            canvas.setMatrix(Matrix().apply {
+                postTranslate(width / 2f, height / 2f)
+            })
             val printPath = Path()
             var printX: Float
             var printY: Float
@@ -190,12 +195,12 @@ class WorldMapFragment : Fragment() {
 
             list.withIndex().forEach { (index, position) ->
                 printX = position.lon.toFloat()
+                printY = position.lat.toFloat() * -1
 
-                if (printX <= 180f) printX += 180f
-                else printX -= 180f
+                if (printX > 180f) printX -= 360f
 
                 printX *= width / 360f
-                printY = ((90.0 - position.lat) * (height / 180.0)).roundToInt().toFloat()
+                printY *= height / 180f
 
                 if (index == 0 || abs(printX - prevX) > 180) printPath.moveTo(printX, printY)
                 else printPath.lineTo(printX, printY)
