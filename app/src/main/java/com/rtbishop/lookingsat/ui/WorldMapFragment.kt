@@ -20,10 +20,7 @@
 package com.rtbishop.lookingsat.ui
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.Rect
+import android.graphics.*
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -56,6 +53,8 @@ class WorldMapFragment : Fragment() {
     private lateinit var predictor: PassPredictor
     private lateinit var mainActivity: MainActivity
     private lateinit var selectedSat: TLE
+    private lateinit var tleMainList: List<TLE>
+    private lateinit var selectionList: MutableList<Int>
     private var checkedItem = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,8 +74,8 @@ class WorldMapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val delay = viewModel.updateFreq
-        val tleMainList = viewModel.tleMainList
-        val selectionList = viewModel.selectionList
+        tleMainList = viewModel.tleMainList
+        selectionList = viewModel.selectionList
         mapFrame = view.findViewById(R.id.worldmap_frame)
         fab = view.findViewById(R.id.worldmap_fab)
 
@@ -141,6 +140,14 @@ class WorldMapFragment : Fragment() {
             style = Paint.Style.FILL
             strokeWidth = scale
             textSize = 16f
+            setShadowLayer(2f, 2f, 2f, Color.BLACK)
+        }
+        private val outlinePaint = Paint().apply {
+            isAntiAlias = true
+            color = Color.BLACK
+            style = Paint.Style.FILL_AND_STROKE
+            strokeWidth = scale
+            textSize = 16f
         }
         private val rect = Rect()
 
@@ -155,10 +162,9 @@ class WorldMapFragment : Fragment() {
             val satPosList = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
             drawGroundTrack(canvas, degLon, degLat, satPosList)
 
-            val satPosNow = predictor.getSatPos(currentTime)
-            val footprintPosList = satPosNow.rangeCircle
-            drawFootprint(canvas, degLon, degLat, footprintPosList)
-            drawName(canvas, degLon, degLat, satPosNow)
+            selectionList.forEach {
+                drawSat(it, currentTime, canvas, degLon, degLat)
+            }
         }
 
         private fun drawHomeLoc(cvs: Canvas, degLon: Float, degLat: Float) {
@@ -193,6 +199,15 @@ class WorldMapFragment : Fragment() {
             cvs.drawPath(path, groundTrackPaint)
         }
 
+        private fun drawSat(index: Int, date: Date, canvas: Canvas, degLon: Float, degLat: Float) {
+            val tle = tleMainList[index]
+            val predictor = PassPredictor(tle, gsp)
+            val satPosNow = predictor.getSatPos(date)
+            val footprintPosList = satPosNow.rangeCircle
+            drawFootprint(canvas, degLon, degLat, footprintPosList)
+            drawName(canvas, degLon, degLat, satPosNow, tle.name)
+        }
+
         private fun drawFootprint(cvs: Canvas, degLon: Float, degLat: Float, list: List<Position>) {
             val path = Path()
             var lon: Float
@@ -216,15 +231,15 @@ class WorldMapFragment : Fragment() {
             cvs.drawPath(path, footprintPaint)
         }
 
-        private fun drawName(cvs: Canvas, degLon: Float, degLat: Float, satPosNow: SatPos) {
-            var lon = rad2Deg(satPosNow.longitude).toFloat()
-            val lat = rad2Deg(satPosNow.latitude).toFloat() * -1
+        private fun drawName(cvs: Canvas, degLon: Float, degLat: Float, pos: SatPos, name: String) {
+            var lon = rad2Deg(pos.longitude).toFloat()
+            val lat = rad2Deg(pos.latitude).toFloat() * -1
             if (lon > 180f) lon -= 360f
             val cx = lon * degLon
             val cy = lat * degLat
             cvs.drawCircle(cx, cy, scale * 2, txtPaint)
-            val name = selectedSat.name
             txtPaint.getTextBounds(name, 0, name.length, rect)
+            cvs.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, outlinePaint)
             cvs.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, txtPaint)
         }
 
