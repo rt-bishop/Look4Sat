@@ -21,7 +21,6 @@ package com.rtbishop.lookingsat.ui
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.os.Bundle
@@ -121,6 +120,8 @@ class WorldMapFragment : Fragment() {
     }
 
     inner class TrackView(context: Context) : View(context) {
+        private val gsp = viewModel.gsp.value!!
+        private val scale = resources.displayMetrics.density
         private val groundTrackPaint = Paint().apply {
             isAntiAlias = true
             color = resources.getColor(R.color.satTrack, mainActivity.theme)
@@ -140,84 +141,77 @@ class WorldMapFragment : Fragment() {
             strokeWidth = scale
             textSize = 16f
         }
-        private val scale = resources.displayMetrics.density
-        private val gsp = viewModel.gsp.value!!
 
         override fun onDraw(canvas: Canvas) {
-            super.onDraw(canvas)
-            val frameWidth = mapFrame.measuredWidth
-            val frameHeight = mapFrame.measuredHeight
+            canvas.translate(width / 2f, height / 2f)
+            val degLon = width / 360f
+            val degLat = height / 180f
+            drawHomeLoc(canvas, degLon, degLat)
+
             val currentTime = getDateFor(System.currentTimeMillis())
             val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
-            val satPosNow = predictor.getSatPos(currentTime)
             val satPosList = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
+            drawGroundTrack(canvas, degLon, degLat, satPosList)
+
+            val satPosNow = predictor.getSatPos(currentTime)
             val footprintPosList = satPosNow.rangeCircle
-            drawFootprint(canvas, frameWidth, frameHeight, footprintPosList)
-            drawGroundTrack(canvas, frameWidth, frameHeight, satPosList)
-            drawHomeLoc(canvas, frameWidth, frameHeight)
+            drawFootprint(canvas, degLon, degLat, footprintPosList)
         }
 
-        private fun drawGroundTrack(canvas: Canvas, width: Int, height: Int, list: List<SatPos>) {
-            canvas.setMatrix(Matrix().apply {
-                postTranslate(width / 2f, height / 2f)
-            })
-            val trackPath = Path()
-            var trackX: Float
-            var trackY: Float
-            var prevX = 181f
+        private fun drawHomeLoc(cvs: Canvas, degLon: Float, degLat: Float) {
+            val lon = gsp.longitude.toFloat()
+            val lat = gsp.latitude.toFloat() * -1
+            val cx = lon * degLon
+            val cy = lat * degLat
+            cvs.drawCircle(cx, cy, scale * 2, txtPaint)
+            cvs.drawText("GSP", cx - txtPaint.textSize, cy - txtPaint.textSize, txtPaint)
+        }
+
+        private fun drawGroundTrack(cvs: Canvas, degLon: Float, degLat: Float, list: List<SatPos>) {
+            val path = Path()
+            var lon: Float
+            var lat: Float
+            var lastLon = 181f
 
             list.withIndex().forEach { (index, satPos) ->
-                trackX = rad2Deg(satPos.longitude).toFloat()
-                trackY = rad2Deg(satPos.latitude).toFloat() * -1
+                lon = rad2Deg(satPos.longitude).toFloat()
+                lat = rad2Deg(satPos.latitude).toFloat() * -1
 
-                if (trackX > 180f) trackX -= 360f
+                if (lon > 180f) lon -= 360f
 
-                trackX *= width / 360f
-                trackY *= height / 180f
+                lon *= degLon
+                lat *= degLat
 
-                if (index == 0 || abs(trackX - prevX) > 180) trackPath.moveTo(trackX, trackY)
-                else trackPath.lineTo(trackX, trackY)
+                if (index == 0 || abs(lon - lastLon) > 180) path.moveTo(lon, lat)
+                else path.lineTo(lon, lat)
 
-                prevX = trackX
+                lastLon = lon
             }
 
-            canvas.drawPath(trackPath, groundTrackPaint)
+            cvs.drawPath(path, groundTrackPaint)
         }
 
-        private fun drawFootprint(canvas: Canvas, width: Int, height: Int, list: List<Position>) {
-            canvas.setMatrix(Matrix().apply {
-                postTranslate(width / 2f, height / 2f)
-            })
-            val printPath = Path()
-            var printX: Float
-            var printY: Float
-            var prevX = 181f
+        private fun drawFootprint(cvs: Canvas, degLon: Float, degLat: Float, list: List<Position>) {
+            val path = Path()
+            var lon: Float
+            var lat: Float
+            var lastLon = 181f
 
             list.withIndex().forEach { (index, position) ->
-                printX = position.lon.toFloat()
-                printY = position.lat.toFloat() * -1
+                lon = position.lon.toFloat()
+                lat = position.lat.toFloat() * -1
 
-                if (printX > 180f) printX -= 360f
+                if (lon > 180f) lon -= 360f
 
-                printX *= width / 360f
-                printY *= height / 180f
+                lon *= degLon
+                lat *= degLat
 
-                if (index == 0 || abs(printX - prevX) > 180) printPath.moveTo(printX, printY)
-                else printPath.lineTo(printX, printY)
+                if (index == 0 || abs(lon - lastLon) > 180) path.moveTo(lon, lat)
+                else path.lineTo(lon, lat)
 
-                prevX = printX
+                lastLon = lon
             }
-            canvas.drawPath(printPath, footprintPaint)
-        }
-
-        private fun drawHomeLoc(canvas: Canvas, frameWidth: Int, frameHeight: Int) {
-            canvas.setMatrix(Matrix().apply {
-                postTranslate(frameWidth / 2f, frameHeight / 2f)
-            })
-            val cx = frameWidth / 360f * gsp.longitude.toFloat()
-            val cy = frameHeight / 180f * gsp.latitude.toFloat() * -1
-            canvas.drawCircle(cx, cy, scale * 2, txtPaint)
-            canvas.drawText("GSP", cx - txtPaint.textSize, cy - txtPaint.textSize, txtPaint)
+            cvs.drawPath(path, footprintPaint)
         }
 
         private fun getDateFor(value: Long): Date {
