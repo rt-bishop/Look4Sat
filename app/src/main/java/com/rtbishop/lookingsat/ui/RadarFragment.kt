@@ -20,7 +20,9 @@
 package com.rtbishop.lookingsat.ui
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -125,14 +127,6 @@ class RadarFragment : Fragment() {
         private val center = 0f
         private val delay = updateFreq
 
-        private val bmp: Bitmap = Bitmap.createBitmap(radarSize, radarSize, Bitmap.Config.ARGB_8888)
-        private val mtrx: Matrix = Matrix().apply {
-            postTranslate(radarSize / 2f, radarSize / 2f)
-        }
-        private val cvs: Canvas = Canvas().apply {
-            setBitmap(bmp)
-            setMatrix(mtrx)
-        }
         private val radarPaint = Paint().apply {
             isAntiAlias = true
             color = resources.getColor(R.color.lightOnDark, mainActivity.theme)
@@ -162,13 +156,12 @@ class RadarFragment : Fragment() {
         private var satPassY = 0f
 
         override fun onDraw(canvas: Canvas) {
-            bmp.eraseColor(Color.TRANSPARENT)
+            canvas.translate(radarSize / 2f, radarSize / 2f)
             setPassText()
-            drawRadarView()
-            drawRadarText()
-            drawPassTrajectory()
-            drawSatellite()
-            canvas.drawBitmap(bmp, left.toFloat(), top.toFloat(), null)
+            drawRadarView(canvas)
+            drawRadarText(canvas)
+            drawPassTrajectory(canvas)
+            drawSatellite(canvas)
         }
 
         private fun setPassText() {
@@ -179,7 +172,7 @@ class RadarFragment : Fragment() {
             radarAltitude.text = String.format("Altitude: %.0f km", satPos.altitude)
         }
 
-        private fun drawRadarView() {
+        private fun drawRadarView(cvs: Canvas) {
             cvs.drawLine(center - radius, center, center + radius, center, radarPaint)
             cvs.drawLine(center, center - radius, center, center + radius, radarPaint)
             cvs.drawCircle(center, center, radius, radarPaint)
@@ -187,7 +180,7 @@ class RadarFragment : Fragment() {
             cvs.drawCircle(center, center, radius / 3, radarPaint)
         }
 
-        private fun drawRadarText() {
+        private fun drawRadarText(cvs: Canvas) {
             cvs.drawText("N", center - txtSize / 3, center - radius - scale * 2, txtPaint)
             cvs.drawText("E", center + radius + scale * 2, center + txtSize / 3, txtPaint)
             cvs.drawText("S", center - txtSize / 3, center + radius + txtSize, txtPaint)
@@ -197,7 +190,7 @@ class RadarFragment : Fragment() {
             cvs.drawText("60°", center + scale, center - ((radius / 3) * 2) - scale * 2, txtPaint)
         }
 
-        private fun drawPassTrajectory() {
+        private fun drawPassTrajectory(cvs: Canvas) {
             while (startTime.before(endTime)) {
                 satPos = satPass.predictor.getSatPos(startTime)
                 satPassX = center + sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
@@ -212,7 +205,7 @@ class RadarFragment : Fragment() {
             cvs.drawPath(path, trackPaint)
         }
 
-        private fun drawSatellite() {
+        private fun drawSatellite(cvs: Canvas) {
             satPos = satPass.predictor.getSatPos(Date())
             if (satPos.elevation > 0) {
                 cvs.drawCircle(
