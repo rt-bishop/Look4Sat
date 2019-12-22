@@ -23,6 +23,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -141,6 +142,7 @@ class WorldMapFragment : Fragment() {
             strokeWidth = scale
             textSize = 16f
         }
+        private val rect = Rect()
 
         override fun onDraw(canvas: Canvas) {
             canvas.translate(width / 2f, height / 2f)
@@ -156,6 +158,7 @@ class WorldMapFragment : Fragment() {
             val satPosNow = predictor.getSatPos(currentTime)
             val footprintPosList = satPosNow.rangeCircle
             drawFootprint(canvas, degLon, degLat, footprintPosList)
+            drawName(canvas, degLon, degLat, satPosNow)
         }
 
         private fun drawHomeLoc(cvs: Canvas, degLon: Float, degLat: Float) {
@@ -187,7 +190,6 @@ class WorldMapFragment : Fragment() {
 
                 lastLon = lon
             }
-
             cvs.drawPath(path, groundTrackPaint)
         }
 
@@ -212,6 +214,18 @@ class WorldMapFragment : Fragment() {
                 lastLon = lon
             }
             cvs.drawPath(path, footprintPaint)
+        }
+
+        private fun drawName(cvs: Canvas, degLon: Float, degLat: Float, satPosNow: SatPos) {
+            var lon = rad2Deg(satPosNow.longitude).toFloat()
+            val lat = rad2Deg(satPosNow.latitude).toFloat() * -1
+            if (lon > 180f) lon -= 360f
+            val cx = lon * degLon
+            val cy = lat * degLat
+            cvs.drawCircle(cx, cy, scale * 2, txtPaint)
+            val name = selectedSat.name
+            txtPaint.getTextBounds(name, 0, name.length, rect)
+            cvs.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, txtPaint)
         }
 
         private fun getDateFor(value: Long): Date {
