@@ -10,12 +10,14 @@
         <item name="colorOnSecondary">@color/darkOnLight</item>
         <item name="colorOnSurface">@color/lightOnDark</item>
         <item name="colorOnError">@color/lightOnDark</item>
-    </style>
 
-    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.Splash" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_drawable</item>
     </style>
 
     <style name="DrawerHeader">
@@ -25,7 +27,7 @@
     </style>
 
     <style name="DrawerHeader.Title">
-        <item name="android:textSize">40sp</item>
+        <item name="android:textSize">42sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 

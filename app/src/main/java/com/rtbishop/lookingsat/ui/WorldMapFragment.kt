@@ -93,7 +93,11 @@ class WorldMapFragment : Fragment() {
             )
         } else {
             fab.setOnClickListener {
-                Toast.makeText(mainActivity, "No satellites were shortlisted", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    mainActivity,
+                    getString(R.string.no_selected_sat),
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }
@@ -107,7 +111,7 @@ class WorldMapFragment : Fragment() {
         }
 
         val builder = AlertDialog.Builder(mainActivity)
-        builder.setTitle("Select Sat to track")
+        builder.setTitle(getString(R.string.dialog_show_track))
             .setSingleChoiceItems(tleNameArray, checkedItem) { dialog, which ->
                 checkedItem = which
                 selectedSat = tleMainList[selectionList[which]]
@@ -173,7 +177,12 @@ class WorldMapFragment : Fragment() {
             val cx = lon * degLon
             val cy = lat * degLat
             cvs.drawCircle(cx, cy, scale * 2, txtPaint)
-            cvs.drawText("GSP", cx - txtPaint.textSize, cy - txtPaint.textSize, txtPaint)
+            cvs.drawText(
+                context.getString(R.string.map_gsp),
+                cx - txtPaint.textSize,
+                cy - txtPaint.textSize,
+                txtPaint
+            )
         }
 
         private fun drawGroundTrack(cvs: Canvas, degLon: Float, degLat: Float, list: List<SatPos>) {

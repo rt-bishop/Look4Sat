@@ -92,22 +92,19 @@ class TransAdapter : RecyclerView.Adapter<TransAdapter.TransHolder>() {
 
         if (transmitter.mode != null) {
             mode.text =
-                String.format(
-                    context.getString(R.string.pattern_trans_mode),
-                    transmitter.mode
-                )
+                String.format(context.getString(R.string.pattern_trans_mode), transmitter.mode)
         } else {
             mode.text = context.getString(R.string.no_mode)
         }
         if (transmitter.isInverted) {
             inverted.text = String.format(
                 context.getString(R.string.pattern_trans_inverted),
-                context.getString(R.string.yes)
+                context.getString(R.string.btn_yes)
             )
         } else {
             inverted.text = String.format(
                 context.getString(R.string.pattern_trans_inverted),
-                context.getString(R.string.no)
+                context.getString(R.string.btn_no)
             )
         }
     }

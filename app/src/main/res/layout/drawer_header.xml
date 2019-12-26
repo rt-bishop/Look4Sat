@@ -9,9 +9,10 @@
 
     <ImageView
         android:id="@+id/drawer_sat_img"
-        android:layout_width="108dp"
-        android:layout_height="108dp"
+        android:layout_width="104dp"
+        android:layout_height="104dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/app_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/drawer_title"
@@ -23,29 +24,22 @@
         style="@style/DrawerHeader.Title"
         android:layout_marginStart="8dp"
         android:text="@string/title"
+        app:layout_constraintBottom_toBottomOf="@+id/drawer_sat_img"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/drawer_sat_img" />
-
-    <TextView
-        android:id="@+id/drawer_subtitle"
-        style="@style/DrawerHeader.Title"
-        android:text="@string/subtitle"
-        app:layout_constraintBottom_toBottomOf="@+id/drawer_sat_img"
-        app:layout_constraintStart_toStartOf="@+id/drawer_title"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_title" />
 
     <TextView
         android:id="@+id/drawer_lat"
         style="@style/DrawerHeader.Item"
         android:text="@string/drawer_latitude"
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_lat_value"
-        app:layout_constraintStart_toStartOf="@+id/drawer_subtitle" />
+        app:layout_constraintStart_toStartOf="@+id/drawer_title" />
 
     <TextView
         android:id="@+id/drawer_lat_value"
         style="@style/DrawerHeader.ItemValue"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="@string/drawer_latitude_value"
         app:layout_constraintStart_toEndOf="@+id/drawer_lat"
         app:layout_constraintTop_toBottomOf="@+id/drawer_sat_img" />

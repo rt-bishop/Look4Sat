@@ -107,7 +107,7 @@ class SkyFragment : Fragment() {
             selectionList.forEach { this[it] = true }
         }
         val builder = AlertDialog.Builder(activity as MainActivity)
-        builder.setTitle(getString(R.string.title_select_sat))
+        builder.setTitle(getString(R.string.dialog_select_sat))
             .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
                 if (isChecked) selectionList.add(which)
                 else if (selectionList.contains(which)) selectionList.remove(which)
