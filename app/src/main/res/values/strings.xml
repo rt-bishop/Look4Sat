@@ -71,6 +71,7 @@
     <string name="no_mode">Mode: Null</string>
     <string name="no_uplink">Uplink: Null</string>
     <string name="no_downlink">Downlink: Null</string>
+    <string name="no_permissions">Missing permissions</string>
     <string name="no_trans">No transmitters found for this Satellite</string>
     <string name="no_selected_sat">No satellites were shortlisted</string>
 
@@ -81,6 +82,8 @@
     <string name="trans_inverted">Inverted: Yes</string>
     <string name="trans_header">Transmitters:</string>
 
+    <string name="pattern_lat">%.4f</string>
+    <string name="pattern_lon">%.4f</string>
     <string name="pattern_aos">AOS -%02d:%02d:%02d</string>
     <string name="pattern_trans_mode">Mode: %s</string>
     <string name="pattern_trans_inverted">Inverted: %s</string>

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_sky"
-        android:name="com.rtbishop.lookingsat.ui.SkyFragment"
+        android:name="com.rtbishop.look4sat.ui.SkyFragment"
         android:label="@string/menu_sky"
         tools:layout="@layout/fragment_sky">
         <action
@@ -21,31 +21,31 @@
 
     <fragment
         android:id="@+id/nav_radar"
-        android:name="com.rtbishop.lookingsat.ui.RadarFragment"
+        android:name="com.rtbishop.look4sat.ui.RadarFragment"
         android:label="@string/menu_radar"
         tools:layout="@layout/fragment_radar" />
 
     <fragment
         android:id="@+id/nav_map"
-        android:name="com.rtbishop.lookingsat.ui.WorldMapFragment"
+        android:name="com.rtbishop.look4sat.ui.WorldMapFragment"
         android:label="@string/menu_map"
         tools:layout="@layout/fragment_worldmap" />
 
     <fragment
         android:id="@+id/nav_credits"
-        android:name="com.rtbishop.lookingsat.ui.CreditsFragment"
+        android:name="com.rtbishop.look4sat.ui.CreditsFragment"
         android:label="@string/menu_credits"
         tools:layout="@layout/fragment_credits" />
 
     <fragment
         android:id="@+id/nav_about"
-        android:name="com.rtbishop.lookingsat.ui.CreditsFragment"
+        android:name="com.rtbishop.look4sat.ui.CreditsFragment"
         android:label="@string/menu_credits"
         tools:layout="@layout/fragment_credits" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.rtbishop.lookingsat.ui.SettingsFragment"
+        android:name="com.rtbishop.look4sat.ui.SettingsFragment"
         android:label="@string/menu_settings" />
 
 </navigation>
