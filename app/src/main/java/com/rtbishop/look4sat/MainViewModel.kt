@@ -73,9 +73,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         (app as Look4SatApp).appComponent.inject(this)
     }
 
-    private var passPrefs = SatPassPrefs(
-        preferences.getString(keyHours, defValueHours)!!.toInt(),
-        preferences.getString(keyMinEl, defValueMinEl)!!.toDouble()
+    private val urlList = listOf(
+        "https://celestrak.com/NORAD/elements/amateur.txt",
+        "https://celestrak.com/NORAD/elements/weather.txt"
     )
 
     private val _debugMessage = MutableLiveData<String>()
@@ -123,7 +123,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateAndSaveTleFile() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val inputStream = repository.fetchTleStream()
+                val inputStream = repository.getStreamForUrl(urlList)
                 val tleList = TLE.importSat(inputStream).apply { sortBy { it.name } }
                 val fileOutStream = app.openFileOutput(tleMainListFileName, Context.MODE_PRIVATE)
                 ObjectOutputStream(fileOutStream).apply {

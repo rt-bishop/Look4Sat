@@ -28,8 +28,8 @@ class Repository @Inject constructor(
     private val localSource: LocalDataSource,
     private val remoteSource: RemoteDataSource
 ) {
-    fun fetchTleStream(): InputStream {
-        return remoteSource.fetchTleStream()
+    suspend fun getStreamForUrl(urlList: List<String>): InputStream {
+        return remoteSource.getStreamForUrl(urlList)
     }
 
     suspend fun updateTransmittersDatabase() {
