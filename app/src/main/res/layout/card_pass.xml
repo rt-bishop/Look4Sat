@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_pass"
+    style="@style/CardPass"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="4dp"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/card_pass_background">
+
+        <TextView
+            android:id="@+id/pass_satName"
+            style="@style/CardPass.SatName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/pass_satName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/pass_satId"
+            style="@style/CardPass.SideText"
+            android:layout_marginEnd="8dp"
+            android:text="@string/pass_satId"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_satName"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/pass_azVector"
+            style="@style/CardPass.SideText"
+            android:layout_width="wrap_content"
+            android:text="@string/pass_azVector"
+            app:layout_constraintStart_toStartOf="@+id/pass_satName"
+            app:layout_constraintTop_toBottomOf="@+id/pass_satName" />
+
+        <TextView
+            android:id="@+id/pass_maxEl"
+            style="@style/CardPass.SideText"
+            android:text="@string/pass_maxEl"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_azVector"
+            app:layout_constraintEnd_toEndOf="@+id/pass_satId" />
+
+        <TextView
+            android:id="@+id/pass_aosTime"
+            style="@style/CardPass.SideText"
+            android:layout_marginBottom="4dp"
+            android:text="@string/pass_aosTime"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/pass_progress"
+            app:layout_constraintTop_toBottomOf="@+id/pass_progress" />
+
+        <TextView
+            android:id="@+id/pass_losTime"
+            style="@style/CardPass.SideText"
+            android:text="@string/pass_losTime"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_aosTime"
+            app:layout_constraintEnd_toEndOf="@+id/pass_progress" />
+
+        <ProgressBar
+            android:id="@+id/pass_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/pass_maxEl"
+            app:layout_constraintStart_toStartOf="@+id/pass_azVector"
+            app:layout_constraintTop_toBottomOf="@+id/pass_azVector" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

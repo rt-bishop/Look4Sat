@@ -22,6 +22,7 @@ package com.rtbishop.look4sat.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
@@ -48,25 +49,28 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PassHolder {
         val itemView = LayoutInflater
             .from(parent.context)
-            .inflate(R.layout.sat_pass_card, parent, false)
+            .inflate(R.layout.card_pass, parent, false)
         return PassHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: PassHolder, position: Int) {
         val satPass = satPassList[position]
 
-        val satName = holder.itemView.findViewById<TextView>(R.id.card_sat_name)
-        val maxEl = holder.itemView.findViewById<TextView>(R.id.card_max_el)
-        val passVector = holder.itemView.findViewById<TextView>(R.id.card_pass_vector)
-        val passStart = holder.itemView.findViewById<TextView>(R.id.card_pass_start)
-        val passEnd = holder.itemView.findViewById<TextView>(R.id.card_pass_end)
+        val satName = holder.itemView.findViewById<TextView>(R.id.pass_satName)
+        val satId = holder.itemView.findViewById<TextView>(R.id.pass_satId)
+        val maxEl = holder.itemView.findViewById<TextView>(R.id.pass_maxEl)
+        val passVector = holder.itemView.findViewById<TextView>(R.id.pass_azVector)
+        val passStart = holder.itemView.findViewById<TextView>(R.id.pass_aosTime)
+        val passEnd = holder.itemView.findViewById<TextView>(R.id.pass_losTime)
+        val progressBar = holder.itemView.findViewById<ProgressBar>(R.id.pass_progress)
 
         val aosTime =
             SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
         val losTime =
             SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.endTime)
         satName.text = satPass.tle.name
-        maxEl.text = String.format("%.1f°", satPass.pass.maxEl)
+        satId.text = String.format("Id: %d", satPass.tle.catnum)
+        maxEl.text = String.format("MaxEl: %.1f°", satPass.pass.maxEl)
         passVector.text =
             String.format("Az: %2d° -> %2d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
         passStart.text = String.format("AOS - %s", aosTime)

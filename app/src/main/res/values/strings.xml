@@ -21,11 +21,12 @@
     <string name="menu_credits">Credits</string>
     <string name="menu_about">About the App</string>
 
-    <string name="card_sat_name">Meteor M2–2</string>
-    <string name="card_pass_vector">Az: 180° -> 360°</string>
-    <string name="card_max_el">75.5°</string>
-    <string name="card_pass_aos_time">AOS - 13:14:15</string>
-    <string name="card_pass_los_time">LOS - 16:17:18</string>
+    <string name="pass_satName">Meteor M2–2</string>
+    <string name="pass_satId">ID: 48680</string>
+    <string name="pass_azVector">Az: 180° -> 360°</string>
+    <string name="pass_maxEl">MaxEl: 75.5°</string>
+    <string name="pass_aosTime">AOS - 13:14:15</string>
+    <string name="pass_losTime">LOS - 16:17:18</string>
 
     <string name="radar_azimuth">Azimuth: 180.00°</string>
     <string name="radar_elevation">Elevation: 75.50°</string>

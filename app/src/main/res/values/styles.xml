@@ -68,23 +68,22 @@
         <item name="android:backgroundTint">@color/toolbarButton</item>
     </style>
 
-    <style name="CardSatPass">
+    <style name="CardPass">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">104dp</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="CardSatPass.SideText">
+    <style name="CardPass.SideText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="CardSatPass.MaxEl">
+    <style name="CardPass.SatName">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">21sp</item>
         <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="RadarText">
