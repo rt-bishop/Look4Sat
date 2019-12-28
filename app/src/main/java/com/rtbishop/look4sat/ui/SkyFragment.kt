@@ -25,7 +25,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -34,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.amsacode.predict4java.TLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
@@ -46,21 +46,21 @@ import java.util.concurrent.TimeUnit
 class SkyFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var recViewCurrent: RecyclerView
     private lateinit var recViewFuture: RecyclerView
-    private lateinit var recAdapterCurrent: RecyclerView.Adapter<*>
     private lateinit var recAdapterFuture: SatPassAdapter
     private lateinit var timeToAos: TextView
     private lateinit var btnRefresh: ImageButton
-    private lateinit var progressBar: ProgressBar
     private lateinit var fab: FloatingActionButton
     private lateinit var aosTimer: CountDownTimer
+    private lateinit var swipeLayout: SwipeRefreshLayout
     private lateinit var satPassList: List<SatPass>
+    private lateinit var mainActivity: MainActivity
     private var isTimerSet: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(activity as MainActivity).get(MainViewModel::class.java)
+        mainActivity = activity as MainActivity
+        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
         recAdapterFuture = SatPassAdapter()
     }
 
@@ -76,15 +76,15 @@ class SkyFragment : Fragment() {
     }
 
     private fun setupViews(view: View) {
-        timeToAos = (activity as MainActivity).findViewById(R.id.toolbar_time_to_aos)
-        btnRefresh = (activity as MainActivity).findViewById(R.id.toolbar_btn_refresh)
-        progressBar = view.findViewById(R.id.sky_progressbar)
+        timeToAos = (mainActivity).findViewById(R.id.toolbar_time_to_aos)
+        btnRefresh = (mainActivity).findViewById(R.id.toolbar_btn_refresh)
+        swipeLayout = view.findViewById(R.id.swipeRefreshLayout)
         recViewFuture = view.findViewById(R.id.sky_recycler_future)
         fab = view.findViewById(R.id.sky_fab)
 
         satPassList = viewModel.satPassList
         recViewFuture.apply {
-            layoutManager = LinearLayoutManager(activity as MainActivity)
+            layoutManager = LinearLayoutManager(mainActivity)
             adapter = recAdapterFuture
         }
         recAdapterFuture.setList(satPassList)
@@ -93,6 +93,7 @@ class SkyFragment : Fragment() {
             resetTimer()
         }
 
+        swipeLayout.setOnRefreshListener { calculatePasses() }
         btnRefresh.setOnClickListener { calculatePasses() }
         fab.setOnClickListener {
             showSelectSatDialog(viewModel.tleMainList, viewModel.selectionList)
@@ -106,7 +107,7 @@ class SkyFragment : Fragment() {
         val tleCheckedArray = BooleanArray(tleMainList.size).apply {
             selectionList.forEach { this[it] = true }
         }
-        val builder = AlertDialog.Builder(activity as MainActivity)
+        val builder = AlertDialog.Builder(mainActivity)
         builder.setTitle(getString(R.string.dialog_select_sat))
             .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
                 if (isChecked) selectionList.add(which)
@@ -130,18 +131,16 @@ class SkyFragment : Fragment() {
 
     private fun calculatePasses() {
         lifecycleScope.launch(Dispatchers.Main) {
-            recViewFuture.visibility = View.INVISIBLE
-            progressBar.visibility = View.VISIBLE
-            progressBar.isIndeterminate = true
             viewModel.getPasses()
             satPassList = viewModel.satPassList
             recAdapterFuture.setList(satPassList)
             recAdapterFuture.notifyDataSetChanged()
-            progressBar.isIndeterminate = false
-            progressBar.visibility = View.INVISIBLE
-            recViewFuture.visibility = View.VISIBLE
             if (satPassList.isNotEmpty()) setTimer(satPassList.first().pass.startTime.time)
-            else resetTimer()
+            else {
+                resetTimer()
+                timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
+            }
+            swipeLayout.isRefreshing = false
         }
     }
 
@@ -171,7 +170,6 @@ class SkyFragment : Fragment() {
         if (isTimerSet) {
             aosTimer.cancel()
             isTimerSet = false
-        }
-        timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
+        } else timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
     }
 }
