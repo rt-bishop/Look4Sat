@@ -126,8 +126,8 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.gsp.observe(this, Observer { gsp ->
-            drawerLat.text = String.format(getString(R.string.pattern_lat), gsp.latitude)
-            drawerLon.text = String.format(getString(R.string.pattern_lon), gsp.longitude)
+            drawerLat.text = String.format(getString(R.string.pattern_location), gsp.latitude)
+            drawerLon.text = String.format(getString(R.string.pattern_location), gsp.longitude)
         })
     }
 

@@ -20,26 +20,10 @@
             android:singleLine="true"
             android:title="@string/pref_alt_title" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_sat_pass_title">
-        <EditTextPreference
-            android:defaultValue="@string/def_hours_ahead"
-            android:key="@string/key_hours_ahead"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:summary="@string/pref_hours_ahead_summary"
-            android:title="@string/pref_hours_ahead_title" />
-        <EditTextPreference
-            android:defaultValue="@string/def_min_el"
-            android:key="@string/key_min_el"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:summary="@string/pref_min_el_summary"
-            android:title="@string/pref_min_el_title" />
-    </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_other_title">
         <EditTextPreference
             android:defaultValue="@string/def_update_freq"
-            android:key="@string/key_update_freq"
+            android:key="@string/key_delay"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:summary="@string/pref_update_freq_summary"

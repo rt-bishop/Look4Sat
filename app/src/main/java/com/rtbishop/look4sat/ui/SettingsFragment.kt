@@ -51,7 +51,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         if (key == context!!.getText(R.string.key_lat) ||
             key == context!!.getText(R.string.key_lon) ||
             key == context!!.getText(R.string.key_alt)
-        ) viewModel.updateGsp()
+        ) viewModel.setGroundStationPosition()
     }
 
     override fun onResume() {

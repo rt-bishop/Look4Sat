@@ -30,10 +30,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.github.amsacode.predict4java.PassPredictor
-import com.github.amsacode.predict4java.Position
-import com.github.amsacode.predict4java.SatPos
-import com.github.amsacode.predict4java.TLE
+import com.github.amsacode.predict4java.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
@@ -45,7 +42,6 @@ import kotlin.math.abs
 class WorldMapFragment : Fragment() {
 
     private val service = Executors.newSingleThreadScheduledExecutor()
-
     private lateinit var viewModel: MainViewModel
     private lateinit var trackView: TrackView
     private lateinit var mapFrame: FrameLayout
@@ -54,7 +50,8 @@ class WorldMapFragment : Fragment() {
     private lateinit var mainActivity: MainActivity
     private lateinit var selectedSat: TLE
     private lateinit var tleMainList: List<TLE>
-    private lateinit var selectionList: MutableList<Int>
+    private lateinit var tleSelection: MutableList<Int>
+    private lateinit var gsp: GroundStationPosition
     private var checkedItem = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,15 +70,24 @@ class WorldMapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val delay = viewModel.updateFreq
-        tleMainList = viewModel.tleMainList
-        selectionList = viewModel.selectionList
+        findViews(view)
+        setupComponents()
+    }
+
+    private fun findViews(view: View) {
         mapFrame = view.findViewById(R.id.worldmap_frame)
         fab = view.findViewById(R.id.worldmap_fab)
+    }
 
-        if (tleMainList.isNotEmpty() && selectionList.isNotEmpty()) {
-            fab.setOnClickListener { showSelectSatDialog(tleMainList, selectionList) }
-            selectedSat = tleMainList[selectionList[0]]
+    private fun setupComponents() {
+        val delay = viewModel.delay
+        tleMainList = viewModel.tleMainList
+        tleSelection = viewModel.tleSelection
+        gsp = viewModel.gsp.value!!
+
+        if (tleMainList.isNotEmpty() && tleSelection.isNotEmpty()) {
+            fab.setOnClickListener { showSelectSatDialog(tleMainList, tleSelection) }
+            selectedSat = tleMainList[tleSelection[0]]
             predictor = PassPredictor(selectedSat, viewModel.gsp.value)
             trackView = TrackView(mainActivity)
             mapFrame.addView(trackView)
@@ -97,8 +103,7 @@ class WorldMapFragment : Fragment() {
                     mainActivity,
                     getString(R.string.no_selected_sat),
                     Toast.LENGTH_SHORT
-                )
-                    .show()
+                ).show()
             }
         }
     }
@@ -115,7 +120,7 @@ class WorldMapFragment : Fragment() {
             .setSingleChoiceItems(tleNameArray, checkedItem) { dialog, which ->
                 checkedItem = which
                 selectedSat = tleMainList[selectionList[which]]
-                predictor = PassPredictor(selectedSat, viewModel.gsp.value)
+                predictor = PassPredictor(selectedSat, gsp)
                 trackView.invalidate()
                 dialog.dismiss()
             }
@@ -124,7 +129,6 @@ class WorldMapFragment : Fragment() {
     }
 
     inner class TrackView(context: Context) : View(context) {
-        private val gsp = viewModel.gsp.value!!
         private val scale = resources.displayMetrics.density
         private val groundTrackPaint = Paint().apply {
             isAntiAlias = true
@@ -166,7 +170,7 @@ class WorldMapFragment : Fragment() {
             val satPosList = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
             drawGroundTrack(canvas, degLon, degLat, satPosList)
 
-            selectionList.forEach {
+            tleSelection.forEach {
                 drawSat(it, currentTime, canvas, degLon, degLat)
             }
         }

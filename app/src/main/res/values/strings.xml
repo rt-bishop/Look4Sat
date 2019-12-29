@@ -41,16 +41,17 @@
 
     <string name="dialog_select_sat">Select satellites to track</string>
     <string name="dialog_show_track">Show ground track for…</string>
+    <string name="dialog_pass_prefs">Satellite pass preferences</string>
+
+    <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
+    <string name="pref_hours_ahead_hint">Hours ahead</string>
+    <string name="pref_min_el_summary">Show passes with max elevation above</string>
+    <string name="pref_min_el_hint">Minimum elevation</string>
 
     <string name="pref_gsp_title">Ground station position settings</string>
     <string name="pref_lat_title">Latitude</string>
     <string name="pref_lon_title">Longitude</string>
     <string name="pref_alt_title">Altitude</string>
-    <string name="pref_sat_pass_title">Satellite pass settings</string>
-    <string name="pref_hours_ahead_title">Hours ahead</string>
-    <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
-    <string name="pref_min_el_title">Minimum elevation</string>
-    <string name="pref_min_el_summary">Show passes with max elevation above</string>
     <string name="pref_other_title">Other settings</string>
     <string name="pref_update_freq_title">Update frequency</string>
     <string name="pref_update_freq_summary">Views update interval, ms</string>
@@ -63,9 +64,9 @@
     <string name="key_lat">latitude</string>
     <string name="key_lon">longitude</string>
     <string name="key_alt">altitude</string>
-    <string name="key_hours_ahead">hours_ahead</string>
-    <string name="key_min_el">min_elevation</string>
-    <string name="key_update_freq">update_freq</string>
+    <string name="key_hours_ahead">hoursAhead</string>
+    <string name="key_min_el">minEl</string>
+    <string name="key_delay">delay</string>
     <string name="tle_main_list_file_name">tleFile.txt</string>
     <string name="tle_selection_file_name">tleSelection</string>
 
@@ -83,8 +84,7 @@
     <string name="trans_inverted">Inverted: Yes</string>
     <string name="trans_header">Transmitters:</string>
 
-    <string name="pattern_lat">%.4f</string>
-    <string name="pattern_lon">%.4f</string>
+    <string name="pattern_location">%.4f</string>
     <string name="pattern_aos">AOS -%02d:%02d:%02d</string>
     <string name="pattern_trans_mode">Mode: %s</string>
     <string name="pattern_trans_inverted">Inverted: %s</string>

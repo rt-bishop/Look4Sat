@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/pass_pref_root"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/pref_hours_ahead_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/pref_hours_ahead_summary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/pref_hours_ahead_et"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/pref_hours_ahead_hint"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="@+id/pref_hours_ahead_tv"
+        app:layout_constraintStart_toStartOf="@+id/pref_hours_ahead_tv"
+        app:layout_constraintTop_toBottomOf="@+id/pref_hours_ahead_tv" />
+
+    <TextView
+        android:id="@+id/pref_min_el_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/pref_min_el_summary"
+        app:layout_constraintEnd_toEndOf="@+id/pref_hours_ahead_et"
+        app:layout_constraintStart_toStartOf="@+id/pref_hours_ahead_et"
+        app:layout_constraintTop_toBottomOf="@+id/pref_hours_ahead_et" />
+
+    <EditText
+        android:id="@+id/pref_min_el_et"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/pref_min_el_hint"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="@+id/pref_min_el_tv"
+        app:layout_constraintStart_toStartOf="@+id/pref_min_el_tv"
+        app:layout_constraintTop_toBottomOf="@+id/pref_min_el_tv" />
+</androidx.constraintlayout.widget.ConstraintLayout>

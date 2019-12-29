@@ -78,7 +78,7 @@ class RadarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val delay = viewModel.updateFreq
+        val delay = viewModel.delay
         satPass = arguments?.get("satPass") as SatPass
         mainActivity.supportActionBar?.title = satPass.tle.name
 
