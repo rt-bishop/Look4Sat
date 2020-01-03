@@ -120,7 +120,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 apply()
             }
             _gsp.postValue(GroundStationPosition(lat, lon, alt))
-            _debugMessage.postValue("Location was updated")
+            _debugMessage.postValue(app.getString(R.string.updateLocSuccess))
         }
     }
 
@@ -145,9 +145,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 tleMainList = tleList
                 tleSelection = mutableListOf()
-                _debugMessage.postValue("TLE file was updated")
+                _debugMessage.postValue(app.getString(R.string.updateTleSuccess))
             } catch (exception: IOException) {
-                _debugMessage.postValue("Couldn't update TLE file")
+                _debugMessage.postValue(app.getString(R.string.updateTleFailure))
             }
         }
     }
@@ -156,9 +156,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateTransmittersDatabase()
-                _debugMessage.postValue("Transmitters were updated")
+                _debugMessage.postValue(app.getString(R.string.updateTransSuccess))
             } catch (exception: IOException) {
-                _debugMessage.postValue("Couldn't update transmitters")
+                _debugMessage.postValue(app.getString(R.string.updateTransFailure))
             }
         }
     }

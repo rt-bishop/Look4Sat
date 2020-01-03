@@ -121,8 +121,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.debugMessage.observe(this, Observer { debug_message ->
-            Toast.makeText(this, debug_message, Toast.LENGTH_SHORT).show()
+        viewModel.debugMessage.observe(this, Observer { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            when (message) {
+                getString(R.string.updateLocSuccess) -> drawerBtnLoc.enable()
+                getString(R.string.updateTleSuccess), getString(R.string.updateTleFailure) -> drawerBtnTle.enable()
+                getString(R.string.updateTransSuccess), getString(R.string.updateTransFailure) -> drawerBtnTrans.enable()
+            }
         })
 
         viewModel.gsp.observe(this, Observer { gsp ->
@@ -132,11 +137,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
-        drawerBtnLoc.setOnClickListener { requestLocationUpdate() }
-        drawerBtnTle.setOnClickListener { viewModel.updateAndSaveTleFile() }
-        drawerBtnTrans.setOnClickListener { viewModel.updateTransmittersDatabase() }
+        drawerBtnLoc.setOnClickListener {
+            drawerBtnLoc.disable()
+            requestLocationUpdate()
+        }
+        drawerBtnTle.setOnClickListener {
+            drawerBtnTle.disable()
+            viewModel.updateAndSaveTleFile()
+        }
+        drawerBtnTrans.setOnClickListener {
+            drawerBtnTrans.disable()
+            viewModel.updateTransmittersDatabase()
+        }
         drawerBtnGithub.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl)))
+            val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
+            startActivity(githubIntent)
         }
         drawerBtnExit.setOnClickListener { finish() }
     }
@@ -167,4 +182,14 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host)
         return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
     }
+}
+
+fun ImageButton.enable() {
+    this.isEnabled = true
+    this.alpha = 1.0f
+}
+
+fun ImageButton.disable() {
+    this.isEnabled = false
+    this.alpha = 0.25f
 }

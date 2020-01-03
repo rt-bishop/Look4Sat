@@ -100,4 +100,10 @@
     <string name="map_gsp">GSP</string>
     <string name="map_content">Nasa Map</string>
     <string name="placeholder">Placeholder</string>
+
+    <string name="updateLocSuccess">Location was updated</string>
+    <string name="updateTleSuccess">TLE file was updated</string>
+    <string name="updateTleFailure">Could not update TLE file</string>
+    <string name="updateTransSuccess">Transmitters database was updated</string>
+    <string name="updateTransFailure">Could not update transmitters</string>
 </resources>
