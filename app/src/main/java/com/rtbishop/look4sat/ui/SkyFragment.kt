@@ -132,8 +132,22 @@ class SkyFragment : Fragment() {
             .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
                 val hoursAhead = etHoursAhead.text.toString().toInt()
                 val minEl = etMinEl.text.toString().toDouble()
-                viewModel.setPassPrefs(hoursAhead, minEl)
-                calculatePasses()
+                if (hoursAhead < 1 || hoursAhead > 168) {
+                    Toast.makeText(
+                        mainActivity,
+                        "Value should be within 1-168 hours",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (minEl < 0 || minEl > 90) {
+                    Toast.makeText(
+                        mainActivity,
+                        "Value should be within 0-90 deg",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    viewModel.setPassPrefs(hoursAhead, minEl)
+                    calculatePasses()
+                }
             }
             .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
                 dialog.cancel()
