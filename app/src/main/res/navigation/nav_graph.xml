@@ -23,7 +23,11 @@
         android:id="@+id/nav_radar"
         android:name="com.rtbishop.look4sat.ui.RadarFragment"
         android:label="@string/menu_radar"
-        tools:layout="@layout/fragment_radar" />
+        tools:layout="@layout/fragment_radar">
+        <argument
+            android:name="satPass"
+            app:argType="com.rtbishop.look4sat.repo.SatPass" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_map"

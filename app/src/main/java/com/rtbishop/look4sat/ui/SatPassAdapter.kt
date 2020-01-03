@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
@@ -77,8 +76,8 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
         passEnd.text = String.format("LOS - %s", losTime)
 
         holder.itemView.setOnClickListener {
-            val bundle = bundleOf("satPass" to satPass)
-            holder.itemView.findNavController().navigate(R.id.action_nav_sky_to_nav_radar, bundle)
+            val action = SkyFragmentDirections.actionNavSkyToNavRadar(satPass)
+            holder.itemView.findNavController().navigate(action)
         }
     }
 }

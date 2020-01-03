@@ -32,6 +32,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.amsacode.predict4java.SatPos
@@ -48,6 +49,7 @@ import kotlin.math.sin
 class RadarFragment : Fragment() {
 
     private val service = Executors.newSingleThreadScheduledExecutor()
+    private val args: RadarFragmentArgs by navArgs()
 
     private lateinit var viewModel: MainViewModel
     private lateinit var satPass: SatPass
@@ -79,7 +81,7 @@ class RadarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val delay = viewModel.delay
-        satPass = arguments?.get("satPass") as SatPass
+        satPass = args.satPass
         mainActivity.supportActionBar?.title = satPass.tle.name
 
         radarSkyFrame = view.findViewById(R.id.radar_sky_frame)
