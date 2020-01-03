@@ -100,7 +100,9 @@ class SkyFragment : Fragment() {
         swipeLayout.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
         swipeLayout.setColorSchemeResources(R.color.darkOnLight)
         swipeLayout.setOnRefreshListener { calculatePasses() }
-        btnPassPrefs.setOnClickListener { showSatPassPrefsDialog() }
+        btnPassPrefs.setOnClickListener {
+            showSatPassPrefsDialog(viewModel.hoursAhead, viewModel.minEl)
+        }
         fab.setOnClickListener {
             showSelectSatDialog(viewModel.tleMainList, viewModel.tleSelection)
         }
@@ -120,34 +122,47 @@ class SkyFragment : Fragment() {
         })
     }
 
-    private fun showSatPassPrefsDialog() {
+    private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
         val satPassPrefView = View.inflate(mainActivity, R.layout.sat_pass_pref, null)
         val etHoursAhead = satPassPrefView.findViewById<EditText>(R.id.pref_hours_ahead_et)
         val etMinEl = satPassPrefView.findViewById<EditText>(R.id.pref_min_el_et)
-        etHoursAhead.setText(viewModel.hoursAhead.toString())
-        etMinEl.setText(viewModel.minEl.toString())
+        etHoursAhead.setText(hoursAhead.toString())
+        etMinEl.setText(minEl.toString())
 
         val builder = AlertDialog.Builder(mainActivity)
         builder.setTitle(getString(R.string.dialog_pass_prefs))
             .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
-                val hoursAhead = etHoursAhead.text.toString().toInt()
-                val minEl = etMinEl.text.toString().toDouble()
-                if (hoursAhead < 1 || hoursAhead > 168) {
-                    Toast.makeText(
-                        mainActivity,
-                        "Value should be within 1-168 hours",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else if (minEl < 0 || minEl > 90) {
-                    Toast.makeText(
-                        mainActivity,
-                        "Value should be within 0-90 deg",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    viewModel.setPassPrefs(hoursAhead, minEl)
-                    calculatePasses()
-                }
+                val hoursStr = etHoursAhead.text.toString()
+                val elevationStr = etMinEl.text.toString()
+                if (hoursStr.isNotEmpty() && elevationStr.isNotEmpty()) {
+                    val hours = hoursStr.toInt()
+                    val elevation = elevationStr.toDouble()
+                    when {
+                        hours < 1 || hours > 168 -> {
+                            Toast.makeText(
+                                mainActivity,
+                                "Value should be within 1-168 hours",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        elevation < 0 || elevation > 90 -> {
+                            Toast.makeText(
+                                mainActivity,
+                                "Value should be within 0-90 deg",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        else -> {
+                            viewModel.setPassPrefs(hours, elevation)
+                            calculatePasses()
+                        }
+                    }
+                } else Toast.makeText(
+                    mainActivity,
+                    "Please, enter the value",
+                    Toast.LENGTH_SHORT
+                ).show()
+
             }
             .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
                 dialog.cancel()

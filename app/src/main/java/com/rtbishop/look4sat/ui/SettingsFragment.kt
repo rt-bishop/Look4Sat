@@ -58,7 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                     InputType.TYPE_NUMBER_FLAG_SIGNED
         }
         latPref?.setOnPreferenceChangeListener { _, newValue ->
-            if (newValue.toString().toDouble() < -90.0 || newValue.toString().toDouble() > 90.0) {
+            if (newValue.toString().isEmpty() || newValue.toString().toDouble() < -90.0 || newValue.toString().toDouble() > 90.0) {
                 Toast.makeText(
                     mainActivity,
                     getString(R.string.pref_lat_input_error),
@@ -75,7 +75,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                     InputType.TYPE_NUMBER_FLAG_SIGNED
         }
         lonPref?.setOnPreferenceChangeListener { _, newValue ->
-            if (newValue.toString().toDouble() < -180.0 || newValue.toString().toDouble() > 180.0) {
+            if (newValue.toString().isEmpty() || newValue.toString().toDouble() < -180.0 || newValue.toString().toDouble() > 180.0) {
                 Toast.makeText(
                     mainActivity,
                     getString(R.string.pref_lon_input_error),
@@ -92,7 +92,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                     InputType.TYPE_NUMBER_FLAG_SIGNED
         }
         altPref?.setOnPreferenceChangeListener { _, newValue ->
-            if (newValue.toString().toDouble() < -413.0 || newValue.toString().toDouble() > 8850.0) {
+            if (newValue.toString().isEmpty() || newValue.toString().toDouble() < -413.0 || newValue.toString().toDouble() > 8850.0) {
                 Toast.makeText(
                     mainActivity,
                     getString(R.string.pref_alt_input_error),
@@ -105,7 +105,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         delayPref?.setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
         delayPref?.setOnPreferenceChangeListener { _, newValue ->
-            if (newValue.toString().toLong() < 250 || newValue.toString().toLong() > 10000) {
+            if (newValue.toString().isEmpty() || newValue.toString().toLong() < 250 || newValue.toString().toLong() > 10000) {
                 Toast.makeText(
                     mainActivity,
                     getString(R.string.pref_update_freq_input_error),
