@@ -50,10 +50,14 @@
 
     <string name="pref_gsp_title">Ground station position settings</string>
     <string name="pref_lat_title">Latitude</string>
+    <string name="pref_lat_input_error">Lat should be within -90 to 90 deg</string>
     <string name="pref_lon_title">Longitude</string>
+    <string name="pref_lon_input_error">Lon should be within -180 to 180 deg</string>
     <string name="pref_alt_title">Altitude</string>
+    <string name="pref_alt_input_error">Alt should be within -413 to 8850 m</string>
     <string name="pref_other_title">Other settings</string>
     <string name="pref_update_freq_title">Update frequency</string>
+    <string name="pref_update_freq_input_error">Value should be within 250 to 10000 ms</string>
     <string name="pref_update_freq_summary">Views update interval, ms</string>
 
     <string name="def_gsp_loc">0.0</string>

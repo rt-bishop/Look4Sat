@@ -21,6 +21,8 @@ package com.rtbishop.look4sat.ui
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.InputType
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
@@ -30,21 +32,89 @@ import com.rtbishop.look4sat.R
 class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: MainViewModel
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
 
-        viewModel = ViewModelProvider(activity as MainActivity).get(MainViewModel::class.java)
+        mainActivity = activity as MainActivity
+        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
 
         val provider = EditTextPreference.SimpleSummaryProvider.getInstance()
         val latPref = findPreference<EditTextPreference>(context!!.getText(R.string.key_lat))
         val lonPref = findPreference<EditTextPreference>(context!!.getText(R.string.key_lon))
         val altPref = findPreference<EditTextPreference>(context!!.getText(R.string.key_alt))
+        val delayPref = findPreference<EditTextPreference>(context!!.getText(R.string.key_delay))
 
         latPref?.summaryProvider = provider
         lonPref?.summaryProvider = provider
         altPref?.summaryProvider = provider
+        delayPref?.summaryProvider = provider
+
+        latPref?.setOnBindEditTextListener {
+            it.inputType = InputType.TYPE_CLASS_NUMBER or
+                    InputType.TYPE_NUMBER_FLAG_DECIMAL or
+                    InputType.TYPE_NUMBER_FLAG_SIGNED
+        }
+        latPref?.setOnPreferenceChangeListener { _, newValue ->
+            if (newValue.toString().toDouble() < -90.0 || newValue.toString().toDouble() > 90.0) {
+                Toast.makeText(
+                    mainActivity,
+                    getString(R.string.pref_lat_input_error),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnPreferenceChangeListener false
+            }
+            return@setOnPreferenceChangeListener true
+        }
+
+        lonPref?.setOnBindEditTextListener {
+            it.inputType = InputType.TYPE_CLASS_NUMBER or
+                    InputType.TYPE_NUMBER_FLAG_DECIMAL or
+                    InputType.TYPE_NUMBER_FLAG_SIGNED
+        }
+        lonPref?.setOnPreferenceChangeListener { _, newValue ->
+            if (newValue.toString().toDouble() < -180.0 || newValue.toString().toDouble() > 180.0) {
+                Toast.makeText(
+                    mainActivity,
+                    getString(R.string.pref_lon_input_error),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnPreferenceChangeListener false
+            }
+            return@setOnPreferenceChangeListener true
+        }
+
+        altPref?.setOnBindEditTextListener {
+            it.inputType = InputType.TYPE_CLASS_NUMBER or
+                    InputType.TYPE_NUMBER_FLAG_DECIMAL or
+                    InputType.TYPE_NUMBER_FLAG_SIGNED
+        }
+        altPref?.setOnPreferenceChangeListener { _, newValue ->
+            if (newValue.toString().toDouble() < -413.0 || newValue.toString().toDouble() > 8850.0) {
+                Toast.makeText(
+                    mainActivity,
+                    getString(R.string.pref_alt_input_error),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnPreferenceChangeListener false
+            }
+            return@setOnPreferenceChangeListener true
+        }
+
+        delayPref?.setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
+        delayPref?.setOnPreferenceChangeListener { _, newValue ->
+            if (newValue.toString().toLong() < 250 || newValue.toString().toLong() > 10000) {
+                Toast.makeText(
+                    mainActivity,
+                    getString(R.string.pref_update_freq_input_error),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnPreferenceChangeListener false
+            }
+            return@setOnPreferenceChangeListener true
+        }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
