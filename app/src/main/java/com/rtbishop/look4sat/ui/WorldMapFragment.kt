@@ -34,28 +34,30 @@ import com.github.amsacode.predict4java.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.repo.SatPass
 import java.util.*
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 class WorldMapFragment : Fragment() {
 
-    private val service = Executors.newSingleThreadScheduledExecutor()
+    private lateinit var service: ScheduledExecutorService
+    private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: MainViewModel
-    private lateinit var trackView: TrackView
     private lateinit var mapFrame: FrameLayout
     private lateinit var fab: FloatingActionButton
+    private lateinit var trackView: TrackView
     private lateinit var predictor: PassPredictor
-    private lateinit var mainActivity: MainActivity
     private lateinit var selectedSat: TLE
-    private lateinit var tleMainList: List<TLE>
-    private lateinit var tleSelection: MutableList<Int>
     private lateinit var gsp: GroundStationPosition
+    private lateinit var satPassList: List<SatPass>
     private var checkedItem = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        service = Executors.newSingleThreadScheduledExecutor()
         mainActivity = activity as MainActivity
         viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
     }
@@ -81,14 +83,15 @@ class WorldMapFragment : Fragment() {
 
     private fun setupComponents() {
         val delay = viewModel.delay
-        tleMainList = viewModel.tleMainList
-        tleSelection = viewModel.tleSelection
-        gsp = viewModel.gsp.value!!
+        gsp = viewModel.gsp.value ?: GroundStationPosition(0.0, 0.0, 0.0)
+        satPassList = viewModel.passSatList.value ?: emptyList()
 
-        if (tleMainList.isNotEmpty() && tleSelection.isNotEmpty()) {
-            fab.setOnClickListener { showSelectSatDialog(tleMainList, tleSelection) }
-            selectedSat = tleMainList[tleSelection[0]]
-            predictor = PassPredictor(selectedSat, viewModel.gsp.value)
+        if (satPassList.isNotEmpty()) {
+            satPassList = satPassList.distinctBy { it.tle }
+            satPassList = satPassList.sortedBy { it.tle.name }
+            fab.setOnClickListener { showSelectSatDialog(satPassList) }
+            selectedSat = satPassList.first().tle
+            predictor = satPassList.first().predictor
             trackView = TrackView(mainActivity)
             mapFrame.addView(trackView)
             service.scheduleAtFixedRate(
@@ -108,19 +111,19 @@ class WorldMapFragment : Fragment() {
         }
     }
 
-    private fun showSelectSatDialog(tleMainList: List<TLE>, selectionList: MutableList<Int>) {
-        val tleNameArray = arrayOfNulls<String>(selectionList.size).apply {
-            selectionList.withIndex().forEach { (index, selection) ->
-                this[index] = tleMainList[selection].name
+    private fun showSelectSatDialog(list: List<SatPass>) {
+        val tleArray = arrayOfNulls<String>(list.size).apply {
+            list.withIndex().forEach {
+                this[it.index] = it.value.tle.name
             }
         }
 
         val builder = AlertDialog.Builder(mainActivity)
         builder.setTitle(getString(R.string.dialog_show_track))
-            .setSingleChoiceItems(tleNameArray, checkedItem) { dialog, which ->
+            .setSingleChoiceItems(tleArray, checkedItem) { dialog, which ->
                 checkedItem = which
-                selectedSat = tleMainList[selectionList[which]]
-                predictor = PassPredictor(selectedSat, gsp)
+                selectedSat = list[which].tle
+                predictor = list[which].predictor
                 trackView.invalidate()
                 dialog.dismiss()
             }
@@ -164,24 +167,22 @@ class WorldMapFragment : Fragment() {
             val degLon = width / 360f
             val degLat = height / 180f
             drawHomeLoc(canvas, degLon, degLat)
-
             val currentTime = getDateFor(System.currentTimeMillis())
             val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
-            val satPosList = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
-            drawGroundTrack(canvas, degLon, degLat, satPosList)
-
-            tleSelection.forEach {
-                drawSat(it, currentTime, canvas, degLon, degLat)
+            val positions = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
+            drawGroundTrack(canvas, degLon, degLat, positions)
+            satPassList.forEach {
+                drawSat(canvas, degLon, degLat, it.tle, it.predictor, currentTime)
             }
         }
 
-        private fun drawHomeLoc(cvs: Canvas, degLon: Float, degLat: Float) {
+        private fun drawHomeLoc(canvas: Canvas, degLon: Float, degLat: Float) {
             val lon = gsp.longitude.toFloat()
             val lat = gsp.latitude.toFloat() * -1
             val cx = lon * degLon
             val cy = lat * degLat
-            cvs.drawCircle(cx, cy, scale * 2, txtPaint)
-            cvs.drawText(
+            canvas.drawCircle(cx, cy, scale * 2, txtPaint)
+            canvas.drawText(
                 context.getString(R.string.map_gsp),
                 cx - txtPaint.textSize,
                 cy - txtPaint.textSize,
@@ -189,7 +190,12 @@ class WorldMapFragment : Fragment() {
             )
         }
 
-        private fun drawGroundTrack(cvs: Canvas, degLon: Float, degLat: Float, list: List<SatPos>) {
+        private fun drawGroundTrack(
+            canvas: Canvas,
+            degLon: Float,
+            degLat: Float,
+            list: List<SatPos>
+        ) {
             val path = Path()
             var lon: Float
             var lat: Float
@@ -209,19 +215,29 @@ class WorldMapFragment : Fragment() {
 
                 lastLon = lon
             }
-            cvs.drawPath(path, groundTrackPaint)
+            canvas.drawPath(path, groundTrackPaint)
         }
 
-        private fun drawSat(index: Int, date: Date, canvas: Canvas, degLon: Float, degLat: Float) {
-            val tle = tleMainList[index]
-            val predictor = PassPredictor(tle, gsp)
+        private fun drawSat(
+            canvas: Canvas,
+            degLon: Float,
+            degLat: Float,
+            tle: TLE,
+            predictor: PassPredictor,
+            date: Date
+        ) {
             val satPosNow = predictor.getSatPos(date)
             val footprintPosList = satPosNow.rangeCircle
             drawFootprint(canvas, degLon, degLat, footprintPosList)
             drawName(canvas, degLon, degLat, satPosNow, tle.name)
         }
 
-        private fun drawFootprint(cvs: Canvas, degLon: Float, degLat: Float, list: List<Position>) {
+        private fun drawFootprint(
+            canvas: Canvas,
+            degLon: Float,
+            degLat: Float,
+            list: List<Position>
+        ) {
             val path = Path()
             var lon: Float
             var lat: Float
@@ -241,19 +257,28 @@ class WorldMapFragment : Fragment() {
 
                 lastLon = lon
             }
-            cvs.drawPath(path, footprintPaint)
+            canvas.drawPath(path, footprintPaint)
         }
 
-        private fun drawName(cvs: Canvas, degLon: Float, degLat: Float, pos: SatPos, name: String) {
-            var lon = rad2Deg(pos.longitude).toFloat()
-            val lat = rad2Deg(pos.latitude).toFloat() * -1
+        private fun drawName(
+            canvas: Canvas,
+            degLon: Float,
+            degLat: Float,
+            position: SatPos,
+            name: String
+        ) {
+            var lon = rad2Deg(position.longitude).toFloat()
+            val lat = rad2Deg(position.latitude).toFloat() * -1
+
             if (lon > 180f) lon -= 360f
+
             val cx = lon * degLon
             val cy = lat * degLat
-            cvs.drawCircle(cx, cy, scale * 2, txtPaint)
+
+            canvas.drawCircle(cx, cy, scale * 2, txtPaint)
             txtPaint.getTextBounds(name, 0, name.length, rect)
-            cvs.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, outlinePaint)
-            cvs.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, txtPaint)
+            canvas.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, outlinePaint)
+            canvas.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, txtPaint)
         }
 
         private fun getDateFor(value: Long): Date {
