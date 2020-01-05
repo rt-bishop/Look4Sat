@@ -179,12 +179,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     suspend fun getPasses() {
         val passList = mutableListOf<SatPass>()
+        val dateNow = Date()
         withContext(Dispatchers.Default) {
             tleSelection.forEach { indexOfSelection ->
                 val tle = tleMainList[indexOfSelection]
                 try {
                     val predictor = PassPredictor(tle, gsp.value)
-                    val passes = predictor.getPasses(Date(), hoursAhead, true)
+                    val passes = predictor.getPasses(dateNow, hoursAhead, true)
                     passes.forEach { passList.add(SatPass(tle, predictor, it)) }
                 } catch (exception: IllegalArgumentException) {
                     _debugMessage.postValue("There was a problem with ${tle.name}")
@@ -192,7 +193,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     _debugMessage.postValue("${tle.name} shall not pass")
                 }
             }
-            passList.retainAll { it.pass.maxEl >= minEl }
+            passList.removeAll { it.pass.endTime.before(dateNow) }
+            passList.removeAll { it.pass.maxEl < minEl }
             passList.sortBy { it.pass.startTime }
         }
         _satPassList.postValue(passList)
