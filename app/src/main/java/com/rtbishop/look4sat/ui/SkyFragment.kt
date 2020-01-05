@@ -95,7 +95,7 @@ class SkyFragment : Fragment() {
         }
         recyclerAdapter.setList(satPassList)
         recyclerAdapter.notifyDataSetChanged()
-        if (satPassList.isEmpty()) resetTimer()
+        setTimerForNextPass()
 
         swipeLayout.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
         swipeLayout.setColorSchemeResources(R.color.darkOnLight)
@@ -113,11 +113,7 @@ class SkyFragment : Fragment() {
             satPassList = it
             recyclerAdapter.setList(satPassList)
             recyclerAdapter.notifyDataSetChanged()
-            if (satPassList.isNotEmpty()) setTimer(satPassList.first().pass.startTime.time)
-            else {
-                resetTimer()
-                timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
-            }
+            setTimerForNextPass()
             swipeLayout.isRefreshing = false
         })
     }
@@ -210,32 +206,49 @@ class SkyFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.Main) { viewModel.getPasses() }
     }
 
-    private fun setTimer(passTime: Long) {
-        resetTimer()
-        val totalMillis = passTime.minus(System.currentTimeMillis())
-        aosTimer = object : CountDownTimer(totalMillis, 1000) {
-            override fun onFinish() {
-                Toast.makeText(activity, "Time is up!", Toast.LENGTH_SHORT).show()
-                this.cancel()
-            }
+    private fun setTimerForNextPass() {
+        if (satPassList.isNotEmpty()) {
+            resetTimer()
+            try {
+                val timeNow = System.currentTimeMillis()
+                val nextPass = satPassList.first {
+                    it.pass.startTime.time.minus(timeNow) > 0
+                }
+                val passTime = nextPass.pass.startTime.time
+                val totalMillis = passTime.minus(timeNow)
 
-            override fun onTick(millisUntilFinished: Long) {
-                timeToAos.text = String.format(
-                    mainActivity.getString(R.string.pattern_aos),
-                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                )
+                aosTimer = object : CountDownTimer(totalMillis, 1000) {
+                    override fun onFinish() {
+                        Toast
+                            .makeText(activity, "Incoming ${nextPass.tle.name}", Toast.LENGTH_SHORT)
+                            .show()
+                        setTimerForNextPass()
+                    }
+
+                    override fun onTick(millisUntilFinished: Long) {
+                        timeToAos.text = String.format(
+                            mainActivity.getString(R.string.pattern_aos),
+                            TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
+                            TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
+                            TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                        )
+                    }
+                }
+                aosTimer.start()
+                isTimerSet = true
+            } catch (e: NoSuchElementException) {
+                resetTimer()
             }
+        } else {
+            resetTimer(true)
         }
-        aosTimer.start()
-        isTimerSet = true
     }
 
-    private fun resetTimer() {
+    private fun resetTimer(toNull: Boolean = false) {
         if (isTimerSet) {
             aosTimer.cancel()
             isTimerSet = false
-        } else timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
+        }
+        if (toNull) timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
     }
 }
