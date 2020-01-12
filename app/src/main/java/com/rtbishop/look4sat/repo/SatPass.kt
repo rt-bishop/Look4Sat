@@ -30,5 +30,6 @@ import kotlinx.android.parcel.RawValue
 data class SatPass(
     val tle: TLE,
     val predictor: @RawValue PassPredictor,
-    val pass: @RawValue SatPassTime
+    val pass: @RawValue SatPassTime,
+    var progress: Int = 0
 ) : Parcelable

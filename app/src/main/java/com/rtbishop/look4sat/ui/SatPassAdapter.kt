@@ -33,10 +33,34 @@ import java.util.*
 
 class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
 
-    private var satPassList = emptyList<SatPass>()
+    private var satPassList = mutableListOf<SatPass>()
 
-    fun setList(list: List<SatPass>) {
+    fun setList(list: MutableList<SatPass>) {
         satPassList = list
+        notifyDataSetChanged()
+    }
+
+    fun updateRecycler() {
+        val timeNow = Date()
+        val iterator = satPassList.listIterator()
+        while (iterator.hasNext()) {
+            val satPass = iterator.next()
+            if (satPass.progress < 100) {
+                val timeStart = satPass.pass.startTime
+                val timeEnd = satPass.pass.endTime
+                if (timeNow.after(timeStart)) {
+                    val index = satPassList.indexOf(satPass)
+                    val deltaTotal = timeEnd.time.minus(timeStart.time)
+                    val deltaNow = timeNow.time.minus(timeStart.time)
+                    satPass.progress = ((deltaNow.toFloat() / deltaTotal.toFloat()) * 100).toInt()
+                    notifyItemChanged(index)
+                }
+            } else {
+                val index = satPassList.indexOf(satPass)
+                iterator.remove()
+                notifyItemRemoved(index)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -51,7 +75,7 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
     }
 
     override fun onBindViewHolder(holder: PassHolder, position: Int) {
-        holder.bind(position)
+        holder.bind(satPassList[position])
     }
 
     inner class PassHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -62,11 +86,9 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
         private val passVector = itemView.findViewById<TextView>(R.id.pass_azVector)
         private val passStart = itemView.findViewById<TextView>(R.id.pass_aosTime)
         private val passEnd = itemView.findViewById<TextView>(R.id.pass_losTime)
-        var progressBar = itemView.findViewById<ProgressBar>(R.id.pass_progress)
+        private var progressBar = itemView.findViewById<ProgressBar>(R.id.pass_progress)
 
-        fun bind(position: Int) {
-            val satPass = satPassList[position]
-
+        fun bind(satPass: SatPass) {
             val aosTime =
                 SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
             val losTime =
@@ -78,6 +100,7 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
                 String.format("Az: %2d° -> %2d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
             passStart.text = String.format("AOS - %s", aosTime)
             passEnd.text = String.format("LOS - %s", losTime)
+            progressBar.progress = satPass.progress
 
             itemView.setOnClickListener {
                 val action = SkyFragmentDirections.actionNavSkyToNavRadar(satPass)

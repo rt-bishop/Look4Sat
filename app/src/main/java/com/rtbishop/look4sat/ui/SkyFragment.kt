@@ -35,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.amsacode.predict4java.TLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -43,6 +44,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.repo.SatPass
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SkyFragment : Fragment() {
@@ -56,7 +58,7 @@ class SkyFragment : Fragment() {
     private lateinit var aosTimer: CountDownTimer
     private lateinit var swipeLayout: SwipeRefreshLayout
     private lateinit var mainActivity: MainActivity
-    private lateinit var satPassList: List<SatPass>
+    private lateinit var satPassList: MutableList<SatPass>
     private var isTimerSet: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +66,7 @@ class SkyFragment : Fragment() {
         mainActivity = activity as MainActivity
         viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
         recyclerAdapter = SatPassAdapter()
-        satPassList = emptyList()
+        satPassList = mutableListOf()
     }
 
     override fun onCreateView(
@@ -92,9 +94,9 @@ class SkyFragment : Fragment() {
         recyclerPasses.apply {
             layoutManager = LinearLayoutManager(mainActivity)
             adapter = recyclerAdapter
+            (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
         recyclerAdapter.setList(satPassList)
-        recyclerAdapter.notifyDataSetChanged()
         setTimerForNextPass()
 
         swipeLayout.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
@@ -112,7 +114,6 @@ class SkyFragment : Fragment() {
         viewModel.passSatList.observe(viewLifecycleOwner, Observer {
             satPassList = it
             recyclerAdapter.setList(satPassList)
-            recyclerAdapter.notifyDataSetChanged()
             setTimerForNextPass()
             swipeLayout.isRefreshing = false
         })
@@ -210,18 +211,12 @@ class SkyFragment : Fragment() {
         if (satPassList.isNotEmpty()) {
             resetTimer()
             try {
-                val timeNow = System.currentTimeMillis()
-                val nextPass = satPassList.first {
-                    it.pass.startTime.time.minus(timeNow) > 0
-                }
-                val passTime = nextPass.pass.startTime.time
-                val totalMillis = passTime.minus(timeNow)
+                val timeNow = Date()
+                val nextPass = satPassList.first { it.pass.startTime.after(timeNow) }
+                val totalMillis = nextPass.pass.startTime.time.minus(timeNow.time)
 
                 aosTimer = object : CountDownTimer(totalMillis, 1000) {
                     override fun onFinish() {
-                        Toast
-                            .makeText(activity, "Incoming ${nextPass.tle.name}", Toast.LENGTH_SHORT)
-                            .show()
                         setTimerForNextPass()
                     }
 
@@ -232,6 +227,7 @@ class SkyFragment : Fragment() {
                             TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                             TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
                         )
+                        recyclerAdapter.updateRecycler()
                     }
                 }
                 aosTimer.start()

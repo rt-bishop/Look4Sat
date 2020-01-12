@@ -65,8 +65,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _debugMessage = MutableLiveData<String>()
     val debugMessage: LiveData<String> = _debugMessage
 
-    private val _satPassList = MutableLiveData<List<SatPass>>()
-    val passSatList: LiveData<List<SatPass>> = _satPassList
+    private val _satPassList = MutableLiveData<MutableList<SatPass>>()
+    val passSatList: LiveData<MutableList<SatPass>> = _satPassList
 
     private val _gsp = MutableLiveData<GroundStationPosition>()
     val gsp: LiveData<GroundStationPosition> = _gsp
@@ -181,6 +181,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun getPasses() {
         val passList = mutableListOf<SatPass>()
         val dateNow = Date()
+        val dateFuture = Calendar.getInstance().let {
+            it.time = dateNow
+            it.add(Calendar.HOUR, hoursAhead)
+            it.time
+        }
         withContext(Dispatchers.Default) {
             tleSelection.forEach { indexOfSelection ->
                 val tle = tleMainList[indexOfSelection]
@@ -194,6 +199,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     _debugMessage.postValue("${tle.name} shall not pass")
                 }
             }
+            passList.removeAll { it.pass.startTime.after(dateFuture) }
             passList.removeAll { it.pass.endTime.before(dateNow) }
             passList.removeAll { it.pass.maxEl < minEl }
             passList.sortBy { it.pass.startTime }
