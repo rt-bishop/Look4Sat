@@ -32,7 +32,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -42,8 +41,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.repo.SatPass
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -97,7 +94,7 @@ class SkyFragment : Fragment() {
             (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
         recyclerAdapter.setList(satPassList)
-        setTimerForNextPass()
+        setTimer()
 
         swipeLayout.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
         swipeLayout.setColorSchemeResources(R.color.darkOnLight)
@@ -114,9 +111,14 @@ class SkyFragment : Fragment() {
         viewModel.passSatList.observe(viewLifecycleOwner, Observer {
             satPassList = it
             recyclerAdapter.setList(satPassList)
-            setTimerForNextPass()
+            setTimer()
             swipeLayout.isRefreshing = false
         })
+    }
+
+    private fun calculatePasses() {
+        swipeLayout.isRefreshing = true
+        viewModel.getPasses()
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
@@ -202,49 +204,68 @@ class SkyFragment : Fragment() {
         }
     }
 
-    private fun calculatePasses() {
-        swipeLayout.isRefreshing = true
-        lifecycleScope.launch(Dispatchers.Main) { viewModel.getPasses() }
-    }
-
-    private fun setTimerForNextPass() {
+    private fun setTimer() {
         if (satPassList.isNotEmpty()) {
             resetTimer()
+            val timeNow = Date()
             try {
-                val timeNow = Date()
-                val nextPass = satPassList.first { it.pass.startTime.after(timeNow) }
-                val totalMillis = nextPass.pass.startTime.time.minus(timeNow.time)
-
-                aosTimer = object : CountDownTimer(totalMillis, 1000) {
-                    override fun onFinish() {
-                        setTimerForNextPass()
-                    }
-
-                    override fun onTick(millisUntilFinished: Long) {
-                        timeToAos.text = String.format(
-                            mainActivity.getString(R.string.pattern_aos),
-                            TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
-                            TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
-                            TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                        )
-                        recyclerAdapter.updateRecycler()
-                    }
-                }
+                setTimerForNext(timeNow)
+            } catch (e: NoSuchElementException) {
+                setTimerForLast(timeNow)
+            } finally {
                 aosTimer.start()
                 isTimerSet = true
-            } catch (e: NoSuchElementException) {
-                resetTimer()
             }
         } else {
             resetTimer(true)
         }
     }
 
-    private fun resetTimer(toNull: Boolean = false) {
+    private fun setTimerForNext(timeNow: Date) {
+        val nextPass = satPassList.first { it.pass.startTime.after(timeNow) }
+        val millisBeforeStart = nextPass.pass.startTime.time.minus(timeNow.time)
+        aosTimer = object : CountDownTimer(millisBeforeStart, 1000) {
+            override fun onFinish() {
+                setTimer()
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                timeToAos.text = String.format(
+                    mainActivity.getString(R.string.pattern_aos),
+                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                )
+                recyclerAdapter.updateRecycler()
+            }
+        }
+    }
+
+    private fun setTimerForLast(timeNow: Date) {
+        val lastPass = satPassList.last()
+        val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow.time)
+        aosTimer = object : CountDownTimer(millisBeforeEnd, 1000) {
+            override fun onFinish() {
+                calculatePasses()
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                timeToAos.text = String.format(
+                    mainActivity.getString(R.string.pattern_los),
+                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
+                )
+                recyclerAdapter.updateRecycler()
+            }
+        }
+    }
+
+    private fun resetTimer(resetToNull: Boolean = false) {
         if (isTimerSet) {
             aosTimer.cancel()
             isTimerSet = false
         }
-        if (toNull) timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
+        if (resetToNull) timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
     }
 }

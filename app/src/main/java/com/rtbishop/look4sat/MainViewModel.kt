@@ -178,7 +178,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    suspend fun getPasses() {
+    fun getPasses() {
         val passList = mutableListOf<SatPass>()
         val dateNow = Date()
         val dateFuture = Calendar.getInstance().let {
@@ -186,25 +186,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             it.add(Calendar.HOUR, hoursAhead)
             it.time
         }
-        withContext(Dispatchers.Default) {
-            tleSelection.forEach { indexOfSelection ->
-                val tle = tleMainList[indexOfSelection]
-                try {
-                    val predictor = PassPredictor(tle, gsp.value)
-                    val passes = predictor.getPasses(dateNow, hoursAhead, true)
-                    passes.forEach { passList.add(SatPass(tle, predictor, it)) }
-                } catch (exception: IllegalArgumentException) {
-                    _debugMessage.postValue("There was a problem with ${tle.name}")
-                } catch (exception: SatNotFoundException) {
-                    _debugMessage.postValue("${tle.name} shall not pass")
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                tleSelection.forEach { indexOfSelection ->
+                    val tle = tleMainList[indexOfSelection]
+                    try {
+                        val predictor = PassPredictor(tle, gsp.value)
+                        val passes = predictor.getPasses(dateNow, hoursAhead, true)
+                        passes.forEach { passList.add(SatPass(tle, predictor, it)) }
+                    } catch (exception: IllegalArgumentException) {
+                        _debugMessage.postValue("There was a problem with ${tle.name}")
+                    } catch (exception: SatNotFoundException) {
+                        _debugMessage.postValue("${tle.name} shall not pass")
+                    }
                 }
+                passList.removeAll { it.pass.startTime.after(dateFuture) }
+                passList.removeAll { it.pass.endTime.before(dateNow) }
+                passList.removeAll { it.pass.maxEl < minEl }
+                passList.sortBy { it.pass.startTime }
             }
-            passList.removeAll { it.pass.startTime.after(dateFuture) }
-            passList.removeAll { it.pass.endTime.before(dateNow) }
-            passList.removeAll { it.pass.maxEl < minEl }
-            passList.sortBy { it.pass.startTime }
+            _satPassList.postValue(passList)
         }
-        _satPassList.postValue(passList)
     }
 
     suspend fun getTransmittersForSat(id: Int): List<Transmitter> {

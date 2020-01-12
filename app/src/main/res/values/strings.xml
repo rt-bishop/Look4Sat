@@ -90,6 +90,7 @@
 
     <string name="pattern_location">%.4f</string>
     <string name="pattern_aos">AOS -%02d:%02d:%02d</string>
+    <string name="pattern_los">LOS -%02d:%02d:%02d</string>
     <string name="pattern_trans_mode">Mode: %s</string>
     <string name="pattern_trans_inverted">Inverted: %s</string>
     <string name="pattern_trans_uplink_low">Uplink: %.4f MHz</string>
