@@ -17,8 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,10 +29,11 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.repo.SatPass
+import com.rtbishop.look4sat.ui.PassListFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
+class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.SatPassHolder>() {
 
     private var satPassList = mutableListOf<SatPass>()
 
@@ -67,43 +69,54 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.PassHolder>() {
         return satPassList.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PassHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatPassHolder {
         val itemView = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.card_pass, parent, false)
-        return PassHolder(itemView)
+        return SatPassHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: PassHolder, position: Int) {
+    override fun onBindViewHolder(holder: SatPassHolder, position: Int) {
         holder.bind(satPassList[position])
     }
 
-    inner class PassHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class SatPassHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        private val context: Context = itemView.context
         private val satName = itemView.findViewById<TextView>(R.id.pass_satName)
         private val satId = itemView.findViewById<TextView>(R.id.pass_satId)
         private val maxEl = itemView.findViewById<TextView>(R.id.pass_maxEl)
-        private val passVector = itemView.findViewById<TextView>(R.id.pass_azVector)
-        private val passStart = itemView.findViewById<TextView>(R.id.pass_aosTime)
-        private val passEnd = itemView.findViewById<TextView>(R.id.pass_losTime)
+        private val azimuth = itemView.findViewById<TextView>(R.id.pass_azimuth)
+        private val aosTime = itemView.findViewById<TextView>(R.id.pass_aosTime)
+        private val losTime = itemView.findViewById<TextView>(R.id.pass_losTime)
         private var progressBar = itemView.findViewById<ProgressBar>(R.id.pass_progress)
 
         fun bind(satPass: SatPass) {
-            val aosTime =
-                SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.startTime)
-            val losTime =
-                SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(satPass.pass.endTime)
+            val aos = SimpleDateFormat(
+                context.getString(R.string.pattern_time),
+                Locale.getDefault()
+            ).format(satPass.pass.startTime)
+            val los = SimpleDateFormat(
+                context.getString(R.string.pattern_time),
+                Locale.getDefault()
+            ).format(satPass.pass.endTime)
+
             satName.text = satPass.tle.name
-            satId.text = String.format("Id: %d", satPass.tle.catnum)
-            maxEl.text = String.format("MaxEl: %.1f°", satPass.pass.maxEl)
-            passVector.text =
-                String.format("Az: %2d° -> %2d°", satPass.pass.aosAzimuth, satPass.pass.losAzimuth)
-            passStart.text = String.format("AOS - %s", aosTime)
-            passEnd.text = String.format("LOS - %s", losTime)
+            satId.text =
+                String.format(context.getString(R.string.pattern_pass_satId), satPass.tle.catnum)
+            maxEl.text =
+                String.format(context.getString(R.string.pattern_pass_maxEl), satPass.pass.maxEl)
+            azimuth.text = String.format(
+                context.getString(R.string.pattern_pass_azimuth),
+                satPass.pass.aosAzimuth,
+                satPass.pass.losAzimuth
+            )
+            aosTime.text = String.format(context.getString(R.string.pattern_pass_aos), aos)
+            losTime.text = String.format(context.getString(R.string.pattern_pass_los), los)
             progressBar.progress = satPass.progress
 
             itemView.setOnClickListener {
-                val action = SkyFragmentDirections.actionNavSkyToNavRadar(satPass)
+                val action = PassListFragmentDirections.actionPassToPolar(satPass)
                 itemView.findNavController().navigate(action)
             }
         }

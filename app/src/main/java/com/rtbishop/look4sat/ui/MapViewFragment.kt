@@ -41,14 +41,14 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
-class WorldMapFragment : Fragment() {
+class MapViewFragment : Fragment() {
 
     private lateinit var service: ScheduledExecutorService
     private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: MainViewModel
     private lateinit var mapFrame: FrameLayout
-    private lateinit var fab: FloatingActionButton
-    private lateinit var trackView: TrackView
+    private lateinit var mapFab: FloatingActionButton
+    private lateinit var mapView: MapView
     private lateinit var predictor: PassPredictor
     private lateinit var selectedSat: TLE
     private lateinit var gsp: GroundStationPosition
@@ -67,7 +67,7 @@ class WorldMapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_worldmap, container, false)
+        return inflater.inflate(R.layout.fragment_map_view, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,8 +77,8 @@ class WorldMapFragment : Fragment() {
     }
 
     private fun findViews(view: View) {
-        mapFrame = view.findViewById(R.id.worldmap_frame)
-        fab = view.findViewById(R.id.worldmap_fab)
+        mapFrame = view.findViewById(R.id.map_frame)
+        mapFab = view.findViewById(R.id.map_fab)
     }
 
     private fun setupComponents() {
@@ -89,19 +89,19 @@ class WorldMapFragment : Fragment() {
         if (satPassList.isNotEmpty()) {
             satPassList = satPassList.distinctBy { it.tle }
             satPassList = satPassList.sortedBy { it.tle.name }
-            fab.setOnClickListener { showSelectSatDialog(satPassList) }
+            mapFab.setOnClickListener { showSelectSatDialog(satPassList) }
             selectedSat = satPassList.first().tle
             predictor = satPassList.first().predictor
-            trackView = TrackView(mainActivity)
-            mapFrame.addView(trackView)
+            mapView = MapView(mainActivity)
+            mapFrame.addView(mapView)
             service.scheduleAtFixedRate(
-                { trackView.invalidate() },
+                { mapView.invalidate() },
                 delay,
                 delay,
                 TimeUnit.MILLISECONDS
             )
         } else {
-            fab.setOnClickListener {
+            mapFab.setOnClickListener {
                 Toast.makeText(
                     mainActivity,
                     getString(R.string.no_selected_sat),
@@ -124,14 +124,14 @@ class WorldMapFragment : Fragment() {
                 checkedItem = which
                 selectedSat = list[which].tle
                 predictor = list[which].predictor
-                trackView.invalidate()
+                mapView.invalidate()
                 dialog.dismiss()
             }
             .create()
             .show()
     }
 
-    inner class TrackView(context: Context) : View(context) {
+    inner class MapView(context: Context) : View(context) {
         private val scale = resources.displayMetrics.density
         private val groundTrackPaint = Paint().apply {
             isAntiAlias = true

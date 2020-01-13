@@ -41,18 +41,19 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.repo.SatPass
+import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class SkyFragment : Fragment() {
+class PassListFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var recyclerPasses: RecyclerView
-    private lateinit var recyclerAdapter: SatPassAdapter
-    private lateinit var timeToAos: TextView
+    private lateinit var satPassRecycler: RecyclerView
+    private lateinit var satPassAdapter: SatPassAdapter
     private lateinit var btnPassPrefs: ImageButton
-    private lateinit var fab: FloatingActionButton
+    private lateinit var passListFab: FloatingActionButton
     private lateinit var aosTimer: CountDownTimer
+    private lateinit var aosTimerText: TextView
     private lateinit var swipeLayout: SwipeRefreshLayout
     private lateinit var mainActivity: MainActivity
     private lateinit var satPassList: MutableList<SatPass>
@@ -62,14 +63,16 @@ class SkyFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mainActivity = activity as MainActivity
         viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
-        recyclerAdapter = SatPassAdapter()
+        satPassAdapter = SatPassAdapter()
         satPassList = mutableListOf()
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_sky, container, false)
+        return inflater.inflate(R.layout.fragment_pass_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,29 +83,29 @@ class SkyFragment : Fragment() {
     }
 
     private fun findViews(view: View) {
-        timeToAos = (mainActivity).findViewById(R.id.toolbar_time_to_aos)
-        btnPassPrefs = (mainActivity).findViewById(R.id.toolbar_btn_refresh)
-        swipeLayout = view.findViewById(R.id.swipeRefreshLayout)
-        recyclerPasses = view.findViewById(R.id.sky_recycler_future)
-        fab = view.findViewById(R.id.sky_fab)
+        aosTimerText = (mainActivity).findViewById(R.id.toolbar_timer)
+        btnPassPrefs = (mainActivity).findViewById(R.id.toolbar_filter)
+        swipeLayout = view.findViewById(R.id.pass_list_refresh)
+        satPassRecycler = view.findViewById(R.id.pass_list_recycler)
+        passListFab = view.findViewById(R.id.pass_list_fab)
     }
 
     private fun setupComponents() {
-        recyclerPasses.apply {
+        satPassRecycler.apply {
             layoutManager = LinearLayoutManager(mainActivity)
-            adapter = recyclerAdapter
+            adapter = satPassAdapter
             (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
-        recyclerAdapter.setList(satPassList)
+        satPassAdapter.setList(satPassList)
         setTimer()
 
         swipeLayout.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
-        swipeLayout.setColorSchemeResources(R.color.darkOnLight)
+        swipeLayout.setColorSchemeResources(R.color.backgroundDark)
         swipeLayout.setOnRefreshListener { calculatePasses() }
         btnPassPrefs.setOnClickListener {
             showSatPassPrefsDialog(viewModel.hoursAhead, viewModel.minEl)
         }
-        fab.setOnClickListener {
+        passListFab.setOnClickListener {
             showSelectSatDialog(viewModel.tleMainList, viewModel.tleSelection)
         }
     }
@@ -110,7 +113,7 @@ class SkyFragment : Fragment() {
     private fun setupObservers() {
         viewModel.passSatList.observe(viewLifecycleOwner, Observer {
             satPassList = it
-            recyclerAdapter.setList(satPassList)
+            satPassAdapter.setList(satPassList)
             setTimer()
             swipeLayout.isRefreshing = false
         })
@@ -122,14 +125,14 @@ class SkyFragment : Fragment() {
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
-        val satPassPrefView = View.inflate(mainActivity, R.layout.sat_pass_pref, null)
-        val etHoursAhead = satPassPrefView.findViewById<EditText>(R.id.pref_hours_ahead_et)
-        val etMinEl = satPassPrefView.findViewById<EditText>(R.id.pref_min_el_et)
+        val satPassPrefView = View.inflate(mainActivity, R.layout.dialog_pass_pref, null)
+        val etHoursAhead = satPassPrefView.findViewById<EditText>(R.id.pref_et_hoursAhead)
+        val etMinEl = satPassPrefView.findViewById<EditText>(R.id.pref_et_minEl)
         etHoursAhead.setText(hoursAhead.toString())
         etMinEl.setText(minEl.toString())
 
         val builder = AlertDialog.Builder(mainActivity)
-        builder.setTitle(getString(R.string.dialog_pass_prefs))
+        builder.setTitle(getString(R.string.dialog_filter_passes))
             .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
                 val hoursStr = etHoursAhead.text.toString()
                 val elevationStr = etMinEl.text.toString()
@@ -140,14 +143,14 @@ class SkyFragment : Fragment() {
                         hours < 1 || hours > 168 -> {
                             Toast.makeText(
                                 mainActivity,
-                                "Value should be within 1-168 hours",
+                                getString(R.string.pref_hours_ahead_input_error),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                         elevation < 0 || elevation > 90 -> {
                             Toast.makeText(
                                 mainActivity,
-                                "Value should be within 0-90 deg",
+                                getString(R.string.pref_min_el_input_error),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -158,7 +161,7 @@ class SkyFragment : Fragment() {
                     }
                 } else Toast.makeText(
                     mainActivity,
-                    "Please, enter the value",
+                    getString(R.string.error_enter_value),
                     Toast.LENGTH_SHORT
                 ).show()
 
@@ -173,7 +176,8 @@ class SkyFragment : Fragment() {
 
     private fun showSelectSatDialog(tleMainList: List<TLE>, selectionList: MutableList<Int>) {
         if (tleMainList.isEmpty()) {
-            Toast.makeText(mainActivity, "Please, update your TLE", Toast.LENGTH_SHORT).show()
+            Toast.makeText(mainActivity, getString(R.string.error_update_tle), Toast.LENGTH_SHORT)
+                .show()
         } else {
             val tleNameArray = arrayOfNulls<String>(tleMainList.size).apply {
                 tleMainList.withIndex().forEach { (position, tle) -> this[position] = tle.name }
@@ -230,13 +234,13 @@ class SkyFragment : Fragment() {
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                timeToAos.text = String.format(
-                    mainActivity.getString(R.string.pattern_aos),
+                aosTimerText.text = String.format(
+                    mainActivity.getString(R.string.pattern_timer_aos),
                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
                 )
-                recyclerAdapter.updateRecycler()
+                satPassAdapter.updateRecycler()
             }
         }
     }
@@ -250,13 +254,13 @@ class SkyFragment : Fragment() {
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                timeToAos.text = String.format(
-                    mainActivity.getString(R.string.pattern_los),
+                aosTimerText.text = String.format(
+                    mainActivity.getString(R.string.pattern_timer_los),
                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
                 )
-                recyclerAdapter.updateRecycler()
+                satPassAdapter.updateRecycler()
             }
         }
     }
@@ -266,6 +270,7 @@ class SkyFragment : Fragment() {
             aosTimer.cancel()
             isTimerSet = false
         }
-        if (resetToNull) timeToAos.text = String.format(getString(R.string.pattern_aos), 0, 0, 0)
+        if (resetToNull) aosTimerText.text =
+            String.format(getString(R.string.pattern_timer_aos), 0, 0, 0)
     }
 }

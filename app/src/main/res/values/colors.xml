@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="themeAccent">#FFE082</color>
-    <color name="darkOnLight">#101010</color>
-    <color name="lightOnDark">#C0C0C0</color>
-    <color name="toolbarButton">#191919</color>
+    <color name="themeLight">#C0C0C0</color>
+    <color name="themeDark">#191919</color>
     <color name="backgroundDark">#080808</color>
-    <color name="error">#800000</color>
     <color name="satTrack">#D50000</color>
     <color name="satFootprint">#FFE082</color>
 </resources>

@@ -2,48 +2,50 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pass_pref_root"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/pref_hours_ahead_tv"
-        android:layout_width="wrap_content"
+        android:id="@+id/pref_tv_hoursAhead"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
         android:text="@string/pref_hours_ahead_summary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/pref_hours_ahead_et"
+        android:id="@+id/pref_et_hoursAhead"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/pref_hours_ahead_hint"
         android:importantForAutofill="no"
         android:inputType="number"
-        app:layout_constraintEnd_toEndOf="@+id/pref_hours_ahead_tv"
-        app:layout_constraintStart_toStartOf="@+id/pref_hours_ahead_tv"
-        app:layout_constraintTop_toBottomOf="@+id/pref_hours_ahead_tv" />
+        app:layout_constraintEnd_toEndOf="@+id/pref_tv_hoursAhead"
+        app:layout_constraintStart_toStartOf="@+id/pref_tv_hoursAhead"
+        app:layout_constraintTop_toBottomOf="@+id/pref_tv_hoursAhead" />
 
     <TextView
-        android:id="@+id/pref_min_el_tv"
-        android:layout_width="wrap_content"
+        android:id="@+id/pref_tv_minEl"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/pref_min_el_summary"
-        app:layout_constraintEnd_toEndOf="@+id/pref_hours_ahead_et"
-        app:layout_constraintStart_toStartOf="@+id/pref_hours_ahead_et"
-        app:layout_constraintTop_toBottomOf="@+id/pref_hours_ahead_et" />
+        app:layout_constraintEnd_toEndOf="@+id/pref_et_hoursAhead"
+        app:layout_constraintStart_toStartOf="@+id/pref_et_hoursAhead"
+        app:layout_constraintTop_toBottomOf="@+id/pref_et_hoursAhead" />
 
     <EditText
-        android:id="@+id/pref_min_el_et"
+        android:id="@+id/pref_et_minEl"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/pref_min_el_hint"
         android:importantForAutofill="no"
         android:inputType="number|numberDecimal"
-        app:layout_constraintEnd_toEndOf="@+id/pref_min_el_tv"
-        app:layout_constraintStart_toStartOf="@+id/pref_min_el_tv"
-        app:layout_constraintTop_toBottomOf="@+id/pref_min_el_tv" />
+        app:layout_constraintEnd_toEndOf="@+id/pref_tv_minEl"
+        app:layout_constraintStart_toStartOf="@+id/pref_tv_minEl"
+        app:layout_constraintTop_toBottomOf="@+id/pref_tv_minEl" />
 </androidx.constraintlayout.widget.ConstraintLayout>

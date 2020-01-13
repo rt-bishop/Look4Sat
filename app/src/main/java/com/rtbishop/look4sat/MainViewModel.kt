@@ -48,19 +48,15 @@ import javax.inject.Inject
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val defValueLoc = application.getString(R.string.def_gsp_loc)
-    private val defValueHours = application.getString(R.string.def_hours_ahead).toInt()
-    private val defValueMinEl = application.getString(R.string.def_min_el).toDouble()
-    private val defValueUpdateFreq = application.getString(R.string.def_update_freq)
-    private val keyHours = application.getString(R.string.key_hours_ahead)
-    private val keyMinEl = application.getString(R.string.key_min_el)
-    private val keyLat = application.getString(R.string.key_lat)
-    private val keyLon = application.getString(R.string.key_lon)
-    private val keyAlt = application.getString(R.string.key_alt)
-    private val keyDelay = application.getString(R.string.key_delay)
-    private val tleMainListFileName = application.getString(R.string.tle_main_list_file_name)
-    private val tleSelectionFileName = application.getString(R.string.tle_selection_file_name)
     private val app = application
+    private val keyHours = application.getString(R.string.pref_hours_ahead_key)
+    private val keyMinEl = application.getString(R.string.pref_min_el_key)
+    private val keyLat = application.getString(R.string.pref_lat_key)
+    private val keyLon = application.getString(R.string.pref_lon_key)
+    private val keyAlt = application.getString(R.string.pref_alt_key)
+    private val keyDelay = application.getString(R.string.pref_refresh_rate_key)
+    private val tleMainListFileName = "tleFile.txt"
+    private val tleSelectionFileName = "tleSelection"
 
     private val _debugMessage = MutableLiveData<String>()
     val debugMessage: LiveData<String> = _debugMessage
@@ -93,18 +89,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val delay: Long
-        get() = preferences.getString(keyDelay, defValueUpdateFreq)!!.toLong()
+        get() = preferences.getString(keyDelay, "3000")!!.toLong()
 
     val hoursAhead: Int
-        get() = preferences.getInt(keyHours, defValueHours)
+        get() = preferences.getInt(keyHours, 8)
 
     val minEl: Double
-        get() = preferences.getDouble(keyMinEl, defValueMinEl)
+        get() = preferences.getDouble(keyMinEl, 16.0)
 
     fun setGroundStationPosition() {
-        val lat = preferences.getString(keyLat, defValueLoc)!!.toDouble()
-        val lon = preferences.getString(keyLon, defValueLoc)!!.toDouble()
-        val alt = preferences.getString(keyAlt, defValueLoc)!!.toDouble()
+        val lat = preferences.getString(keyLat, "0.0")!!.toDouble()
+        val lon = preferences.getString(keyLon, "0.0")!!.toDouble()
+        val alt = preferences.getString(keyAlt, "0.0")!!.toDouble()
         _gsp.postValue(GroundStationPosition(lat, lon, alt))
     }
 
@@ -193,11 +189,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         val predictor = PassPredictor(tle, gsp.value)
                         val passes = predictor.getPasses(dateNow, hoursAhead, true)
-                        passes.forEach { passList.add(SatPass(tle, predictor, it)) }
+                        passes.forEach {
+                            passList.add(
+                                SatPass(
+                                    tle,
+                                    predictor,
+                                    it
+                                )
+                            )
+                        }
                     } catch (exception: IllegalArgumentException) {
-                        _debugMessage.postValue("There was a problem with ${tle.name}")
+                        _debugMessage.postValue(app.getString(R.string.error_sat_tle))
                     } catch (exception: SatNotFoundException) {
-                        _debugMessage.postValue("${tle.name} shall not pass")
+                        _debugMessage.postValue(app.getString(R.string.error_sat_wont_pass))
                     }
                 }
                 passList.removeAll { it.pass.startTime.after(dateFuture) }
@@ -220,7 +224,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val tleList = ObjectInputStream(tleStream).readObject()
             tleList as List<TLE>
         } catch (exception: FileNotFoundException) {
-            _debugMessage.postValue("TLE file wasn't found")
+            _debugMessage.postValue(app.getString(R.string.no_tle_found))
             emptyList()
         } catch (exception: IOException) {
             _debugMessage.postValue(exception.toString())
@@ -231,7 +235,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val selectionList = ObjectInputStream(selectionStream).readObject()
             selectionList as MutableList<Int>
         } catch (exception: FileNotFoundException) {
-            _debugMessage.postValue("Selection file wasn't found")
+            _debugMessage.postValue(app.getString(R.string.no_selection_found))
             mutableListOf()
         } catch (exception: IOException) {
             _debugMessage.postValue(exception.toString())

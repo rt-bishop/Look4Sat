@@ -39,6 +39,7 @@ import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.repo.SatPass
+import com.rtbishop.look4sat.ui.adapters.TransmitterAdapter
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.Executors
@@ -46,22 +47,22 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.cos
 import kotlin.math.sin
 
-class RadarFragment : Fragment() {
+class PolarViewFragment : Fragment() {
 
     private val service = Executors.newSingleThreadScheduledExecutor()
-    private val args: RadarFragmentArgs by navArgs()
+    private val args: PolarViewFragmentArgs by navArgs()
 
     private lateinit var viewModel: MainViewModel
     private lateinit var satPass: SatPass
-    private lateinit var radarView: RadarView
-    private lateinit var radarSkyFrame: FrameLayout
+    private lateinit var polarView: PolarView
+    private lateinit var polarViewFrame: FrameLayout
     private lateinit var transRecycler: RecyclerView
-    private lateinit var transAdapter: TransAdapter
-    private lateinit var radarAzimuth: TextView
-    private lateinit var radarElevation: TextView
-    private lateinit var radarRange: TextView
-    private lateinit var radarAltitude: TextView
-    private lateinit var transNoFound: TextView
+    private lateinit var transmitterAdapter: TransmitterAdapter
+    private lateinit var polarAzimuth: TextView
+    private lateinit var polarElevation: TextView
+    private lateinit var polarRange: TextView
+    private lateinit var polarAltitude: TextView
+    private lateinit var noTransFound: TextView
     private lateinit var mainActivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +76,7 @@ class RadarFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_radar, container, false)
+        return inflater.inflate(R.layout.fragment_polar_view, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,40 +85,40 @@ class RadarFragment : Fragment() {
         satPass = args.satPass
         mainActivity.supportActionBar?.title = satPass.tle.name
 
-        radarSkyFrame = view.findViewById(R.id.radar_sky_frame)
-        transRecycler = view.findViewById(R.id.radar_recycler)
-        radarAzimuth = view.findViewById(R.id.radar_azimuth)
-        radarElevation = view.findViewById(R.id.radar_elevation)
-        radarRange = view.findViewById(R.id.radar_range)
-        radarAltitude = view.findViewById(R.id.radar_altitude)
-        transNoFound = view.findViewById(R.id.radar_no_trans)
+        polarViewFrame = view.findViewById(R.id.polar_view_frame)
+        transRecycler = view.findViewById(R.id.polar_recycler)
+        polarAzimuth = view.findViewById(R.id.polar_azimuth)
+        polarElevation = view.findViewById(R.id.polar_elevation)
+        polarRange = view.findViewById(R.id.polar_range)
+        polarAltitude = view.findViewById(R.id.polar_altitude)
+        noTransFound = view.findViewById(R.id.polar_no_trans)
 
-        radarView = RadarView(mainActivity, delay)
-        radarSkyFrame.addView(radarView)
-        service.scheduleAtFixedRate({ radarView.invalidate() }, delay, delay, TimeUnit.MILLISECONDS)
+        polarView = PolarView(mainActivity, delay)
+        polarViewFrame.addView(polarView)
+        service.scheduleAtFixedRate({ polarView.invalidate() }, delay, delay, TimeUnit.MILLISECONDS)
 
         setupTransRecycler()
     }
 
     private fun setupTransRecycler() {
-        transAdapter = TransAdapter()
+        transmitterAdapter = TransmitterAdapter()
         transRecycler.apply {
             layoutManager = LinearLayoutManager(mainActivity)
-            adapter = transAdapter
+            adapter = transmitterAdapter
         }
         lifecycleScope.launch {
             val transList = viewModel.getTransmittersForSat(satPass.tle.catnum)
             if (transList.isNotEmpty()) {
-                transAdapter.setList(transList)
-                transAdapter.notifyDataSetChanged()
+                transmitterAdapter.setList(transList)
+                transmitterAdapter.notifyDataSetChanged()
             } else {
                 transRecycler.visibility = View.INVISIBLE
-                transNoFound.visibility = View.VISIBLE
+                noTransFound.visibility = View.VISIBLE
             }
         }
     }
 
-    inner class RadarView(context: Context, updateFreq: Long) : View(context) {
+    inner class PolarView(context: Context, updateFreq: Long) : View(context) {
 
         private val radarSize = resources.displayMetrics.widthPixels
         private val scale = resources.displayMetrics.density
@@ -131,7 +132,7 @@ class RadarFragment : Fragment() {
 
         private val radarPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.lightOnDark, mainActivity.theme)
+            color = resources.getColor(R.color.themeLight, mainActivity.theme)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
@@ -168,10 +169,18 @@ class RadarFragment : Fragment() {
 
         private fun setPassText() {
             satPos = satPass.predictor.getSatPos(Date())
-            radarAzimuth.text = String.format("Azimuth: %.1f°", rad2Deg(satPos.azimuth))
-            radarElevation.text = String.format("Elevation: %.1f°", rad2Deg(satPos.elevation))
-            radarRange.text = String.format("Range: %.0f km", satPos.range)
-            radarAltitude.text = String.format("Altitude: %.0f km", satPos.altitude)
+            polarAzimuth.text = String.format(
+                context.getString(R.string.pattern_polar_azimuth),
+                rad2Deg(satPos.azimuth)
+            )
+            polarElevation.text = String.format(
+                context.getString(R.string.pattern_polar_elev),
+                rad2Deg(satPos.elevation)
+            )
+            polarRange.text =
+                String.format(context.getString(R.string.pattern_polar_range), satPos.range)
+            polarAltitude.text =
+                String.format(context.getString(R.string.pattern_polar_alt), satPos.altitude)
         }
 
         private fun drawRadarView(cvs: Canvas) {

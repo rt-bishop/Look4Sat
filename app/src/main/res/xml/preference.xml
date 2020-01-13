@@ -2,31 +2,31 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/pref_gsp_title">
         <EditTextPreference
-            android:defaultValue="@string/def_gsp_loc"
-            android:key="@string/key_lat"
+            android:defaultValue="0.0"
+            android:key="@string/pref_lat_key"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_lat_title" />
         <EditTextPreference
-            android:defaultValue="@string/def_gsp_loc"
-            android:key="@string/key_lon"
+            android:defaultValue="0.0"
+            android:key="@string/pref_lon_key"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_lon_title" />
         <EditTextPreference
-            android:defaultValue="@string/def_gsp_loc"
-            android:key="@string/key_alt"
+            android:defaultValue="0.0"
+            android:key="@string/pref_alt_key"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_alt_title" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_other_title">
         <EditTextPreference
-            android:defaultValue="@string/def_update_freq"
-            android:key="@string/key_delay"
+            android:defaultValue="3000"
+            android:key="@string/pref_refresh_rate_key"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:summary="@string/pref_update_freq_summary"
-            android:title="@string/pref_update_freq_title" />
+            android:summary="@string/pref_refresh_rate_summary"
+            android:title="@string/pref_refresh_rate_title" />
     </PreferenceCategory>
 </PreferenceScreen>

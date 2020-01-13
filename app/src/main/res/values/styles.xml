@@ -4,12 +4,10 @@
         <item name="colorPrimary">@color/themeAccent</item>
         <item name="colorSecondary">@color/themeAccent</item>
         <item name="colorSurface">@color/backgroundDark</item>
-        <item name="colorError">@color/error</item>
 
-        <item name="colorOnPrimary">@color/darkOnLight</item>
-        <item name="colorOnSecondary">@color/darkOnLight</item>
-        <item name="colorOnSurface">@color/lightOnDark</item>
-        <item name="colorOnError">@color/lightOnDark</item>
+        <item name="colorOnPrimary">@color/backgroundDark</item>
+        <item name="colorOnSecondary">@color/backgroundDark</item>
+        <item name="colorOnSurface">@color/themeLight</item>
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -23,7 +21,7 @@
     <style name="DrawerHeader">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/lightOnDark</item>
+        <item name="android:textColor">@color/themeLight</item>
     </style>
 
     <style name="DrawerHeader.Title">
@@ -64,39 +62,34 @@
     <style name="ToolbarButton">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:src">@drawable/ic_prefs</item>
-        <item name="android:backgroundTint">@color/toolbarButton</item>
+        <item name="android:src">@drawable/ic_filter</item>
+        <item name="android:backgroundTint">@color/themeDark</item>
     </style>
 
-    <style name="CardPass">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="CardPass.SideText">
+    <style name="CardPassText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="CardPass.SatName">
+    <style name="CardPassName">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">21sp</item>
         <item name="android:textColor">@color/themeAccent</item>
     </style>
 
-    <style name="RadarText">
+    <style name="PolarViewText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/lightOnDark</item>
+        <item name="android:textColor">@color/themeLight</item>
         <item name="android:textSize">15sp</item>
     </style>
 
     <style name="CardTransText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/lightOnDark</item>
+        <item name="android:textColor">@color/themeLight</item>
         <item name="android:textSize">15sp</item>
     </style>
 

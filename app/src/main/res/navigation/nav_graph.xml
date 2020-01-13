@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_sky">
+    app:startDestination="@id/nav_pass_list">
 
     <fragment
-        android:id="@+id/nav_sky"
-        android:name="com.rtbishop.look4sat.ui.SkyFragment"
-        android:label="@string/menu_sky"
-        tools:layout="@layout/fragment_sky">
+        android:id="@+id/nav_pass_list"
+        android:name="com.rtbishop.look4sat.ui.PassListFragment"
+        android:label="@string/menu_pass_list"
+        tools:layout="@layout/fragment_pass_list">
         <action
-            android:id="@+id/action_nav_sky_to_nav_radar"
-            app:destination="@id/nav_radar"
+            android:id="@+id/action_pass_to_polar"
+            app:destination="@id/nav_polar_view"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_enter_anim"
@@ -20,20 +20,20 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_radar"
-        android:name="com.rtbishop.look4sat.ui.RadarFragment"
-        android:label="@string/menu_radar"
-        tools:layout="@layout/fragment_radar">
+        android:id="@+id/nav_polar_view"
+        android:name="com.rtbishop.look4sat.ui.PolarViewFragment"
+        android:label="@string/menu_polar_view"
+        tools:layout="@layout/fragment_polar_view">
         <argument
             android:name="satPass"
             app:argType="com.rtbishop.look4sat.repo.SatPass" />
     </fragment>
 
     <fragment
-        android:id="@+id/nav_map"
-        android:name="com.rtbishop.look4sat.ui.WorldMapFragment"
-        android:label="@string/menu_map"
-        tools:layout="@layout/fragment_worldmap" />
+        android:id="@+id/nav_map_view"
+        android:name="com.rtbishop.look4sat.ui.MapViewFragment"
+        android:label="@string/menu_map_view"
+        tools:layout="@layout/fragment_map_view" />
 
     <fragment
         android:id="@+id/nav_credits"

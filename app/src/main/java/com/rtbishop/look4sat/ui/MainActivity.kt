@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        timerLayout = findViewById(R.id.toolbar_layout_timer)
+        timerLayout = findViewById(R.id.toolbar_layout)
         drawerLayout = findViewById(R.id.drawer_layout)
         drawerLat = header.findViewById(R.id.drawer_lat_value)
         drawerLon = header.findViewById(R.id.drawer_lon_value)
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         drawerBtnExit = header.findViewById(R.id.drawer_btn_exit)
 
         appBarConfig = AppBarConfiguration(
-            setOf(R.id.nav_sky, R.id.nav_map, R.id.nav_credits, R.id.nav_about),
+            setOf(R.id.nav_pass_list, R.id.nav_map_view, R.id.nav_credits, R.id.nav_about),
             drawerLayout
         )
 
@@ -102,12 +102,12 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.nav_sky -> {
+                R.id.nav_pass_list -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     toolbar.visibility = View.VISIBLE
                     timerLayout.visibility = View.VISIBLE
                 }
-                R.id.nav_map -> {
+                R.id.nav_map_view -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                     toolbar.visibility = View.GONE
                 }
@@ -131,8 +131,8 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.gsp.observe(this, Observer { gsp ->
-            drawerLat.text = String.format(getString(R.string.pattern_location), gsp.latitude)
-            drawerLon.text = String.format(getString(R.string.pattern_location), gsp.longitude)
+            drawerLat.text = String.format(getString(R.string.pattern_loc), gsp.latitude)
+            drawerLon.text = String.format(getString(R.string.pattern_loc), gsp.longitude)
         })
     }
 

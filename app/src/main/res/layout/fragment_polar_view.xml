@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.RadarFragment">
+    tools:context=".ui.PolarViewFragment">
 
     <FrameLayout
-        android:id="@+id/radar_sky_frame"
+        android:id="@+id/polar_view_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1"
@@ -16,54 +16,54 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/radar_azimuth"
-        style="@style/RadarText"
+        android:id="@+id/polar_azimuth"
+        style="@style/PolarViewText"
         android:layout_marginStart="4dp"
-        android:text="@string/radar_azimuth"
-        app:layout_constraintBottom_toBottomOf="@+id/radar_sky_frame"
-        app:layout_constraintStart_toStartOf="@+id/radar_sky_frame" />
+        android:text="@string/polar_azimuth"
+        app:layout_constraintBottom_toBottomOf="@+id/polar_view_frame"
+        app:layout_constraintStart_toStartOf="@+id/polar_view_frame" />
 
     <TextView
-        android:id="@+id/radar_elevation"
-        style="@style/RadarText"
+        android:id="@+id/polar_elevation"
+        style="@style/PolarViewText"
         android:layout_marginEnd="4dp"
-        android:text="@string/radar_elevation"
+        android:text="@string/polar_elevation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/radar_sky_frame" />
+        app:layout_constraintTop_toTopOf="@+id/polar_view_frame" />
 
     <TextView
-        android:id="@+id/radar_altitude"
-        style="@style/RadarText"
+        android:id="@+id/polar_altitude"
+        style="@style/PolarViewText"
         android:layout_marginStart="4dp"
-        android:text="@string/radar_altitude"
+        android:text="@string/polar_altitude"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/radar_sky_frame" />
+        app:layout_constraintTop_toTopOf="@+id/polar_view_frame" />
 
     <TextView
-        android:id="@+id/radar_range"
-        style="@style/RadarText"
+        android:id="@+id/polar_range"
+        style="@style/PolarViewText"
         android:layout_marginEnd="4dp"
-        android:text="@string/radar_range"
-        app:layout_constraintBottom_toBottomOf="@+id/radar_sky_frame"
-        app:layout_constraintEnd_toEndOf="@+id/radar_sky_frame" />
+        android:text="@string/polar_range"
+        app:layout_constraintBottom_toBottomOf="@+id/polar_view_frame"
+        app:layout_constraintEnd_toEndOf="@+id/polar_view_frame" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/radar_recycler"
+        android:id="@+id/polar_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_sky_frame" />
+        app:layout_constraintTop_toBottomOf="@+id/polar_view_frame" />
 
     <TextView
-        android:id="@+id/radar_no_trans"
-        style="@style/RadarText"
+        android:id="@+id/polar_no_trans"
+        style="@style/PolarViewText"
         android:layout_marginTop="8dp"
-        android:text="@string/no_trans"
+        android:text="@string/no_transmitters"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_sky_frame" />
+        app:layout_constraintTop_toBottomOf="@+id/polar_view_frame" />
 </androidx.constraintlayout.widget.ConstraintLayout>

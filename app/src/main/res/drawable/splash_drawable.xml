@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
-    <item android:drawable="@color/darkOnLight" />
+    <item android:drawable="@drawable/launcher_background" />
     <item
         android:width="240dp"
         android:height="240dp"

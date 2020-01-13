@@ -23,7 +23,7 @@
         android:id="@+id/drawer_title"
         style="@style/DrawerHeader.Title"
         android:layout_marginStart="8dp"
-        android:text="@string/title"
+        android:text="@string/drawer_title"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_sat_img"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/drawer_sat_img" />
@@ -31,7 +31,7 @@
     <TextView
         android:id="@+id/drawer_lat"
         style="@style/DrawerHeader.Item"
-        android:text="@string/drawer_latitude"
+        android:text="@string/drawer_lat"
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_lat_value"
         app:layout_constraintStart_toStartOf="@+id/drawer_title" />
 
@@ -40,14 +40,14 @@
         style="@style/DrawerHeader.ItemValue"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
-        android:text="@string/drawer_latitude_value"
+        android:text="@string/drawer_lat_value"
         app:layout_constraintStart_toEndOf="@+id/drawer_lat"
         app:layout_constraintTop_toBottomOf="@+id/drawer_sat_img" />
 
     <TextView
         android:id="@+id/drawer_lon"
         style="@style/DrawerHeader.Item"
-        android:text="@string/drawer_longitude"
+        android:text="@string/drawer_lon"
         app:layout_constraintStart_toStartOf="@+id/drawer_lat"
         app:layout_constraintTop_toBottomOf="@+id/drawer_lat" />
 
@@ -55,7 +55,7 @@
         android:id="@+id/drawer_lon_value"
         style="@style/DrawerHeader.ItemValue"
         android:layout_marginStart="8dp"
-        android:text="@string/drawer_longitude_value"
+        android:text="@string/drawer_lon_value"
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_lon"
         app:layout_constraintStart_toEndOf="@+id/drawer_lon" />
 
@@ -65,7 +65,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_location"
+        android:src="@drawable/ic_update_loc"
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_tle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/drawer_lon_value" />
@@ -74,7 +74,7 @@
         android:id="@+id/drawer_tv_loc"
         style="@style/DrawerHeader.ButtonText"
         android:layout_marginStart="8dp"
-        android:text="@string/update_location"
+        android:text="@string/update_loc"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_loc"
         app:layout_constraintStart_toEndOf="@+id/drawer_btn_loc"
         app:layout_constraintTop_toTopOf="@+id/drawer_btn_loc" />
@@ -83,7 +83,7 @@
         android:id="@+id/drawer_btn_tle"
         style="@style/DrawerHeader.Button"
         android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_tle"
+        android:src="@drawable/ic_update_tle"
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_trans"
         app:layout_constraintStart_toStartOf="@+id/drawer_btn_loc"
         app:layout_constraintTop_toBottomOf="@+id/drawer_btn_loc" />
@@ -100,7 +100,7 @@
         android:id="@+id/drawer_btn_trans"
         style="@style/DrawerHeader.Button"
         android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_trans"
+        android:src="@drawable/ic_update_trans"
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_github"
         app:layout_constraintStart_toStartOf="@+id/drawer_btn_tle"
         app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle" />
@@ -108,7 +108,7 @@
     <TextView
         android:id="@+id/drawer_tv_trans"
         style="@style/DrawerHeader.ButtonText"
-        android:text="@string/update_transmitters"
+        android:text="@string/update_trans"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_trans"
         app:layout_constraintStart_toStartOf="@+id/drawer_tv_tle"
         app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle" />
@@ -118,7 +118,7 @@
         style="@style/DrawerHeader.Button"
         android:layout_marginBottom="8dp"
         android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_github"
+        android:src="@drawable/ic_goto_github"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/drawer_btn_trans"
         app:layout_constraintTop_toBottomOf="@+id/drawer_btn_trans" />
@@ -126,7 +126,7 @@
     <TextView
         android:id="@+id/drawer_tv_github"
         style="@style/DrawerHeader.ButtonText"
-        android:text="@string/github"
+        android:text="@string/goto_github"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_github"
         app:layout_constraintStart_toStartOf="@+id/drawer_tv_trans"
         app:layout_constraintTop_toBottomOf="@+id/drawer_btn_trans" />
@@ -136,7 +136,7 @@
         style="@style/DrawerHeader.Button"
         android:layout_marginStart="8dp"
         android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_exit"
+        android:src="@drawable/ic_exit_app"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_github"
         app:layout_constraintStart_toEndOf="@+id/drawer_tv_github"
         app:layout_constraintTop_toTopOf="@+id/drawer_btn_github" />
@@ -145,7 +145,7 @@
         android:id="@+id/drawer_tv_exit"
         style="@style/DrawerHeader.ButtonText"
         android:layout_marginStart="8dp"
-        android:text="@string/exit"
+        android:text="@string/exit_app"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_btn_exit"
         app:layout_constraintStart_toEndOf="@+id/drawer_btn_exit"
         app:layout_constraintTop_toTopOf="@+id/drawer_btn_exit" />
