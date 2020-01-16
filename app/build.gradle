@@ -27,12 +27,11 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        applicationId "com.rtbishop.lookingsat"
+        applicationId "com.rtbishop.look4sat"
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
-        versionName "0.2"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName '1.0'
     }
     buildTypes {
         release {
@@ -66,7 +65,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
 
     // room
     implementation "androidx.room:room-runtime:$room"
@@ -86,9 +84,4 @@ dependencies {
 
     // location
     implementation "com.google.android.gms:play-services-location:$google_play"
-
-    // testing
-    testImplementation "junit:junit:$junit"
-    androidTestImplementation "androidx.test:runner:$runner"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
 }
