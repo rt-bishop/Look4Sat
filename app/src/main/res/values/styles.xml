@@ -69,13 +69,13 @@
     <style name="CardPassText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">17sp</item>
     </style>
 
     <style name="CardPassName">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">21sp</item>
+        <item name="android:textSize">19sp</item>
         <item name="android:textColor">@color/themeAccent</item>
     </style>
 

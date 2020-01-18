@@ -23,6 +23,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.navigation.findNavController
@@ -51,6 +52,7 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.SatPassHolder>() {
                 val timeStart = satPass.pass.startTime
                 val timeEnd = satPass.pass.endTime
                 if (timeNow.after(timeStart)) {
+                    satPass.active = true
                     val index = satPassList.indexOf(satPass)
                     val deltaTotal = timeEnd.time.minus(timeStart.time)
                     val deltaNow = timeNow.time.minus(timeStart.time)
@@ -83,36 +85,36 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.SatPassHolder>() {
     inner class SatPassHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val context: Context = itemView.context
+        private val passImg = itemView.findViewById<ImageView>(R.id.pass_img)
         private val satName = itemView.findViewById<TextView>(R.id.pass_satName)
         private val satId = itemView.findViewById<TextView>(R.id.pass_satId)
         private val maxEl = itemView.findViewById<TextView>(R.id.pass_maxEl)
-        private val azimuth = itemView.findViewById<TextView>(R.id.pass_azimuth)
+        private val aosAz = itemView.findViewById<TextView>(R.id.pass_aosAz)
+        private val losAz = itemView.findViewById<TextView>(R.id.pass_losAz)
         private val aosTime = itemView.findViewById<TextView>(R.id.pass_aosTime)
         private val losTime = itemView.findViewById<TextView>(R.id.pass_losTime)
         private var progressBar = itemView.findViewById<ProgressBar>(R.id.pass_progress)
 
         fun bind(satPass: SatPass) {
-            val aos = SimpleDateFormat(
-                context.getString(R.string.pat_time),
-                Locale.getDefault()
-            ).format(satPass.pass.startTime)
-            val los = SimpleDateFormat(
-                context.getString(R.string.pat_time),
-                Locale.getDefault()
-            ).format(satPass.pass.endTime)
+
+            if (satPass.active) passImg.setImageResource(R.drawable.ic_pass_active)
+            else passImg.setImageResource(R.drawable.ic_pass_inactive)
 
             satName.text = satPass.tle.name
             satId.text =
                 String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
             maxEl.text =
                 String.format(context.getString(R.string.pass_maxEl), satPass.pass.maxEl)
-            azimuth.text = String.format(
-                context.getString(R.string.pass_azimuth),
-                satPass.pass.aosAzimuth,
-                satPass.pass.losAzimuth
-            )
-            aosTime.text = String.format(context.getString(R.string.pass_aos), aos)
-            losTime.text = String.format(context.getString(R.string.pass_los), los)
+            aosAz.text =
+                String.format(context.getString(R.string.pass_aos_az), satPass.pass.aosAzimuth)
+            losAz.text =
+                String.format(context.getString(R.string.pass_los_az), satPass.pass.losAzimuth)
+            aosTime.text =
+                SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
+                    .format(satPass.pass.startTime)
+            losTime.text =
+                SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
+                    .format(satPass.pass.endTime)
             progressBar.progress = satPass.progress
 
             itemView.setOnClickListener {

@@ -31,5 +31,6 @@ data class SatPass(
     val tle: TLE,
     val predictor: @RawValue PassPredictor,
     val pass: @RawValue SatPassTime,
-    var progress: Int = 0
+    var progress: Int = 0,
+    var active: Boolean = false
 ) : Parcelable

@@ -17,9 +17,9 @@
             android:id="@+id/trans_description"
             style="@style/CardTransText"
             android:text="@string/trans_description"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="@+id/imageView" />
+            app:layout_constraintBottom_toBottomOf="@+id/trans_img"
+            app:layout_constraintStart_toEndOf="@+id/trans_img"
+            app:layout_constraintTop_toTopOf="@+id/trans_img" />
 
         <TextView
             android:id="@+id/trans_downlink"
@@ -60,7 +60,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/trans_img"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="4dp"
@@ -72,7 +72,7 @@
             app:srcCompat="@drawable/ic_trans" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/trans_img_downlink"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:contentDescription="@string/placeholder"
@@ -83,7 +83,7 @@
             app:srcCompat="@drawable/ic_arrow" />
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/trans_img_uplink"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:contentDescription="@string/placeholder"
