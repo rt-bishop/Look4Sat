@@ -124,15 +124,19 @@ class MainActivity : AppCompatActivity() {
         viewModel.debugMessage.observe(this, Observer { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             when (message) {
-                getString(R.string.updateLocSuccess) -> drawerBtnLoc.enable()
-                getString(R.string.updateTleSuccess), getString(R.string.updateTleFailure) -> drawerBtnTle.enable()
-                getString(R.string.updateTransSuccess), getString(R.string.updateTransFailure) -> drawerBtnTrans.enable()
+                getString(R.string.update_loc_success) -> drawerBtnLoc.enable()
+                getString(R.string.update_tle_success) -> drawerBtnTle.enable()
+                getString(R.string.update_trans_success) -> drawerBtnTrans.enable()
+                getString(R.string.update_failure) -> {
+                    drawerBtnTle.enable()
+                    drawerBtnTrans.enable()
+                }
             }
         })
 
         viewModel.gsp.observe(this, Observer { gsp ->
-            drawerLat.text = String.format(getString(R.string.pattern_loc), gsp.latitude)
-            drawerLon.text = String.format(getString(R.string.pattern_loc), gsp.longitude)
+            drawerLat.text = String.format(getString(R.string.pat_location), gsp.latitude)
+            drawerLon.text = String.format(getString(R.string.pat_location), gsp.longitude)
         })
     }
 
@@ -159,7 +163,8 @@ class MainActivity : AppCompatActivity() {
     private fun requestLocationUpdate() {
         if (ContextCompat.checkSelfPermission(this, permLocation) != permGranted) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permLocation)) {
-                Toast.makeText(this, getString(R.string.no_permissions), Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.err_no_permissions), Toast.LENGTH_LONG)
+                    .show()
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(permLocation), permLocationCode)
             }
@@ -182,14 +187,14 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host)
         return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
     }
-}
 
-fun ImageButton.enable() {
-    this.isEnabled = true
-    this.alpha = 1.0f
-}
+    private fun ImageButton.enable() {
+        this.isEnabled = true
+        this.alpha = 1.0f
+    }
 
-fun ImageButton.disable() {
-    this.isEnabled = false
-    this.alpha = 0.25f
+    private fun ImageButton.disable() {
+        this.isEnabled = false
+        this.alpha = 0.25f
+    }
 }

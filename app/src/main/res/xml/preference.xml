@@ -26,7 +26,6 @@
             android:key="@string/pref_refresh_rate_key"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:summary="@string/pref_refresh_rate_summary"
             android:title="@string/pref_refresh_rate_title" />
     </PreferenceCategory>
 </PreferenceScreen>

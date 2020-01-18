@@ -169,18 +169,14 @@ class PolarViewFragment : Fragment() {
 
         private fun setPassText() {
             satPos = satPass.predictor.getSatPos(Date())
-            polarAzimuth.text = String.format(
-                context.getString(R.string.pattern_value_az),
-                rad2Deg(satPos.azimuth)
-            )
-            polarElevation.text = String.format(
-                context.getString(R.string.pattern_value_el),
-                rad2Deg(satPos.elevation)
-            )
+            polarAzimuth.text =
+                String.format(context.getString(R.string.pat_azimuth), rad2Deg(satPos.azimuth))
+            polarElevation.text =
+                String.format(context.getString(R.string.pat_elevation), rad2Deg(satPos.elevation))
             polarRange.text =
-                String.format(context.getString(R.string.pattern_value_rng), satPos.range)
+                String.format(context.getString(R.string.pat_range), satPos.range)
             polarAltitude.text =
-                String.format(context.getString(R.string.pattern_value_alt), satPos.altitude)
+                String.format(context.getString(R.string.pat_altitude), satPos.altitude)
         }
 
         private fun drawRadarView(cvs: Canvas) {

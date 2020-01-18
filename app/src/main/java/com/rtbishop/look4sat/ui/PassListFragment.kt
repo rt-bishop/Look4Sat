@@ -83,8 +83,8 @@ class PassListFragment : Fragment() {
     }
 
     private fun findViews(view: View) {
-        aosTimerText = (mainActivity).findViewById(R.id.toolbar_timer)
-        btnPassPrefs = (mainActivity).findViewById(R.id.toolbar_filter)
+        aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
+        btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
         swipeLayout = view.findViewById(R.id.pass_list_refresh)
         satPassRecycler = view.findViewById(R.id.pass_list_recycler)
         passListFab = view.findViewById(R.id.pass_list_fab)
@@ -161,7 +161,7 @@ class PassListFragment : Fragment() {
                     }
                 } else Toast.makeText(
                     mainActivity,
-                    getString(R.string.error_enter_value),
+                    getString(R.string.err_enter_value),
                     Toast.LENGTH_SHORT
                 ).show()
 
@@ -176,7 +176,7 @@ class PassListFragment : Fragment() {
 
     private fun showSelectSatDialog(tleMainList: List<TLE>, selectionList: MutableList<Int>) {
         if (tleMainList.isEmpty()) {
-            Toast.makeText(mainActivity, getString(R.string.error_update_tle), Toast.LENGTH_SHORT)
+            Toast.makeText(mainActivity, getString(R.string.err_update_tle), Toast.LENGTH_SHORT)
                 .show()
         } else {
             val tleNameArray = arrayOfNulls<String>(tleMainList.size).apply {
@@ -235,7 +235,7 @@ class PassListFragment : Fragment() {
 
             override fun onTick(millisUntilFinished: Long) {
                 aosTimerText.text = String.format(
-                    mainActivity.getString(R.string.pattern_timer_aos),
+                    mainActivity.getString(R.string.pat_timer_aos),
                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
@@ -255,7 +255,7 @@ class PassListFragment : Fragment() {
 
             override fun onTick(millisUntilFinished: Long) {
                 aosTimerText.text = String.format(
-                    mainActivity.getString(R.string.pattern_timer_los),
+                    mainActivity.getString(R.string.pat_timer_los),
                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
@@ -271,6 +271,6 @@ class PassListFragment : Fragment() {
             isTimerSet = false
         }
         if (resetToNull) aosTimerText.text =
-            String.format(getString(R.string.pattern_timer_aos), 0, 0, 0)
+            String.format(getString(R.string.pat_timer_aos), 0, 0, 0)
     }
 }

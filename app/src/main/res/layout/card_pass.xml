@@ -51,7 +51,7 @@
             android:id="@+id/pass_aosTime"
             style="@style/CardPassText"
             android:layout_marginBottom="4dp"
-            android:text="@string/pass_aosTime"
+            android:text="@string/pass_aos"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/pass_progress"
             app:layout_constraintTop_toBottomOf="@+id/pass_progress" />
@@ -59,7 +59,7 @@
         <TextView
             android:id="@+id/pass_losTime"
             style="@style/CardPassText"
-            android:text="@string/pass_losTime"
+            android:text="@string/pass_los"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_aosTime"
             app:layout_constraintEnd_toEndOf="@+id/pass_progress" />
 

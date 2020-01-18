@@ -19,31 +19,31 @@
         android:id="@+id/polar_azimuth"
         style="@style/PolarViewText"
         android:layout_marginStart="4dp"
-        android:text="@string/polar_azimuth"
-        app:layout_constraintBottom_toBottomOf="@+id/polar_view_frame"
-        app:layout_constraintStart_toStartOf="@+id/polar_view_frame" />
+        android:text="@string/pat_azimuth"
+        app:layout_constraintStart_toStartOf="@+id/polar_view_frame"
+        app:layout_constraintTop_toTopOf="@+id/polar_view_frame" />
 
     <TextView
         android:id="@+id/polar_elevation"
         style="@style/PolarViewText"
         android:layout_marginEnd="4dp"
-        android:text="@string/polar_elevation"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/pat_elevation"
+        app:layout_constraintEnd_toEndOf="@+id/polar_view_frame"
         app:layout_constraintTop_toTopOf="@+id/polar_view_frame" />
 
     <TextView
         android:id="@+id/polar_altitude"
         style="@style/PolarViewText"
         android:layout_marginStart="4dp"
-        android:text="@string/polar_altitude"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/polar_view_frame" />
+        android:text="@string/pat_altitude"
+        app:layout_constraintBottom_toBottomOf="@+id/polar_view_frame"
+        app:layout_constraintStart_toStartOf="@+id/polar_view_frame" />
 
     <TextView
         android:id="@+id/polar_range"
         style="@style/PolarViewText"
         android:layout_marginEnd="4dp"
-        android:text="@string/polar_range"
+        android:text="@string/pat_range"
         app:layout_constraintBottom_toBottomOf="@+id/polar_view_frame"
         app:layout_constraintEnd_toEndOf="@+id/polar_view_frame" />
 

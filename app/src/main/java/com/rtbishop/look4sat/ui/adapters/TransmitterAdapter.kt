@@ -66,12 +66,12 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
 
             if (transmitter.downlinkLow != null && transmitter.downlinkHigh == null) {
                 downlink.text = String.format(
-                    context.getString(R.string.pattern_trans_down_low),
+                    context.getString(R.string.trans_down_low),
                     transmitter.downlinkLow / freqDivider
                 )
             } else if (transmitter.downlinkLow != null && transmitter.downlinkHigh != null) {
                 downlink.text = String.format(
-                    context.getString(R.string.pattern_trans_down_lowHigh),
+                    context.getString(R.string.trans_down_lowHigh),
                     transmitter.downlinkLow / freqDivider,
                     transmitter.downlinkHigh / freqDivider
                 )
@@ -81,12 +81,12 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
 
             if (transmitter.uplinkLow != null && transmitter.uplinkHigh == null) {
                 uplink.text = String.format(
-                    context.getString(R.string.pattern_trans_up_low),
+                    context.getString(R.string.trans_up_low),
                     transmitter.uplinkLow / freqDivider
                 )
             } else if (transmitter.uplinkLow != null && transmitter.uplinkHigh != null) {
                 uplink.text = String.format(
-                    context.getString(R.string.pattern_trans_up_lowHigh),
+                    context.getString(R.string.trans_up_lowHigh),
                     transmitter.uplinkLow / freqDivider,
                     transmitter.uplinkHigh / freqDivider
                 )
@@ -96,18 +96,18 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
 
             if (transmitter.mode != null) {
                 mode.text =
-                    String.format(context.getString(R.string.pattern_trans_mode), transmitter.mode)
+                    String.format(context.getString(R.string.trans_mode), transmitter.mode)
             } else {
                 mode.text = context.getString(R.string.no_mode)
             }
             if (transmitter.isInverted) {
                 inverted.text = String.format(
-                    context.getString(R.string.pattern_trans_invert),
+                    context.getString(R.string.trans_inverted),
                     context.getString(R.string.btn_yes)
                 )
             } else {
                 inverted.text = String.format(
-                    context.getString(R.string.pattern_trans_invert),
+                    context.getString(R.string.trans_inverted),
                     context.getString(R.string.btn_no)
                 )
             }

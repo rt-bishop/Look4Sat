@@ -93,26 +93,26 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.SatPassHolder>() {
 
         fun bind(satPass: SatPass) {
             val aos = SimpleDateFormat(
-                context.getString(R.string.pattern_time),
+                context.getString(R.string.pat_time),
                 Locale.getDefault()
             ).format(satPass.pass.startTime)
             val los = SimpleDateFormat(
-                context.getString(R.string.pattern_time),
+                context.getString(R.string.pat_time),
                 Locale.getDefault()
             ).format(satPass.pass.endTime)
 
             satName.text = satPass.tle.name
             satId.text =
-                String.format(context.getString(R.string.pattern_pass_satId), satPass.tle.catnum)
+                String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
             maxEl.text =
-                String.format(context.getString(R.string.pattern_pass_maxEl), satPass.pass.maxEl)
+                String.format(context.getString(R.string.pass_maxEl), satPass.pass.maxEl)
             azimuth.text = String.format(
-                context.getString(R.string.pattern_pass_azimuth),
+                context.getString(R.string.pass_azimuth),
                 satPass.pass.aosAzimuth,
                 satPass.pass.losAzimuth
             )
-            aosTime.text = String.format(context.getString(R.string.pattern_pass_aos), aos)
-            losTime.text = String.format(context.getString(R.string.pattern_pass_los), los)
+            aosTime.text = String.format(context.getString(R.string.pass_aos), aos)
+            losTime.text = String.format(context.getString(R.string.pass_los), los)
             progressBar.progress = satPass.progress
 
             itemView.setOnClickListener {

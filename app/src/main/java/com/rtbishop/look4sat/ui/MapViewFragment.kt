@@ -205,9 +205,9 @@ class MapViewFragment : Fragment() {
 
             if (lon > 180f) lon -= 360f
 
-            mapLat.text = String.format(context.getString(R.string.pattern_value_lat), lat)
-            mapLon.text = String.format(context.getString(R.string.pattern_value_lon), lon)
-            mapRng.text = String.format(context.getString(R.string.pattern_value_rng), rng)
+            mapLat.text = String.format(context.getString(R.string.pat_latitude), lat)
+            mapLon.text = String.format(context.getString(R.string.pat_longitude), lon)
+            mapRng.text = String.format(context.getString(R.string.pat_range), rng)
         }
 
         private fun drawGroundTrack(

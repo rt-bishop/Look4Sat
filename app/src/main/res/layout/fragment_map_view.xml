@@ -32,7 +32,7 @@
         style="@style/MapText"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
-        android:text="@string/pattern_value_lat"
+        android:text="@string/pat_latitude"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,7 +41,7 @@
         style="@style/MapText"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:text="@string/pattern_value_lon"
+        android:text="@string/pat_longitude"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,7 +50,7 @@
         style="@style/MapText"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
-        android:text="@string/pattern_value_rng"
+        android:text="@string/pat_range"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

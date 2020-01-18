@@ -117,7 +117,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 apply()
             }
             _gsp.postValue(GroundStationPosition(lat, lon, alt))
-            _debugMessage.postValue(app.getString(R.string.updateLocSuccess))
+            _debugMessage.postValue(app.getString(R.string.update_loc_success))
         }
     }
 
@@ -142,9 +142,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 tleMainList = tleList
                 tleSelection = mutableListOf()
-                _debugMessage.postValue(app.getString(R.string.updateTleSuccess))
+                _debugMessage.postValue(app.getString(R.string.update_tle_success))
             } catch (exception: IOException) {
-                _debugMessage.postValue(app.getString(R.string.updateTleFailure))
+                _debugMessage.postValue(app.getString(R.string.update_failure))
             }
         }
     }
@@ -153,9 +153,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.updateTransmittersDatabase()
-                _debugMessage.postValue(app.getString(R.string.updateTransSuccess))
+                _debugMessage.postValue(app.getString(R.string.update_trans_success))
             } catch (exception: IOException) {
-                _debugMessage.postValue(app.getString(R.string.updateTransFailure))
+                _debugMessage.postValue(app.getString(R.string.update_failure))
             }
         }
     }
@@ -190,18 +190,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         val predictor = PassPredictor(tle, gsp.value)
                         val passes = predictor.getPasses(dateNow, hoursAhead, true)
                         passes.forEach {
-                            passList.add(
-                                SatPass(
-                                    tle,
-                                    predictor,
-                                    it
-                                )
-                            )
+                            passList.add(SatPass(tle, predictor, it))
                         }
                     } catch (exception: IllegalArgumentException) {
-                        _debugMessage.postValue(app.getString(R.string.error_sat_tle))
+                        _debugMessage.postValue(app.getString(R.string.err_parse_tle))
                     } catch (exception: SatNotFoundException) {
-                        _debugMessage.postValue(app.getString(R.string.error_sat_wont_pass))
+                        _debugMessage.postValue(app.getString(R.string.err_sat_wont_pass))
                     }
                 }
                 passList.removeAll { it.pass.startTime.after(dateFuture) }
@@ -224,7 +218,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val tleList = ObjectInputStream(tleStream).readObject()
             tleList as List<TLE>
         } catch (exception: FileNotFoundException) {
-            _debugMessage.postValue(app.getString(R.string.no_tle_found))
+            _debugMessage.postValue(app.getString(R.string.err_no_tle_file))
             emptyList()
         } catch (exception: IOException) {
             _debugMessage.postValue(exception.toString())
@@ -235,7 +229,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val selectionList = ObjectInputStream(selectionStream).readObject()
             selectionList as MutableList<Int>
         } catch (exception: FileNotFoundException) {
-            _debugMessage.postValue(app.getString(R.string.no_selection_found))
+            _debugMessage.postValue(app.getString(R.string.err_no_selection_file))
             mutableListOf()
         } catch (exception: IOException) {
             _debugMessage.postValue(exception.toString())
