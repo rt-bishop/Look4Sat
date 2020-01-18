@@ -99,10 +99,12 @@
     <string name="pattern_pass_maxEl">MaxEl: %.1f°</string>
     <string name="pattern_pass_azimuth">Az: %2d° -> %2d°</string>
 
-    <string name="pattern_polar_azimuth">Azimuth: %.1f°</string>
-    <string name="pattern_polar_elev">Elevation: %.1f°</string>
-    <string name="pattern_polar_range">Range: %.0f km</string>
-    <string name="pattern_polar_alt">Altitude: %.0f km</string>
+    <string name="pattern_value_az">Az: %.1f°</string>
+    <string name="pattern_value_el">El: %.1f°</string>
+    <string name="pattern_value_lat">Lat: %.1f°</string>
+    <string name="pattern_value_lon">Lon: %.1f°</string>
+    <string name="pattern_value_rng">Rng: %.0f km</string>
+    <string name="pattern_value_alt">Alt: %.0f km</string>
 
     <string name="pattern_trans_mode">Mode: %s</string>
     <string name="pattern_trans_invert">Inverted: %s</string>

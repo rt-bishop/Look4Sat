@@ -26,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -49,6 +50,9 @@ class MapViewFragment : Fragment() {
     private lateinit var mapFrame: FrameLayout
     private lateinit var mapFab: FloatingActionButton
     private lateinit var mapView: MapView
+    private lateinit var mapLat: TextView
+    private lateinit var mapLon: TextView
+    private lateinit var mapRng: TextView
     private lateinit var predictor: PassPredictor
     private lateinit var selectedSat: TLE
     private lateinit var gsp: GroundStationPosition
@@ -79,6 +83,9 @@ class MapViewFragment : Fragment() {
     private fun findViews(view: View) {
         mapFrame = view.findViewById(R.id.map_frame)
         mapFab = view.findViewById(R.id.map_fab)
+        mapLat = view.findViewById(R.id.map_lat)
+        mapLon = view.findViewById(R.id.map_lon)
+        mapRng = view.findViewById(R.id.map_rng)
     }
 
     private fun setupComponents() {
@@ -170,6 +177,7 @@ class MapViewFragment : Fragment() {
             val currentTime = getDateFor(System.currentTimeMillis())
             val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
             val positions = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
+            setTextViewsToSelectedSatPos(positions[0])
             drawGroundTrack(canvas, degLon, degLat, positions)
             satPassList.forEach {
                 drawSat(canvas, degLon, degLat, it.tle, it.predictor, currentTime)
@@ -188,6 +196,18 @@ class MapViewFragment : Fragment() {
                 cy - txtPaint.textSize,
                 txtPaint
             )
+        }
+
+        private fun setTextViewsToSelectedSatPos(position: SatPos) {
+            var lon = rad2Deg(position.longitude).toFloat()
+            val lat = rad2Deg(position.latitude).toFloat()
+            val rng = position.range
+
+            if (lon > 180f) lon -= 360f
+
+            mapLat.text = String.format(context.getString(R.string.pattern_value_lat), lat)
+            mapLon.text = String.format(context.getString(R.string.pattern_value_lon), lon)
+            mapRng.text = String.format(context.getString(R.string.pattern_value_rng), rng)
         }
 
         private fun drawGroundTrack(
