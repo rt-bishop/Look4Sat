@@ -1,6 +1,6 @@
 /*
- * LookingSat. Amateur radio & weather satellite tracker and passes calculator.
- * Copyright (C) 2019 Arty Bishop (bishop.arty@gmail.com)
+ * Look4Sat. Amateur radio & weather satellites passes calculator for Android.
+ * Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
