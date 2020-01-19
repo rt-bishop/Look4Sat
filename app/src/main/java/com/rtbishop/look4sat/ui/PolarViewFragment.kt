@@ -1,6 +1,6 @@
 /*
- * LookingSat. Amateur radio & weather satellite tracker and passes calculator.
- * Copyright (C) 2019 Arty Bishop (bishop.arty@gmail.com)
+ * Look4Sat. Amateur radio & weather satellites passes calculator for Android.
+ * Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -188,13 +188,33 @@ class PolarViewFragment : Fragment() {
         }
 
         private fun drawRadarText(cvs: Canvas) {
-            cvs.drawText("N", center - txtSize / 3, center - radius - scale * 2, txtPaint)
-            cvs.drawText("E", center + radius + scale * 2, center + txtSize / 3, txtPaint)
-            cvs.drawText("S", center - txtSize / 3, center + radius + txtSize, txtPaint)
-            cvs.drawText("W", center - radius - txtSize, center + txtSize / 3, txtPaint)
-            cvs.drawText("0°", center + scale, center - scale * 2, txtPaint)
-            cvs.drawText("30°", center + scale, center - (radius / 3) - scale * 2, txtPaint)
-            cvs.drawText("60°", center + scale, center - ((radius / 3) * 2) - scale * 2, txtPaint)
+            cvs.drawText(
+                context.getString(R.string.polar_north),
+                center - txtSize / 3,
+                center - radius - scale * 2,
+                txtPaint
+            )
+            cvs.drawText(
+                context.getString(R.string.polar_east),
+                center + radius + scale * 2,
+                center + txtSize / 3,
+                txtPaint
+            )
+            cvs.drawText(
+                context.getString(R.string.polar_south),
+                center - txtSize / 3,
+                center + radius + txtSize,
+                txtPaint
+            )
+            cvs.drawText(
+                context.getString(R.string.polar_west),
+                center - radius - txtSize,
+                center + txtSize / 3,
+                txtPaint
+            )
+            cvs.drawText("90°", center + scale, center - scale * 2, txtPaint)
+            cvs.drawText("60°", center + scale, center - (radius / 3) - scale * 2, txtPaint)
+            cvs.drawText("30°", center + scale, center - ((radius / 3) * 2) - scale * 2, txtPaint)
         }
 
         private fun drawPassTrajectory(cvs: Canvas) {

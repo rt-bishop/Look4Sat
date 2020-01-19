@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Look4Sat. Amateur radio & weather satellites passes calculator for Android.
+  ~ Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
+  ~
+  ~ This program is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with this program; if not, write to the Free Software Foundation, Inc.,
+  ~ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  -->
+
 <resources>
     <string name="app_name">Look4Sat</string>
 
@@ -68,9 +87,14 @@
     <string name="pass_satName">%s</string>
     <string name="pass_satId">Id: %d</string>
     <string name="pass_aos_az">AOS — %2d°</string>
-    <string name="pass_maxEl">MaxEl: %.1f°</string>
-    <string name="pass_los_az">LOS — %2d°</string>
+    <string name="pass_maxEl">MaxElev: %.1f°</string>
+    <string name="pass_los_az">%2d° — LOS</string>
     <string name="pass_dateTime">MMM dd @ HH:mm:ss</string>
+
+    <string name="polar_north">N</string>
+    <string name="polar_east">E</string>
+    <string name="polar_south">S</string>
+    <string name="polar_west">W</string>
 
     <string name="pat_location">%.4f</string>
     <string name="pat_azimuth">Azimuth: %.1f°</string>
