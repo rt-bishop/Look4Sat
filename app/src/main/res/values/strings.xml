@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Look4Sat. Amateur radio & weather satellites passes calculator for Android.
   ~ Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
   ~
@@ -73,7 +72,7 @@
     <string name="no_mode">Mode: Null</string>
     <string name="no_uplink">Uplink: Null</string>
     <string name="no_downlink">Downlink: Null</string>
-    <string name="no_selected_sat">No satellites were shortlisted</string>
+    <string name="no_selected_sat">No satellites were selected</string>
     <string name="no_transmitters">No transmitters found for this Satellite</string>
 
     <string name="err_no_permissions">Missing permissions</string>
@@ -113,6 +112,15 @@
     <string name="trans_up_lowHigh">Uplink: %.4f - %.4f MHz</string>
     <string name="trans_down_low">Downlink: %.4f MHz</string>
     <string name="trans_down_lowHigh">Downlink: %.4f - %.4f MHz</string>
+
+    <string name="info_swipe_text">
+        Swipe the screen to refresh the list of passes for selected satellites</string>
+    <string name="info_main_text">
+        Look4Sat is using the Two-Line Element set to calculate the satellites positions \n
+        You can update the TLE file via the corresponding button in the main menu \n \n
+        Once the list is calculated, press a pass item for detailed information</string>
+    <string name="info_select_text">
+        Press this button to select the satellites you wish to track</string>
 
     <string name="btn_yes">Yes</string>
     <string name="btn_no">No</string>

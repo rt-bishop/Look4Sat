@@ -29,6 +29,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -55,6 +56,7 @@ class PassListFragment : Fragment() {
     private lateinit var aosTimer: CountDownTimer
     private lateinit var aosTimerText: TextView
     private lateinit var swipeLayout: SwipeRefreshLayout
+    private lateinit var infoLayout: ConstraintLayout
     private lateinit var mainActivity: MainActivity
     private lateinit var satPassList: MutableList<SatPass>
     private var isTimerSet: Boolean = false
@@ -86,6 +88,7 @@ class PassListFragment : Fragment() {
         aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
         btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
         swipeLayout = view.findViewById(R.id.pass_list_refresh)
+        infoLayout = view.findViewById(R.id.pass_info_layout)
         satPassRecycler = view.findViewById(R.id.pass_list_recycler)
         passListFab = view.findViewById(R.id.pass_list_fab)
     }
@@ -114,6 +117,13 @@ class PassListFragment : Fragment() {
         viewModel.passSatList.observe(viewLifecycleOwner, Observer {
             satPassList = it
             satPassAdapter.setList(satPassList)
+            if (satPassList.isNotEmpty()) {
+                infoLayout.visibility = View.INVISIBLE
+                satPassRecycler.visibility = View.VISIBLE
+            } else {
+                infoLayout.visibility = View.VISIBLE
+                satPassRecycler.visibility = View.INVISIBLE
+            }
             setTimer()
             swipeLayout.isRefreshing = false
         })

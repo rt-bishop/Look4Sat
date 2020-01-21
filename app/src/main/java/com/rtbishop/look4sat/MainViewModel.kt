@@ -69,7 +69,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val urlList = listOf(
         "https://celestrak.com/NORAD/elements/amateur.txt",
-        "https://celestrak.com/NORAD/elements/starlink.txt",
         "https://celestrak.com/NORAD/elements/weather.txt"
     )
 

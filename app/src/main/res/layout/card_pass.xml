@@ -48,7 +48,7 @@
             style="@style/CardPassName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="2dp"
             android:text="@string/pass_satName"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_satId"
             app:layout_constraintStart_toEndOf="@+id/pass_img" />
