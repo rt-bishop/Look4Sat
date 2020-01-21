@@ -20,19 +20,35 @@
 package com.rtbishop.look4sat.ui
 
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 
-class CreditsFragment : Fragment() {
+class AboutFragment : Fragment() {
+
+    private lateinit var textVersion: TextView
+    private lateinit var textThanks: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_credits, container, false)
+        return inflater.inflate(R.layout.fragment_about, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        textVersion = view.findViewById(R.id.about_title_version)
+        textThanks = view.findViewById(R.id.about_thanks_to)
+
+        textVersion.text = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
+        textThanks.movementMethod = LinkMovementMethod.getInstance()
     }
 }

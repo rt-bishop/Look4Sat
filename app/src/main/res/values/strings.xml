@@ -19,6 +19,7 @@
 
 <resources>
     <string name="app_name">Look4Sat</string>
+    <string name="app_version">Version: %s</string>
 
     <string name="drawer_title">L∞king \n4Sat…</string>
     <string name="drawer_lat_text">Latitude: </string>
@@ -38,7 +39,6 @@
     <string name="menu_polar_view">Polar View</string>
     <string name="menu_map_view">World Map View</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_credits">Credits</string>
     <string name="menu_about">About the App</string>
 
     <string name="dialog_select_sat">Select satellites to track…</string>
@@ -121,6 +121,34 @@
         Once the list is calculated, press a pass item for detailed information</string>
     <string name="info_select_text">
         Press this button to select the satellites you wish to track</string>
+
+    <string name="about_subtitle">
+        Amateur radio &amp; weather satellites passes calculator for Android</string>
+    <string name="about_thanks_to">Big thanks:</string>
+    <string name="about_thanks_list">— To you for installing and using this app!
+        \nMay your sky always be clear! \n
+
+        \n— To David A. B. Johnson, <a href="https://github.com/g4dpz">G4DPZ</a>, the author of
+        predict4java library which this app is using for all the SGP4 model calculations. \n
+
+        \n— To <a href="https://github.com/davidmoten">Dave Moten</a> for creating the mavenized fork
+        of predict4java which made it super easy to integrate the library in the app. Predict4java
+        is available under the
+        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license. \n
+
+        \n— To Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>,
+        for his amazing Gpredict program which inspired the creation of Look4Sat. \n
+
+        \n— To Guys from Square for creating an amazing set of libraries (OkHttp, Okio, Retrofit)
+        and for making them available under the
+        <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a> license. \n
+
+        \n— To Guys from Google and AOSP for making the best mobile OS available nowadays, for their
+        Google Play Services, Gson and Dagger2 libs. \n
+
+        \nThis application comes with absolutely no warranty. See the
+        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> for details.
+    </string>
 
     <string name="btn_yes">Yes</string>
     <string name="btn_no">No</string>

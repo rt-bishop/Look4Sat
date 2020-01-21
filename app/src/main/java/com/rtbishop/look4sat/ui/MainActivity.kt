@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         drawerBtnExit = header.findViewById(R.id.drawer_btn_exit)
 
         appBarConfig = AppBarConfiguration(
-            setOf(R.id.nav_pass_list, R.id.nav_map_view, R.id.nav_credits, R.id.nav_about),
+            setOf(R.id.nav_pass_list, R.id.nav_map_view, R.id.nav_settings, R.id.nav_about),
             drawerLayout
         )
 

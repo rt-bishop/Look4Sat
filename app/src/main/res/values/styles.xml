@@ -129,4 +129,26 @@
         <item name="android:paddingBottom">2dp</item>
     </style>
 
+    <style name="AboutTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textSize">42sp</item>
+    </style>
+
+    <style name="AboutSubtitle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="AboutRegular">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
 </resources>
