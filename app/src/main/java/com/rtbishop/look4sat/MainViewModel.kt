@@ -23,6 +23,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
+import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -47,6 +48,8 @@ import java.util.*
 import javax.inject.Inject
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val tag = "MainViewModel"
 
     private val app = application
     private val keyHours = application.getString(R.string.pref_hours_ahead_key)
@@ -217,10 +220,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val tleList = ObjectInputStream(tleStream).readObject()
             tleList as List<TLE>
         } catch (exception: FileNotFoundException) {
-            _debugMessage.postValue(app.getString(R.string.err_no_tle_file))
+            Log.w(tag, app.getString(R.string.err_no_tle_file))
             emptyList()
         } catch (exception: IOException) {
-            _debugMessage.postValue(exception.toString())
+            Log.w(tag, exception.toString())
             emptyList()
         }
         tleSelection = try {
@@ -228,10 +231,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val selectionList = ObjectInputStream(selectionStream).readObject()
             selectionList as MutableList<Int>
         } catch (exception: FileNotFoundException) {
-            _debugMessage.postValue(app.getString(R.string.err_no_selection_file))
+            Log.w(tag, app.getString(R.string.err_no_selection_file))
             mutableListOf()
         } catch (exception: IOException) {
-            _debugMessage.postValue(exception.toString())
+            Log.w(tag, exception.toString())
             mutableListOf()
         }
         setGroundStationPosition()

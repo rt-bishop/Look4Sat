@@ -21,7 +21,7 @@
     <string name="app_name">Look4Sat</string>
     <string name="app_version">Version: %s</string>
 
-    <string name="drawer_title">L∞king \n4Sat…</string>
+    <string name="drawer_title" translatable="false">L∞king \n4Sat…</string>
     <string name="drawer_lat_text">Latitude: </string>
     <string name="drawer_lon_text">Longitude: </string>
 
@@ -29,10 +29,10 @@
     <string name="update_loc_success">Location was updated</string>
     <string name="update_tle">Update TLE file</string>
     <string name="update_tle_success">TLE file was updated</string>
-    <string name="update_trans">Update transmitters DB</string>
-    <string name="update_trans_success">Transmitters database was updated</string>
+    <string name="update_trans">Update transceiver DB</string>
+    <string name="update_trans_success">Transceiver database was updated</string>
     <string name="update_failure">Check your internet connection</string>
-    <string name="goto_github">GitHub</string>
+    <string name="goto_github" translatable="false">GitHub</string>
     <string name="exit_app">Exit</string>
 
     <string name="menu_pass_list">List of Passes</string>
@@ -45,27 +45,27 @@
     <string name="dialog_show_track">Show ground track for…</string>
     <string name="dialog_filter_passes">Filter passes…</string>
 
-    <string name="pref_hours_ahead_key">hoursAhead</string>
+    <string name="pref_hours_ahead_key" translatable="false">hoursAhead</string>
     <string name="pref_hours_ahead_hint">Hours ahead</string>
     <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
     <string name="pref_hours_ahead_input_error">Set the value between 1h and 168h</string>
-    <string name="pref_min_el_key">minEl</string>
+    <string name="pref_min_el_key" translatable="false">minEl</string>
     <string name="pref_min_el_hint">Minimum elevation</string>
     <string name="pref_min_el_summary">Show passes with max elevation above</string>
     <string name="pref_min_el_input_error">Set the value between 0° and 90°</string>
 
     <string name="pref_gsp_title">Ground station position</string>
-    <string name="pref_lat_key">latitude</string>
+    <string name="pref_lat_key" translatable="false">latitude</string>
     <string name="pref_lat_title">Latitude, deg</string>
     <string name="pref_lat_input_error">Set the value between -90° and 90°</string>
-    <string name="pref_lon_key">longitude</string>
+    <string name="pref_lon_key" translatable="false">longitude</string>
     <string name="pref_lon_title">Longitude, deg</string>
     <string name="pref_lon_input_error">Set the value between -180° and 180°</string>
-    <string name="pref_alt_key">altitude</string>
+    <string name="pref_alt_key" translatable="false">altitude</string>
     <string name="pref_alt_title">Altitude, m</string>
     <string name="pref_alt_input_error">Set the value between -413m and 8850m</string>
     <string name="pref_other_title">Other</string>
-    <string name="pref_refresh_rate_key">rate</string>
+    <string name="pref_refresh_rate_key" translatable="false">rate</string>
     <string name="pref_refresh_rate_title">View refresh rate, ms</string>
     <string name="pref_refresh_rate_input_error">Set the value between 250ms and 10000ms</string>
 
@@ -73,7 +73,7 @@
     <string name="no_uplink">Uplink: Null</string>
     <string name="no_downlink">Downlink: Null</string>
     <string name="no_selected_sat">No satellites were selected</string>
-    <string name="no_transmitters">No transmitters found for this Satellite</string>
+    <string name="no_trans">No transmitters found for this Satellite</string>
 
     <string name="err_no_permissions">Missing permissions</string>
     <string name="err_sat_wont_pass">Certain satellites shall not pass</string>
@@ -83,29 +83,29 @@
     <string name="err_no_tle_file">TLE file was not found</string>
     <string name="err_no_selection_file">Selection file was not found</string>
 
-    <string name="pass_satName">%s</string>
-    <string name="pass_satId">Id: %d</string>
+    <string name="pass_satName" translatable="false">%s</string>
+    <string name="pass_satId" translatable="false">ID: %d</string>
     <string name="pass_aos_az">AOS — %2d°</string>
     <string name="pass_maxEl">MaxElev: %.1f°</string>
     <string name="pass_los_az">%2d° — LOS</string>
-    <string name="pass_dateTime">MMM dd @ HH:mm:ss</string>
+    <string name="pass_dateTime" translatable="false">dd MMM @ HH:mm:ss</string>
 
     <string name="polar_north">N</string>
-    <string name="polar_east">E</string>
-    <string name="polar_south">S</string>
     <string name="polar_west">W</string>
+    <string name="polar_south">S</string>
+    <string name="polar_east">E</string>
 
-    <string name="pat_location">%.4f</string>
+    <string name="pat_location" translatable="false">%.4f</string>
     <string name="pat_azimuth">Azimuth: %.1f°</string>
     <string name="pat_elevation">Elevation: %.1f°</string>
     <string name="pat_latitude">Latitude: %.1f°</string>
     <string name="pat_longitude">Longitude: %.1f°</string>
-    <string name="pat_range">Range: %.0f km</string>
+    <string name="pat_range">Distance: %.0f km</string>
     <string name="pat_altitude">Altitude: %.0f km</string>
     <string name="pat_timer_aos">AOS -%02d:%02d:%02d</string>
     <string name="pat_timer_los">LOS -%02d:%02d:%02d</string>
 
-    <string name="trans_description">%s</string>
+    <string name="trans_description" translatable="false">%s</string>
     <string name="trans_mode">Mode: %s</string>
     <string name="trans_inverted">Inverted: %s</string>
     <string name="trans_up_low">Uplink: %.4f MHz</string>
@@ -123,28 +123,28 @@
         Press this button to select the satellites you wish to track</string>
 
     <string name="about_subtitle">
-        Amateur radio &amp; weather satellites passes calculator for Android</string>
+        Amateur radio and weather satellites passes calculator for Android</string>
     <string name="about_thanks_to">Big thanks:</string>
     <string name="about_thanks_list">— To you for installing and using this app!
-        \nMay your sky always be clear! \n
+        \nMay your sky always be clear!\n
 
         \n— To David A. B. Johnson, <a href="https://github.com/g4dpz">G4DPZ</a>, the author of
-        predict4java library which this app is using for all the SGP4 model calculations. \n
+        predict4java library which this app is using for all the SGP4 model calculations.\n
 
         \n— To <a href="https://github.com/davidmoten">Dave Moten</a> for creating the mavenized fork
         of predict4java which made it super easy to integrate the library in the app. Predict4java
         is available under the
-        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license. \n
+        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license.\n
 
         \n— To Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>,
-        for his amazing Gpredict program which inspired the creation of Look4Sat. \n
+        for his amazing Gpredict program which inspired the creation of Look4Sat.\n
 
         \n— To Guys from Square for creating an amazing set of libraries (OkHttp, Okio, Retrofit)
         and for making them available under the
-        <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a> license. \n
+        <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a> license.\n
 
         \n— To Guys from Google and AOSP for making the best mobile OS available nowadays, for their
-        Google Play Services, Gson and Dagger2 libs. \n
+        Google Play Services, Gson and Dagger2 libs.\n
 
         \nThis application comes with absolutely no warranty. See the
         <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> for details.
@@ -157,5 +157,5 @@
     <string name="btn_clear">Clear All</string>
 
     <string name="map_gsp">GSP</string>
-    <string name="placeholder">Placeholder</string>
+    <string name="placeholder" translatable="false">Placeholder</string>
 </resources>

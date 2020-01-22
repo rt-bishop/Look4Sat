@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Look4Sat. Amateur radio & weather satellites passes calculator for Android.
+  ~ Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
+  ~
+  ~ This program is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with this program; if not, write to the Free Software Foundation, Inc.,
+  ~ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  -->
+
+<resources>
+    <string name="app_name">Look4Sat</string>
+    <string name="app_version">Версия: %s</string>
+
+    <string name="drawer_lat_text">Широта:</string>
+    <string name="drawer_lon_text">Долгота:</string>
+
+    <string name="update_loc">Обновить геопозицию</string>
+    <string name="update_loc_success">Геопозиция обновлена</string>
+    <string name="update_tle">Обновить файл TLE</string>
+    <string name="update_tle_success">Файл TLE обновлен</string>
+    <string name="update_trans">Обновить трансиверы</string>
+    <string name="update_trans_success">База трансиверов обновлена</string>
+    <string name="update_failure">Проверьте интернет-подключение</string>
+    <string name="exit_app">Выход</string>
+
+    <string name="menu_pass_list">Список пролетов</string>
+    <string name="menu_polar_view">Полярная система координат</string>
+    <string name="menu_map_view">Карта мира</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_about">О приложении</string>
+
+    <string name="dialog_select_sat">Выберите спутники для слежения…</string>
+    <string name="dialog_show_track">Показать трассу орбиты для…</string>
+    <string name="dialog_filter_passes">Фильтровать пролеты…</string>
+
+    <string name="pref_hours_ahead_hint">Количество часов</string>
+    <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
+    <string name="pref_hours_ahead_input_error">Введите значение между 1ч и 168ч</string>
+    <string name="pref_min_el_hint">Минимальная элевация</string>
+    <string name="pref_min_el_summary">Показать пролеты с элевацией более</string>
+    <string name="pref_min_el_input_error">Введите значение между 0° и 90°</string>
+
+    <string name="pref_gsp_title">Местоположение наземной станции</string>
+    <string name="pref_lat_title">Широта, град</string>
+    <string name="pref_lat_input_error">Введите значение между -90° и 90°</string>
+    <string name="pref_lon_title">Долгота, град</string>
+    <string name="pref_lon_input_error">Введите значение между -180° и 180°</string>
+    <string name="pref_alt_title">Высота, м</string>
+    <string name="pref_alt_input_error">Введите значение между -413м и 8850м</string>
+    <string name="pref_other_title">Другие настройки</string>
+    <string name="pref_refresh_rate_title">Частота обновления, мс</string>
+    <string name="pref_refresh_rate_input_error">Введите значение между 250мс и 10000мс</string>
+
+    <string name="no_mode">Модуляция: нет</string>
+    <string name="no_uplink">Исход. канал: нет</string>
+    <string name="no_downlink">Вход. канал: нет</string>
+    <string name="no_selected_sat">Не выбраны спутники</string>
+    <string name="no_trans">Не найдены трансиверы для этого спутника</string>
+
+    <string name="err_no_permissions">Отсутствуют необходимые разрешения</string>
+    <string name="err_sat_wont_pass">Некоторые спутники не пролетят над заданной точкой</string>
+    <string name="err_parse_tle">Ошибка обработки TLE</string>
+    <string name="err_update_tle">Пожалуйста, обновите ваш файл TLE</string>
+    <string name="err_enter_value">Пожалуйста, введите значение</string>
+    <string name="err_no_tle_file">Не найден файл TLE</string>
+    <string name="err_no_selection_file">Не найден файл выбранных спутников</string>
+
+    <string name="pass_aos_az">НПС — %2d°</string>
+    <string name="pass_maxEl">Элевация: %.1f°</string>
+    <string name="pass_los_az">%2d° — КПС</string>
+
+    <string name="polar_north">С</string>
+    <string name="polar_west">З</string>
+    <string name="polar_south">Ю</string>
+    <string name="polar_east">В</string>
+
+    <string name="pat_azimuth">Азимут: %.1f°</string>
+    <string name="pat_elevation">Элевация: %.1f°</string>
+    <string name="pat_latitude">Широта: %.1f°</string>
+    <string name="pat_longitude">Долгота: %.1f°</string>
+    <string name="pat_range">Расст.: %.0f км</string>
+    <string name="pat_altitude">Высота: %.0f км</string>
+    <string name="pat_timer_aos">НПС -%02d:%02d:%02d</string>
+    <string name="pat_timer_los">КПС -%02d:%02d:%02d</string>
+
+    <string name="trans_mode">Модуляция: %s</string>
+    <string name="trans_inverted">Инверсия: %s</string>
+    <string name="trans_up_low">Исход. канал: %.4f MHz</string>
+    <string name="trans_up_lowHigh">Исход. канал: %.4f - %.4f MHz</string>
+    <string name="trans_down_low">Вход. канал: %.4f MHz</string>
+    <string name="trans_down_lowHigh">Вход. канал: %.4f - %.4f MHz</string>
+
+    <string name="info_swipe_text">Проведите по экрану вниз, чтобы обновить список пролетов
+        для выбранных спутников</string>
+    <string name="info_main_text">Приложение Look4Sat использует набор двухстрочных элементов TLE
+        для вычисления траекторий движения и текущего местоположения спутников. Вы можете обновить
+        файл TLE при помощи кнопки в главном меню.</string>
+    <string name="info_select_text">Нажмите эту кнопку, чтобы выбрать спутники для слежения</string>
+
+    <string name="about_subtitle">Приложение для слежения за спутниками радио и погоды
+        для платформы Android</string>
+    <string name="about_thanks_to">Большое спасибо:</string>
+    <string name="about_thanks_list">— Вам за использование этого приложения!
+        \nЖелаю всегда чистого неба над головой!\n
+
+        \n— David A. B. Johnson, <a href="https://github.com/g4dpz">G4DPZ</a>, автору библиотеки
+        predict4java, которую приложение использует для вычисления орбит спутников по модели SGP4.\n
+
+        \n— <a href="https://github.com/davidmoten">Dave Moten</a> за создание форка и добавления
+        библиотеки в репозиторий maven, что значительно облегчило интеграцию в приложение.
+        Библиотека predict4java доступна по лицензии
+        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.\n
+
+        \n— Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>, за его замечательную
+        программу Gpredict, которая вдохновила меня на создание Look4Sat.\n
+
+        \n— Ребятам из Square за создание библиотек OkHttp, Okio, Retrofit и за доступ
+        к ним по лицензии <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a>.\n
+
+        \n— Ребятам из Google и AOSP за создание самой лучшей мобильной ОС, доступной
+        на сегодняшний день. За их Google Play Services и за библиотеки Gson и Dagger2.\n
+
+        \nЭто программное обеспечение поставляется без каких либо гарантий. Подробности содержатся
+        в лицензии <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
+    </string>
+
+    <string name="btn_yes">Да</string>
+    <string name="btn_no">Нет</string>
+    <string name="btn_ok">Ок</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="btn_clear">Очистить</string>
+
+    <string name="map_gsp">СТЦ</string>
+</resources>

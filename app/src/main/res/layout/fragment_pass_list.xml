@@ -96,7 +96,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/guide_right"
                 app:layout_constraintStart_toStartOf="@+id/guide_left"
                 app:layout_constraintTop_toTopOf="@+id/guide_center"
-                app:layout_constraintVertical_bias="0.25"
+                app:layout_constraintVertical_bias="0.32"
                 app:layout_constraintVertical_chainStyle="spread" />
 
             <TextView

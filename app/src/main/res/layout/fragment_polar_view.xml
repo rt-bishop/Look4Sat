@@ -80,7 +80,7 @@
         android:id="@+id/polar_no_trans"
         style="@style/PolarViewText"
         android:layout_marginTop="8dp"
-        android:text="@string/no_transmitters"
+        android:text="@string/no_trans"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
