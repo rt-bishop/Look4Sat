@@ -31,10 +31,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.github.amsacode.predict4java.*
+import com.github.amsacode.predict4java.GroundStationPosition
+import com.github.amsacode.predict4java.Position
+import com.github.amsacode.predict4java.SatPos
+import com.github.amsacode.predict4java.TLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import com.rtbishop.look4sat.repo.SatPass
 import java.util.*
 import java.util.concurrent.Executors

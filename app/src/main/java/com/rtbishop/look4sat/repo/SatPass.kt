@@ -20,9 +20,9 @@
 package com.rtbishop.look4sat.repo
 
 import android.os.Parcelable
-import com.github.amsacode.predict4java.PassPredictor
 import com.github.amsacode.predict4java.SatPassTime
 import com.github.amsacode.predict4java.TLE
+import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
 

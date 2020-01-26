@@ -30,10 +30,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.github.amsacode.predict4java.PassPredictor
 import com.github.amsacode.predict4java.SatNotFoundException
 import com.github.amsacode.predict4java.TLE
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.repo.Transmitter
@@ -189,7 +189,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 tleSelection.forEach { indexOfSelection ->
                     val tle = tleMainList[indexOfSelection]
                     try {
-                        val predictor = PassPredictor(tle, gsp.value)
+                        val predictor = PassPredictor(tle, gsp.value!!)
                         val passes = predictor.getPasses(dateNow, hoursAhead, true)
                         passes.forEach {
                             passList.add(SatPass(tle, predictor, it))
