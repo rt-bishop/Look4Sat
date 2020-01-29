@@ -54,11 +54,10 @@
                 android:id="@+id/info_swipe_img"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_marginTop="8dp"
                 android:contentDescription="@string/placeholder"
-                app:layout_constraintEnd_toStartOf="@+id/guide_right"
-                app:layout_constraintStart_toStartOf="@+id/guide_left"
-                app:layout_constraintTop_toTopOf="@+id/guide_top"
+                app:layout_constraintEnd_toStartOf="@+id/guideRight"
+                app:layout_constraintStart_toStartOf="@+id/guideLeft"
+                app:layout_constraintTop_toTopOf="@+id/guideTop"
                 app:srcCompat="@drawable/ic_arrow_swipe" />
 
             <TextView
@@ -66,21 +65,26 @@
                 style="@style/PassInfoText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:text="@string/info_swipe_text"
-                app:layout_constraintEnd_toStartOf="@+id/guide_right"
-                app:layout_constraintStart_toStartOf="@+id/guide_left"
+                app:layout_constraintEnd_toStartOf="@+id/guideRight"
+                app:layout_constraintStart_toStartOf="@+id/guideLeft"
                 app:layout_constraintTop_toBottomOf="@+id/info_swipe_img" />
 
             <ImageView
                 android:id="@+id/info_img_sputnik"
-                android:layout_width="176dp"
-                android:layout_height="176dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:contentDescription="@string/placeholder"
                 app:layout_constraintBottom_toTopOf="@+id/info_main_text"
-                app:layout_constraintEnd_toStartOf="@+id/guide_right"
-                app:layout_constraintStart_toStartOf="@+id/guide_left"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toStartOf="@+id/guideRight"
+                app:layout_constraintStart_toStartOf="@+id/guideLeft"
                 app:layout_constraintTop_toBottomOf="@+id/info_swipe_text"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:srcCompat="@drawable/ic_sputnik" />
@@ -93,9 +97,9 @@
                 android:gravity="center"
                 android:text="@string/info_main_text"
                 app:layout_constraintBottom_toTopOf="@+id/info_select_text"
-                app:layout_constraintEnd_toStartOf="@+id/guide_right"
-                app:layout_constraintStart_toStartOf="@+id/guide_left"
-                app:layout_constraintTop_toTopOf="@+id/guide_center"
+                app:layout_constraintEnd_toStartOf="@+id/guideRight"
+                app:layout_constraintStart_toStartOf="@+id/guideLeft"
+                app:layout_constraintTop_toTopOf="@+id/guideCenter"
                 app:layout_constraintVertical_bias="0.32"
                 app:layout_constraintVertical_chainStyle="spread" />
 
@@ -106,40 +110,40 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="64dp"
                 android:text="@string/info_select_text"
-                app:layout_constraintBottom_toTopOf="@+id/guide_bottom"
-                app:layout_constraintEnd_toStartOf="@+id/guide_right"
-                app:layout_constraintStart_toStartOf="@+id/guide_left" />
+                app:layout_constraintBottom_toTopOf="@+id/guideBottom"
+                app:layout_constraintEnd_toStartOf="@+id/guideRight"
+                app:layout_constraintStart_toStartOf="@+id/guideLeft" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guide_top"
+                android:id="@+id/guideTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_begin="16dp" />
+                app:layout_constraintGuide_begin="24dp" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guide_left"
+                android:id="@+id/guideLeft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_begin="16dp" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guide_center"
+                android:id="@+id/guideCenter"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.5" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guide_right"
+                android:id="@+id/guideRight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_end="16dp" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guide_bottom"
+                android:id="@+id/guideBottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"

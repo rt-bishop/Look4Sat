@@ -111,7 +111,7 @@
 
     <style name="PassInfoText">
         <item name="android:textColor">@color/themeLight</item>
-        <item name="android:textSize">17sp</item>
+        <item name="android:textSize">15sp</item>
     </style>
 
     <style name="MapText">
@@ -138,7 +138,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/themeLight</item>
-        <item name="android:textSize">17sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="AboutRegular">
