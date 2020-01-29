@@ -19,11 +19,13 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/toolbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/toolbar_timer"
                     style="@style/ToolbarText"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
                     android:layout_marginEnd="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/toolbar_filter"
