@@ -26,7 +26,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageButton
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -58,11 +58,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerLat: TextView
     private lateinit var drawerLon: TextView
-    private lateinit var drawerBtnLoc: ImageButton
-    private lateinit var drawerBtnTle: ImageButton
-    private lateinit var drawerBtnTrans: ImageButton
-    private lateinit var drawerBtnGithub: ImageButton
-    private lateinit var drawerBtnExit: ImageButton
+    private lateinit var drawerBtnLoc: Button
+    private lateinit var drawerBtnTle: Button
+    private lateinit var drawerBtnTrans: Button
+    private lateinit var drawerBtnGithub: Button
+    private lateinit var drawerBtnExit: Button
     private lateinit var appBarConfig: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -124,12 +124,12 @@ class MainActivity : AppCompatActivity() {
         viewModel.debugMessage.observe(this, Observer { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             when (message) {
-                getString(R.string.update_loc_success) -> drawerBtnLoc.enable()
-                getString(R.string.update_tle_success) -> drawerBtnTle.enable()
-                getString(R.string.update_trans_success) -> drawerBtnTrans.enable()
+                getString(R.string.update_loc_success) -> drawerBtnLoc.isEnabled = true
+                getString(R.string.update_tle_success) -> drawerBtnTle.isEnabled = true
+                getString(R.string.update_trans_success) -> drawerBtnTrans.isEnabled = true
                 getString(R.string.update_failure) -> {
-                    drawerBtnTle.enable()
-                    drawerBtnTrans.enable()
+                    drawerBtnTle.isEnabled = true
+                    drawerBtnTrans.isEnabled = true
                 }
             }
         })
@@ -142,15 +142,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupDrawer() {
         drawerBtnLoc.setOnClickListener {
-            drawerBtnLoc.disable()
+            it.isEnabled = false
             requestLocationUpdate()
         }
         drawerBtnTle.setOnClickListener {
-            drawerBtnTle.disable()
+            it.isEnabled = false
             viewModel.updateAndSaveTleFile()
         }
         drawerBtnTrans.setOnClickListener {
-            drawerBtnTrans.disable()
+            it.isEnabled = false
             viewModel.updateTransmittersDatabase()
         }
         drawerBtnGithub.setOnClickListener {
@@ -187,14 +187,14 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host)
         return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
     }
-
-    private fun ImageButton.enable() {
-        this.isEnabled = true
-        this.alpha = 1.0f
-    }
-
-    private fun ImageButton.disable() {
-        this.isEnabled = false
-        this.alpha = 0.25f
-    }
+//
+//    private fun ImageButton.enable() {
+//        this.isEnabled = true
+//        this.alpha = 1.0f
+//    }
+//
+//    private fun ImageButton.disable() {
+//        this.isEnabled = false
+//        this.alpha = 0.25f
+//    }
 }

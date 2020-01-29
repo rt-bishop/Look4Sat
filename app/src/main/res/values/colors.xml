@@ -3,6 +3,8 @@
     <color name="themeAccent">#FFE082</color>
     <color name="themeLight">#C0C0C0</color>
     <color name="themeDark">#191919</color>
+    <color name="themeIcon">#FFE082</color>
+    <color name="themeButton">#242424</color>
     <color name="backgroundDark">#080808</color>
     <color name="backgroundMapText">#CC000000</color>
     <color name="satTrack">#D50000</color>
