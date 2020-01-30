@@ -24,7 +24,9 @@
         android:id="@+id/drawer_sat_img"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
         android:contentDescription="@string/app_name"
         app:layout_constraintBottom_toBottomOf="@+id/drawer_title"
         app:layout_constraintDimensionRatio="1:1"
@@ -48,9 +50,8 @@
         android:layout_width="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/pat_location"
-        app:layout_constraintEnd_toEndOf="@+id/drawer_lon_value"
         app:layout_constraintStart_toStartOf="@+id/drawer_lon_value"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_title" />
+        app:layout_constraintTop_toBottomOf="@+id/drawer_sat_img" />
 
     <TextView
         android:id="@+id/drawer_lon"
@@ -64,8 +65,9 @@
         android:id="@+id/drawer_lon_value"
         style="@style/DrawerHeader.ItemValue"
         android:layout_width="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="@string/pat_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toEndOf="@+id/barrier"
         app:layout_constraintTop_toBottomOf="@+id/drawer_lat_value" />
 

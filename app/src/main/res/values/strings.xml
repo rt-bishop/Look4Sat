@@ -73,7 +73,7 @@
     <string name="no_uplink">Uplink: Null</string>
     <string name="no_downlink">Downlink: Null</string>
     <string name="no_selected_sat">No satellites were selected</string>
-    <string name="no_trans">No transmitters found for this Satellite</string>
+    <string name="no_trans">No transceivers found for this Satellite</string>
 
     <string name="err_no_permissions">Missing permissions</string>
     <string name="err_sat_wont_pass">Certain satellites shall not pass</string>

@@ -38,7 +38,7 @@
             android:text="@string/pass_los_az"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_maxEl"
             app:layout_constraintEnd_toEndOf="@+id/pass_progress"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/pass_maxEl" />
 
         <TextView
@@ -52,11 +52,11 @@
         <TextView
             android:id="@+id/pass_maxEl"
             style="@style/CardPassText"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="@string/pass_maxEl"
-            app:layout_constraintEnd_toStartOf="@+id/pass_losAz"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/pass_aosAz"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pass_satId" />
 
         <ImageView
@@ -87,8 +87,7 @@
             android:text="@string/pass_aos_az"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_maxEl"
             app:layout_constraintEnd_toStartOf="@+id/pass_maxEl"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/pass_progress" />
 
         <TextView
@@ -116,7 +115,7 @@
             android:id="@+id/pass_progress"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="14dp"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
             app:layout_constraintEnd_toEndOf="parent"

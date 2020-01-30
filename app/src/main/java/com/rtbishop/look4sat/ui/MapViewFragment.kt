@@ -193,13 +193,12 @@ class MapViewFragment : Fragment() {
             val lat = gsp.latitude.toFloat() * -1
             val cx = lon * degLon
             val cy = lat * degLat
+            val gspName = context.getString(R.string.map_gsp)
+            txtPaint.getTextBounds(gspName, 0, gspName.length, rect)
             canvas.drawCircle(cx, cy, scale * 2, txtPaint)
-            canvas.drawText(
-                context.getString(R.string.map_gsp),
-                cx - txtPaint.textSize,
-                cy - txtPaint.textSize,
-                txtPaint
-            )
+            canvas.drawText(gspName, cx - rect.width() / 2, cy - txtPaint.textSize, outlinePaint)
+            canvas.drawText(gspName, cx - rect.width() / 2, cy - txtPaint.textSize, txtPaint)
+
         }
 
         private fun setTextViewsToSelectedSatPos(position: SatPos) {
