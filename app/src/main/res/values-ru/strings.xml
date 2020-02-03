@@ -90,15 +90,13 @@
     <string name="pat_longitude">Долгота: %.1f°</string>
     <string name="pat_range">Расст.: %.0f км</string>
     <string name="pat_altitude">Высота: %.0f км</string>
-    <string name="pat_timer_aos">НПС -%02d:%02d:%02d</string>
-    <string name="pat_timer_los">КПС -%02d:%02d:%02d</string>
 
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_inverted">Инверсия: %s</string>
-    <string name="trans_up_low">Исход. канал: %.4f MHz</string>
-    <string name="trans_up_lowHigh">Исход. канал: %.4f - %.4f MHz</string>
-    <string name="trans_down_low">Вход. канал: %.4f MHz</string>
-    <string name="trans_down_lowHigh">Вход. канал: %.4f - %.4f MHz</string>
+    <string name="trans_up_low">Исходящий: %.4f MHz</string>
+    <string name="trans_up_lowHigh">Исходящий: %.4f - %.4f MHz</string>
+    <string name="trans_down_low">Входящий: %.4f MHz</string>
+    <string name="trans_down_lowHigh">Входящий: %.4f - %.4f MHz</string>
 
     <string name="info_swipe_text">Проведите по экрану вниз, чтобы обновить список пролетов
         для выбранных спутников</string>

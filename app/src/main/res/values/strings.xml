@@ -102,8 +102,7 @@
     <string name="pat_longitude">Longitude: %.1f°</string>
     <string name="pat_range">Distance: %.0f km</string>
     <string name="pat_altitude">Altitude: %.0f km</string>
-    <string name="pat_timer_aos">AOS -%02d:%02d:%02d</string>
-    <string name="pat_timer_los">LOS -%02d:%02d:%02d</string>
+    <string name="pat_timer" translatable="false">%02d:%02d:%02d</string>
 
     <string name="trans_description" translatable="false">%s</string>
     <string name="trans_mode">Mode: %s</string>
@@ -125,8 +124,7 @@
     <string name="about_subtitle">
         Amateur radio and weather satellites passes calculator for Android</string>
     <string name="about_thanks_to">Big thanks:</string>
-    <string name="about_thanks_list">— To you for installing and using this app!
-        \nMay your sky always be clear!\n
+    <string name="about_thanks_list">— To you for installing and using this app! May your sky always be clear!\n
 
         \n— To David A. B. Johnson, <a href="https://github.com/g4dpz">G4DPZ</a>, the author of
         predict4java library which this app is using for all the SGP4 model calculations.\n

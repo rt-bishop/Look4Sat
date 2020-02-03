@@ -29,8 +29,19 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/card_pass_bg">
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/pass_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/placeholder"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/card_pass_bg" />
 
         <TextView
             android:id="@+id/pass_losAz"

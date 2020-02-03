@@ -245,7 +245,7 @@ class PassListFragment : Fragment() {
 
             override fun onTick(millisUntilFinished: Long) {
                 aosTimerText.text = String.format(
-                    mainActivity.getString(R.string.pat_timer_aos),
+                    mainActivity.getString(R.string.pat_timer),
                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
@@ -265,7 +265,7 @@ class PassListFragment : Fragment() {
 
             override fun onTick(millisUntilFinished: Long) {
                 aosTimerText.text = String.format(
-                    mainActivity.getString(R.string.pat_timer_los),
+                    mainActivity.getString(R.string.pat_timer),
                     TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
                     TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
@@ -281,6 +281,6 @@ class PassListFragment : Fragment() {
             isTimerSet = false
         }
         if (resetToNull) aosTimerText.text =
-            String.format(getString(R.string.pat_timer_aos), 0, 0, 0)
+            String.format(getString(R.string.pat_timer), 0, 0, 0)
     }
 }

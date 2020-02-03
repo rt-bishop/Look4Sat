@@ -34,7 +34,7 @@ import com.rtbishop.look4sat.ui.PassListFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.SatPassHolder>() {
+class SatPassAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var satPassList = mutableListOf<SatPass>()
 
@@ -71,15 +71,31 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.SatPassHolder>() {
         return satPassList.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatPassHolder {
-        val itemView = LayoutInflater
-            .from(parent.context)
-            .inflate(R.layout.card_pass, parent, false)
-        return SatPassHolder(itemView)
+    override fun getItemViewType(position: Int): Int {
+        return if (satPassList[position].tle.isDeepspace) 1
+        else 0
     }
 
-    override fun onBindViewHolder(holder: SatPassHolder, position: Int) {
-        holder.bind(satPassList[position])
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == 0) {
+            val itemView = LayoutInflater
+                .from(parent.context)
+                .inflate(R.layout.card_pass, parent, false)
+            return SatPassHolder(itemView)
+        } else {
+            val itemView = LayoutInflater
+                .from(parent.context)
+                .inflate(R.layout.card_pass_geo, parent, false)
+            SatPassGeoHolder(itemView)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder.itemViewType == 0) {
+            (holder as SatPassHolder).bind(satPassList[position])
+        } else {
+            (holder as SatPassGeoHolder).bind(satPassList[position])
+        }
     }
 
     inner class SatPassHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -116,6 +132,31 @@ class SatPassAdapter : RecyclerView.Adapter<SatPassAdapter.SatPassHolder>() {
                 SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
                     .format(satPass.pass.endTime)
             progressBar.progress = satPass.progress
+
+            itemView.setOnClickListener {
+                val action = PassListFragmentDirections.actionPassToPolar(satPass)
+                itemView.findNavController().navigate(action)
+            }
+        }
+    }
+
+    inner class SatPassGeoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        private val context: Context = itemView.context
+        private val satName = itemView.findViewById<TextView>(R.id.pass_geo_name)
+        private val satId = itemView.findViewById<TextView>(R.id.pass_geo_id)
+        private val satAz = itemView.findViewById<TextView>(R.id.pass_geo_az)
+        private val satEl = itemView.findViewById<TextView>(R.id.pass_geo_el)
+
+        fun bind(satPass: SatPass) {
+            val satPos = satPass.predictor.getSatPos(satPass.pass.startTime)
+            val azimuth = satPos.azimuth * 180 / Math.PI
+
+            satName.text = satPass.tle.name
+            satId.text = String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
+            satAz.text = String.format(context.getString(R.string.pat_azimuth), azimuth)
+            satEl.text =
+                String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
 
             itemView.setOnClickListener {
                 val action = PassListFragmentDirections.actionPassToPolar(satPass)

@@ -103,16 +103,47 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         var lastAOS: Date
         var count = 0
 
-        do {
-            if (count > 0) windBackTime = false
-            val pass = nextSatPass(trackStartDate, windBackTime)
-            lastAOS = pass.startTime
-            passes.add(pass)
-            trackStartDate = Date(pass.endTime.time + threeQuarterOrbitMinutes() * 60L * 1000L)
-            count++
-        } while (lastAOS < trackEndDate)
+        if (tle.isDeepspace) {
+            passes.add(nextGeoSatPass(start))
+        } else {
+            do {
+                if (count > 0) windBackTime = false
+                val pass = nextSatPass(trackStartDate, windBackTime)
+                lastAOS = pass.startTime
+                passes.add(pass)
+                trackStartDate = Date(pass.endTime.time + threeQuarterOrbitMinutes() * 60L * 1000L)
+                count++
+            } while (lastAOS < trackEndDate)
+        }
 
         return passes
+    }
+
+    private fun nextGeoSatPass(date: Date): SatPassTime {
+        val aosAzimuth: Int
+        val losAzimuth: Int
+        val tca: Date
+        val polePassed: String
+        val cal = Calendar.getInstance(timeZone).apply {
+            clear()
+            timeInMillis = date.time
+        }
+        val satPos = getSatPos(cal.time)
+
+        aosAzimuth = (satPos.azimuth / (2.0 * Math.PI) * 360.0).toInt()
+        losAzimuth = (satPos.azimuth / (2.0 * Math.PI) * 360.0).toInt()
+        tca = satPos.time
+        polePassed = getPolePassed(satPos, satPos)
+
+        cal.add(Calendar.HOUR, -12)
+        val startDate = cal.time
+        cal.add(Calendar.HOUR, 24)
+        val endDate = cal.time
+
+        return SatPassTime(
+            startDate, endDate, tca, polePassed, aosAzimuth,
+            losAzimuth, satPos.elevation / (2.0 * Math.PI) * 360.0
+        )
     }
 
     private fun nextSatPass(date: Date, windBack: Boolean = false): SatPassTime {

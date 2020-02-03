@@ -187,14 +187,4 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host)
         return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
     }
-//
-//    private fun ImageButton.enable() {
-//        this.isEnabled = true
-//        this.alpha = 1.0f
-//    }
-//
-//    private fun ImageButton.disable() {
-//        this.isEnabled = false
-//        this.alpha = 0.25f
-//    }
 }

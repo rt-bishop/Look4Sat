@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_pass_geo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="4dp"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/pass_geo_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/placeholder"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/card_pass_bg" />
+
+        <ImageView
+            android:id="@+id/pass_geo_img"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/placeholder"
+            app:layout_constraintBottom_toBottomOf="@+id/pass_geo_name"
+            app:layout_constraintStart_toStartOf="@+id/pass_geo_az"
+            app:layout_constraintTop_toTopOf="@+id/pass_geo_name"
+            app:srcCompat="@drawable/ic_pass_active" />
+
+        <TextView
+            android:id="@+id/pass_geo_name"
+            style="@style/CardPassName"
+            android:text="@string/pass_satName"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_id"
+            app:layout_constraintEnd_toStartOf="@+id/pass_geo_id"
+            app:layout_constraintHorizontal_bias="0.02"
+            app:layout_constraintStart_toEndOf="@+id/pass_geo_img" />
+
+        <TextView
+            android:id="@+id/pass_geo_id"
+            style="@style/CardPassName"
+            android:layout_marginTop="4dp"
+            android:text="@string/pass_satId"
+            app:layout_constraintEnd_toEndOf="@+id/pass_geo_el"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/pass_geo_az"
+            style="@style/CardPassText"
+            android:layout_marginStart="6dp"
+            android:text="@string/pat_azimuth"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_el"
+            app:layout_constraintEnd_toStartOf="@+id/pass_geo_el"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/pass_geo_el"
+            style="@style/CardPassText"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/pat_elevation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/pass_geo_az"
+            app:layout_constraintTop_toBottomOf="@+id/pass_geo_id" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

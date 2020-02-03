@@ -29,6 +29,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.github.amsacode.predict4java.GroundStationPosition
@@ -146,19 +147,19 @@ class MapViewFragment : Fragment() {
         private val scale = resources.displayMetrics.density
         private val groundTrackPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.satTrack, mainActivity.theme)
+            color = ContextCompat.getColor(mainActivity, R.color.satTrack)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val footprintPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.satFootprint, mainActivity.theme)
+            color = ContextCompat.getColor(mainActivity, R.color.satFootprint)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val txtPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.satFootprint, mainActivity.theme)
+            color = ContextCompat.getColor(mainActivity, R.color.satFootprint)
             style = Paint.Style.FILL
             strokeWidth = scale
             textSize = 16f

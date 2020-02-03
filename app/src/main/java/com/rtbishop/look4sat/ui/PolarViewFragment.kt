@@ -29,6 +29,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -132,24 +133,24 @@ class PolarViewFragment : Fragment() {
 
         private val radarPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.themeLight, mainActivity.theme)
+            color = ContextCompat.getColor(mainActivity, R.color.themeLight)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val txtPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.themeAccent, mainActivity.theme)
+            color = ContextCompat.getColor(mainActivity, R.color.themeAccent)
             textSize = txtSize
         }
         private val trackPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.satTrack, mainActivity.theme)
+            color = ContextCompat.getColor(mainActivity, R.color.satTrack)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val satPaint = Paint().apply {
             isAntiAlias = true
-            color = resources.getColor(R.color.themeAccent, mainActivity.theme)
+            color = ContextCompat.getColor(mainActivity, R.color.themeAccent)
             style = Paint.Style.FILL
         }
         private val path: Path = Path()
@@ -163,7 +164,7 @@ class PolarViewFragment : Fragment() {
             setPassText()
             drawRadarView(canvas)
             drawRadarText(canvas)
-            drawPassTrajectory(canvas)
+            if (!satPass.tle.isDeepspace) drawPassTrajectory(canvas)
             drawSatellite(canvas)
         }
 
