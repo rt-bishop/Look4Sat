@@ -28,13 +28,15 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.ui.PassListFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SatPassAdapter(val viewModel: MainViewModel) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var satPassList = mutableListOf<SatPass>()
 
@@ -134,8 +136,9 @@ class SatPassAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             progressBar.progress = satPass.progress
 
             itemView.setOnClickListener {
-                val action = PassListFragmentDirections.actionPassToPolar(satPass)
-                itemView.findNavController().navigate(action)
+                val satPassIndex = viewModel.passSatList.value!!.indexOf(satPass)
+                val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
+                it.findNavController().navigate(action)
             }
         }
     }
@@ -159,8 +162,9 @@ class SatPassAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
 
             itemView.setOnClickListener {
-                val action = PassListFragmentDirections.actionPassToPolar(satPass)
-                itemView.findNavController().navigate(action)
+                val satPassIndex = viewModel.passSatList.value!!.indexOf(satPass)
+                val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
+                it.findNavController().navigate(action)
             }
         }
     }

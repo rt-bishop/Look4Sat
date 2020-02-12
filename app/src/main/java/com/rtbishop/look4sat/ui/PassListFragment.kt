@@ -65,7 +65,7 @@ class PassListFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mainActivity = activity as MainActivity
         viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
-        satPassAdapter = SatPassAdapter()
+        satPassAdapter = SatPassAdapter(viewModel)
         satPassList = mutableListOf()
     }
 
@@ -97,6 +97,7 @@ class PassListFragment : Fragment() {
         satPassRecycler.apply {
             layoutManager = LinearLayoutManager(mainActivity)
             adapter = satPassAdapter
+            isVerticalScrollBarEnabled = false
             (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
         satPassAdapter.setList(satPassList)

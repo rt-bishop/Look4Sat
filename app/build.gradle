@@ -25,13 +25,13 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 3
-        versionName '1.2'
+        versionCode 5
+        versionName '1.2.2'
     }
     buildTypes {
         release {

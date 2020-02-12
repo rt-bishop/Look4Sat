@@ -44,8 +44,8 @@
         android:label="@string/menu_polar_view"
         tools:layout="@layout/fragment_polar_view">
         <argument
-            android:name="satPass"
-            app:argType="com.rtbishop.look4sat.repo.SatPass" />
+            android:name="satPassIndex"
+            app:argType="integer" />
     </fragment>
 
     <fragment

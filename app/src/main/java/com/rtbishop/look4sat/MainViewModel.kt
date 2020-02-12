@@ -38,6 +38,7 @@ import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.repo.Transmitter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
@@ -74,6 +75,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         "https://celestrak.com/NORAD/elements/amateur.txt",
         "https://celestrak.com/NORAD/elements/weather.txt"
     )
+
+    private var calculationJob: Job? = null
 
     @Inject
     lateinit var locationClient: FusedLocationProviderClient
@@ -177,6 +180,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getPasses() {
+        calculationJob?.cancel()
         val passList = mutableListOf<SatPass>()
         val dateNow = Date()
         val dateFuture = Calendar.getInstance().let {
@@ -184,28 +188,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             it.add(Calendar.HOUR, hoursAhead)
             it.time
         }
-        viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-                tleSelection.forEach { indexOfSelection ->
-                    val tle = tleMainList[indexOfSelection]
-                    try {
-                        val predictor = PassPredictor(tle, gsp.value!!)
-                        val passes = predictor.getPasses(dateNow, hoursAhead, true)
-                        passes.forEach {
-                            passList.add(SatPass(tle, predictor, it))
+        calculationJob = viewModelScope.launch {
+            if (tleMainList.isNotEmpty() && tleSelection.isNotEmpty()) {
+                withContext(Dispatchers.Default) {
+                    tleSelection.forEach { indexOfSelection ->
+                        val tle = tleMainList[indexOfSelection]
+                        try {
+                            val predictor = PassPredictor(tle, gsp.value!!)
+                            val passes = predictor.getPasses(dateNow, hoursAhead, true)
+                            passes.forEach {
+                                passList.add(SatPass(tle, predictor, it))
+                            }
+                        } catch (exception: IllegalArgumentException) {
+                            _debugMessage.postValue(app.getString(R.string.err_parse_tle))
+                        } catch (exception: SatNotFoundException) {
+                            _debugMessage.postValue(app.getString(R.string.err_sat_wont_pass))
                         }
-                    } catch (exception: IllegalArgumentException) {
-                        _debugMessage.postValue(app.getString(R.string.err_parse_tle))
-                    } catch (exception: SatNotFoundException) {
-                        _debugMessage.postValue(app.getString(R.string.err_sat_wont_pass))
                     }
+                    passList.removeAll { it.pass.startTime.after(dateFuture) }
+                    passList.removeAll { it.pass.endTime.before(dateNow) }
+                    passList.removeAll { it.pass.maxEl < minEl }
+                    passList.sortBy { it.pass.startTime }
                 }
-                passList.removeAll { it.pass.startTime.after(dateFuture) }
-                passList.removeAll { it.pass.endTime.before(dateNow) }
-                passList.removeAll { it.pass.maxEl < minEl }
-                passList.sortBy { it.pass.startTime }
+                _satPassList.postValue(passList)
+            } else {
+                _satPassList.postValue(mutableListOf())
+                _debugMessage.postValue(app.getString(R.string.err_no_sat_selected))
             }
-            _satPassList.postValue(passList)
         }
     }
 

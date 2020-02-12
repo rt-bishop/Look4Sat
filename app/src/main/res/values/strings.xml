@@ -82,6 +82,7 @@
     <string name="err_enter_value">Please, enter the value</string>
     <string name="err_no_tle_file">TLE file was not found</string>
     <string name="err_no_selection_file">Selection file was not found</string>
+    <string name="err_no_sat_selected">No satellites selected</string>
 
     <string name="pass_satName" translatable="false">%s</string>
     <string name="pass_satId" translatable="false">ID: %d</string>

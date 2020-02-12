@@ -83,7 +83,7 @@ class PolarViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val delay = viewModel.delay
-        satPass = args.satPass
+        satPass = viewModel.passSatList.value!![args.satPassIndex]
         mainActivity.supportActionBar?.title = satPass.tle.name
 
         polarViewFrame = view.findViewById(R.id.polar_view_frame)

@@ -74,6 +74,7 @@
     <string name="err_enter_value">Пожалуйста, введите значение</string>
     <string name="err_no_tle_file">Не найден файл TLE</string>
     <string name="err_no_selection_file">Не найден файл выбранных спутников</string>
+    <string name="err_no_sat_selected">Не выбраны спутники</string>
 
     <string name="pass_aos_az">НПС — %2d°</string>
     <string name="pass_maxEl">Элевация: %.1f°</string>
