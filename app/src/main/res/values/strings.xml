@@ -135,8 +135,13 @@
         is available under the
         <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license.\n
 
-        \n— To Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>,
-        for his amazing Gpredict program which inspired the creation of Look4Sat.\n
+        \n— To Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>, and contributors
+        for the amazing Gpredict program that inspired the creation and design of Look4Sat.\n
+
+        \n— To the <a href="https://libre.space/">Libre Space Foundation</a> team and their SatNOGS
+        project that provides an extremely easy to use <a href="https://db.satnogs.org/api/">API</a>
+        and <a href="https://db.satnogs.org/">DB</a> with a huge amount of information about
+        satellites, their telemetry and transmitters, which the app uses under the hood.\n
 
         \n— To Guys from Square for creating an amazing set of libraries (OkHttp, Okio, Retrofit)
         and for making them available under the

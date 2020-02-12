@@ -62,8 +62,8 @@
     <string name="pref_refresh_rate_input_error">Введите значение между 250мс и 10000мс</string>
 
     <string name="no_mode">Модуляция: нет</string>
-    <string name="no_uplink">Исход. канал: нет</string>
-    <string name="no_downlink">Вход. канал: нет</string>
+    <string name="no_uplink">Исходящий: нет</string>
+    <string name="no_downlink">Входящий: нет</string>
     <string name="no_selected_sat">Не выбраны спутники</string>
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
@@ -109,8 +109,7 @@
     <string name="about_subtitle">Приложение для слежения за спутниками радио и погоды
         для платформы Android</string>
     <string name="about_thanks_to">Большое спасибо:</string>
-    <string name="about_thanks_list">— Вам за использование этого приложения!
-        \nЖелаю всегда чистого неба над головой!\n
+    <string name="about_thanks_list">— Вам за использование этого приложения! Желаю всегда чистого неба над головой!\n
 
         \n— David A. B. Johnson, <a href="https://github.com/g4dpz">G4DPZ</a>, автору библиотеки
         predict4java, которую приложение использует для вычисления орбит спутников по модели SGP4.\n
@@ -122,6 +121,11 @@
 
         \n— Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>, за его замечательную
         программу Gpredict, которая вдохновила меня на создание Look4Sat.\n
+
+        \n— Команде <a href="https://libre.space/">Libre Space Foundation</a> и их проекту SatNOGS,
+        который предоставляет замечательное <a href="https://db.satnogs.org/api/">API</a>
+        и <a href="https://db.satnogs.org/">базу данных</a> с огромным количеством информации
+        о спутниках, их телеметрии и трансиверах, которую приложение использует под капотом.\n
 
         \n— Ребятам из Square за создание библиотек OkHttp, Okio, Retrofit и за доступ
         к ним по лицензии <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a>.\n

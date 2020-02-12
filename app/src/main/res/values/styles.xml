@@ -44,17 +44,17 @@
     </style>
 
     <style name="DrawerHeader.Title">
-        <item name="android:textSize">46sp</item>
+        <item name="android:textSize">42sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DrawerHeader.Item">
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">21sp</item>
         <item name="android:fontFamily">serif</item>
     </style>
 
     <style name="DrawerHeader.ItemValue">
-        <item name="android:textSize">26sp</item>
+        <item name="android:textSize">25sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
