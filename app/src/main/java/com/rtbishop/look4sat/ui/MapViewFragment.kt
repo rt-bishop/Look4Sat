@@ -96,7 +96,7 @@ class MapViewFragment : Fragment() {
     private fun setupComponents() {
         val delay = viewModel.delay
         gsp = viewModel.gsp.value ?: GroundStationPosition(0.0, 0.0, 0.0)
-        satPassList = viewModel.passSatList.value ?: emptyList()
+        satPassList = viewModel.satPassList.value ?: emptyList()
 
         if (satPassList.isNotEmpty()) {
             satPassList = satPassList.distinctBy { it.tle }

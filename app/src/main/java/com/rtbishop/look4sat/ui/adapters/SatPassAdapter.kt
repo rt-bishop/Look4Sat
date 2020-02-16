@@ -136,9 +136,11 @@ class SatPassAdapter(val viewModel: MainViewModel) :
             progressBar.progress = satPass.progress
 
             itemView.setOnClickListener {
-                val satPassIndex = viewModel.passSatList.value!!.indexOf(satPass)
-                val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
-                it.findNavController().navigate(action)
+                viewModel.satPassList.value?.let {
+                    val satPassIndex = it.indexOf(satPass)
+                    val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
+                    itemView.findNavController().navigate(action)
+                }
             }
         }
     }
@@ -162,9 +164,11 @@ class SatPassAdapter(val viewModel: MainViewModel) :
                 String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
 
             itemView.setOnClickListener {
-                val satPassIndex = viewModel.passSatList.value!!.indexOf(satPass)
-                val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
-                it.findNavController().navigate(action)
+                viewModel.satPassList.value?.let {
+                    val satPassIndex = it.indexOf(satPass)
+                    val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
+                    itemView.findNavController().navigate(action)
+                }
             }
         }
     }

@@ -82,9 +82,6 @@ class PolarViewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val delay = viewModel.delay
-        satPass = viewModel.passSatList.value!![args.satPassIndex]
-        mainActivity.supportActionBar?.title = satPass.tle.name
 
         polarViewFrame = view.findViewById(R.id.polar_view_frame)
         transRecycler = view.findViewById(R.id.polar_recycler)
@@ -94,11 +91,22 @@ class PolarViewFragment : Fragment() {
         polarAltitude = view.findViewById(R.id.polar_altitude)
         noTransFound = view.findViewById(R.id.polar_no_trans)
 
-        polarView = PolarView(mainActivity, delay)
-        polarViewFrame.addView(polarView)
-        service.scheduleAtFixedRate({ polarView.invalidate() }, delay, delay, TimeUnit.MILLISECONDS)
+        viewModel.satPassList.value?.let {
+            val refreshRate = viewModel.delay
+            satPass = it[args.satPassIndex]
+            mainActivity.supportActionBar?.title = satPass.tle.name
 
-        setupTransRecycler()
+            polarView = PolarView(mainActivity, refreshRate)
+            polarViewFrame.addView(polarView)
+            service.scheduleAtFixedRate(
+                { polarView.invalidate() },
+                refreshRate,
+                refreshRate,
+                TimeUnit.MILLISECONDS
+            )
+
+            setupTransRecycler()
+        }
     }
 
     private fun setupTransRecycler() {

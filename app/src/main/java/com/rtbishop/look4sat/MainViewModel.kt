@@ -65,7 +65,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val debugMessage: LiveData<String> = _debugMessage
 
     private val _satPassList = MutableLiveData<MutableList<SatPass>>()
-    val passSatList: LiveData<MutableList<SatPass>> = _satPassList
+    val satPassList: LiveData<MutableList<SatPass>> = _satPassList
 
     private val _gsp = MutableLiveData<GroundStationPosition>()
     val gsp: LiveData<GroundStationPosition> = _gsp

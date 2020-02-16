@@ -115,7 +115,7 @@ class PassListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.passSatList.observe(viewLifecycleOwner, Observer {
+        viewModel.satPassList.observe(viewLifecycleOwner, Observer {
             satPassList = it
             satPassAdapter.setList(satPassList)
             if (satPassList.isNotEmpty()) {
