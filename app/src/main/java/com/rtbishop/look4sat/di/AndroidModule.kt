@@ -21,9 +21,8 @@ package com.rtbishop.look4sat.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.LocationManager
 import androidx.preference.PreferenceManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -39,7 +38,7 @@ class AndroidModule {
 
     @Singleton
     @Provides
-    fun provideLocationClient(context: Context): FusedLocationProviderClient {
-        return LocationServices.getFusedLocationProviderClient(context)
+    fun provideLocationManager(context: Context): LocationManager {
+        return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 }

@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(permLocation), permLocationCode)
             }
         } else {
-            viewModel.getCurrentLocation()
+            viewModel.updateLocation()
         }
     }
 
@@ -177,7 +177,7 @@ class MainActivity : AppCompatActivity() {
         when (reqCode) {
             permLocationCode -> {
                 if (res.isNotEmpty() && res[0] == permGranted) {
-                    viewModel.getCurrentLocation()
+                    viewModel.updateLocation()
                 }
             }
         }

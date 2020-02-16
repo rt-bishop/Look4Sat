@@ -85,7 +85,4 @@ dependencies {
 
     // predict4java
     implementation "com.github.davidmoten:predict4java:$predict4java"
-
-    // location
-    implementation "com.google.android.gms:play-services-location:$google_play"
 }

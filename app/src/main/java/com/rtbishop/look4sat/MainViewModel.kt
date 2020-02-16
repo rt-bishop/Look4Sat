@@ -22,7 +22,7 @@ package com.rtbishop.look4sat
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.location.Location
+import android.location.LocationManager
 import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
@@ -32,7 +32,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.SatNotFoundException
 import com.github.amsacode.predict4java.TLE
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.repo.SatPass
@@ -79,7 +78,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var calculationJob: Job? = null
 
     @Inject
-    lateinit var locationClient: FusedLocationProviderClient
+    lateinit var locationManager: LocationManager
     @Inject
     lateinit var preferences: SharedPreferences
     @Inject
@@ -109,8 +108,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _gsp.postValue(GroundStationPosition(lat, lon, alt))
     }
 
-    fun getCurrentLocation() {
-        locationClient.lastLocation.addOnSuccessListener { location: Location? ->
+    fun updateLocation() {
+        val passiveProvider = LocationManager.PASSIVE_PROVIDER
+        try {
+            val location = locationManager.getLastKnownLocation(passiveProvider)
+
             val lat = location?.latitude ?: 0.0
             val lon = location?.longitude ?: 0.0
             val alt = location?.altitude ?: 0.0
@@ -123,6 +125,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
             _gsp.postValue(GroundStationPosition(lat, lon, alt))
             _debugMessage.postValue(app.getString(R.string.update_loc_success))
+        } catch (e: SecurityException) {
+            _debugMessage.postValue(app.getString(R.string.err_no_permissions))
         }
     }
 
