@@ -96,6 +96,7 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
     fun getPasses(start: Date, hoursAhead: Int, windBack: Boolean): List<SatPassTime> {
         iterationCount = 0
 
+        val satellite = SatelliteFactory.createSatellite(tle)
         val passes: MutableList<SatPassTime> = ArrayList()
         val trackEndDate = Date(start.time + hoursAhead * 60L * 60L * 1000L)
         var trackStartDate = start
@@ -103,17 +104,19 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         var lastAOS: Date
         var count = 0
 
-        if (tle.isDeepspace) {
-            passes.add(nextGeoSatPass(start))
-        } else {
-            do {
-                if (count > 0) windBackTime = false
-                val pass = nextSatPass(trackStartDate, windBackTime)
-                lastAOS = pass.startTime
-                passes.add(pass)
-                trackStartDate = Date(pass.endTime.time + threeQuarterOrbitMinutes() * 60L * 1000L)
-                count++
-            } while (lastAOS < trackEndDate)
+        if (satellite.willBeSeen(qth)) {
+            if (tle.isDeepspace) passes.add(nextGeoSatPass(start))
+            else {
+                do {
+                    if (count > 0) windBackTime = false
+                    val pass = nextSatPass(trackStartDate, windBackTime)
+                    lastAOS = pass.startTime
+                    passes.add(pass)
+                    trackStartDate =
+                        Date(pass.endTime.time + threeQuarterOrbitMinutes() * 60L * 1000L)
+                    count++
+                } while (lastAOS < trackEndDate)
+            }
         }
 
         return passes
