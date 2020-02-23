@@ -126,6 +126,13 @@
         <item name="android:paddingBottom">2dp</item>
     </style>
 
+    <style name="SatEntryDialogText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
     <style name="AboutTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

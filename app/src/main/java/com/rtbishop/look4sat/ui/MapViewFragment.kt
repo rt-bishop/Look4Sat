@@ -116,7 +116,7 @@ class MapViewFragment : Fragment() {
             mapFab.setOnClickListener {
                 Toast.makeText(
                     mainActivity,
-                    getString(R.string.no_selected_sat),
+                    getString(R.string.err_no_sat_selected),
                     Toast.LENGTH_SHORT
                 ).show()
             }

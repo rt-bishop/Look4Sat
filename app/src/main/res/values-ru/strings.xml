@@ -37,9 +37,9 @@
     <string name="menu_settings">Настройки</string>
     <string name="menu_about">О приложении</string>
 
-    <string name="dialog_select_sat">Выберите спутники для слежения…</string>
-    <string name="dialog_show_track">Показать трассу орбиты для…</string>
-    <string name="dialog_filter_passes">Фильтровать пролеты…</string>
+    <string name="dialog_select_sat">Выберите спутники для слежения</string>
+    <string name="dialog_show_track">Показать трассу орбиты для</string>
+    <string name="dialog_filter_passes">Фильтровать пролеты</string>
 
     <string name="pref_hours_ahead_hint">Количество часов</string>
     <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
@@ -60,9 +60,8 @@
     <string name="pref_refresh_rate_input_error">Введите значение между 250мс и 10000мс</string>
 
     <string name="no_mode">Модуляция: нет</string>
-    <string name="no_uplink">Восходящая: нет</string>
-    <string name="no_downlink">Нисходящая: нет</string>
-    <string name="no_selected_sat">Не выбраны спутники</string>
+    <string name="no_uplink">Восход.: нет</string>
+    <string name="no_downlink">Нисход.: нет</string>
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
     <string name="err_no_permissions">Отсутствуют необходимые разрешения</string>
@@ -92,17 +91,17 @@
 
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_inverted">Инверсия: %s</string>
-    <string name="trans_up_low">Восходящая: %.4f MHz</string>
-    <string name="trans_up_lowHigh">Восходящая: %.4f - %.4f MHz</string>
-    <string name="trans_down_low">Нисходящая: %.4f MHz</string>
-    <string name="trans_down_lowHigh">Нисходящая: %.4f - %.4f MHz</string>
+    <string name="trans_up_low">Восход.: %.4f MHz</string>
+    <string name="trans_up_lowHigh">Восход.: %.4f - %.4f MHz</string>
+    <string name="trans_down_low">Нисход.: %.4f MHz</string>
+    <string name="trans_down_lowHigh">Нисход.: %.4f - %.4f MHz</string>
 
     <string name="info_swipe_text">Проведите по экрану вниз, чтобы обновить список пролетов
         для выбранных спутников</string>
     <string name="info_main_text">Приложение Look4Sat использует набор двухстрочных элементов TLE
         для вычисления траекторий движения и текущего местоположения спутников. Вы можете обновить
         файл TLE при помощи кнопки в главном меню.</string>
-    <string name="info_select_text">Нажмите эту кнопку, чтобы выбрать спутники для слежения</string>
+    <string name="info_select_text">Нажмите эту кнопку, чтобы выбрать спутники</string>
 
     <string name="about_subtitle">Приложение для слежения за спутниками радио и погоды
         для платформы Android</string>
@@ -137,9 +136,9 @@
 
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
-    <string name="btn_ok">Ок</string>
+    <string name="btn_ok">OK</string>
     <string name="btn_cancel">Отмена</string>
-    <string name="btn_clear">Очистить</string>
+    <string name="btn_all_none">Все/Нет</string>
 
     <string name="map_gsp">СТЦ</string>
 </resources>
