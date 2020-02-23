@@ -101,7 +101,7 @@
     <string name="info_main_text">Приложение Look4Sat использует набор двухстрочных элементов TLE
         для вычисления траекторий движения и текущего местоположения спутников. Вы можете обновить
         файл TLE при помощи кнопки в главном меню.</string>
-    <string name="info_select_text">Нажмите эту кнопку, чтобы выбрать спутники</string>
+    <string name="info_select_text">Нажмите эту кнопку, чтобы выбрать спутники для слежения</string>
 
     <string name="about_subtitle">Приложение для слежения за спутниками радио и погоды
         для платформы Android</string>
@@ -118,6 +118,10 @@
 
         \n— Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>, за его замечательную
         программу Gpredict, которая вдохновила меня на создание Look4Sat.\n
+
+        \n— Доктору <a href="https://celestrak.com/webmaster.php">T.S. Kelso</a> за его бесценный
+        вклад в развитие космической отрасли и за его сайт <a href="https://celestrak.com/">Celestrak</a>,
+        который хранит, обновляет и предоставляет доступ к файлам TLE.\n
 
         \n— Команде <a href="https://libre.space/">Libre Space Foundation</a> и их проекту SatNOGS,
         который предоставляет замечательное <a href="https://db.satnogs.org/api/">API</a>

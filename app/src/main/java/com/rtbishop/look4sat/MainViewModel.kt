@@ -70,10 +70,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _gsp = MutableLiveData<GroundStationPosition>()
     val gsp: LiveData<GroundStationPosition> = _gsp
 
-    private val urlList = listOf(
-        "https://celestrak.com/NORAD/elements/amateur.txt",
-        "https://celestrak.com/NORAD/elements/weather.txt"
-    )
+    private val urlList = listOf("https://celestrak.com/NORAD/elements/active.txt")
 
     private var calculationJob: Job? = null
 
