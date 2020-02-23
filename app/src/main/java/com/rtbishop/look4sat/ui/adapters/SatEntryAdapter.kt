@@ -7,7 +7,6 @@ import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.repo.SatEntry
-import com.rtbishop.look4sat.ui.SatEntryDialog
 
 internal class SatEntryAdapter(private var entriesList: MutableList<SatEntry>) :
     RecyclerView.Adapter<SatEntryAdapter.SatEntryHolder>() {
@@ -37,21 +36,8 @@ internal class SatEntryAdapter(private var entriesList: MutableList<SatEntry>) :
 
         fun bind(satEntry: SatEntry) {
             satEntryItem.text = satEntry.name
-            satEntryItem.isChecked = SatEntryDialog.tempSelectionList.contains(satEntry.id)
-
-            itemView.setOnClickListener {
-                if (satEntryItem.isChecked) {
-                    if (!SatEntryDialog.tempSelectionList.contains(satEntry.id)) {
-                        SatEntryDialog.tempSelectionList.add(satEntry.id)
-                        satEntry.isSelected = true
-                    }
-                } else {
-                    if (SatEntryDialog.tempSelectionList.contains(satEntry.id)) {
-                        SatEntryDialog.tempSelectionList.remove(satEntry.id)
-                        satEntry.isSelected = false
-                    }
-                }
-            }
+            satEntryItem.isChecked = satEntry.isSelected
+            itemView.setOnClickListener { satEntry.isSelected = satEntryItem.isChecked }
         }
     }
 }

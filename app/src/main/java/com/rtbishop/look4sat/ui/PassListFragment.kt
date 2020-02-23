@@ -41,6 +41,7 @@ import com.github.amsacode.predict4java.TLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.repo.SatEntry
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
 import java.util.*
@@ -185,37 +186,30 @@ class PassListFragment : Fragment() {
             .show()
     }
 
-    private fun showSelectSatDialog(tleMainList: List<TLE>, selectionList: MutableList<Int>) {
+    private fun showSelectSatDialog(tleMainList: List<TLE>, selection: MutableList<Int>) {
         if (tleMainList.isEmpty()) {
             Toast.makeText(mainActivity, getString(R.string.err_update_tle), Toast.LENGTH_SHORT)
                 .show()
         } else {
-            val tleNameArray = arrayOfNulls<String>(tleMainList.size).apply {
-                tleMainList.withIndex().forEach { (position, tle) -> this[position] = tle.name }
-            }
-            val tleCheckedArray = BooleanArray(tleMainList.size).apply {
-                selectionList.forEach { this[it] = true }
-            }
-            val builder = AlertDialog.Builder(mainActivity)
-            builder.setTitle(getString(R.string.dialog_select_sat))
-                .setMultiChoiceItems(tleNameArray, tleCheckedArray) { _, which, isChecked ->
-                    if (isChecked) selectionList.add(which)
-                    else if (selectionList.contains(which)) selectionList.remove(which)
+            val entriesList = mutableListOf<SatEntry>().apply {
+                tleMainList.withIndex().forEach {
+                    this.add(SatEntry(it.index, it.value.name))
                 }
-                .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
-                    viewModel.updateAndSaveSelectionList(selectionList)
+            }
+
+            val listener = object : SatEntryDialog.EntriesSubmitListener {
+                override fun onEntriesSubmit(list: MutableList<Int>) {
+                    viewModel.updateAndSaveSelectionList(list)
                     calculatePasses()
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
-                    dialog.cancel()
-                }
-                .setNeutralButton(getString(R.string.btn_clear)) { _, _ ->
-                    selectionList.clear()
-                    viewModel.updateAndSaveSelectionList(selectionList)
-                    calculatePasses()
-                }
-                .create()
-                .show()
+            }
+
+            val dialogFragment = SatEntryDialog().apply {
+                setEntriesList(entriesList)
+                setSelectionList(selection)
+                setEntriesListener(listener)
+            }
+            dialogFragment.show(mainActivity.supportFragmentManager, "SatEntryDialog")
         }
     }
 
