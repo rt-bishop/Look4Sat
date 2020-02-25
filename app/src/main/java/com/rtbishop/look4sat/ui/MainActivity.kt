@@ -1,5 +1,5 @@
 /*
- * Look4Sat. Amateur radio & weather satellites passes calculator for Android.
+ * Look4Sat. Amateur radio and weather satellite tracker and passes predictor for Android.
  * Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 package com.rtbishop.look4sat.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -75,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         setupDrawer()
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     private fun setupComponents() {
         val navController = findNavController(R.id.nav_host)
         val navView: NavigationView = findViewById(R.id.nav_view)

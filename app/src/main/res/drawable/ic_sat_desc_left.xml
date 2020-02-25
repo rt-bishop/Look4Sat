@@ -1,4 +1,24 @@
+<!--
+  ~ Look4Sat. Amateur radio and weather satellite tracker and passes predictor for Android.
+  ~ Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
+  ~
+  ~ This program is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with this program; if not, write to the Free Software Foundation, Inc.,
+  ~ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:width="128dp"
     android:height="128dp"
     android:viewportWidth="128"
@@ -8,7 +28,8 @@
         android:fillColor="#C0C0C0"
         android:fillType="evenOdd"
         android:pathData="m105.138,114.121a2.864,2.864 90,0 0,1.701 -0.85l19.334,-19.331a2.864,2.864 90,0 0,-0 -4.027l-26.584,-26.625a2.864,2.864 90,0 0,-1.835 -0.805l-7.922,-0.626 5.773,-5.772a2.864,2.864 90,0 0,-0 -4.027l-19.602,-19.644a2.864,2.864 90,0 0,-4.073 -0l-5.773,5.772 -0.627,-7.92a2.864,2.864 90,0 0,-0.805 -1.835l-26.629,-26.58a2.864,2.864 90,0 0,-4.073 -0l-19.289,19.286a2.864,2.864 90,0 0,-0 4.072l26.584,26.625a2.864,2.864 90,0 0,1.835 0.805l7.922,0.626 -5.773,5.772a2.864,2.864 90,0 0,-0 4.072l19.603,19.599a2.864,2.864 90,0 0,4.073 -0l5.773,-5.772 0.626,7.92a2.864,2.864 90,0 0,0.806 1.835l26.629,26.58a2.864,2.864 90,0 0,2.059 0.85,2.864 2.864,90 0,0 0.269,-0zM104.825,107.23 L80.97,83.38 80.165,72.685 85.58,67.271 96.276,68.121 120.13,91.926zM55.326,47.85 L44.629,47 20.775,23.194 36.081,7.891 59.891,31.741 60.741,42.436z"
-        android:strokeColor="#00000000" />
+        android:strokeColor="#00000000"
+        tools:ignore="VectorPath" />
     <path
         android:fillAlpha="1"
         android:fillColor="#FFE082"
