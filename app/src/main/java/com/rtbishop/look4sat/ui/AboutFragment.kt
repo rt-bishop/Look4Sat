@@ -24,31 +24,34 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.FragmentAboutBinding
 
 class AboutFragment : Fragment() {
 
-    private lateinit var textVersion: TextView
-    private lateinit var textThanks: TextView
+    private var _binding: FragmentAboutBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_about, container, false)
+        _binding = FragmentAboutBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.tvAboutVersion.text =
+            String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
+        binding.tvAboutMessage.movementMethod = LinkMovementMethod.getInstance()
+    }
 
-        textVersion = view.findViewById(R.id.about_title_version)
-        textThanks = view.findViewById(R.id.about_thanks_to)
-
-        textVersion.text = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
-        textThanks.movementMethod = LinkMovementMethod.getInstance()
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 }

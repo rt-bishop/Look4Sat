@@ -19,7 +19,7 @@
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_pass_geo"
+    android:id="@+id/pass_geo_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
@@ -32,7 +32,7 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/pass_geo_background"
+            android:id="@+id/pass_geo_bg"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@string/placeholder"

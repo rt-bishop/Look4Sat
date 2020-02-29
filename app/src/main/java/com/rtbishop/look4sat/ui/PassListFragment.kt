@@ -29,18 +29,15 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.amsacode.predict4java.TLE
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.FragmentPassListBinding
 import com.rtbishop.look4sat.repo.SatEntry
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
@@ -49,15 +46,14 @@ import java.util.concurrent.TimeUnit
 
 class PassListFragment : Fragment() {
 
+    private var _binding: FragmentPassListBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var viewModel: MainViewModel
-    private lateinit var satPassRecycler: RecyclerView
     private lateinit var satPassAdapter: SatPassAdapter
     private lateinit var btnPassPrefs: ImageButton
-    private lateinit var passListFab: FloatingActionButton
     private lateinit var aosTimer: CountDownTimer
     private lateinit var aosTimerText: TextView
-    private lateinit var swipeLayout: SwipeRefreshLayout
-    private lateinit var infoLayout: ConstraintLayout
     private lateinit var mainActivity: MainActivity
     private lateinit var satPassList: MutableList<SatPass>
     private var isTimerSet: Boolean = false
@@ -75,27 +71,20 @@ class PassListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_pass_list, container, false)
+        _binding = FragmentPassListBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        findViews(view)
+        aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
+        btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
         setupComponents()
         setupObservers()
     }
 
-    private fun findViews(view: View) {
-        aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
-        btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
-        swipeLayout = view.findViewById(R.id.pass_list_refresh)
-        infoLayout = view.findViewById(R.id.pass_info_layout)
-        satPassRecycler = view.findViewById(R.id.pass_list_recycler)
-        passListFab = view.findViewById(R.id.pass_list_fab)
-    }
-
     private fun setupComponents() {
-        satPassRecycler.apply {
+        binding.recPassList.apply {
             layoutManager = LinearLayoutManager(mainActivity)
             adapter = satPassAdapter
             isVerticalScrollBarEnabled = false
@@ -104,13 +93,13 @@ class PassListFragment : Fragment() {
         satPassAdapter.setList(satPassList)
         setTimer()
 
-        swipeLayout.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
-        swipeLayout.setColorSchemeResources(R.color.backgroundDark)
-        swipeLayout.setOnRefreshListener { calculatePasses() }
+        binding.refLayoutPassList.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
+        binding.refLayoutPassList.setColorSchemeResources(R.color.backgroundDark)
+        binding.refLayoutPassList.setOnRefreshListener { calculatePasses() }
         btnPassPrefs.setOnClickListener {
             showSatPassPrefsDialog(viewModel.hoursAhead, viewModel.minEl)
         }
-        passListFab.setOnClickListener {
+        binding.fabSatSelect.setOnClickListener {
             showSelectSatDialog(viewModel.tleMainList, viewModel.tleSelection)
         }
     }
@@ -120,19 +109,19 @@ class PassListFragment : Fragment() {
             satPassList = it
             satPassAdapter.setList(satPassList)
             if (satPassList.isNotEmpty()) {
-                infoLayout.visibility = View.INVISIBLE
-                satPassRecycler.visibility = View.VISIBLE
+                binding.layoutInfo.visibility = View.INVISIBLE
+                binding.recPassList.visibility = View.VISIBLE
             } else {
-                infoLayout.visibility = View.VISIBLE
-                satPassRecycler.visibility = View.INVISIBLE
+                binding.layoutInfo.visibility = View.VISIBLE
+                binding.recPassList.visibility = View.INVISIBLE
             }
             setTimer()
-            swipeLayout.isRefreshing = false
+            binding.refLayoutPassList.isRefreshing = false
         })
     }
 
     private fun calculatePasses() {
-        swipeLayout.isRefreshing = true
+        binding.refLayoutPassList.isRefreshing = true
         viewModel.getPasses()
     }
 
@@ -277,5 +266,10 @@ class PassListFragment : Fragment() {
         }
         if (resetToNull) aosTimerText.text =
             String.format(getString(R.string.pat_timer), 0, 0, 0)
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 }

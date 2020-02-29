@@ -50,12 +50,15 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    viewBinding {
+        enabled = true
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.google.android.material:material:$material"
-    implementation "androidx.appcompat:appcompat:$supportLib"
+    implementation "androidx.appcompat:appcompat:$appCompat"
     implementation "androidx.legacy:legacy-support-v4:$supportLib"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
 

@@ -27,18 +27,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.FragmentPolarViewBinding
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.ui.adapters.TransmitterAdapter
 import kotlinx.coroutines.launch
@@ -53,17 +51,13 @@ class PolarViewFragment : Fragment() {
     private val service = Executors.newSingleThreadScheduledExecutor()
     private val args: PolarViewFragmentArgs by navArgs()
 
+    private var _binding: FragmentPolarViewBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var viewModel: MainViewModel
     private lateinit var satPass: SatPass
     private lateinit var polarView: PolarView
-    private lateinit var polarViewFrame: FrameLayout
-    private lateinit var transRecycler: RecyclerView
     private lateinit var transmitterAdapter: TransmitterAdapter
-    private lateinit var polarAzimuth: TextView
-    private lateinit var polarElevation: TextView
-    private lateinit var polarRange: TextView
-    private lateinit var polarAltitude: TextView
-    private lateinit var noTransFound: TextView
     private lateinit var mainActivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,19 +71,12 @@ class PolarViewFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_polar_view, container, false)
+        _binding = FragmentPolarViewBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        polarViewFrame = view.findViewById(R.id.polar_view_frame)
-        transRecycler = view.findViewById(R.id.polar_recycler)
-        polarAzimuth = view.findViewById(R.id.polar_azimuth)
-        polarElevation = view.findViewById(R.id.polar_elevation)
-        polarRange = view.findViewById(R.id.polar_range)
-        polarAltitude = view.findViewById(R.id.polar_altitude)
-        noTransFound = view.findViewById(R.id.polar_no_trans)
 
         viewModel.satPassList.value?.let {
             val refreshRate = viewModel.delay
@@ -97,7 +84,7 @@ class PolarViewFragment : Fragment() {
             mainActivity.supportActionBar?.title = satPass.tle.name
 
             polarView = PolarView(mainActivity, refreshRate)
-            polarViewFrame.addView(polarView)
+            binding.framePolar.addView(polarView)
             service.scheduleAtFixedRate(
                 { polarView.invalidate() },
                 refreshRate,
@@ -111,7 +98,7 @@ class PolarViewFragment : Fragment() {
 
     private fun setupTransRecycler() {
         transmitterAdapter = TransmitterAdapter()
-        transRecycler.apply {
+        binding.recPolar.apply {
             layoutManager = LinearLayoutManager(mainActivity)
             adapter = transmitterAdapter
         }
@@ -121,8 +108,8 @@ class PolarViewFragment : Fragment() {
                 transmitterAdapter.setList(transList)
                 transmitterAdapter.notifyDataSetChanged()
             } else {
-                transRecycler.visibility = View.INVISIBLE
-                noTransFound.visibility = View.VISIBLE
+                binding.recPolar.visibility = View.INVISIBLE
+                binding.tvPolarNoTrans.visibility = View.VISIBLE
             }
         }
     }
@@ -178,13 +165,13 @@ class PolarViewFragment : Fragment() {
 
         private fun setPassText() {
             satPos = satPass.predictor.getSatPos(Date())
-            polarAzimuth.text =
+            binding.tvPolarAz.text =
                 String.format(context.getString(R.string.pat_azimuth), rad2Deg(satPos.azimuth))
-            polarElevation.text =
+            binding.tvPolarEl.text =
                 String.format(context.getString(R.string.pat_elevation), rad2Deg(satPos.elevation))
-            polarRange.text =
+            binding.tvPolarRng.text =
                 String.format(context.getString(R.string.pat_range), satPos.range)
-            polarAltitude.text =
+            binding.tvPolarAlt.text =
                 String.format(context.getString(R.string.pat_altitude), satPos.altitude)
         }
 
@@ -265,5 +252,10 @@ class PolarViewFragment : Fragment() {
         private fun rad2Deg(value: Double): Double {
             return value * 180 / Math.PI
         }
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 }

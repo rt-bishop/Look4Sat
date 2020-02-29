@@ -19,7 +19,7 @@
 
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/pass_list_refresh"
+    android:id="@+id/refLayoutPassList"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -28,7 +28,7 @@
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/pass_list_recycler"
+            android:id="@+id/recPassList"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:paddingBottom="4dp"
@@ -41,7 +41,7 @@
         </androidx.recyclerview.widget.RecyclerView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/pass_info_layout"
+            android:id="@+id/layoutInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible"
@@ -51,7 +51,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/info_swipe_img"
+                android:id="@+id/imgInfoSwipe"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:contentDescription="@string/placeholder"
@@ -61,7 +61,7 @@
                 app:srcCompat="@drawable/ic_arrow_swipe" />
 
             <TextView
-                android:id="@+id/info_swipe_text"
+                android:id="@+id/tvInfoSwipe"
                 style="@style/PassInfoText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -70,10 +70,10 @@
                 android:text="@string/info_swipe_text"
                 app:layout_constraintEnd_toStartOf="@+id/guideRight"
                 app:layout_constraintStart_toStartOf="@+id/guideLeft"
-                app:layout_constraintTop_toBottomOf="@+id/info_swipe_img" />
+                app:layout_constraintTop_toBottomOf="@+id/imgInfoSwipe" />
 
             <ImageView
-                android:id="@+id/info_img_sputnik"
+                android:id="@+id/imgInfoSputnik"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="16dp"
@@ -81,22 +81,22 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:contentDescription="@string/placeholder"
-                app:layout_constraintBottom_toTopOf="@+id/info_main_text"
+                app:layout_constraintBottom_toTopOf="@+id/tvInfoMain"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toStartOf="@+id/guideRight"
                 app:layout_constraintStart_toStartOf="@+id/guideLeft"
-                app:layout_constraintTop_toBottomOf="@+id/info_swipe_text"
+                app:layout_constraintTop_toBottomOf="@+id/tvInfoSwipe"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:srcCompat="@drawable/ic_sputnik" />
 
             <TextView
-                android:id="@+id/info_main_text"
+                android:id="@+id/tvInfoMain"
                 style="@style/PassInfoText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/info_main_text"
-                app:layout_constraintBottom_toTopOf="@+id/info_select_text"
+                app:layout_constraintBottom_toTopOf="@+id/tvSatSelect"
                 app:layout_constraintEnd_toStartOf="@+id/guideRight"
                 app:layout_constraintStart_toStartOf="@+id/guideLeft"
                 app:layout_constraintTop_toTopOf="@+id/guideCenter"
@@ -104,7 +104,7 @@
                 app:layout_constraintVertical_chainStyle="spread" />
 
             <TextView
-                android:id="@+id/info_select_text"
+                android:id="@+id/tvSatSelect"
                 style="@style/PassInfoText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -152,7 +152,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/pass_list_fab"
+            android:id="@+id/fabSatSelect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"

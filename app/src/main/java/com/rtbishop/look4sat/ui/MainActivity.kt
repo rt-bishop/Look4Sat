@@ -27,15 +27,10 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -43,9 +38,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.navigation.NavigationView
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.ActivityMainBinding
+import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,22 +50,17 @@ class MainActivity : AppCompatActivity() {
     private val permGranted = PackageManager.PERMISSION_GRANTED
     private val githubUrl = "https://github.com/rt-bishop/LookingSat"
 
+    private lateinit var mainBinding: ActivityMainBinding
+    private lateinit var drawerBinding: DrawerHeaderBinding
     private lateinit var viewModel: MainViewModel
-    private lateinit var timerLayout: ConstraintLayout
-    private lateinit var drawerLayout: DrawerLayout
-    private lateinit var drawerLat: TextView
-    private lateinit var drawerLon: TextView
-    private lateinit var drawerBtnLoc: Button
-    private lateinit var drawerBtnTle: Button
-    private lateinit var drawerBtnTrans: Button
-    private lateinit var drawerBtnGithub: Button
-    private lateinit var drawerBtnExit: Button
     private lateinit var appBarConfig: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        mainBinding = ActivityMainBinding.inflate(layoutInflater)
+        drawerBinding = DrawerHeaderBinding.inflate(layoutInflater, mainBinding.navView, true)
+        setContentView(mainBinding.root)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         setupComponents()
         setupObservers()
@@ -79,24 +70,13 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SourceLockedOrientationActivity")
     private fun setupComponents() {
         val navController = findNavController(R.id.nav_host)
-        val navView: NavigationView = findViewById(R.id.nav_view)
-        val header = navView.getHeaderView(0)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        val navView = mainBinding.navView
+        val toolbar = mainBinding.includeAppBar.toolbar
         setSupportActionBar(toolbar)
-
-        timerLayout = findViewById(R.id.toolbar_layout)
-        drawerLayout = findViewById(R.id.drawer_layout)
-        drawerLat = header.findViewById(R.id.drawer_lat_value)
-        drawerLon = header.findViewById(R.id.drawer_lon_value)
-        drawerBtnLoc = header.findViewById(R.id.drawer_btn_loc)
-        drawerBtnTle = header.findViewById(R.id.drawer_btn_tle)
-        drawerBtnTrans = header.findViewById(R.id.drawer_btn_trans)
-        drawerBtnGithub = header.findViewById(R.id.drawer_btn_github)
-        drawerBtnExit = header.findViewById(R.id.drawer_btn_exit)
 
         appBarConfig = AppBarConfiguration(
             setOf(R.id.nav_pass_list, R.id.nav_map_view, R.id.nav_settings, R.id.nav_about),
-            drawerLayout
+            mainBinding.drawerLayout
         )
 
         setupActionBarWithNavController(navController, appBarConfig)
@@ -107,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_pass_list -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     toolbar.visibility = View.VISIBLE
-                    timerLayout.visibility = View.VISIBLE
+                    mainBinding.includeAppBar.toolbarLayout.visibility = View.VISIBLE
                 }
                 R.id.nav_map_view -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -116,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                 else -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     toolbar.visibility = View.VISIBLE
-                    timerLayout.visibility = View.GONE
+                    mainBinding.includeAppBar.toolbarLayout.visibility = View.GONE
                 }
             }
         }
@@ -126,40 +106,45 @@ class MainActivity : AppCompatActivity() {
         viewModel.debugMessage.observe(this, Observer { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             when (message) {
-                getString(R.string.update_loc_success) -> drawerBtnLoc.isEnabled = true
-                getString(R.string.update_tle_success) -> drawerBtnTle.isEnabled = true
-                getString(R.string.update_trans_success) -> drawerBtnTrans.isEnabled = true
+                getString(R.string.update_loc_success) -> drawerBinding.drawerBtnLoc.isEnabled =
+                    true
+                getString(R.string.update_tle_success) -> drawerBinding.drawerBtnTle.isEnabled =
+                    true
+                getString(R.string.update_trans_success) -> drawerBinding.drawerBtnTrans.isEnabled =
+                    true
                 getString(R.string.update_failure) -> {
-                    drawerBtnTle.isEnabled = true
-                    drawerBtnTrans.isEnabled = true
+                    drawerBinding.drawerBtnTle.isEnabled = true
+                    drawerBinding.drawerBtnTrans.isEnabled = true
                 }
             }
         })
 
         viewModel.gsp.observe(this, Observer { gsp ->
-            drawerLat.text = String.format(getString(R.string.pat_location), gsp.latitude)
-            drawerLon.text = String.format(getString(R.string.pat_location), gsp.longitude)
+            drawerBinding.drawerLatValue.text =
+                String.format(getString(R.string.pat_location), gsp.latitude)
+            drawerBinding.drawerLonValue.text =
+                String.format(getString(R.string.pat_location), gsp.longitude)
         })
     }
 
     private fun setupDrawer() {
-        drawerBtnLoc.setOnClickListener {
+        drawerBinding.drawerBtnLoc.setOnClickListener {
             it.isEnabled = false
             requestLocationUpdate()
         }
-        drawerBtnTle.setOnClickListener {
+        drawerBinding.drawerBtnTle.setOnClickListener {
             it.isEnabled = false
             viewModel.updateAndSaveTleFile()
         }
-        drawerBtnTrans.setOnClickListener {
+        drawerBinding.drawerBtnTrans.setOnClickListener {
             it.isEnabled = false
             viewModel.updateTransmittersDatabase()
         }
-        drawerBtnGithub.setOnClickListener {
+        drawerBinding.drawerBtnGithub.setOnClickListener {
             val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
             startActivity(githubIntent)
         }
-        drawerBtnExit.setOnClickListener { finish() }
+        drawerBinding.drawerBtnExit.setOnClickListener { finish() }
     }
 
     private fun requestLocationUpdate() {

@@ -23,13 +23,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
+import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.ui.PassListFragmentDirections
 import java.text.SimpleDateFormat
@@ -80,60 +79,48 @@ class SatPassAdapter(val viewModel: MainViewModel) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 0) {
-            val itemView = LayoutInflater
-                .from(parent.context)
-                .inflate(R.layout.card_pass, parent, false)
-            return SatPassHolder(itemView)
+            val bindingLeo = ItemPassLeoBinding
+                .inflate(LayoutInflater.from(parent.context), parent, false)
+            SatPassLeoHolder(bindingLeo.root, bindingLeo)
         } else {
-            val itemView = LayoutInflater
-                .from(parent.context)
-                .inflate(R.layout.card_pass_geo, parent, false)
-            SatPassGeoHolder(itemView)
+            val bindingGeo = ItemPassGeoBinding
+                .inflate(LayoutInflater.from(parent.context), parent, false)
+            SatPassGeoHolder(bindingGeo.root, bindingGeo)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder.itemViewType == 0) {
-            (holder as SatPassHolder).bind(satPassList[position])
+            (holder as SatPassLeoHolder).bind(satPassList[position])
         } else {
             (holder as SatPassGeoHolder).bind(satPassList[position])
         }
     }
 
-    inner class SatPassHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val context: Context = itemView.context
-        private val passImg = itemView.findViewById<ImageView>(R.id.pass_img)
-        private val satName = itemView.findViewById<TextView>(R.id.pass_satName)
-        private val satId = itemView.findViewById<TextView>(R.id.pass_satId)
-        private val maxEl = itemView.findViewById<TextView>(R.id.pass_maxEl)
-        private val aosAz = itemView.findViewById<TextView>(R.id.pass_aosAz)
-        private val losAz = itemView.findViewById<TextView>(R.id.pass_losAz)
-        private val aosTime = itemView.findViewById<TextView>(R.id.pass_aosTime)
-        private val losTime = itemView.findViewById<TextView>(R.id.pass_losTime)
-        private var progressBar = itemView.findViewById<ProgressBar>(R.id.pass_progress)
+    inner class SatPassLeoHolder(itemView: View, private val binding: ItemPassLeoBinding) :
+        RecyclerView.ViewHolder(itemView) {
 
         fun bind(satPass: SatPass) {
+            val context: Context = itemView.context
+            if (satPass.active) binding.passLeoImg.setImageResource(R.drawable.ic_pass_active)
+            else binding.passLeoImg.setImageResource(R.drawable.ic_pass_inactive)
 
-            if (satPass.active) passImg.setImageResource(R.drawable.ic_pass_active)
-            else passImg.setImageResource(R.drawable.ic_pass_inactive)
-
-            satName.text = satPass.tle.name
-            satId.text =
+            binding.passLeoSatName.text = satPass.tle.name
+            binding.passLeoSatId.text =
                 String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
-            maxEl.text =
+            binding.passLeoMaxEl.text =
                 String.format(context.getString(R.string.pass_maxEl), satPass.pass.maxEl)
-            aosAz.text =
+            binding.passLeoAosAz.text =
                 String.format(context.getString(R.string.pass_aos_az), satPass.pass.aosAzimuth)
-            losAz.text =
+            binding.passLeoLosAz.text =
                 String.format(context.getString(R.string.pass_los_az), satPass.pass.losAzimuth)
-            aosTime.text =
+            binding.passLeoAosTime.text =
                 SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
                     .format(satPass.pass.startTime)
-            losTime.text =
+            binding.passLeoLosTime.text =
                 SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
                     .format(satPass.pass.endTime)
-            progressBar.progress = satPass.progress
+            binding.passLeoProgress.progress = satPass.progress
 
             itemView.setOnClickListener {
                 viewModel.satPassList.value?.let {
@@ -145,22 +132,19 @@ class SatPassAdapter(val viewModel: MainViewModel) :
         }
     }
 
-    inner class SatPassGeoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val context: Context = itemView.context
-        private val satName = itemView.findViewById<TextView>(R.id.pass_geo_name)
-        private val satId = itemView.findViewById<TextView>(R.id.pass_geo_id)
-        private val satAz = itemView.findViewById<TextView>(R.id.pass_geo_az)
-        private val satEl = itemView.findViewById<TextView>(R.id.pass_geo_el)
+    inner class SatPassGeoHolder(itemView: View, private val binding: ItemPassGeoBinding) :
+        RecyclerView.ViewHolder(itemView) {
 
         fun bind(satPass: SatPass) {
+            val context: Context = itemView.context
             val satPos = satPass.predictor.getSatPos(satPass.pass.startTime)
             val azimuth = satPos.azimuth * 180 / Math.PI
 
-            satName.text = satPass.tle.name
-            satId.text = String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
-            satAz.text = String.format(context.getString(R.string.pat_azimuth), azimuth)
-            satEl.text =
+            binding.passGeoName.text = satPass.tle.name
+            binding.passGeoId.text =
+                String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
+            binding.passGeoAz.text = String.format(context.getString(R.string.pat_azimuth), azimuth)
+            binding.passGeoEl.text =
                 String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
 
             itemView.setOnClickListener {

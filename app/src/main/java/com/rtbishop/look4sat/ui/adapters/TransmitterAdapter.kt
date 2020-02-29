@@ -23,9 +23,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.ItemTransmitterBinding
 import com.rtbishop.look4sat.repo.Transmitter
 
 class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHolder>() {
@@ -41,72 +41,69 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransmitterHolder {
-        val itemView = LayoutInflater
-            .from(parent.context)
-            .inflate(R.layout.card_trans, parent, false)
-        return TransmitterHolder(itemView)
+        val binding = ItemTransmitterBinding
+            .inflate(LayoutInflater.from(parent.context), parent, false)
+        return TransmitterHolder(binding.root, binding)
     }
 
     override fun onBindViewHolder(holder: TransmitterHolder, position: Int) {
         holder.bind(transmittersList[position])
     }
 
-    inner class TransmitterHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val context: Context = itemView.context
-        private val description = itemView.findViewById<TextView>(R.id.trans_description)
-        private val downlink = itemView.findViewById<TextView>(R.id.trans_downlink)
-        private val uplink = itemView.findViewById<TextView>(R.id.trans_uplink)
-        private val mode = itemView.findViewById<TextView>(R.id.trans_mode)
-        private val inverted = itemView.findViewById<TextView>(R.id.trans_inverted)
-        private val freqDivider = 1000000f
+    inner class TransmitterHolder(itemView: View, private val binding: ItemTransmitterBinding) :
+        RecyclerView.ViewHolder(itemView) {
 
         fun bind(transmitter: Transmitter) {
-            description.text = transmitter.description
+            val context: Context = itemView.context
+            val freqDivider = 1000000f
+
+            binding.transDescription.text = transmitter.description
 
             if (transmitter.downlinkLow != null && transmitter.downlinkHigh == null) {
-                downlink.text = String.format(
-                    context.getString(R.string.trans_down_low),
-                    transmitter.downlinkLow / freqDivider
-                )
+                binding.transDownlink.text = String
+                    .format(
+                        context.getString(R.string.trans_down_low),
+                        transmitter.downlinkLow / freqDivider
+                    )
             } else if (transmitter.downlinkLow != null && transmitter.downlinkHigh != null) {
-                downlink.text = String.format(
-                    context.getString(R.string.trans_down_lowHigh),
-                    transmitter.downlinkLow / freqDivider,
-                    transmitter.downlinkHigh / freqDivider
-                )
+                binding.transDownlink.text = String
+                    .format(
+                        context.getString(R.string.trans_down_lowHigh),
+                        transmitter.downlinkLow / freqDivider,
+                        transmitter.downlinkHigh / freqDivider
+                    )
             } else {
-                downlink.text = context.getString(R.string.no_downlink)
+                binding.transDownlink.text = context.getString(R.string.no_downlink)
             }
 
             if (transmitter.uplinkLow != null && transmitter.uplinkHigh == null) {
-                uplink.text = String.format(
+                binding.transUplink.text = String.format(
                     context.getString(R.string.trans_up_low),
                     transmitter.uplinkLow / freqDivider
                 )
             } else if (transmitter.uplinkLow != null && transmitter.uplinkHigh != null) {
-                uplink.text = String.format(
+                binding.transUplink.text = String.format(
                     context.getString(R.string.trans_up_lowHigh),
                     transmitter.uplinkLow / freqDivider,
                     transmitter.uplinkHigh / freqDivider
                 )
             } else {
-                uplink.text = context.getString(R.string.no_uplink)
+                binding.transUplink.text = context.getString(R.string.no_uplink)
             }
 
             if (transmitter.mode != null) {
-                mode.text =
+                binding.transMode.text =
                     String.format(context.getString(R.string.trans_mode), transmitter.mode)
             } else {
-                mode.text = context.getString(R.string.no_mode)
+                binding.transMode.text = context.getString(R.string.no_mode)
             }
             if (transmitter.isInverted) {
-                inverted.text = String.format(
+                binding.transInverted.text = String.format(
                     context.getString(R.string.trans_inverted),
                     context.getString(R.string.btn_yes)
                 )
             } else {
-                inverted.text = String.format(
+                binding.transInverted.text = String.format(
                     context.getString(R.string.trans_inverted),
                     context.getString(R.string.btn_no)
                 )

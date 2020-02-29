@@ -25,7 +25,7 @@
     tools:context=".ui.MapViewFragment">
 
     <FrameLayout
-        android:id="@+id/map_frame"
+        android:id="@+id/frameMap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/worldmap_bg_dark"
@@ -35,7 +35,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/map_fab"
+        android:id="@+id/fabMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
@@ -46,7 +46,7 @@
         app:srcCompat="@drawable/ic_sat_asc_right" />
 
     <TextView
-        android:id="@+id/map_lat"
+        android:id="@+id/tvMapLat"
         style="@style/MapText"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
@@ -55,7 +55,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/map_lon"
+        android:id="@+id/tvMapLon"
         style="@style/MapText"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
@@ -64,7 +64,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/map_rng"
+        android:id="@+id/tvMapRng"
         style="@style/MapText"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"

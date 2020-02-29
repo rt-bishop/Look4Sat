@@ -25,8 +25,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -36,9 +34,9 @@ import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
 import com.github.amsacode.predict4java.TLE
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.FragmentMapViewBinding
 import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import com.rtbishop.look4sat.repo.SatPass
 import java.util.*
@@ -49,15 +47,13 @@ import kotlin.math.abs
 
 class MapViewFragment : Fragment() {
 
+    private var _binding: FragmentMapViewBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var service: ScheduledExecutorService
     private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: MainViewModel
-    private lateinit var mapFrame: FrameLayout
-    private lateinit var mapFab: FloatingActionButton
     private lateinit var mapView: MapView
-    private lateinit var mapLat: TextView
-    private lateinit var mapLon: TextView
-    private lateinit var mapRng: TextView
     private lateinit var predictor: PassPredictor
     private lateinit var selectedSat: TLE
     private lateinit var gsp: GroundStationPosition
@@ -76,21 +72,13 @@ class MapViewFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_map_view, container, false)
+        _binding = FragmentMapViewBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        findViews(view)
         setupComponents()
-    }
-
-    private fun findViews(view: View) {
-        mapFrame = view.findViewById(R.id.map_frame)
-        mapFab = view.findViewById(R.id.map_fab)
-        mapLat = view.findViewById(R.id.map_lat)
-        mapLon = view.findViewById(R.id.map_lon)
-        mapRng = view.findViewById(R.id.map_rng)
     }
 
     private fun setupComponents() {
@@ -101,11 +89,11 @@ class MapViewFragment : Fragment() {
         if (satPassList.isNotEmpty()) {
             satPassList = satPassList.distinctBy { it.tle }
             satPassList = satPassList.sortedBy { it.tle.name }
-            mapFab.setOnClickListener { showSelectSatDialog(satPassList) }
+            binding.fabMap.setOnClickListener { showSelectSatDialog(satPassList) }
             selectedSat = satPassList.first().tle
             predictor = satPassList.first().predictor
             mapView = MapView(mainActivity)
-            mapFrame.addView(mapView)
+            binding.frameMap.addView(mapView)
             service.scheduleAtFixedRate(
                 { mapView.invalidate() },
                 delay,
@@ -113,7 +101,7 @@ class MapViewFragment : Fragment() {
                 TimeUnit.MILLISECONDS
             )
         } else {
-            mapFab.setOnClickListener {
+            binding.fabMap.setOnClickListener {
                 Toast.makeText(
                     mainActivity,
                     getString(R.string.err_no_sat_selected),
@@ -209,9 +197,9 @@ class MapViewFragment : Fragment() {
 
             if (lon > 180f) lon -= 360f
 
-            mapLat.text = String.format(context.getString(R.string.pat_latitude), lat)
-            mapLon.text = String.format(context.getString(R.string.pat_longitude), lon)
-            mapRng.text = String.format(context.getString(R.string.pat_range), rng)
+            binding.tvMapLat.text = String.format(context.getString(R.string.pat_latitude), lat)
+            binding.tvMapLon.text = String.format(context.getString(R.string.pat_longitude), lon)
+            binding.tvMapRng.text = String.format(context.getString(R.string.pat_range), rng)
         }
 
         private fun drawGroundTrack(
@@ -312,5 +300,10 @@ class MapViewFragment : Fragment() {
         private fun rad2Deg(value: Double): Double {
             return value * 180 / Math.PI
         }
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 }

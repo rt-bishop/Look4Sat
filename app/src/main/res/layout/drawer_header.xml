@@ -20,6 +20,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/ic_launcher_background"
@@ -86,7 +87,7 @@
         android:text="@string/pat_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.1"
-        app:layout_constraintStart_toEndOf="@+id/barrier"
+        app:layout_constraintStart_toEndOf="@+id/mainBarrier"
         app:layout_constraintTop_toBottomOf="@+id/drawer_lat_value" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -131,14 +132,14 @@
         android:drawableEnd="@drawable/ic_goto_github"
         android:text="@string/goto_github"
         app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_center"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineCenter"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
         app:layout_constraintTop_toBottomOf="@+id/drawer_btn_trans" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/drawer_btn_exit"
+        android:id="@+id/drawerBtnExit"
         style="@style/DrawerHeader.Button"
         android:layout_width="0dp"
         android:layout_marginStart="1dp"
@@ -147,17 +148,17 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/drawer_btn_github"
         app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/guideline_center" />
+        app:layout_constraintStart_toStartOf="@+id/guidelineCenter" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_center"
+        android:id="@+id/guidelineCenter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier"
+        android:id="@+id/mainBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="end"

@@ -24,33 +24,30 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.SearchView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.DialogSatEntryBinding
 import com.rtbishop.look4sat.repo.SatEntry
 import com.rtbishop.look4sat.ui.adapters.SatEntryAdapter
 import java.util.*
 
 class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener {
 
-    private lateinit var searchView: SearchView
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var dialogBtnPositive: TextView
-    private lateinit var dialogBtnNegative: TextView
-    private lateinit var dialogBtnNeutral: TextView
     private lateinit var satEntryAdapter: SatEntryAdapter
     private lateinit var entriesListener: EntriesSubmitListener
+
+    private var _binding: DialogSatEntryBinding? = null
+    private val binding get() = _binding!!
 
     private var entriesList = mutableListOf<SatEntry>()
     private var selectionList = mutableListOf<Int>()
     private var selectAllToggle = true
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        _binding = DialogSatEntryBinding.inflate(requireActivity().layoutInflater)
         val satEntryDialog = Dialog(requireActivity()).apply {
             window?.requestFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.dialog_sat_entry)
+            setContentView(binding.root)
             window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -60,19 +57,20 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
         entriesList = checkSelectedEntries(entriesList, selectionList)
         satEntryAdapter = SatEntryAdapter(entriesList)
 
-        findViews(satEntryDialog)
-        setListeners()
-
-        searchView.apply {
+        binding.dialogSearch.apply {
             setOnQueryTextListener(this@SatEntryDialog)
             onActionViewExpanded()
             clearFocus()
         }
 
-        recyclerView.apply {
+        binding.dialogRecycler.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = satEntryAdapter
         }
+
+        binding.dialogBtnPositive.setOnClickListener { onPositiveClicked() }
+        binding.dialogBtnNegative.setOnClickListener { onNegativeClicked() }
+        binding.dialogBtnNeutral.setOnClickListener { onNeutralClicked() }
 
         return satEntryDialog
     }
@@ -91,20 +89,6 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
     fun setEntriesListener(listener: EntriesSubmitListener): SatEntryDialog {
         entriesListener = listener
         return this
-    }
-
-    private fun findViews(dialog: Dialog) {
-        searchView = dialog.findViewById(R.id.dialog_search)
-        recyclerView = dialog.findViewById(R.id.dialog_recycler)
-        dialogBtnPositive = dialog.findViewById(R.id.dialog_btn_positive)
-        dialogBtnNegative = dialog.findViewById(R.id.dialog_btn_negative)
-        dialogBtnNeutral = dialog.findViewById(R.id.dialog_btn_neutral)
-    }
-
-    private fun setListeners() {
-        dialogBtnPositive.setOnClickListener { onPositiveClicked() }
-        dialogBtnNegative.setOnClickListener { onNegativeClicked() }
-        dialogBtnNeutral.setOnClickListener { onNeutralClicked() }
     }
 
     private fun checkSelectedEntries(entries: MutableList<SatEntry>, selection: MutableList<Int>)
@@ -162,5 +146,10 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
 
     interface EntriesSubmitListener {
         fun onEntriesSubmit(list: MutableList<Int>)
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 }
