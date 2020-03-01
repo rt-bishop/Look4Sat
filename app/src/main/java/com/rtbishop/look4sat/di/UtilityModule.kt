@@ -17,49 +17,29 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package com.rtbishop.look4sat.di
 
-buildscript {
-    repositories {
-        google()
-        jcenter()
+import android.content.Context
+import android.content.SharedPreferences
+import android.location.LocationManager
+import com.rtbishop.look4sat.utility.DataManager
+import com.rtbishop.look4sat.utility.PrefsManager
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
+@Module
+class UtilityModule {
+
+    @Singleton
+    @Provides
+    fun providePrefsManager(preferences: SharedPreferences): PrefsManager {
+        return PrefsManager(preferences)
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.2.1"
+
+    @Singleton
+    @Provides
+    fun provideDataManager(locationManager: LocationManager, context: Context): DataManager {
+        return DataManager(locationManager, context)
     }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-
-ext {
-    material = '1.2.0-alpha05'
-    appCompat = '1.1.0'
-    supportLib = '1.0.0'
-    constraintLayout = '1.1.3'
-
-    ktx = '1.2.0'
-    preference = '1.1.0'
-
-    navigation = '2.2.1'
-    lifecycle = '2.2.0'
-
-    room = '2.2.4'
-
-    retrofit = '2.7.1'
-
-    dagger = '2.26'
-
-    predict4java = '1.3.1'
 }

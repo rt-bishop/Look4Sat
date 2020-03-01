@@ -97,7 +97,7 @@ class PassListFragment : Fragment() {
         binding.refLayoutPassList.setColorSchemeResources(R.color.backgroundDark)
         binding.refLayoutPassList.setOnRefreshListener { calculatePasses() }
         btnPassPrefs.setOnClickListener {
-            showSatPassPrefsDialog(viewModel.hoursAhead, viewModel.minEl)
+            showSatPassPrefsDialog(viewModel.getHoursAhead(), viewModel.getMinElevation())
         }
         binding.fabSatSelect.setOnClickListener {
             showSelectSatDialog(viewModel.tleMainList, viewModel.tleSelection)
@@ -105,7 +105,7 @@ class PassListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.satPassList.observe(viewLifecycleOwner, Observer {
+        viewModel.getSatPassList().observe(viewLifecycleOwner, Observer {
             satPassList = it
             satPassAdapter.setList(satPassList)
             if (satPassList.isNotEmpty()) {

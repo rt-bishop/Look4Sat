@@ -82,9 +82,9 @@ class MapViewFragment : Fragment() {
     }
 
     private fun setupComponents() {
-        val delay = viewModel.delay
-        gsp = viewModel.gsp.value ?: GroundStationPosition(0.0, 0.0, 0.0)
-        satPassList = viewModel.satPassList.value ?: emptyList()
+        val refreshRate = viewModel.getRefreshRate()
+        gsp = viewModel.getGSP().value ?: GroundStationPosition(0.0, 0.0, 0.0)
+        satPassList = viewModel.getSatPassList().value ?: emptyList()
 
         if (satPassList.isNotEmpty()) {
             satPassList = satPassList.distinctBy { it.tle }
@@ -96,8 +96,8 @@ class MapViewFragment : Fragment() {
             binding.frameMap.addView(mapView)
             service.scheduleAtFixedRate(
                 { mapView.invalidate() },
-                delay,
-                delay,
+                refreshRate,
+                refreshRate,
                 TimeUnit.MILLISECONDS
             )
         } else {

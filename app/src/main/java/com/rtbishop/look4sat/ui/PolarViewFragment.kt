@@ -78,8 +78,8 @@ class PolarViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.satPassList.value?.let {
-            val refreshRate = viewModel.delay
+        viewModel.getSatPassList().value?.let {
+            val refreshRate = viewModel.getRefreshRate()
             satPass = it[args.satPassIndex]
             mainActivity.supportActionBar?.title = satPass.tle.name
 

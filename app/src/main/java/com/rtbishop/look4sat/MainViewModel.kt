@@ -20,11 +20,6 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
-import android.location.LocationManager
-import android.util.Log
-import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -36,103 +31,58 @@ import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.repo.Transmitter
+import com.rtbishop.look4sat.utility.DataManager
+import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.FileNotFoundException
 import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.util.*
 import javax.inject.Inject
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val tag = "MainViewModel"
-
     private val app = application
-    private val keyHours = application.getString(R.string.pref_hours_ahead_key)
-    private val keyMinEl = application.getString(R.string.pref_min_el_key)
-    private val keyLat = application.getString(R.string.pref_lat_key)
-    private val keyLon = application.getString(R.string.pref_lon_key)
-    private val keyAlt = application.getString(R.string.pref_alt_key)
-    private val keyDelay = application.getString(R.string.pref_refresh_rate_key)
-    private val tleMainListFileName = "tleFile.txt"
-    private val tleSelectionFileName = "tleSelection"
-
-    private val _debugMessage = MutableLiveData<String>()
-    val debugMessage: LiveData<String> = _debugMessage
-
-    private val _satPassList = MutableLiveData<MutableList<SatPass>>()
-    val satPassList: LiveData<MutableList<SatPass>> = _satPassList
-
-    private val _gsp = MutableLiveData<GroundStationPosition>()
-    val gsp: LiveData<GroundStationPosition> = _gsp
-
     private val urlList = listOf("https://celestrak.com/NORAD/elements/active.txt")
-
+    private val _satPassList = MutableLiveData<MutableList<SatPass>>()
+    private val _debugMessage = MutableLiveData<String>()
+    private val _gsp = MutableLiveData<GroundStationPosition>()
     private var calculationJob: Job? = null
 
     @Inject
-    lateinit var locationManager: LocationManager
-    @Inject
-    lateinit var preferences: SharedPreferences
-    @Inject
     lateinit var repository: Repository
-
-    lateinit var tleMainList: List<TLE>
-    lateinit var tleSelection: MutableList<Int>
+    @Inject
+    lateinit var dataManager: DataManager
+    @Inject
+    lateinit var prefsManager: PrefsManager
 
     init {
         (app as Look4SatApp).appComponent.inject(this)
-        loadDataFromDisk()
+        setGroundStationPosition()
     }
 
-    val delay: Long
-        get() = preferences.getString(keyDelay, "3000")!!.toLong()
+    var tleMainList = dataManager.loadTleList()
+    var tleSelection = dataManager.loadSelectionList()
 
-    val hoursAhead: Int
-        get() = preferences.getInt(keyHours, 8)
-
-    val minEl: Double
-        get() = preferences.getDouble(keyMinEl, 16.0)
-
-    fun setGroundStationPosition() {
-        val lat = preferences.getString(keyLat, "0.0")!!.toDouble()
-        val lon = preferences.getString(keyLon, "0.0")!!.toDouble()
-        val alt = preferences.getString(keyAlt, "0.0")!!.toDouble()
-        _gsp.postValue(GroundStationPosition(lat, lon, alt))
-    }
+    fun getGSP(): LiveData<GroundStationPosition> = _gsp
+    fun getDebugMessage(): LiveData<String> = _debugMessage
+    fun getSatPassList(): LiveData<MutableList<SatPass>> = _satPassList
+    fun getRefreshRate() = prefsManager.getRefreshRate()
+    fun getHoursAhead() = prefsManager.getHoursAhead()
+    fun getMinElevation() = prefsManager.getMinElevation()
+    fun setGroundStationPosition() = _gsp.postValue(prefsManager.getGroundStationPosition())
 
     fun updateLocation() {
-        val passiveProvider = LocationManager.PASSIVE_PROVIDER
-        try {
-            val location = locationManager.getLastKnownLocation(passiveProvider)
-
-            val lat = location?.latitude ?: 0.0
-            val lon = location?.longitude ?: 0.0
-            val alt = location?.altitude ?: 0.0
-
-            preferences.edit {
-                putString(keyLat, lat.toString())
-                putString(keyLon, lon.toString())
-                putString(keyAlt, alt.toString())
-                apply()
-            }
-            _gsp.postValue(GroundStationPosition(lat, lon, alt))
-            _debugMessage.postValue(app.getString(R.string.update_loc_success))
-        } catch (e: SecurityException) {
-            _debugMessage.postValue(app.getString(R.string.err_no_permissions))
+        dataManager.getLastKnownLocation()?.let {
+            prefsManager.setGroundStationPosition(it)
+            _gsp.postValue(it)
         }
     }
 
     fun setPassPrefs(hoursAhead: Int, minEl: Double) {
-        preferences.edit {
-            putInt(keyHours, hoursAhead)
-            putDouble(keyMinEl, minEl)
-            apply()
-        }
+        prefsManager.setHoursAhead(hoursAhead)
+        prefsManager.setMinElevation(minEl)
     }
 
     fun updateAndSaveTleFile() {
@@ -140,12 +90,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val inputStream = repository.getStreamForUrl(urlList)
                 val tleList = TLE.importSat(inputStream).apply { sortBy { it.name } }
-                val fileOutStream = app.openFileOutput(tleMainListFileName, Context.MODE_PRIVATE)
-                ObjectOutputStream(fileOutStream).apply {
-                    writeObject(tleList)
-                    flush()
-                    close()
-                }
+                dataManager.saveTleList(tleList)
                 tleMainList = tleList
                 tleSelection = mutableListOf()
                 _debugMessage.postValue(app.getString(R.string.update_tle_success))
@@ -168,35 +113,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateAndSaveSelectionList(list: MutableList<Int>) {
         tleSelection = list
-        try {
-            val fileOutputStream = app.openFileOutput(tleSelectionFileName, Context.MODE_PRIVATE)
-            ObjectOutputStream(fileOutputStream).apply {
-                writeObject(list)
-                flush()
-                close()
-            }
-        } catch (exception: IOException) {
-            _debugMessage.postValue(exception.toString())
-        }
+        dataManager.saveSelectionList(list)
     }
 
     fun getPasses() {
         calculationJob?.cancel()
-        val passList = mutableListOf<SatPass>()
-        val dateNow = Date()
-        val dateFuture = Calendar.getInstance().let {
-            it.time = dateNow
-            it.add(Calendar.HOUR, hoursAhead)
-            it.time
-        }
+        var passList = mutableListOf<SatPass>()
         calculationJob = viewModelScope.launch {
             if (tleMainList.isNotEmpty() && tleSelection.isNotEmpty()) {
                 withContext(Dispatchers.Default) {
+                    val dateNow = Date()
                     tleSelection.forEach { indexOfSelection ->
                         val tle = tleMainList[indexOfSelection]
                         try {
-                            val predictor = PassPredictor(tle, gsp.value!!)
-                            val passes = predictor.getPasses(dateNow, hoursAhead, true)
+                            val predictor = PassPredictor(tle, getGSP().value!!)
+                            val passes = predictor.getPasses(dateNow, getHoursAhead(), true)
                             passes.forEach {
                                 passList.add(SatPass(tle, predictor, it))
                             }
@@ -206,10 +137,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             _debugMessage.postValue(app.getString(R.string.err_sat_wont_pass))
                         }
                     }
-                    passList.removeAll { it.pass.startTime.after(dateFuture) }
-                    passList.removeAll { it.pass.endTime.before(dateNow) }
-                    passList.removeAll { it.pass.maxEl < minEl }
-                    passList.sortBy { it.pass.startTime }
+                    passList = filterAndSortList(passList, getHoursAhead())
                 }
                 _satPassList.postValue(passList)
             } else {
@@ -219,42 +147,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun filterAndSortList(
+        list: MutableList<SatPass>,
+        hoursAhead: Int
+    ): MutableList<SatPass> {
+        val dateNow = Date()
+        val dateFuture = Calendar.getInstance().let {
+            it.time = dateNow
+            it.add(Calendar.HOUR, hoursAhead)
+            it.time
+        }
+        list.removeAll { it.pass.startTime.after(dateFuture) }
+        list.removeAll { it.pass.endTime.before(dateNow) }
+        list.removeAll { it.pass.maxEl < getMinElevation() }
+        list.sortBy { it.pass.startTime }
+        return list
+    }
+
     suspend fun getTransmittersForSat(id: Int): List<Transmitter> {
         return repository.getTransmittersForSat(id)
     }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun loadDataFromDisk() {
-        tleMainList = try {
-            val tleStream = app.openFileInput(tleMainListFileName)
-            val tleList = ObjectInputStream(tleStream).readObject()
-            tleList as List<TLE>
-        } catch (exception: FileNotFoundException) {
-            Log.w(tag, app.getString(R.string.err_no_tle_file))
-            emptyList()
-        } catch (exception: IOException) {
-            Log.w(tag, exception.toString())
-            emptyList()
-        }
-        tleSelection = try {
-            val selectionStream = app.openFileInput(tleSelectionFileName)
-            val selectionList = ObjectInputStream(selectionStream).readObject()
-            selectionList as MutableList<Int>
-        } catch (exception: FileNotFoundException) {
-            Log.w(tag, app.getString(R.string.err_no_selection_file))
-            mutableListOf()
-        } catch (exception: IOException) {
-            Log.w(tag, exception.toString())
-            mutableListOf()
-        }
-        setGroundStationPosition()
-    }
-}
-
-fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
-    putLong(key, double.toRawBits())
-}
-
-fun SharedPreferences.getDouble(key: String, default: Double): Double {
-    return Double.fromBits(getLong(key, default.toRawBits()))
 }

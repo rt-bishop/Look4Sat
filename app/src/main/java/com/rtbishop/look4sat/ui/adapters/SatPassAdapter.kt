@@ -123,7 +123,7 @@ class SatPassAdapter(val viewModel: MainViewModel) :
             binding.passLeoProgress.progress = satPass.progress
 
             itemView.setOnClickListener {
-                viewModel.satPassList.value?.let {
+                viewModel.getSatPassList().value?.let {
                     val satPassIndex = it.indexOf(satPass)
                     val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
                     itemView.findNavController().navigate(action)
@@ -148,7 +148,7 @@ class SatPassAdapter(val viewModel: MainViewModel) :
                 String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
 
             itemView.setOnClickListener {
-                viewModel.satPassList.value?.let {
+                viewModel.getSatPassList().value?.let {
                     val satPassIndex = it.indexOf(satPass)
                     val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
                     itemView.findNavController().navigate(action)

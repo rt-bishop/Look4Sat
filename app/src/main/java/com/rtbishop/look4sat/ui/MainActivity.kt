@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.debugMessage.observe(this, Observer { message ->
+        viewModel.getDebugMessage().observe(this, Observer { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             when (message) {
                 getString(R.string.update_loc_success) -> drawerBinding.drawerBtnLoc.isEnabled =
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.gsp.observe(this, Observer { gsp ->
+        viewModel.getGSP().observe(this, Observer { gsp ->
             drawerBinding.drawerLatValue.text =
                 String.format(getString(R.string.pat_location), gsp.latitude)
             drawerBinding.drawerLonValue.text =
