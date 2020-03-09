@@ -10,18 +10,18 @@ For TLE data calculation and passes prediction Look4Sat uses the mavenized versi
 The app is built using Dagger2, Retrofit2, Kotlin and Kotlin coroutines, Architecture Components and Jetpack Navigation.
 
 <p float="left">
-<img src="screenshots/scr_main_menu.jpg" width="250"/>
-<img src="screenshots/scr_main_list.jpg" width="250"/>
-<img src="screenshots/scr_pass_view.jpg" width="250"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="250"/>
 </p>
-<img src="screenshots/scr_world_map.jpg" width="750">
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="750">
 
-## Main features: 
+## Main features:
 
-– Calculating satellite passes for up to one week (168 hours)  
-– Calculating passes for the current or manually entered location  
-– Showing the list of currently active and upcoming satellite passes  
-– Showing the active pass progress, polar trajectory and transceivers info  
-– Showing the satellite positional data, footprint and ground track on a map  
-– Offline first: all the passes predictions are made offline. It's up to you to decide when  
-to update the TLE file and the transceivers DB. (Updates once a week are recommended)
+*  Calculating satellite passes for up to one week (168 hours)
+*  Calculating passes for the current or manually entered location
+*  Showing the list of currently active and upcoming satellite passes
+*  Showing the active pass progress, polar trajectory and transceivers info
+*  Showing the satellite positional data, footprint and ground track on a map
+*  Offline first: passes predictions are made offline.
+Weekly updates of TLEs and transceivers DB are recommended.
