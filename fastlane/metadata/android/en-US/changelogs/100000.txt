@@ -1,0 +1,2 @@
+Implemented search feature for the satellite selection dialog
+Increased the number of satellites available for tracking
