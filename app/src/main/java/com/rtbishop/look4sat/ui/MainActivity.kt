@@ -33,6 +33,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -42,6 +43,8 @@ import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -105,18 +108,6 @@ class MainActivity : AppCompatActivity() {
     private fun setupObservers() {
         viewModel.getDebugMessage().observe(this, Observer { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            when (message) {
-                getString(R.string.update_loc_success) -> drawerBinding.drawerBtnLoc.isEnabled =
-                    true
-                getString(R.string.update_tle_success) -> drawerBinding.drawerBtnTle.isEnabled =
-                    true
-                getString(R.string.update_trans_success) -> drawerBinding.drawerBtnTrans.isEnabled =
-                    true
-                getString(R.string.update_failure) -> {
-                    drawerBinding.drawerBtnTle.isEnabled = true
-                    drawerBinding.drawerBtnTrans.isEnabled = true
-                }
-            }
         })
 
         viewModel.getGSP().observe(this, Observer { gsp ->
@@ -129,22 +120,30 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupDrawer() {
         drawerBinding.drawerBtnLoc.setOnClickListener {
-            it.isEnabled = false
             requestLocationUpdate()
+            it.lockButton()
         }
         drawerBinding.drawerBtnTle.setOnClickListener {
-            it.isEnabled = false
             viewModel.updateAndSaveTleFile()
+            it.lockButton()
         }
         drawerBinding.drawerBtnTrans.setOnClickListener {
-            it.isEnabled = false
             viewModel.updateTransmittersDatabase()
+            it.lockButton()
         }
         drawerBinding.drawerBtnGithub.setOnClickListener {
             val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
             startActivity(githubIntent)
         }
         drawerBinding.drawerBtnExit.setOnClickListener { finish() }
+    }
+
+    private fun View.lockButton() {
+        lifecycleScope.launch {
+            this@lockButton.isEnabled = false
+            delay(3000)
+            this@lockButton.isEnabled = true
+        }
     }
 
     private fun requestLocationUpdate() {
