@@ -55,11 +55,11 @@ ext {
     navigation = '2.2.1'
     lifecycle = '2.2.0'
 
-    room = '2.2.4'
+    room = '2.2.5'
 
-    retrofit = '2.7.1'
+    retrofit = '2.7.2'
 
-    dagger = '2.26'
+    dagger = '2.27'
 
     predict4java = '1.3.1'
 }
