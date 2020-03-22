@@ -139,15 +139,21 @@ class MapViewFragment : Fragment() {
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
-        private val footprintPaint = Paint().apply {
+        private val satPaintPrim = Paint().apply {
             isAntiAlias = true
-            color = ContextCompat.getColor(mainActivity, R.color.satFootprint)
+            color = ContextCompat.getColor(mainActivity, R.color.satPrimary)
+            style = Paint.Style.STROKE
+            strokeWidth = scale
+        }
+        private val satPaintSec = Paint().apply {
+            isAntiAlias = true
+            color = ContextCompat.getColor(mainActivity, R.color.satSecondary)
             style = Paint.Style.STROKE
             strokeWidth = scale
         }
         private val txtPaint = Paint().apply {
             isAntiAlias = true
-            color = ContextCompat.getColor(mainActivity, R.color.satFootprint)
+            color = ContextCompat.getColor(mainActivity, R.color.satPrimary)
             style = Paint.Style.FILL
             strokeWidth = scale
             textSize = 16f
@@ -173,8 +179,17 @@ class MapViewFragment : Fragment() {
             setTextViewsToSelectedSatPos(positions[0])
             drawGroundTrack(canvas, degLon, degLat, positions)
             satPassList.forEach {
-                drawSat(canvas, degLon, degLat, it.tle, it.predictor, currentTime)
+                drawSat(canvas, degLon, degLat, it.tle, it.predictor, currentTime, satPaintSec)
             }
+            drawSat(
+                canvas,
+                degLon,
+                degLat,
+                satPassList[checkedItem].tle,
+                satPassList[checkedItem].predictor,
+                currentTime,
+                satPaintPrim
+            )
         }
 
         private fun drawHomeLoc(canvas: Canvas, degLon: Float, degLat: Float) {
@@ -236,11 +251,12 @@ class MapViewFragment : Fragment() {
             degLat: Float,
             tle: TLE,
             predictor: PassPredictor,
-            date: Date
+            date: Date,
+            paint: Paint
         ) {
             val satPosNow = predictor.getSatPos(date)
             val footprintPosList = satPosNow.rangeCircle
-            drawFootprint(canvas, degLon, degLat, footprintPosList)
+            drawFootprint(canvas, degLon, degLat, footprintPosList, paint)
             drawName(canvas, degLon, degLat, satPosNow, tle.name)
         }
 
@@ -248,7 +264,8 @@ class MapViewFragment : Fragment() {
             canvas: Canvas,
             degLon: Float,
             degLat: Float,
-            list: List<Position>
+            list: List<Position>,
+            paint: Paint
         ) {
             val path = Path()
             var lon: Float
@@ -269,7 +286,7 @@ class MapViewFragment : Fragment() {
 
                 lastLon = lon
             }
-            canvas.drawPath(path, footprintPaint)
+            canvas.drawPath(path, paint)
         }
 
         private fun drawName(
