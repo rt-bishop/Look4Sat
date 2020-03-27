@@ -1,9 +1,9 @@
 Amateur radio and weather satellite tracker and passes predictor for Android
 
-Main features:
-Calculating satellite passes for up to one week (168 hours)
-Calculating passes for the current or manually entered location
-Showing the list of currently active and upcoming satellite passes
-Showing the active pass progress, polar trajectory and transceivers info
-Showing the satellite positional data, footprint and ground track on a map
-Offline first: passes predictions are made offline. Weekly updates of TLEs and transceivers DB are recommended.
+<b>Main features:</b><ul>
+<li>Calculating satellite passes for up to one week (168 hours)</li>
+<li>Calculating passes for the current or manually entered location</li>
+<li>Showing the list of currently active and upcoming satellite passes</li>
+<li>Showing the active pass progress, polar trajectory and transceivers info</li>
+<li>Showing the satellite positional data, footprint and ground track on a map</li>
+<li>Offline first: passes predictions are made offline. Weekly updates of TLEs and transceivers DB are recommended.</li></ul>
