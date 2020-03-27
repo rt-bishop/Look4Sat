@@ -51,6 +51,7 @@ class DataManager @Inject constructor(
             }
             groundStationPosition
         } catch (e: SecurityException) {
+            Log.w(tag, "No permissions")
             null
         }
     }
@@ -65,6 +66,7 @@ class DataManager @Inject constructor(
                 close()
             }
         } catch (exception: IOException) {
+            Log.w(tag, "Can't save selection list")
         }
     }
 
@@ -77,6 +79,7 @@ class DataManager @Inject constructor(
                 close()
             }
         } catch (exception: IOException) {
+            Log.w(tag, "Can't save TLE list")
         }
     }
 
