@@ -94,7 +94,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val tleList = TLE.importSat(inputStream).apply { sortBy { it.name } }
                 dataManager.saveTleList(tleList)
                 tleMainList = tleList
-                tleSelection = mutableListOf()
+                updateAndSaveSelectionList(mutableListOf())
                 _debugMessage.postValue(app.getString(R.string.update_tle_success))
             } catch (exception: IOException) {
                 _debugMessage.postValue(app.getString(R.string.update_failure))
