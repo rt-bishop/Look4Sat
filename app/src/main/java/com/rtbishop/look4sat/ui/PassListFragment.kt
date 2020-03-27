@@ -21,9 +21,7 @@ package com.rtbishop.look4sat.ui
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -44,10 +42,7 @@ import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class PassListFragment : Fragment() {
-
-    private var _binding: FragmentPassListBinding? = null
-    private val binding get() = _binding!!
+class PassListFragment : Fragment(R.layout.fragment_pass_list) {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var satPassAdapter: SatPassAdapter
@@ -66,24 +61,16 @@ class PassListFragment : Fragment() {
         satPassList = mutableListOf()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentPassListBinding.inflate(layoutInflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val fragmentBinding = FragmentPassListBinding.bind(view)
         aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
         btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
-        setupComponents()
-        setupObservers()
+        setupComponents(fragmentBinding)
+        setupObservers(fragmentBinding)
     }
 
-    private fun setupComponents() {
+    private fun setupComponents(binding: FragmentPassListBinding) {
         binding.recPassList.apply {
             layoutManager = LinearLayoutManager(mainActivity)
             adapter = satPassAdapter
@@ -95,7 +82,7 @@ class PassListFragment : Fragment() {
 
         binding.refLayoutPassList.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
         binding.refLayoutPassList.setColorSchemeResources(R.color.backgroundDark)
-        binding.refLayoutPassList.setOnRefreshListener { calculatePasses() }
+        binding.refLayoutPassList.setOnRefreshListener { viewModel.getPasses() }
         btnPassPrefs.setOnClickListener {
             showSatPassPrefsDialog(viewModel.getHoursAhead(), viewModel.getMinElevation())
         }
@@ -104,7 +91,7 @@ class PassListFragment : Fragment() {
         }
     }
 
-    private fun setupObservers() {
+    private fun setupObservers(binding: FragmentPassListBinding) {
         viewModel.getSatPassList().observe(viewLifecycleOwner, Observer {
             satPassList = it
             satPassAdapter.setList(satPassList)
@@ -116,13 +103,10 @@ class PassListFragment : Fragment() {
                 binding.recPassList.visibility = View.INVISIBLE
             }
             setTimer()
-            binding.refLayoutPassList.isRefreshing = false
         })
-    }
-
-    private fun calculatePasses() {
-        binding.refLayoutPassList.isRefreshing = true
-        viewModel.getPasses()
+        viewModel.getRefreshing().observe(viewLifecycleOwner, Observer {
+            binding.refLayoutPassList.isRefreshing = it
+        })
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
@@ -157,7 +141,7 @@ class PassListFragment : Fragment() {
                         }
                         else -> {
                             viewModel.setPassPrefs(hours, elevation)
-                            calculatePasses()
+                            viewModel.getPasses()
                         }
                     }
                 } else Toast.makeText(
@@ -189,7 +173,7 @@ class PassListFragment : Fragment() {
             val listener = object : SatEntryDialog.EntriesSubmitListener {
                 override fun onEntriesSubmit(list: MutableList<Int>) {
                     viewModel.updateAndSaveSelectionList(list)
-                    calculatePasses()
+                    viewModel.getPasses()
                 }
             }
 
@@ -244,7 +228,7 @@ class PassListFragment : Fragment() {
         val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow.time)
         aosTimer = object : CountDownTimer(millisBeforeEnd, 1000) {
             override fun onFinish() {
-                calculatePasses()
+                viewModel.getPasses()
             }
 
             override fun onTick(millisUntilFinished: Long) {
@@ -266,10 +250,5 @@ class PassListFragment : Fragment() {
         }
         if (resetToNull) aosTimerText.text =
             String.format(getString(R.string.pat_timer), 0, 0, 0)
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

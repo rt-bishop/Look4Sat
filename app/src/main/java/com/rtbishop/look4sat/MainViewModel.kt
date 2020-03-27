@@ -48,6 +48,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _satPassList = MutableLiveData<MutableList<SatPass>>()
     private val _debugMessage = MutableLiveData<String>()
     private val _gsp = MutableLiveData<GroundStationPosition>()
+    private val _isListRefreshing = MutableLiveData<Boolean>()
     private var calculationJob: Job? = null
 
     @Inject
@@ -68,6 +69,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getGSP(): LiveData<GroundStationPosition> = _gsp
     fun getDebugMessage(): LiveData<String> = _debugMessage
     fun getSatPassList(): LiveData<MutableList<SatPass>> = _satPassList
+    fun getRefreshing(): LiveData<Boolean> = _isListRefreshing
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
@@ -117,6 +119,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getPasses() {
+        _isListRefreshing.value = true
         calculationJob?.cancel()
         var passList = mutableListOf<SatPass>()
         calculationJob = viewModelScope.launch {
@@ -144,6 +147,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _satPassList.postValue(mutableListOf())
                 _debugMessage.postValue(app.getString(R.string.err_no_sat_selected))
             }
+            _isListRefreshing.value = false
         }
     }
 
