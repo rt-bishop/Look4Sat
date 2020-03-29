@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         drawerBinding = DrawerHeaderBinding.inflate(layoutInflater, mainBinding.navView, true)
         setContentView(mainBinding.root)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         setupComponents()
         setupObservers()
