@@ -24,9 +24,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -46,13 +44,10 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.cos
 import kotlin.math.sin
 
-class PolarViewFragment : Fragment() {
+class PolarViewFragment : Fragment(R.layout.fragment_polar_view) {
 
     private val service = Executors.newSingleThreadScheduledExecutor()
     private val args: PolarViewFragmentArgs by navArgs()
-
-    private var _binding: FragmentPolarViewBinding? = null
-    private val binding get() = _binding!!
 
     private lateinit var viewModel: MainViewModel
     private lateinit var satPass: SatPass
@@ -60,30 +55,17 @@ class PolarViewFragment : Fragment() {
     private lateinit var transmitterAdapter: TransmitterAdapter
     private lateinit var mainActivity: MainActivity
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mainActivity = activity as MainActivity
-        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentPolarViewBinding.inflate(layoutInflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val binding = FragmentPolarViewBinding.bind(view)
+        mainActivity = activity as MainActivity
+        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
         viewModel.getSatPassList().value?.let {
             val refreshRate = viewModel.getRefreshRate()
             satPass = it[args.satPassIndex]
             mainActivity.supportActionBar?.title = satPass.tle.name
 
-            polarView = PolarView(mainActivity, refreshRate)
+            polarView = PolarView(mainActivity, refreshRate, binding)
             binding.framePolar.addView(polarView)
             service.scheduleAtFixedRate(
                 { polarView.invalidate() },
@@ -92,11 +74,11 @@ class PolarViewFragment : Fragment() {
                 TimeUnit.MILLISECONDS
             )
 
-            setupTransRecycler()
+            setupTransRecycler(binding)
         }
     }
 
-    private fun setupTransRecycler() {
+    private fun setupTransRecycler(binding: FragmentPolarViewBinding) {
         transmitterAdapter = TransmitterAdapter()
         binding.recPolar.apply {
             layoutManager = LinearLayoutManager(mainActivity)
@@ -114,7 +96,12 @@ class PolarViewFragment : Fragment() {
         }
     }
 
-    inner class PolarView(context: Context, updateFreq: Long) : View(context) {
+    inner class PolarView(
+        context: Context,
+        private val updateFreq: Long,
+        private val binding: FragmentPolarViewBinding
+    ) :
+        View(context) {
 
         private val radarSize = resources.displayMetrics.widthPixels
         private val scale = resources.displayMetrics.density
@@ -124,7 +111,6 @@ class PolarViewFragment : Fragment() {
         private val piDiv2 = Math.PI / 2.0
         private val txtSize = scale * 15
         private val center = 0f
-        private val delay = updateFreq
 
         private val radarPaint = Paint().apply {
             isAntiAlias = true
@@ -223,7 +209,7 @@ class PolarViewFragment : Fragment() {
                 } else {
                     path.lineTo(satPassX, satPassY)
                 }
-                startTime.time += delay
+                startTime.time += updateFreq
             }
             cvs.drawPath(path, trackPaint)
         }
@@ -252,10 +238,5 @@ class PolarViewFragment : Fragment() {
         private fun rad2Deg(value: Double): Double {
             return value * 180 / Math.PI
         }
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

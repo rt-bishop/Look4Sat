@@ -21,37 +21,19 @@ package com.rtbishop.look4sat.ui
 
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentAboutBinding
 
-class AboutFragment : Fragment() {
-
-    private var _binding: FragmentAboutBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentAboutBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+class AboutFragment : Fragment(R.layout.fragment_about) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val binding = FragmentAboutBinding.bind(view)
         binding.tvAboutVersion.text =
             String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
         binding.tvAboutMessage.movementMethod = LinkMovementMethod.getInstance()
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

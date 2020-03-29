@@ -22,9 +22,7 @@ package com.rtbishop.look4sat.ui
 import android.content.Context
 import android.graphics.*
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -41,16 +39,11 @@ import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import com.rtbishop.look4sat.repo.SatPass
 import java.util.*
 import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
-class MapViewFragment : Fragment() {
+class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
-    private var _binding: FragmentMapViewBinding? = null
-    private val binding get() = _binding!!
-
-    private lateinit var service: ScheduledExecutorService
     private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: MainViewModel
     private lateinit var mapView: MapView
@@ -60,29 +53,12 @@ class MapViewFragment : Fragment() {
     private lateinit var satPassList: List<SatPass>
     private var checkedItem = 0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        service = Executors.newSingleThreadScheduledExecutor()
-        mainActivity = activity as MainActivity
-        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentMapViewBinding.inflate(layoutInflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupComponents()
-    }
-
-    private fun setupComponents() {
-        val refreshRate = viewModel.getRefreshRate()
+        val binding = FragmentMapViewBinding.bind(view)
+        val service = Executors.newSingleThreadScheduledExecutor()
+        mainActivity = activity as MainActivity
+        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
         gsp = viewModel.getGSP().value ?: GroundStationPosition(0.0, 0.0, 0.0)
         satPassList = viewModel.getSatPassList().value ?: emptyList()
 
@@ -92,12 +68,12 @@ class MapViewFragment : Fragment() {
             binding.fabMap.setOnClickListener { showSelectSatDialog(satPassList) }
             selectedSat = satPassList.first().tle
             predictor = satPassList.first().predictor
-            mapView = MapView(mainActivity)
+            mapView = MapView(mainActivity, binding)
             binding.frameMap.addView(mapView)
             service.scheduleAtFixedRate(
                 { mapView.invalidate() },
-                refreshRate,
-                refreshRate,
+                viewModel.getRefreshRate(),
+                viewModel.getRefreshRate(),
                 TimeUnit.MILLISECONDS
             )
         } else {
@@ -131,7 +107,8 @@ class MapViewFragment : Fragment() {
             .show()
     }
 
-    inner class MapView(context: Context) : View(context) {
+    inner class MapView(context: Context, private val binding: FragmentMapViewBinding) :
+        View(context) {
         private val scale = resources.displayMetrics.density
         private val groundTrackPaint = Paint().apply {
             isAntiAlias = true
@@ -317,10 +294,5 @@ class MapViewFragment : Fragment() {
         private fun rad2Deg(value: Double): Double {
             return value * 180 / Math.PI
         }
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

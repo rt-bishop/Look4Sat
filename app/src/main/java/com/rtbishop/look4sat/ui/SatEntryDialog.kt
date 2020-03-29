@@ -36,15 +36,12 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
     private lateinit var satEntryAdapter: SatEntryAdapter
     private lateinit var entriesListener: EntriesSubmitListener
 
-    private var _binding: DialogSatEntryBinding? = null
-    private val binding get() = _binding!!
-
     private var entriesList = mutableListOf<SatEntry>()
     private var selectionList = mutableListOf<Int>()
     private var selectAllToggle = true
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = DialogSatEntryBinding.inflate(requireActivity().layoutInflater)
+        val binding = DialogSatEntryBinding.inflate(requireActivity().layoutInflater)
         val satEntryDialog = Dialog(requireActivity()).apply {
             window?.requestFeature(Window.FEATURE_NO_TITLE)
             setContentView(binding.root)
@@ -146,10 +143,5 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
 
     interface EntriesSubmitListener {
         fun onEntriesSubmit(list: MutableList<Int>)
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

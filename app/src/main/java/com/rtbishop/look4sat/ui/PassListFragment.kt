@@ -53,17 +53,13 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
     private lateinit var satPassList: MutableList<SatPass>
     private var isTimerSet: Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val fragmentBinding = FragmentPassListBinding.bind(view)
         mainActivity = activity as MainActivity
         viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
         satPassAdapter = SatPassAdapter(viewModel)
         satPassList = mutableListOf()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val fragmentBinding = FragmentPassListBinding.bind(view)
         aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
         btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
         setupComponents(fragmentBinding)
