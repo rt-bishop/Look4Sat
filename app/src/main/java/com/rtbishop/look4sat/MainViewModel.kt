@@ -129,7 +129,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     tleSelection.forEach { indexOfSelection ->
                         val tle = tleMainList[indexOfSelection]
                         try {
-                            val predictor = PassPredictor(tle, getGSP().value!!)
+                            val gsp = getGSP().value ?: GroundStationPosition(0.0, 0.0, 0.0)
+                            val predictor = PassPredictor(tle, gsp)
                             val passes = predictor.getPasses(dateNow, getHoursAhead(), true)
                             passes.forEach {
                                 passList.add(SatPass(tle, predictor, it))
