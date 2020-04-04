@@ -63,6 +63,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         setGroundStationPosition()
     }
 
+    var isFirstLaunch = true
     var tleMainList = dataManager.loadTleList()
     var tleSelection = dataManager.loadSelectionList()
 

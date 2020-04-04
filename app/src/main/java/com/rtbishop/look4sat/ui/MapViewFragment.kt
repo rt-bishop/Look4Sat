@@ -28,6 +28,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
@@ -37,9 +38,9 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapViewBinding
 import com.rtbishop.look4sat.predict4kotlin.PassPredictor
 import com.rtbishop.look4sat.repo.SatPass
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 class MapViewFragment : Fragment(R.layout.fragment_map_view) {
@@ -56,7 +57,6 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentMapViewBinding.bind(view)
-        val service = Executors.newSingleThreadScheduledExecutor()
         mainActivity = activity as MainActivity
         viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
         gsp = viewModel.getGSP().value ?: GroundStationPosition(0.0, 0.0, 0.0)
@@ -70,12 +70,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             predictor = satPassList.first().predictor
             mapView = MapView(mainActivity, binding)
             binding.frameMap.addView(mapView)
-            service.scheduleAtFixedRate(
-                { mapView.invalidate() },
-                viewModel.getRefreshRate(),
-                viewModel.getRefreshRate(),
-                TimeUnit.MILLISECONDS
-            )
+            refreshView()
         } else {
             binding.fabMap.setOnClickListener {
                 Toast.makeText(
@@ -83,6 +78,15 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
                     getString(R.string.err_no_sat_selected),
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+        }
+    }
+
+    private fun refreshView() {
+        lifecycleScope.launch {
+            while (true) {
+                mapView.invalidate()
+                delay(viewModel.getRefreshRate())
             }
         }
     }

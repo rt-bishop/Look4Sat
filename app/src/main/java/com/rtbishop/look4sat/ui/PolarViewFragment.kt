@@ -37,16 +37,14 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPolarViewBinding
 import com.rtbishop.look4sat.repo.SatPass
 import com.rtbishop.look4sat.ui.adapters.TransmitterAdapter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlin.math.cos
 import kotlin.math.sin
 
 class PolarViewFragment : Fragment(R.layout.fragment_polar_view) {
 
-    private val service = Executors.newSingleThreadScheduledExecutor()
     private val args: PolarViewFragmentArgs by navArgs()
 
     private lateinit var viewModel: MainViewModel
@@ -67,14 +65,18 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view) {
 
             polarView = PolarView(mainActivity, refreshRate, binding)
             binding.framePolar.addView(polarView)
-            service.scheduleAtFixedRate(
-                { polarView.invalidate() },
-                refreshRate,
-                refreshRate,
-                TimeUnit.MILLISECONDS
-            )
 
             setupTransRecycler(binding)
+            refreshView()
+        }
+    }
+
+    private fun refreshView() {
+        lifecycleScope.launch {
+            while (true) {
+                polarView.invalidate()
+                delay(viewModel.getRefreshRate())
+            }
         }
     }
 

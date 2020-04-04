@@ -50,9 +50,8 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
     private lateinit var aosTimer: CountDownTimer
     private lateinit var aosTimerText: TextView
     private lateinit var mainActivity: MainActivity
-    private lateinit var satPassList: MutableList<SatPass>
+    private var satPassList: MutableList<SatPass> = mutableListOf()
     private var isTimerSet: Boolean = false
-    private var isFirstLaunch: Boolean = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,14 +59,15 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         mainActivity = activity as MainActivity
         viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
         satPassAdapter = SatPassAdapter(viewModel)
-        satPassList = mutableListOf()
         aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
         btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
+
         setupComponents(fragmentBinding)
         setupObservers(fragmentBinding)
-        if (viewModel.tleSelection.isNotEmpty() && isFirstLaunch) {
+
+        if (viewModel.tleSelection.isNotEmpty() && viewModel.isFirstLaunch) {
             viewModel.getPasses()
-            isFirstLaunch = false
+            viewModel.isFirstLaunch = false
         }
     }
 
