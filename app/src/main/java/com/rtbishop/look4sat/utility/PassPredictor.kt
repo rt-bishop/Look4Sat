@@ -35,7 +35,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, visit http://www.fsf.org/
  */
-package com.rtbishop.look4sat.predict4kotlin
+package com.rtbishop.look4sat.utility
 
 import com.github.amsacode.predict4java.*
 import java.util.*
@@ -253,14 +253,18 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         var polePassed = deadSpotNone
         val az1 = prevPos.azimuth / twoPi * 360.0
         val az2 = satPos.azimuth / twoPi * 360.0
-        if (az1 > az2) { // we may be moving from 350 or greater through north
+        if (az1 > az2) {
+            // we may be moving from 350 or greater through north
             if (az1 > 350 && az2 < 10) polePassed = north
-            else { // we may be moving from 190 or greater through south
+            else {
+                // we may be moving from 190 or greater through south
                 if (az1 > 180 && az2 < 180) polePassed = south
             }
-        } else { // we may be moving from 10 or less through north
+        } else {
+            // we may be moving from 10 or less through north
             if (az1 < 10 && az2 > 350) polePassed = north
-            else { // we may be moving from 170 or more through south
+            else {
+                // we may be moving from 170 or more through south
                 if (az1 < 180 && az2 > 180) polePassed = south
             }
         }

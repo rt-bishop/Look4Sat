@@ -17,14 +17,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.storage
+package com.rtbishop.look4sat.ui.fragments
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.rtbishop.look4sat.repo.Transmitter
+import android.os.Bundle
+import android.text.method.LinkMovementMethod
+import android.view.View
+import androidx.fragment.app.Fragment
+import com.rtbishop.look4sat.BuildConfig
+import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.databinding.FragmentAboutBinding
 
-@Database(entities = [Transmitter::class], version = 1, exportSchema = false)
-abstract class TransmittersDb : RoomDatabase() {
+class AboutFragment : Fragment(R.layout.fragment_about) {
 
-    abstract fun transmittersDao(): TransmittersDao
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val binding = FragmentAboutBinding.bind(view)
+        binding.tvAboutVersion.text =
+            String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
+        binding.tvAboutMessage.movementMethod = LinkMovementMethod.getInstance()
+    }
 }

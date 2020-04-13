@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.fragments
 
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -30,65 +30,52 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.github.amsacode.predict4java.TLE
-import com.rtbishop.look4sat.MainViewModel
+import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassListBinding
-import com.rtbishop.look4sat.repo.SatEntry
-import com.rtbishop.look4sat.repo.SatPass
+import com.rtbishop.look4sat.ui.MainActivity
+import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class PassListFragment : Fragment(R.layout.fragment_pass_list) {
 
-    private lateinit var viewModel: MainViewModel
+    @Inject
+    lateinit var modelFactory: ViewModelFactory
+    private lateinit var viewModel: SharedViewModel
     private lateinit var satPassAdapter: SatPassAdapter
     private lateinit var btnPassPrefs: ImageButton
     private lateinit var aosTimer: CountDownTimer
     private lateinit var aosTimerText: TextView
     private lateinit var mainActivity: MainActivity
-    private var satPassList: MutableList<SatPass> = mutableListOf()
     private var isTimerSet: Boolean = false
+    private var satPassList: MutableList<SatPass> = mutableListOf()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val fragmentBinding = FragmentPassListBinding.bind(view)
+        val binding = FragmentPassListBinding.bind(view)
         mainActivity = activity as MainActivity
-        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
+        (mainActivity.application as Look4SatApp).appComponent.inject(this)
+        viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
         satPassAdapter = SatPassAdapter(viewModel)
         aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
         btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
 
-        setupComponents(fragmentBinding)
-        setupObservers(fragmentBinding)
+        setupObservers(binding)
+        setupComponents(binding)
 
-        if (viewModel.tleSelection.isNotEmpty() && viewModel.isFirstLaunch) {
-            viewModel.getPasses()
+        if (viewModel.isFirstLaunch) {
+            viewModel.calculatePasses()
             viewModel.isFirstLaunch = false
-        }
-    }
-
-    private fun setupComponents(binding: FragmentPassListBinding) {
-        binding.recPassList.apply {
-            layoutManager = LinearLayoutManager(mainActivity)
-            adapter = satPassAdapter
-            isVerticalScrollBarEnabled = false
-            (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        }
-        satPassAdapter.setList(satPassList)
-        setTimer()
-
-        binding.refLayoutPassList.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
-        binding.refLayoutPassList.setColorSchemeResources(R.color.backgroundDark)
-        binding.refLayoutPassList.setOnRefreshListener { viewModel.getPasses() }
-        btnPassPrefs.setOnClickListener {
-            showSatPassPrefsDialog(viewModel.getHoursAhead(), viewModel.getMinElevation())
-        }
-        binding.fabSatSelect.setOnClickListener {
-            showSelectSatDialog(viewModel.tleMainList, viewModel.tleSelection)
         }
     }
 
@@ -108,6 +95,30 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         viewModel.getRefreshing().observe(viewLifecycleOwner, Observer {
             binding.refLayoutPassList.isRefreshing = it
         })
+    }
+
+    private fun setupComponents(binding: FragmentPassListBinding) {
+        binding.recPassList.apply {
+            layoutManager = LinearLayoutManager(mainActivity)
+            adapter = satPassAdapter
+            isVerticalScrollBarEnabled = false
+            (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        }
+        satPassAdapter.setList(satPassList)
+        setTimer()
+
+        binding.refLayoutPassList.setProgressBackgroundColorSchemeResource(R.color.themeAccent)
+        binding.refLayoutPassList.setColorSchemeResources(R.color.backgroundDark)
+        binding.refLayoutPassList.setOnRefreshListener { viewModel.calculatePasses() }
+        btnPassPrefs.setOnClickListener {
+            showSatPassPrefsDialog(viewModel.getHoursAhead(), viewModel.getMinElevation())
+        }
+        binding.fabSatSelect.setOnClickListener {
+            lifecycleScope.launch {
+                val list = viewModel.getAllEntries() as MutableList
+                showSelectSatDialog(list)
+            }
+        }
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
@@ -142,7 +153,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
                         }
                         else -> {
                             viewModel.setPassPrefs(hours, elevation)
-                            viewModel.getPasses()
+                            viewModel.calculatePasses()
                         }
                     }
                 } else Toast.makeText(
@@ -160,31 +171,17 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
             .show()
     }
 
-    private fun showSelectSatDialog(tleMainList: List<TLE>, selection: MutableList<Int>) {
-        if (tleMainList.isEmpty()) {
-            Toast.makeText(mainActivity, getString(R.string.err_update_tle), Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            val entriesList = mutableListOf<SatEntry>().apply {
-                tleMainList.withIndex().forEach {
-                    this.add(SatEntry(it.index, it.value.name))
-                }
+    private fun showSelectSatDialog(tleMainList: MutableList<SatEntry>) {
+        val listener = object : SatEntryDialogFragment.EntriesSubmitListener {
+            override fun onEntriesSubmit(entries: MutableList<SatEntry>) {
+                viewModel.updateEntriesSelection(entries)
             }
-
-            val listener = object : SatEntryDialog.EntriesSubmitListener {
-                override fun onEntriesSubmit(list: MutableList<Int>) {
-                    viewModel.updateAndSaveSelectionList(list)
-                    viewModel.getPasses()
-                }
-            }
-
-            val dialogFragment = SatEntryDialog().apply {
-                setEntriesList(entriesList)
-                setSelectionList(selection)
-                setEntriesListener(listener)
-            }
-            dialogFragment.show(mainActivity.supportFragmentManager, "SatEntryDialog")
         }
+
+        val dialogFragment = SatEntryDialogFragment(tleMainList).apply {
+            setEntriesListener(listener)
+        }
+        dialogFragment.show(mainActivity.supportFragmentManager, "SatEntryDialogFragment")
     }
 
     private fun setTimer() {
@@ -229,7 +226,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow.time)
         aosTimer = object : CountDownTimer(millisBeforeEnd, 1000) {
             override fun onFinish() {
-                viewModel.getPasses()
+                viewModel.calculatePasses()
             }
 
             override fun onTick(millisUntilFinished: Long) {

@@ -19,11 +19,11 @@
 
 package com.rtbishop.look4sat.network
 
-import com.rtbishop.look4sat.repo.Transmitter
+import com.rtbishop.look4sat.data.Transmitter
 import retrofit2.http.GET
 
 interface TransmittersApi {
 
     @GET("transmitters/")
-    suspend fun fetchTransmittersList(): List<Transmitter>
+    suspend fun fetchTransmitters(): List<Transmitter>
 }

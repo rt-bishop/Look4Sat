@@ -17,20 +17,22 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.storage
+package com.rtbishop.look4sat.data
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.rtbishop.look4sat.repo.Transmitter
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-@Dao
-interface TransmittersDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTransmitters(transmitters: List<Transmitter>)
-
-    @Query("SELECT * FROM transmitters WHERE isAlive = 1 and noradCatId = :id")
-    suspend fun getTransmittersForSat(id: Int): List<Transmitter>
-}
+@Entity(tableName = "transmitters")
+data class Transmitter(
+    @PrimaryKey @SerializedName("uuid") val uuid: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("alive") val isAlive: Boolean,
+    @SerializedName("uplink_low") val uplinkLow: Long?,
+    @SerializedName("uplink_high") val uplinkHigh: Long?,
+    @SerializedName("downlink_low") val downlinkLow: Long?,
+    @SerializedName("downlink_high") val downlinkHigh: Long?,
+    @SerializedName("mode") val mode: String?,
+    @SerializedName("invert") val isInverted: Boolean,
+    @SerializedName("norad_cat_id") val catNum: Int
+)

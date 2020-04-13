@@ -17,6 +17,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.repo
+package com.rtbishop.look4sat.data
 
-data class SatEntry(val id: Int, val name: String, var isSelected: Boolean = false)
+import com.github.amsacode.predict4java.SatPassTime
+import com.github.amsacode.predict4java.TLE
+import com.rtbishop.look4sat.utility.PassPredictor
+
+data class SatPass(
+    val tle: TLE,
+    val predictor: PassPredictor,
+    val pass: SatPassTime,
+    var progress: Int = 0,
+    var active: Boolean = false
+)

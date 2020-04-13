@@ -17,29 +17,47 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.di
+package com.rtbishop.look4sat.dagger.modules
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.location.LocationManager
-import com.rtbishop.look4sat.utility.DataManager
-import com.rtbishop.look4sat.utility.PrefsManager
+import androidx.room.Room
+import com.rtbishop.look4sat.persistence.LocalDataSource
+import com.rtbishop.look4sat.persistence.LocalSource
+import com.rtbishop.look4sat.persistence.SatelliteDb
+import com.rtbishop.look4sat.persistence.dao.EntriesDao
+import com.rtbishop.look4sat.persistence.dao.TransmittersDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class UtilityModule {
+class PersistenceModule {
 
     @Singleton
     @Provides
-    fun providePrefsManager(preferences: SharedPreferences): PrefsManager {
-        return PrefsManager(preferences)
+    fun provideEntriesDao(db: SatelliteDb): EntriesDao {
+        return db.entriesDao()
     }
 
     @Singleton
     @Provides
-    fun provideDataManager(locationManager: LocationManager, context: Context): DataManager {
-        return DataManager(locationManager, context)
+    fun provideTransmittersDao(db: SatelliteDb): TransmittersDao {
+        return db.transmittersDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideLocalDataSource(
+        entriesDao: EntriesDao,
+        transmittersDao: TransmittersDao
+    ): LocalSource {
+        return LocalDataSource(entriesDao, transmittersDao)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSatelliteDb(context: Context): SatelliteDb {
+        return Room.databaseBuilder(context, SatelliteDb::class.java, "satellites")
+            .build()
     }
 }

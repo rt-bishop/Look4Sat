@@ -17,18 +17,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.storage
+package com.rtbishop.look4sat.persistence.dao
 
-import com.rtbishop.look4sat.repo.Transmitter
-import javax.inject.Inject
+import androidx.room.*
+import com.rtbishop.look4sat.data.SatEntry
 
-class LocalDataSource @Inject constructor(private val transmittersDao: TransmittersDao) {
+@Dao
+interface EntriesDao {
 
-    suspend fun insertTransmitters(transmitters: List<Transmitter>) {
-        transmittersDao.insertTransmitters(transmitters)
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
 
-    suspend fun getTransmittersForSat(id: Int): List<Transmitter> {
-        return transmittersDao.getTransmittersForSat(id)
-    }
+    @Query("SELECT * FROM entries ORDER BY name ASC")
+    suspend fun getAllEntries(): List<SatEntry>
+
+    @Query("SELECT * FROM entries WHERE isSelected = 1 ORDER BY name ASC")
+    suspend fun getSelectedEntries(): List<SatEntry>
+
+    @Update
+    suspend fun updateEntriesSelection(entries: List<SatEntry>)
 }

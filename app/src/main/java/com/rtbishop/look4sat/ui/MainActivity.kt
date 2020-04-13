@@ -40,12 +40,14 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.rtbishop.look4sat.MainViewModel
+import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,19 +56,25 @@ class MainActivity : AppCompatActivity() {
     private val permGranted = PackageManager.PERMISSION_GRANTED
     private val githubUrl = "https://github.com/rt-bishop/LookingSat"
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var viewModel: SharedViewModel
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var drawerBinding: DrawerHeaderBinding
-    private lateinit var viewModel: MainViewModel
     private lateinit var appBarConfig: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         drawerBinding = DrawerHeaderBinding.inflate(layoutInflater, mainBinding.navView, true)
         setContentView(mainBinding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        (application as Look4SatApp).appComponent.inject(this)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(SharedViewModel::class.java)
+
         setupComponents()
         setupObservers()
         setupDrawer()
@@ -108,10 +116,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.getDebugMessage().observe(this, Observer { message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        })
-
         viewModel.getGSP().observe(this, Observer { gsp ->
             drawerBinding.drawerLatValue.text =
                 String.format(getString(R.string.pat_location), gsp.latitude)
@@ -126,11 +130,11 @@ class MainActivity : AppCompatActivity() {
             it.lockButton()
         }
         drawerBinding.drawerBtnTle.setOnClickListener {
-            viewModel.updateAndSaveTleFile()
+            viewModel.updateEntries()
             it.lockButton()
         }
         drawerBinding.drawerBtnTrans.setOnClickListener {
-            viewModel.updateTransmittersDatabase()
+            viewModel.updateTransmitters()
             it.lockButton()
         }
         drawerBinding.drawerBtnGithub.setOnClickListener {
@@ -157,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(permLocation), permLocationCode)
             }
         } else {
-            viewModel.updateLocation()
+            viewModel.updatePosition()
         }
     }
 
@@ -165,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         when (reqCode) {
             permLocationCode -> {
                 if (res.isNotEmpty() && res[0] == permGranted) {
-                    viewModel.updateLocation()
+                    viewModel.updatePosition()
                 }
             }
         }

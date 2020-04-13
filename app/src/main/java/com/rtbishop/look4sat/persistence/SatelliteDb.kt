@@ -17,23 +17,22 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.persistence
 
-import android.os.Bundle
-import android.text.method.LinkMovementMethod
-import android.view.View
-import androidx.fragment.app.Fragment
-import com.rtbishop.look4sat.BuildConfig
-import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.FragmentAboutBinding
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.Transmitter
+import com.rtbishop.look4sat.persistence.dao.EntriesDao
+import com.rtbishop.look4sat.persistence.dao.TransmittersDao
+import com.rtbishop.look4sat.utility.Converters
 
-class AboutFragment : Fragment(R.layout.fragment_about) {
+@Database(entities = [Transmitter::class, SatEntry::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
+abstract class SatelliteDb : RoomDatabase() {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val binding = FragmentAboutBinding.bind(view)
-        binding.tvAboutVersion.text =
-            String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
-        binding.tvAboutMessage.movementMethod = LinkMovementMethod.getInstance()
-    }
+    abstract fun entriesDao(): EntriesDao
+
+    abstract fun transmittersDao(): TransmittersDao
 }

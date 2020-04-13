@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.fragments
 
 import android.content.Context
 import android.graphics.Canvas
@@ -32,43 +32,65 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.amsacode.predict4java.SatPos
-import com.rtbishop.look4sat.MainViewModel
+import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarViewBinding
-import com.rtbishop.look4sat.repo.SatPass
+import com.rtbishop.look4sat.ui.MainActivity
+import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransmitterAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.sin
 
 class PolarViewFragment : Fragment(R.layout.fragment_polar_view) {
 
+    @Inject
+    lateinit var modelFactory: ViewModelFactory
     private val args: PolarViewFragmentArgs by navArgs()
-
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: SharedViewModel
     private lateinit var satPass: SatPass
     private lateinit var polarView: PolarView
-    private lateinit var transmitterAdapter: TransmitterAdapter
     private lateinit var mainActivity: MainActivity
+    private var transmitterAdapter: TransmitterAdapter = TransmitterAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentPolarViewBinding.bind(view)
         mainActivity = activity as MainActivity
-        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
-        viewModel.getSatPassList().value?.let {
-            val refreshRate = viewModel.getRefreshRate()
-            satPass = it[args.satPassIndex]
-            mainActivity.supportActionBar?.title = satPass.tle.name
+        (mainActivity.application as Look4SatApp).appComponent.inject(this)
+        viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
+        val refreshRate = viewModel.getRefreshRate()
 
-            polarView = PolarView(mainActivity, refreshRate, binding)
-            binding.framePolar.addView(polarView)
-
-            setupTransRecycler(binding)
-            refreshView()
+        binding.recPolar.apply {
+            layoutManager = LinearLayoutManager(mainActivity)
+            adapter = transmitterAdapter
         }
+
+        viewModel.getSatPassList()
+            .observe(viewLifecycleOwner, androidx.lifecycle.Observer { mutableList ->
+                satPass = mutableList[args.satPassIndex]
+                mainActivity.supportActionBar?.title = satPass.tle.name
+                polarView = PolarView(mainActivity, refreshRate, binding)
+                binding.framePolar.addView(polarView)
+                refreshView()
+                viewModel.getTransmittersForSat(satPass.tle.catnum)
+                    .observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                        if (it.isNotEmpty()) {
+                            transmitterAdapter.setList(it)
+                            transmitterAdapter.notifyDataSetChanged()
+                            binding.recPolar.visibility = View.VISIBLE
+                            binding.tvPolarNoTrans.visibility = View.INVISIBLE
+                        } else {
+                            binding.recPolar.visibility = View.INVISIBLE
+                            binding.tvPolarNoTrans.visibility = View.VISIBLE
+                        }
+                    })
+            })
     }
 
     private fun refreshView() {
@@ -76,24 +98,6 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view) {
             while (true) {
                 polarView.invalidate()
                 delay(viewModel.getRefreshRate())
-            }
-        }
-    }
-
-    private fun setupTransRecycler(binding: FragmentPolarViewBinding) {
-        transmitterAdapter = TransmitterAdapter()
-        binding.recPolar.apply {
-            layoutManager = LinearLayoutManager(mainActivity)
-            adapter = transmitterAdapter
-        }
-        lifecycleScope.launch {
-            val transList = viewModel.getTransmittersForSat(satPass.tle.catnum)
-            if (transList.isNotEmpty()) {
-                transmitterAdapter.setList(transList)
-                transmitterAdapter.notifyDataSetChanged()
-            } else {
-                binding.recPolar.visibility = View.INVISIBLE
-                binding.tvPolarNoTrans.visibility = View.VISIBLE
             }
         }
     }

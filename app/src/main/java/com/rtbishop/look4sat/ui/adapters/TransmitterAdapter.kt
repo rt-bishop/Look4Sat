@@ -25,8 +25,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.Transmitter
 import com.rtbishop.look4sat.databinding.ItemTransmitterBinding
-import com.rtbishop.look4sat.repo.Transmitter
 
 class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHolder>() {
 

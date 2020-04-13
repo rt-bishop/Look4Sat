@@ -19,11 +19,13 @@
 
 package com.rtbishop.look4sat.network
 
-import com.rtbishop.look4sat.repo.Transmitter
+import android.util.Log
+import com.rtbishop.look4sat.data.Transmitter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
 import java.io.InputStream
 import java.io.SequenceInputStream
 import java.util.*
@@ -32,20 +34,25 @@ import javax.inject.Inject
 class RemoteDataSource @Inject constructor(
     private val api: TransmittersApi,
     private val client: OkHttpClient
-) {
-    suspend fun getStreamForUrl(urlList: List<String>): InputStream {
+) : RemoteSource {
+
+    override suspend fun fetchTleStream(urlList: List<String>): InputStream {
         val streamTable = Hashtable<String, InputStream>()
-        withContext(Dispatchers.IO) {
-            urlList.forEach {
-                val request = Request.Builder().url(it).build()
-                val stream = client.newCall(request).execute().body()?.byteStream()!!
-                streamTable[it] = stream
+        try {
+            withContext(Dispatchers.IO) {
+                urlList.forEach {
+                    val request = Request.Builder().url(it).build()
+                    val stream = client.newCall(request).execute().body()?.byteStream()
+                    streamTable[it] = stream
+                }
             }
+        } catch (e: IOException) {
+            Log.w("remoteDataSource", e.toString())
         }
         return SequenceInputStream(streamTable.elements())
     }
 
-    suspend fun fetchTransmittersList(): List<Transmitter> {
-        return api.fetchTransmittersList()
+    override suspend fun fetchTransmitters(): List<Transmitter> {
+        return api.fetchTransmitters()
     }
 }

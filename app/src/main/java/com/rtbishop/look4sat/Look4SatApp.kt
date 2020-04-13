@@ -20,8 +20,8 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import com.rtbishop.look4sat.di.AppComponent
-import com.rtbishop.look4sat.di.DaggerAppComponent
+import com.rtbishop.look4sat.dagger.AppComponent
+import com.rtbishop.look4sat.dagger.DaggerAppComponent
 
 class Look4SatApp : Application() {
 

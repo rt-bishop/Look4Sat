@@ -23,10 +23,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.databinding.ItemSatEntryBinding
-import com.rtbishop.look4sat.repo.SatEntry
 
-internal class SatEntryAdapter(private var entriesList: MutableList<SatEntry>) :
+class SatEntryAdapter(private var entries: MutableList<SatEntry>) :
     RecyclerView.Adapter<SatEntryAdapter.SatEntryHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatEntryHolder {
@@ -36,25 +36,27 @@ internal class SatEntryAdapter(private var entriesList: MutableList<SatEntry>) :
     }
 
     override fun onBindViewHolder(holder: SatEntryHolder, position: Int) {
-        holder.bind(entriesList[position])
+        holder.bind(entries[position])
     }
 
     override fun getItemCount(): Int {
-        return entriesList.size
+        return entries.size
     }
 
-    fun setEntries(entries: MutableList<SatEntry>) {
-        entriesList = entries
+    fun setEntries(list: MutableList<SatEntry>) {
+        entries = list
         notifyDataSetChanged()
     }
 
-    internal inner class SatEntryHolder(itemView: View, private val binding: ItemSatEntryBinding) :
+    inner class SatEntryHolder(itemView: View, private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(satEntry: SatEntry) {
             binding.satEntryCheckbox.text = satEntry.name
             binding.satEntryCheckbox.isChecked = satEntry.isSelected
-            itemView.setOnClickListener { satEntry.isSelected = binding.satEntryCheckbox.isChecked }
+            itemView.setOnClickListener {
+                satEntry.isSelected = binding.satEntryCheckbox.isChecked
+            }
         }
     }
 }

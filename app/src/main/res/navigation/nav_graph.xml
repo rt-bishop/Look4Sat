@@ -26,7 +26,7 @@
 
     <fragment
         android:id="@+id/nav_pass_list"
-        android:name="com.rtbishop.look4sat.ui.PassListFragment"
+        android:name="com.rtbishop.look4sat.ui.fragments.PassListFragment"
         android:label="@string/menu_pass_list"
         tools:layout="@layout/fragment_pass_list">
         <action
@@ -40,7 +40,7 @@
 
     <fragment
         android:id="@+id/nav_polar_view"
-        android:name="com.rtbishop.look4sat.ui.PolarViewFragment"
+        android:name="com.rtbishop.look4sat.ui.fragments.PolarViewFragment"
         android:label="@string/menu_polar_view"
         tools:layout="@layout/fragment_polar_view">
         <argument
@@ -50,18 +50,18 @@
 
     <fragment
         android:id="@+id/nav_map_view"
-        android:name="com.rtbishop.look4sat.ui.MapViewFragment"
+        android:name="com.rtbishop.look4sat.ui.fragments.MapViewFragment"
         android:label="@string/menu_map_view"
         tools:layout="@layout/fragment_map_view" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.rtbishop.look4sat.ui.SettingsFragment"
+        android:name="com.rtbishop.look4sat.ui.fragments.PreferencesFragment"
         android:label="@string/menu_settings" />
 
     <fragment
         android:id="@+id/nav_about"
-        android:name="com.rtbishop.look4sat.ui.AboutFragment"
+        android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment"
         android:label="@string/menu_about"
         tools:layout="@layout/fragment_about" />
 

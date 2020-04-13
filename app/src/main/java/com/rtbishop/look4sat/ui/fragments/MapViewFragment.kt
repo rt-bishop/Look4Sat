@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.fragments
 
 import android.content.Context
 import android.graphics.*
@@ -33,20 +33,26 @@ import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
 import com.github.amsacode.predict4java.TLE
-import com.rtbishop.look4sat.MainViewModel
+import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapViewBinding
-import com.rtbishop.look4sat.predict4kotlin.PassPredictor
-import com.rtbishop.look4sat.repo.SatPass
+import com.rtbishop.look4sat.ui.MainActivity
+import com.rtbishop.look4sat.ui.SharedViewModel
+import com.rtbishop.look4sat.utility.PassPredictor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.abs
 
 class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
+    @Inject
+    lateinit var modelFactory: ViewModelFactory
     private lateinit var mainActivity: MainActivity
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: SharedViewModel
     private lateinit var mapView: MapView
     private lateinit var predictor: PassPredictor
     private lateinit var selectedSat: TLE
@@ -58,7 +64,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentMapViewBinding.bind(view)
         mainActivity = activity as MainActivity
-        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
+        (mainActivity.application as Look4SatApp).appComponent.inject(this)
+        viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
         gsp = viewModel.getGSP().value ?: GroundStationPosition(0.0, 0.0, 0.0)
         satPassList = viewModel.getSatPassList().value ?: emptyList()
 

@@ -25,16 +25,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
-import com.rtbishop.look4sat.repo.SatPass
-import com.rtbishop.look4sat.ui.PassListFragmentDirections
+import com.rtbishop.look4sat.ui.SharedViewModel
+import com.rtbishop.look4sat.ui.fragments.PassListFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter(val viewModel: MainViewModel) :
+class SatPassAdapter(val viewModel: SharedViewModel) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var satPassList = mutableListOf<SatPass>()

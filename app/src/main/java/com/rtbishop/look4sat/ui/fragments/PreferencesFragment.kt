@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.fragments
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -26,14 +26,15 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
-import com.rtbishop.look4sat.MainViewModel
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.ui.MainActivity
+import com.rtbishop.look4sat.ui.SharedViewModel
 
-class SettingsFragment : PreferenceFragmentCompat(),
+class PreferencesFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var mainActivity: MainActivity
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: SharedViewModel
     private lateinit var keyLat: String
     private lateinit var keyLon: String
     private lateinit var keyAlt: String
@@ -44,7 +45,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val provider = EditTextPreference.SimpleSummaryProvider.getInstance()
 
         mainActivity = activity as MainActivity
-        viewModel = ViewModelProvider(mainActivity).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(mainActivity).get(SharedViewModel::class.java)
 
         keyLat = mainActivity.getString(R.string.pref_lat_key)
         keyLon = mainActivity.getString(R.string.pref_lon_key)
@@ -139,7 +140,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key == keyLat || key == keyLon || key == keyAlt) viewModel.setGroundStationPosition()
+        if (key == keyLat || key == keyLon || key == keyAlt) viewModel.setPositionFromPref()
     }
 
     override fun onResume() {

@@ -17,28 +17,40 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.di
+package com.rtbishop.look4sat.dagger.modules
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.location.LocationManager
-import androidx.preference.PreferenceManager
+import com.rtbishop.look4sat.network.RemoteDataSource
+import com.rtbishop.look4sat.network.RemoteSource
+import com.rtbishop.look4sat.network.TransmittersApi
 import dagger.Module
 import dagger.Provides
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
-class AndroidModule {
+class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideSharedPreferences(context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context)
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient()
     }
 
     @Singleton
     @Provides
-    fun provideLocationManager(context: Context): LocationManager {
-        return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    fun provideRemoteDataSource(api: TransmittersApi, client: OkHttpClient): RemoteSource {
+        return RemoteDataSource(api, client)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTransmittersApi(): TransmittersApi {
+        return Retrofit.Builder()
+            .baseUrl("https://db.satnogs.org/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(TransmittersApi::class.java)
     }
 }

@@ -17,16 +17,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.di
+package com.rtbishop.look4sat.dagger
 
 import android.content.Context
-import com.rtbishop.look4sat.MainViewModel
+import com.rtbishop.look4sat.dagger.modules.*
+import com.rtbishop.look4sat.ui.MainActivity
+import com.rtbishop.look4sat.ui.fragments.MapViewFragment
+import com.rtbishop.look4sat.ui.fragments.PassListFragment
+import com.rtbishop.look4sat.ui.fragments.PolarViewFragment
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AndroidModule::class, NetworkModule::class, StorageModule::class, UtilityModule::class])
+@Component(
+    modules = [NetworkModule::class, PersistenceModule::class,
+        RepoModule::class, UtilityModule::class, ViewModelModule::class]
+)
 interface AppComponent {
 
     @Component.Factory
@@ -34,5 +41,8 @@ interface AppComponent {
         fun create(@BindsInstance context: Context): AppComponent
     }
 
-    fun inject(viewModel: MainViewModel)
+    fun inject(mainActivity: MainActivity)
+    fun inject(mapViewFragment: MapViewFragment)
+    fun inject(passListFragment: PassListFragment)
+    fun inject(polarViewFragment: PolarViewFragment)
 }

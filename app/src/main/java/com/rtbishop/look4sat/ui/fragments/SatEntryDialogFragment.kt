@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.fragments
 
 import android.app.Dialog
 import android.os.Bundle
@@ -26,18 +26,16 @@ import android.view.Window
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.databinding.DialogSatEntryBinding
-import com.rtbishop.look4sat.repo.SatEntry
 import com.rtbishop.look4sat.ui.adapters.SatEntryAdapter
 import java.util.*
 
-class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener {
+class SatEntryDialogFragment(private var entries: MutableList<SatEntry>) :
+    AppCompatDialogFragment(), SearchView.OnQueryTextListener {
 
-    private lateinit var satEntryAdapter: SatEntryAdapter
     private lateinit var entriesListener: EntriesSubmitListener
-
-    private var entriesList = mutableListOf<SatEntry>()
-    private var selectionList = mutableListOf<Int>()
+    private val entryAdapter = SatEntryAdapter(entries)
     private var selectAllToggle = true
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -51,18 +49,15 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
             )
         }
 
-        entriesList = checkSelectedEntries(entriesList, selectionList)
-        satEntryAdapter = SatEntryAdapter(entriesList)
-
         binding.dialogSearch.apply {
-            setOnQueryTextListener(this@SatEntryDialog)
+            setOnQueryTextListener(this@SatEntryDialogFragment)
             onActionViewExpanded()
             clearFocus()
         }
 
         binding.dialogRecycler.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = satEntryAdapter
+            adapter = entryAdapter
         }
 
         binding.dialogBtnPositive.setOnClickListener { onPositiveClicked() }
@@ -72,32 +67,27 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
         return satEntryDialog
     }
 
-    fun setEntriesList(list: MutableList<SatEntry>): SatEntryDialog {
-        entriesList = list
-        return this
-    }
-
-    fun setSelectionList(list: MutableList<Int>): SatEntryDialog {
-        selectAllToggle = list.isEmpty()
-        selectionList = list
-        return this
-    }
-
-    fun setEntriesListener(listener: EntriesSubmitListener): SatEntryDialog {
+    fun setEntriesListener(listener: EntriesSubmitListener): SatEntryDialogFragment {
         entriesListener = listener
         return this
     }
 
-    private fun checkSelectedEntries(entries: MutableList<SatEntry>, selection: MutableList<Int>)
-            : MutableList<SatEntry> {
-        selection.forEach { entries[it].isSelected = true }
-        return entries
+    private fun filterEntries(list: MutableList<SatEntry>, query: String): MutableList<SatEntry> {
+        if (query.isEmpty()) return list
+        return try {
+            filterByCatNum(list, query.toInt())
+        } catch (e: NumberFormatException) {
+            filterByName(list, query)
+        }
     }
 
-    private fun filterEntries(list: MutableList<SatEntry>, query: String): MutableList<SatEntry> {
-        val searchQuery = query.toLowerCase(Locale.getDefault())
-        if ((searchQuery == "") or searchQuery.isEmpty()) return list
+    private fun filterByCatNum(list: MutableList<SatEntry>, catNum: Int): MutableList<SatEntry> {
+        val filteredList = list.filter { it.catNum == catNum }
+        return filteredList as MutableList<SatEntry>
+    }
 
+    private fun filterByName(list: MutableList<SatEntry>, query: String): MutableList<SatEntry> {
+        val searchQuery = query.toLowerCase(Locale.getDefault())
         val filteredList = mutableListOf<SatEntry>()
         list.forEach {
             val name = it.name.toLowerCase(Locale.getDefault())
@@ -107,10 +97,7 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
     }
 
     private fun onPositiveClicked() {
-        val listToSubmit = mutableListOf<Int>().apply {
-            entriesList.forEach { if (it.isSelected) this.add(it.id) }
-        }
-        entriesListener.onEntriesSubmit(listToSubmit)
+        entriesListener.onEntriesSubmit(entries)
         dismiss()
     }
 
@@ -120,20 +107,19 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
 
     private fun onNeutralClicked() {
         selectAllToggle = if (selectAllToggle) {
-            entriesList.forEach { it.isSelected = true }
-            satEntryAdapter.setEntries(entriesList)
+            entries.forEach { it.isSelected = true }
+            entryAdapter.setEntries(entries)
             false
         } else {
-            entriesList.forEach { it.isSelected = false }
-            satEntryAdapter.setEntries(entriesList)
+            entries.forEach { it.isSelected = false }
+            entryAdapter.setEntries(entries)
             true
         }
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        entriesList = checkSelectedEntries(entriesList, selectionList)
-        val filteredList = filterEntries(entriesList, newText)
-        satEntryAdapter.setEntries(filteredList)
+        val filteredList = filterEntries(entries, newText)
+        entryAdapter.setEntries(filteredList)
         return false
     }
 
@@ -142,6 +128,6 @@ class SatEntryDialog : AppCompatDialogFragment(), SearchView.OnQueryTextListener
     }
 
     interface EntriesSubmitListener {
-        fun onEntriesSubmit(list: MutableList<Int>)
+        fun onEntriesSubmit(entries: MutableList<SatEntry>)
     }
 }
