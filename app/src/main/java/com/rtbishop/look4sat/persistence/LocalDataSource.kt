@@ -42,8 +42,9 @@ class LocalDataSource @Inject constructor(
         return entriesDao.getSelectedEntries()
     }
 
-    override suspend fun updateEntriesSelection(entries: List<SatEntry>) {
-        entriesDao.updateEntriesSelection(entries)
+    override suspend fun updateEntriesSelection(catNumList: List<Int>) {
+        entriesDao.clearEntriesSelection()
+        catNumList.forEach { entriesDao.updateEntrySelection(it) }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

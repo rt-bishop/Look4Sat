@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         appBarConfig = AppBarConfiguration(
-            setOf(R.id.nav_pass_list, R.id.nav_map_view, R.id.nav_settings, R.id.nav_about),
+            setOf(R.id.nav_pass_list, R.id.nav_map_view),
             mainBinding.drawerLayout
         )
 
@@ -121,6 +121,9 @@ class MainActivity : AppCompatActivity() {
                 String.format(getString(R.string.pat_location), gsp.latitude)
             drawerBinding.drawerLonValue.text =
                 String.format(getString(R.string.pat_location), gsp.longitude)
+        })
+        viewModel.getDebugMessage().observe(this, Observer { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         })
     }
 

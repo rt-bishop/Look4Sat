@@ -97,7 +97,10 @@ class SatEntryDialogFragment(private var entries: MutableList<SatEntry>) :
     }
 
     private fun onPositiveClicked() {
-        entriesListener.onEntriesSubmit(entries)
+        val catNumList = mutableListOf<Int>().apply {
+            entries.forEach { if (it.isSelected) this.add(it.catNum) }
+        }
+        entriesListener.onEntriesSubmit(catNumList)
         dismiss()
     }
 
@@ -128,6 +131,6 @@ class SatEntryDialogFragment(private var entries: MutableList<SatEntry>) :
     }
 
     interface EntriesSubmitListener {
-        fun onEntriesSubmit(entries: MutableList<SatEntry>)
+        fun onEntriesSubmit(catNumList: MutableList<Int>)
     }
 }

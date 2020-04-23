@@ -94,10 +94,11 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view) {
     }
 
     private fun refreshView() {
+        val rate = viewModel.getRefreshRate()
         lifecycleScope.launch {
             while (true) {
                 polarView.invalidate()
-                delay(viewModel.getRefreshRate())
+                delay(rate)
             }
         }
     }

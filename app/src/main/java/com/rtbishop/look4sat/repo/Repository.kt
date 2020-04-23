@@ -11,7 +11,7 @@ interface Repository {
 
     suspend fun getSelectedEntries(): List<SatEntry>
 
-    suspend fun updateEntriesSelection(entries: List<SatEntry>)
+    suspend fun updateEntriesSelection(catNumList: List<Int>)
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

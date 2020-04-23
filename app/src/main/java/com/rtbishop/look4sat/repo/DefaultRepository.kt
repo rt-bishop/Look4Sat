@@ -58,8 +58,8 @@ class DefaultRepository @Inject constructor(
         return localSource.getSelectedEntries()
     }
 
-    override suspend fun updateEntriesSelection(entries: List<SatEntry>) {
-        localSource.updateEntriesSelection(entries)
+    override suspend fun updateEntriesSelection(catNumList: List<Int>) {
+        localSource.updateEntriesSelection(catNumList)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

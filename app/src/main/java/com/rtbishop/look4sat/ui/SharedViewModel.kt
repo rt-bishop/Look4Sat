@@ -39,56 +39,63 @@ class SharedViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    var isFirstLaunch = true
-    private var calculationJob: Job? = null
     private val urlList = listOf("https://celestrak.com/NORAD/elements/active.txt")
-
-    private val _satPassList = MutableLiveData<MutableList<SatPass>>()
-    fun getSatPassList(): LiveData<MutableList<SatPass>> = _satPassList
-
     private val _gsp = MutableLiveData(prefsManager.getPosition())
-    fun getGSP(): LiveData<GroundStationPosition> = _gsp
-
+    private val _satPassList = MutableLiveData<MutableList<SatPass>>()
     private val _isListRefreshing = MutableLiveData<Boolean>()
-    fun getRefreshing(): LiveData<Boolean> = _isListRefreshing
+    private val _debugMessage = MutableLiveData<String>()
+    private var calculationJob: Job? = null
+    var isFirstLaunch = true
 
+    fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersByCatNum(id)) }
+    fun getGSP(): LiveData<GroundStationPosition> = _gsp
+    fun getSatPassList(): LiveData<MutableList<SatPass>> = _satPassList
+    fun getRefreshing(): LiveData<Boolean> = _isListRefreshing
+    fun getDebugMessage(): LiveData<String> = _debugMessage
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
+
+    suspend fun getAllEntries(): List<SatEntry> {
+        return repository.getAllEntries()
+    }
+
+    fun setPassPrefs(hoursAhead: Int, minEl: Double) {
+        prefsManager.setHoursAhead(hoursAhead)
+        prefsManager.setMinElevation(minEl)
+    }
+
     fun setPositionFromPref() = _gsp.postValue(prefsManager.getPosition())
-
-    fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersByCatNum(id)) }
-
-    fun updateEntries() {
-        viewModelScope.launch {
-            val selected = repository.getSelectedEntries()
-            repository.updateEntriesFrom(urlList)
-            repository.updateEntriesSelection(selected)
-        }
-    }
-
-    fun updateEntriesSelection(entries: List<SatEntry>) {
-        viewModelScope.launch {
-            repository.updateEntriesSelection(entries)
-            calculatePasses()
-        }
-    }
 
     fun updatePosition() {
         prefsManager.getLastKnownPosition().let {
             prefsManager.setPosition(it)
             _gsp.postValue(it)
+            _debugMessage.postValue("Location was updated")
+        }
+    }
+
+    fun updateEntries() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val selected = repository.getSelectedEntries().map { it.catNum }
+            repository.updateEntriesFrom(urlList)
+            repository.updateEntriesSelection(selected)
+            _debugMessage.postValue("TLE file was updated")
         }
     }
 
     fun updateTransmitters() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateTransmitters()
+            _debugMessage.postValue("Transceivers database was updated")
         }
     }
 
-    suspend fun getAllEntries(): List<SatEntry> {
-        return repository.getAllEntries()
+    fun updateEntriesSelection(catNumList: MutableList<Int>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateEntriesSelection(catNumList)
+            calculatePasses()
+        }
     }
 
     fun calculatePasses() {
@@ -107,21 +114,15 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun setPassPrefs(hoursAhead: Int, minEl: Double) {
-        prefsManager.setHoursAhead(hoursAhead)
-        prefsManager.setMinElevation(minEl)
-    }
-
     private fun getPassesForEntries(
         entry: SatEntry,
         dateNow: Date,
         gsp: GroundStationPosition
     ): MutableList<SatPass> {
-        val passList = mutableListOf<SatPass>()
         val predictor = PassPredictor(entry.tle, gsp)
         val passes = predictor.getPasses(dateNow, getHoursAhead(), true)
-        passes.forEach { passList.add(SatPass(entry.tle, predictor, it)) }
-        return passList
+        val passList = passes.map { SatPass(entry.tle, predictor, it) }
+        return passList as MutableList<SatPass>
     }
 
     private fun filterAndSortPasses(

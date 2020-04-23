@@ -116,7 +116,12 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         binding.fabSatSelect.setOnClickListener {
             lifecycleScope.launch {
                 val list = viewModel.getAllEntries() as MutableList
-                showSelectSatDialog(list)
+                if (list.isEmpty()) {
+                    Toast.makeText(requireContext(), "Please, update TLE", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    showSelectSatDialog(list, binding)
+                }
             }
         }
     }
@@ -171,17 +176,21 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
             .show()
     }
 
-    private fun showSelectSatDialog(tleMainList: MutableList<SatEntry>) {
+    private fun showSelectSatDialog(
+        tleMainList: MutableList<SatEntry>,
+        binding: FragmentPassListBinding
+    ) {
         val listener = object : SatEntryDialogFragment.EntriesSubmitListener {
-            override fun onEntriesSubmit(entries: MutableList<SatEntry>) {
-                viewModel.updateEntriesSelection(entries)
+            override fun onEntriesSubmit(catNumList: MutableList<Int>) {
+                binding.refLayoutPassList.isRefreshing = true
+                viewModel.updateEntriesSelection(catNumList)
             }
         }
 
-        val dialogFragment = SatEntryDialogFragment(tleMainList).apply {
+        SatEntryDialogFragment(tleMainList).apply {
             setEntriesListener(listener)
+            show(mainActivity.supportFragmentManager, "SatEntryDialogFragment")
         }
-        dialogFragment.show(mainActivity.supportFragmentManager, "SatEntryDialogFragment")
     }
 
     private fun setTimer() {

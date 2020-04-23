@@ -19,7 +19,10 @@
 
 package com.rtbishop.look4sat.persistence.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.rtbishop.look4sat.data.SatEntry
 
 @Dao
@@ -34,6 +37,9 @@ interface EntriesDao {
     @Query("SELECT * FROM entries WHERE isSelected = 1 ORDER BY name ASC")
     suspend fun getSelectedEntries(): List<SatEntry>
 
-    @Update
-    suspend fun updateEntriesSelection(entries: List<SatEntry>)
+    @Query("UPDATE entries SET isSelected = 1 WHERE catNum == :catNum")
+    suspend fun updateEntrySelection(catNum: Int)
+
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearEntriesSelection()
 }
