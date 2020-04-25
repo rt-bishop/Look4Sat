@@ -27,6 +27,7 @@
 
     <string name="update_loc">Update location</string>
     <string name="update_loc_success">Location was updated</string>
+    <string name="update_loc_failure">Check your Location settings</string>
     <string name="update_tle">Update TLE file</string>
     <string name="update_tle_success">TLE file was updated</string>
     <string name="update_trans">Update transceivers</string>

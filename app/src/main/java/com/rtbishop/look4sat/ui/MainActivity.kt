@@ -43,6 +43,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
 import kotlinx.coroutines.delay
@@ -54,7 +55,6 @@ class MainActivity : AppCompatActivity() {
     private val permLocationCode = 101
     private val permLocation = Manifest.permission.ACCESS_FINE_LOCATION
     private val permGranted = PackageManager.PERMISSION_GRANTED
-    private val githubUrl = "https://github.com/rt-bishop/LookingSat"
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -116,14 +116,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.getGSP().observe(this, Observer { gsp ->
-            drawerBinding.drawerLatValue.text =
-                String.format(getString(R.string.pat_location), gsp.latitude)
-            drawerBinding.drawerLonValue.text =
-                String.format(getString(R.string.pat_location), gsp.longitude)
+        viewModel.getGSP().observe(this, Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    drawerBinding.drawerLatValue.text =
+                        String.format(getString(R.string.pat_location), result.data.latitude)
+                    drawerBinding.drawerLonValue.text =
+                        String.format(getString(R.string.pat_location), result.data.longitude)
+                }
+                is Result.Error -> {
+                    when (result.exception) {
+                        is SecurityException -> toast(getString(R.string.err_no_permissions))
+                        is IllegalArgumentException -> toast(getString(R.string.update_loc_failure))
+                    }
+                }
+            }
         })
-        viewModel.getDebugMessage().observe(this, Observer { message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        viewModel.getUpdateStatus().observe(this, Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    when (result.data) {
+                        0 -> toast(getString(R.string.update_tle_success))
+                        1 -> toast(getString(R.string.update_trans_success))
+                    }
+                }
+                is Result.Error -> toast(getString(R.string.update_failure))
+            }
         })
     }
 
@@ -141,10 +159,15 @@ class MainActivity : AppCompatActivity() {
             it.lockButton()
         }
         drawerBinding.drawerBtnGithub.setOnClickListener {
-            val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
+            val gitHubUrl = "https://github.com/rt-bishop/LookingSat"
+            val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(gitHubUrl))
             startActivity(githubIntent)
         }
         drawerBinding.drawerBtnExit.setOnClickListener { finish() }
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun View.lockButton() {
@@ -158,8 +181,7 @@ class MainActivity : AppCompatActivity() {
     private fun requestLocationUpdate() {
         if (ContextCompat.checkSelfPermission(this, permLocation) != permGranted) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permLocation)) {
-                Toast.makeText(this, getString(R.string.err_no_permissions), Toast.LENGTH_LONG)
-                    .show()
+                toast(getString(R.string.err_no_permissions))
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(permLocation), permLocationCode)
             }

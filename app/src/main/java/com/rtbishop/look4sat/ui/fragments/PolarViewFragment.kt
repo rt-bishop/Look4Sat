@@ -35,6 +35,7 @@ import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarViewBinding
 import com.rtbishop.look4sat.ui.MainActivity
@@ -71,25 +72,40 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view) {
             adapter = transmitterAdapter
         }
 
-        viewModel.getSatPassList()
-            .observe(viewLifecycleOwner, androidx.lifecycle.Observer { mutableList ->
-                satPass = mutableList[args.satPassIndex]
-                mainActivity.supportActionBar?.title = satPass.tle.name
-                polarView = PolarView(mainActivity, refreshRate, binding)
-                binding.framePolar.addView(polarView)
-                refreshView()
-                viewModel.getTransmittersForSat(satPass.tle.catnum)
-                    .observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-                        if (it.isNotEmpty()) {
-                            transmitterAdapter.setList(it)
-                            transmitterAdapter.notifyDataSetChanged()
-                            binding.recPolar.visibility = View.VISIBLE
-                            binding.tvPolarNoTrans.visibility = View.INVISIBLE
-                        } else {
-                            binding.recPolar.visibility = View.INVISIBLE
-                            binding.tvPolarNoTrans.visibility = View.VISIBLE
-                        }
-                    })
+        observePasses(refreshRate, binding)
+    }
+
+    private fun observePasses(
+        refreshRate: Long,
+        binding: FragmentPolarViewBinding
+    ) {
+        viewModel.getPassList()
+            .observe(viewLifecycleOwner, androidx.lifecycle.Observer { result ->
+                when (result) {
+                    is Result.Success -> {
+                        satPass = result.data[args.satPassIndex]
+                        mainActivity.supportActionBar?.title = satPass.tle.name
+                        polarView = PolarView(mainActivity, refreshRate, binding)
+                        binding.framePolar.addView(polarView)
+                        observeTransmitters(binding)
+                        refreshView()
+                    }
+                }
+            })
+    }
+
+    private fun observeTransmitters(binding: FragmentPolarViewBinding) {
+        viewModel.getTransmittersForSat(satPass.tle.catnum)
+            .observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                if (it.isNotEmpty()) {
+                    transmitterAdapter.setList(it)
+                    transmitterAdapter.notifyDataSetChanged()
+                    binding.recPolar.visibility = View.VISIBLE
+                    binding.tvPolarNoTrans.visibility = View.INVISIBLE
+                } else {
+                    binding.recPolar.visibility = View.INVISIBLE
+                    binding.tvPolarNoTrans.visibility = View.VISIBLE
+                }
             })
     }
 

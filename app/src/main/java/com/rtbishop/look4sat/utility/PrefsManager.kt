@@ -21,16 +21,14 @@ package com.rtbishop.look4sat.utility
 
 import android.content.SharedPreferences
 import android.location.LocationManager
-import android.util.Log
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
 import javax.inject.Inject
 
 class PrefsManager @Inject constructor(
     private val preferences: SharedPreferences,
-    private val locationManager: LocationManager
+    val locationManager: LocationManager
 ) {
-    private val tag = "prefsManager"
     private val keyHoursAhead = "hoursAhead"
     private val keyMinElevation = "minEl"
     private val keyLatitude = "latitude"
@@ -88,22 +86,6 @@ class PrefsManager @Inject constructor(
             putString(keyLongitude, gsp.longitude.toString())
             putString(keyAltitude, gsp.heightAMSL.toString())
             apply()
-        }
-    }
-
-    fun getLastKnownPosition(): GroundStationPosition {
-        val provider = LocationManager.PASSIVE_PROVIDER
-        var gsp = GroundStationPosition(0.0, 0.0, 0.0)
-        return try {
-            val location = locationManager.getLastKnownLocation(provider)
-            location?.let {
-                gsp =
-                    GroundStationPosition(it.latitude, it.longitude, it.altitude)
-            }
-            gsp
-        } catch (e: SecurityException) {
-            Log.w(tag, "No permissions")
-            gsp
         }
     }
 

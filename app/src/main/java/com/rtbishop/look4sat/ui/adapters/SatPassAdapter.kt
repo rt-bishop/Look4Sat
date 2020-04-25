@@ -29,15 +29,12 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.fragments.PassListFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter(val viewModel: SharedViewModel) :
+class SatPassAdapter(private var satPassList: MutableList<SatPass>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private var satPassList = mutableListOf<SatPass>()
 
     fun setList(list: MutableList<SatPass>) {
         satPassList = list
@@ -123,11 +120,9 @@ class SatPassAdapter(val viewModel: SharedViewModel) :
             binding.passLeoProgress.progress = satPass.progress
 
             itemView.setOnClickListener {
-                viewModel.getSatPassList().value?.let {
-                    val satPassIndex = it.indexOf(satPass)
-                    val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
-                    itemView.findNavController().navigate(action)
-                }
+                val passIndex = satPassList.indexOf(satPass)
+                val action = PassListFragmentDirections.actionPassToPolar(passIndex)
+                itemView.findNavController().navigate(action)
             }
         }
     }
@@ -148,11 +143,9 @@ class SatPassAdapter(val viewModel: SharedViewModel) :
                 String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
 
             itemView.setOnClickListener {
-                viewModel.getSatPassList().value?.let {
-                    val satPassIndex = it.indexOf(satPass)
-                    val action = PassListFragmentDirections.actionPassToPolar(satPassIndex)
-                    itemView.findNavController().navigate(action)
-                }
+                val passIndex = satPassList.indexOf(satPass)
+                val action = PassListFragmentDirections.actionPassToPolar(passIndex)
+                itemView.findNavController().navigate(action)
             }
         }
     }

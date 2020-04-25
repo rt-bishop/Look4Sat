@@ -19,8 +19,10 @@
 
 package com.rtbishop.look4sat.ui
 
+import android.location.LocationManager
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.GroundStationPosition
+import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.repo.Repository
@@ -39,55 +41,70 @@ class SharedViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
+    private val _satPassList = MutableLiveData<Result<MutableList<SatPass>>>()
+    private val _updateStatus = MutableLiveData<Result<Int>>()
+    private val _gsp = MutableLiveData<Result<GroundStationPosition>>().apply {
+        value = Result.Success(prefsManager.getPosition())
+    }
     private val urlList = listOf("https://celestrak.com/NORAD/elements/active.txt")
-    private val _gsp = MutableLiveData(prefsManager.getPosition())
-    private val _satPassList = MutableLiveData<MutableList<SatPass>>()
-    private val _isListRefreshing = MutableLiveData<Boolean>()
-    private val _debugMessage = MutableLiveData<String>()
     private var calculationJob: Job? = null
     var isFirstLaunch = true
 
     fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersByCatNum(id)) }
-    fun getGSP(): LiveData<GroundStationPosition> = _gsp
-    fun getSatPassList(): LiveData<MutableList<SatPass>> = _satPassList
-    fun getRefreshing(): LiveData<Boolean> = _isListRefreshing
-    fun getDebugMessage(): LiveData<String> = _debugMessage
+    fun getPassList(): LiveData<Result<MutableList<SatPass>>> = _satPassList
+    fun getUpdateStatus(): LiveData<Result<Int>> = _updateStatus
+    fun getGSP(): LiveData<Result<GroundStationPosition>> = _gsp
+
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
-
-    suspend fun getAllEntries(): List<SatEntry> {
-        return repository.getAllEntries()
-    }
+    fun setPositionFromPref() = _gsp.postValue(Result.Success(prefsManager.getPosition()))
+    suspend fun getAllEntries() = repository.getAllEntries()
 
     fun setPassPrefs(hoursAhead: Int, minEl: Double) {
         prefsManager.setHoursAhead(hoursAhead)
         prefsManager.setMinElevation(minEl)
     }
 
-    fun setPositionFromPref() = _gsp.postValue(prefsManager.getPosition())
-
     fun updatePosition() {
-        prefsManager.getLastKnownPosition().let {
-            prefsManager.setPosition(it)
-            _gsp.postValue(it)
-            _debugMessage.postValue("Location was updated")
+        val provider = LocationManager.PASSIVE_PROVIDER
+        try {
+            val location = prefsManager.locationManager.getLastKnownLocation(provider)
+            location.let {
+                if (it == null) {
+                    _gsp.postValue(Result.Error(IllegalArgumentException()))
+                } else {
+                    val gsp = GroundStationPosition(it.latitude, it.longitude, it.altitude)
+                    prefsManager.setPosition(gsp)
+                    _gsp.postValue(Result.Success(gsp))
+                }
+            }
+        } catch (e: SecurityException) {
+            _gsp.postValue(Result.Error(e))
         }
     }
 
     fun updateEntries() {
         viewModelScope.launch(Dispatchers.IO) {
-            val selected = repository.getSelectedEntries().map { it.catNum }
-            repository.updateEntriesFrom(urlList)
-            repository.updateEntriesSelection(selected)
-            _debugMessage.postValue("TLE file was updated")
+            try {
+                val selected = repository.getSelectedEntries().map { it.catNum }
+                repository.updateEntriesFrom(urlList)
+                repository.updateEntriesSelection(selected)
+                _updateStatus.postValue(Result.Success(0))
+            } catch (e: Exception) {
+                _updateStatus.postValue(Result.Error(e))
+            }
         }
     }
 
     fun updateTransmitters() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateTransmitters()
-            _debugMessage.postValue("Transceivers database was updated")
+            try {
+                repository.updateTransmitters()
+                _updateStatus.postValue(Result.Success(1))
+            } catch (e: Exception) {
+                _updateStatus.postValue(Result.Error(e))
+            }
         }
     }
 
@@ -99,18 +116,17 @@ class SharedViewModel @Inject constructor(
     }
 
     fun calculatePasses() {
-        _isListRefreshing.postValue(true)
+        _satPassList.postValue(Result.InProgress)
         calculationJob?.cancel()
         var passList = mutableListOf<SatPass>()
         val dateNow = Date()
-        val gsp = getGSP().value ?: GroundStationPosition(0.0, 0.0, 0.0)
+        val gsp = prefsManager.getPosition()
         calculationJob = viewModelScope.launch(Dispatchers.Default) {
             repository.getSelectedEntries().forEach {
                 passList.addAll(getPassesForEntries(it, dateNow, gsp))
             }
             passList = filterAndSortPasses(passList, dateNow, getHoursAhead())
-            _satPassList.postValue(passList)
-            _isListRefreshing.postValue(false)
+            _satPassList.postValue(Result.Success(passList))
         }
     }
 

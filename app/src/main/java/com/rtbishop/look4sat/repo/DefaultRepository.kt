@@ -19,7 +19,6 @@
 
 package com.rtbishop.look4sat.repo
 
-import android.util.Log
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.Transmitter
@@ -27,7 +26,6 @@ import com.rtbishop.look4sat.network.RemoteSource
 import com.rtbishop.look4sat.persistence.LocalSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import javax.inject.Inject
 
 class DefaultRepository @Inject constructor(
@@ -35,18 +33,12 @@ class DefaultRepository @Inject constructor(
     private val remoteSource: RemoteSource
 ) : Repository {
 
-    private val tag = "defaultRepository"
-
     override suspend fun updateEntriesFrom(urlList: List<String>) {
         val stream = remoteSource.fetchTleStream(urlList)
-        try {
-            withContext(Dispatchers.IO) {
-                val tleList = TLE.importSat(stream)
-                val entries = tleList.map { SatEntry(it) }
-                localSource.insertEntries(entries)
-            }
-        } catch (e: Exception) {
-            Log.w(tag, e.toString())
+        withContext(Dispatchers.IO) {
+            val tleList = TLE.importSat(stream)
+            val entries = tleList.map { SatEntry(it) }
+            localSource.insertEntries(entries)
         }
     }
 
@@ -65,12 +57,7 @@ class DefaultRepository @Inject constructor(
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     override suspend fun updateTransmitters() {
-        try {
-            val list = remoteSource.fetchTransmitters()
-            localSource.insertTransmitters(list)
-        } catch (e: IOException) {
-            Log.w(tag, e.toString())
-        }
+        localSource.insertTransmitters(remoteSource.fetchTransmitters())
     }
 
     override suspend fun getTransmittersByCatNum(catNum: Int): List<Transmitter> {

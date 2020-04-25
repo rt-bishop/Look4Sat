@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassListBinding
@@ -66,7 +67,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         mainActivity = activity as MainActivity
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
-        satPassAdapter = SatPassAdapter(viewModel)
+        satPassAdapter = SatPassAdapter(satPassList)
         aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
         btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
 
@@ -80,20 +81,25 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
     }
 
     private fun setupObservers(binding: FragmentPassListBinding) {
-        viewModel.getSatPassList().observe(viewLifecycleOwner, Observer {
-            satPassList = it
-            satPassAdapter.setList(satPassList)
-            if (satPassList.isNotEmpty()) {
-                binding.layoutInfo.visibility = View.INVISIBLE
-                binding.recPassList.visibility = View.VISIBLE
-            } else {
-                binding.layoutInfo.visibility = View.VISIBLE
-                binding.recPassList.visibility = View.INVISIBLE
+        viewModel.getPassList().observe(viewLifecycleOwner, Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    satPassList = result.data
+                    satPassAdapter.setList(satPassList)
+                    if (satPassList.isNotEmpty()) {
+                        binding.layoutInfo.visibility = View.INVISIBLE
+                        binding.recPassList.visibility = View.VISIBLE
+                    } else {
+                        binding.layoutInfo.visibility = View.VISIBLE
+                        binding.recPassList.visibility = View.INVISIBLE
+                    }
+                    setTimer()
+                    binding.refLayoutPassList.isRefreshing = false
+                }
+                is Result.InProgress -> {
+                    binding.refLayoutPassList.isRefreshing = true
+                }
             }
-            setTimer()
-        })
-        viewModel.getRefreshing().observe(viewLifecycleOwner, Observer {
-            binding.refLayoutPassList.isRefreshing = it
         })
     }
 

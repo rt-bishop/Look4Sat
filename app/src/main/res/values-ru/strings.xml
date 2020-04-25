@@ -145,4 +145,5 @@
     <string name="btn_all_none">Все/Нет</string>
 
     <string name="map_gsp">СТЦ</string>
+    <string name="update_loc_failure">Проверьте ваши настройки GPS</string>
 </resources>

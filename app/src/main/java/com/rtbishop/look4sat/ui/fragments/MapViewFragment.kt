@@ -36,6 +36,7 @@ import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapViewBinding
 import com.rtbishop.look4sat.ui.MainActivity
@@ -56,8 +57,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     private lateinit var mapView: MapView
     private lateinit var predictor: PassPredictor
     private lateinit var selectedSat: TLE
-    private lateinit var gsp: GroundStationPosition
-    private lateinit var satPassList: List<SatPass>
+    private var gsp = GroundStationPosition(0.0, 0.0, 0.0)
+    private var satPassList = emptyList<SatPass>()
     private var checkedItem = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,9 +67,29 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         mainActivity = activity as MainActivity
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
-        gsp = viewModel.getGSP().value ?: GroundStationPosition(0.0, 0.0, 0.0)
-        satPassList = viewModel.getSatPassList().value ?: emptyList()
+        setupObservers(binding)
+    }
 
+    private fun setupObservers(binding: FragmentMapViewBinding) {
+        viewModel.getGSP().observe(viewLifecycleOwner, androidx.lifecycle.Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    gsp = result.data
+                }
+            }
+        })
+
+        viewModel.getPassList().observe(viewLifecycleOwner, androidx.lifecycle.Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    satPassList = result.data
+                    setupMapView(binding)
+                }
+            }
+        })
+    }
+
+    private fun setupMapView(binding: FragmentMapViewBinding) {
         if (satPassList.isNotEmpty()) {
             satPassList = satPassList.distinctBy { it.tle }
             satPassList = satPassList.sortedBy { it.tle.name }
