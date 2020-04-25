@@ -155,7 +155,6 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         var maxElevation = 0.0
         var elevation: Double
         var prevPos: SatPos
-        var tca: Date? = null
         var polePassed = deadSpotNone
 
         // get the current position
@@ -184,11 +183,9 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         // now find the next time it comes above the horizon
         do {
             satPos = getPosition(cal, 60)
-            val now = cal.time
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                tca = now
             }
         } while (satPos.elevation < 0.0)
 
@@ -196,11 +193,9 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         cal.add(Calendar.SECOND, -60)
         do {
             satPos = getPosition(cal, 5)
-            val now = cal.time
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                tca = now
             }
             prevPos = satPos
         } while (satPos.elevation < 0.0)
@@ -210,7 +205,6 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         // now find when it goes below
         do {
             satPos = getPosition(cal, 30)
-            val now = cal.time
             val currPolePassed = getPolePassed(prevPos, satPos)
             if (currPolePassed != deadSpotNone) {
                 polePassed = currPolePassed
@@ -218,7 +212,6 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                tca = now
             }
             prevPos = satPos
         } while (satPos.elevation > 0.0)
@@ -227,16 +220,15 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         cal.add(Calendar.SECOND, -30)
         do {
             satPos = getPosition(cal, 5)
-            val now = cal.time
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                tca = now
             }
         } while (satPos.elevation > 0.0)
 
         val endDate = satPos.time
         losAzimuth = (satPos.azimuth / (2.0 * Math.PI) * 360.0).toInt()
+        val tca = Date(startDate.time + (endDate.time - startDate.time) / 2)
 
         return SatPassTime(
             startDate, endDate, tca, polePassed, aosAzimuth,
