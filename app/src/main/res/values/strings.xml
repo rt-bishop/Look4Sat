@@ -91,18 +91,13 @@
     <string name="pass_los_az">%2d° — LOS</string>
     <string name="pass_dateTime" translatable="false">dd MMM @ HH:mm:ss</string>
 
-    <string name="polar_north">N</string>
-    <string name="polar_west">W</string>
-    <string name="polar_south">S</string>
-    <string name="polar_east">E</string>
-
     <string name="pat_location" translatable="false">%.4f</string>
-    <string name="pat_azimuth">Azimuth: %.1f°</string>
-    <string name="pat_elevation">Elevation: %.1f°</string>
-    <string name="pat_latitude">Latitude: %.1f°</string>
-    <string name="pat_longitude">Longitude: %.1f°</string>
-    <string name="pat_range">Distance: %.0f km</string>
-    <string name="pat_altitude">Altitude: %.0f km</string>
+    <string name="pat_azimuth">Az: %.1f°</string>
+    <string name="pat_elevation">El: %.1f°</string>
+    <string name="pat_latitude">Lat: %.1f°</string>
+    <string name="pat_longitude">Lon: %.1f°</string>
+    <string name="pat_range">Dst: %.0f km</string>
+    <string name="pat_altitude">Alt: %.0f km</string>
     <string name="pat_timer" translatable="false">%02d:%02d:%02d</string>
 
     <string name="trans_description" translatable="false">%s</string>

@@ -77,11 +77,6 @@
     <string name="pass_maxEl">Элевация: %.1f°</string>
     <string name="pass_los_az">%2d° — КПС</string>
 
-    <string name="polar_north">С</string>
-    <string name="polar_west">З</string>
-    <string name="polar_south">Ю</string>
-    <string name="polar_east">В</string>
-
     <string name="pat_azimuth">Азимут: %.1f°</string>
     <string name="pat_elevation">Элевация: %.1f°</string>
     <string name="pat_latitude">Широта: %.1f°</string>

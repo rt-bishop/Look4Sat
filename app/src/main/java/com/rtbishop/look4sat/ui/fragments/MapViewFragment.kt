@@ -41,6 +41,7 @@ import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapViewBinding
 import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
+import com.rtbishop.look4sat.utility.GeneralUtils
 import com.rtbishop.look4sat.utility.PassPredictor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -182,7 +183,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             val degLon = width / 360f
             val degLat = height / 180f
             drawHomeLoc(canvas, degLon, degLat)
-            val currentTime = getDateFor(System.currentTimeMillis())
+            val currentTime = GeneralUtils.getDateFor(System.currentTimeMillis())
             val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
             val positions = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
             setTextViewsToSelectedSatPos(positions[0])
@@ -215,8 +216,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         }
 
         private fun setTextViewsToSelectedSatPos(position: SatPos) {
-            var lon = rad2Deg(position.longitude).toFloat()
-            val lat = rad2Deg(position.latitude).toFloat()
+            var lon = GeneralUtils.rad2Deg(position.longitude).toFloat()
+            val lat = GeneralUtils.rad2Deg(position.latitude).toFloat()
             val rng = position.range
 
             if (lon > 180f) lon -= 360f
@@ -238,8 +239,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             var lastLon = 181f
 
             list.withIndex().forEach { (index, satPos) ->
-                lon = rad2Deg(satPos.longitude).toFloat()
-                lat = rad2Deg(satPos.latitude).toFloat() * -1
+                lon = GeneralUtils.rad2Deg(satPos.longitude).toFloat()
+                lat = GeneralUtils.rad2Deg(satPos.latitude).toFloat() * -1
 
                 if (lon > 180f) lon -= 360f
 
@@ -305,8 +306,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             position: SatPos,
             name: String
         ) {
-            var lon = rad2Deg(position.longitude).toFloat()
-            val lat = rad2Deg(position.latitude).toFloat() * -1
+            var lon = GeneralUtils.rad2Deg(position.longitude).toFloat()
+            val lat = GeneralUtils.rad2Deg(position.latitude).toFloat() * -1
 
             if (lon > 180f) lon -= 360f
 
@@ -317,14 +318,6 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             txtPaint.getTextBounds(name, 0, name.length, rect)
             canvas.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, outlinePaint)
             canvas.drawText(name, cx - rect.width() / 2, cy - txtPaint.textSize, txtPaint)
-        }
-
-        private fun getDateFor(value: Long): Date {
-            return Date(value)
-        }
-
-        private fun rad2Deg(value: Double): Double {
-            return value * 180 / Math.PI
         }
     }
 }
