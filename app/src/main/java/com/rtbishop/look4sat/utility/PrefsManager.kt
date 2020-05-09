@@ -35,6 +35,7 @@ class PrefsManager @Inject constructor(
     private val keyLongitude = "longitude"
     private val keyAltitude = "altitude"
     private val keyRefreshRate = "rate"
+    private val keyCompass = "compass"
     private val defaultHoursAhead = 8
     private val defaultMinEl = 16.0
     private val defaultRefreshRate = "3000"
@@ -50,6 +51,10 @@ class PrefsManager @Inject constructor(
 
     fun getRefreshRate(): Long {
         return preferences.getString(keyRefreshRate, defaultRefreshRate)!!.toLong()
+    }
+
+    fun getCompass(): Boolean {
+        return preferences.getBoolean(keyCompass, false)
     }
 
     fun getPosition(): GroundStationPosition {

@@ -82,17 +82,21 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
 
     override fun onResume() {
         super.onResume()
-        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER).also { accData ->
-            sensorManager.registerListener(this, accData, SensorManager.SENSOR_DELAY_GAME)
-        }
-        sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD).also { magData ->
-            sensorManager.registerListener(this, magData, SensorManager.SENSOR_DELAY_GAME)
+        if (viewModel.getCompass()) {
+            sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER).also { accData ->
+                sensorManager.registerListener(this, accData, SensorManager.SENSOR_DELAY_GAME)
+            }
+            sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD).also { magData ->
+                sensorManager.registerListener(this, magData, SensorManager.SENSOR_DELAY_GAME)
+            }
         }
     }
 
     override fun onPause() {
         super.onPause()
-        sensorManager.unregisterListener(this)
+        if (viewModel.getCompass()) {
+            sensorManager.unregisterListener(this)
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
@@ -152,7 +156,6 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
 
     private fun refreshText(rate: Long) {
         refreshJob?.cancel()
-        refreshJob = null
         refreshJob = lifecycleScope.launch {
             while (true) {
                 setPassText()

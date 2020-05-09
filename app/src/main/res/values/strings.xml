@@ -69,6 +69,8 @@
     <string name="pref_refresh_rate_key" translatable="false">rate</string>
     <string name="pref_refresh_rate_title">View refresh rate, ms</string>
     <string name="pref_refresh_rate_input_error">Set the value between 250ms and 10000ms</string>
+    <string name="pref_compass_key" translatable="false">compass</string>
+    <string name="pref_compass_title" translatable="false">Use sensors to rotate PolarView</string>
 
     <string name="no_mode">Mode: Null</string>
     <string name="no_uplink">Uplink: Null</string>
