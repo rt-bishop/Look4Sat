@@ -16,6 +16,10 @@ import kotlin.math.abs
 
 class MapView(context: Context) : View(context) {
 
+    constructor(context: Context, groundStationPosition: GroundStationPosition) : this(context) {
+        gsp = groundStationPosition
+    }
+
     private lateinit var passList: List<SatPass>
     private lateinit var gsp: GroundStationPosition
     private lateinit var selectedSat: TLE
@@ -60,10 +64,6 @@ class MapView(context: Context) : View(context) {
 
     fun setList(satPassList: List<SatPass>) {
         passList = satPassList
-    }
-
-    fun setGSP(groundStationPosition: GroundStationPosition) {
-        gsp = groundStationPosition
     }
 
     fun setChecked(item: Int) {

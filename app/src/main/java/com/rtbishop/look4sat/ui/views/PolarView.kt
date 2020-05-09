@@ -2,7 +2,6 @@ package com.rtbishop.look4sat.ui.views
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.view.View
@@ -24,7 +23,6 @@ class PolarView(context: Context) : View(context) {
     private val radius = polarWidth * 0.49f
     private val txtSize = scale * 15
     private val path: Path = Path()
-    private val mMatrix = Matrix()
     var azimuth = 0f
 
     private val radarPaint = Paint().apply {
@@ -51,7 +49,6 @@ class PolarView(context: Context) : View(context) {
     }
 
     override fun onDraw(canvas: Canvas) {
-//        Log.w("myTag", "$measuredWidth, $measuredHeight")
         canvas.rotate(-azimuth, polarCenter, polarCenter)
         canvas.translate(polarCenter, polarCenter)
         drawRadarView(canvas)

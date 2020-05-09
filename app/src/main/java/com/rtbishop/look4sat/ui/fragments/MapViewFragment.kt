@@ -92,9 +92,8 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             binding.fabMap.setOnClickListener { showSelectSatDialog(satPassList) }
             selectedSat = satPassList.first().tle
             predictor = satPassList.first().predictor
-            mapView = MapView(mainActivity)
+            mapView = MapView(mainActivity, gsp)
             mapView.setList(satPassList)
-            mapView.setGSP(gsp)
             mapView.setChecked(checkedItem)
             binding.frameMap.addView(mapView)
             refreshView()
@@ -132,8 +131,6 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
                 checkedItem = which
                 selectedSat = list[which].tle
                 predictor = list[which].predictor
-                mapView.setList(satPassList)
-                mapView.setGSP(gsp)
                 mapView.setChecked(checkedItem)
                 mapView.invalidate()
                 dialog.dismiss()
