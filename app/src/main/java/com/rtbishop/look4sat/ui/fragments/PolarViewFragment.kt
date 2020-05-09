@@ -57,9 +57,8 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentPolarViewBinding
     private lateinit var satPass: SatPass
-    private lateinit var polarView: PolarView
     private lateinit var sensorManager: SensorManager
-
+    private var polarView: PolarView? = null
     private val args: PolarViewFragmentArgs by navArgs()
     private val transmitterAdapter = TransmitterAdapter()
     private var lastAccData = FloatArray(3)
@@ -114,7 +113,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
                 val orientation = FloatArray(3)
                 SensorManager.getOrientation(rotationMatrix, orientation)
                 val degree = orientation[0] * 57.2957795f
-                polarView.rotation = -degree
+                polarView?.rotation = -degree
             }
         }
     }
@@ -159,7 +158,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
         refreshJob = lifecycleScope.launch {
             while (true) {
                 setPassText()
-                polarView.invalidate()
+                polarView?.invalidate()
                 delay(rate)
             }
         }

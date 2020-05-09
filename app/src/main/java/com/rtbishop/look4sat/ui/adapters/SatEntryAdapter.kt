@@ -48,6 +48,10 @@ class SatEntryAdapter(private var entries: MutableList<SatEntry>) :
         notifyDataSetChanged()
     }
 
+    fun getEntries(): MutableList<SatEntry> {
+        return entries
+    }
+
     inner class SatEntryHolder(itemView: View, private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(itemView) {
 

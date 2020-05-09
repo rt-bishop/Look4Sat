@@ -110,12 +110,14 @@ class SatEntryDialogFragment(private var entries: MutableList<SatEntry>) :
 
     private fun onNeutralClicked() {
         selectAllToggle = if (selectAllToggle) {
-            entries.forEach { it.isSelected = true }
-            entryAdapter.setEntries(entries)
+            val currentList = entryAdapter.getEntries()
+            currentList.forEach { it.isSelected = true }
+            entryAdapter.setEntries(currentList)
             false
         } else {
-            entries.forEach { it.isSelected = false }
-            entryAdapter.setEntries(entries)
+            val currentList = entryAdapter.getEntries()
+            currentList.forEach { it.isSelected = false }
+            entryAdapter.setEntries(currentList)
             true
         }
     }
