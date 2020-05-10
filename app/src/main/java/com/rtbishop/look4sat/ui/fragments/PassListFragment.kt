@@ -139,9 +139,9 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         etHoursAhead.setText(hoursAhead.toString())
         etMinEl.setText(minEl.toString())
 
-        val builder = AlertDialog.Builder(mainActivity)
-        builder.setTitle(getString(R.string.dialog_filter_passes))
-            .setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
+        AlertDialog.Builder(mainActivity).apply {
+            setTitle(getString(R.string.dialog_filter_passes))
+            setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
                 val hoursStr = etHoursAhead.text.toString()
                 val elevationStr = etMinEl.text.toString()
                 if (hoursStr.isNotEmpty() && elevationStr.isNotEmpty()) {
@@ -174,12 +174,13 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
                 ).show()
 
             }
-            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
+            setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
                 dialog.cancel()
             }
-            .setView(satPassPrefView)
-            .create()
-            .show()
+            setView(satPassPrefView)
+            create()
+            show()
+        }
     }
 
     private fun showSelectSatDialog(

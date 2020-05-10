@@ -36,8 +36,8 @@ class DefaultRepository @Inject constructor(
     private val remoteSource: RemoteSource
 ) : Repository {
 
-    override suspend fun updateEntriesFromFile(uri: Uri) {
-        resolver.openInputStream(uri)?.use {
+    override suspend fun updateEntriesFromFile(tleUri: Uri) {
+        resolver.openInputStream(tleUri)?.use {
             withContext(Dispatchers.IO) {
                 val tleList = TLE.importSat(it)
                 val entries = tleList.map { SatEntry(it) }

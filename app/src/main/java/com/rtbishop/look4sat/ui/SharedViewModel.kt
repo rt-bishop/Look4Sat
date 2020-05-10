@@ -98,10 +98,15 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun updateEntriesFromWeb() {
+    fun updateEntriesFromWeb(tleUrl: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val url = prefsManager.getTleUrl()
+                val url = if (tleUrl.isNullOrEmpty()) {
+                    prefsManager.getTleUrl()
+                } else {
+                    prefsManager.setTleUrl(tleUrl)
+                    tleUrl
+                }
                 val selected = repository.getSelectedEntries().map { it.catNum }
                 repository.updateEntriesFromUrl(url)
                 repository.updateEntriesSelection(selected)

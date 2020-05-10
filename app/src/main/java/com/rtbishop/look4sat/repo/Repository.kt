@@ -6,7 +6,7 @@ import com.rtbishop.look4sat.data.Transmitter
 
 interface Repository {
 
-    suspend fun updateEntriesFromFile(uri: Uri)
+    suspend fun updateEntriesFromFile(tleUri: Uri)
 
     suspend fun updateEntriesFromUrl(tleUrl: String)
 

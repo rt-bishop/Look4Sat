@@ -29,10 +29,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/dialog_select_sat"
-        android:textSize="21sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,8 +42,9 @@
         android:id="@+id/dialog_search"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_title"
+        app:layout_constraintStart_toStartOf="@+id/dialog_title"
         app:layout_constraintTop_toBottomOf="@+id/dialog_title" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -53,18 +54,17 @@
         android:layout_marginTop="4dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/dialog_btn_negative"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_title"
+        app:layout_constraintStart_toStartOf="@+id/dialog_title"
         app:layout_constraintTop_toBottomOf="@+id/dialog_search" />
 
     <TextView
         android:id="@+id/dialog_btn_neutral"
         style="@style/SatEntryDialogText"
         android:layout_marginStart="8dp"
-        android:layout_marginBottom="4dp"
         android:text="@string/btn_all_none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/dialog_btn_negative"
+        app:layout_constraintStart_toStartOf="@+id/dialog_recycler" />
 
     <TextView
         android:id="@+id/dialog_btn_negative"
@@ -79,10 +79,10 @@
         style="@style/SatEntryDialogText"
         android:layout_width="36dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="8dp"
         android:gravity="end"
         android:text="@string/btn_ok"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/dialog_recycler" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

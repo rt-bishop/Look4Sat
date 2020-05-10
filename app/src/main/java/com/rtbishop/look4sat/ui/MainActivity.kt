@@ -22,6 +22,7 @@ package com.rtbishop.look4sat.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -33,6 +34,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -46,6 +48,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
+import com.rtbishop.look4sat.databinding.DialogTleUrlBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -162,7 +165,8 @@ class MainActivity : AppCompatActivity() {
             it.lockButton()
         }
         drawerBinding.drawerBtnTleUrl.setOnClickListener {
-            viewModel.updateEntriesFromWeb()
+            showTleUrlDialog()
+            mainBinding.drawerLayout.closeDrawers()
             it.lockButton()
         }
         drawerBinding.drawerBtnTrans.setOnClickListener {
@@ -175,6 +179,27 @@ class MainActivity : AppCompatActivity() {
             startActivity(githubIntent)
         }
         drawerBinding.drawerBtnExit.setOnClickListener { finish() }
+    }
+
+    private fun showTleUrlDialog() {
+        var tleUrl = ""
+        val dialogBinding = DialogTleUrlBinding.inflate(layoutInflater).apply {
+            dialogTleInput.addTextChangedListener {
+                tleUrl = it.toString()
+            }
+            dialogTleNeg.setOnClickListener {
+
+            }
+            dialogTlePos.setOnClickListener {
+
+            }
+        }
+
+        AlertDialog.Builder(this).apply {
+            setView(dialogBinding.root)
+            create()
+            show()
+        }
     }
 
     private fun toast(message: String) {
