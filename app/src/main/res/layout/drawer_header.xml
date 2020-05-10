@@ -94,16 +94,26 @@
         android:id="@+id/drawer_btn_loc"
         style="@style/DrawerHeader.Button"
         android:layout_width="0dp"
-        android:layout_marginTop="4dp"
         android:drawableEnd="@drawable/ic_update_loc"
         android:text="@string/update_loc"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_btn_tle"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_btn_tle_file"
         app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
         app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
         app:layout_constraintTop_toBottomOf="@+id/drawer_lon_value" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/drawer_btn_tle"
+        android:id="@+id/drawer_btn_tle_file"
+        style="@style/DrawerHeader.Button"
+        android:layout_width="0dp"
+        android:drawableEnd="@drawable/ic_file_open"
+        android:text="@string/update_tle_file"
+        app:layout_constraintBottom_toTopOf="@+id/drawer_btn_tle_url"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
+        app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
+        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_loc" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/drawer_btn_tle_url"
         style="@style/DrawerHeader.Button"
         android:layout_width="0dp"
         android:drawableEnd="@drawable/ic_update_tle"
@@ -111,7 +121,7 @@
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_trans"
         app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
         app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_loc" />
+        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle_file" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/drawer_btn_trans"
@@ -122,7 +132,7 @@
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_github"
         app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
         app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle" />
+        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle_url" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/drawer_btn_github"

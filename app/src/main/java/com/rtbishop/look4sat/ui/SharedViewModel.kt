@@ -20,6 +20,7 @@
 package com.rtbishop.look4sat.ui
 
 import android.location.LocationManager
+import android.net.Uri
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.Result
@@ -46,7 +47,6 @@ class SharedViewModel @Inject constructor(
     private val _gsp = MutableLiveData<Result<GroundStationPosition>>().apply {
         value = Result.Success(prefsManager.getPosition())
     }
-    private val urlList = listOf("https://celestrak.com/NORAD/elements/active.txt")
     private var calculationJob: Job? = null
     var isFirstLaunch = true
 
@@ -85,11 +85,25 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun updateEntries() {
+    fun updateEntriesFromFile(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val selected = repository.getSelectedEntries().map { it.catNum }
-                repository.updateEntriesFrom(urlList)
+                repository.updateEntriesFromFile(uri)
+                repository.updateEntriesSelection(selected)
+                _updateStatus.postValue(Result.Success(0))
+            } catch (e: Exception) {
+                _updateStatus.postValue(Result.Error(e))
+            }
+        }
+    }
+
+    fun updateEntriesFromWeb() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val url = prefsManager.getTleUrl()
+                val selected = repository.getSelectedEntries().map { it.catNum }
+                repository.updateEntriesFromUrl(url)
                 repository.updateEntriesSelection(selected)
                 _updateStatus.postValue(Result.Success(0))
             } catch (e: Exception) {

@@ -19,6 +19,8 @@
 
 package com.rtbishop.look4sat.repo
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.Transmitter
@@ -29,12 +31,23 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DefaultRepository @Inject constructor(
+    private val resolver: ContentResolver,
     private val localSource: LocalSource,
     private val remoteSource: RemoteSource
 ) : Repository {
 
-    override suspend fun updateEntriesFrom(urlList: List<String>) {
-        val stream = remoteSource.fetchTleStream(urlList)
+    override suspend fun updateEntriesFromFile(uri: Uri) {
+        resolver.openInputStream(uri)?.use {
+            withContext(Dispatchers.IO) {
+                val tleList = TLE.importSat(it)
+                val entries = tleList.map { SatEntry(it) }
+                localSource.insertEntries(entries)
+            }
+        }
+    }
+
+    override suspend fun updateEntriesFromUrl(tleUrl: String) {
+        val stream = remoteSource.fetchTleStream(tleUrl)
         withContext(Dispatchers.IO) {
             val tleList = TLE.importSat(stream)
             val entries = tleList.map { SatEntry(it) }

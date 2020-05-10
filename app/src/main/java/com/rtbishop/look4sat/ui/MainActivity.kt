@@ -21,6 +21,7 @@ package com.rtbishop.look4sat.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -52,6 +53,7 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
+    private val pickFileReqCode = 111
     private val permLocationCode = 101
     private val permLocation = Manifest.permission.ACCESS_FINE_LOCATION
     private val permGranted = PackageManager.PERMISSION_GRANTED
@@ -150,8 +152,17 @@ class MainActivity : AppCompatActivity() {
             requestLocationUpdate()
             it.lockButton()
         }
-        drawerBinding.drawerBtnTle.setOnClickListener {
-            viewModel.updateEntries()
+        drawerBinding.drawerBtnTleFile.setOnClickListener {
+            val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "text/*"
+            }
+            startActivityForResult(openFileIntent, pickFileReqCode)
+            mainBinding.drawerLayout.closeDrawers()
+            it.lockButton()
+        }
+        drawerBinding.drawerBtnTleUrl.setOnClickListener {
+            viewModel.updateEntriesFromWeb()
             it.lockButton()
         }
         drawerBinding.drawerBtnTrans.setOnClickListener {
@@ -203,5 +214,15 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host)
         return navController.navigateUp(appBarConfig) || super.onSupportNavigateUp()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == pickFileReqCode && resultCode == Activity.RESULT_OK) {
+            data?.data?.also { uri ->
+                viewModel.updateEntriesFromFile(uri)
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 }

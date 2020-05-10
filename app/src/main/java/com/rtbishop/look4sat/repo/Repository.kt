@@ -1,11 +1,14 @@
 package com.rtbishop.look4sat.repo
 
+import android.net.Uri
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.Transmitter
 
 interface Repository {
 
-    suspend fun updateEntriesFrom(urlList: List<String>)
+    suspend fun updateEntriesFromFile(uri: Uri)
+
+    suspend fun updateEntriesFromUrl(tleUrl: String)
 
     suspend fun getAllEntries(): List<SatEntry>
 

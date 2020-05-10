@@ -36,10 +36,12 @@ class PrefsManager @Inject constructor(
     private val keyAltitude = "altitude"
     private val keyRefreshRate = "rate"
     private val keyCompass = "compass"
+    private val keyTleUrl = "tleUrl"
     private val defaultHoursAhead = 8
     private val defaultMinEl = 16.0
     private val defaultRefreshRate = "3000"
     private val defaultGSP = "0.0"
+    private val defaultTleUrl = "https://celestrak.com/NORAD/elements/active.txt"
 
     fun getHoursAhead(): Int {
         return preferences.getInt(keyHoursAhead, defaultHoursAhead)
@@ -62,6 +64,10 @@ class PrefsManager @Inject constructor(
         val lon = preferences.getString(keyLongitude, defaultGSP)!!.toDouble()
         val alt = preferences.getString(keyAltitude, defaultGSP)!!.toDouble()
         return GroundStationPosition(lat, lon, alt)
+    }
+
+    fun getTleUrl(): String {
+        return preferences.getString(keyTleUrl, defaultTleUrl)!!
     }
 
     fun setHoursAhead(hours: Int) {
@@ -91,6 +97,12 @@ class PrefsManager @Inject constructor(
             putString(keyLongitude, gsp.longitude.toString())
             putString(keyAltitude, gsp.heightAMSL.toString())
             apply()
+        }
+    }
+
+    fun setTleUrl(tleUrl: String) {
+        preferences.edit {
+            putString(keyTleUrl, tleUrl)
         }
     }
 

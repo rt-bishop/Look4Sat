@@ -34,14 +34,12 @@ class RemoteDataSource @Inject constructor(
     private val client: OkHttpClient
 ) : RemoteSource {
 
-    override suspend fun fetchTleStream(urlList: List<String>): InputStream {
+    override suspend fun fetchTleStream(tleUrl: String): InputStream {
         val streamTable = Hashtable<String, InputStream>()
         withContext(Dispatchers.IO) {
-            urlList.forEach {
-                val request = Request.Builder().url(it).build()
-                val stream = client.newCall(request).execute().body()?.byteStream()
-                streamTable[it] = stream
-            }
+            val request = Request.Builder().url(tleUrl).build()
+            val stream = client.newCall(request).execute().body()?.byteStream()
+            streamTable[tleUrl] = stream
         }
         return SequenceInputStream(streamTable.elements())
     }
