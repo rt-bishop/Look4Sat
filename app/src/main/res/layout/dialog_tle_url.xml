@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
-        android:text="TextView"
+        android:text="@string/pref_tle_url_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,8 +19,7 @@
         android:id="@+id/dialogTleInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="https://server/with/tle.txt"
+        android:hint="@string/placeholder"
         android:importantForAutofill="no"
         android:inputType="textWebEditText"
         app:layout_constraintEnd_toEndOf="@+id/dialogTlePos"
@@ -41,7 +40,6 @@
         android:id="@+id/dialogTlePos"
         style="@style/SatEntryDialogText"
         android:layout_width="36dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="12dp"
         android:gravity="end"

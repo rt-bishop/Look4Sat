@@ -28,9 +28,9 @@
     <string name="update_loc">Update location</string>
     <string name="update_loc_success">Location was updated</string>
     <string name="update_loc_failure">Check your Location settings</string>
-    <string name="update_tle_file" translatable="false">Update TLE from file</string>
+    <string name="update_tle_file" translatable="false">Import TLE from file</string>
     <string name="update_tle_file_success" translatable="false">TLE was updated</string>
-    <string name="update_tle">Update TLE from URL</string>
+    <string name="update_tle">Import TLE from WEB</string>
     <string name="update_tle_success">TLE was updated</string>
     <string name="update_trans">Update transceivers</string>
     <string name="update_trans_success">Transceivers database was updated</string>
@@ -73,6 +73,7 @@
     <string name="pref_refresh_rate_input_error">Set the value between 250ms and 10000ms</string>
     <string name="pref_compass_key" translatable="false">compass</string>
     <string name="pref_compass_title" translatable="false">Use sensors to rotate PolarView</string>
+    <string name="pref_tle_url_title" translatable="false">Please, enter the HTTPS URL:</string>
 
     <string name="no_mode">Mode: Null</string>
     <string name="no_uplink">Uplink: Null</string>

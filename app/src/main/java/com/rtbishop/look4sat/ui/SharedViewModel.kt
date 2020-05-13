@@ -59,6 +59,7 @@ class SharedViewModel @Inject constructor(
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
+    fun getTleUrl() = prefsManager.getTleUrl()
     fun setPositionFromPref() = _gsp.postValue(Result.Success(prefsManager.getPosition()))
     suspend fun getAllEntries() = repository.getAllEntries()
 

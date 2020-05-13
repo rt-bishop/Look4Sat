@@ -21,8 +21,6 @@ package com.rtbishop.look4sat.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -30,6 +28,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -88,7 +87,6 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SourceLockedOrientationActivity")
     private fun setupComponents() {
         val navController = findNavController(R.id.nav_host)
-        val navView = mainBinding.navView
         val toolbar = mainBinding.includeAppBar.toolbar
         setSupportActionBar(toolbar)
 
@@ -98,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         setupActionBarWithNavController(navController, appBarConfig)
-        navView.setupWithNavController(navController)
+        mainBinding.navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
@@ -184,24 +182,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showTleUrlDialog() {
-        var tleUrl = ""
-        val dialogBinding = DialogTleUrlBinding.inflate(layoutInflater).apply {
-            dialogTleInput.addTextChangedListener {
-                tleUrl = it.toString()
+        val dialogBinding = DialogTleUrlBinding.inflate(layoutInflater)
+        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialogBinding.apply {
+            var tleUrl = String()
+            dialogTleInput.apply {
+                hint = viewModel.getTleUrl()
+                addTextChangedListener { tleUrl = it.toString() }
             }
             dialogTleNeg.setOnClickListener {
-
+                dialog.dismiss()
             }
             dialogTlePos.setOnClickListener {
-
+                viewModel.updateEntriesFromWeb(tleUrl)
+                dialog.dismiss()
             }
         }
-
-        AlertDialog.Builder(this).apply {
-            setView(dialogBinding.root)
-            create()
-            show()
-        }
+        dialog.show()
     }
 
     private fun View.lockButton() {
@@ -240,7 +237,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == pickFileReqCode && resultCode == Activity.RESULT_OK) {
+        if (requestCode == pickFileReqCode && resultCode == RESULT_OK) {
             data?.data?.also { uri ->
                 viewModel.updateEntriesFromFile(uri)
             }
