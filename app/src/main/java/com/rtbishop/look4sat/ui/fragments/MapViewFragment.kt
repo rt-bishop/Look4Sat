@@ -21,7 +21,6 @@ package com.rtbishop.look4sat.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -38,6 +37,7 @@ import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.views.MapView
 import com.rtbishop.look4sat.utility.GeneralUtils
+import com.rtbishop.look4sat.utility.GeneralUtils.toast
 import com.rtbishop.look4sat.utility.PassPredictor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -69,9 +69,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     private fun setupObservers(binding: FragmentMapViewBinding) {
         viewModel.getGSP().observe(viewLifecycleOwner, androidx.lifecycle.Observer { result ->
             when (result) {
-                is Result.Success -> {
-                    gsp = result.data
-                }
+                is Result.Success -> gsp = result.data
             }
         })
 
@@ -99,11 +97,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             refreshView()
         } else {
             binding.fabMap.setOnClickListener {
-                Toast.makeText(
-                    mainActivity,
-                    getString(R.string.err_no_sat_selected),
-                    Toast.LENGTH_SHORT
-                ).show()
+                getString(R.string.err_no_sat_selected).toast(mainActivity)
             }
         }
     }

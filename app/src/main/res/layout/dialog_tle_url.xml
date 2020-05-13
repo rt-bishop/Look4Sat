@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/dialotTleTitle"
+        android:id="@+id/dialogTleTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -24,8 +24,8 @@
         android:importantForAutofill="no"
         android:inputType="textWebEditText"
         app:layout_constraintEnd_toEndOf="@+id/dialogTlePos"
-        app:layout_constraintStart_toStartOf="@+id/dialotTleTitle"
-        app:layout_constraintTop_toBottomOf="@+id/dialotTleTitle" />
+        app:layout_constraintStart_toStartOf="@+id/dialogTleTitle"
+        app:layout_constraintTop_toBottomOf="@+id/dialogTleTitle" />
 
     <TextView
         android:id="@+id/dialogTleNeg"

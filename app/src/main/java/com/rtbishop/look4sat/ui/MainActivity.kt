@@ -30,7 +30,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -50,6 +49,7 @@ import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.databinding.DialogTleUrlBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
+import com.rtbishop.look4sat.utility.GeneralUtils.toast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -131,8 +131,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 is Result.Error -> {
                     when (result.exception) {
-                        is SecurityException -> toast(getString(R.string.err_no_permissions))
-                        is IllegalArgumentException -> toast(getString(R.string.update_loc_failure))
+                        is SecurityException ->
+                            getString(R.string.err_no_permissions).toast(this)
+                        is IllegalArgumentException ->
+                            getString(R.string.update_loc_failure).toast(this)
                     }
                 }
             }
@@ -141,11 +143,11 @@ class MainActivity : AppCompatActivity() {
             when (result) {
                 is Result.Success -> {
                     when (result.data) {
-                        0 -> toast(getString(R.string.update_tle_success))
-                        1 -> toast(getString(R.string.update_trans_success))
+                        0 -> getString(R.string.update_tle_success).toast(this)
+                        1 -> getString(R.string.update_trans_success).toast(this)
                     }
                 }
-                is Result.Error -> toast(getString(R.string.update_failure))
+                is Result.Error -> getString(R.string.update_failure).toast(this)
             }
         })
     }
@@ -202,10 +204,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
     private fun View.lockButton() {
         lifecycleScope.launch {
             this@lockButton.isEnabled = false
@@ -217,7 +215,7 @@ class MainActivity : AppCompatActivity() {
     private fun requestLocationUpdate() {
         if (ContextCompat.checkSelfPermission(this, permLocation) != permGranted) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permLocation)) {
-                toast(getString(R.string.err_no_permissions))
+                getString(R.string.err_no_permissions).toast(this)
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(permLocation), permLocationCode)
             }
