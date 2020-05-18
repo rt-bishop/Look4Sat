@@ -37,6 +37,7 @@ class PrefsManager @Inject constructor(
     private val keyRefreshRate = "rate"
     private val keyCompass = "compass"
     private val keyTleUrl = "tleUrl"
+    private val keyTleSources = "tleSources"
     private val defaultHoursAhead = 8
     private val defaultMinEl = 16.0
     private val defaultRefreshRate = "3000"
@@ -84,13 +85,6 @@ class PrefsManager @Inject constructor(
         }
     }
 
-    fun setRefreshRate(rate: Long) {
-        preferences.edit {
-            putLong(keyRefreshRate, rate)
-            apply()
-        }
-    }
-
     fun setPosition(gsp: GroundStationPosition) {
         preferences.edit {
             putString(keyLatitude, gsp.latitude.toString())
@@ -103,6 +97,16 @@ class PrefsManager @Inject constructor(
     fun setTleUrl(tleUrl: String) {
         preferences.edit {
             putString(keyTleUrl, tleUrl)
+        }
+    }
+
+    fun getTleSources(): Set<String> {
+        return preferences.getStringSet(keyTleSources, null) ?: emptySet()
+    }
+
+    fun setTleSources(sources: Set<String>) {
+        preferences.edit {
+            putStringSet(keyTleSources, sources)
         }
     }
 

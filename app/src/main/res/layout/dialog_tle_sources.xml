@@ -20,15 +20,16 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tleSourcesRecycler"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/tleSourcesBtnPos"
+        app:layout_constraintBottom_toTopOf="@+id/tleSourceBtnAdd"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tleSourcesTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tleSourcesTitle"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/tleSourcesBtnNeg"
@@ -48,4 +49,18 @@
         android:text="@string/btn_ok"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/tleSourcesRecycler" />
+
+    <ImageView
+        android:id="@+id/tleSourceBtnAdd"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/placeholder"
+        app:layout_constraintBottom_toTopOf="@+id/tleSourcesBtnPos"
+        app:layout_constraintEnd_toEndOf="@+id/tleSourcesRecycler"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/tleSourcesRecycler"
+        app:layout_constraintTop_toBottomOf="@+id/tleSourcesRecycler"
+        app:srcCompat="@android:drawable/ic_menu_add" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

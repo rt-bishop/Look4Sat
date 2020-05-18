@@ -151,6 +151,14 @@ class SharedViewModel @Inject constructor(
         }
     }
 
+    fun getTleSources(): Set<String> {
+        return prefsManager.getTleSources()
+    }
+
+    fun setTleSource(sources: Set<String>) {
+        prefsManager.setTleSources(sources)
+    }
+
     private fun getPassesForEntries(
         entry: SatEntry,
         dateNow: Date,
