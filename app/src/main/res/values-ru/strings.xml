@@ -141,4 +141,6 @@
 
     <string name="map_gsp">СТЦ</string>
     <string name="update_loc_failure">Проверьте ваши настройки GPS</string>
+    <string name="manage_tle_sources">Manage TLE sources</string>
+    <string name="tle_source">TLE source</string>
 </resources>

@@ -59,7 +59,6 @@ class SharedViewModel @Inject constructor(
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
-    fun getTleUrl() = prefsManager.getTleUrl()
     fun setPositionFromPref() = _gsp.postValue(Result.Success(prefsManager.getPosition()))
     suspend fun getAllEntries() = repository.getAllEntries()
 
@@ -102,15 +101,15 @@ class SharedViewModel @Inject constructor(
     fun updateEntriesFromWeb(tleUrl: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val url = if (tleUrl.isNullOrEmpty()) {
-                    prefsManager.getTleUrl()
-                } else {
-                    prefsManager.setTleUrl(tleUrl)
-                    tleUrl
-                }
-                val selected = repository.getSelectedEntries().map { it.catNum }
-                repository.updateEntriesFromUrl(url)
-                repository.updateEntriesSelection(selected)
+//                val url = if (tleUrl.isNullOrEmpty()) {
+//                    prefsManager.getTleUrl()
+//                } else {
+//                    prefsManager.setTleUrl(tleUrl)
+//                    tleUrl
+//                }
+//                val selected = repository.getSelectedEntries().map { it.catNum }
+//                repository.updateEntriesFromUrl(url)
+//                repository.updateEntriesSelection(selected)
                 _updateStatus.postValue(Result.Success(0))
             } catch (e: Exception) {
                 _updateStatus.postValue(Result.Error(e))

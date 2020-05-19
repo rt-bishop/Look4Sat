@@ -1,9 +1,28 @@
+/*
+ * Look4Sat. Amateur radio and weather satellite tracker and passes predictor for Android.
+ * Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 package com.rtbishop.look4sat.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.ItemTleSourceBinding
@@ -25,8 +44,9 @@ class TleSourcesAdapter(private var sources: MutableList<TleSource>) :
         return sources.size
     }
 
-    fun setSources(sources: MutableList<TleSource>) {
-        this.sources = sources
+    fun setSources(list: MutableList<TleSource>) {
+        sources = list
+        notifyDataSetChanged()
     }
 
     fun getSources(): MutableList<TleSource> {
@@ -37,13 +57,13 @@ class TleSourcesAdapter(private var sources: MutableList<TleSource>) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(source: TleSource) {
+            binding.tleSourceUrl.setText(source.url)
+            binding.tleSourceUrl.doAfterTextChanged {
+                source.url = it.toString()
+            }
             binding.tleSourceBtnDel.setOnClickListener {
                 sources.remove(source)
                 notifyItemRemoved(adapterPosition)
-            }
-            binding.tleSourceUrl.addTextChangedListener {
-                source.url = it.toString()
-                notifyItemChanged(adapterPosition)
             }
         }
     }

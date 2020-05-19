@@ -45,15 +45,17 @@ import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
+import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.databinding.DialogTleUrlBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
+import com.rtbishop.look4sat.ui.fragments.TleSourcesDialogFragment
 import com.rtbishop.look4sat.utility.GeneralUtils.toast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmitListener {
 
     private val pickFileReqCode = 111
     private val permLocationCode = 101
@@ -165,7 +167,7 @@ class MainActivity : AppCompatActivity() {
             it.lockButton()
         }
         drawerBinding.drawerBtnTleUrl.setOnClickListener {
-            showTleUrlDialog()
+            showTleSourcesDialog()
             mainBinding.drawerLayout.closeDrawers()
             it.lockButton()
         }
@@ -187,7 +189,7 @@ class MainActivity : AppCompatActivity() {
         dialogBinding.apply {
             var tleUrl = String()
             dialogTleInput.apply {
-                hint = viewModel.getTleUrl()
+//                hint = viewModel.getTleUrl()
                 addTextChangedListener { tleUrl = it.toString() }
             }
             dialogTleNeg.setOnClickListener {
@@ -199,6 +201,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         dialog.show()
+    }
+
+    private fun showTleSourcesDialog() {
+        val sources = viewModel.getTleSources().map { TleSource(it) }
+        TleSourcesDialogFragment(sources).apply {
+            setSourcesListener(this@MainActivity)
+            show(supportFragmentManager, "TleSourcesDialog")
+        }
+    }
+
+    override fun onSourcesSubmit(list: List<TleSource>) {
+        val sources = list.map { it.url }.toSet()
+        viewModel.setTleSource(sources)
     }
 
     private fun View.lockButton() {

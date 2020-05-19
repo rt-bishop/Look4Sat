@@ -166,4 +166,7 @@
 
     <string name="map_gsp">GSP</string>
     <string name="placeholder" translatable="false">Placeholder</string>
+    <string name="manage_tle_sources">Manage TLE sources</string>
+    <string name="please_make_sure_you_use_https_url_for_tle_source" translatable="false">Please use HTTPS URLs only</string>
+    <string name="tle_source">TLE source</string>
 </resources>
