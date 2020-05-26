@@ -19,10 +19,11 @@
 
 package com.rtbishop.look4sat.ui.adapters
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.ItemTleSourceBinding
@@ -33,10 +34,11 @@ class TleSourcesAdapter(private var sources: MutableList<TleSource>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TleSourceHolder {
         val binding = ItemTleSourceBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
-        return TleSourceHolder(binding.root, binding)
+        return TleSourceHolder(binding.root, binding, TleSourceWatcher())
     }
 
     override fun onBindViewHolder(holder: TleSourceHolder, position: Int) {
+        holder.textWatcher.updatePosition(position)
         holder.bind(sources[position])
     }
 
@@ -44,27 +46,46 @@ class TleSourcesAdapter(private var sources: MutableList<TleSource>) :
         return sources.size
     }
 
+    fun getSources(): MutableList<TleSource> {
+        return sources
+    }
+
     fun setSources(list: MutableList<TleSource>) {
         sources = list
         notifyDataSetChanged()
     }
 
-    fun getSources(): MutableList<TleSource> {
-        return sources
-    }
-
-    inner class TleSourceHolder(itemView: View, private val binding: ItemTleSourceBinding) :
+    inner class TleSourceHolder(
+        itemView: View,
+        val binding: ItemTleSourceBinding,
+        val textWatcher: TleSourceWatcher
+    ) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(source: TleSource) {
             binding.tleSourceUrl.setText(source.url)
-            binding.tleSourceUrl.doAfterTextChanged {
-                source.url = it.toString()
-            }
+            binding.tleSourceUrl.addTextChangedListener(textWatcher)
             binding.tleSourceBtnDel.setOnClickListener {
                 sources.remove(source)
                 notifyItemRemoved(adapterPosition)
             }
+        }
+    }
+
+    inner class TleSourceWatcher : TextWatcher {
+
+        private var position = 0
+
+        fun updatePosition(position: Int) {
+            this.position = position
+        }
+
+        override fun afterTextChanged(s: Editable?) {}
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            sources[position].url = s.toString()
         }
     }
 }

@@ -32,7 +32,8 @@ class TleSourcesDialogFragment(sources: List<TleSource>) :
     AppCompatDialogFragment() {
 
     private lateinit var sourcesListener: SourcesSubmitListener
-    private var sourcesAdapter = TleSourcesAdapter(sources.toMutableList())
+    private val emptySource = TleSource("")
+    private val sourcesAdapter = TleSourcesAdapter(sources.toMutableList())
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = DialogTleSourcesBinding.inflate(requireActivity().layoutInflater)
@@ -51,14 +52,16 @@ class TleSourcesDialogFragment(sources: List<TleSource>) :
 
         binding.tleSourceBtnAdd.setOnClickListener {
             val tempSources = sourcesAdapter.getSources()
-            tempSources.add(TleSource())
+            tempSources.add(emptySource)
             sourcesAdapter.setSources(tempSources)
             sourcesAdapter.notifyDataSetChanged()
         }
 
         binding.tleSourcesBtnNeg.setOnClickListener { dismiss() }
         binding.tleSourcesBtnPos.setOnClickListener {
-            sourcesListener.onSourcesSubmit(sourcesAdapter.getSources())
+            val filteredSources = sourcesAdapter.getSources()
+                .filter { it.url != String() && it.url != " " && it.url.contains("https://") }
+            sourcesListener.onSourcesSubmit(filteredSources)
             dismiss()
         }
 

@@ -28,11 +28,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -47,7 +45,6 @@ import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
-import com.rtbishop.look4sat.databinding.DialogTleUrlBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
 import com.rtbishop.look4sat.ui.fragments.TleSourcesDialogFragment
 import com.rtbishop.look4sat.utility.GeneralUtils.toast
@@ -183,26 +180,6 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         drawerBinding.drawerBtnExit.setOnClickListener { finish() }
     }
 
-    private fun showTleUrlDialog() {
-        val dialogBinding = DialogTleUrlBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
-        dialogBinding.apply {
-            var tleUrl = String()
-            dialogTleInput.apply {
-//                hint = viewModel.getTleUrl()
-                addTextChangedListener { tleUrl = it.toString() }
-            }
-            dialogTleNeg.setOnClickListener {
-                dialog.dismiss()
-            }
-            dialogTlePos.setOnClickListener {
-                viewModel.updateEntriesFromWeb(tleUrl)
-                dialog.dismiss()
-            }
-        }
-        dialog.show()
-    }
-
     private fun showTleSourcesDialog() {
         val sources = viewModel.getTleSources().map { TleSource(it) }
         TleSourcesDialogFragment(sources).apply {
@@ -212,8 +189,7 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
     }
 
     override fun onSourcesSubmit(list: List<TleSource>) {
-        val sources = list.map { it.url }.toSet()
-        viewModel.setTleSource(sources)
+        viewModel.updateEntriesFromWeb(list)
     }
 
     private fun View.lockButton() {

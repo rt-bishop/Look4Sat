@@ -26,6 +26,7 @@ import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
+import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -59,6 +60,7 @@ class SharedViewModel @Inject constructor(
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
+    fun getTleSources() = prefsManager.getTleSources()
     fun setPositionFromPref() = _gsp.postValue(Result.Success(prefsManager.getPosition()))
     suspend fun getAllEntries() = repository.getAllEntries()
 
@@ -98,22 +100,26 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun updateEntriesFromWeb(tleUrl: String? = null) {
+    fun updateEntriesFromWeb(list: List<TleSource>) {
+        val sourcesSet = list.map { it.url }.toSet()
+        prefsManager.setTleSources(sourcesSet)
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-//                val url = if (tleUrl.isNullOrEmpty()) {
-//                    prefsManager.getTleUrl()
-//                } else {
-//                    prefsManager.setTleUrl(tleUrl)
-//                    tleUrl
-//                }
-//                val selected = repository.getSelectedEntries().map { it.catNum }
-//                repository.updateEntriesFromUrl(url)
-//                repository.updateEntriesSelection(selected)
+                val selected = repository.getSelectedEntries().map { it.catNum }
+                repository.updateEntriesFromUrl(list)
+                repository.updateEntriesSelection(selected)
                 _updateStatus.postValue(Result.Success(0))
             } catch (e: Exception) {
                 _updateStatus.postValue(Result.Error(e))
             }
+        }
+    }
+
+    fun updateEntriesSelection(catNumList: MutableList<Int>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateEntriesSelection(catNumList)
+            calculatePasses()
         }
     }
 
@@ -125,13 +131,6 @@ class SharedViewModel @Inject constructor(
             } catch (e: Exception) {
                 _updateStatus.postValue(Result.Error(e))
             }
-        }
-    }
-
-    fun updateEntriesSelection(catNumList: MutableList<Int>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateEntriesSelection(catNumList)
-            calculatePasses()
         }
     }
 
@@ -148,14 +147,6 @@ class SharedViewModel @Inject constructor(
             passList = filterAndSortPasses(passList, dateNow, getHoursAhead())
             _satPassList.postValue(Result.Success(passList))
         }
-    }
-
-    fun getTleSources(): Set<String> {
-        return prefsManager.getTleSources()
-    }
-
-    fun setTleSource(sources: Set<String>) {
-        prefsManager.setTleSources(sources)
     }
 
     private fun getPassesForEntries(

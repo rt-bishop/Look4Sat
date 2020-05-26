@@ -23,6 +23,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.data.Transmitter
 import com.rtbishop.look4sat.network.RemoteSource
 import com.rtbishop.look4sat.persistence.LocalSource
@@ -46,8 +47,8 @@ class DefaultRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateEntriesFromUrl(tleUrl: String) {
-        val stream = remoteSource.fetchTleStream(tleUrl)
+    override suspend fun updateEntriesFromUrl(urlList: List<TleSource>) {
+        val stream = remoteSource.fetchTleStream(urlList)
         withContext(Dispatchers.IO) {
             val tleList = TLE.importSat(stream)
             val entries = tleList.map { SatEntry(it) }

@@ -19,6 +19,7 @@
 
 package com.rtbishop.look4sat.network
 
+import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.data.Transmitter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -34,12 +35,14 @@ class RemoteDataSource @Inject constructor(
     private val client: OkHttpClient
 ) : RemoteSource {
 
-    override suspend fun fetchTleStream(tleUrl: String): InputStream {
+    override suspend fun fetchTleStream(urlList: List<TleSource>): InputStream {
         val streamTable = Hashtable<String, InputStream>()
         withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(tleUrl).build()
-            val stream = client.newCall(request).execute().body()?.byteStream()
-            streamTable[tleUrl] = stream
+            urlList.forEach {
+                val request = Request.Builder().url(it.url).build()
+                val stream = client.newCall(request).execute().body()?.byteStream()
+                streamTable[it.url] = stream
+            }
         }
         return SequenceInputStream(streamTable.elements())
     }
