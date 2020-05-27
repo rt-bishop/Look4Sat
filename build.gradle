@@ -57,7 +57,7 @@ ext {
 
     room = '2.2.5'
 
-    retrofit = '2.8.1'
+    retrofit = '2.9.0'
 
     dagger = '2.27'
 

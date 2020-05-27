@@ -56,7 +56,7 @@ class PrefsManager @Inject constructor(
     }
 
     fun getCompass(): Boolean {
-        return preferences.getBoolean(keyCompass, false)
+        return preferences.getBoolean(keyCompass, true)
     }
 
     fun getPosition(): GroundStationPosition {

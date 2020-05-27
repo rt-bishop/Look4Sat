@@ -46,7 +46,7 @@
             android:singleLine="true"
             android:title="@string/pref_refresh_rate_title" />
         <SwitchPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="@string/pref_compass_key"
             android:title="@string/pref_compass_title" />
     </PreferenceCategory>
