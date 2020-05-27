@@ -1,0 +1,4 @@
+Added PolarView rotation using sensors data
+Added custom TLE import (file/url)
+Fixed "All/None" selection button behaviour
+Minor fixes and code cleanup

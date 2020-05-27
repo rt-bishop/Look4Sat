@@ -152,8 +152,13 @@
         <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> for details.
     </string>
 
-    <string name="map_gsp">GSP</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
     <string name="btn_all_none">All/None</string>
+
+    <string name="map_gsp">GSP</string>
     <string name="tle_source">TLE source</string>
     <string name="https_only">Please use HTTPS URLs only</string>
     <string name="placeholder" translatable="false">Placeholder</string>

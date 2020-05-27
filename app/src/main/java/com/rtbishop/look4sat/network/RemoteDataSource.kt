@@ -40,7 +40,7 @@ class RemoteDataSource @Inject constructor(
         withContext(Dispatchers.IO) {
             urlList.forEach {
                 val request = Request.Builder().url(it.url).build()
-                val stream = client.newCall(request).execute().body()?.byteStream()
+                val stream = client.newCall(request).execute().body?.byteStream()
                 streamTable[it.url] = stream
             }
         }

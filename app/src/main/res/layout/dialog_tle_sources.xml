@@ -61,8 +61,8 @@
     <TextView
         android:id="@+id/tleSourcesBtnNeg"
         style="@style/DialogText"
-        android:layout_marginEnd="32dp"
-        android:text="@android:string/cancel"
+        android:layout_marginEnd="24dp"
+        android:text="@string/btn_cancel"
         app:layout_constraintBaseline_toBaselineOf="@+id/tleSourcesBtnPos"
         app:layout_constraintEnd_toStartOf="@+id/tleSourcesBtnPos"
         app:layout_constraintHorizontal_chainStyle="spread_inside" />
@@ -71,7 +71,7 @@
         android:id="@+id/tleSourcesBtnPos"
         style="@style/DialogText"
         android:layout_marginBottom="8dp"
-        android:text="@android:string/ok"
+        android:text="@string/btn_ok"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/tleSourceBtnAdd" />
 

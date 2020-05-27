@@ -61,7 +61,7 @@
     <string name="pref_other_title">Другие настройки</string>
     <string name="pref_refresh_rate_title">Частота обновления, мс</string>
     <string name="pref_refresh_rate_input_error">Введите значение между 250мс и 10000мс</string>
-    <string name="pref_compass_title">Используйте компас при отображении полярных координат</string>
+    <string name="pref_compass_title">Использовать компас при отображении полярных координат</string>
 
     <string name="no_mode">Модуляция: нет</string>
     <string name="no_uplink">Восход.: нет</string>
@@ -80,8 +80,8 @@
     <string name="pat_elevation">Элев.: %.1f°</string>
     <string name="pat_latitude">Шир.: %.1f°</string>
     <string name="pat_longitude">Дол.: %.1f°</string>
-    <string name="pat_distance">Дист.: %.0f км</string>
-    <string name="pat_altitude">Выс.: %.0f км</string>
+    <string name="pat_distance">Дист.: %.0fкм</string>
+    <string name="pat_altitude">Выс.: %.0fкм</string>
 
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_inverted">Инверсия: %s</string>
@@ -132,8 +132,13 @@
         в лицензии <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
     </string>
 
-    <string name="map_gsp">СТЦ</string>
+    <string name="btn_yes">Да</string>
+    <string name="btn_no">Нет</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Отмена</string>
     <string name="btn_all_none">Все/Нет</string>
+
+    <string name="map_gsp">СТЦ</string>
     <string name="tle_source">Источник TLE</string>
-    <string name="https_only">Пожалуйста, используйте протокол HTTPS</string>
+    <string name="https_only">Используйте протокол HTTPS</string>
 </resources>

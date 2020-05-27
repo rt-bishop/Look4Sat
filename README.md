@@ -7,6 +7,8 @@ The [Libre Space Foundation](https://libre.space/) team is also behind the epic 
 
 For TLE data calculation and passes prediction Look4Sat uses the mavenized version of [predict4java](https://github.com/davidmoten/predict4java) library, created by [David A. B. Johnson, G4DPZ](https://github.com/g4dpz) and [Dave Moten](https://github.com/davidmoten). Thank you guys for your hard work making this lib efficient and easy to use!
 
+Also, I'd like to mention Dr T.S. Kelso for his invaluable contribution to the industry and for his [Celestrak](https://celestrak.com) website, that stores, updates and provides access to TLE data.
+
 The app is built using Dagger2, Retrofit2, Kotlin and Kotlin coroutines, Architecture Components and Jetpack Navigation.
 
 <p float="left">

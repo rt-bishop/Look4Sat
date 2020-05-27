@@ -43,6 +43,11 @@ android {
             }
         }
     }
+    configurations {
+        all {
+            exclude module: 'commons-logging'
+        }
+    }
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -82,6 +87,7 @@ dependencies {
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp"
 
     //dagger
     implementation "com.google.dagger:dagger:$dagger"

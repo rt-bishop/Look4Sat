@@ -58,6 +58,7 @@ ext {
     room = '2.2.5'
 
     retrofit = '2.9.0'
+    okhttp = '4.7.2'
 
     dagger = '2.27'
 
