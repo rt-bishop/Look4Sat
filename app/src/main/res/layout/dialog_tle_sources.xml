@@ -3,45 +3,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tleSourcesDialog"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="4dp">
 
     <TextView
         android:id="@+id/tleSourcesTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/DialogText"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:text="@string/manage_tle_sources"
-        android:textSize="18sp"
+        android:layout_marginTop="10dp"
+        android:text="@string/dialog_tle_sources"
         app:layout_constraintEnd_toStartOf="@+id/tleSourceBtnAdd"
-        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/tleSourceBtnAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="10dp"
         android:contentDescription="@string/placeholder"
-        app:layout_constraintBottom_toBottomOf="@+id/tleSourcesTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/tleSourcesWarning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/tleSourcesTitle"
         app:layout_constraintTop_toTopOf="@+id/tleSourcesTitle"
-        app:srcCompat="@android:drawable/ic_menu_add" />
+        app:srcCompat="@drawable/ic_add" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tleSourcesRecycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/tleSourcesWarning"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/tleSourcesBtnPos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,33 +51,27 @@
 
     <TextView
         android:id="@+id/tleSourcesWarning"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        style="@style/DialogText"
+        android:layout_marginTop="4dp"
         android:gravity="center"
-        android:text="@string/please_make_sure_you_use_https_url_for_tle_source"
-        app:layout_constraintBottom_toTopOf="@+id/tleSourcesBtnPos"
-        app:layout_constraintEnd_toEndOf="@+id/tleSourcesRecycler"
-        app:layout_constraintStart_toStartOf="@+id/tleSourcesRecycler" />
+        android:text="@string/https_only"
+        app:layout_constraintStart_toStartOf="@+id/tleSourcesTitle"
+        app:layout_constraintTop_toBottomOf="@+id/tleSourcesTitle" />
 
     <TextView
         android:id="@+id/tleSourcesBtnNeg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/DialogText"
         android:layout_marginEnd="32dp"
-        android:text="@string/btn_cancel"
-        android:textSize="18sp"
+        android:text="@android:string/cancel"
         app:layout_constraintBaseline_toBaselineOf="@+id/tleSourcesBtnPos"
         app:layout_constraintEnd_toStartOf="@+id/tleSourcesBtnPos"
         app:layout_constraintHorizontal_chainStyle="spread_inside" />
 
     <TextView
         android:id="@+id/tleSourcesBtnPos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/DialogText"
         android:layout_marginBottom="8dp"
-        android:text="@string/btn_ok"
-        android:textSize="18sp"
+        android:text="@android:string/ok"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/tleSourceBtnAdd" />
 

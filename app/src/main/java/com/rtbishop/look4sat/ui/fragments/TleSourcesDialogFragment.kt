@@ -22,6 +22,7 @@ package com.rtbishop.look4sat.ui.fragments
 import android.app.Dialog
 import android.os.Bundle
 import android.view.ViewGroup
+import android.view.Window
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.data.TleSource
@@ -38,6 +39,7 @@ class TleSourcesDialogFragment(sources: List<TleSource>) :
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = DialogTleSourcesBinding.inflate(requireActivity().layoutInflater)
         val tleSourcesDialog = Dialog(requireActivity()).apply {
+            window?.requestFeature(Window.FEATURE_NO_TITLE)
             setContentView(binding.root)
             window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,

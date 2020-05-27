@@ -26,14 +26,13 @@
     <string name="drawer_lon_text">Longitude: </string>
 
     <string name="update_loc">Update location</string>
-    <string name="update_loc_success">Location was updated</string>
+    <string name="update_loc_success">Location updated</string>
     <string name="update_loc_failure">Check your Location settings</string>
-    <string name="update_tle_file" translatable="false">Import TLE from file</string>
-    <string name="update_tle_file_success" translatable="false">TLE was updated</string>
-    <string name="update_tle">Import TLE from WEB</string>
+    <string name="update_tle_file">Import TLE from file</string>
+    <string name="update_tle_web">Import TLE from web</string>
     <string name="update_tle_success">TLE was updated</string>
     <string name="update_trans">Update transceivers</string>
-    <string name="update_trans_success">Transceivers database was updated</string>
+    <string name="update_trans_success">Transceivers DB updated</string>
     <string name="update_failure">Check your internet connection</string>
     <string name="goto_github" translatable="false">GitHub</string>
     <string name="exit_app">Exit</string>
@@ -47,6 +46,7 @@
     <string name="dialog_select_sat">Select satellites to track</string>
     <string name="dialog_show_track">Show ground track for</string>
     <string name="dialog_filter_passes">Filter passes</string>
+    <string name="dialog_tle_sources">Manage TLE sources</string>
 
     <string name="pref_hours_ahead_key" translatable="false">hoursAhead</string>
     <string name="pref_hours_ahead_hint">Hours ahead</string>
@@ -69,24 +69,18 @@
     <string name="pref_alt_input_error">Set the value between -413m and 8850m</string>
     <string name="pref_other_title">Other</string>
     <string name="pref_refresh_rate_key" translatable="false">rate</string>
-    <string name="pref_refresh_rate_title">View refresh rate, ms</string>
+    <string name="pref_refresh_rate_title">Refresh rate, ms</string>
     <string name="pref_refresh_rate_input_error">Set the value between 250ms and 10000ms</string>
     <string name="pref_compass_key" translatable="false">compass</string>
-    <string name="pref_compass_title" translatable="false">Use sensors to rotate PolarView</string>
-    <string name="pref_tle_url_title" translatable="false">Please, enter the HTTPS URL:</string>
+    <string name="pref_compass_title">Use sensors to rotate PolarView</string>
 
-    <string name="no_mode">Mode: Null</string>
-    <string name="no_uplink">Uplink: Null</string>
-    <string name="no_downlink">Downlink: Null</string>
-    <string name="no_trans">No transceivers found for this Satellite</string>
+    <string name="no_mode">Mode: null</string>
+    <string name="no_uplink">Uplink: null</string>
+    <string name="no_downlink">Downlink: null</string>
+    <string name="no_trans">No transceivers found for this satellite</string>
 
     <string name="err_no_permissions">Missing permissions</string>
-    <string name="err_sat_wont_pass">Certain satellites shall not pass</string>
-    <string name="err_parse_tle">Error parsing TLE entry</string>
-    <string name="err_update_tle">Please, update your TLE file</string>
     <string name="err_enter_value">Please, enter the value</string>
-    <string name="err_no_tle_file">TLE file was not found</string>
-    <string name="err_no_selection_file">Selection file was not found</string>
     <string name="err_no_sat_selected">No satellites selected</string>
 
     <string name="pass_satName" translatable="false">%s</string>
@@ -101,7 +95,7 @@
     <string name="pat_elevation">El: %.1f°</string>
     <string name="pat_latitude">Lat: %.1f°</string>
     <string name="pat_longitude">Lon: %.1f°</string>
-    <string name="pat_range">Dst: %.0f km</string>
+    <string name="pat_distance">Dst: %.0f km</string>
     <string name="pat_altitude">Alt: %.0f km</string>
     <string name="pat_timer" translatable="false">%02d:%02d:%02d</string>
 
@@ -158,15 +152,9 @@
         <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> for details.
     </string>
 
-    <string name="btn_yes">Yes</string>
-    <string name="btn_no">No</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_cancel">Cancel</string>
-    <string name="btn_all_none">All/None</string>
-
     <string name="map_gsp">GSP</string>
-    <string name="placeholder" translatable="false">Placeholder</string>
-    <string name="manage_tle_sources">Manage TLE sources</string>
-    <string name="please_make_sure_you_use_https_url_for_tle_source" translatable="false">Please use HTTPS URLs only</string>
+    <string name="btn_all_none">All/None</string>
     <string name="tle_source">TLE source</string>
+    <string name="https_only">Please use HTTPS URLs only</string>
+    <string name="placeholder" translatable="false">Placeholder</string>
 </resources>

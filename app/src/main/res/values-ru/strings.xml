@@ -25,7 +25,9 @@
 
     <string name="update_loc">Обновить геопозицию</string>
     <string name="update_loc_success">Геопозиция обновлена</string>
-    <string name="update_tle">Обновить файл TLE</string>
+    <string name="update_loc_failure">Проверьте настройки GPS</string>
+    <string name="update_tle_file">Обновить TLE из файла</string>
+    <string name="update_tle_web">Обновить TLE по ссылке</string>
     <string name="update_tle_success">Файл TLE обновлен</string>
     <string name="update_trans">Обновить трансиверы</string>
     <string name="update_trans_success">База трансиверов обновлена</string>
@@ -40,6 +42,7 @@
     <string name="dialog_select_sat">Выберите спутники для слежения</string>
     <string name="dialog_show_track">Показать трассу орбиты для</string>
     <string name="dialog_filter_passes">Фильтровать пролеты</string>
+    <string name="dialog_tle_sources">Управление источниками TLE</string>
 
     <string name="pref_hours_ahead_hint">Количество часов</string>
     <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
@@ -58,6 +61,7 @@
     <string name="pref_other_title">Другие настройки</string>
     <string name="pref_refresh_rate_title">Частота обновления, мс</string>
     <string name="pref_refresh_rate_input_error">Введите значение между 250мс и 10000мс</string>
+    <string name="pref_compass_title">Используйте компас при отображении полярных координат</string>
 
     <string name="no_mode">Модуляция: нет</string>
     <string name="no_uplink">Восход.: нет</string>
@@ -65,24 +69,19 @@
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
     <string name="err_no_permissions">Отсутствуют необходимые разрешения</string>
-    <string name="err_sat_wont_pass">Некоторые спутники не пролетят над заданной точкой</string>
-    <string name="err_parse_tle">Ошибка обработки TLE</string>
-    <string name="err_update_tle">Пожалуйста, обновите ваш файл TLE</string>
     <string name="err_enter_value">Пожалуйста, введите значение</string>
-    <string name="err_no_tle_file">Не найден файл TLE</string>
-    <string name="err_no_selection_file">Не найден файл выбранных спутников</string>
     <string name="err_no_sat_selected">Не выбраны спутники</string>
 
     <string name="pass_aos_az">НПС — %2d°</string>
-    <string name="pass_maxEl">Элевация: %.1f°</string>
+    <string name="pass_maxEl">Элев.: %.1f°</string>
     <string name="pass_los_az">%2d° — КПС</string>
 
-    <string name="pat_azimuth">Азимут: %.1f°</string>
-    <string name="pat_elevation">Элевация: %.1f°</string>
-    <string name="pat_latitude">Широта: %.1f°</string>
-    <string name="pat_longitude">Долгота: %.1f°</string>
-    <string name="pat_range">Дист.: %.0f км</string>
-    <string name="pat_altitude">Высота: %.0f км</string>
+    <string name="pat_azimuth">Аз.: %.1f°</string>
+    <string name="pat_elevation">Элев.: %.1f°</string>
+    <string name="pat_latitude">Шир.: %.1f°</string>
+    <string name="pat_longitude">Дол.: %.1f°</string>
+    <string name="pat_distance">Дист.: %.0f км</string>
+    <string name="pat_altitude">Выс.: %.0f км</string>
 
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_inverted">Инверсия: %s</string>
@@ -133,14 +132,8 @@
         в лицензии <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
     </string>
 
-    <string name="btn_yes">Да</string>
-    <string name="btn_no">Нет</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_cancel">Отмена</string>
-    <string name="btn_all_none">Все/Нет</string>
-
     <string name="map_gsp">СТЦ</string>
-    <string name="update_loc_failure">Проверьте ваши настройки GPS</string>
-    <string name="manage_tle_sources">Manage TLE sources</string>
-    <string name="tle_source">TLE source</string>
+    <string name="btn_all_none">Все/Нет</string>
+    <string name="tle_source">Источник TLE</string>
+    <string name="https_only">Пожалуйста, используйте протокол HTTPS</string>
 </resources>

@@ -168,7 +168,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
         val satPos = satPass.predictor.getSatPos(Date())
         val polarAz = mainActivity.getString(R.string.pat_azimuth)
         val polarEl = mainActivity.getString(R.string.pat_elevation)
-        val polarRng = mainActivity.getString(R.string.pat_range)
+        val polarRng = mainActivity.getString(R.string.pat_distance)
         val polarAlt = mainActivity.getString(R.string.pat_altitude)
         binding.tvPolarAz.text = String.format(polarAz, GeneralUtils.rad2Deg(satPos.azimuth))
         binding.tvPolarEl.text = String.format(polarEl, GeneralUtils.rad2Deg(satPos.elevation))

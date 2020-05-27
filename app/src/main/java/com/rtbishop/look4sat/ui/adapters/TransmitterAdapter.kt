@@ -100,12 +100,12 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
             if (transmitter.isInverted) {
                 binding.transInverted.text = String.format(
                     context.getString(R.string.trans_inverted),
-                    context.getString(R.string.btn_yes)
+                    context.getString(android.R.string.yes)
                 )
             } else {
                 binding.transInverted.text = String.format(
                     context.getString(R.string.trans_inverted),
-                    context.getString(R.string.btn_no)
+                    context.getString(android.R.string.no)
                 )
             }
         }

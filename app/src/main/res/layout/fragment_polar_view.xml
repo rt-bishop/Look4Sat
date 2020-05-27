@@ -61,7 +61,7 @@
         android:id="@+id/tv_polar_rng"
         style="@style/PolarViewText"
         android:layout_marginEnd="4dp"
-        android:text="@string/pat_range"
+        android:text="@string/pat_distance"
         app:layout_constraintBottom_toBottomOf="@+id/frame_polar"
         app:layout_constraintEnd_toEndOf="@+id/frame_polar" />
 

@@ -117,7 +117,7 @@
         style="@style/DrawerHeader.Button"
         android:layout_width="0dp"
         android:drawableEnd="@drawable/ic_update_tle"
-        android:text="@string/update_tle"
+        android:text="@string/update_tle_web"
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_trans"
         app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
         app:layout_constraintStart_toStartOf="@+id/guidelineLeft"

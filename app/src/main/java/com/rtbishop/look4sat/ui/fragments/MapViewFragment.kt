@@ -145,6 +145,6 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
         binding.tvMapLat.text = String.format(mainActivity.getString(R.string.pat_latitude), lat)
         binding.tvMapLon.text = String.format(mainActivity.getString(R.string.pat_longitude), lon)
-        binding.tvMapRng.text = String.format(mainActivity.getString(R.string.pat_range), rng)
+        binding.tvMapRng.text = String.format(mainActivity.getString(R.string.pat_distance), rng)
     }
 }

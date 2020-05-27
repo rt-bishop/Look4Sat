@@ -140,8 +140,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         etMinEl.setText(minEl.toString())
 
         AlertDialog.Builder(mainActivity).apply {
-            setTitle(getString(R.string.dialog_filter_passes))
-            setPositiveButton(getString(R.string.btn_ok)) { _, _ ->
+            setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                 val hoursStr = etHoursAhead.text.toString()
                 val elevationStr = etMinEl.text.toString()
                 if (hoursStr.isNotEmpty() && elevationStr.isNotEmpty()) {
@@ -174,7 +173,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
                 ).show()
 
             }
-            setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
+            setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.cancel()
             }
             setView(satPassPrefView)
