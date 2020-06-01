@@ -39,5 +39,9 @@
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_about"
             android:title="@string/menu_about" />
+        <item
+            android:id="@+id/nav_map_osm"
+            android:icon="@drawable/ic_world_map"
+            android:title="@string/placeholder" />
     </group>
 </menu>

@@ -109,6 +109,12 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
                 R.id.nav_map_view -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                     toolbar.visibility = View.GONE
+                    mainBinding.includeAppBar.toolbarLayout.visibility = View.GONE
+                }
+                R.id.nav_map_osm -> {
+                    this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    toolbar.visibility = View.GONE
+                    mainBinding.includeAppBar.toolbarLayout.visibility = View.GONE
                 }
                 else -> {
                     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
