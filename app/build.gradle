@@ -95,4 +95,7 @@ dependencies {
 
     // predict4java
     implementation "com.github.davidmoten:predict4java:$predict4java"
+
+    // openStreetMaps
+    implementation "org.osmdroid:osmdroid-android:$openStreetMap"
 }
