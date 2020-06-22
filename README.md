@@ -1,4 +1,8 @@
 # Look4Sat: Radio satellite tracker
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.rtbishop.look4sat/)
+[<img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=com.rtbishop.look4sat)
+
 Amateur radio and weather satellite tracker and passes predictor for Android.
 
 The very app creation and design is hugely inspired by the open-source [Gpredict](http://gpredict.oz9aec.net/) desktop satellite tracking application, created by [Alexandru Csete, OZ9AEC](https://github.com/csete) and contributors, supported by the [Libre Space Foundation](https://libre.space/).
