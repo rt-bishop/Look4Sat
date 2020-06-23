@@ -22,6 +22,7 @@ package com.rtbishop.look4sat.dagger
 import android.content.Context
 import com.rtbishop.look4sat.dagger.modules.*
 import com.rtbishop.look4sat.ui.MainActivity
+import com.rtbishop.look4sat.ui.fragments.MapOsmFragment
 import com.rtbishop.look4sat.ui.fragments.MapViewFragment
 import com.rtbishop.look4sat.ui.fragments.PassListFragment
 import com.rtbishop.look4sat.ui.fragments.PolarViewFragment
@@ -45,4 +46,5 @@ interface AppComponent {
     fun inject(mapViewFragment: MapViewFragment)
     fun inject(passListFragment: PassListFragment)
     fun inject(polarViewFragment: PolarViewFragment)
+    fun inject(mapOsmFragment: MapOsmFragment)
 }

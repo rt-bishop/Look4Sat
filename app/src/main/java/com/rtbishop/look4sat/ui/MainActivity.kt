@@ -21,6 +21,7 @@ package com.rtbishop.look4sat.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -30,7 +31,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -54,10 +54,13 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmitListener {
 
-    private val pickFileReqCode = 111
-    private val permLocationCode = 101
-    private val permLocation = Manifest.permission.ACCESS_FINE_LOCATION
-    private val permGranted = PackageManager.PERMISSION_GRANTED
+    private val pickFileReqCode = 1001
+    private val permissionsReqCode = 1000
+    private val permissions = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -83,6 +86,10 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         setupDrawer()
 
         viewModel.setDefaultTleSources()
+
+        if (!hasPermissions(this, permissions)) {
+            ActivityCompat.requestPermissions(this, permissions, permissionsReqCode)
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -154,7 +161,7 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
 
     private fun setupDrawer() {
         drawerBinding.drawerBtnLoc.setOnClickListener {
-            requestLocationUpdate()
+            viewModel.updatePosition()
             it.lockButton()
         }
         drawerBinding.drawerBtnTleFile.setOnClickListener {
@@ -193,27 +200,10 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         }
     }
 
-    private fun requestLocationUpdate() {
-        if (ContextCompat.checkSelfPermission(this, permLocation) != permGranted) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permLocation)) {
-                getString(R.string.err_no_permissions).toast(this)
-            } else {
-                ActivityCompat.requestPermissions(this, arrayOf(permLocation), permLocationCode)
-            }
-        } else {
-            viewModel.updatePosition()
+    private fun hasPermissions(context: Context, permissions: Array<String>): Boolean =
+        permissions.all {
+            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
-    }
-
-    override fun onRequestPermissionsResult(reqCode: Int, perms: Array<out String>, res: IntArray) {
-        when (reqCode) {
-            permLocationCode -> {
-                if (res.isNotEmpty() && res[0] == permGranted) {
-                    viewModel.updatePosition()
-                }
-            }
-        }
-    }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host)

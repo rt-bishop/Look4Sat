@@ -48,21 +48,19 @@ ext {
     appCompat = '1.1.0'
     supportLib = '1.0.0'
     constraintLayout = '1.1.3'
-
     ktx = '1.3.0'
     preference = '1.1.1'
-
     navigation = '2.2.2'
     lifecycle = '2.2.0'
-
     room = '2.2.5'
+
+    dagger = '2.28'
 
     retrofit = '2.9.0'
     okhttp = '4.7.2'
 
-    dagger = '2.28'
+    openStreetMap = '6.1.6'
+    mapsForge = '0.13.0'
 
     predict4java = '1.3.1'
-
-    openStreetMap = '6.1.6'
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rendertheme version="5">
+
+    <rule
+        e="way"
+        k="natural"
+        v="issea|sea">
+        <area fill="#242424" />
+    </rule>
+
+    <rule
+        e="way"
+        k="natural"
+        v="nosea">
+        <area fill="#606060" />
+    </rule>
+
+</rendertheme>
