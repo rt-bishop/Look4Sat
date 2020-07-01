@@ -28,7 +28,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.utility.GeneralUtils.toast
+import com.rtbishop.look4sat.utility.Extensions.toast
 
 class PreferencesFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {

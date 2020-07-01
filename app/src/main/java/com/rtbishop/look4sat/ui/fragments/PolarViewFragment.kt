@@ -42,7 +42,6 @@ import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransmitterAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
-import com.rtbishop.look4sat.utility.GeneralUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -172,8 +171,8 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
         val polarEl = mainActivity.getString(R.string.pat_elevation)
         val polarRng = mainActivity.getString(R.string.pat_distance)
         val polarAlt = mainActivity.getString(R.string.pat_altitude)
-        binding.tvPolarAz.text = String.format(polarAz, GeneralUtils.rad2Deg(satPos.azimuth))
-        binding.tvPolarEl.text = String.format(polarEl, GeneralUtils.rad2Deg(satPos.elevation))
+        binding.tvPolarAz.text = String.format(polarAz, Math.toDegrees(satPos.azimuth))
+        binding.tvPolarEl.text = String.format(polarEl, Math.toDegrees(satPos.elevation))
         binding.tvPolarRng.text = String.format(polarRng, satPos.range)
         binding.tvPolarAlt.text = String.format(polarAlt, satPos.altitude)
     }

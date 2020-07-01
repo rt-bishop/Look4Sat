@@ -47,7 +47,7 @@ import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.databinding.DrawerHeaderBinding
 import com.rtbishop.look4sat.ui.fragments.TleSourcesDialogFragment
-import com.rtbishop.look4sat.utility.GeneralUtils.toast
+import com.rtbishop.look4sat.utility.Extensions.toast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -36,11 +36,11 @@ import com.rtbishop.look4sat.databinding.FragmentMapViewBinding
 import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.views.MapView
-import com.rtbishop.look4sat.utility.GeneralUtils
-import com.rtbishop.look4sat.utility.GeneralUtils.toast
+import com.rtbishop.look4sat.utility.Extensions.toast
 import com.rtbishop.look4sat.utility.PassPredictor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 class MapViewFragment : Fragment(R.layout.fragment_map_view) {
@@ -60,7 +60,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMapViewBinding.bind(view)
-        mainActivity = activity as MainActivity
+        mainActivity = requireActivity() as MainActivity
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
         setupObservers(binding)
@@ -106,7 +106,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
         lifecycleScope.launch {
             while (true) {
                 mapView.invalidate()
-                setTextViewsToSelectedSatPos()
+                setDataToTextViews()
                 delay(viewModel.getRefreshRate())
             }
         }
@@ -133,12 +133,12 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
             .show()
     }
 
-    private fun setTextViewsToSelectedSatPos() {
-        val currentTime = GeneralUtils.getDateFor(System.currentTimeMillis())
+    private fun setDataToTextViews() {
+        val currentTime = Date(System.currentTimeMillis())
         val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
         val positions = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
-        var lon = GeneralUtils.rad2Deg(positions[0].longitude).toFloat()
-        val lat = GeneralUtils.rad2Deg(positions[0].latitude).toFloat()
+        var lon = Math.toDegrees(positions[0].longitude).toFloat()
+        val lat = Math.toDegrees(positions[0].latitude).toFloat()
         val rng = positions[0].range
 
         if (lon > 180f) lon -= 360f

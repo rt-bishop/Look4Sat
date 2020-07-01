@@ -8,7 +8,9 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.SatPass
-import com.rtbishop.look4sat.utility.GeneralUtils
+import java.util.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 class PolarView(context: Context) : View(context) {
 
@@ -23,7 +25,7 @@ class PolarView(context: Context) : View(context) {
     private val radius = polarWidth * 0.49f
     private val txtSize = scale * 15
     private val path: Path = Path()
-    var azimuth = 0f
+    private var azimuth = 0f
 
     private val radarPaint = Paint().apply {
         isAntiAlias = true
@@ -79,8 +81,8 @@ class PolarView(context: Context) : View(context) {
         val endTime = satPass.pass.endTime
         while (startTime.before(endTime)) {
             val satPos = satPass.predictor.getSatPos(startTime)
-            val x = GeneralUtils.sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-            val y = GeneralUtils.sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
             if (startTime.compareTo(satPass.pass.startTime) == 0) {
                 path.moveTo(x, -y)
             } else {
@@ -92,12 +94,24 @@ class PolarView(context: Context) : View(context) {
     }
 
     private fun drawSatellite(cvs: Canvas, satPass: SatPass) {
-        val date = GeneralUtils.getDateFor(System.currentTimeMillis())
+        val date = Date(System.currentTimeMillis())
         val satPos = satPass.predictor.getSatPos(date)
         if (satPos.elevation > 0) {
-            val x = GeneralUtils.sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-            val y = GeneralUtils.sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
             cvs.drawCircle(x, -y, txtSize / 3, satPaint)
         }
+    }
+
+    private fun sph2CartX(azimuth: Double, elevation: Double, r: Double): Float {
+        val piDiv2 = Math.PI / 2.0
+        val radius = r * (piDiv2 - elevation) / piDiv2
+        return (radius * cos(piDiv2 - azimuth)).toFloat()
+    }
+
+    private fun sph2CartY(azimuth: Double, elevation: Double, r: Double): Float {
+        val piDiv2 = Math.PI / 2.0
+        val radius = r * (piDiv2 - elevation) / piDiv2
+        return (radius * sin(piDiv2 - azimuth)).toFloat()
     }
 }

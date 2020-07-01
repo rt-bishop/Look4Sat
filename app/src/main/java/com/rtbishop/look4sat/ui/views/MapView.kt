@@ -1,5 +1,6 @@
 package com.rtbishop.look4sat.ui.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.view.View
@@ -10,7 +11,6 @@ import com.github.amsacode.predict4java.SatPos
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.SatPass
-import com.rtbishop.look4sat.utility.GeneralUtils
 import java.util.*
 import kotlin.math.abs
 
@@ -71,12 +71,13 @@ class MapView(context: Context) : View(context) {
         selectedSat = passList[checked].tle
     }
 
+    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         degLon = width / 360f
         degLat = height / 180f
         canvas.translate(width / 2f, height / 2f)
         drawHomeLoc(canvas)
-        val currentTime = GeneralUtils.getDateFor(System.currentTimeMillis())
+        val currentTime = Date(System.currentTimeMillis())
         val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
         val predictor = passList[checked].predictor
         val positions = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
@@ -105,8 +106,8 @@ class MapView(context: Context) : View(context) {
         var lastLon = 181f
 
         list.withIndex().forEach { (index, satPos) ->
-            lon = GeneralUtils.rad2Deg(satPos.longitude).toFloat()
-            lat = GeneralUtils.rad2Deg(satPos.latitude).toFloat() * -1
+            lon = Math.toDegrees(satPos.longitude).toFloat()
+            lat = Math.toDegrees(satPos.latitude).toFloat() * -1
 
             if (lon > 180f) lon -= 360f
 
@@ -154,8 +155,8 @@ class MapView(context: Context) : View(context) {
     }
 
     private fun drawName(canvas: Canvas, position: SatPos, name: String) {
-        var lon = GeneralUtils.rad2Deg(position.longitude).toFloat()
-        val lat = GeneralUtils.rad2Deg(position.latitude).toFloat() * -1
+        var lon = Math.toDegrees(position.longitude).toFloat()
+        val lat = Math.toDegrees(position.latitude).toFloat() * -1
 
         if (lon > 180f) lon -= 360f
 
