@@ -3,6 +3,7 @@ package com.rtbishop.look4sat.ui.fragments
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
@@ -43,6 +43,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapOsmBinding
     private var satLayer: FolderOverlay = FolderOverlay()
+    private var groundTrackLayer = FolderOverlay()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -134,8 +135,8 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             return@withContext satMarkers
         }
 
-    private fun getMarkerForPass(it: SatPass, dateNow: Date): Marker {
-        val satPos = it.predictor.getSatPos(dateNow)
+    private fun getMarkerForPass(pass: SatPass, date: Date): Marker {
+        val satPos = pass.predictor.getSatPos(date)
         val lat = Math.toDegrees(satPos.latitude)
         var lon = Math.toDegrees(satPos.longitude)
         if (lon > 180) lon -= 360
@@ -144,17 +145,47 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             textLabelBackgroundColor = Color.TRANSPARENT
             textLabelForegroundColor = Color.WHITE
             textLabelFontSize = 24
-            title = it.tle.name
-            setTextIcon(it.tle.name)
+            setTextIcon(pass.tle.name)
             setInfoWindow(null)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            setOnMarkerClickListener { marker, mapView ->
-                Log.d("myTag", "Marker ${marker.title} clicked")
+            setOnMarkerClickListener { _, _ ->
+                showSatGroundTrack(pass)
                 return@setOnMarkerClickListener true
             }
         }
     }
 
+    private fun showSatGroundTrack(pass: SatPass) {
+        val dateNow = Date(System.currentTimeMillis())
+        val period = (24 * 60 / pass.tle.meanmo).toInt()
+        val positions = pass.predictor.getPositions(dateNow, 15, 3, period)
+        val track = Polyline(binding.mapView)
+        val trackPoints = mutableListOf<GeoPoint>()
+
+        val trackPaint = Paint().apply {
+            strokeWidth = mainActivity.resources.displayMetrics.scaledDensity
+            style = Paint.Style.FILL_AND_STROKE
+            color = Color.RED
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+            isAntiAlias = true
+        }
+
+        track.outlinePaint.set(trackPaint)
+
+        positions.forEach {
+            val lat = Math.toDegrees(it.latitude)
+            var lon = Math.toDegrees(it.longitude)
+            if (lon > 180.0) lon -= 360.0
+            trackPoints.add(GeoPoint(lat, lon))
+        }
+
+        track.setPoints(trackPoints)
+        groundTrackLayer = FolderOverlay()
+        groundTrackLayer.add(track)
+        binding.mapView.overlays.add(groundTrackLayer)
+        binding.mapView.invalidate()
+    }
 
     private fun addGridLineOverlay() {
         val overlay = LatLonGridlineOverlay2()
@@ -246,45 +277,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         val filter = ColorMatrixColorFilter(scaleMatrix)
 
         binding.mapView.overlayManager.tilesOverlay.setColorFilter(filter)
-    }
-
-    private suspend fun drawGroundTrack(data: List<SatPass>) {
-        withContext(Dispatchers.IO) {
-            data[1].apply {
-                val dateNow = Date(System.currentTimeMillis())
-                val period = (24 * 60 / this.tle.meanmo).toInt()
-                val positions = this.predictor.getPositions(dateNow, 15, 0, period)
-                positions.forEach {
-                    val lat = Math.toDegrees(it.latitude)
-                    var lon = Math.toDegrees(it.longitude)
-//                    Log.d("myTag", "$lat, $lon")
-                    if (lon > 180.0) {
-//                        path.addPoint(GeoPoint(lat, 180.0))
-                        lon -= 360.0
-                    }
-                    Log.d("myTag", "$lat, $lon")
-                }
-            }
-//            binding.mapView.map().layers().add(path)
-//            binding.mapView.map().render()
-        }
-    }
-
-    private fun drawGroundTrack(list: List<SatPos>) {
-        val groundTrack = Polyline(binding.mapView)
-        val trackPoints = mutableListOf<GeoPoint>()
-
-        list.forEach {
-            val lat = Math.toDegrees(it.latitude) * -1
-            var lon = Math.toDegrees(it.longitude)
-            if (lon > 180.0) lon -= 360.0
-            trackPoints.add(GeoPoint(lat, lon))
-        }
-
-        groundTrack.setPoints(trackPoints)
-        groundTrack.setDensityMultiplier(0.5f)
-        binding.mapView.overlays.add(groundTrack)
-        binding.mapView.invalidate()
     }
 
     private fun drawPosition(position: GeoPoint) {
