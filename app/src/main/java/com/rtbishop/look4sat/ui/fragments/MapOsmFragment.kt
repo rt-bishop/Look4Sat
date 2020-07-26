@@ -31,11 +31,7 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
-import org.osmdroid.views.overlay.compass.CompassOverlay
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
 import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay2
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 import javax.inject.Inject
 
@@ -46,6 +42,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapOsmBinding
+    private var satLayer: FolderOverlay = FolderOverlay()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,31 +60,18 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun setupMapView() {
         binding.mapView.apply {
+            setMultiTouchControls(true)
             setTileSource(TileSourceFactory.MAPNIK)
-
-            // General settings
-//            isHorizontalMapRepetitionEnabled = false
-//            isVerticalMapRepetitionEnabled = false
+            minZoomLevel = 2.5
+            maxZoomLevel = 6.0
+            controller.setZoom(minZoomLevel)
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+            isHorizontalMapRepetitionEnabled = false
+            isVerticalMapRepetitionEnabled = false
             overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
             overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
-
-
-            // Zoom settings
-            minZoomLevel = 2.5
-            maxZoomLevel = 6.5
-            controller.setZoom(minZoomLevel)
-//            controller.setCenter(GeoPoint(0.0, 0.0))
-            setMultiTouchControls(true)
-            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-
-            // Scroll limits
-//            setScrollableAreaLimitLatitude(85.0, -85.0, 0)
-//            setScrollableAreaLimitLongitude(-180.0, 180.0, 0)
             setScrollableAreaLimitDouble(BoundingBox(85.0, 180.0, -85.0, -180.0))
 
-            addLocationOverlay()
-            addMapScaleBarOverlay()
-            addSomeIcons()
             addColorFilter()
         }
     }
@@ -96,7 +80,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         viewModel.getGSP().observe(viewLifecycleOwner, Observer { stationPosition ->
             when (stationPosition) {
                 is Result.Success -> {
-//                    setUserLocation(stationPosition.data)
+                    setUserLocation(stationPosition.data)
                 }
             }
         })
@@ -105,7 +89,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             when (satPasses) {
                 is Result.Success -> {
                     val filteredPasses = satPasses.data.distinctBy { it.tle }
-//                    setupSatOverlay(filteredPasses)
+                    setupSatOverlay(filteredPasses)
                 }
             }
         })
@@ -113,29 +97,70 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun setUserLocation(position: GroundStationPosition) {
         val startPoint = GeoPoint(position.latitude, position.longitude)
-        Marker(binding.mapView).apply {
+        val positionMarker = Marker(binding.mapView).apply {
             this.position = startPoint
+            textLabelBackgroundColor = Color.TRANSPARENT
+            textLabelForegroundColor = Color.WHITE
+            textLabelFontSize = 24
+            setTextIcon("GSP")
+            setInfoWindow(null)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            title = "Ground Station Position"
+        }
+        binding.mapView.overlays.add(positionMarker)
+    }
+
+    private fun setupSatOverlay(passList: List<SatPass>) {
+        lifecycleScope.launch {
+            while (true) {
+                val satMarkers = getSatMarkers(passList)
+                binding.mapView.overlays.remove(satLayer)
+                satLayer = FolderOverlay()
+                satMarkers.forEach { satLayer.add(it) }
+                binding.mapView.overlays.add(satLayer)
+                binding.mapView.invalidate()
+                delay(3000)
+            }
         }
     }
 
-    private fun addCompassOverlay() {
-        val overlay =
-            CompassOverlay(context, InternalCompassOrientationProvider(context), binding.mapView)
-        overlay.enableCompass()
-        binding.mapView.overlays.add(overlay)
+    private suspend fun getSatMarkers(passList: List<SatPass>): List<Overlay> =
+        withContext(Dispatchers.Default) {
+            val satMarkers = mutableListOf<Overlay>()
+            val dateNow = Date(System.currentTimeMillis())
+            passList.forEach {
+                val satMarker = getMarkerForPass(it, dateNow)
+                satMarkers.add(satMarker)
+            }
+            return@withContext satMarkers
+        }
 
+    private fun getMarkerForPass(it: SatPass, dateNow: Date): Marker {
+        val satPos = it.predictor.getSatPos(dateNow)
+        val lat = Math.toDegrees(satPos.latitude)
+        var lon = Math.toDegrees(satPos.longitude)
+        if (lon > 180) lon -= 360
+        return Marker(binding.mapView).apply {
+            position = GeoPoint(lat, lon)
+            textLabelBackgroundColor = Color.TRANSPARENT
+            textLabelForegroundColor = Color.WHITE
+            textLabelFontSize = 24
+            title = it.tle.name
+            setTextIcon(it.tle.name)
+            setInfoWindow(null)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            setOnMarkerClickListener { marker, mapView ->
+                Log.d("myTag", "Marker ${marker.title} clicked")
+                return@setOnMarkerClickListener true
+            }
+        }
     }
 
-    private fun addLocationOverlay() {
-        val overlay = MyLocationNewOverlay(GpsMyLocationProvider(mainActivity), binding.mapView)
-        overlay.enableMyLocation()
-        binding.mapView.overlays.add(overlay)
-    }
 
     private fun addGridLineOverlay() {
         val overlay = LatLonGridlineOverlay2()
+        overlay.setBackgroundColor(Color.TRANSPARENT)
+        overlay.setFontColor(Color.WHITE)
+        overlay.setFontSizeDp(18)
         binding.mapView.overlays.add(overlay)
     }
 
@@ -145,16 +170,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             setCentred(true)
             setScaleBarOffset(dm.widthPixels / 2, 10)
         }
-        binding.mapView.overlays.add(overlay)
-    }
-
-    private fun addMiniMap() {
-        val dm = mainActivity.resources.displayMetrics
-        val overlay =
-            MinimapOverlay(mainActivity, binding.mapView.tileRequestCompleteHandler).apply {
-                width = dm.widthPixels / 5
-                height = dm.heightPixels / 5
-            }
         binding.mapView.overlays.add(overlay)
     }
 
@@ -233,17 +248,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         binding.mapView.overlayManager.tilesOverlay.setColorFilter(filter)
     }
 
-    private fun setupSatOverlay(passList: List<SatPass>) {
-        lifecycleScope.launch {
-            while (true) {
-//                val markers = showSatIcons(data)
-//                satLayer.removeAllItems()
-//                satLayer.addItems(markers)
-                delay(1000)
-            }
-        }
-    }
-
     private suspend fun drawGroundTrack(data: List<SatPass>) {
         withContext(Dispatchers.IO) {
             data[1].apply {
@@ -301,19 +305,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         binding.mapView.overlays.add(satPosition)
         satPosition.points = trackPoints
         binding.mapView.invalidate()
-    }
-
-    private suspend fun showSatIcons(data: List<SatPass>) {
-        withContext(Dispatchers.Default) {
-            val dateNow = Date(System.currentTimeMillis())
-            data.forEach {
-                val satPos = it.predictor.getSatPos(dateNow)
-                val lat = Math.toDegrees(satPos.latitude)
-                var lon = Math.toDegrees(satPos.longitude)
-                if (lon > 180) lon -= 360
-                Log.d("myTag", "${it.tle.name}, $lat, $lon")
-            }
-        }
     }
 
     override fun onPause() {
