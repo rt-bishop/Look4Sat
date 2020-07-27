@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
+import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
@@ -43,7 +44,14 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapOsmBinding
     private var satLayer: FolderOverlay = FolderOverlay()
-    private var groundTrackLayer = FolderOverlay()
+    private val trackPaint = Paint().apply {
+        strokeWidth = 2f
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.RED
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+        isAntiAlias = true
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -149,41 +157,44 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             setInfoWindow(null)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             setOnMarkerClickListener { _, _ ->
-                showSatGroundTrack(pass)
+                val period = (24 * 60 / pass.tle.meanmo).toInt()
+                val positions = pass.predictor.getPositions(date, 20, 0, period * 3)
+                showSatGroundTrack(positions)
                 return@setOnMarkerClickListener true
             }
         }
     }
 
-    private fun showSatGroundTrack(pass: SatPass) {
-        val dateNow = Date(System.currentTimeMillis())
-        val period = (24 * 60 / pass.tle.meanmo).toInt()
-        val positions = pass.predictor.getPositions(dateNow, 15, 3, period)
-        val track = Polyline(binding.mapView)
+    private fun showSatGroundTrack(positions: List<SatPos>) {
+        val tracksOverlay = FolderOverlay()
         val trackPoints = mutableListOf<GeoPoint>()
 
-        val trackPaint = Paint().apply {
-            strokeWidth = mainActivity.resources.displayMetrics.scaledDensity
-            style = Paint.Style.FILL_AND_STROKE
-            color = Color.RED
-            strokeCap = Paint.Cap.ROUND
-            strokeJoin = Paint.Join.ROUND
-            isAntiAlias = true
-        }
-
-        track.outlinePaint.set(trackPaint)
-
+        var oldLon = 0.0
         positions.forEach {
-            val lat = Math.toDegrees(it.latitude)
-            var lon = Math.toDegrees(it.longitude)
-            if (lon > 180.0) lon -= 360.0
-            trackPoints.add(GeoPoint(lat, lon))
+            val newLat = Math.toDegrees(it.latitude)
+            var newLon = Math.toDegrees(it.longitude)
+            if (newLon > 180.0) newLon -= 360.0
+
+            if (oldLon < -170.0 && newLon > 170.0 || oldLon > 170.0 && newLon < -170.0) {
+                val currentPoints = mutableListOf<GeoPoint>()
+                currentPoints.addAll(trackPoints)
+                val completeTrack = Polyline()
+                completeTrack.outlinePaint.set(trackPaint)
+                completeTrack.setPoints(currentPoints)
+                tracksOverlay.add(completeTrack)
+                trackPoints.clear()
+            }
+
+            oldLon = newLon
+            trackPoints.add(GeoPoint(newLat, newLon))
         }
 
-        track.setPoints(trackPoints)
-        groundTrackLayer = FolderOverlay()
-        groundTrackLayer.add(track)
-        binding.mapView.overlays.add(groundTrackLayer)
+        val completeTrack = Polyline()
+        completeTrack.outlinePaint.set(trackPaint)
+        completeTrack.setPoints(trackPoints)
+        tracksOverlay.add(completeTrack)
+
+        binding.mapView.overlays.add(tracksOverlay)
         binding.mapView.invalidate()
     }
 
