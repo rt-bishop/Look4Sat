@@ -43,7 +43,12 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapOsmBinding
-    private var satLayer: FolderOverlay = FolderOverlay()
+
+    private var gspOverlay = FolderOverlay()
+    private var satTrackOverlay = FolderOverlay()
+    private var satRangeOverlay = FolderOverlay()
+    private var satNameOverlay = FolderOverlay()
+
     private val trackPaint = Paint().apply {
         strokeWidth = 2f
         style = Paint.Style.FILL_AND_STROKE
@@ -82,6 +87,12 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             setScrollableAreaLimitDouble(BoundingBox(85.0, 180.0, -85.0, -180.0))
 
             addColorFilter()
+
+            // fill overlays
+            overlays.add(0, gspOverlay)
+            overlays.add(1, satTrackOverlay)
+            overlays.add(2, satRangeOverlay)
+            overlays.add(3, satNameOverlay)
         }
     }
 
@@ -115,17 +126,17 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             setInfoWindow(null)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         }
-        binding.mapView.overlays.add(positionMarker)
+        binding.mapView.overlays[0] = positionMarker
+        binding.mapView.invalidate()
     }
 
     private fun setupSatOverlay(passList: List<SatPass>) {
         lifecycleScope.launch {
             while (true) {
                 val satMarkers = getSatMarkers(passList)
-                binding.mapView.overlays.remove(satLayer)
-                satLayer = FolderOverlay()
-                satMarkers.forEach { satLayer.add(it) }
-                binding.mapView.overlays.add(satLayer)
+                satMarkers.forEach { satNameOverlay.add(it) }
+                binding.mapView.overlays[3] = satNameOverlay
+                satNameOverlay = FolderOverlay()
                 binding.mapView.invalidate()
                 delay(3000)
             }
@@ -166,7 +177,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     }
 
     private fun showSatGroundTrack(positions: List<SatPos>) {
-        val tracksOverlay = FolderOverlay()
         val trackPoints = mutableListOf<GeoPoint>()
 
         var oldLon = 0.0
@@ -181,7 +191,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
                 val completeTrack = Polyline()
                 completeTrack.outlinePaint.set(trackPaint)
                 completeTrack.setPoints(currentPoints)
-                tracksOverlay.add(completeTrack)
+                satTrackOverlay.add(completeTrack)
                 trackPoints.clear()
             }
 
@@ -192,9 +202,9 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         val completeTrack = Polyline()
         completeTrack.outlinePaint.set(trackPaint)
         completeTrack.setPoints(trackPoints)
-        tracksOverlay.add(completeTrack)
-
-        binding.mapView.overlays.add(tracksOverlay)
+        satTrackOverlay.add(completeTrack)
+        binding.mapView.overlays[1] = satTrackOverlay
+        satTrackOverlay = FolderOverlay()
         binding.mapView.invalidate()
     }
 
