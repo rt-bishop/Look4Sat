@@ -28,4 +28,5 @@
     <color name="satTrack">#D50000</color>
     <color name="satPrimary">#FFE082</color>
     <color name="satSecondary">#80FFE082</color>
+    <color name="satTertiary">#26FFE082</color>
 </resources>

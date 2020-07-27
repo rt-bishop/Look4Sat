@@ -51,10 +51,23 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private val trackPaint = Paint().apply {
         strokeWidth = 2f
-        style = Paint.Style.FILL_AND_STROKE
-        color = Color.RED
+        style = Paint.Style.STROKE
+        color = Color.parseColor("#D50000")
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
+        isAntiAlias = true
+    }
+
+    private val fillPaint = Paint().apply {
+//        strokeWidth = 2f
+        style = Paint.Style.FILL
+        color = Color.parseColor("#26FFE082")
+//        isAntiAlias = true
+    }
+    private val rangePaint = Paint().apply {
+        strokeWidth = 2f
+        style = Paint.Style.STROKE
+        color = Color.parseColor("#26FFE082")
         isAntiAlias = true
     }
 
@@ -84,7 +97,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             isVerticalMapRepetitionEnabled = false
             overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
             overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
-            setScrollableAreaLimitDouble(BoundingBox(85.0, 180.0, -85.0, -180.0))
+            setScrollableAreaLimitDouble(BoundingBox(85.05, 180.0, -85.05, -180.0))
 
             addColorFilter()
 
@@ -133,14 +146,58 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private fun setupSatOverlay(passList: List<SatPass>) {
         lifecycleScope.launch {
             while (true) {
+                val satRanges = getSatRanges(passList)
+                satRanges.forEach { satRangeOverlay.add(it) }
+                binding.mapView.overlays[2] = satRangeOverlay
+                satRangeOverlay = FolderOverlay()
+
                 val satMarkers = getSatMarkers(passList)
                 satMarkers.forEach { satNameOverlay.add(it) }
                 binding.mapView.overlays[3] = satNameOverlay
                 satNameOverlay = FolderOverlay()
+
                 binding.mapView.invalidate()
                 delay(3000)
             }
         }
+    }
+
+    private suspend fun getSatRanges(passList: List<SatPass>): List<Overlay> =
+        withContext(Dispatchers.Default) {
+            val satRanges = mutableListOf<Overlay>()
+            val dateNow = Date(System.currentTimeMillis())
+            passList.forEach {
+                val satRange = getRangeForPass(it, dateNow)
+                satRanges.add(satRange)
+            }
+            return@withContext satRanges
+        }
+
+    private fun getRangeForPass(it: SatPass, dateNow: Date): Overlay {
+        val satRange = Polygon().apply {
+            fillPaint.set(fillPaint)
+            outlinePaint.set(rangePaint)
+        }
+        val rangePoints = mutableListOf<GeoPoint>()
+        val rangeCircle = it.predictor.getSatPos(dateNow).rangeCircle
+
+        var zeroPoint = GeoPoint(0.0, 0.0)
+        rangeCircle.withIndex().forEach {
+            var lat = it.value.lat
+            var lon = it.value.lon
+
+            if (lat > 85.05) lat = 85.05
+            else if (lat < -85.05) lat = -85.05
+
+            if (lon > 180.0) lon -= 360.0
+
+            if (it.index == 0) zeroPoint = GeoPoint(lat, lon)
+            rangePoints.add(GeoPoint(lat, lon))
+        }
+        rangePoints.add(zeroPoint)
+        satRange.points = rangePoints
+
+        return satRange
     }
 
     private suspend fun getSatMarkers(passList: List<SatPass>): List<Overlay> =
@@ -156,13 +213,18 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun getMarkerForPass(pass: SatPass, date: Date): Marker {
         val satPos = pass.predictor.getSatPos(date)
-        val lat = Math.toDegrees(satPos.latitude)
+        var lat = Math.toDegrees(satPos.latitude)
         var lon = Math.toDegrees(satPos.longitude)
-        if (lon > 180) lon -= 360
+
+        if (lat > 85.05) lat = 85.05
+        else if (lat < -85.05) lat = -85.05
+
+        if (lon > 180.0) lon -= 360.0
+
         return Marker(binding.mapView).apply {
             position = GeoPoint(lat, lon)
             textLabelBackgroundColor = Color.TRANSPARENT
-            textLabelForegroundColor = Color.WHITE
+            textLabelForegroundColor = Color.RED
             textLabelFontSize = 24
             setTextIcon(pass.tle.name)
             setInfoWindow(null)
@@ -298,26 +360,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         val filter = ColorMatrixColorFilter(scaleMatrix)
 
         binding.mapView.overlayManager.tilesOverlay.setColorFilter(filter)
-    }
-
-    private fun drawPosition(position: GeoPoint) {
-        val satPosition = Polygon(binding.mapView)
-        val trackPoints = mutableListOf<GeoPoint>()
-
-        val lat = Math.toDegrees(position.latitude)
-        var lon = Math.toDegrees(position.longitude)
-        if (lon > 180.0) lon -= 360.0
-        trackPoints.add(GeoPoint(lat, lon))
-
-        val startMarker = Marker(binding.mapView)
-        startMarker.position = GeoPoint(lat, lon)
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        startMarker.title = "Sat Position"
-        binding.mapView.overlays.add(startMarker)
-
-        binding.mapView.overlays.add(satPosition)
-        satPosition.points = trackPoints
-        binding.mapView.invalidate()
     }
 
     override fun onPause() {
