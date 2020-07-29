@@ -58,15 +58,8 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         isAntiAlias = true
     }
 
-    private val fillPaint = Paint().apply {
-//        strokeWidth = 2f
-        style = Paint.Style.FILL
-        color = Color.parseColor("#26FFE082")
-//        isAntiAlias = true
-    }
     private val rangePaint = Paint().apply {
-        strokeWidth = 2f
-        style = Paint.Style.STROKE
+        style = Paint.Style.FILL_AND_STROKE
         color = Color.parseColor("#26FFE082")
         isAntiAlias = true
     }
@@ -99,7 +92,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
             setScrollableAreaLimitDouble(BoundingBox(85.05, 180.0, -85.05, -180.0))
 
-            addColorFilter()
+            addExperimentColorFilter()
 
             // fill overlays
             overlays.add(0, gspOverlay)
@@ -138,7 +131,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         val positionMarker = Marker(binding.mapView).apply {
             this.position = startPoint
             textLabelBackgroundColor = Color.TRANSPARENT
-            textLabelForegroundColor = Color.WHITE
+            textLabelForegroundColor = Color.YELLOW
             textLabelFontSize = 24
             setTextIcon("GSP")
             setInfoWindow(null)
@@ -180,7 +173,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun getRangeForPass(it: SatPass, dateNow: Date): Overlay {
         val satRange = Polygon().apply {
-            fillPaint.set(fillPaint)
+            fillPaint.set(rangePaint)
             outlinePaint.set(rangePaint)
         }
         val rangePoints = mutableListOf<GeoPoint>()
@@ -229,7 +222,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         return Marker(binding.mapView).apply {
             position = GeoPoint(lat, lon)
             textLabelBackgroundColor = Color.TRANSPARENT
-            textLabelForegroundColor = Color.RED
+            textLabelForegroundColor = Color.YELLOW
             textLabelFontSize = 24
             setTextIcon(pass.tle.name)
             setInfoWindow(null)
@@ -309,6 +302,49 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
         val overlay = ItemizedIconOverlay(mainActivity, items, listener)
         binding.mapView.overlays.add(overlay)
+    }
+
+    private fun addExperimentColorFilter() {
+
+        val negativeArray = floatArrayOf(
+            -1.0f, .0f, .0f, .0f, 255.0f,
+            .0f, -1.0f, .0f, .0f, 255.0f,
+            .0f, .0f, -1.0f, .0f, 255.0f,
+            .0f, .0f, .0f, 1.0f, .0f
+        )
+        val negativeMatrix = ColorMatrix(negativeArray)
+
+        val destinationColor = Color.parseColor("#FF2A2A2A")
+        val lr = (255.0f - Color.red(destinationColor)) / 255.0f
+        val lg = (255.0f - Color.green(destinationColor)) / 255.0f
+        val lb = (255.0f - Color.blue(destinationColor)) / 255.0f
+        val grayScaleArray = floatArrayOf(
+            lr, lg, lb, 0f, 0f,
+            lr, lg, lb, 0f, 0f,
+            lr, lg, lb, 0f, 0f,
+            0f, 0f, 0f, 0f, 255f
+        )
+        val grayScaleMatrix = ColorMatrix(grayScaleArray)
+        grayScaleMatrix.preConcat(negativeMatrix)
+
+        val dr = Color.red(destinationColor)
+        val dg = Color.green(destinationColor)
+        val db = Color.blue(destinationColor)
+        val drf = dr / 255f
+        val dgf = dg / 255f
+        val dbf = db / 255f
+        val tintArray = floatArrayOf(
+            drf, 0f, 0f, 0f, 0f,
+            0f, dgf, 0f, 0f, 0f,
+            0f, 0f, dbf, 0f, 0f,
+            0f, 0f, 0f, 1f, 0f
+        )
+        val tintMatrix = ColorMatrix(tintArray)
+        tintMatrix.preConcat(grayScaleMatrix)
+
+        val filter = ColorMatrixColorFilter(tintMatrix)
+
+        binding.mapView.overlayManager.tilesOverlay.setColorFilter(filter)
     }
 
     private fun addColorFilter() {
