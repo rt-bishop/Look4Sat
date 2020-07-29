@@ -27,7 +27,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -88,7 +88,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private fun setupMapView() {
         binding.mapView.apply {
             setMultiTouchControls(true)
-            setTileSource(TileSourceFactory.MAPNIK)
+            setTileSource(getTileSource())
             minZoomLevel = 2.5
             maxZoomLevel = 6.0
             controller.setZoom(minZoomLevel)
@@ -107,6 +107,11 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             overlays.add(2, satRangeOverlay)
             overlays.add(3, satNameOverlay)
         }
+    }
+
+    private fun getTileSource(): XYTileSource {
+        val tileSourceArray = arrayOf("https://maps.wikimedia.org/osm-intl/")
+        return XYTileSource("wiki", 2, 6, 256, ".png", tileSourceArray)
     }
 
     private fun setupObservers() {
