@@ -92,7 +92,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
             setScrollableAreaLimitDouble(BoundingBox(85.05, 180.0, -85.05, -180.0))
 
-            addExperimentColorFilter()
+            addColorFilter()
 
             // fill overlays
             overlays.add(0, gspOverlay)
@@ -304,7 +304,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         binding.mapView.overlays.add(overlay)
     }
 
-    private fun addExperimentColorFilter() {
+    private fun addColorFilter() {
 
         val negativeArray = floatArrayOf(
             -1.0f, .0f, .0f, .0f, 255.0f,
@@ -314,18 +314,35 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         )
         val negativeMatrix = ColorMatrix(negativeArray)
 
+        val grayScaleArray = floatArrayOf(
+            0.2126f, 0.7152f, 0.0722f, 0f, 0f,
+            0.2126f, 0.7152f, 0.0722f, 0f, 0f,
+            0.2126f, 0.7152f, 0.0722f, 0f, 0f,
+            0f, 0f, 0f, 1f, 0f
+        )
+        val grayScaleMatrix = ColorMatrix(grayScaleArray)
+
         val destinationColor = Color.parseColor("#FF2A2A2A")
         val lr = (255.0f - Color.red(destinationColor)) / 255.0f
         val lg = (255.0f - Color.green(destinationColor)) / 255.0f
         val lb = (255.0f - Color.blue(destinationColor)) / 255.0f
-        val grayScaleArray = floatArrayOf(
+        val tintedGrayScaleArray = floatArrayOf(
             lr, lg, lb, 0f, 0f,
             lr, lg, lb, 0f, 0f,
             lr, lg, lb, 0f, 0f,
             0f, 0f, 0f, 0f, 255f
         )
-        val grayScaleMatrix = ColorMatrix(grayScaleArray)
-        grayScaleMatrix.preConcat(negativeMatrix)
+        val tintedGrayScaleMatrix = ColorMatrix(tintedGrayScaleArray)
+        tintedGrayScaleMatrix.preConcat(negativeMatrix)
+
+        val sepiaArray = floatArrayOf(
+            0.393f, 0.769f, 0.189f, .0f, .0f,
+            0.349f, 0.686f, 0.168f, .0f, .0f,
+            0.272f, 0.534f, 0.131f, .0f, .0f,
+            .0f, .0f, .0f, 1.0f, .0f
+        )
+        val sepiaMatrix = ColorMatrix(sepiaArray)
+        sepiaMatrix.preConcat(tintedGrayScaleMatrix)
 
         val dr = Color.red(destinationColor)
         val dg = Color.green(destinationColor)
@@ -340,66 +357,9 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             0f, 0f, 0f, 1f, 0f
         )
         val tintMatrix = ColorMatrix(tintArray)
-        tintMatrix.preConcat(grayScaleMatrix)
+        tintMatrix.preConcat(tintedGrayScaleMatrix)
 
-        val filter = ColorMatrixColorFilter(tintMatrix)
-
-        binding.mapView.overlayManager.tilesOverlay.setColorFilter(filter)
-    }
-
-    private fun addColorFilter() {
-
-        val negativeArray = floatArrayOf(
-            -1.0f, .0f, .0f, .0f, 255.0f,
-            .0f, -1.0f, .0f, .0f, 255.0f,
-            .0f, .0f, -1.0f, .0f, 255.0f,
-            .0f, .0f, .0f, 1.0f, .0f
-        )
-        val negativeMatrix = ColorMatrix(negativeArray)
-
-        val destinationColor = Color.parseColor("#FF2A2A2A")
-        val lr = (255.0f - Color.red(destinationColor)) / 255.0f
-        val lg = (255.0f - Color.green(destinationColor)) / 255.0f
-        val lb = (255.0f - Color.blue(destinationColor)) / 255.0f
-        val grayScaleArray = floatArrayOf(
-            lr, lg, lb, 0f, 0f, //
-            lr, lg, lb, 0f, 0f, //
-            lr, lg, lb, 0f, 0f, //
-            0f, 0f, 0f, 0f, 255f //
-        )
-        val grayScaleMatrix = ColorMatrix(grayScaleArray)
-        grayScaleMatrix.preConcat(negativeMatrix)
-
-        val dr = Color.red(destinationColor)
-        val dg = Color.green(destinationColor)
-        val db = Color.blue(destinationColor)
-        val drf = dr / 255f
-        val dgf = dg / 255f
-        val dbf = db / 255f
-        val tintArray = floatArrayOf(
-            drf, 0f, 0f, 0f, 0f, //
-            0f, dgf, 0f, 0f, 0f, //
-            0f, 0f, dbf, 0f, 0f, //
-            0f, 0f, 0f, 1f, 0f //
-        )
-        val tintMatrix = ColorMatrix(tintArray)
-        tintMatrix.preConcat(grayScaleMatrix)
-
-        val lDest = drf * lr + dgf * lg + dbf * lb
-        val scale = 1f - lDest
-        val translate = 1 - scale * 0.5f
-
-        val scaleArray = floatArrayOf(
-            scale, 0f, 0f, 0f, dr * translate, //
-            0f, scale, 0f, 0f, dg * translate, //
-            0f, 0f, scale, 0f, db * translate, //
-            0f, 0f, 0f, 1f, 0f
-        )
-        val scaleMatrix = ColorMatrix(scaleArray)
-        scaleMatrix.preConcat(tintMatrix)
-
-        val filter = ColorMatrixColorFilter(scaleMatrix)
-
+        val filter = ColorMatrixColorFilter(sepiaMatrix)
         binding.mapView.overlayManager.tilesOverlay.setColorFilter(filter)
     }
 
