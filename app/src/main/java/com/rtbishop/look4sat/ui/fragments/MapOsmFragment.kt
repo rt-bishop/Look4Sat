@@ -27,6 +27,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -81,7 +83,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private fun setupMapView() {
         binding.mapView.apply {
             setMultiTouchControls(true)
-            setTileSource(getTileSource())
+            setTileSource(getWikimediaTileSource())
             minZoomLevel = 2.5
             maxZoomLevel = 6.0
             controller.setZoom(minZoomLevel)
@@ -102,9 +104,23 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         }
     }
 
-    private fun getTileSource(): XYTileSource {
-        val tileSourceArray = arrayOf("https://maps.wikimedia.org/osm-intl/")
-        return XYTileSource("wiki", 2, 6, 256, ".png", tileSourceArray)
+    private fun getWikimediaTileSource(): OnlineTileSourceBase {
+        val wikimediaSourceArray = arrayOf("https://maps.wikimedia.org/osm-intl/")
+        val wikimediaCopyright = "Wikimedia maps | Map data © OpenStreetMap contributors"
+        val wikimediaSourcePolicy = TileSourcePolicy(
+            1, TileSourcePolicy.FLAG_NO_BULK and TileSourcePolicy.FLAG_NO_PREVENTIVE and
+                    TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
+        )
+        return XYTileSource(
+            "wikimedia",
+            2,
+            6,
+            256,
+            ".png",
+            wikimediaSourceArray,
+            wikimediaCopyright,
+            wikimediaSourcePolicy
+        )
     }
 
     private fun setupObservers() {
