@@ -1,5 +1,6 @@
 package com.rtbishop.look4sat.ui.fragments
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -101,7 +102,14 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             overlays.add(1, satTrackOverlay)
             overlays.add(2, satRangeOverlay)
             overlays.add(3, satNameOverlay)
+            overlays.add(4, getCopyrightOverlay(mainActivity))
         }
+    }
+
+    private fun getCopyrightOverlay(context: Context): Overlay {
+        val copyrightOverlay = CopyrightOverlay(context)
+        copyrightOverlay.setTextColor(Color.WHITE)
+        return copyrightOverlay
     }
 
     private fun getWikimediaTileSource(): OnlineTileSourceBase {
