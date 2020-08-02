@@ -29,4 +29,10 @@
     <color name="satPrimary">#FFE082</color>
     <color name="satSecondary">#80FFE082</color>
     <color name="satTertiary">#26FFE082</color>
+    <!-- temp colors -->
+    <color name="shark">#202124</color>
+    <color name="shark_light">#2E2F32</color>
+    <color name="athens_gray">#e8e9ec</color>
+    <color name="shuttle_gray">#606367</color>
+    <color name="mako">#3d4043</color>
 </resources>
