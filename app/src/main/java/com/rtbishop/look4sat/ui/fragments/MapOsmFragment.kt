@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.ui.fragments
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -35,7 +34,6 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
-import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay2
 import java.util.*
 import javax.inject.Inject
 
@@ -104,19 +102,12 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             overlays.add(1, satTrackOverlay)
             overlays.add(2, satRangeOverlay)
             overlays.add(3, satNameOverlay)
-            overlays.add(4, getCopyrightOverlay(mainActivity))
         }
-    }
-
-    private fun getCopyrightOverlay(context: Context): Overlay {
-        val copyrightOverlay = CopyrightOverlay(context)
-        copyrightOverlay.setTextColor(Color.WHITE)
-        return copyrightOverlay
     }
 
     private fun getWikimediaTileSource(): OnlineTileSourceBase {
         val wikimediaSourceArray = arrayOf("https://maps.wikimedia.org/osm-intl/")
-        val wikimediaCopyright = "Wikimedia maps | Map data © OpenStreetMap contributors"
+        val wikimediaCopyright = resources.getString(R.string.osmCopyright)
         val wikimediaSourcePolicy = TileSourcePolicy(
             1, TileSourcePolicy.FLAG_NO_BULK and TileSourcePolicy.FLAG_NO_PREVENTIVE and
                     TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
@@ -212,7 +203,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
             if (lat > 85.05) lat = 85.05
             else if (lat < -85.05) lat = -85.05
-
             if (lon > 180.0) lon -= 360.0
 
             if (it.index == 0) zeroPoint = GeoPoint(lat, lon)
@@ -242,7 +232,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
         if (lat > 85.05) lat = 85.05
         else if (lat < -85.05) lat = -85.05
-
         if (lon > 180.0) lon -= 360.0
 
         return Marker(binding.mapView).apply {
@@ -264,7 +253,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun showSatGroundTrack(positions: List<SatPos>) {
         val trackPoints = mutableListOf<GeoPoint>()
-
         var oldLon = 0.0
         positions.forEach {
             val newLat = Math.toDegrees(it.latitude)
@@ -294,40 +282,22 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         binding.mapView.invalidate()
     }
 
-    private fun addGridLineOverlay() {
-        val overlay = LatLonGridlineOverlay2()
-        overlay.setBackgroundColor(Color.TRANSPARENT)
-        overlay.setFontColor(Color.WHITE)
-        overlay.setFontSizeDp(18)
-        binding.mapView.overlays.add(overlay)
-    }
-
-    private fun addMapScaleBarOverlay() {
-        val dm = mainActivity.resources.displayMetrics
-        val overlay = ScaleBarOverlay(binding.mapView).apply {
-            setCentred(true)
-            setScaleBarOffset(dm.widthPixels / 2, 10)
-        }
-        binding.mapView.overlays.add(overlay)
-    }
-
-    private fun addSomeIcons() {
+    private fun getItemizedOverlay(): Overlay {
         val items = mutableListOf<OverlayItem>()
         items.add(OverlayItem("Title", "Description", GeoPoint(0.0, 0.0)))
 
         val listener = object : ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
-            override fun onItemLongPress(index: Int, item: OverlayItem?): Boolean {
+            override fun onItemLongPress(index: Int, item: OverlayItem): Boolean {
                 return true
             }
 
-            override fun onItemSingleTapUp(index: Int, item: OverlayItem?): Boolean {
-                Log.d("myTag", "${item?.title}")
+            override fun onItemSingleTapUp(index: Int, item: OverlayItem): Boolean {
+                Log.d("myTag", item.title)
                 return true
             }
         }
 
-        val overlay = ItemizedIconOverlay(mainActivity, items, listener)
-        binding.mapView.overlays.add(overlay)
+        return ItemizedIconOverlay<OverlayItem>(mainActivity, items, listener)
     }
 
     private fun getColorFilter(targetColor: Int): ColorMatrixColorFilter {

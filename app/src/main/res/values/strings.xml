@@ -170,4 +170,5 @@
     <string name="tle_source">TLE source</string>
     <string name="https_only">Please use HTTPS URLs only</string>
     <string name="placeholder" translatable="false">Placeholder</string>
+    <string name="osmCopyright" translatable="false">Wikimedia maps | Map data © OpenStreetMap contributors</string>
 </resources>
