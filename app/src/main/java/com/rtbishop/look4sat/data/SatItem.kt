@@ -3,7 +3,7 @@ package com.rtbishop.look4sat.data
 import org.osmdroid.api.IGeoPoint
 import org.osmdroid.views.overlay.OverlayItem
 
-data class SatOverlayItem(
+data class SatItem(
     val name: String,
     val description: String,
     val position: IGeoPoint,

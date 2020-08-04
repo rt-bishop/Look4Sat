@@ -28,7 +28,7 @@
     <color name="satTrack">#D50000</color>
     <color name="satPrimary">#FFE082</color>
     <color name="satSecondary">#80FFE082</color>
-    <color name="satTertiary">#26FFE082</color>
+    <color name="satOsmTemp">#26FFE082</color>
     <!-- temp colors -->
     <color name="shark">#202124</color>
     <color name="shark_light">#2E2F32</color>

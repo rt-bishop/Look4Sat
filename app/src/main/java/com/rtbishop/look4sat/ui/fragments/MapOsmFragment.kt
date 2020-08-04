@@ -6,6 +6,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +17,7 @@ import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
-import com.rtbishop.look4sat.data.SatOverlayItem
+import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapOsmBinding
 import com.rtbishop.look4sat.ui.MainActivity
@@ -43,21 +44,10 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private lateinit var mainActivity: MainActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapOsmBinding
-
-    private val trackPaint = Paint().apply {
-        strokeWidth = 2f
-        style = Paint.Style.STROKE
-        color = Color.parseColor("#D50000")
-        strokeCap = Paint.Cap.ROUND
-        strokeJoin = Paint.Join.ROUND
-        isAntiAlias = true
-    }
-
-    private val rangePaint = Paint().apply {
-        style = Paint.Style.FILL_AND_STROKE
-        color = Color.parseColor("#26FFE082")
-        isAntiAlias = true
-    }
+    private lateinit var trackPaint: Paint
+    private lateinit var footprintPaint: Paint
+    private lateinit var selectedPass: SatPass
+    private val dateNow = Date(System.currentTimeMillis())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,6 +58,21 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity.applicationContext)
         Configuration.getInstance().load(mainActivity.applicationContext, prefs)
+
+        trackPaint = Paint().apply {
+            strokeWidth = 2f
+            style = Paint.Style.STROKE
+            color = ContextCompat.getColor(mainActivity, R.color.satTrack)
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+            isAntiAlias = true
+        }
+
+        footprintPaint = Paint().apply {
+            style = Paint.Style.FILL_AND_STROKE
+            color = ContextCompat.getColor(mainActivity, R.color.satOsmTemp)
+            isAntiAlias = true
+        }
 
         setupMapView()
         setupObservers()
@@ -91,28 +96,25 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             val tilesFilter = getColorFilter(Color.parseColor("#D50000"))
             overlayManager.tilesOverlay.setColorFilter(tilesFilter)
 
-            // fill overlays
+            // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
             val layers = listOf(FolderOverlay(), FolderOverlay(), FolderOverlay(), FolderOverlay())
             overlays.addAll(layers)
         }
     }
 
     private fun getWikimediaTileSource(): OnlineTileSourceBase {
-        val wikimediaSourceArray = arrayOf("https://maps.wikimedia.org/osm-intl/")
-        val wikimediaCopyright = resources.getString(R.string.osmCopyright)
-        val wikimediaSourcePolicy = TileSourcePolicy(
-            1, TileSourcePolicy.FLAG_NO_BULK and TileSourcePolicy.FLAG_NO_PREVENTIVE and
-                    TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
-        )
         return XYTileSource(
             "wikimedia",
             2,
             6,
             256,
             ".png",
-            wikimediaSourceArray,
-            wikimediaCopyright,
-            wikimediaSourcePolicy
+            arrayOf("https://maps.wikimedia.org/osm-intl/"),
+            resources.getString(R.string.osmCopyright),
+            TileSourcePolicy(
+                1, TileSourcePolicy.FLAG_NO_BULK and TileSourcePolicy.FLAG_NO_PREVENTIVE and
+                        TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
+            )
         )
     }
 
@@ -128,8 +130,11 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         viewModel.getPassList().observe(viewLifecycleOwner, Observer { satPasses ->
             when (satPasses) {
                 is Result.Success -> {
-                    val filteredPasses = satPasses.data.distinctBy { it.tle }
-                    setupSatOverlay(filteredPasses)
+                    if (satPasses.data.isNotEmpty()) {
+                        val filteredPasses = satPasses.data.distinctBy { it.tle }
+                        selectedPass = filteredPasses[0]
+                        setupSatOverlay(filteredPasses)
+                    }
                 }
             }
         })
@@ -149,18 +154,19 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private fun setupSatOverlay(passList: List<SatPass>) {
         lifecycleScope.launch {
             while (true) {
-                val dateNow = Date(System.currentTimeMillis())
-                binding.mapView.overlays[3] = getSatOverlay(passList, dateNow)
+                dateNow.time = System.currentTimeMillis()
+                binding.mapView.overlays[3] = getSatIcons(passList)
+                binding.mapView.overlays[2] = getSatFootprint(selectedPass)
                 binding.mapView.invalidate()
                 delay(3000)
             }
         }
     }
 
-    private suspend fun getSatOverlay(passList: List<SatPass>, dateNow: Date): Overlay =
+    private suspend fun getSatIcons(passList: List<SatPass>): Overlay =
         withContext(Dispatchers.Default) {
-            val satIcon = resources.getDrawable(R.drawable.ic_map_sat, mainActivity.theme)
-            val overlayItems = mutableListOf<SatOverlayItem>()
+            val icon = resources.getDrawable(R.drawable.ic_map_sat, mainActivity.theme)
+            val items = mutableListOf<SatItem>()
 
             passList.forEach {
                 val satPos = it.predictor.getSatPos(dateNow)
@@ -171,44 +177,40 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
                 else if (lat < -85.05) lat = -85.05
                 if (lon > 180.0) lon -= 360.0
 
-                val satItem = SatOverlayItem(it.tle.name, it.tle.name, GeoPoint(lat, lon), it)
+                val satItem = SatItem(it.tle.name, it.tle.name, GeoPoint(lat, lon), it)
                 satItem.markerHotspot = OverlayItem.HotspotPlace.CENTER
-                overlayItems.add(satItem)
+                items.add(satItem)
             }
 
-            val listener = object : ItemizedIconOverlay.OnItemGestureListener<SatOverlayItem> {
-                override fun onItemLongPress(index: Int, item: SatOverlayItem): Boolean {
+            val listener = object : ItemizedIconOverlay.OnItemGestureListener<SatItem> {
+                override fun onItemLongPress(index: Int, item: SatItem): Boolean {
                     return true
                 }
 
-                override fun onItemSingleTapUp(index: Int, item: SatOverlayItem): Boolean {
-                    setSatDetails(item.pass, dateNow)
+                override fun onItemSingleTapUp(index: Int, item: SatItem): Boolean {
+                    selectedPass = item.pass
+                    setSatDetails(item.pass)
                     return true
                 }
             }
 
-            return@withContext ItemizedIconOverlay<SatOverlayItem>(
-                overlayItems,
-                satIcon,
-                listener,
-                mainActivity
-            )
+            return@withContext ItemizedIconOverlay<SatItem>(items, icon, listener, mainActivity)
         }
 
-    private fun setSatDetails(pass: SatPass, dateNow: Date) {
-        binding.mapView.overlays[1] = getSatTrack(pass, dateNow)
-        binding.mapView.overlays[2] = getSatFootprint(pass, dateNow)
+    private fun setSatDetails(pass: SatPass) {
+        binding.mapView.overlays[1] = getSatTrack(pass)
+        binding.mapView.overlays[2] = getSatFootprint(pass)
 //        showSatInfo(pass)
         binding.mapView.invalidate()
     }
 
-    private fun getSatTrack(pass: SatPass, dateNow: Date): Overlay {
+    private fun getSatTrack(pass: SatPass): Overlay {
         val period = (24 * 60 / pass.tle.meanmo).toInt()
         val positions = pass.predictor.getPositions(dateNow, 20, 0, period * 3)
         val trackOverlay = FolderOverlay()
         val trackPoints = mutableListOf<GeoPoint>()
-        var oldLon = 0.0
 
+        var oldLon = 0.0
         positions.forEach {
             val newLat = Math.toDegrees(it.latitude)
             var newLon = Math.toDegrees(it.longitude)
@@ -236,14 +238,11 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         return trackOverlay
     }
 
-    private fun getSatFootprint(pass: SatPass, dateNow: Date): Overlay {
-        val rangePoints = mutableListOf<GeoPoint>()
+    private fun getSatFootprint(pass: SatPass): Overlay {
         val rangeCircle = pass.predictor.getSatPos(dateNow).rangeCircle
+        val rangePoints = mutableListOf<GeoPoint>()
         var zeroPoint = GeoPoint(0.0, 0.0)
-        val satRange = Polygon().apply {
-            fillPaint.set(rangePaint)
-            outlinePaint.set(rangePaint)
-        }
+
         rangeCircle.withIndex().forEach {
             var lat = it.value.lat
             var lon = it.value.lon
@@ -256,9 +255,12 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             rangePoints.add(GeoPoint(lat, lon))
         }
         rangePoints.add(zeroPoint)
-        satRange.points = rangePoints
 
-        return satRange
+        return Polygon().apply {
+            fillPaint.set(footprintPaint)
+            outlinePaint.set(footprintPaint)
+            points = rangePoints
+        }
     }
 
     private fun getColorFilter(targetColor: Int): ColorMatrixColorFilter {
