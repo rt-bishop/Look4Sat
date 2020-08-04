@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -129,7 +128,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         viewModel.getGSP().observe(viewLifecycleOwner, Observer { stationPosition ->
             when (stationPosition) {
                 is Result.Success -> {
-                    setUserLocation(stationPosition.data)
+                    setupPosOverlay(stationPosition.data)
                 }
             }
         })
@@ -144,19 +143,15 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         })
     }
 
-    private fun setUserLocation(position: GroundStationPosition) {
-        val startPoint = GeoPoint(position.latitude, position.longitude)
-        val positionMarker = Marker(binding.mapView).apply {
-            this.position = startPoint
-            textLabelBackgroundColor = Color.TRANSPARENT
-            textLabelForegroundColor = ContextCompat.getColor(mainActivity, R.color.themeAccent)
-            textLabelFontSize = 24
-            setTextIcon("GSP")
+    private fun setupPosOverlay(gsp: GroundStationPosition) {
+        Marker(binding.mapView).apply {
             setInfoWindow(null)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            icon = resources.getDrawable(R.drawable.ic_map_pos, mainActivity.theme)
+            position = GeoPoint(gsp.latitude, gsp.longitude)
+            binding.mapView.overlays[0] = this
+            binding.mapView.invalidate()
         }
-        binding.mapView.overlays[0] = positionMarker
-        binding.mapView.invalidate()
     }
 
     private fun setupSatOverlay(passList: List<SatPass>) {
