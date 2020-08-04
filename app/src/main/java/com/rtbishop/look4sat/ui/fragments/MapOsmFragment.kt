@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -148,7 +149,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         val positionMarker = Marker(binding.mapView).apply {
             this.position = startPoint
             textLabelBackgroundColor = Color.TRANSPARENT
-            textLabelForegroundColor = Color.YELLOW
+            textLabelForegroundColor = ContextCompat.getColor(mainActivity, R.color.themeAccent)
             textLabelFontSize = 24
             setTextIcon("GSP")
             setInfoWindow(null)
@@ -161,15 +162,14 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private fun setupSatOverlay(passList: List<SatPass>) {
         lifecycleScope.launch {
             while (true) {
-                val satRanges = getSatRanges(passList)
+                val dateNow = Date(System.currentTimeMillis())
+
+                val satRanges = getSatRanges(passList, dateNow)
                 satRanges.forEach { satRangeOverlay.add(it) }
                 binding.mapView.overlays[2] = satRangeOverlay
                 satRangeOverlay = FolderOverlay()
 
-                val satMarkers = getSatMarkers(passList)
-                satMarkers.forEach { satNameOverlay.add(it) }
-                binding.mapView.overlays[3] = satNameOverlay
-                satNameOverlay = FolderOverlay()
+                binding.mapView.overlays[3] = getSatOverlay(passList, dateNow)
 
                 binding.mapView.invalidate()
                 delay(3000)
@@ -177,10 +177,9 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         }
     }
 
-    private suspend fun getSatRanges(passList: List<SatPass>): List<Overlay> =
+    private suspend fun getSatRanges(passList: List<SatPass>, dateNow: Date): List<Overlay> =
         withContext(Dispatchers.Default) {
             val satRanges = mutableListOf<Overlay>()
-            val dateNow = Date(System.currentTimeMillis())
             passList.forEach {
                 val satRange = getRangeForPass(it, dateNow)
                 satRanges.add(satRange)
@@ -214,42 +213,43 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         return satRange
     }
 
-    private suspend fun getSatMarkers(passList: List<SatPass>): List<Overlay> =
+    private suspend fun getSatOverlay(passList: List<SatPass>, dateNow: Date): Overlay =
         withContext(Dispatchers.Default) {
-            val satMarkers = mutableListOf<Overlay>()
-            val dateNow = Date(System.currentTimeMillis())
+            val satIcon = resources.getDrawable(R.drawable.ic_map_sat, mainActivity.theme)
+            val overlayItems = mutableListOf<OverlayItem>()
+
             passList.forEach {
-                val satMarker = getMarkerForPass(it, dateNow)
-                satMarkers.add(satMarker)
+                val satPos = it.predictor.getSatPos(dateNow)
+                var lat = Math.toDegrees(satPos.latitude)
+                var lon = Math.toDegrees(satPos.longitude)
+
+                if (lat > 85.05) lat = 85.05
+                else if (lat < -85.05) lat = -85.05
+                if (lon > 180.0) lon -= 360.0
+
+                val item = OverlayItem(it.tle.name, it.tle.name, GeoPoint(lat, lon))
+                item.markerHotspot = OverlayItem.HotspotPlace.CENTER
+                overlayItems.add(item)
             }
-            return@withContext satMarkers
-        }
 
-    private fun getMarkerForPass(pass: SatPass, date: Date): Marker {
-        val satPos = pass.predictor.getSatPos(date)
-        var lat = Math.toDegrees(satPos.latitude)
-        var lon = Math.toDegrees(satPos.longitude)
+            val listener = object : ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
+                override fun onItemLongPress(index: Int, item: OverlayItem): Boolean {
+                    return true
+                }
 
-        if (lat > 85.05) lat = 85.05
-        else if (lat < -85.05) lat = -85.05
-        if (lon > 180.0) lon -= 360.0
-
-        return Marker(binding.mapView).apply {
-            position = GeoPoint(lat, lon)
-            textLabelBackgroundColor = Color.TRANSPARENT
-            textLabelForegroundColor = Color.YELLOW
-            textLabelFontSize = 24
-            setTextIcon(pass.tle.name)
-            setInfoWindow(null)
-            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            setOnMarkerClickListener { _, _ ->
-                val period = (24 * 60 / pass.tle.meanmo).toInt()
-                val positions = pass.predictor.getPositions(date, 20, 0, period * 3)
-                showSatGroundTrack(positions)
-                return@setOnMarkerClickListener true
+                override fun onItemSingleTapUp(index: Int, item: OverlayItem): Boolean {
+                    Log.d("myTag", item.title)
+                    return true
+                }
             }
+
+            return@withContext ItemizedIconOverlay<OverlayItem>(
+                overlayItems,
+                satIcon,
+                listener,
+                mainActivity
+            )
         }
-    }
 
     private fun showSatGroundTrack(positions: List<SatPos>) {
         val trackPoints = mutableListOf<GeoPoint>()
@@ -280,24 +280,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         binding.mapView.overlays[1] = satTrackOverlay
         satTrackOverlay = FolderOverlay()
         binding.mapView.invalidate()
-    }
-
-    private fun getItemizedOverlay(): Overlay {
-        val items = mutableListOf<OverlayItem>()
-        items.add(OverlayItem("Title", "Description", GeoPoint(0.0, 0.0)))
-
-        val listener = object : ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
-            override fun onItemLongPress(index: Int, item: OverlayItem): Boolean {
-                return true
-            }
-
-            override fun onItemSingleTapUp(index: Int, item: OverlayItem): Boolean {
-                Log.d("myTag", item.title)
-                return true
-            }
-        }
-
-        return ItemizedIconOverlay<OverlayItem>(mainActivity, items, listener)
     }
 
     private fun getColorFilter(targetColor: Int): ColorMatrixColorFilter {
