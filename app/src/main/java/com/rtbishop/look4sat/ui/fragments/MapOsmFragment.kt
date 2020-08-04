@@ -5,7 +5,6 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -13,11 +12,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
+import com.rtbishop.look4sat.data.SatOverlayItem
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapOsmBinding
 import com.rtbishop.look4sat.ui.MainActivity
@@ -211,7 +210,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private suspend fun getSatOverlay(passList: List<SatPass>, dateNow: Date): Overlay =
         withContext(Dispatchers.Default) {
             val satIcon = resources.getDrawable(R.drawable.ic_map_sat, mainActivity.theme)
-            val overlayItems = mutableListOf<OverlayItem>()
+            val overlayItems = mutableListOf<SatOverlayItem>()
 
             passList.forEach {
                 val satPos = it.predictor.getSatPos(dateNow)
@@ -222,23 +221,23 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
                 else if (lat < -85.05) lat = -85.05
                 if (lon > 180.0) lon -= 360.0
 
-                val item = OverlayItem(it.tle.name, it.tle.name, GeoPoint(lat, lon))
-                item.markerHotspot = OverlayItem.HotspotPlace.CENTER
-                overlayItems.add(item)
+                val satItem = SatOverlayItem(it.tle.name, it.tle.name, GeoPoint(lat, lon), it)
+                satItem.markerHotspot = OverlayItem.HotspotPlace.CENTER
+                overlayItems.add(satItem)
             }
 
-            val listener = object : ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
-                override fun onItemLongPress(index: Int, item: OverlayItem): Boolean {
+            val listener = object : ItemizedIconOverlay.OnItemGestureListener<SatOverlayItem> {
+                override fun onItemLongPress(index: Int, item: SatOverlayItem): Boolean {
                     return true
                 }
 
-                override fun onItemSingleTapUp(index: Int, item: OverlayItem): Boolean {
-                    Log.d("myTag", item.title)
+                override fun onItemSingleTapUp(index: Int, item: SatOverlayItem): Boolean {
+                    setSatDetails(item.pass, dateNow)
                     return true
                 }
             }
 
-            return@withContext ItemizedIconOverlay<OverlayItem>(
+            return@withContext ItemizedIconOverlay<SatOverlayItem>(
                 overlayItems,
                 satIcon,
                 listener,
@@ -246,35 +245,45 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             )
         }
 
-    private fun showSatGroundTrack(positions: List<SatPos>) {
+    private fun setSatDetails(pass: SatPass, dateNow: Date) {
+        binding.mapView.overlays[1] = getSatTrack(pass, dateNow)
+//        showSatPrint(pass)
+//        showSatInfo(pass)
+        binding.mapView.invalidate()
+    }
+
+    private fun getSatTrack(pass: SatPass, dateNow: Date): Overlay {
+        val period = (24 * 60 / pass.tle.meanmo).toInt()
+        val positions = pass.predictor.getPositions(dateNow, 20, 0, period * 3)
+        val trackOverlay = FolderOverlay()
         val trackPoints = mutableListOf<GeoPoint>()
         var oldLon = 0.0
+
         positions.forEach {
             val newLat = Math.toDegrees(it.latitude)
             var newLon = Math.toDegrees(it.longitude)
             if (newLon > 180.0) newLon -= 360.0
-
             if (oldLon < -170.0 && newLon > 170.0 || oldLon > 170.0 && newLon < -170.0) {
                 val currentPoints = mutableListOf<GeoPoint>()
                 currentPoints.addAll(trackPoints)
-                val completeTrack = Polyline()
-                completeTrack.outlinePaint.set(trackPaint)
-                completeTrack.setPoints(currentPoints)
-                satTrackOverlay.add(completeTrack)
+                Polyline().apply {
+                    outlinePaint.set(trackPaint)
+                    setPoints(currentPoints)
+                    trackOverlay.add(this)
+                }
                 trackPoints.clear()
             }
-
             oldLon = newLon
             trackPoints.add(GeoPoint(newLat, newLon))
         }
 
-        val completeTrack = Polyline()
-        completeTrack.outlinePaint.set(trackPaint)
-        completeTrack.setPoints(trackPoints)
-        satTrackOverlay.add(completeTrack)
-        binding.mapView.overlays[1] = satTrackOverlay
-        satTrackOverlay = FolderOverlay()
-        binding.mapView.invalidate()
+        Polyline().apply {
+            outlinePaint.set(trackPaint)
+            setPoints(trackPoints)
+            trackOverlay.add(this)
+        }
+
+        return trackOverlay
     }
 
     private fun getColorFilter(targetColor: Int): ColorMatrixColorFilter {
