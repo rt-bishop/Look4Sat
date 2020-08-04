@@ -44,11 +44,6 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapOsmBinding
 
-    private var gspOverlay = FolderOverlay()
-    private var satTrackOverlay = FolderOverlay()
-    private var satRangeOverlay = FolderOverlay()
-    private var satNameOverlay = FolderOverlay()
-
     private val trackPaint = Paint().apply {
         strokeWidth = 2f
         style = Paint.Style.STROKE
@@ -97,10 +92,8 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             overlayManager.tilesOverlay.setColorFilter(tilesFilter)
 
             // fill overlays
-            overlays.add(0, gspOverlay)
-            overlays.add(1, satTrackOverlay)
-            overlays.add(2, satRangeOverlay)
-            overlays.add(3, satNameOverlay)
+            val layers = listOf(FolderOverlay(), FolderOverlay(), FolderOverlay(), FolderOverlay())
+            overlays.addAll(layers)
         }
     }
 
@@ -157,54 +150,11 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         lifecycleScope.launch {
             while (true) {
                 val dateNow = Date(System.currentTimeMillis())
-
-                val satRanges = getSatRanges(passList, dateNow)
-                satRanges.forEach { satRangeOverlay.add(it) }
-                binding.mapView.overlays[2] = satRangeOverlay
-                satRangeOverlay = FolderOverlay()
-
                 binding.mapView.overlays[3] = getSatOverlay(passList, dateNow)
-
                 binding.mapView.invalidate()
                 delay(3000)
             }
         }
-    }
-
-    private suspend fun getSatRanges(passList: List<SatPass>, dateNow: Date): List<Overlay> =
-        withContext(Dispatchers.Default) {
-            val satRanges = mutableListOf<Overlay>()
-            passList.forEach {
-                val satRange = getRangeForPass(it, dateNow)
-                satRanges.add(satRange)
-            }
-            return@withContext satRanges
-        }
-
-    private fun getRangeForPass(it: SatPass, dateNow: Date): Overlay {
-        val satRange = Polygon().apply {
-            fillPaint.set(rangePaint)
-            outlinePaint.set(rangePaint)
-        }
-        val rangePoints = mutableListOf<GeoPoint>()
-        val rangeCircle = it.predictor.getSatPos(dateNow).rangeCircle
-
-        var zeroPoint = GeoPoint(0.0, 0.0)
-        rangeCircle.withIndex().forEach {
-            var lat = it.value.lat
-            var lon = it.value.lon
-
-            if (lat > 85.05) lat = 85.05
-            else if (lat < -85.05) lat = -85.05
-            if (lon > 180.0) lon -= 360.0
-
-            if (it.index == 0) zeroPoint = GeoPoint(lat, lon)
-            rangePoints.add(GeoPoint(lat, lon))
-        }
-        rangePoints.add(zeroPoint)
-        satRange.points = rangePoints
-
-        return satRange
     }
 
     private suspend fun getSatOverlay(passList: List<SatPass>, dateNow: Date): Overlay =
@@ -247,7 +197,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun setSatDetails(pass: SatPass, dateNow: Date) {
         binding.mapView.overlays[1] = getSatTrack(pass, dateNow)
-//        showSatPrint(pass)
+        binding.mapView.overlays[2] = getSatFootprint(pass, dateNow)
 //        showSatInfo(pass)
         binding.mapView.invalidate()
     }
@@ -284,6 +234,31 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         }
 
         return trackOverlay
+    }
+
+    private fun getSatFootprint(pass: SatPass, dateNow: Date): Overlay {
+        val rangePoints = mutableListOf<GeoPoint>()
+        val rangeCircle = pass.predictor.getSatPos(dateNow).rangeCircle
+        var zeroPoint = GeoPoint(0.0, 0.0)
+        val satRange = Polygon().apply {
+            fillPaint.set(rangePaint)
+            outlinePaint.set(rangePaint)
+        }
+        rangeCircle.withIndex().forEach {
+            var lat = it.value.lat
+            var lon = it.value.lon
+
+            if (lat > 85.05) lat = 85.05
+            else if (lat < -85.05) lat = -85.05
+            if (lon > 180.0) lon -= 360.0
+
+            if (it.index == 0) zeroPoint = GeoPoint(lat, lon)
+            rangePoints.add(GeoPoint(lat, lon))
+        }
+        rangePoints.add(zeroPoint)
+        satRange.points = rangePoints
+
+        return satRange
     }
 
     private fun getColorFilter(targetColor: Int): ColorMatrixColorFilter {
