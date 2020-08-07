@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/osmLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.fragments.MapOsmFragment">
@@ -15,13 +16,65 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/osmCopyright"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/satInfo"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/backgroundMapInfoLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/idName"
+            style="@style/MapOsmSatInfo.Name"
+            android:layout_marginTop="4dp"
+            android:text="@string/placeholder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/alt"
+            style="@style/MapOsmSatInfo"
+            android:layout_marginStart="8dp"
+            android:text="@string/placeholder"
+            app:layout_constraintBaseline_toBaselineOf="@+id/speed"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/latLon"
+            style="@style/MapOsmSatInfo"
+            android:text="@string/placeholder"
+            app:layout_constraintBaseline_toBaselineOf="@+id/range"
+            app:layout_constraintStart_toStartOf="@+id/alt" />
+
+        <TextView
+            android:id="@+id/speed"
+            style="@style/MapOsmSatInfo"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/placeholder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/idName" />
+
+        <TextView
+            android:id="@+id/range"
+            style="@style/MapOsmSatInfo"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/placeholder"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/speed"
+            app:layout_constraintTop_toBottomOf="@+id/speed" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/mapOsmCopyright"
+        style="@style/MapOsmCopyright"
         android:text="@string/osmCopyright"
-        android:textColor="@color/athens_gray"
-        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

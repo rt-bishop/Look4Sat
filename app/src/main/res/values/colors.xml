@@ -25,6 +25,7 @@
     <color name="themeButton">#242424</color>
     <color name="backgroundDark">#080808</color>
     <color name="backgroundMapText">#CC000000</color>
+    <color name="backgroundMapInfoLayout">#66000000</color>
     <color name="satTrack">#D50000</color>
     <color name="satPrimary">#FFE082</color>
     <color name="satSecondary">#80FFE082</color>

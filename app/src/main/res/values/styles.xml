@@ -134,6 +134,24 @@
         <item name="android:textSize">17sp</item>
     </style>
 
+    <style name="MapOsmSatInfo">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/themeAccent</item>
+    </style>
+
+    <style name="MapOsmSatInfo.Name">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="MapOsmCopyright">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="AboutTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

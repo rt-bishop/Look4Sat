@@ -5,6 +5,7 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -177,9 +178,10 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
                 else if (lat < -85.05) lat = -85.05
                 if (lon > 180.0) lon -= 360.0
 
-                val satItem = SatItem(it.tle.name, it.tle.name, GeoPoint(lat, lon), it)
-                satItem.markerHotspot = OverlayItem.HotspotPlace.CENTER
-                items.add(satItem)
+                SatItem(it.tle.name, it.tle.name, GeoPoint(lat, lon), it).apply {
+                    markerHotspot = OverlayItem.HotspotPlace.CENTER
+                    items.add(this)
+                }
             }
 
             val listener = object : ItemizedIconOverlay.OnItemGestureListener<SatItem> {
@@ -197,11 +199,16 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             return@withContext ItemizedIconOverlay<SatItem>(items, icon, listener, mainActivity)
         }
 
-    private fun setSatDetails(pass: SatPass) {
-        binding.mapView.overlays[1] = getSatTrack(pass)
-        binding.mapView.overlays[2] = getSatFootprint(pass)
-//        showSatInfo(pass)
+    private fun setSatDetails(satPass: SatPass) {
+        setSatInfo(satPass)
+        binding.mapView.overlays[1] = getSatTrack(satPass)
+        binding.mapView.overlays[2] = getSatFootprint(satPass)
         binding.mapView.invalidate()
+    }
+
+    private fun setSatInfo(satPass: SatPass) {
+        val satPos = satPass.predictor.getSatPos(dateNow)
+        Log.d("myTag", satPos.toString())
     }
 
     private fun getSatTrack(pass: SatPass): Overlay {
