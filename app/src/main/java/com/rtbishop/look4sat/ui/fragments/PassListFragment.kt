@@ -21,7 +21,9 @@ package com.rtbishop.look4sat.ui.fragments
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -61,9 +63,20 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
     private var isTimerSet: Boolean = false
     private var satPassList: MutableList<SatPass> = mutableListOf()
 
+    private var _binding: FragmentPassListBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentPassListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val binding = FragmentPassListBinding.bind(view)
         mainActivity = activity as MainActivity
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
@@ -263,5 +276,10 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         }
         if (resetToNull) aosTimerText.text =
             String.format(getString(R.string.pat_timer), 0, 0, 0)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
