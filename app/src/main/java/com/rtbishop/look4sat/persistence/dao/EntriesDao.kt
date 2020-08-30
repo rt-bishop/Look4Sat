@@ -42,4 +42,7 @@ interface EntriesDao {
 
     @Query("UPDATE entries SET isSelected = 0")
     suspend fun clearEntriesSelection()
+
+    @Query("DELETE FROM entries")
+    suspend fun clearEntries()
 }

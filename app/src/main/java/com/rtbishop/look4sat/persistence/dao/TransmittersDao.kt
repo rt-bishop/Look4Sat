@@ -14,4 +14,7 @@ interface TransmittersDao {
 
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :catNum")
     suspend fun getTransmittersByCatNum(catNum: Int): List<Transmitter>
+
+    @Query("DELETE FROM transmitters")
+    suspend fun clearTransmitters()
 }

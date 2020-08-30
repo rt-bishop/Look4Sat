@@ -20,14 +20,17 @@
 package com.rtbishop.look4sat.persistence
 
 import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.data.Transmitter
 import com.rtbishop.look4sat.persistence.dao.EntriesDao
+import com.rtbishop.look4sat.persistence.dao.SourcesDao
 import com.rtbishop.look4sat.persistence.dao.TransmittersDao
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor(
     private val entriesDao: EntriesDao,
-    private val transmittersDao: TransmittersDao
+    private val transmittersDao: TransmittersDao,
+    private val sourcesDao: SourcesDao
 ) : LocalSource {
 
     override suspend fun insertEntries(entries: List<SatEntry>) {
@@ -47,6 +50,10 @@ class LocalDataSource @Inject constructor(
         catNumList.forEach { entriesDao.updateEntrySelection(it) }
     }
 
+    override suspend fun clearEntries() {
+        entriesDao.clearEntries()
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     override suspend fun insertTransmitters(transmitters: List<Transmitter>) {
@@ -55,5 +62,23 @@ class LocalDataSource @Inject constructor(
 
     override suspend fun getTransmittersByCatNum(catNum: Int): List<Transmitter> {
         return transmittersDao.getTransmittersByCatNum(catNum)
+    }
+
+    override suspend fun clearTransmitters() {
+        transmittersDao.clearTransmitters()
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    override suspend fun insertSources(sources: List<TleSource>) {
+        sourcesDao.insertSources(sources)
+    }
+
+    override suspend fun getSources(): List<TleSource> {
+        return sourcesDao.getSources()
+    }
+
+    override suspend fun clearSources() {
+        sourcesDao.clearSources()
     }
 }

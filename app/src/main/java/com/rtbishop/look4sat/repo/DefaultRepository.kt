@@ -38,20 +38,22 @@ class DefaultRepository @Inject constructor(
 ) : Repository {
 
     override suspend fun updateEntriesFromFile(tleUri: Uri) {
-        resolver.openInputStream(tleUri)?.use {
-            withContext(Dispatchers.IO) {
-                val tleList = TLE.importSat(it)
+        withContext(Dispatchers.IO) {
+            resolver.openInputStream(tleUri)?.use { stream ->
+                val tleList = TLE.importSat(stream)
                 val entries = tleList.map { SatEntry(it) }
+                localSource.clearEntries()
                 localSource.insertEntries(entries)
             }
         }
     }
 
     override suspend fun updateEntriesFromUrl(urlList: List<TleSource>) {
-        val stream = remoteSource.fetchTleStream(urlList)
         withContext(Dispatchers.IO) {
+            val stream = remoteSource.fetchTleStream(urlList)
             val tleList = TLE.importSat(stream)
             val entries = tleList.map { SatEntry(it) }
+            localSource.clearEntries()
             localSource.insertEntries(entries)
         }
     }
@@ -71,10 +73,22 @@ class DefaultRepository @Inject constructor(
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     override suspend fun updateTransmitters() {
+        localSource.clearTransmitters()
         localSource.insertTransmitters(remoteSource.fetchTransmitters())
     }
 
     override suspend fun getTransmittersByCatNum(catNum: Int): List<Transmitter> {
         return localSource.getTransmittersByCatNum(catNum)
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    override suspend fun updateSources(sources: List<TleSource>) {
+        localSource.clearSources()
+        localSource.insertSources(sources)
+    }
+
+    override suspend fun getSources(): List<TleSource> {
+        return localSource.getSources()
     }
 }

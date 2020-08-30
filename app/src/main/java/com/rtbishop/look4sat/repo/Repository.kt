@@ -22,4 +22,10 @@ interface Repository {
     suspend fun updateTransmitters()
 
     suspend fun getTransmittersByCatNum(catNum: Int): List<Transmitter>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    suspend fun updateSources(sources: List<TleSource>)
+
+    suspend fun getSources(): List<TleSource>
 }

@@ -25,6 +25,7 @@ import com.rtbishop.look4sat.persistence.LocalDataSource
 import com.rtbishop.look4sat.persistence.LocalSource
 import com.rtbishop.look4sat.persistence.SatelliteDb
 import com.rtbishop.look4sat.persistence.dao.EntriesDao
+import com.rtbishop.look4sat.persistence.dao.SourcesDao
 import com.rtbishop.look4sat.persistence.dao.TransmittersDao
 import dagger.Module
 import dagger.Provides
@@ -47,11 +48,18 @@ class PersistenceModule {
 
     @Singleton
     @Provides
+    fun providesSourcesDao(db: SatelliteDb): SourcesDao {
+        return db.sourcesDao()
+    }
+
+    @Singleton
+    @Provides
     fun provideLocalDataSource(
         entriesDao: EntriesDao,
-        transmittersDao: TransmittersDao
+        transmittersDao: TransmittersDao,
+        sourcesDao: SourcesDao
     ): LocalSource {
-        return LocalDataSource(entriesDao, transmittersDao)
+        return LocalDataSource(entriesDao, transmittersDao, sourcesDao)
     }
 
     @Singleton

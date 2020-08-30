@@ -23,16 +23,24 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.data.Transmitter
 import com.rtbishop.look4sat.persistence.dao.EntriesDao
+import com.rtbishop.look4sat.persistence.dao.SourcesDao
 import com.rtbishop.look4sat.persistence.dao.TransmittersDao
 import com.rtbishop.look4sat.utility.Converters
 
-@Database(entities = [Transmitter::class, SatEntry::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Transmitter::class, SatEntry::class, TleSource::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(Converters::class)
 abstract class SatelliteDb : RoomDatabase() {
 
     abstract fun entriesDao(): EntriesDao
 
     abstract fun transmittersDao(): TransmittersDao
+
+    abstract fun sourcesDao(): SourcesDao
 }
