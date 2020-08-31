@@ -19,7 +19,6 @@
 
 package com.rtbishop.look4sat.ui
 
-import android.location.LocationManager
 import android.net.Uri
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.GroundStationPosition
@@ -70,20 +69,12 @@ class SharedViewModel @Inject constructor(
     }
 
     fun updatePosition() {
-        val provider = LocationManager.PASSIVE_PROVIDER
-        try {
-            val location = prefsManager.locationManager.getLastKnownLocation(provider)
-            location.let {
-                if (it == null) {
-                    _gsp.postValue(Result.Error(IllegalArgumentException()))
-                } else {
-                    val gsp = GroundStationPosition(it.latitude, it.longitude, it.altitude)
-                    prefsManager.setPosition(gsp)
-                    _gsp.postValue(Result.Success(gsp))
-                }
-            }
-        } catch (e: SecurityException) {
-            _gsp.postValue(Result.Error(e))
+        val lastLoc = prefsManager.getLastKnownLocation()
+        if (lastLoc == null) {
+            _gsp.postValue(Result.Error(Exception()))
+        } else {
+            val gsp = GroundStationPosition(lastLoc.latitude, lastLoc.longitude, lastLoc.altitude)
+            _gsp.postValue(Result.Success(gsp))
         }
     }
 

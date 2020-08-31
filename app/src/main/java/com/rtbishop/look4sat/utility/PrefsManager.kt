@@ -20,6 +20,7 @@
 package com.rtbishop.look4sat.utility
 
 import android.content.SharedPreferences
+import android.location.Location
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
@@ -27,7 +28,7 @@ import javax.inject.Inject
 
 class PrefsManager @Inject constructor(
     private val preferences: SharedPreferences,
-    val locationManager: LocationManager
+    private val locationManager: LocationManager
 ) {
     private val keyHoursAhead = "hoursAhead"
     private val keyMinElevation = "minEl"
@@ -66,6 +67,24 @@ class PrefsManager @Inject constructor(
         return GroundStationPosition(lat, lon, alt)
     }
 
+    fun getLastKnownLocation(): Location? {
+        val provPassive = LocationManager.PASSIVE_PROVIDER
+        return try {
+            val location = locationManager.getLastKnownLocation(provPassive)
+            location?.let {
+                preferences.edit {
+                    putString(keyLatitude, location.latitude.toString())
+                    putString(keyLongitude, location.longitude.toString())
+                    putString(keyAltitude, location.altitude.toString())
+                    apply()
+                }
+            }
+            location
+        } catch (e: SecurityException) {
+            null
+        }
+    }
+
     fun setHoursAhead(hours: Int) {
         preferences.edit {
             putInt(keyHoursAhead, hours)
@@ -76,15 +95,6 @@ class PrefsManager @Inject constructor(
     fun setMinElevation(minEl: Double) {
         preferences.edit {
             putDouble(keyMinElevation, minEl)
-            apply()
-        }
-    }
-
-    fun setPosition(gsp: GroundStationPosition) {
-        preferences.edit {
-            putString(keyLatitude, gsp.latitude.toString())
-            putString(keyLongitude, gsp.longitude.toString())
-            putString(keyAltitude, gsp.heightAMSL.toString())
             apply()
         }
     }

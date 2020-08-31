@@ -65,7 +65,7 @@ class PersistenceModule {
     @Singleton
     @Provides
     fun provideSatelliteDb(context: Context): SatelliteDb {
-        return Room.databaseBuilder(context, SatelliteDb::class.java, "satellites")
+        return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb")
             .build()
     }
 }
