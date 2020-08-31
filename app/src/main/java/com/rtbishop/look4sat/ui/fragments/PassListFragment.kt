@@ -30,7 +30,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,7 +44,7 @@ import com.rtbishop.look4sat.databinding.FragmentPassListBinding
 import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
-import com.rtbishop.look4sat.utility.GeneralUtils.toast
+import com.rtbishop.look4sat.utility.Extensions.toast
 import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.launch
 import java.util.*
@@ -102,7 +101,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
     }
 
     private fun setupObservers(binding: FragmentPassListBinding) {
-        viewModel.getPassList().observe(viewLifecycleOwner, Observer { result ->
+        viewModel.getPassList().observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> {
                     satPassList = result.data
