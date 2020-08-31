@@ -32,6 +32,7 @@ import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,7 +60,6 @@ class SharedViewModel @Inject constructor(
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
-    fun getTleSources() = prefsManager.getTleSources()
     fun setPositionFromPref() = _gsp.postValue(Result.Success(prefsManager.getPosition()))
     suspend fun getAllEntries() = repository.getAllEntries()
 
@@ -92,11 +92,9 @@ class SharedViewModel @Inject constructor(
     }
 
     fun updateEntriesFromWeb(list: List<TleSource>) {
-        val sourcesSet = list.map { it.url }.toSet()
-        prefsManager.setTleSources(sourcesSet)
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                repository.updateSources(list)
                 val selected = repository.getSelectedEntries().map { it.catNum }
                 repository.updateEntriesFromUrl(list)
                 repository.updateEntriesSelection(selected)
@@ -138,6 +136,22 @@ class SharedViewModel @Inject constructor(
             passList = filterAndSortPasses(passList, dateNow, getHoursAhead())
             _satPassList.postValue(Result.Success(passList))
         }
+    }
+
+    fun setDefaultTleSources() {
+        if (prefsManager.isFirstLaunch()) {
+            viewModelScope.launch {
+                val defSourcesList = listOf(
+                    TleSource("https://celestrak.com/NORAD/elements/active.txt"),
+                    TleSource("https://amsat.org/tle/current/nasabare.txt")
+                )
+                repository.updateSources(defSourcesList)
+            }
+        }
+    }
+
+    fun getTleSources(): List<TleSource> = runBlocking {
+        return@runBlocking repository.getSources()
     }
 
     private fun getPassesForEntries(

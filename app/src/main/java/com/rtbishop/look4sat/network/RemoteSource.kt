@@ -6,7 +6,7 @@ import java.io.InputStream
 
 interface RemoteSource {
 
-    suspend fun fetchTleStream(urlList: List<TleSource>): InputStream
+    suspend fun fetchTleStreams(urlList: List<TleSource>): List<InputStream>
 
     suspend fun fetchTransmitters(): List<Transmitter>
 }

@@ -37,12 +37,22 @@ class PrefsManager @Inject constructor(
     private val keyAltitude = "altitude"
     private val keyRefreshRate = "rate"
     private val keyCompass = "compass"
-    private val keyTleSources = "tleSources"
     private val defaultHoursAhead = 8
     private val defaultMinEl = 16.0
     private val defaultRefreshRate = "3000"
     private val defaultGSP = "0.0"
-    private val defaultTleUrl = "https://celestrak.com/NORAD/elements/active.txt"
+
+    fun isFirstLaunch(): Boolean {
+        val keyIsFirstLaunch = "keyIsFirstLaunch"
+        val isFirstLaunch = preferences.getBoolean(keyIsFirstLaunch, true)
+        return if (isFirstLaunch) {
+            preferences.edit {
+                putBoolean(keyIsFirstLaunch, false)
+                apply()
+            }
+            true
+        } else isFirstLaunch
+    }
 
     fun getHoursAhead(): Int {
         return preferences.getInt(keyHoursAhead, defaultHoursAhead)
@@ -95,17 +105,6 @@ class PrefsManager @Inject constructor(
     fun setMinElevation(minEl: Double) {
         preferences.edit {
             putDouble(keyMinElevation, minEl)
-            apply()
-        }
-    }
-
-    fun getTleSources(): Set<String> {
-        return preferences.getStringSet(keyTleSources, null) ?: setOf(defaultTleUrl)
-    }
-
-    fun setTleSources(sources: Set<String>) {
-        preferences.edit {
-            putStringSet(keyTleSources, sources)
             apply()
         }
     }

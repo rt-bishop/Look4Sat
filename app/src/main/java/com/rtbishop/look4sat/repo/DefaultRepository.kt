@@ -50,9 +50,12 @@ class DefaultRepository @Inject constructor(
 
     override suspend fun updateEntriesFromUrl(urlList: List<TleSource>) {
         withContext(Dispatchers.IO) {
-            val stream = remoteSource.fetchTleStream(urlList)
-            val tleList = TLE.importSat(stream)
-            val entries = tleList.map { SatEntry(it) }
+            val streams = remoteSource.fetchTleStreams(urlList)
+            val entries = mutableListOf<SatEntry>()
+            streams.forEach {
+                val list = TLE.importSat(it).map { tle -> SatEntry(tle) }
+                entries.addAll(list)
+            }
             localSource.clearEntries()
             localSource.insertEntries(entries)
         }

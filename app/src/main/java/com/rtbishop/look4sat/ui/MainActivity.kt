@@ -81,6 +81,8 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         setupComponents()
         setupObservers()
         setupDrawer()
+
+        viewModel.setDefaultTleSources()
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -181,7 +183,7 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
     }
 
     private fun showTleSourcesDialog() {
-        val sources = viewModel.getTleSources().map { TleSource(it) }
+        val sources = viewModel.getTleSources()
         TleSourcesDialogFragment(sources).apply {
             setSourcesListener(this@MainActivity)
             show(supportFragmentManager, "TleSourcesDialog")

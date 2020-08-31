@@ -19,6 +19,7 @@
 
 package com.rtbishop.look4sat.network
 
+import android.util.Log
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.data.Transmitter
 import kotlinx.coroutines.Dispatchers
@@ -26,8 +27,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.InputStream
-import java.io.SequenceInputStream
-import java.util.*
 import javax.inject.Inject
 
 class RemoteDataSource @Inject constructor(
@@ -35,16 +34,17 @@ class RemoteDataSource @Inject constructor(
     private val client: OkHttpClient
 ) : RemoteSource {
 
-    override suspend fun fetchTleStream(urlList: List<TleSource>): InputStream {
-        val streamTable = Hashtable<String, InputStream>()
+    override suspend fun fetchTleStreams(urlList: List<TleSource>): List<InputStream> {
+        val streams = mutableListOf<InputStream>()
         withContext(Dispatchers.IO) {
-            urlList.forEach {
-                val request = Request.Builder().url(it.url).build()
+            urlList.withIndex().forEach {
+                val request = Request.Builder().url(it.value.url).build()
                 val stream = client.newCall(request).execute().body?.byteStream()
-                streamTable[it.url] = stream
+                stream?.let { inputStream -> streams.add(inputStream) }
             }
         }
-        return SequenceInputStream(streamTable.elements())
+        Log.d("myTag", urlList.toString())
+        return streams
     }
 
     override suspend fun fetchTransmitters(): List<Transmitter> {
