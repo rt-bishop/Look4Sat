@@ -47,6 +47,7 @@
     <string name="dialog_show_track">Show ground track for</string>
     <string name="dialog_filter_passes">Filter passes</string>
     <string name="dialog_tle_sources">Manage TLE sources</string>
+    <string name="dialog_entries_hint">Name/CatNum</string>
 
     <string name="pref_hours_ahead_key" translatable="false">hoursAhead</string>
     <string name="pref_hours_ahead_hint">Hours ahead</string>

@@ -43,6 +43,7 @@
     <string name="dialog_show_track">Показать трассу орбиты для</string>
     <string name="dialog_filter_passes">Фильтровать пролеты</string>
     <string name="dialog_tle_sources">Управление источниками TLE</string>
+    <string name="dialog_entries_hint">Имя/Идентификатор</string>
 
     <string name="pref_hours_ahead_hint">Количество часов</string>
     <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
