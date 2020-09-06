@@ -118,21 +118,10 @@
         android:layout_width="0dp"
         android:drawableEnd="@drawable/ic_update_tle"
         android:text="@string/update_tle_web"
-        app:layout_constraintBottom_toTopOf="@+id/drawer_btn_trans"
-        app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
-        app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle_file" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/drawer_btn_trans"
-        style="@style/DrawerHeader.Button"
-        android:layout_width="0dp"
-        android:drawableEnd="@drawable/ic_update_trans"
-        android:text="@string/update_trans"
         app:layout_constraintBottom_toTopOf="@+id/drawer_btn_github"
         app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
         app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle_url" />
+        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle_file" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/drawer_btn_github"
@@ -146,7 +135,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
-        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_trans" />
+        app:layout_constraintTop_toBottomOf="@+id/drawer_btn_tle_url" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/drawerBtnExit"

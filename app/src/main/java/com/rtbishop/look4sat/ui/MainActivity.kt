@@ -140,12 +140,7 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         })
         viewModel.getUpdateStatus().observe(this, Observer { result ->
             when (result) {
-                is Result.Success -> {
-                    when (result.data) {
-                        0 -> getString(R.string.update_tle_success).toast(this)
-                        1 -> getString(R.string.update_trans_success).toast(this)
-                    }
-                }
+                is Result.Success -> getString(R.string.update_tle_success).toast(this)
                 is Result.Error -> getString(R.string.update_failure).toast(this)
             }
         })
@@ -166,12 +161,11 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
             it.lockButton()
         }
         drawerBinding.drawerBtnTleUrl.setOnClickListener {
-            showTleSourcesDialog()
+            TleSourcesDialogFragment(viewModel.getTleSources()).apply {
+                setSourcesListener(this@MainActivity)
+                show(supportFragmentManager, "TleSourcesDialog")
+            }
             mainBinding.drawerLayout.closeDrawers()
-            it.lockButton()
-        }
-        drawerBinding.drawerBtnTrans.setOnClickListener {
-            viewModel.updateTransmitters()
             it.lockButton()
         }
         drawerBinding.drawerBtnGithub.setOnClickListener {
@@ -182,16 +176,8 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         drawerBinding.drawerBtnExit.setOnClickListener { finish() }
     }
 
-    private fun showTleSourcesDialog() {
-        val sources = viewModel.getTleSources()
-        TleSourcesDialogFragment(sources).apply {
-            setSourcesListener(this@MainActivity)
-            show(supportFragmentManager, "TleSourcesDialog")
-        }
-    }
-
     override fun onSourcesSubmit(list: List<TleSource>) {
-        viewModel.updateEntriesFromWeb(list)
+        viewModel.updateSatData(list)
     }
 
     private fun View.lockButton() {

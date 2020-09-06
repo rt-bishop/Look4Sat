@@ -91,11 +91,12 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun updateEntriesFromWeb(list: List<TleSource>) {
+    fun updateSatData(list: List<TleSource>) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                repository.updateSources(list)
                 val selected = repository.getSelectedEntries().map { it.catNum }
+                repository.updateSources(list)
+                repository.updateTransmitters()
                 repository.updateEntriesFromUrl(list)
                 repository.updateEntriesSelection(selected)
                 _updateStatus.postValue(Result.Success(0))
@@ -109,17 +110,6 @@ class SharedViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateEntriesSelection(catNumList)
             calculatePasses()
-        }
-    }
-
-    fun updateTransmitters() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                repository.updateTransmitters()
-                _updateStatus.postValue(Result.Success(1))
-            } catch (e: Exception) {
-                _updateStatus.postValue(Result.Error(e))
-            }
         }
     }
 

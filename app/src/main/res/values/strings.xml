@@ -30,9 +30,7 @@
     <string name="update_loc_failure">Check your Location settings</string>
     <string name="update_tle_file">Import TLE from file</string>
     <string name="update_tle_web">Import TLE from web</string>
-    <string name="update_tle_success">TLE was updated</string>
-    <string name="update_trans">Update transceivers</string>
-    <string name="update_trans_success">Transceivers DB updated</string>
+    <string name="update_tle_success">Satellite data was updated</string>
     <string name="update_failure">Check your internet connection</string>
     <string name="goto_github" translatable="false">GitHub</string>
     <string name="exit_app">Exit</string>

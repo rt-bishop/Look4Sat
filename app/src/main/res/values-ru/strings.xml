@@ -28,9 +28,7 @@
     <string name="update_loc_failure">Проверьте настройки GPS</string>
     <string name="update_tle_file">Обновить TLE из файла</string>
     <string name="update_tle_web">Обновить TLE по ссылке</string>
-    <string name="update_tle_success">Файл TLE обновлен</string>
-    <string name="update_trans">Обновить трансиверы</string>
-    <string name="update_trans_success">База трансиверов обновлена</string>
+    <string name="update_tle_success">Данные спутников обновлены</string>
     <string name="update_failure">Проверьте интернет-подключение</string>
     <string name="exit_app">Выход</string>
 
