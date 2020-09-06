@@ -49,7 +49,6 @@ class SharedViewModel @Inject constructor(
         value = Result.Success(prefsManager.getPosition())
     }
     private var calculationJob: Job? = null
-    var isFirstLaunch = true
 
     fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersByCatNum(id)) }
     fun getPassList(): LiveData<Result<MutableList<SatPass>>> = _satPassList

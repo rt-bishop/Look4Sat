@@ -87,9 +87,8 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         setupObservers(binding)
         setupComponents(binding)
 
-        if (viewModel.isFirstLaunch) {
+        if (satPassList.isEmpty()) {
             viewModel.calculatePasses()
-            viewModel.isFirstLaunch = false
         }
     }
 
