@@ -140,8 +140,8 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         })
         viewModel.getUpdateStatus().observe(this, Observer { result ->
             when (result) {
-                is Result.Success -> getString(R.string.update_tle_success).toast(this)
-                is Result.Error -> getString(R.string.update_failure).toast(this)
+                is Result.Success -> getString(R.string.import_data_success).toast(this)
+                is Result.Error -> getString(R.string.import_data_failure).toast(this)
             }
         })
     }
@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
         drawerBinding.drawerBtnTleFile.setOnClickListener {
             val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/*"
+                type = "*/*"
             }
             startActivityForResult(openFileIntent, pickFileReqCode)
             mainBinding.drawerLayout.closeDrawers()

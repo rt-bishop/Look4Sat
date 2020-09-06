@@ -26,10 +26,10 @@
     <string name="update_loc">Обновить геопозицию</string>
     <string name="update_loc_success">Геопозиция обновлена</string>
     <string name="update_loc_failure">Проверьте настройки GPS</string>
-    <string name="update_tle_file">Обновить TLE из файла</string>
-    <string name="update_tle_web">Обновить TLE по ссылке</string>
-    <string name="update_tle_success">Данные спутников обновлены</string>
-    <string name="update_failure">Проверьте интернет-подключение</string>
+    <string name="import_data_file">Импорт данных из файла</string>
+    <string name="import_data_web">Импорт данных по ссылке</string>
+    <string name="import_data_success">Данные спутников обновлены</string>
+    <string name="import_data_failure">Ошибка импорта данных</string>
     <string name="exit_app">Выход</string>
 
     <string name="menu_pass_list">Список пролетов</string>
@@ -92,8 +92,8 @@
     <string name="info_swipe_text">Проведите по экрану вниз, чтобы обновить список пролетов
         для выбранных спутников</string>
     <string name="info_main_text">Приложение Look4Sat использует набор двухстрочных элементов TLE
-        для вычисления траекторий движения и текущего местоположения спутников. Вы можете обновить
-        файл TLE при помощи кнопки в главном меню.</string>
+        для вычисления траекторий движения и текущего местоположения спутников. Вы можете
+        импортировать БД TLE при помощи кнопки в главном меню.</string>
     <string name="info_select_text">Нажмите эту кнопку, чтобы выбрать спутники для слежения</string>
 
     <string name="about_subtitle">Приложение для слежения за спутниками радио и погоды

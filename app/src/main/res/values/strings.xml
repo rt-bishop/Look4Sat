@@ -28,10 +28,10 @@
     <string name="update_loc">Update location</string>
     <string name="update_loc_success">Location updated</string>
     <string name="update_loc_failure">Check your Location settings</string>
-    <string name="update_tle_file">Import TLE from file</string>
-    <string name="update_tle_web">Import TLE from web</string>
-    <string name="update_tle_success">Satellite data was updated</string>
-    <string name="update_failure">Check your internet connection</string>
+    <string name="import_data_file">Import data from file</string>
+    <string name="import_data_web">Import data from web</string>
+    <string name="import_data_success">Satellite data was updated</string>
+    <string name="import_data_failure">Satellite data import failed</string>
     <string name="goto_github" translatable="false">GitHub</string>
     <string name="exit_app">Exit</string>
 
@@ -110,7 +110,7 @@
         Swipe the screen to refresh the list of passes for selected satellites</string>
     <string name="info_main_text">
         Look4Sat is using the Two-Line Element set to calculate the satellites positions \n
-        You can update the TLE file via the corresponding button in the main menu \n \n
+        You can import the TLE data via the corresponding button in the main menu \n \n
         Once the list is calculated, press a pass item for detailed information</string>
     <string name="info_select_text">
         Press this button to select the satellites you wish to track</string>
