@@ -32,8 +32,7 @@
     <string name="import_data_web">Import data from web</string>
     <string name="import_data_success">Satellite data was updated</string>
     <string name="import_data_failure">Satellite data import failed</string>
-    <string name="goto_github" translatable="false">GitHub</string>
-    <string name="exit_app">Exit</string>
+    <string name="goto_github">Link to GitHub</string>
 
     <string name="menu_pass_list">List of Passes</string>
     <string name="menu_polar_view" translatable="false">Polar View</string>
@@ -79,6 +78,7 @@
     <string name="no_trans">No transceivers found for this satellite</string>
 
     <string name="err_no_permissions">Missing permissions</string>
+    <string name="err_update_data">Please, update satellite data</string>
     <string name="err_enter_value">Please, enter the value</string>
     <string name="err_no_sat_selected">No satellites selected</string>
 

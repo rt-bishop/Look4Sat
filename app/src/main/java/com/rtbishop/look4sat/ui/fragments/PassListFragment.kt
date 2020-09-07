@@ -45,6 +45,7 @@ import com.rtbishop.look4sat.databinding.FragmentPassListBinding
 import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
+import com.rtbishop.look4sat.utility.GeneralUtils.toast
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -86,8 +87,11 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
 
         setupObservers(binding)
         setupComponents(binding)
+    }
 
-        if (satPassList.isEmpty()) {
+    override fun onStart() {
+        super.onStart()
+        if (satPassAdapter.itemCount == 0) {
             viewModel.calculatePasses()
         }
     }
@@ -135,10 +139,9 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
             lifecycleScope.launch {
                 val list = viewModel.getAllEntries() as MutableList
                 if (list.isEmpty()) {
-                    Toast.makeText(requireContext(), "Please, update TLE", Toast.LENGTH_SHORT)
-                        .show()
+                    getString(R.string.err_update_data).toast(mainActivity, Toast.LENGTH_SHORT)
                 } else {
-                    showSelectSatDialog(list, binding)
+                    showSelectSatDialog(list)
                 }
             }
         }
@@ -160,29 +163,23 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
                     val elevation = elevationStr.toDouble()
                     when {
                         hours < 1 || hours > 168 -> {
-                            Toast.makeText(
+                            getString(R.string.pref_hours_ahead_input_error).toast(
                                 mainActivity,
-                                getString(R.string.pref_hours_ahead_input_error),
                                 Toast.LENGTH_SHORT
-                            ).show()
+                            )
                         }
                         elevation < 0 || elevation > 90 -> {
-                            Toast.makeText(
+                            getString(R.string.pref_min_el_input_error).toast(
                                 mainActivity,
-                                getString(R.string.pref_min_el_input_error),
                                 Toast.LENGTH_SHORT
-                            ).show()
+                            )
                         }
                         else -> {
                             viewModel.setPassPrefs(hours, elevation)
                             viewModel.calculatePasses()
                         }
                     }
-                } else Toast.makeText(
-                    mainActivity,
-                    getString(R.string.err_enter_value),
-                    Toast.LENGTH_SHORT
-                ).show()
+                } else getString(R.string.err_enter_value).toast(mainActivity, Toast.LENGTH_SHORT)
 
             }
             setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
@@ -194,13 +191,9 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         }
     }
 
-    private fun showSelectSatDialog(
-        tleMainList: MutableList<SatEntry>,
-        binding: FragmentPassListBinding
-    ) {
+    private fun showSelectSatDialog(tleMainList: MutableList<SatEntry>) {
         val listener = object : SatEntryDialogFragment.EntriesSubmitListener {
             override fun onEntriesSubmit(catNumList: MutableList<Int>) {
-                binding.refLayoutPassList.isRefreshing = true
                 viewModel.updateEntriesSelection(catNumList)
             }
         }

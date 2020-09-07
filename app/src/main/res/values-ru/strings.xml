@@ -30,7 +30,7 @@
     <string name="import_data_web">Импорт данных по ссылке</string>
     <string name="import_data_success">Данные спутников обновлены</string>
     <string name="import_data_failure">Ошибка импорта данных</string>
-    <string name="exit_app">Выход</string>
+    <string name="goto_github">Ссылка на GitHub</string>
 
     <string name="menu_pass_list">Список пролетов</string>
     <string name="menu_map_view">Карта мира</string>
@@ -68,6 +68,7 @@
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
     <string name="err_no_permissions">Отсутствуют необходимые разрешения</string>
+    <string name="err_update_data">Пожалуйста, обновите данные спутников</string>
     <string name="err_enter_value">Пожалуйста, введите значение</string>
     <string name="err_no_sat_selected">Не выбраны спутники</string>
 

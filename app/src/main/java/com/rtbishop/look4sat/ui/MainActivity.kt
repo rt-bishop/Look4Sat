@@ -173,7 +173,6 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
             val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(gitHubUrl))
             startActivity(githubIntent)
         }
-        drawerBinding.drawerBtnExit.setOnClickListener { finish() }
     }
 
     override fun onSourcesSubmit(list: List<TleSource>) {
