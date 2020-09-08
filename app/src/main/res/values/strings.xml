@@ -72,6 +72,9 @@
     <string name="pref_compass_key" translatable="false">compass</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>
 
+    <string name="pref_time_utc_key" translatable="false">timeUTC</string>
+    <string name="pref_time_utc_title">Show pass time in UTC</string>
+
     <string name="no_mode">Mode: null</string>
     <string name="no_uplink">Uplink: null</string>
     <string name="no_downlink">Downlink: null</string>

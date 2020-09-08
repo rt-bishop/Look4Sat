@@ -46,6 +46,7 @@ import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
 import com.rtbishop.look4sat.utility.GeneralUtils.toast
+import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -55,6 +56,10 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
 
     @Inject
     lateinit var modelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var prefsManager: PrefsManager
+
     private lateinit var viewModel: SharedViewModel
     private lateinit var satPassAdapter: SatPassAdapter
     private lateinit var btnPassPrefs: ImageButton
@@ -81,7 +86,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
         mainActivity = activity as MainActivity
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
-        satPassAdapter = SatPassAdapter(satPassList)
+        satPassAdapter = SatPassAdapter(satPassList, prefsManager)
         aosTimerText = mainActivity.findViewById(R.id.toolbar_timer)
         btnPassPrefs = mainActivity.findViewById(R.id.toolbar_filter)
 

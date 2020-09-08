@@ -30,10 +30,14 @@ import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
 import com.rtbishop.look4sat.ui.fragments.PassListFragmentDirections
+import com.rtbishop.look4sat.utility.PrefsManager
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter(private var satPassList: MutableList<SatPass>) :
+class SatPassAdapter(
+    private var satPassList: MutableList<SatPass>,
+    private val prefsManager: PrefsManager
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setList(list: MutableList<SatPass>) {
@@ -111,13 +115,13 @@ class SatPassAdapter(private var satPassList: MutableList<SatPass>) :
                 String.format(context.getString(R.string.pass_aos_az), satPass.pass.aosAzimuth)
             binding.passLeoLosAz.text =
                 String.format(context.getString(R.string.pass_los_az), satPass.pass.losAzimuth)
-            binding.passLeoAosTime.text =
-                SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
-                    .format(satPass.pass.startTime)
-            binding.passLeoLosTime.text =
-                SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
-                    .format(satPass.pass.endTime)
             binding.passLeoProgress.progress = satPass.progress
+
+            val dateFormat =
+                SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
+            if (prefsManager.isTimeUTC()) dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+            binding.passLeoAosTime.text = dateFormat.format(satPass.pass.startTime)
+            binding.passLeoLosTime.text = dateFormat.format(satPass.pass.endTime)
 
             itemView.setOnClickListener {
                 val passIndex = satPassList.indexOf(satPass)

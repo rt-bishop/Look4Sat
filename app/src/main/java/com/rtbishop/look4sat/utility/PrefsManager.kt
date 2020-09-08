@@ -37,6 +37,7 @@ class PrefsManager @Inject constructor(
     private val keyAltitude = "altitude"
     private val keyRefreshRate = "rate"
     private val keyCompass = "compass"
+    private val keyTimeUtc = "timeUTC"
     private val defaultHoursAhead = 8
     private val defaultMinEl = 16.0
     private val defaultRefreshRate = "3000"
@@ -52,6 +53,10 @@ class PrefsManager @Inject constructor(
             }
             true
         } else isFirstLaunch
+    }
+
+    fun isTimeUTC(): Boolean {
+        return preferences.getBoolean(keyTimeUtc, false)
     }
 
     fun getHoursAhead(): Int {
