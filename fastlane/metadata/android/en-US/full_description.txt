@@ -6,4 +6,4 @@ Amateur radio and weather satellite tracker and passes predictor for Android
 <li>Showing the list of currently active and upcoming satellite passes</li>
 <li>Showing the active pass progress, polar trajectory and transceivers info</li>
 <li>Showing the satellite positional data, footprint and ground track on a map</li>
-<li>Offline first: passes predictions are made offline. Weekly updates of TLEs and transceivers DB are recommended.</li></ul>
+<li>Offline first: calculations are made offline. Weekly update of satellite data is recommended.</li></ul>

@@ -1,0 +1,5 @@
+Fixed the "eternal refresh" bug
+Fixed TLE sources storage and addition order
+Added AMSAT TLE source as default
+Added non-txt TLE file import (.tle)
+Added ability to toggle UTC times for passes
