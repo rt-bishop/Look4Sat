@@ -34,6 +34,7 @@
 
     <string name="menu_pass_list">Список пролетов</string>
     <string name="menu_map_view">Карта мира</string>
+    <string name="menu_map_osm">Карта мира (Демо)</string>
     <string name="menu_settings">Настройки</string>
     <string name="menu_about">О приложении</string>
 

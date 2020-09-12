@@ -37,6 +37,7 @@
     <string name="menu_pass_list">List of Passes</string>
     <string name="menu_polar_view" translatable="false">Polar View</string>
     <string name="menu_map_view">World Map View</string>
+    <string name="menu_map_osm">World Map Demo</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_about">About the App</string>
 
