@@ -5,11 +5,10 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -37,6 +36,8 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
@@ -120,7 +121,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     }
 
     private fun setupObservers() {
-        viewModel.getGSP().observe(viewLifecycleOwner, Observer { stationPosition ->
+        viewModel.getGSP().observe(viewLifecycleOwner, { stationPosition ->
             when (stationPosition) {
                 is Result.Success -> {
                     setupPosOverlay(stationPosition.data)
@@ -128,7 +129,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
             }
         })
 
-        viewModel.getPassList().observe(viewLifecycleOwner, Observer { satPasses ->
+        viewModel.getPassList().observe(viewLifecycleOwner, { satPasses ->
             when (satPasses) {
                 is Result.Success -> {
                     if (satPasses.data.isNotEmpty()) {
@@ -145,7 +146,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
         Marker(binding.mapView).apply {
             setInfoWindow(null)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            icon = resources.getDrawable(R.drawable.ic_map_pos, mainActivity.theme)
+            icon = ResourcesCompat.getDrawable(resources, R.drawable.ic_map_pos, mainActivity.theme)
             position = GeoPoint(gsp.latitude, gsp.longitude)
             binding.mapView.overlays[0] = this
             binding.mapView.invalidate()
@@ -166,7 +167,8 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private suspend fun getSatIcons(passList: List<SatPass>): Overlay =
         withContext(Dispatchers.Default) {
-            val icon = resources.getDrawable(R.drawable.ic_map_sat, mainActivity.theme)
+            val icon =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_map_sat, mainActivity.theme)
             val items = mutableListOf<SatItem>()
 
             passList.forEach {
@@ -196,7 +198,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
                 }
             }
 
-            return@withContext ItemizedIconOverlay<SatItem>(items, icon, listener, mainActivity)
+            return@withContext ItemizedIconOverlay(items, icon, listener, mainActivity)
         }
 
     private fun setSatDetails(satPass: SatPass) {
@@ -208,7 +210,19 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun setSatInfo(satPass: SatPass) {
         val satPos = satPass.predictor.getSatPos(dateNow)
-        Log.d("myTag", satPos.toString())
+        val satRng = satPos.range
+        val satAlt = satPos.altitude
+        val satVel = getSatVelocity(satAlt)
+        val satLat = Math.toDegrees(satPos.latitude).toFloat()
+        var satLon = Math.toDegrees(satPos.longitude).toFloat()
+        if (satLon > 180f) satLon -= 360f
+    }
+
+    private fun getSatVelocity(satAlt: Double): Double {
+        val earthG = 6.674 * 10.0.pow(-11)
+        val earthM = 5.98 * 10.0.pow(24)
+        val orbitRadius = 6.37 * 10.0.pow(6) + satAlt * 10.0.pow(3)
+        return sqrt(earthG * earthM / orbitRadius) / 1000
     }
 
     private fun getSatTrack(pass: SatPass): Overlay {

@@ -67,13 +67,13 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     }
 
     private fun setupObservers(binding: FragmentMapViewBinding) {
-        viewModel.getGSP().observe(viewLifecycleOwner, androidx.lifecycle.Observer { result ->
+        viewModel.getGSP().observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> gsp = result.data
             }
         })
 
-        viewModel.getPassList().observe(viewLifecycleOwner, androidx.lifecycle.Observer { result ->
+        viewModel.getPassList().observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> {
                     satPassList = result.data
@@ -135,11 +135,10 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
     private fun setDataToTextViews() {
         val currentTime = Date(System.currentTimeMillis())
-        val orbitalPeriod = (24 * 60 / selectedSat.meanmo).toInt()
-        val positions = predictor.getPositions(currentTime, 60, 0, orbitalPeriod * 3)
-        var lon = Math.toDegrees(positions[0].longitude).toFloat()
-        val lat = Math.toDegrees(positions[0].latitude).toFloat()
-        val rng = positions[0].range
+        val position = predictor.getSatPos(currentTime)
+        var lon = Math.toDegrees(position.longitude).toFloat()
+        val lat = Math.toDegrees(position.latitude).toFloat()
+        val rng = position.range
 
         if (lon > 180f) lon -= 360f
 
