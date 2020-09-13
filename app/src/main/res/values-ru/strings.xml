@@ -77,15 +77,17 @@
     <string name="err_no_sat_selected">Не выбраны спутники</string>
 
     <string name="pass_aos_az">НПС — %2d°</string>
-    <string name="pass_maxEl">Элев.: %.1f°</string>
     <string name="pass_los_az">%2d° — КПС</string>
 
-    <string name="pat_azimuth">Аз.: %.1f°</string>
-    <string name="pat_elevation">Элев.: %.1f°</string>
-    <string name="pat_latitude">Шир.: %.1f°</string>
-    <string name="pat_longitude">Дол.: %.1f°</string>
-    <string name="pat_distance">Дист.: %.0fкм</string>
-    <string name="pat_altitude">Выс.: %.0fкм</string>
+    <string name="pat_azimuth">Аз: %.1f°</string>
+    <string name="pat_elevation">Элев: %.1f°</string>
+    <string name="pat_latitude">Шир: %.1f°</string>
+    <string name="pat_longitude">Дол: %.1f°</string>
+    <string name="pat_distance">Дист: %.0fкм</string>
+    <string name="pat_altitude">Выс: %.0fкм</string>
+
+    <string name="pat_osm_latLon">Шир: %.1f°, Дол: %.1f°</string>
+    <string name="pat_osm_vel">Скор: %.2f км/с</string>
 
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_inverted">Инверсия: %s</string>

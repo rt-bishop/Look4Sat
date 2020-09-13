@@ -91,7 +91,6 @@
     <string name="pass_satName" translatable="false">%s</string>
     <string name="pass_satId" translatable="false">ID: %d</string>
     <string name="pass_aos_az">AOS — %2d°</string>
-    <string name="pass_maxEl">MaxElev: %.1f°</string>
     <string name="pass_los_az">%2d° — LOS</string>
     <string name="pass_dateTime" translatable="false">dd MMM @ HH:mm:ss</string>
 
@@ -103,6 +102,10 @@
     <string name="pat_distance">Dst: %.0f km</string>
     <string name="pat_altitude">Alt: %.0f km</string>
     <string name="pat_timer" translatable="false">%02d:%02d:%02d</string>
+
+    <string name="pat_osm_idName" translatable="false">%s / %s</string>
+    <string name="pat_osm_latLon">Lat: %.1f°, Lon: %.1f°</string>
+    <string name="pat_osm_vel">Vel: %.2f km/s</string>
 
     <string name="trans_description" translatable="false">%s</string>
     <string name="trans_mode">Mode: %s</string>

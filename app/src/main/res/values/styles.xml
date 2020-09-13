@@ -141,7 +141,7 @@
     </style>
 
     <style name="MapOsmSatInfo.Name">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="MapOsmCopyright">

@@ -159,6 +159,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
                 dateNow.time = System.currentTimeMillis()
                 binding.mapView.overlays[3] = getSatIcons(passList)
                 binding.mapView.overlays[2] = getSatFootprint(selectedPass)
+                setSatInfo(selectedPass)
                 binding.mapView.invalidate()
                 delay(3000)
             }
@@ -210,19 +211,34 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     private fun setSatInfo(satPass: SatPass) {
         val satPos = satPass.predictor.getSatPos(dateNow)
-        val satRng = satPos.range
-        val satAlt = satPos.altitude
-        val satVel = getSatVelocity(satAlt)
         val satLat = Math.toDegrees(satPos.latitude).toFloat()
         var satLon = Math.toDegrees(satPos.longitude).toFloat()
         if (satLon > 180f) satLon -= 360f
+
+        binding.idName.text =
+            String.format(
+                mainActivity.getString(R.string.pat_osm_idName),
+                satPass.tle.catnum,
+                satPass.tle.name
+            )
+        binding.altitude.text =
+            String.format(mainActivity.getString(R.string.pat_altitude), satPos.altitude)
+        binding.distance.text =
+            String.format(mainActivity.getString(R.string.pat_distance), satPos.range)
+        binding.velocity.text =
+            String.format(
+                mainActivity.getString(R.string.pat_osm_vel),
+                getSatVelocity(satPos.altitude)
+            )
+        binding.latLon.text =
+            String.format(mainActivity.getString(R.string.pat_osm_latLon), satLat, satLon)
     }
 
     private fun getSatVelocity(satAlt: Double): Double {
         val earthG = 6.674 * 10.0.pow(-11)
         val earthM = 5.98 * 10.0.pow(24)
-        val orbitRadius = 6.37 * 10.0.pow(6) + satAlt * 10.0.pow(3)
-        return sqrt(earthG * earthM / orbitRadius) / 1000
+        val radius = 6.37 * 10.0.pow(6) + satAlt * 10.0.pow(3)
+        return sqrt(earthG * earthM / radius) / 1000
     }
 
     private fun getSatTrack(pass: SatPass): Overlay {

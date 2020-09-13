@@ -110,7 +110,7 @@ class SatPassAdapter(
             binding.passLeoSatId.text =
                 String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
             binding.passLeoMaxEl.text =
-                String.format(context.getString(R.string.pass_maxEl), satPass.pass.maxEl)
+                String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
             binding.passLeoAosAz.text =
                 String.format(context.getString(R.string.pass_aos_az), satPass.pass.aosAzimuth)
             binding.passLeoLosAz.text =
