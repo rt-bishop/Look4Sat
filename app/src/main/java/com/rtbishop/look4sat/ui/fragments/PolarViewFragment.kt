@@ -27,7 +27,6 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
@@ -42,11 +41,11 @@ import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransmitterAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.round
 
 class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventListener {
 
@@ -60,9 +59,6 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     private var polarView: PolarView? = null
     private val args: PolarViewFragmentArgs by navArgs()
     private val transmitterAdapter = TransmitterAdapter()
-    private var lastAccData = FloatArray(3)
-    private var lastMagData = FloatArray(3)
-    private var refreshJob: Job? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,11 +77,8 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     override fun onResume() {
         super.onResume()
         if (viewModel.getCompass()) {
-            sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER).also { accData ->
-                sensorManager.registerListener(this, accData, SensorManager.SENSOR_DELAY_GAME)
-            }
-            sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD).also { magData ->
-                sensorManager.registerListener(this, magData, SensorManager.SENSOR_DELAY_GAME)
+            sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
+                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
             }
         }
     }
@@ -100,30 +93,26 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     override fun onSensorChanged(event: SensorEvent?) {
-        event?.let {
-            if (it.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                filterSensorData(event.values, lastAccData)
-            } else if (it.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
-                filterSensorData(event.values, lastMagData)
-            }
+        event?.let { useSoftwareSensor(it) }
+    }
 
-            val rotationMatrix = FloatArray(9)
-            if (SensorManager.getRotationMatrix(rotationMatrix, null, lastAccData, lastMagData)) {
-                val orientation = FloatArray(3)
-                SensorManager.getOrientation(rotationMatrix, orientation)
-                val degree = orientation[0] * 57.2957795f
-                polarView?.rotation = -degree
-            }
-        }
+    private fun useSoftwareSensor(event: SensorEvent) {
+        val rotationValues = FloatArray(9)
+        SensorManager.getRotationMatrixFromVector(rotationValues, event.values)
+        val orientationValues = FloatArray(3)
+        SensorManager.getOrientation(rotationValues, orientationValues)
+        val magneticAzimuth = ((orientationValues[0] * 57.2957795f) + 360f) % 360f
+        val roundedAzimuth = round(magneticAzimuth * 100) / 100
+        polarView?.rotation = -roundedAzimuth
     }
 
     private fun filterSensorData(input: FloatArray, output: FloatArray) {
-        val filterStep = 0.05f
+        val filterStep = 1f
         input.indices.forEach { output[it] = output[it] + filterStep * (input[it] - output[it]) }
     }
 
     private fun observePasses() {
-        viewModel.getPassList().observe(viewLifecycleOwner, Observer { result ->
+        viewModel.getPassList().observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> {
                     val refreshRate = viewModel.getRefreshRate()
@@ -139,7 +128,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     }
 
     private fun observeTransmitters() {
-        viewModel.getTransmittersForSat(satPass.tle.catnum).observe(viewLifecycleOwner, Observer {
+        viewModel.getTransmittersForSat(satPass.tle.catnum).observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
                 transmitterAdapter.setPredictor(satPass.predictor)
                 transmitterAdapter.setList(it)
@@ -154,8 +143,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     }
 
     private fun refreshText(rate: Long) {
-        refreshJob?.cancel()
-        refreshJob = lifecycleScope.launch {
+        lifecycleScope.launch {
             while (true) {
                 setPassText()
                 polarView?.invalidate()
