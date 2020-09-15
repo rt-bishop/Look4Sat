@@ -20,10 +20,7 @@
 package com.rtbishop.look4sat.ui.fragments
 
 import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+import android.hardware.*
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -59,6 +56,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     private var polarView: PolarView? = null
     private val args: PolarViewFragmentArgs by navArgs()
     private val transmitterAdapter = TransmitterAdapter()
+    private var magneticDeclination = 0f
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,6 +70,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
             adapter = transmitterAdapter
         }
         observePasses()
+        observeStationPosition()
     }
 
     override fun onResume() {
@@ -103,7 +102,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
         SensorManager.getOrientation(rotationValues, orientationValues)
         val magneticAzimuth = ((orientationValues[0] * 57.2957795f) + 360f) % 360f
         val roundedAzimuth = round(magneticAzimuth * 100) / 100
-        polarView?.rotation = -roundedAzimuth
+        polarView?.rotation = -(roundedAzimuth + magneticDeclination)
     }
 
     private fun filterSensorData(input: FloatArray, output: FloatArray) {
@@ -113,16 +112,14 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
 
     private fun observePasses() {
         viewModel.getPassList().observe(viewLifecycleOwner, { result ->
-            when (result) {
-                is Result.Success -> {
-                    val refreshRate = viewModel.getRefreshRate()
-                    satPass = result.data[args.satPassIndex]
-                    mainActivity.supportActionBar?.title = satPass.tle.name
-                    polarView = PolarView(mainActivity, satPass)
-                    binding.framePolar.addView(polarView)
-                    observeTransmitters()
-                    refreshText(refreshRate)
-                }
+            if (result is Result.Success) {
+                val refreshRate = viewModel.getRefreshRate()
+                satPass = result.data[args.satPassIndex]
+                mainActivity.supportActionBar?.title = satPass.tle.name
+                polarView = PolarView(mainActivity, satPass)
+                binding.framePolar.addView(polarView)
+                observeTransmitters()
+                refreshText(refreshRate)
             }
         })
     }
@@ -138,6 +135,20 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
             } else {
                 binding.recPolar.visibility = View.INVISIBLE
                 binding.tvPolarNoTrans.visibility = View.VISIBLE
+            }
+        })
+    }
+
+    private fun observeStationPosition() {
+        viewModel.getGSP().observe(viewLifecycleOwner, { result ->
+            if (result is Result.Success) {
+                val geoField = GeomagneticField(
+                    result.data.latitude.toFloat(),
+                    result.data.longitude.toFloat(),
+                    result.data.heightAMSL.toFloat(),
+                    System.currentTimeMillis()
+                )
+                magneticDeclination = geoField.declination
             }
         })
     }
