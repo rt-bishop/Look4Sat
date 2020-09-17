@@ -27,10 +27,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.Transmitter
 import com.rtbishop.look4sat.databinding.ItemTransmitterBinding
+import com.rtbishop.look4sat.utility.PassPredictor
+import java.util.*
 
 class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHolder>() {
 
     private var transmittersList = emptyList<Transmitter>()
+    private lateinit var predictor: PassPredictor
+
+    fun setPredictor(predict: PassPredictor) {
+        predictor = predict
+    }
 
     fun setList(list: List<Transmitter>) {
         transmittersList = list
@@ -65,6 +72,11 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
                         context.getString(R.string.trans_down_low),
                         transmitter.downlinkLow / freqDivider
                     )
+                binding.transDownlinkDoppler.text = String
+                    .format(
+                        context.getString(R.string.trans_down_low_doppler),
+                        predictor.getDownlinkFreq(transmitter.downlinkLow, Date()) / freqDivider
+                    )
             } else if (transmitter.downlinkLow != null && transmitter.downlinkHigh != null) {
                 binding.transDownlink.text = String
                     .format(
@@ -72,8 +84,15 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
                         transmitter.downlinkLow / freqDivider,
                         transmitter.downlinkHigh / freqDivider
                     )
+                binding.transDownlinkDoppler.text = String
+                    .format(
+                        context.getString(R.string.trans_down_lowHigh_doppler),
+                        predictor.getDownlinkFreq(transmitter.downlinkLow, Date()) / freqDivider,
+                        predictor.getDownlinkFreq(transmitter.downlinkHigh, Date()) / freqDivider
+                    )
             } else {
                 binding.transDownlink.text = context.getString(R.string.no_downlink)
+                binding.transDownlinkDoppler.text = context.getString(R.string.no_downlink_doppler)
             }
 
             if (transmitter.uplinkLow != null && transmitter.uplinkHigh == null) {
@@ -81,14 +100,24 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
                     context.getString(R.string.trans_up_low),
                     transmitter.uplinkLow / freqDivider
                 )
+                binding.transUplinkDoppler.text = String.format(
+                    context.getString(R.string.trans_up_low_doppler),
+                    predictor.getUplinkFreq(transmitter.uplinkLow, Date()) / freqDivider
+                )
             } else if (transmitter.uplinkLow != null && transmitter.uplinkHigh != null) {
                 binding.transUplink.text = String.format(
                     context.getString(R.string.trans_up_lowHigh),
                     transmitter.uplinkLow / freqDivider,
                     transmitter.uplinkHigh / freqDivider
                 )
+                binding.transUplinkDoppler.text = String.format(
+                    context.getString(R.string.trans_up_lowHigh_doppler),
+                    predictor.getUplinkFreq(transmitter.uplinkLow, Date()) / freqDivider,
+                    predictor.getUplinkFreq(transmitter.uplinkHigh, Date()) / freqDivider
+                )
             } else {
                 binding.transUplink.text = context.getString(R.string.no_uplink)
+                binding.transUplinkDoppler.text = context.getString(R.string.no_uplink_doppler)
             }
 
             if (transmitter.mode != null) {

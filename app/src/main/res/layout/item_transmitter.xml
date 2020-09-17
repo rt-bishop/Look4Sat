@@ -57,6 +57,34 @@
             app:layout_constraintStart_toEndOf="@+id/trans_img_uplink"
             app:layout_constraintTop_toBottomOf="@+id/trans_downlink" />
 
+        <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:padding="15dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_height="1dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintTop_toBottomOf="@+id/trans_uplink"
+            android:background="#333"/>
+
+        <TextView
+            android:id="@+id/trans_downlink_doppler"
+            style="@style/CardTransText"
+            android:text="@string/trans_down_lowHigh_doppler"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/trans_img_downlink_doppler"
+            app:layout_constraintTop_toBottomOf="@+id/separator" />
+
+        <TextView
+            android:id="@+id/trans_uplink_doppler"
+            style="@style/CardTransText"
+            android:text="@string/trans_up_lowHigh_doppler"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/trans_img_uplink_doppler"
+            app:layout_constraintTop_toBottomOf="@+id/trans_downlink_doppler" />
+
         <TextView
             android:id="@+id/trans_mode"
             style="@style/CardTransText"
@@ -65,7 +93,7 @@
             android:text="@string/trans_mode"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trans_uplink" />
+            app:layout_constraintTop_toBottomOf="@+id/trans_uplink_doppler" />
 
         <TextView
             android:id="@+id/trans_inverted"
@@ -112,6 +140,33 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trans_downlink"
+            app:srcCompat="@drawable/ic_arrow" />
+
+        <ImageView
+            android:id="@+id/trans_img_downlink_doppler"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/placeholder"
+            android:rotation="180"
+            app:layout_constraintBottom_toBottomOf="@+id/trans_downlink_doppler"
+            app:layout_constraintEnd_toStartOf="@+id/trans_downlink_doppler"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/trans_downlink_doppler"
+            app:srcCompat="@drawable/ic_arrow" />
+
+        <ImageView
+            android:id="@+id/trans_img_uplink_doppler"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/placeholder"
+            app:layout_constraintBottom_toBottomOf="@+id/trans_uplink_doppler"
+            app:layout_constraintEnd_toStartOf="@+id/trans_uplink_doppler"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/trans_downlink_doppler"
             app:srcCompat="@drawable/ic_arrow" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
