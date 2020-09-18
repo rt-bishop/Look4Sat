@@ -143,6 +143,33 @@
             app:srcCompat="@drawable/ic_arrow" />
 
         <ImageView
+            android:id="@+id/trans_img_downlink_current"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/placeholder"
+            android:rotation="180"
+            app:layout_constraintBottom_toBottomOf="@+id/trans_downlink_doppler"
+            app:layout_constraintEnd_toStartOf="@+id/trans_img_downlink_doppler"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/trans_downlink_doppler"
+            app:srcCompat="@drawable/ic_arrow" />
+
+        <ImageView
+            android:id="@+id/trans_img_uplink_current"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/placeholder"
+            app:layout_constraintBottom_toBottomOf="@+id/trans_uplink_doppler"
+            app:layout_constraintEnd_toStartOf="@+id/trans_img_uplink_doppler"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/trans_downlink_doppler"
+            app:srcCompat="@drawable/ic_arrow" />
+
+        <ImageView
             android:id="@+id/trans_img_downlink_doppler"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -154,7 +181,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/trans_downlink_doppler"
-            app:srcCompat="@drawable/ic_arrow" />
+            app:srcCompat="@drawable/ic_doppler" />
 
         <ImageView
             android:id="@+id/trans_img_uplink_doppler"
@@ -167,7 +194,9 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trans_downlink_doppler"
-            app:srcCompat="@drawable/ic_arrow" />
+            app:srcCompat="@drawable/ic_doppler" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -160,6 +160,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
             while (true) {
                 setPassText()
                 polarView?.invalidate()
+                transmitterAdapter.notifyDataSetChanged()
                 delay(rate)
             }
         }
