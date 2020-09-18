@@ -92,6 +92,10 @@
     <string name="trans_up_lowHigh">Восход.: %.4f - %.4f MHz</string>
     <string name="trans_down_low">Нисход.: %.4f MHz</string>
     <string name="trans_down_lowHigh">Нисход.: %.4f - %.4f MHz</string>
+    <string name="trans_up_low_doppler">Восход.: %.4f MHz</string>
+    <string name="trans_up_lowHigh_doppler">Восход.: %.4f - %.4f MHz</string>
+    <string name="trans_down_low_doppler">Нисход.: %.4f MHz</string>
+    <string name="trans_down_lowHigh_doppler">Нисход.: %.4f - %.4f MHz</string>
 
     <string name="info_swipe_text">Проведите по экрану вниз, чтобы обновить список пролетов
         для выбранных спутников</string>

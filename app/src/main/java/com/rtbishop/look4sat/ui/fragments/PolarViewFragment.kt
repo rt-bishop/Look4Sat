@@ -142,6 +142,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     private fun observeTransmitters() {
         viewModel.getTransmittersForSat(satPass.tle.catnum).observe(viewLifecycleOwner, Observer {
             if (it.isNotEmpty()) {
+                transmitterAdapter.setPredictor(satPass.predictor)
                 transmitterAdapter.setList(it)
                 transmitterAdapter.notifyDataSetChanged()
                 binding.recPolar.visibility = View.VISIBLE
@@ -159,6 +160,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
             while (true) {
                 setPassText()
                 polarView?.invalidate()
+                transmitterAdapter.notifyDataSetChanged()
                 delay(rate)
             }
         }
