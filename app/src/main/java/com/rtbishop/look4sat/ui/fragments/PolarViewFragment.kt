@@ -92,10 +92,10 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     override fun onSensorChanged(event: SensorEvent?) {
-        event?.let { useSoftwareSensor(it) }
+        event?.let { calculateAzimuth(it) }
     }
 
-    private fun useSoftwareSensor(event: SensorEvent) {
+    private fun calculateAzimuth(event: SensorEvent) {
         val rotationValues = FloatArray(9)
         SensorManager.getRotationMatrixFromVector(rotationValues, event.values)
         val orientationValues = FloatArray(3)
@@ -103,11 +103,6 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
         val magneticAzimuth = ((orientationValues[0] * 57.2957795f) + 360f) % 360f
         val roundedAzimuth = round(magneticAzimuth * 100) / 100
         polarView?.rotation = -(roundedAzimuth + magneticDeclination)
-    }
-
-    private fun filterSensorData(input: FloatArray, output: FloatArray) {
-        val filterStep = 1f
-        input.indices.forEach { output[it] = output[it] + filterStep * (input[it] - output[it]) }
     }
 
     private fun observePasses() {
