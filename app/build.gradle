@@ -30,8 +30,8 @@ android {
         applicationId "com.rtbishop.look4sat"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 16
-        versionName '1.4.6'
+        versionCode 18
+        versionName '1.4.8'
     }
     buildTypes {
         release {
