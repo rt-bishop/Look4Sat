@@ -60,17 +60,20 @@
         <View
             android:id="@+id/separator"
             android:layout_width="match_parent"
-            android:padding="15dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
             android:layout_height="1dp"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintTop_toBottomOf="@+id/trans_uplink"
-            android:background="#333"/>
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
+            android:background="#333"
+            android:padding="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/trans_uplink" />
 
         <TextView
             android:id="@+id/trans_downlink_doppler"
             style="@style/CardTransText"
+            android:layout_marginTop="1dp"
             android:text="@string/trans_down_lowHigh_doppler"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/trans_img_downlink_doppler"
@@ -119,6 +122,7 @@
             android:id="@+id/trans_img_downlink"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_marginTop="1dp"
             android:contentDescription="@string/placeholder"
             android:rotation="180"
             app:layout_constraintBottom_toBottomOf="@+id/trans_downlink"
@@ -133,6 +137,7 @@
             android:id="@+id/trans_img_uplink"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_marginTop="1dp"
             android:contentDescription="@string/placeholder"
             app:layout_constraintBottom_toBottomOf="@+id/trans_uplink"
             app:layout_constraintEnd_toStartOf="@+id/trans_uplink"
@@ -143,36 +148,11 @@
             app:srcCompat="@drawable/ic_arrow" />
 
         <ImageView
-            android:id="@+id/trans_img_downlink_current"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:contentDescription="@string/placeholder"
-            android:rotation="180"
-            app:layout_constraintBottom_toBottomOf="@+id/trans_downlink_doppler"
-            app:layout_constraintEnd_toStartOf="@+id/trans_img_downlink_doppler"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/trans_downlink_doppler"
-            app:srcCompat="@drawable/ic_arrow" />
-
-        <ImageView
-            android:id="@+id/trans_img_uplink_current"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:contentDescription="@string/placeholder"
-            app:layout_constraintBottom_toBottomOf="@+id/trans_uplink_doppler"
-            app:layout_constraintEnd_toStartOf="@+id/trans_img_uplink_doppler"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trans_downlink_doppler"
-            app:srcCompat="@drawable/ic_arrow" />
-
-        <ImageView
             android:id="@+id/trans_img_downlink_doppler"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="2dp"
             android:contentDescription="@string/placeholder"
             android:rotation="180"
             app:layout_constraintBottom_toBottomOf="@+id/trans_downlink_doppler"
@@ -185,8 +165,10 @@
 
         <ImageView
             android:id="@+id/trans_img_uplink_doppler"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="2dp"
             android:contentDescription="@string/placeholder"
             app:layout_constraintBottom_toBottomOf="@+id/trans_uplink_doppler"
             app:layout_constraintEnd_toStartOf="@+id/trans_uplink_doppler"

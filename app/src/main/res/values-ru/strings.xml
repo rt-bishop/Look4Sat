@@ -67,8 +67,10 @@
     <string name="pref_time_utc_title">Показывать время пролёта по UTC</string>
 
     <string name="no_mode">Модуляция: нет</string>
-    <string name="no_uplink">Восход.: нет</string>
-    <string name="no_downlink">Нисход.: нет</string>
+    <string name="no_uplink">Восход: нет</string>
+    <string name="no_downlink">Нисход: нет</string>
+    <string name="no_uplink_doppler">Тек. восход: нет</string>
+    <string name="no_downlink_doppler">Тек. нисход: нет</string>
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
     <string name="err_no_permissions">Отсутствуют необходимые разрешения</string>
@@ -91,14 +93,14 @@
 
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_inverted">Инверсия: %s</string>
-    <string name="trans_up_low">Восход.: %.4f MHz</string>
-    <string name="trans_up_lowHigh">Восход.: %.4f - %.4f MHz</string>
-    <string name="trans_down_low">Нисход.: %.4f MHz</string>
-    <string name="trans_down_lowHigh">Нисход.: %.4f - %.4f MHz</string>
-    <string name="trans_up_low_doppler">Восход.: %.4f MHz</string>
-    <string name="trans_up_lowHigh_doppler">Восход.: %.4f - %.4f MHz</string>
-    <string name="trans_down_low_doppler">Нисход.: %.4f MHz</string>
-    <string name="trans_down_lowHigh_doppler">Нисход.: %.4f - %.4f MHz</string>
+    <string name="trans_up_low">Восход: %.4fMHz</string>
+    <string name="trans_up_lowHigh">Восход: %.4f - %.4fMHz</string>
+    <string name="trans_down_low">Нисход: %.4f MHz</string>
+    <string name="trans_down_lowHigh">Нисход: %.4f - %.4fMHz</string>
+    <string name="trans_up_low_doppler">Тек. восход: %.4fMHz</string>
+    <string name="trans_up_lowHigh_doppler">Тек. восход: %.4f - %.4fMHz</string>
+    <string name="trans_down_low_doppler">Тек. нисход: %.4fMHz</string>
+    <string name="trans_down_lowHigh_doppler">Тек. нисход: %.4f - %.4fMHz</string>
 
     <string name="info_swipe_text">Проведите по экрану вниз, чтобы обновить список пролетов
         для выбранных спутников</string>

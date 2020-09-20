@@ -95,8 +95,8 @@ class SharedViewModel @Inject constructor(
             try {
                 val selected = repository.getSelectedEntries().map { it.catNum }
                 repository.updateSources(list)
-                repository.updateTransmitters()
                 repository.updateEntriesFromUrl(list)
+                repository.updateTransmitters()
                 repository.updateEntriesSelection(selected)
                 _updateStatus.postValue(Result.Success(0))
             } catch (e: Exception) {

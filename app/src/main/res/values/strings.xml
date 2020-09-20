@@ -79,8 +79,8 @@
     <string name="no_mode">Mode: null</string>
     <string name="no_uplink">Uplink: null</string>
     <string name="no_downlink">Downlink: null</string>
-    <string name="no_uplink_doppler">Current uplink: null</string>
-    <string name="no_downlink_doppler">Current downlink: null</string>
+    <string name="no_uplink_doppler">Curr. uplink: null</string>
+    <string name="no_downlink_doppler">Curr. downlink: null</string>
     <string name="no_trans">No transceivers found for this satellite</string>
 
     <string name="err_no_permissions">Missing permissions</string>
@@ -110,14 +110,14 @@
     <string name="trans_description" translatable="false">%s</string>
     <string name="trans_mode">Mode: %s</string>
     <string name="trans_inverted">Inverted: %s</string>
-    <string name="trans_up_low">Uplink: %.4f MHz</string>
-    <string name="trans_up_lowHigh">Uplink: %.4f - %.4f MHz</string>
-    <string name="trans_down_low">Downlink: %.4f MHz</string>
-    <string name="trans_down_lowHigh">Downlink: %.4f - %.4f MHz</string>
-    <string name="trans_up_low_doppler">Current uplink: %.4f MHz</string>
-    <string name="trans_up_lowHigh_doppler">Current uplink: %.4f - %.4f MHz</string>
-    <string name="trans_down_low_doppler">Current downlink: %.4f MHz</string>
-    <string name="trans_down_lowHigh_doppler">Current downlink: %.4f - %.4f MHz</string>
+    <string name="trans_up_low">Uplink: %.4fMHz</string>
+    <string name="trans_up_lowHigh">Uplink: %.4f - %.4fMHz</string>
+    <string name="trans_down_low">Downlink: %.4fMHz</string>
+    <string name="trans_down_lowHigh">Downlink: %.4f - %.4fMHz</string>
+    <string name="trans_up_low_doppler">Curr. uplink: %.4fMHz</string>
+    <string name="trans_up_lowHigh_doppler">Curr. uplink: %.4f - %.4fMHz</string>
+    <string name="trans_down_low_doppler">Curr. downlink: %.4fMHz</string>
+    <string name="trans_down_lowHigh_doppler">Curr. downlink: %.4f - %.4fMHz</string>
 
     <string name="info_swipe_text">
         Swipe the screen to refresh the list of passes for selected satellites</string>
