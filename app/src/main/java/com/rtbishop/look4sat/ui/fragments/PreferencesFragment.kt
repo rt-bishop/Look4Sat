@@ -22,18 +22,18 @@ package com.rtbishop.look4sat.ui.fragments
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.Extensions.toast
 
 class PreferencesFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private lateinit var mainActivity: MainActivity
+    private lateinit var mainActivity: FragmentActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var keyLat: String
     private lateinit var keyLon: String
@@ -44,7 +44,7 @@ class PreferencesFragment : PreferenceFragmentCompat(),
         setPreferencesFromResource(R.xml.preference, rootKey)
         val provider = EditTextPreference.SimpleSummaryProvider.getInstance()
 
-        mainActivity = activity as MainActivity
+        mainActivity = requireActivity()
         viewModel = ViewModelProvider(mainActivity).get(SharedViewModel::class.java)
 
         keyLat = mainActivity.getString(R.string.pref_lat_key)

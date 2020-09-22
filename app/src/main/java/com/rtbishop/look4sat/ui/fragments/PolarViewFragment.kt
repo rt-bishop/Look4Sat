@@ -24,6 +24,7 @@ import android.hardware.*
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
@@ -34,7 +35,6 @@ import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarViewBinding
-import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransmitterAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
@@ -48,7 +48,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
 
     @Inject
     lateinit var modelFactory: ViewModelFactory
-    private lateinit var mainActivity: MainActivity
+    private lateinit var mainActivity: FragmentActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentPolarViewBinding
     private lateinit var satPass: SatPass
@@ -60,7 +60,7 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainActivity = activity as MainActivity
+        mainActivity = requireActivity()
         binding = FragmentPolarViewBinding.bind(view)
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
@@ -110,7 +110,6 @@ class PolarViewFragment : Fragment(R.layout.fragment_polar_view), SensorEventLis
             if (result is Result.Success) {
                 val refreshRate = viewModel.getRefreshRate()
                 satPass = result.data[args.satPassIndex]
-                mainActivity.supportActionBar?.title = satPass.tle.name
                 polarView = PolarView(mainActivity, satPass)
                 binding.framePolar.addView(polarView)
                 observeTransmitters()

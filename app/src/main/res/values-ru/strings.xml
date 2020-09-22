@@ -37,6 +37,11 @@
     <string name="menu_map_osm">Карта мира (Демо)</string>
     <string name="menu_settings">Настройки</string>
     <string name="menu_about">О приложении</string>
+    <string name="menu_bottom_entries">Спутники</string>
+    <string name="menu_bottom_passes">Пролеты</string>
+    <string name="menu_bottom_osm">Карта Мира</string>
+    <string name="menu_bottom_settings">Настройки</string>
+    <string name="menu_bottom_about">О приложении</string>
 
     <string name="dialog_select_sat">Выберите спутники для слежения</string>
     <string name="dialog_show_track">Показать трассу орбиты для</string>

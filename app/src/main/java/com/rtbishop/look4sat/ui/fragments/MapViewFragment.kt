@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.amsacode.predict4java.GroundStationPosition
@@ -33,7 +34,6 @@ import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapViewBinding
-import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.views.MapView
 import com.rtbishop.look4sat.utility.Extensions.toast
@@ -47,7 +47,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
 
     @Inject
     lateinit var modelFactory: ViewModelFactory
-    private lateinit var mainActivity: MainActivity
+    private lateinit var mainActivity: FragmentActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var mapView: MapView
     private lateinit var predictor: PassPredictor
@@ -60,7 +60,7 @@ class MapViewFragment : Fragment(R.layout.fragment_map_view) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMapViewBinding.bind(view)
-        mainActivity = requireActivity() as MainActivity
+        mainActivity = requireActivity()
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
         setupObservers(binding)

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/temp_graph"
+    app:startDestination="@id/nav_about">
+
+    <fragment
+        android:id="@+id/nav_satellites"
+        android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment" />
+    <fragment
+        android:id="@+id/nav_passes"
+        android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment" />
+    <fragment
+        android:id="@+id/nav_world_map"
+        android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment" />
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment" />
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment"
+        android:label="fragment_about"
+        tools:layout="@layout/fragment_about" />
+</navigation>

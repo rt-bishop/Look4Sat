@@ -31,7 +31,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -133,7 +132,7 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
     }
 
     private fun setupObservers() {
-        viewModel.getGSP().observe(this, Observer { result ->
+        viewModel.getGSP().observe(this, { result ->
             when (result) {
                 is Result.Success -> {
                     drawerBinding.drawerLatValue.text =
@@ -151,7 +150,7 @@ class MainActivity : AppCompatActivity(), TleSourcesDialogFragment.SourcesSubmit
                 }
             }
         })
-        viewModel.getUpdateStatus().observe(this, Observer { result ->
+        viewModel.getUpdateStatus().observe(this, { result ->
             when (result) {
                 is Result.Success -> getString(R.string.import_data_success).toast(this)
                 is Result.Error -> getString(R.string.import_data_failure).toast(this)

@@ -18,7 +18,6 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.rtbishop.look4sat">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -28,20 +27,28 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name="com.rtbishop.look4sat.Look4SatApp"
+        android:name=".Look4SatApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:theme="@style/AppTheme">
         <activity
-            android:name="com.rtbishop.look4sat.ui.MainActivity"
+            android:name=".ui.NavActivity"
+            android:screenOrientation="portrait">
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
+        </activity>
+        <activity
+            android:name=".ui.MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

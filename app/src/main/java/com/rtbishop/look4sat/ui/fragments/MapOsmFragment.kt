@@ -9,6 +9,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -20,7 +21,6 @@ import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapOsmBinding
-import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -43,7 +43,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
 
     @Inject
     lateinit var modelFactory: ViewModelFactory
-    private lateinit var mainActivity: MainActivity
+    private lateinit var mainActivity: FragmentActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapOsmBinding
     private lateinit var trackPaint: Paint
@@ -54,7 +54,7 @@ class MapOsmFragment : Fragment(R.layout.fragment_map_osm) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMapOsmBinding.bind(view)
-        mainActivity = requireActivity() as MainActivity
+        mainActivity = requireActivity()
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
 

@@ -30,6 +30,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,7 +42,6 @@ import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassListBinding
-import com.rtbishop.look4sat.ui.MainActivity
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.SatPassAdapter
 import com.rtbishop.look4sat.utility.Extensions.toast
@@ -64,7 +64,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
     private lateinit var btnPassPrefs: ImageButton
     private lateinit var aosTimer: CountDownTimer
     private lateinit var aosTimerText: TextView
-    private lateinit var mainActivity: MainActivity
+    private lateinit var mainActivity: FragmentActivity
     private var isTimerSet: Boolean = false
     private var satPassList: MutableList<SatPass> = mutableListOf()
 
@@ -82,7 +82,7 @@ class PassListFragment : Fragment(R.layout.fragment_pass_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainActivity = activity as MainActivity
+        mainActivity = requireActivity()
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
         satPassAdapter = SatPassAdapter(satPassList, prefsManager)
