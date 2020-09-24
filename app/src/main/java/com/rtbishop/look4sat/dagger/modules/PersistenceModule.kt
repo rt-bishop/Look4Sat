@@ -21,12 +21,10 @@ package com.rtbishop.look4sat.dagger.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.rtbishop.look4sat.persistence.LocalDataSource
-import com.rtbishop.look4sat.persistence.LocalSource
-import com.rtbishop.look4sat.persistence.SatelliteDb
-import com.rtbishop.look4sat.persistence.dao.EntriesDao
-import com.rtbishop.look4sat.persistence.dao.SourcesDao
-import com.rtbishop.look4sat.persistence.dao.TransmittersDao
+import com.rtbishop.look4sat.repo.SatelliteDb
+import com.rtbishop.look4sat.repo.dao.EntriesDao
+import com.rtbishop.look4sat.repo.dao.SourcesDao
+import com.rtbishop.look4sat.repo.dao.TransmittersDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -50,16 +48,6 @@ class PersistenceModule {
     @Provides
     fun providesSourcesDao(db: SatelliteDb): SourcesDao {
         return db.sourcesDao()
-    }
-
-    @Singleton
-    @Provides
-    fun provideLocalDataSource(
-        entriesDao: EntriesDao,
-        transmittersDao: TransmittersDao,
-        sourcesDao: SourcesDao
-    ): LocalSource {
-        return LocalDataSource(entriesDao, transmittersDao, sourcesDao)
     }
 
     @Singleton

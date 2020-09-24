@@ -19,7 +19,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_satellites"
-        android:icon="@drawable/ic_sat_desc_left"
+        android:icon="@drawable/ic_sat_asc_left"
         android:title="@string/menu_bottom_entries" />
     <item
         android:id="@+id/nav_passes"

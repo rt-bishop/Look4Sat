@@ -1,11 +1,11 @@
 package com.rtbishop.look4sat.utility
 
-import android.content.Context
-import android.widget.Toast
+import android.view.View
+import com.google.android.material.snackbar.Snackbar
 
 object Extensions {
 
-    fun String.toast(context: Context, duration: Int = Toast.LENGTH_SHORT): Toast {
-        return Toast.makeText(context, this, duration).apply { show() }
+    fun String.snack(view: View) {
+        Snackbar.make(view, this, Snackbar.LENGTH_SHORT).show()
     }
 }

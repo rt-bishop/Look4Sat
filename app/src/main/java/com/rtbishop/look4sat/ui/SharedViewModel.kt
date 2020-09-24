@@ -52,14 +52,12 @@ class SharedViewModel @Inject constructor(
 
     fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersByCatNum(id)) }
     fun getPassList(): LiveData<Result<MutableList<SatPass>>> = _satPassList
-    fun getUpdateStatus(): LiveData<Result<Int>> = _updateStatus
     fun getGSP(): LiveData<Result<GroundStationPosition>> = _gsp
 
     fun getCompass() = prefsManager.getCompass()
     fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
-    fun setPositionFromPref() = _gsp.postValue(Result.Success(prefsManager.getPosition()))
     suspend fun getAllEntries() = repository.getAllEntries()
 
     fun setPassPrefs(hoursAhead: Int, minEl: Double) {

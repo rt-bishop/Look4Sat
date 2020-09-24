@@ -17,151 +17,189 @@
   ~ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
   -->
 
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/refLayoutPassList"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recPassList"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="@color/themeAccent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/toolbar_timer"
+                    style="@style/ToolbarText"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/toolbar_filter"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/toolbar_filter"
+                    style="@style/ToolbarButton"
+                    android:contentDescription="@string/placeholder"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recPassList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingBottom="4dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutInfo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+        <ImageView
+            android:id="@+id/imgInfoSwipe"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/placeholder"
+            app:layout_constraintEnd_toStartOf="@+id/guideRight"
+            app:layout_constraintStart_toStartOf="@+id/guideLeft"
+            app:layout_constraintTop_toTopOf="@+id/guideTop"
+            app:srcCompat="@drawable/ic_arrow_swipe" />
+
+        <TextView
+            android:id="@+id/tvInfoSwipe"
+            style="@style/PassInfoText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/info_swipe_text"
+            app:layout_constraintEnd_toStartOf="@+id/guideRight"
+            app:layout_constraintStart_toStartOf="@+id/guideLeft"
+            app:layout_constraintTop_toBottomOf="@+id/imgInfoSwipe" />
+
+        <ImageView
+            android:id="@+id/imgInfoSputnik"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:paddingBottom="4dp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutInfo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/imgInfoSwipe"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:contentDescription="@string/placeholder"
-                app:layout_constraintEnd_toStartOf="@+id/guideRight"
-                app:layout_constraintStart_toStartOf="@+id/guideLeft"
-                app:layout_constraintTop_toTopOf="@+id/guideTop"
-                app:srcCompat="@drawable/ic_arrow_swipe" />
-
-            <TextView
-                android:id="@+id/tvInfoSwipe"
-                style="@style/PassInfoText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="@string/info_swipe_text"
-                app:layout_constraintEnd_toStartOf="@+id/guideRight"
-                app:layout_constraintStart_toStartOf="@+id/guideLeft"
-                app:layout_constraintTop_toBottomOf="@+id/imgInfoSwipe" />
-
-            <ImageView
-                android:id="@+id/imgInfoSputnik"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:contentDescription="@string/placeholder"
-                app:layout_constraintBottom_toTopOf="@+id/tvInfoMain"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@+id/guideRight"
-                app:layout_constraintStart_toStartOf="@+id/guideLeft"
-                app:layout_constraintTop_toBottomOf="@+id/tvInfoSwipe"
-                app:layout_constraintVertical_chainStyle="packed"
-                app:srcCompat="@drawable/ic_sputnik" />
-
-            <TextView
-                android:id="@+id/tvInfoMain"
-                style="@style/PassInfoText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/info_main_text"
-                app:layout_constraintBottom_toTopOf="@+id/tvSatSelect"
-                app:layout_constraintEnd_toStartOf="@+id/guideRight"
-                app:layout_constraintStart_toStartOf="@+id/guideLeft"
-                app:layout_constraintTop_toTopOf="@+id/guideCenter"
-                app:layout_constraintVertical_bias="0.32"
-                app:layout_constraintVertical_chainStyle="spread" />
-
-            <TextView
-                android:id="@+id/tvSatSelect"
-                style="@style/PassInfoText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="64dp"
-                android:text="@string/info_select_text"
-                app:layout_constraintBottom_toTopOf="@+id/guideBottom"
-                app:layout_constraintEnd_toStartOf="@+id/guideRight"
-                app:layout_constraintStart_toStartOf="@+id/guideLeft" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideTop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_begin="24dp" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideLeft"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_begin="16dp" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideCenter"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.5" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideRight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_end="16dp" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideBottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_end="16dp" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabSatSelect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_sat_asc_left" />
+            android:contentDescription="@string/placeholder"
+            app:layout_constraintBottom_toTopOf="@+id/tvInfoMain"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/guideRight"
+            app:layout_constraintStart_toStartOf="@+id/guideLeft"
+            app:layout_constraintTop_toBottomOf="@+id/tvInfoSwipe"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:srcCompat="@drawable/ic_sputnik" />
+
+        <TextView
+            android:id="@+id/tvInfoMain"
+            style="@style/PassInfoText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/info_main_text"
+            app:layout_constraintBottom_toTopOf="@+id/tvSatSelect"
+            app:layout_constraintEnd_toStartOf="@+id/guideRight"
+            app:layout_constraintStart_toStartOf="@+id/guideLeft"
+            app:layout_constraintTop_toTopOf="@+id/guideCenter"
+            app:layout_constraintVertical_bias="0.32"
+            app:layout_constraintVertical_chainStyle="spread" />
+
+        <TextView
+            android:id="@+id/tvSatSelect"
+            style="@style/PassInfoText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="64dp"
+            android:text="@string/info_select_text"
+            app:layout_constraintBottom_toTopOf="@+id/guideBottom"
+            app:layout_constraintEnd_toStartOf="@+id/guideRight"
+            app:layout_constraintStart_toStartOf="@+id/guideLeft" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="24dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideCenter"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="16dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_end="16dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSatSelect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_sat_asc_left" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -64,7 +64,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.appcompat:appcompat:$app_compat_version"
-    implementation "androidx.legacy:legacy-support-v4:$support_lib_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
     implementation "androidx.core:core-ktx:$ktx_version"
     implementation "androidx.preference:preference:$preference_version"

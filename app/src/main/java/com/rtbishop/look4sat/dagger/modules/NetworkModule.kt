@@ -19,9 +19,7 @@
 
 package com.rtbishop.look4sat.dagger.modules
 
-import com.rtbishop.look4sat.network.RemoteDataSource
-import com.rtbishop.look4sat.network.RemoteSource
-import com.rtbishop.look4sat.network.TransmittersApi
+import com.rtbishop.look4sat.repo.api.TransmittersApi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -36,12 +34,6 @@ class NetworkModule {
     @Provides
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient()
-    }
-
-    @Singleton
-    @Provides
-    fun provideRemoteDataSource(api: TransmittersApi, client: OkHttpClient): RemoteSource {
-        return RemoteDataSource(api, client)
     }
 
     @Singleton

@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.persistence.dao
+package com.rtbishop.look4sat.repo.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -17,32 +17,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.persistence.dao
+package com.rtbishop.look4sat.repo
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.TleSource
+import com.rtbishop.look4sat.data.Transmitter
+import com.rtbishop.look4sat.repo.dao.EntriesDao
+import com.rtbishop.look4sat.repo.dao.SourcesDao
+import com.rtbishop.look4sat.repo.dao.TransmittersDao
+import com.rtbishop.look4sat.utility.Converters
 
-@Dao
-interface EntriesDao {
+@Database(
+    entities = [Transmitter::class, SatEntry::class, TleSource::class],
+    version = 1,
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
+abstract class SatelliteDb : RoomDatabase() {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertEntries(entries: List<SatEntry>)
+    abstract fun entriesDao(): EntriesDao
 
-    @Query("SELECT * FROM entries ORDER BY name ASC")
-    suspend fun getAllEntries(): List<SatEntry>
+    abstract fun transmittersDao(): TransmittersDao
 
-    @Query("SELECT * FROM entries WHERE isSelected = 1 ORDER BY name ASC")
-    suspend fun getSelectedEntries(): List<SatEntry>
-
-    @Query("UPDATE entries SET isSelected = 1 WHERE catNum == :catNum")
-    suspend fun updateEntrySelection(catNum: Int)
-
-    @Query("UPDATE entries SET isSelected = 0")
-    suspend fun clearEntriesSelection()
-
-    @Query("DELETE FROM entries")
-    suspend fun clearEntries()
+    abstract fun sourcesDao(): SourcesDao
 }
