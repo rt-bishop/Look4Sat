@@ -22,9 +22,9 @@ package com.rtbishop.look4sat.dagger
 import android.content.Context
 import com.rtbishop.look4sat.dagger.modules.*
 import com.rtbishop.look4sat.ui.MainActivity
-import com.rtbishop.look4sat.ui.fragments.MapOsmFragment
-import com.rtbishop.look4sat.ui.fragments.PassListFragment
-import com.rtbishop.look4sat.ui.fragments.PolarViewFragment
+import com.rtbishop.look4sat.ui.fragments.MapFragment
+import com.rtbishop.look4sat.ui.fragments.PassesFragment
+import com.rtbishop.look4sat.ui.fragments.PolarFragment
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -42,7 +42,7 @@ interface AppComponent {
     }
 
     fun inject(mainActivity: MainActivity)
-    fun inject(passListFragment: PassListFragment)
-    fun inject(polarViewFragment: PolarViewFragment)
-    fun inject(mapOsmFragment: MapOsmFragment)
+    fun inject(passesFragment: PassesFragment)
+    fun inject(polarFragment: PolarFragment)
+    fun inject(mapFragment: MapFragment)
 }

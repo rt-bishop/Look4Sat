@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragments.MapFragment">
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/map_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/backgroundMapInfoLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/id_name"
+            style="@style/MapOsmSatInfo.Name"
+            android:layout_marginTop="4dp"
+            android:text="@string/pat_osm_idName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/altitude"
+            style="@style/MapOsmSatInfo"
+            android:layout_marginStart="4dp"
+            android:text="@string/pat_altitude"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_name" />
+
+        <TextView
+            android:id="@+id/distance"
+            style="@style/MapOsmSatInfo"
+            android:layout_marginBottom="4dp"
+            android:text="@string/pat_distance"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/altitude"
+            app:layout_constraintTop_toBottomOf="@+id/altitude" />
+
+        <TextView
+            android:id="@+id/velocity"
+            style="@style/MapOsmSatInfo"
+            android:layout_marginEnd="4dp"
+            android:text="@string/pat_osm_vel"
+            app:layout_constraintBaseline_toBaselineOf="@+id/altitude"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lat_lon"
+            style="@style/MapOsmSatInfo"
+            android:text="@string/pat_osm_latLon"
+            app:layout_constraintBaseline_toBaselineOf="@+id/distance"
+            app:layout_constraintEnd_toEndOf="@+id/velocity" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/copyright"
+        style="@style/MapOsmCopyright"
+        android:text="@string/osmCopyright"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

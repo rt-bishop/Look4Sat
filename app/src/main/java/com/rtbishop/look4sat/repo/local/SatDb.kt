@@ -17,32 +17,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.dagger.modules
+package com.rtbishop.look4sat.repo.local
 
-import com.rtbishop.look4sat.repo.remote.TransApi
-import dagger.Module
-import dagger.Provides
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.SatTrans
+import com.rtbishop.look4sat.data.TleSource
+import com.rtbishop.look4sat.utility.Converters
 
-@Module
-class NetworkModule {
+@Database(
+    entities = [SatTrans::class, SatEntry::class, TleSource::class],
+    version = 1,
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
+abstract class SatDb : RoomDatabase() {
 
-    @Singleton
-    @Provides
-    fun provideWebClient(): OkHttpClient {
-        return OkHttpClient()
-    }
+    abstract fun entriesDao(): EntriesDao
 
-    @Singleton
-    @Provides
-    fun provideTransApi(): TransApi {
-        return Retrofit.Builder()
-            .baseUrl("https://db.satnogs.org/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(TransApi::class.java)
-    }
+    abstract fun transDao(): TransDao
+
+    abstract fun sourcesDao(): SourcesDao
 }

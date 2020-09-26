@@ -18,23 +18,23 @@
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_satellites"
-        android:icon="@drawable/ic_sat_asc_left"
+        android:id="@+id/nav_entries"
+        android:icon="@drawable/ic_menu_sat"
         android:title="@string/menu_bottom_entries" />
     <item
         android:id="@+id/nav_passes"
-        android:icon="@drawable/ic_list"
+        android:icon="@drawable/ic_menu_passes"
         android:title="@string/menu_bottom_passes" />
     <item
-        android:id="@+id/nav_world_map"
-        android:icon="@drawable/ic_update_tle"
+        android:id="@+id/nav_map"
+        android:icon="@drawable/ic_world"
         android:title="@string/menu_bottom_osm" />
     <item
-        android:id="@+id/nav_settings"
+        android:id="@+id/nav_prefs"
         android:icon="@drawable/ic_settings"
         android:title="@string/menu_settings" />
     <item
         android:id="@+id/nav_about"
-        android:icon="@drawable/ic_help_outline"
+        android:icon="@drawable/ic_menu_about"
         android:title="@string/menu_bottom_about" />
 </menu>

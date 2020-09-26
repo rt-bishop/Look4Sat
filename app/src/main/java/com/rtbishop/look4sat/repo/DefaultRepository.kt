@@ -23,12 +23,12 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.SatTrans
 import com.rtbishop.look4sat.data.TleSource
-import com.rtbishop.look4sat.data.Transmitter
-import com.rtbishop.look4sat.repo.api.TransmittersApi
-import com.rtbishop.look4sat.repo.dao.EntriesDao
-import com.rtbishop.look4sat.repo.dao.SourcesDao
-import com.rtbishop.look4sat.repo.dao.TransmittersDao
+import com.rtbishop.look4sat.repo.local.EntriesDao
+import com.rtbishop.look4sat.repo.local.SourcesDao
+import com.rtbishop.look4sat.repo.local.TransDao
+import com.rtbishop.look4sat.repo.remote.TransApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -39,10 +39,10 @@ import javax.inject.Inject
 class DefaultRepository @Inject constructor(
     private val resolver: ContentResolver,
     private val client: OkHttpClient,
-    private val api: TransmittersApi,
+    private val api: TransApi,
     private val entriesDao: EntriesDao,
     private val sourcesDao: SourcesDao,
-    private val transmittersDao: TransmittersDao
+    private val transDao: TransDao
 ) : Repository {
 
     override suspend fun updateEntriesFromFile(tleUri: Uri) {
@@ -82,8 +82,8 @@ class DefaultRepository @Inject constructor(
             return@withContext streams
         }
 
-    override suspend fun fetchTransmitters(): List<Transmitter> {
-        return api.fetchTransmitters()
+    override suspend fun fetchTransmitters(): List<SatTrans> {
+        return api.fetchTransList()
     }
 
     override suspend fun insertEntries(entries: List<SatEntry>) {
@@ -112,12 +112,12 @@ class DefaultRepository @Inject constructor(
     override suspend fun updateTransmitters() {
     }
 
-    override suspend fun getTransmittersByCatNum(catNum: Int): List<Transmitter> {
-        return transmittersDao.getTransmittersByCatNum(catNum)
+    override suspend fun getTransmittersByCatNum(catNum: Int): List<SatTrans> {
+        return transDao.getTransmittersForCatNum(catNum)
     }
 
     override suspend fun clearTransmitters() {
-        transmittersDao.clearTransmitters()
+        transDao.clearTransmitters()
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

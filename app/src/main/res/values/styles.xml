@@ -33,56 +33,6 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme.Splash" parent="AppTheme">
-        <item name="android:windowBackground">@drawable/splash_drawable</item>
-    </style>
-
-    <style name="DrawerHeader">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/themeLight</item>
-    </style>
-
-    <style name="DrawerHeader.Title">
-        <item name="android:textSize">42sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="DrawerHeader.Item">
-        <item name="android:textSize">21sp</item>
-        <item name="android:fontFamily">serif</item>
-    </style>
-
-    <style name="DrawerHeader.ItemValue">
-        <item name="android:textSize">25sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="DrawerHeader.Button">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:textSize">13sp</item>
-        <item name="android:gravity">start|center_vertical</item>
-        <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:backgroundTint">@color/themeButton</item>
-    </style>
-
-    <style name="ToolbarText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textSize">36sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/themeAccent</item>
-    </style>
-
-    <style name="ToolbarButton">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:src">@drawable/ic_filter</item>
-        <item name="android:backgroundTint">@color/themeDark</item>
-    </style>
-
     <style name="CardPassText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

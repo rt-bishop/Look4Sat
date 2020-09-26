@@ -42,31 +42,17 @@ import java.util.*
 
 class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition) {
     private val sat: Satellite = SatelliteFactory.createSatellite(tle)
-    private val south = "south"
-    private val north = "north"
-    private val deadSpotNone = "none"
     private val speedOfLight = 2.99792458E8
-    private val twoPi = Math.PI * 2.0
     private val timeZone: TimeZone = TimeZone.getTimeZone("UTC")
     private var iterationCount = 0
 
     fun getDownlinkFreq(freq: Long, date: Date): Long {
-        val cal = Calendar.getInstance(timeZone).apply {
-            clear()
-            timeInMillis = date.time
-        }
-        val satPos = getSatPos(cal.time)
-        val rangeRate = satPos.rangeRate
+        val rangeRate = getSatPos(date).rangeRate
         return (freq.toDouble() * (speedOfLight - rangeRate * 1000.0) / speedOfLight).toLong()
     }
 
     fun getUplinkFreq(freq: Long, date: Date): Long {
-        val cal = Calendar.getInstance(timeZone).apply {
-            clear()
-            timeInMillis = date.time
-        }
-        val satPos = getSatPos(cal.time)
-        val rangeRate = satPos.rangeRate
+        val rangeRate = getSatPos(date).rangeRate
         return (freq.toDouble() * (speedOfLight + rangeRate * 1000.0) / speedOfLight).toLong()
     }
 
@@ -155,7 +141,7 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         var maxElevation = 0.0
         var elevation: Double
         var prevPos: SatPos
-        var polePassed = deadSpotNone
+        var polePassed = "none"
 
         // get the current position
         val cal = Calendar.getInstance(timeZone).apply {
@@ -206,7 +192,7 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
         do {
             satPos = getPosition(cal, 30)
             val currPolePassed = getPolePassed(prevPos, satPos)
-            if (currPolePassed != deadSpotNone) {
+            if (currPolePassed != "none") {
                 polePassed = currPolePassed
             }
             elevation = satPos.elevation
@@ -242,23 +228,17 @@ class PassPredictor(private val tle: TLE, private val qth: GroundStationPosition
     }
 
     private fun getPolePassed(prevPos: SatPos, satPos: SatPos): String {
-        var polePassed = deadSpotNone
-        val az1 = prevPos.azimuth / twoPi * 360.0
-        val az2 = satPos.azimuth / twoPi * 360.0
+        var polePassed = "none"
+        val north = "north"
+        val south = "south"
+        val az1 = Math.toDegrees(prevPos.azimuth)
+        val az2 = Math.toDegrees(satPos.azimuth)
         if (az1 > az2) {
-            // we may be moving from 350 or greater through north
             if (az1 > 350 && az2 < 10) polePassed = north
-            else {
-                // we may be moving from 190 or greater through south
-                if (az1 > 180 && az2 < 180) polePassed = south
-            }
+            else if (az1 > 180 && az2 < 180) polePassed = south
         } else {
-            // we may be moving from 10 or less through north
             if (az1 < 10 && az2 > 350) polePassed = north
-            else {
-                // we may be moving from 170 or more through south
-                if (az1 < 180 && az2 > 180) polePassed = south
-            }
+            else if (az1 < 180 && az2 > 180) polePassed = south
         }
         return polePassed
     }

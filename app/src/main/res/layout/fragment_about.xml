@@ -29,34 +29,34 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/tv_about_title"
+            android:id="@+id/title"
             style="@style/AboutTitle"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="16dp"
             android:text="@string/app_name"
-            app:layout_constraintBottom_toBottomOf="@+id/img_about"
+            app:layout_constraintBottom_toBottomOf="@+id/title_img"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/img_about"
-            app:layout_constraintTop_toTopOf="@+id/img_about" />
+            app:layout_constraintStart_toEndOf="@+id/title_img"
+            app:layout_constraintTop_toTopOf="@+id/title_img" />
 
         <ImageView
-            android:id="@+id/img_about"
+            android:id="@+id/title_img"
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="4dp"
             android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_sputnik"
-            app:layout_constraintEnd_toStartOf="@+id/tv_about_title"
+            android:src="@drawable/ic_menu_sat"
+            app:layout_constraintEnd_toStartOf="@+id/title"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_about_version"
+            android:id="@+id/version"
             style="@style/AboutSubtitle"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
@@ -64,10 +64,10 @@
             android:text="@string/app_version"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_about_title" />
+            app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <TextView
-            android:id="@+id/tv_about_subtitle"
+            android:id="@+id/subtitle"
             style="@style/AboutSubtitle"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
@@ -75,19 +75,19 @@
             android:text="@string/about_subtitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_about_version" />
+            app:layout_constraintTop_toBottomOf="@+id/version" />
 
         <TextView
-            android:id="@+id/tv_about_thanks"
+            android:id="@+id/thanks"
             style="@style/AboutSubtitle"
             android:layout_marginTop="16dp"
             android:text="@string/about_thanks_to"
-            app:layout_constraintEnd_toEndOf="@+id/tv_about_subtitle"
-            app:layout_constraintStart_toStartOf="@+id/tv_about_subtitle"
-            app:layout_constraintTop_toBottomOf="@+id/tv_about_subtitle" />
+            app:layout_constraintEnd_toEndOf="@+id/subtitle"
+            app:layout_constraintStart_toStartOf="@+id/subtitle"
+            app:layout_constraintTop_toBottomOf="@+id/subtitle" />
 
         <TextView
-            android:id="@+id/tv_about_message"
+            android:id="@+id/message"
             style="@style/AboutRegular"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
@@ -97,7 +97,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_about_thanks" />
+            app:layout_constraintTop_toBottomOf="@+id/thanks" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -17,32 +17,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.dagger.modules
+package com.rtbishop.look4sat.repo.local
 
-import com.rtbishop.look4sat.repo.remote.TransApi
-import dagger.Module
-import dagger.Provides
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.rtbishop.look4sat.data.SatEntry
 
-@Module
-class NetworkModule {
+@Dao
+interface EntriesDao {
 
-    @Singleton
-    @Provides
-    fun provideWebClient(): OkHttpClient {
-        return OkHttpClient()
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
 
-    @Singleton
-    @Provides
-    fun provideTransApi(): TransApi {
-        return Retrofit.Builder()
-            .baseUrl("https://db.satnogs.org/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(TransApi::class.java)
-    }
+    @Query("SELECT * FROM entries ORDER BY name ASC")
+    suspend fun getAllEntries(): List<SatEntry>
+
+    @Query("SELECT * FROM entries WHERE isSelected = 1 ORDER BY name ASC")
+    suspend fun getSelectedEntries(): List<SatEntry>
+
+    @Query("UPDATE entries SET isSelected = 1 WHERE catNum == :catNum")
+    suspend fun updateEntrySelection(catNum: Int)
+
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearEntriesSelection()
+
+    @Query("DELETE FROM entries")
+    suspend fun clearEntries()
 }

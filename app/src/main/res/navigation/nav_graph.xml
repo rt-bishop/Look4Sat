@@ -21,20 +21,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_passes">
+    app:startDestination="@id/nav_entries">
 
     <fragment
-        android:id="@+id/nav_satellites"
-        android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment" />
+        android:id="@+id/nav_entries"
+        android:name="com.rtbishop.look4sat.ui.fragments.EntriesFragment"
+        tools:layout="@layout/fragment_entries" />
 
     <fragment
         android:id="@+id/nav_passes"
-        android:name="com.rtbishop.look4sat.ui.fragments.PassListFragment"
-        android:label="@string/menu_pass_list"
-        tools:layout="@layout/fragment_pass_list">
+        android:name="com.rtbishop.look4sat.ui.fragments.PassesFragment"
+        tools:layout="@layout/fragment_passes">
         <action
             android:id="@+id/action_pass_to_polar"
-            app:destination="@id/nav_polar_view"
+            app:destination="@id/nav_polar"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_enter_anim"
@@ -42,31 +42,26 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_polar_view"
-        android:name="com.rtbishop.look4sat.ui.fragments.PolarViewFragment"
-        android:label="@string/menu_polar_view"
-        tools:layout="@layout/fragment_polar_view">
+        android:id="@+id/nav_polar"
+        android:name="com.rtbishop.look4sat.ui.fragments.PolarFragment"
+        tools:layout="@layout/fragment_polar">
         <argument
             android:name="satPassIndex"
             app:argType="integer" />
     </fragment>
 
     <fragment
-        android:id="@+id/nav_world_map"
-        android:name="com.rtbishop.look4sat.ui.fragments.MapOsmFragment"
-        android:label="@string/menu_map_osm"
-        tools:layout="@layout/fragment_map_osm" />
+        android:id="@+id/nav_map"
+        android:name="com.rtbishop.look4sat.ui.fragments.MapFragment"
+        tools:layout="@layout/fragment_map" />
 
     <fragment
-        android:id="@+id/nav_settings"
-        android:name="com.rtbishop.look4sat.ui.fragments.PreferencesFragment"
-        android:label="@string/menu_settings" />
+        android:id="@+id/nav_prefs"
+        android:name="com.rtbishop.look4sat.ui.fragments.PrefsFragment" />
 
     <fragment
         android:id="@+id/nav_about"
         android:name="com.rtbishop.look4sat.ui.fragments.AboutFragment"
-        android:label="@string/menu_about"
         tools:layout="@layout/fragment_about" />
-
 
 </navigation>

@@ -2,8 +2,8 @@ package com.rtbishop.look4sat.repo
 
 import android.net.Uri
 import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.SatTrans
 import com.rtbishop.look4sat.data.TleSource
-import com.rtbishop.look4sat.data.Transmitter
 import java.io.InputStream
 
 interface Repository {
@@ -16,7 +16,7 @@ interface Repository {
 
     suspend fun fetchTleStreams(urlList: List<TleSource>): List<InputStream>
 
-    suspend fun fetchTransmitters(): List<Transmitter>
+    suspend fun fetchTransmitters(): List<SatTrans>
 
     suspend fun insertEntries(entries: List<SatEntry>)
 
@@ -32,7 +32,7 @@ interface Repository {
 
     suspend fun updateTransmitters()
 
-    suspend fun getTransmittersByCatNum(catNum: Int): List<Transmitter>
+    suspend fun getTransmittersByCatNum(catNum: Int): List<SatTrans>
 
     suspend fun clearTransmitters()
 

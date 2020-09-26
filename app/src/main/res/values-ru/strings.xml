@@ -158,4 +158,5 @@
     <string name="map_gsp">СТЦ</string>
     <string name="tle_source">Источник TLE</string>
     <string name="https_only">Используйте протокол HTTPS</string>
+    <string name="sat_import">Импорт спутников</string>
 </resources>

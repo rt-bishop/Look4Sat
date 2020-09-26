@@ -31,9 +31,9 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val binding = FragmentAboutBinding.bind(view)
-        binding.tvAboutVersion.text =
-            String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
-        binding.tvAboutMessage.movementMethod = LinkMovementMethod.getInstance()
+        FragmentAboutBinding.bind(view).apply {
+            version.text = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
+            message.movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 }

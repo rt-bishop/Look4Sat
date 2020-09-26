@@ -4,10 +4,10 @@ import android.content.ContentResolver
 import android.content.Context
 import com.rtbishop.look4sat.repo.DefaultRepository
 import com.rtbishop.look4sat.repo.Repository
-import com.rtbishop.look4sat.repo.api.TransmittersApi
-import com.rtbishop.look4sat.repo.dao.EntriesDao
-import com.rtbishop.look4sat.repo.dao.SourcesDao
-import com.rtbishop.look4sat.repo.dao.TransmittersDao
+import com.rtbishop.look4sat.repo.local.EntriesDao
+import com.rtbishop.look4sat.repo.local.SourcesDao
+import com.rtbishop.look4sat.repo.local.TransDao
+import com.rtbishop.look4sat.repo.remote.TransApi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -26,19 +26,19 @@ class RepoModule {
     @Provides
     fun provideDefaultRepository(
         resolver: ContentResolver,
-        transmittersApi: TransmittersApi,
         client: OkHttpClient,
+        transApi: TransApi,
         entriesDao: EntriesDao,
-        transmittersDao: TransmittersDao,
+        transDao: TransDao,
         sourcesDao: SourcesDao
     ): Repository {
         return DefaultRepository(
             resolver,
             client,
-            transmittersApi,
+            transApi,
             entriesDao,
             sourcesDao,
-            transmittersDao
+            transDao
         )
     }
 }

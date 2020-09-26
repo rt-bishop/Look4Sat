@@ -17,32 +17,22 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.dagger.modules
+package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.repo.remote.TransApi
-import dagger.Module
-import dagger.Provides
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-@Module
-class NetworkModule {
-
-    @Singleton
-    @Provides
-    fun provideWebClient(): OkHttpClient {
-        return OkHttpClient()
-    }
-
-    @Singleton
-    @Provides
-    fun provideTransApi(): TransApi {
-        return Retrofit.Builder()
-            .baseUrl("https://db.satnogs.org/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(TransApi::class.java)
-    }
-}
+@Entity(tableName = "transmitters")
+data class SatTrans(
+    @PrimaryKey @SerializedName("uuid") val uuid: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("alive") val isAlive: Boolean,
+    @SerializedName("uplink_low") val uplinkLow: Long?,
+    @SerializedName("uplink_high") val uplinkHigh: Long?,
+    @SerializedName("downlink_low") val downlinkLow: Long?,
+    @SerializedName("downlink_high") val downlinkHigh: Long?,
+    @SerializedName("mode") val mode: String?,
+    @SerializedName("invert") val isInverted: Boolean,
+    @SerializedName("norad_cat_id") val catNum: Int
+)

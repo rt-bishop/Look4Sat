@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
 //    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -48,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 //    }
 
 //    private fun openSourcesDialog() {
-//        TleSourcesDialogFragment(viewModel.getTleSources()).apply {
+//        SourcesDialog(viewModel.getTleSources()).apply {
 //            setSourcesListener(this@MainActivity)
 //            show(supportFragmentManager, "TleSourcesDialog")
 //        }
