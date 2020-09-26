@@ -29,11 +29,9 @@ import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
 import com.rtbishop.look4sat.ui.adapters.SourcesAdapter
 
-class SourcesDialog(sources: List<TleSource>) :
-    AppCompatDialogFragment() {
+class SourcesDialog(sources: List<TleSource>) : AppCompatDialogFragment() {
 
     private lateinit var sourcesListener: SourcesSubmitListener
-    private val emptySource = TleSource("")
     private val sourcesAdapter = SourcesAdapter(sources.toMutableList())
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -54,7 +52,7 @@ class SourcesDialog(sources: List<TleSource>) :
 
         binding.tleSourceBtnAdd.setOnClickListener {
             val tempSources = sourcesAdapter.getSources()
-            tempSources.add(emptySource)
+            tempSources.add(TleSource(""))
             sourcesAdapter.setSources(tempSources)
             sourcesAdapter.notifyDataSetChanged()
         }

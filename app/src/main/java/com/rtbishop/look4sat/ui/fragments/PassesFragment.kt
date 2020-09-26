@@ -26,14 +26,12 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
-import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
@@ -41,7 +39,6 @@ import com.rtbishop.look4sat.ui.adapters.PassesAdapter
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities
 import com.rtbishop.look4sat.utility.Utilities.snack
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -105,14 +102,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             showSatPassPrefsDialog(viewModel.getHoursAhead(), viewModel.getMinElevation())
         }
         binding.passesFab.setOnClickListener {
-            lifecycleScope.launch {
-                val list = viewModel.getAllEntries() as MutableList
-                if (list.isEmpty()) {
-                    getString(R.string.err_update_data).snack(requireView())
-                } else {
-                    showSelectSatDialog(list)
-                }
-            }
+            viewModel.calculatePasses()
         }
     }
 
@@ -151,19 +141,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             setView(satPassPrefView)
             create()
             show()
-        }
-    }
-
-    private fun showSelectSatDialog(tleMainList: MutableList<SatEntry>) {
-        val listener = object : EntriesDialog.EntriesSubmitListener {
-            override fun onEntriesSubmit(catNumList: MutableList<Int>) {
-                viewModel.updateEntriesSelection(catNumList)
-            }
-        }
-
-        EntriesDialog(tleMainList).apply {
-            setEntriesListener(listener)
-            show(requireActivity().supportFragmentManager, "EntriesDialog")
         }
     }
 
