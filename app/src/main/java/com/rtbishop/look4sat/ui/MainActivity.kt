@@ -1,7 +1,6 @@
 package com.rtbishop.look4sat.ui
 
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -16,6 +15,5 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val navHost = supportFragmentManager.findFragmentById(R.id.nav_frag) as NavHostFragment
         binding.navBottom.setupWithNavController(navHost.navController)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 }
