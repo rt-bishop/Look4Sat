@@ -21,37 +21,25 @@
     <PreferenceCategory android:title="@string/pref_gsp_title">
         <EditTextPreference
             android:defaultValue="0.0"
-            android:key="@string/pref_lat_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
+            android:key="latitude"
             android:title="@string/pref_lat_title" />
         <EditTextPreference
             android:defaultValue="0.0"
-            android:key="@string/pref_lon_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
+            android:key="longitude"
             android:title="@string/pref_lon_title" />
         <EditTextPreference
             android:defaultValue="0.0"
-            android:key="@string/pref_alt_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
+            android:key="altitude"
             android:title="@string/pref_alt_title" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_other_title">
-        <EditTextPreference
-            android:defaultValue="3000"
-            android:key="@string/pref_refresh_rate_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/pref_refresh_rate_title" />
         <SwitchPreference
             android:defaultValue="false"
-            android:key="@string/pref_time_utc_key"
+            android:key="timeUTC"
             android:title="@string/pref_time_utc_title" />
         <SwitchPreference
             android:defaultValue="true"
-            android:key="@string/pref_compass_key"
+            android:key="compass"
             android:title="@string/pref_compass_title" />
     </PreferenceCategory>
 </PreferenceScreen>

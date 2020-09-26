@@ -26,24 +26,16 @@ import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.Extensions.snack
+import com.rtbishop.look4sat.utility.PrefsManager
 
 class PrefsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private lateinit var keyLat: String
-    private lateinit var keyLon: String
-    private lateinit var keyAlt: String
-    private lateinit var keyDelay: String
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
         val provider = EditTextPreference.SimpleSummaryProvider.getInstance()
-        keyLat = preferenceManager.context.getString(R.string.pref_lat_key)
-        keyLon = preferenceManager.context.getString(R.string.pref_lon_key)
-        keyAlt = preferenceManager.context.getString(R.string.pref_alt_key)
-        keyDelay = preferenceManager.context.getString(R.string.pref_refresh_rate_key)
 
-        findPreference<EditTextPreference>(keyLat)?.apply {
+        findPreference<EditTextPreference>(PrefsManager.keyLatitude)?.apply {
             summaryProvider = provider
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER or
@@ -60,7 +52,7 @@ class PrefsFragment : PreferenceFragmentCompat(),
             }
         }
 
-        findPreference<EditTextPreference>(keyLon)?.apply {
+        findPreference<EditTextPreference>(PrefsManager.keyLongitude)?.apply {
             summaryProvider = provider
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER or
@@ -77,7 +69,7 @@ class PrefsFragment : PreferenceFragmentCompat(),
             }
         }
 
-        findPreference<EditTextPreference>(keyAlt)?.apply {
+        findPreference<EditTextPreference>(PrefsManager.keyAltitude)?.apply {
             summaryProvider = provider
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER or
@@ -88,19 +80,6 @@ class PrefsFragment : PreferenceFragmentCompat(),
                 val valueStr = newValue.toString()
                 if (valueStr.isEmpty() || valueStr == "-" || valueStr.toDouble() < -413.0 || valueStr.toDouble() > 8850.0) {
                     getString(R.string.pref_alt_input_error).snack(requireView())
-                    return@setOnPreferenceChangeListener false
-                }
-                return@setOnPreferenceChangeListener true
-            }
-        }
-
-        findPreference<EditTextPreference>(keyDelay)?.apply {
-            summaryProvider = provider
-            setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
-            setOnPreferenceChangeListener { _, newValue ->
-                val valueStr = newValue.toString()
-                if (valueStr.isEmpty() || valueStr.toLong() < 250 || valueStr.toLong() > 10000) {
-                    getString(R.string.pref_refresh_rate_input_error).snack(requireView())
                     return@setOnPreferenceChangeListener false
                 }
                 return@setOnPreferenceChangeListener true

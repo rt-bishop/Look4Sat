@@ -30,21 +30,21 @@ class PrefsManager @Inject constructor(
     private val preferences: SharedPreferences,
     private val locationManager: LocationManager
 ) {
-    private val keyHoursAhead = "hoursAhead"
-    private val keyMinElevation = "minEl"
-    private val keyLatitude = "latitude"
-    private val keyLongitude = "longitude"
-    private val keyAltitude = "altitude"
-    private val keyRefreshRate = "rate"
-    private val keyCompass = "compass"
-    private val keyTimeUtc = "timeUTC"
-    private val defaultHoursAhead = 8
-    private val defaultMinEl = 16.0
-    private val defaultRefreshRate = "3000"
-    private val defaultGSP = "0.0"
+    companion object {
+        const val keyHoursAhead = "hoursAhead"
+        const val keyMinElevation = "minEl"
+        const val keyLatitude = "latitude"
+        const val keyLongitude = "longitude"
+        const val keyAltitude = "altitude"
+        const val keyCompass = "compass"
+        const val keyTimeUtc = "timeUTC"
+        const val defaultHoursAhead = 8
+        const val defaultMinEl = 16.0
+        const val defaultGSP = "0.0"
+        const val keyIsFirstLaunch = "keyIsFirstLaunch"
+    }
 
     fun isFirstLaunch(): Boolean {
-        val keyIsFirstLaunch = "keyIsFirstLaunch"
         val isFirstLaunch = preferences.getBoolean(keyIsFirstLaunch, true)
         return if (isFirstLaunch) {
             preferences.edit {
@@ -65,10 +65,6 @@ class PrefsManager @Inject constructor(
 
     fun getMinElevation(): Double {
         return preferences.getDouble(keyMinElevation, defaultMinEl)
-    }
-
-    fun getRefreshRate(): Long {
-        return preferences.getString(keyRefreshRate, defaultRefreshRate)!!.toLong()
     }
 
     fun getCompass(): Boolean {

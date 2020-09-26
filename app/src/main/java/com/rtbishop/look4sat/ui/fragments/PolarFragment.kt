@@ -108,12 +108,11 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     private fun observePasses() {
         viewModel.getPassList().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
-                val refreshRate = viewModel.getRefreshRate()
                 satPass = result.data[args.satPassIndex]
                 polarView = PolarView(mainActivity, satPass)
                 binding.frame.addView(polarView)
                 observeTransmitters()
-                refreshText(refreshRate)
+                refreshText()
             }
         })
     }
@@ -147,13 +146,13 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         })
     }
 
-    private fun refreshText(rate: Long) {
+    private fun refreshText() {
         lifecycleScope.launch {
             while (true) {
                 setPassText()
                 polarView?.invalidate()
                 transmitterAdapter.notifyDataSetChanged()
-                delay(rate)
+                delay(3000)
             }
         }
     }

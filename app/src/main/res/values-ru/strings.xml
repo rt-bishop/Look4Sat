@@ -47,11 +47,7 @@
     <string name="pref_alt_title">Высота, м</string>
     <string name="pref_alt_input_error">Введите значение между -413м и 8850м</string>
     <string name="pref_other_title">Другие настройки</string>
-    <string name="pref_refresh_rate_title">Частота обновления, мс</string>
-    <string name="pref_refresh_rate_input_error">Введите значение между 250мс и 10000мс</string>
     <string name="pref_compass_title">Использовать компас при отображении полярных координат</string>
-
-    <string name="pref_time_utc_key" translatable="false">timeUTC</string>
     <string name="pref_time_utc_title">Показывать время пролёта по UTC</string>
 
     <string name="no_mode">Модуляция: нет</string>

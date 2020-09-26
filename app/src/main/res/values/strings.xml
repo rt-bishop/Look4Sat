@@ -33,33 +33,22 @@
     <string name="dialog_tle_sources">Manage TLE sources</string>
     <string name="dialog_entries_hint">Name/CatNum</string>
 
-    <string name="pref_hours_ahead_key" translatable="false">hoursAhead</string>
     <string name="pref_hours_ahead_hint">Hours ahead</string>
     <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
     <string name="pref_hours_ahead_input_error">Set the value between 1h and 168h</string>
-    <string name="pref_min_el_key" translatable="false">minEl</string>
     <string name="pref_min_el_hint">Minimum elevation</string>
     <string name="pref_min_el_summary">Show passes with max elevation above</string>
     <string name="pref_min_el_input_error">Set the value between 0° and 90°</string>
 
     <string name="pref_gsp_title">Ground station position</string>
-    <string name="pref_lat_key" translatable="false">latitude</string>
     <string name="pref_lat_title">Latitude, deg</string>
     <string name="pref_lat_input_error">Set the value between -90° and 90°</string>
-    <string name="pref_lon_key" translatable="false">longitude</string>
     <string name="pref_lon_title">Longitude, deg</string>
     <string name="pref_lon_input_error">Set the value between -180° and 180°</string>
-    <string name="pref_alt_key" translatable="false">altitude</string>
     <string name="pref_alt_title">Altitude, m</string>
     <string name="pref_alt_input_error">Set the value between -413m and 8850m</string>
     <string name="pref_other_title">Other</string>
-    <string name="pref_refresh_rate_key" translatable="false">rate</string>
-    <string name="pref_refresh_rate_title">Refresh rate, ms</string>
-    <string name="pref_refresh_rate_input_error">Set the value between 250ms and 10000ms</string>
-    <string name="pref_compass_key" translatable="false">compass</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>
-
-    <string name="pref_time_utc_key" translatable="false">timeUTC</string>
     <string name="pref_time_utc_title">Show pass time in UTC</string>
 
     <string name="no_mode">Mode: null</string>

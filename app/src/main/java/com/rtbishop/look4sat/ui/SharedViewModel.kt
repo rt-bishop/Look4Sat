@@ -55,7 +55,6 @@ class SharedViewModel @Inject constructor(
     fun getGSP(): LiveData<Result<GroundStationPosition>> = _gsp
 
     fun getCompass() = prefsManager.getCompass()
-    fun getRefreshRate() = prefsManager.getRefreshRate()
     fun getHoursAhead() = prefsManager.getHoursAhead()
     fun getMinElevation() = prefsManager.getMinElevation()
     suspend fun getAllEntries() = repository.getAllEntries()
