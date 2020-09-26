@@ -48,7 +48,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="4dp"
             android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_menu_sat"
+            android:src="@drawable/ic_menu_entries"
             app:layout_constraintEnd_toStartOf="@+id/title"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"

@@ -20,28 +20,11 @@
 <resources>
     <string name="app_version">Версия: %s</string>
 
-    <string name="drawer_lat_text">Широта:</string>
-    <string name="drawer_lon_text">Долгота:</string>
-
-    <string name="update_loc">Обновить геопозицию</string>
-    <string name="update_loc_success">Геопозиция обновлена</string>
-    <string name="update_loc_failure">Проверьте настройки GPS</string>
-    <string name="import_data_file">Импорт данных из файла</string>
-    <string name="import_data_web">Импорт данных по ссылке</string>
-    <string name="import_data_success">Данные спутников обновлены</string>
-    <string name="import_data_failure">Ошибка импорта данных</string>
-    <string name="goto_github">Ссылка на GitHub</string>
-
-    <string name="menu_pass_list">Список пролетов</string>
-    <string name="menu_map_view">Карта мира</string>
-    <string name="menu_map_osm">Карта мира (Демо)</string>
-    <string name="menu_settings">Настройки</string>
+    <string name="menu_entries">Спутники</string>
+    <string name="menu_passes">Пролеты</string>
+    <string name="menu_map">Карта Мира</string>
+    <string name="menu_prefs">Настройки</string>
     <string name="menu_about">О приложении</string>
-    <string name="menu_bottom_entries">Спутники</string>
-    <string name="menu_bottom_passes">Пролеты</string>
-    <string name="menu_bottom_osm">Карта Мира</string>
-    <string name="menu_bottom_settings">Настройки</string>
-    <string name="menu_bottom_about">О приложении</string>
 
     <string name="dialog_select_sat">Выберите спутники для слежения</string>
     <string name="dialog_show_track">Показать трассу орбиты для</string>
@@ -78,10 +61,8 @@
     <string name="no_downlink_doppler">Тек. нисход: нет</string>
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
-    <string name="err_no_permissions">Отсутствуют необходимые разрешения</string>
     <string name="err_update_data">Пожалуйста, обновите данные спутников</string>
     <string name="err_enter_value">Пожалуйста, введите значение</string>
-    <string name="err_no_sat_selected">Не выбраны спутники</string>
 
     <string name="pass_aos_az">НПС — %2d°</string>
     <string name="pass_los_az">%2d° — КПС</string>
@@ -106,13 +87,6 @@
     <string name="trans_up_lowHigh_doppler">Тек. восход: %.4f - %.4fMHz</string>
     <string name="trans_down_low_doppler">Тек. нисход: %.4fMHz</string>
     <string name="trans_down_lowHigh_doppler">Тек. нисход: %.4f - %.4fMHz</string>
-
-    <string name="info_swipe_text">Проведите по экрану вниз, чтобы обновить список пролетов
-        для выбранных спутников</string>
-    <string name="info_main_text">Приложение Look4Sat использует набор двухстрочных элементов TLE
-        для вычисления траекторий движения и текущего местоположения спутников. Вы можете
-        импортировать БД TLE при помощи кнопки в главном меню.</string>
-    <string name="info_select_text">Нажмите эту кнопку, чтобы выбрать спутники для слежения</string>
 
     <string name="about_subtitle">Приложение для слежения за спутниками радио и погоды
         для платформы Android</string>
@@ -155,8 +129,6 @@
     <string name="btn_cancel">Отмена</string>
     <string name="btn_all_none">Все/Нет</string>
 
-    <string name="map_gsp">СТЦ</string>
-    <string name="tle_source">Источник TLE</string>
     <string name="https_only">Используйте протокол HTTPS</string>
     <string name="sat_import">Импорт спутников</string>
 </resources>

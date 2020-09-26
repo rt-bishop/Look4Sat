@@ -23,8 +23,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
-    android:layout_marginTop="4dp"
+    android:layout_marginTop="2dp"
     android:layout_marginEnd="4dp"
+    android:layout_marginBottom="2dp"
     app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout

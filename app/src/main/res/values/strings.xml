@@ -21,30 +21,11 @@
     <string name="app_name" translatable="false">Look4Sat</string>
     <string name="app_version">Version: %s</string>
 
-    <string name="drawer_title" translatable="false">L∞k \n4Sat</string>
-    <string name="drawer_lat_text">Latitude: </string>
-    <string name="drawer_lon_text">Longitude: </string>
-
-    <string name="update_loc">Update location</string>
-    <string name="update_loc_success">Location updated</string>
-    <string name="update_loc_failure">Check your Location settings</string>
-    <string name="import_data_file">Import data from file</string>
-    <string name="import_data_web">Import data from web</string>
-    <string name="import_data_success">Satellite data was updated</string>
-    <string name="import_data_failure">Satellite data import failed</string>
-    <string name="goto_github">Link to GitHub</string>
-
-    <string name="menu_pass_list">List of Passes</string>
-    <string name="menu_polar_view" translatable="false">Polar View</string>
-    <string name="menu_map_view">World Map View</string>
-    <string name="menu_map_osm">World Map Demo</string>
-    <string name="menu_settings">Settings</string>
-    <string name="menu_about">About the App</string>
-    <string name="menu_bottom_entries">Satellites</string>
-    <string name="menu_bottom_passes">Passes</string>
-    <string name="menu_bottom_osm">World Map</string>
-    <string name="menu_bottom_settings">Settings</string>
-    <string name="menu_bottom_about">About</string>
+    <string name="menu_entries">Satellites</string>
+    <string name="menu_passes">Passes</string>
+    <string name="menu_map">World Map</string>
+    <string name="menu_prefs">Settings</string>
+    <string name="menu_about">About</string>
 
     <string name="dialog_select_sat">Select satellites to track</string>
     <string name="dialog_show_track">Show ground track for</string>
@@ -88,10 +69,8 @@
     <string name="no_downlink_doppler">Curr. downlink: null</string>
     <string name="no_trans">No transceivers found for this satellite</string>
 
-    <string name="err_no_permissions">Missing permissions</string>
     <string name="err_update_data">Please, update satellite data</string>
     <string name="err_enter_value">Please, enter the value</string>
-    <string name="err_no_sat_selected">No satellites selected</string>
 
     <string name="pass_satName" translatable="false">%s</string>
     <string name="pass_satId" translatable="false">ID: %d</string>
@@ -123,15 +102,6 @@
     <string name="trans_up_lowHigh_doppler">Curr. uplink: %.4f - %.4fMHz</string>
     <string name="trans_down_low_doppler">Curr. downlink: %.4fMHz</string>
     <string name="trans_down_lowHigh_doppler">Curr. downlink: %.4f - %.4fMHz</string>
-
-    <string name="info_swipe_text">
-        Swipe the screen to refresh the list of passes for selected satellites</string>
-    <string name="info_main_text">
-        Look4Sat is using the Two-Line Element set to calculate the satellites positions \n
-        You can import the TLE data via the corresponding button in the main menu \n \n
-        Once the list is calculated, press a pass item for detailed information</string>
-    <string name="info_select_text">
-        Press this button to select the satellites you wish to track</string>
 
     <string name="about_subtitle">
         Amateur radio and weather satellites passes calculator for Android</string>
@@ -175,10 +145,10 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_all_none">All/None</string>
 
-    <string name="map_gsp">GSP</string>
-    <string name="tle_source">TLE source</string>
+    <string name="tle_source" translatable="false">https://</string>
     <string name="https_only">Please use HTTPS URLs only</string>
     <string name="placeholder" translatable="false">Placeholder</string>
     <string name="osmCopyright" translatable="false">Wikimedia maps | Map data © OpenStreetMap contributors</string>
     <string name="sat_import">Import satellite data</string>
+    <string name="timer_zero" translatable="false">00:00:00</string>
 </resources>
