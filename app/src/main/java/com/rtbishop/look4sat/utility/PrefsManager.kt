@@ -24,6 +24,7 @@ import android.location.Location
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
+import com.rtbishop.look4sat.utility.Utilities.round
 import javax.inject.Inject
 
 class PrefsManager @Inject constructor(
@@ -83,10 +84,13 @@ class PrefsManager @Inject constructor(
         return try {
             val location = locationManager.getLastKnownLocation(provPassive)
             location?.let {
+                val lat = location.latitude.round(4)
+                val lon = location.longitude.round(4)
+                val alt = location.altitude.round(1)
                 preferences.edit {
-                    putString(keyLatitude, location.latitude.toString())
-                    putString(keyLongitude, location.longitude.toString())
-                    putString(keyAltitude, location.altitude.toString())
+                    putString(keyLatitude, lat.toString())
+                    putString(keyLongitude, lon.toString())
+                    putString(keyAltitude, alt.toString())
                     apply()
                 }
             }

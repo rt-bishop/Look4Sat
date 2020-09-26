@@ -25,7 +25,6 @@ import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,17 +38,17 @@ import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.PassesAdapter
-import com.rtbishop.look4sat.utility.Extensions.snack
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.Utilities
+import com.rtbishop.look4sat.utility.Utilities.snack
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class PassesFragment : Fragment(R.layout.fragment_passes) {
 
     @Inject
-    lateinit var modelFactory: ViewModelFactory
+    lateinit var factory: ViewModelFactory
 
     @Inject
     lateinit var prefsManager: PrefsManager
@@ -57,20 +56,16 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     private lateinit var viewModel: SharedViewModel
     private lateinit var passesAdapter: PassesAdapter
     private lateinit var aosTimer: CountDownTimer
-    private lateinit var mainActivity: FragmentActivity
     private lateinit var binding: FragmentPassesBinding
     private var isTimerSet: Boolean = false
-    private var satPassList: MutableList<SatPass> = mutableListOf()
-
+    private var satPassList = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainActivity = requireActivity()
         binding = FragmentPassesBinding.bind(view)
-        (mainActivity.application as Look4SatApp).appComponent.inject(this)
-        viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
+        (requireActivity().application as Look4SatApp).appComponent.inject(this)
+        viewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
         passesAdapter = PassesAdapter(satPassList, prefsManager)
-
         setupObservers()
         setupComponents()
     }
@@ -98,7 +93,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
 
     private fun setupComponents() {
         binding.passesRecycler.apply {
-            layoutManager = LinearLayoutManager(mainActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = passesAdapter
             isVerticalScrollBarEnabled = false
             (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -122,13 +117,13 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
-        val satPassPrefView = View.inflate(mainActivity, R.layout.dialog_passes, null)
+        val satPassPrefView = View.inflate(requireContext(), R.layout.dialog_passes, null)
         val etHoursAhead = satPassPrefView.findViewById<EditText>(R.id.pref_et_hoursAhead)
         val etMinEl = satPassPrefView.findViewById<EditText>(R.id.pref_et_minEl)
         etHoursAhead.setText(hoursAhead.toString())
         etMinEl.setText(minEl.toString())
 
-        AlertDialog.Builder(mainActivity).apply {
+        AlertDialog.Builder(requireContext()).apply {
             setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                 val hoursStr = etHoursAhead.text.toString()
                 val elevationStr = etMinEl.text.toString()
@@ -168,7 +163,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
 
         EntriesDialog(tleMainList).apply {
             setEntriesListener(listener)
-            show(mainActivity.supportFragmentManager, "EntriesDialog")
+            show(requireActivity().supportFragmentManager, "EntriesDialog")
         }
     }
 
@@ -198,12 +193,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                binding.passesTimer.text = String.format(
-                    mainActivity.getString(R.string.pat_timer),
-                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                )
+                binding.passesTimer.text = Utilities.formatForTimer(millisUntilFinished)
                 passesAdapter.updateRecycler()
             }
         }
@@ -218,12 +208,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                binding.passesTimer.text = String.format(
-                    mainActivity.getString(R.string.pat_timer),
-                    TimeUnit.MILLISECONDS.toHours(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
-                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60
-                )
+                binding.passesTimer.text = Utilities.formatForTimer(millisUntilFinished)
                 passesAdapter.updateRecycler()
             }
         }
@@ -234,7 +219,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             aosTimer.cancel()
             isTimerSet = false
         }
-        if (resetToNull) binding.passesTimer.text =
-            String.format(getString(R.string.pat_timer), 0, 0, 0)
+        if (resetToNull) binding.passesTimer.text = String.format("%02d:%02d:%02d", 0, 0, 0)
     }
 }

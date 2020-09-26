@@ -25,8 +25,8 @@ import android.text.InputType
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.utility.Extensions.snack
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.Utilities.snack
 
 class PrefsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {

@@ -19,6 +19,8 @@
 
 package com.rtbishop.look4sat.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
@@ -35,5 +37,11 @@ class AboutFragment : Fragment(R.layout.fragment_about) {
             version.text = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
             message.movementMethod = LinkMovementMethod.getInstance()
         }
+    }
+
+    private fun gotoGitHub() {
+        val gitHubUrl = "https://github.com/rt-bishop/LookingSat"
+        val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(gitHubUrl))
+        startActivity(githubIntent)
     }
 }

@@ -74,7 +74,6 @@
     <string name="pat_longitude">Lon: %.1f°</string>
     <string name="pat_distance">Dst: %.0f km</string>
     <string name="pat_altitude">Alt: %.0f km</string>
-    <string name="pat_timer" translatable="false">%02d:%02d:%02d</string>
 
     <string name="pat_osm_idName" translatable="false">%s / %s</string>
     <string name="pat_osm_latLon">Lat: %.1f°, Lon: %.1f°</string>
