@@ -1,7 +1,9 @@
 package com.rtbishop.look4sat.utility
 
+import android.animation.ObjectAnimator
 import android.content.SharedPreferences
 import android.view.View
+import android.view.animation.LinearInterpolator
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 import kotlin.math.round
@@ -24,6 +26,15 @@ object Utilities {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
         return round(this * multiplier) / multiplier
+    }
+
+    fun View.getRotationAnimator(): ObjectAnimator {
+        return ObjectAnimator.ofFloat(this, "rotation", 0f, 360f).apply {
+            duration = 800
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.RESTART
+            interpolator = LinearInterpolator()
+        }
     }
 
     fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
