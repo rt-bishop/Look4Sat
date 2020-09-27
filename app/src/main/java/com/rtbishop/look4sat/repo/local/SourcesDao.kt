@@ -1,5 +1,6 @@
 package com.rtbishop.look4sat.repo.local
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -13,7 +14,7 @@ interface SourcesDao {
     suspend fun insertSources(sources: List<TleSource>)
 
     @Query("SELECT * FROM sources")
-    suspend fun getSources(): List<TleSource>
+    fun getSources(): LiveData<List<TleSource>>
 
     @Query("DELETE FROM sources")
     suspend fun clearSources()

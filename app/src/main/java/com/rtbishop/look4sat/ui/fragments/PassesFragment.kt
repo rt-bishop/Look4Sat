@@ -99,7 +99,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         setTimer()
 
         binding.passesFilter.setOnClickListener {
-            showSatPassPrefsDialog(viewModel.getHoursAhead(), viewModel.getMinElevation())
+            showSatPassPrefsDialog(prefsManager.getHoursAhead(), prefsManager.getMinElevation())
         }
         binding.passesFab.setOnClickListener {
             viewModel.calculatePasses()
@@ -128,7 +128,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                             getString(R.string.pref_min_el_input_error).snack(requireView())
                         }
                         else -> {
-                            viewModel.setPassPrefs(hours, elevation)
+                            prefsManager.setHoursAhead(hours)
+                            prefsManager.setMinElevation(elevation)
                             viewModel.calculatePasses()
                         }
                     }

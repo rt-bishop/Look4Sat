@@ -38,6 +38,7 @@ import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
+import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -48,6 +49,10 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     @Inject
     lateinit var modelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var prefsManager: PrefsManager
+
     private lateinit var mainActivity: FragmentActivity
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentPolarBinding
@@ -69,13 +74,13 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
             layoutManager = LinearLayoutManager(mainActivity)
             adapter = transmitterAdapter
         }
+        calculateMagneticDeclination()
         observePasses()
-        observeStationPosition()
     }
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.getCompass()) {
+        if (prefsManager.getCompass()) {
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
             }
@@ -84,7 +89,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.getCompass()) {
+        if (prefsManager.getCompass()) {
             sensorManager.unregisterListener(this)
         }
     }
@@ -132,18 +137,15 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         })
     }
 
-    private fun observeStationPosition() {
-        viewModel.getGSP().observe(viewLifecycleOwner, { result ->
-            if (result is Result.Success) {
-                val geoField = GeomagneticField(
-                    result.data.latitude.toFloat(),
-                    result.data.longitude.toFloat(),
-                    result.data.heightAMSL.toFloat(),
-                    System.currentTimeMillis()
-                )
-                magneticDeclination = geoField.declination
-            }
-        })
+    private fun calculateMagneticDeclination() {
+        val position = prefsManager.getStationPosition()
+        val geoField = GeomagneticField(
+            position.latitude.toFloat(),
+            position.longitude.toFloat(),
+            position.heightAMSL.toFloat(),
+            System.currentTimeMillis()
+        )
+        magneticDeclination = geoField.declination
     }
 
     private fun refreshText() {

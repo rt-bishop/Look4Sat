@@ -26,7 +26,15 @@
     <fragment
         android:id="@+id/nav_entries"
         android:name="com.rtbishop.look4sat.ui.fragments.EntriesFragment"
-        tools:layout="@layout/fragment_entries" />
+        tools:layout="@layout/fragment_entries">
+        <action
+            android:id="@+id/action_entries_to_passes"
+            app:destination="@id/nav_passes"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_passes"
@@ -37,8 +45,8 @@
             app:destination="@id/nav_polar"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_enter_anim"
-            app:popExitAnim="@anim/nav_default_exit_anim" />
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
     <fragment

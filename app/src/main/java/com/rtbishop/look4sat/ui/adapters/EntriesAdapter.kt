@@ -25,9 +25,24 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.databinding.ItemSatEntryBinding
+import java.util.*
 
-class EntriesAdapter(private var entries: MutableList<SatEntry>) :
+class EntriesAdapter(private var entries: MutableList<SatEntry> = mutableListOf()) :
     RecyclerView.Adapter<EntriesAdapter.SatEntryHolder>() {
+
+    private var selectAllToggle = true
+
+    inner class SatEntryHolder(itemView: View, private val binding: ItemSatEntryBinding) :
+        RecyclerView.ViewHolder(itemView) {
+
+        fun bind(satEntry: SatEntry) {
+            binding.satEntryCheckbox.text = satEntry.name
+            binding.satEntryCheckbox.isChecked = satEntry.isSelected
+            itemView.setOnClickListener {
+                satEntry.isSelected = binding.satEntryCheckbox.isChecked
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatEntryHolder {
         val binding = ItemSatEntryBinding
@@ -43,24 +58,50 @@ class EntriesAdapter(private var entries: MutableList<SatEntry>) :
         return entries.size
     }
 
+    fun getEntries(): MutableList<SatEntry> {
+        return entries
+    }
+
     fun setEntries(list: MutableList<SatEntry>) {
         entries = list
         notifyDataSetChanged()
     }
 
-    fun getEntries(): MutableList<SatEntry> {
-        return entries
+    fun selectAll() {
+        selectAllToggle = if (selectAllToggle) {
+            val currentList = getEntries()
+            currentList.forEach { it.isSelected = true }
+            setEntries(currentList)
+            false
+        } else {
+            val currentList = getEntries()
+            currentList.forEach { it.isSelected = false }
+            setEntries(currentList)
+            true
+        }
     }
 
-    inner class SatEntryHolder(itemView: View, private val binding: ItemSatEntryBinding) :
-        RecyclerView.ViewHolder(itemView) {
-
-        fun bind(satEntry: SatEntry) {
-            binding.satEntryCheckbox.text = satEntry.name
-            binding.satEntryCheckbox.isChecked = satEntry.isSelected
-            itemView.setOnClickListener {
-                satEntry.isSelected = binding.satEntryCheckbox.isChecked
-            }
+    fun filterEntries(list: MutableList<SatEntry>, query: String): MutableList<SatEntry> {
+        if (query.isEmpty()) return list
+        return try {
+            filterByCatNum(list, query.toInt())
+        } catch (e: NumberFormatException) {
+            filterByName(list, query)
         }
+    }
+
+    private fun filterByCatNum(list: MutableList<SatEntry>, catNum: Int): MutableList<SatEntry> {
+        val filteredList = list.filter { it.catNum == catNum }
+        return filteredList as MutableList<SatEntry>
+    }
+
+    private fun filterByName(list: MutableList<SatEntry>, query: String): MutableList<SatEntry> {
+        val searchQuery = query.toLowerCase(Locale.getDefault())
+        val filteredList = mutableListOf<SatEntry>()
+        list.forEach {
+            val entryName = it.name.toLowerCase(Locale.getDefault())
+            if (entryName.contains(searchQuery)) filteredList.add(it)
+        }
+        return filteredList
     }
 }

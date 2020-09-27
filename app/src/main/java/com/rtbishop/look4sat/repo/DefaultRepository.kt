@@ -21,6 +21,7 @@ package com.rtbishop.look4sat.repo
 
 import android.content.ContentResolver
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatTrans
@@ -45,33 +46,37 @@ class DefaultRepository @Inject constructor(
     private val transDao: TransDao
 ) : Repository {
 
+    override fun getSources(): LiveData<List<TleSource>> {
+        return sourcesDao.getSources()
+    }
+
+    override suspend fun updateSources(sources: List<TleSource>) {
+        sourcesDao.clearSources()
+        sourcesDao.insertSources(sources)
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    override fun getAllEntries(): LiveData<List<SatEntry>> {
+        return entriesDao.getAllEntries()
+    }
+
+    override fun getSelectedEntries(): LiveData<List<SatEntry>> {
+        return entriesDao.getSelectedEntries()
+    }
+
     override suspend fun updateEntriesFromFile(tleUri: Uri) {
         withContext(Dispatchers.IO) {
             resolver.openInputStream(tleUri)?.use { stream ->
                 val tleList = TLE.importSat(stream)
                 val entries = tleList.map { SatEntry(it) }
-                clearEntries()
-                insertEntries(entries)
+                entriesDao.clearEntries()
+                entriesDao.insertEntries(entries)
             }
         }
     }
 
     override suspend fun updateEntriesFromUrl(urlList: List<TleSource>) {
-        withContext(Dispatchers.IO) {
-            val streams = fetchTleStreams(urlList)
-            val entries = mutableListOf<SatEntry>()
-            streams.forEach {
-                val list = TLE.importSat(it).map { tle -> SatEntry(tle) }
-                entries.addAll(list)
-            }
-            clearEntries()
-            insertEntries(entries)
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    override suspend fun fetchTleStreams(urlList: List<TleSource>): List<InputStream> =
         withContext(Dispatchers.IO) {
             val streams = mutableListOf<InputStream>()
             urlList.withIndex().forEach {
@@ -79,23 +84,15 @@ class DefaultRepository @Inject constructor(
                 val stream = client.newCall(request).execute().body?.byteStream()
                 stream?.let { inputStream -> streams.add(inputStream) }
             }
-            return@withContext streams
+
+            val entries = mutableListOf<SatEntry>()
+            streams.forEach {
+                val list = TLE.importSat(it).map { tle -> SatEntry(tle) }
+                entries.addAll(list)
+            }
+            entriesDao.clearEntries()
+            entriesDao.insertEntries(entries)
         }
-
-    override suspend fun fetchTransmitters(): List<SatTrans> {
-        return api.fetchTransList()
-    }
-
-    override suspend fun insertEntries(entries: List<SatEntry>) {
-        entriesDao.insertEntries(entries)
-    }
-
-    override suspend fun getAllEntries(): List<SatEntry> {
-        return entriesDao.getAllEntries()
-    }
-
-    override suspend fun getSelectedEntries(): List<SatEntry> {
-        return entriesDao.getSelectedEntries()
     }
 
     override suspend fun updateEntriesSelection(catNumList: List<Int>) {
@@ -103,35 +100,14 @@ class DefaultRepository @Inject constructor(
         catNumList.forEach { entriesDao.updateEntrySelection(it) }
     }
 
-    override suspend fun clearEntries() {
-        entriesDao.clearEntries()
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     override suspend fun updateTransmitters() {
+        transDao.clearTransmitters()
+        transDao.insertTransmitters(api.fetchTransList())
     }
 
     override suspend fun getTransmittersByCatNum(catNum: Int): List<SatTrans> {
         return transDao.getTransmittersForCatNum(catNum)
-    }
-
-    override suspend fun clearTransmitters() {
-        transDao.clearTransmitters()
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    override suspend fun updateSources(sources: List<TleSource>) {
-        clearSources()
-        sourcesDao.insertSources(sources)
-    }
-
-    override suspend fun getSources(): List<TleSource> {
-        return sourcesDao.getSources()
-    }
-
-    override suspend fun clearSources() {
-        sourcesDao.clearSources()
     }
 }

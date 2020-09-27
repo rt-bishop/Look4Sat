@@ -20,7 +20,6 @@
 package com.rtbishop.look4sat.utility
 
 import android.content.SharedPreferences
-import android.location.Location
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
@@ -72,21 +71,19 @@ class PrefsManager @Inject constructor(
         return preferences.getBoolean(keyCompass, true)
     }
 
-    fun getPosition(): GroundStationPosition {
+    fun getStationPosition(): GroundStationPosition {
         val lat = preferences.getString(keyLatitude, defaultGSP)!!.toDouble()
         val lon = preferences.getString(keyLongitude, defaultGSP)!!.toDouble()
         val alt = preferences.getString(keyAltitude, defaultGSP)!!.toDouble()
         return GroundStationPosition(lat, lon, alt)
     }
 
-    fun getLastKnownLocation(): Location? {
-        val provPassive = LocationManager.PASSIVE_PROVIDER
-        return try {
-            val location = locationManager.getLastKnownLocation(provPassive)
-            location?.let {
-                val lat = location.latitude.round(4)
-                val lon = location.longitude.round(4)
-                val alt = location.altitude.round(1)
+    fun updateLocation() {
+        try {
+            locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)?.let {
+                val lat = it.latitude.round(4)
+                val lon = it.longitude.round(4)
+                val alt = it.altitude.round(1)
                 preferences.edit {
                     putString(keyLatitude, lat.toString())
                     putString(keyLongitude, lon.toString())
@@ -94,9 +91,7 @@ class PrefsManager @Inject constructor(
                     apply()
                 }
             }
-            location
         } catch (e: SecurityException) {
-            null
         }
     }
 

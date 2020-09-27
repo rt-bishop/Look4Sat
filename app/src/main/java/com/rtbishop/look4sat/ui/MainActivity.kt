@@ -27,5 +27,6 @@ class MainActivity : AppCompatActivity() {
         binding.navBottom.setupWithNavController(navHost.navController)
         (application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(this, factory).get(SharedViewModel::class.java)
+        viewModel.setDefaultTleSources()
     }
 }
