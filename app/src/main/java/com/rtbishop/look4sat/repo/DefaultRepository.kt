@@ -78,18 +78,8 @@ class DefaultRepository @Inject constructor(
 
     override suspend fun updateEntriesFromUrl(urlList: List<TleSource>) {
         withContext(Dispatchers.IO) {
-            val streams = mutableListOf<InputStream>()
-            urlList.withIndex().forEach {
-                val request = Request.Builder().url(it.value.url).build()
-                val stream = client.newCall(request).execute().body?.byteStream()
-                stream?.let { inputStream -> streams.add(inputStream) }
-            }
-
-            val entries = mutableListOf<SatEntry>()
-            streams.forEach {
-                val list = TLE.importSat(it).map { tle -> SatEntry(tle) }
-                entries.addAll(list)
-            }
+            val streams = getStreamsForSources(urlList)
+            val entries = getEntriesForStreams(streams)
             entriesDao.clearEntries()
             entriesDao.insertEntries(entries)
         }
@@ -98,6 +88,25 @@ class DefaultRepository @Inject constructor(
     override suspend fun updateEntriesSelection(catNumList: List<Int>) {
         entriesDao.clearEntriesSelection()
         catNumList.forEach { entriesDao.updateEntrySelection(it) }
+    }
+
+    private fun getStreamsForSources(urlList: List<TleSource>): MutableList<InputStream> {
+        val streams = mutableListOf<InputStream>()
+        urlList.withIndex().forEach {
+            val request = Request.Builder().url(it.value.url).build()
+            val stream = client.newCall(request).execute().body?.byteStream()
+            stream?.let { inputStream -> streams.add(inputStream) }
+        }
+        return streams
+    }
+
+    private fun getEntriesForStreams(streams: MutableList<InputStream>): MutableList<SatEntry> {
+        val entries = mutableListOf<SatEntry>()
+        streams.forEach {
+            val list = TLE.importSat(it).map { tle -> SatEntry(tle) }
+            entries.addAll(list)
+        }
+        return entries
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

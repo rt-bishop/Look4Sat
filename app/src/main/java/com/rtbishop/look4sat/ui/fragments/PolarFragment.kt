@@ -38,7 +38,6 @@ import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
-import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -49,9 +48,6 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     @Inject
     lateinit var modelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var prefsManager: PrefsManager
 
     private lateinit var mainActivity: FragmentActivity
     private lateinit var viewModel: SharedViewModel
@@ -80,7 +76,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        if (prefsManager.getCompass()) {
+        if (viewModel.shouldUseCompass()) {
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
             }
@@ -89,7 +85,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        if (prefsManager.getCompass()) {
+        if (viewModel.shouldUseCompass()) {
             sensorManager.unregisterListener(this)
         }
     }
@@ -138,7 +134,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun calculateMagneticDeclination() {
-        val position = prefsManager.getStationPosition()
+        val position = viewModel.getStationPosition()
         val geoField = GeomagneticField(
             position.latitude.toFloat(),
             position.longitude.toFloat(),

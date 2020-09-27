@@ -36,7 +36,6 @@ import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.PassesAdapter
-import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities
 import com.rtbishop.look4sat.utility.Utilities.snack
 import java.util.*
@@ -47,14 +46,11 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     @Inject
     lateinit var factory: ViewModelFactory
 
-    @Inject
-    lateinit var prefsManager: PrefsManager
-
     private lateinit var viewModel: SharedViewModel
-    private lateinit var passesAdapter: PassesAdapter
     private lateinit var aosTimer: CountDownTimer
     private lateinit var binding: FragmentPassesBinding
     private var isTimerSet: Boolean = false
+    private val passesAdapter = PassesAdapter()
     private var satPassList = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,7 +58,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         binding = FragmentPassesBinding.bind(view)
         (requireActivity().application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
-        passesAdapter = PassesAdapter(satPassList, prefsManager)
         setupObservers()
         setupComponents()
     }
@@ -89,21 +84,22 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setupComponents() {
-        binding.passesRecycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = passesAdapter
-            isVerticalScrollBarEnabled = false
-            (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        binding.apply {
+            passesRecycler.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = passesAdapter
+                isVerticalScrollBarEnabled = false
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            }
+            passesFilter.setOnClickListener {
+                val passPrefs = viewModel.getPassPrefs()
+                showSatPassPrefsDialog(passPrefs.hoursAhead, passPrefs.minEl)
+            }
+            passesFab.setOnClickListener { viewModel.calculatePasses() }
         }
+        passesAdapter.setShouldUseUTC(viewModel.shouldUseUTC())
         passesAdapter.setList(satPassList)
         setTimer()
-
-        binding.passesFilter.setOnClickListener {
-            showSatPassPrefsDialog(prefsManager.getHoursAhead(), prefsManager.getMinElevation())
-        }
-        binding.passesFab.setOnClickListener {
-            viewModel.calculatePasses()
-        }
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
@@ -115,11 +111,11 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
 
         AlertDialog.Builder(requireContext()).apply {
             setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                val hoursStr = etHoursAhead.text.toString()
-                val elevationStr = etMinEl.text.toString()
-                if (hoursStr.isNotEmpty() && elevationStr.isNotEmpty()) {
-                    val hours = hoursStr.toInt()
-                    val elevation = elevationStr.toDouble()
+                val hoursString = etHoursAhead.text.toString()
+                val minElString = etMinEl.text.toString()
+                if (hoursString.isNotEmpty() && minElString.isNotEmpty()) {
+                    val hours = hoursString.toInt()
+                    val elevation = minElString.toDouble()
                     when {
                         hours < 1 || hours > 168 -> {
                             getString(R.string.pref_hours_ahead_input_error).snack(requireView())
@@ -128,8 +124,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                             getString(R.string.pref_min_el_input_error).snack(requireView())
                         }
                         else -> {
-                            prefsManager.setHoursAhead(hours)
-                            prefsManager.setMinElevation(elevation)
+                            viewModel.setPassPrefs(hours, elevation)
                             viewModel.calculatePasses()
                         }
                     }

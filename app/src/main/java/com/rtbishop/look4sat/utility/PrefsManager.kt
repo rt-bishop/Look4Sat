@@ -23,6 +23,9 @@ import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
+import com.rtbishop.look4sat.data.PassPrefs
+import com.rtbishop.look4sat.utility.Utilities.getDouble
+import com.rtbishop.look4sat.utility.Utilities.putDouble
 import com.rtbishop.look4sat.utility.Utilities.round
 import javax.inject.Inject
 
@@ -44,31 +47,18 @@ class PrefsManager @Inject constructor(
         const val keyIsFirstLaunch = "keyIsFirstLaunch"
     }
 
-    fun isFirstLaunch(): Boolean {
-        val isFirstLaunch = preferences.getBoolean(keyIsFirstLaunch, true)
-        return if (isFirstLaunch) {
-            preferences.edit {
-                putBoolean(keyIsFirstLaunch, false)
-                apply()
-            }
-            true
-        } else isFirstLaunch
+    fun getPassPrefs(): PassPrefs {
+        val hoursAhead = preferences.getInt(keyHoursAhead, defaultHoursAhead)
+        val minEl = preferences.getDouble(keyMinElevation, defaultMinEl)
+        return PassPrefs(hoursAhead, minEl)
     }
 
-    fun isTimeUTC(): Boolean {
-        return preferences.getBoolean(keyTimeUtc, false)
-    }
-
-    fun getHoursAhead(): Int {
-        return preferences.getInt(keyHoursAhead, defaultHoursAhead)
-    }
-
-    fun getMinElevation(): Double {
-        return preferences.getDouble(keyMinElevation, defaultMinEl)
-    }
-
-    fun getCompass(): Boolean {
-        return preferences.getBoolean(keyCompass, true)
+    fun setPassPrefs(hoursAhead: Int, minEl: Double) {
+        preferences.edit {
+            putInt(keyHoursAhead, hoursAhead)
+            putDouble(keyMinElevation, minEl)
+            apply()
+        }
     }
 
     fun getStationPosition(): GroundStationPosition {
@@ -78,7 +68,7 @@ class PrefsManager @Inject constructor(
         return GroundStationPosition(lat, lon, alt)
     }
 
-    fun updateLocation() {
+    fun updateStationPosition() {
         try {
             locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)?.let {
                 val lat = it.latitude.round(4)
@@ -95,25 +85,22 @@ class PrefsManager @Inject constructor(
         }
     }
 
-    fun setHoursAhead(hours: Int) {
-        preferences.edit {
-            putInt(keyHoursAhead, hours)
-            apply()
-        }
+    fun shouldUseUTC(): Boolean {
+        return preferences.getBoolean(keyTimeUtc, false)
     }
 
-    fun setMinElevation(minEl: Double) {
-        preferences.edit {
-            putDouble(keyMinElevation, minEl)
-            apply()
-        }
+    fun shouldUseCompass(): Boolean {
+        return preferences.getBoolean(keyCompass, true)
     }
 
-    private fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
-        putLong(key, double.toRawBits())
-    }
-
-    private fun SharedPreferences.getDouble(key: String, default: Double): Double {
-        return Double.fromBits(getLong(key, default.toRawBits()))
+    fun isFirstLaunch(): Boolean {
+        val isFirstLaunch = preferences.getBoolean(keyIsFirstLaunch, true)
+        return if (isFirstLaunch) {
+            preferences.edit {
+                putBoolean(keyIsFirstLaunch, false)
+                apply()
+            }
+            isFirstLaunch
+        } else isFirstLaunch
     }
 }

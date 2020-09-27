@@ -22,10 +22,7 @@ package com.rtbishop.look4sat.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.rtbishop.look4sat.data.Result
-import com.rtbishop.look4sat.data.SatEntry
-import com.rtbishop.look4sat.data.SatPass
-import com.rtbishop.look4sat.data.TleSource
+import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -49,10 +46,30 @@ class SharedViewModel @Inject constructor(
     private var calculationJob: Job? = null
     private val _satPassList = MutableLiveData<Result<MutableList<SatPass>>>()
     fun getPassList(): LiveData<Result<MutableList<SatPass>>> = _satPassList
-
     fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersByCatNum(id)) }
-    fun updatePosition() {
-        prefsManager.updateLocation()
+
+    fun getPassPrefs(): PassPrefs {
+        return prefsManager.getPassPrefs()
+    }
+
+    fun setPassPrefs(hoursAhead: Int, minEl: Double) {
+        prefsManager.setPassPrefs(hoursAhead, minEl)
+    }
+
+    fun getStationPosition(): GroundStationPosition {
+        return prefsManager.getStationPosition()
+    }
+
+    fun updateStationPosition() {
+        prefsManager.updateStationPosition()
+    }
+
+    fun shouldUseUTC(): Boolean {
+        return prefsManager.shouldUseUTC()
+    }
+
+    fun shouldUseCompass(): Boolean {
+        return prefsManager.shouldUseCompass()
     }
 
     fun updateEntriesFromFile(uri: Uri) {
@@ -90,7 +107,8 @@ class SharedViewModel @Inject constructor(
             repository.getSelectedEntries().value?.forEach {
                 passList.addAll(getPassesForEntries(it, dateNow, gsp))
             }
-            passList = filterAndSortPasses(passList, dateNow, prefsManager.getHoursAhead())
+            val hoursAhead = prefsManager.getPassPrefs().hoursAhead
+            passList = filterAndSortPasses(passList, dateNow, hoursAhead)
             _satPassList.postValue(Result.Success(passList))
         }
     }
@@ -113,7 +131,8 @@ class SharedViewModel @Inject constructor(
         gsp: GroundStationPosition
     ): MutableList<SatPass> {
         val predictor = PassPredictor(entry.tle, gsp)
-        val passes = predictor.getPasses(dateNow, prefsManager.getHoursAhead(), true)
+        val hoursAhead = prefsManager.getPassPrefs().hoursAhead
+        val passes = predictor.getPasses(dateNow, hoursAhead, true)
         val passList = passes.map { SatPass(entry.tle, predictor, it) }
         return passList as MutableList<SatPass>
     }
@@ -128,9 +147,10 @@ class SharedViewModel @Inject constructor(
             it.add(Calendar.HOUR, hoursAhead)
             it.time
         }
+        val minEl = prefsManager.getPassPrefs().minEl
         passes.removeAll { it.pass.startTime.after(dateFuture) }
         passes.removeAll { it.pass.endTime.before(dateNow) }
-        passes.removeAll { it.pass.maxEl < prefsManager.getMinElevation() }
+        passes.removeAll { it.pass.maxEl < minEl }
         passes.sortBy { it.pass.startTime }
         return passes
     }

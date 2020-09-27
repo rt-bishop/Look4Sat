@@ -22,7 +22,6 @@ import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -44,9 +43,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     @Inject
     lateinit var modelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var prefsManager: PrefsManager
 
     private lateinit var mainActivity: FragmentActivity
     private lateinit var viewModel: SharedViewModel
@@ -82,7 +78,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
 
         setupMapView()
-        setupPosOverlay(prefsManager.getStationPosition())
+        setupPosOverlay(viewModel.getStationPosition())
         setupObservers()
     }
 
