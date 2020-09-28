@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
@@ -45,11 +47,19 @@ class EntriesFragment : Fragment(R.layout.fragment_entries),
         binding.apply {
             importWeb.setOnClickListener { showSourcesDialog() }
             importFile.setOnClickListener { showFileDialog() }
-            selectAll.setOnClickListener { entriesAdapter.selectAll() }
-            entriesFab.setOnClickListener { goToPassesAndCalculateForSelection() }
             searchBar.setOnQueryTextListener(this@EntriesFragment)
-            entriesRecycler.layoutManager = LinearLayoutManager(requireActivity())
-            entriesRecycler.adapter = entriesAdapter
+            selectAll.setOnClickListener { entriesAdapter.selectAll() }
+            entriesRecycler.apply {
+                val linearLayoutMgr = LinearLayoutManager(requireContext())
+                val divider = DividerItemDecoration(requireContext(), linearLayoutMgr.orientation)
+                val drawable = ResourcesCompat
+                    .getDrawable(resources, R.drawable.entries_divider, requireActivity().theme)
+                drawable?.let { divider.setDrawable(it) }
+                layoutManager = linearLayoutMgr
+                adapter = entriesAdapter
+                addItemDecoration(divider)
+            }
+            entriesFab.setOnClickListener { goToPassesAndCalculateForSelection() }
         }
     }
 

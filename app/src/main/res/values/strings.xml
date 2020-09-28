@@ -25,13 +25,13 @@
     <string name="menu_passes">Passes</string>
     <string name="menu_map">World Map</string>
     <string name="menu_prefs">Settings</string>
-    <string name="menu_about">About</string>
+    <string name="menu_about">Info</string>
 
     <string name="dialog_select_sat">Select satellites to track</string>
     <string name="dialog_show_track">Show ground track for</string>
     <string name="dialog_filter_passes">Filter passes</string>
     <string name="dialog_tle_sources">Manage TLE sources</string>
-    <string name="dialog_entries_hint">Name/CatNum</string>
+    <string name="dialog_entries_hint">ID / Name</string>
 
     <string name="pref_hours_ahead_hint">Hours ahead</string>
     <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
@@ -65,9 +65,8 @@
     <string name="pass_satId" translatable="false">ID: %d</string>
     <string name="pass_aos_az">AOS — %2d°</string>
     <string name="pass_los_az">%2d° — LOS</string>
-    <string name="pass_dateTime" translatable="false">dd MMM @ HH:mm:ss</string>
+    <string name="pass_dateTime" translatable="false">dd MMM - HH:mm:ss</string>
 
-    <string name="pat_location" translatable="false">%.4f</string>
     <string name="pat_azimuth">Az: %.1f°</string>
     <string name="pat_elevation">El: %.1f°</string>
     <string name="pat_latitude">Lat: %.1f°</string>

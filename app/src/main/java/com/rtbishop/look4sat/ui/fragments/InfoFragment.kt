@@ -27,13 +27,13 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.FragmentAboutBinding
+import com.rtbishop.look4sat.databinding.FragmentInfoBinding
 
-class AboutFragment : Fragment(R.layout.fragment_about) {
+class InfoFragment : Fragment(R.layout.fragment_info) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        FragmentAboutBinding.bind(view).apply {
+        FragmentInfoBinding.bind(view).apply {
             version.text = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
             message.movementMethod = LinkMovementMethod.getInstance()
         }

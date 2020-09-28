@@ -20,7 +20,12 @@
 <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sat_entry_checkbox"
     android:layout_width="match_parent"
-    android:layout_height="36dp"
+    android:layout_height="34dp"
+    android:background="@null"
+    android:button="@null"
+    android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+    android:paddingStart="24dp"
+    android:paddingEnd="20dp"
     android:text="@string/placeholder"
     android:textColor="@color/themeLight"
     android:textSize="17sp" />

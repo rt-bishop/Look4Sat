@@ -29,7 +29,7 @@
         <View
             android:id="@+id/entries_bar"
             android:layout_width="0dp"
-            android:layout_height="96dp"
+            android:layout_height="48dp"
             android:background="@color/themeDark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
             android:id="@+id/import_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:text="@string/sat_import"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/import_web"
@@ -48,9 +48,8 @@
 
         <ImageButton
             android:id="@+id/import_web"
-            android:layout_width="48dp"
+            android:layout_width="64dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="4dp"
             android:backgroundTint="@color/backgroundDark"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_update_web"
@@ -60,9 +59,9 @@
 
         <ImageButton
             android:id="@+id/import_file"
-            android:layout_width="48dp"
+            android:layout_width="64dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
             android:backgroundTint="@color/backgroundDark"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_update_file"
@@ -73,17 +72,18 @@
             android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:iconifiedByDefault="false"
             android:queryHint="@string/dialog_entries_hint"
-            app:layout_constraintBottom_toBottomOf="@+id/entries_bar"
             app:layout_constraintEnd_toStartOf="@+id/select_all"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
         <ImageButton
             android:id="@+id/select_all"
-            android:layout_width="48dp"
+            android:layout_width="64dp"
             android:layout_height="48dp"
-            android:backgroundTint="@color/backgroundDark"
+            android:backgroundTint="@color/themeDark"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_select_all"
             app:layout_constraintEnd_toEndOf="@+id/import_file"
