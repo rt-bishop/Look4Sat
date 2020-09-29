@@ -20,8 +20,7 @@ import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.EntriesAdapter
 import javax.inject.Inject
 
-class EntriesFragment : Fragment(R.layout.fragment_entries),
-    SourcesDialog.SourcesSubmitListener {
+class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     @Inject
     lateinit var factory: ViewModelFactory
@@ -37,16 +36,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries),
         binding = FragmentEntriesBinding.bind(view)
         (requireActivity().application as Look4SatApp).appComponent.inject(this)
         viewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
-        setupUI()
+        setupComponents()
         setupObservers()
     }
 
-    private fun setupUI() {
+    private fun setupComponents() {
         binding.apply {
-            importWeb.setOnClickListener { showSourcesDialog() }
-            importFile.setOnClickListener { showFileDialog() }
-            searchBar.setOnQueryTextListener(entriesAdapter)
-            selectAll.setOnClickListener { entriesAdapter.selectAll() }
             entriesRecycler.apply {
                 val linearLayoutMgr = LinearLayoutManager(requireContext())
                 val divider = DividerItemDecoration(requireContext(), linearLayoutMgr.orientation)
@@ -57,36 +52,33 @@ class EntriesFragment : Fragment(R.layout.fragment_entries),
                 adapter = entriesAdapter
                 addItemDecoration(divider)
             }
+            importWeb.setOnClickListener { showImportFromWebDialog() }
+            importFile.setOnClickListener { showImportFromFileDialog() }
+            searchBar.setOnQueryTextListener(entriesAdapter)
+            selectAll.setOnClickListener { entriesAdapter.selectAll() }
             entriesFab.setOnClickListener { goToPassesAndCalculateForSelection() }
         }
     }
 
     private fun setupObservers() {
-        viewModel.tleSources.observe(viewLifecycleOwner, { sources ->
-            tleSources = sources
-        })
-        viewModel.allEntries.observe(viewLifecycleOwner, { entries ->
-            entriesAdapter.setEntries(entries as MutableList<SatEntry>)
+        viewModel.tleSources.observe(viewLifecycleOwner, { tleSources = it })
+        viewModel.allEntries.observe(viewLifecycleOwner, {
+            entriesAdapter.setEntries(it as MutableList<SatEntry>)
         })
     }
 
-    // Entries update from web
-
-    private fun showSourcesDialog() {
-        val fragmentManager = childFragmentManager
-        SourcesDialog(tleSources).apply {
-            setSourcesListener(this@EntriesFragment)
-            show(fragmentManager, "TleSourcesDialog")
-        }
+    private fun goToPassesAndCalculateForSelection() {
+        val catNumList = mutableListOf<Int>()
+        entriesAdapter.getEntries().forEach { if (it.isSelected) catNumList.add(it.catNum) }
+        viewModel.updateEntriesSelection(catNumList)
+        requireView().findNavController().navigate(R.id.action_entries_to_passes)
     }
 
-    override fun onSourcesSubmit(list: List<TleSource>) {
-        viewModel.updateSatelliteData(list)
+    private fun showImportFromWebDialog() {
+        SourcesDialog(tleSources, viewModel).show(childFragmentManager, "SourcesDialog")
     }
 
-    // Entries update from file
-
-    private fun showFileDialog() {
+    private fun showImportFromFileDialog() {
         Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
@@ -98,15 +90,5 @@ class EntriesFragment : Fragment(R.layout.fragment_entries),
         if (requestCode == pickFileReqCode && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.also { uri -> viewModel.updateEntriesFromFile(uri) }
         } else super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    // Search and select entries
-
-    private fun goToPassesAndCalculateForSelection() {
-        val catNumList = mutableListOf<Int>().apply {
-            entriesAdapter.getEntries().forEach { if (it.isSelected) this.add(it.catNum) }
-        }
-        viewModel.updateEntriesSelection(catNumList)
-        requireView().findNavController().navigate(R.id.action_entries_to_passes)
     }
 }

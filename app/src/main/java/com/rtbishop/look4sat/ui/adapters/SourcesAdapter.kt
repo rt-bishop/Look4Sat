@@ -31,6 +31,15 @@ import com.rtbishop.look4sat.databinding.ItemTleSourceBinding
 class SourcesAdapter(private var sources: MutableList<TleSource>) :
     RecyclerView.Adapter<SourcesAdapter.TleSourceHolder>() {
 
+    fun getSources(): MutableList<TleSource> {
+        return sources
+    }
+
+    fun setSources(list: MutableList<TleSource>) {
+        sources = list
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TleSourceHolder {
         val binding = ItemTleSourceBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
@@ -46,19 +55,8 @@ class SourcesAdapter(private var sources: MutableList<TleSource>) :
         return sources.size
     }
 
-    fun getSources(): MutableList<TleSource> {
-        return sources
-    }
-
-    fun setSources(list: MutableList<TleSource>) {
-        sources = list
-        notifyDataSetChanged()
-    }
-
     inner class TleSourceHolder(
-        itemView: View,
-        val binding: ItemTleSourceBinding,
-        val textWatcher: TleSourceWatcher
+        itemView: View, val binding: ItemTleSourceBinding, val textWatcher: TleSourceWatcher
     ) :
         RecyclerView.ViewHolder(itemView) {
 

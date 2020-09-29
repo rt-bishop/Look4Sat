@@ -22,58 +22,44 @@ package com.rtbishop.look4sat.ui.fragments
 import android.app.Dialog
 import android.os.Bundle
 import android.view.ViewGroup
-import android.view.Window
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
+import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.SourcesAdapter
 
-class SourcesDialog(sources: List<TleSource>) : AppCompatDialogFragment() {
+class SourcesDialog(sources: List<TleSource>, private val viewModel: SharedViewModel) :
+    AppCompatDialogFragment() {
 
-    private lateinit var sourcesListener: SourcesSubmitListener
-    private val sourcesAdapter = SourcesAdapter(sources.toMutableList())
+    private val sourcesAdapter = SourcesAdapter(sources as MutableList<TleSource>)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding = DialogSourcesBinding.inflate(requireActivity().layoutInflater)
-        val tleSourcesDialog = Dialog(requireActivity()).apply {
-            window?.requestFeature(Window.FEATURE_NO_TITLE)
+        val binding = DialogSourcesBinding.inflate(requireActivity().layoutInflater).apply {
+            tleSourcesRecycler.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = sourcesAdapter
+            }
+            tleSourceBtnAdd.setOnClickListener {
+                val tempSources = sourcesAdapter.getSources()
+                tempSources.add(TleSource(String()))
+                sourcesAdapter.setSources(tempSources)
+            }
+            tleSourcesBtnPos.setOnClickListener {
+                val filteredSources = sourcesAdapter.getSources()
+                    .filter { it.url != String() && it.url != " " && it.url.contains("https://") }
+                viewModel.updateSatelliteData(filteredSources)
+                dismiss()
+            }
+            tleSourcesBtnNeg.setOnClickListener { dismiss() }
+        }
+
+        return Dialog(requireActivity()).apply {
             setContentView(binding.root)
             window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         }
-
-        binding.tleSourcesRecycler.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = sourcesAdapter
-        }
-
-        binding.tleSourceBtnAdd.setOnClickListener {
-            val tempSources = sourcesAdapter.getSources()
-            tempSources.add(TleSource(""))
-            sourcesAdapter.setSources(tempSources)
-            sourcesAdapter.notifyDataSetChanged()
-        }
-
-        binding.tleSourcesBtnNeg.setOnClickListener { dismiss() }
-        binding.tleSourcesBtnPos.setOnClickListener {
-            val filteredSources = sourcesAdapter.getSources()
-                .filter { it.url != String() && it.url != " " && it.url.contains("https://") }
-            sourcesListener.onSourcesSubmit(filteredSources)
-            dismiss()
-        }
-
-        return tleSourcesDialog
-    }
-
-    fun setSourcesListener(listener: SourcesSubmitListener): SourcesDialog {
-        sourcesListener = listener
-        return this
-    }
-
-    interface SourcesSubmitListener {
-        fun onSourcesSubmit(list: List<TleSource>)
     }
 }
