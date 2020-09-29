@@ -3,7 +3,6 @@ package com.rtbishop.look4sat.ui.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -22,8 +21,7 @@ import com.rtbishop.look4sat.ui.adapters.EntriesAdapter
 import javax.inject.Inject
 
 class EntriesFragment : Fragment(R.layout.fragment_entries),
-    SourcesDialog.SourcesSubmitListener,
-    SearchView.OnQueryTextListener {
+    SourcesDialog.SourcesSubmitListener {
 
     @Inject
     lateinit var factory: ViewModelFactory
@@ -47,7 +45,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries),
         binding.apply {
             importWeb.setOnClickListener { showSourcesDialog() }
             importFile.setOnClickListener { showFileDialog() }
-            searchBar.setOnQueryTextListener(this@EntriesFragment)
+            searchBar.setOnQueryTextListener(entriesAdapter)
             selectAll.setOnClickListener { entriesAdapter.selectAll() }
             entriesRecycler.apply {
                 val linearLayoutMgr = LinearLayoutManager(requireContext())
@@ -110,15 +108,5 @@ class EntriesFragment : Fragment(R.layout.fragment_entries),
         }
         viewModel.updateEntriesSelection(catNumList)
         requireView().findNavController().navigate(R.id.action_entries_to_passes)
-    }
-
-    override fun onQueryTextChange(newText: String): Boolean {
-        val filteredList = entriesAdapter.filterEntries(entriesAdapter.getEntries(), newText)
-        entriesAdapter.setEntries(filteredList)
-        return false
-    }
-
-    override fun onQueryTextSubmit(query: String): Boolean {
-        return false
     }
 }
