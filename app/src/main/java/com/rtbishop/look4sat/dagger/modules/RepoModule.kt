@@ -6,8 +6,8 @@ import com.rtbishop.look4sat.repo.DefaultRepository
 import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.repo.local.EntriesDao
 import com.rtbishop.look4sat.repo.local.SourcesDao
-import com.rtbishop.look4sat.repo.local.TransDao
-import com.rtbishop.look4sat.repo.remote.TransApi
+import com.rtbishop.look4sat.repo.local.TransmittersDao
+import com.rtbishop.look4sat.repo.remote.TransmittersApi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -27,18 +27,18 @@ class RepoModule {
     fun provideDefaultRepository(
         resolver: ContentResolver,
         client: OkHttpClient,
-        transApi: TransApi,
+        transmittersApi: TransmittersApi,
         entriesDao: EntriesDao,
-        transDao: TransDao,
+        transmittersDao: TransmittersDao,
         sourcesDao: SourcesDao
     ): Repository {
         return DefaultRepository(
             resolver,
             client,
-            transApi,
+            transmittersApi,
             entriesDao,
             sourcesDao,
-            transDao
+            transmittersDao
         )
     }
 }

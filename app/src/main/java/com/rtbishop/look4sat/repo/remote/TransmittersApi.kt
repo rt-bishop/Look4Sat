@@ -22,8 +22,8 @@ package com.rtbishop.look4sat.repo.remote
 import com.rtbishop.look4sat.data.SatTrans
 import retrofit2.http.GET
 
-interface TransApi {
+interface TransmittersApi {
 
     @GET("transmitters/")
-    suspend fun fetchTransList(): List<SatTrans>
+    suspend fun getTransmitters(): List<SatTrans>
 }

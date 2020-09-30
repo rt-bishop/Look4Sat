@@ -48,7 +48,7 @@ class SourcesDialog(sources: List<TleSource>, private val viewModel: SharedViewM
             tleSourcesBtnPos.setOnClickListener {
                 val filteredSources = sourcesAdapter.getSources()
                     .filter { it.url != String() && it.url != " " && it.url.contains("https://") }
-                viewModel.updateSatelliteData(filteredSources)
+                viewModel.updateEntriesFromSources(filteredSources)
                 dismiss()
             }
             tleSourcesBtnNeg.setOnClickListener { dismiss() }

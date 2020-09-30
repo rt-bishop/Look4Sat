@@ -28,8 +28,8 @@ import com.rtbishop.look4sat.data.SatTrans
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.repo.local.EntriesDao
 import com.rtbishop.look4sat.repo.local.SourcesDao
-import com.rtbishop.look4sat.repo.local.TransDao
-import com.rtbishop.look4sat.repo.remote.TransApi
+import com.rtbishop.look4sat.repo.local.TransmittersDao
+import com.rtbishop.look4sat.repo.remote.TransmittersApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -40,10 +40,10 @@ import javax.inject.Inject
 class DefaultRepository @Inject constructor(
     private val resolver: ContentResolver,
     private val client: OkHttpClient,
-    private val api: TransApi,
+    private val api: TransmittersApi,
     private val entriesDao: EntriesDao,
     private val sourcesDao: SourcesDao,
-    private val transDao: TransDao
+    private val transmittersDao: TransmittersDao
 ) : Repository {
 
     override fun getSources(): LiveData<List<TleSource>> {
@@ -51,72 +51,48 @@ class DefaultRepository @Inject constructor(
     }
 
     override suspend fun updateSources(sources: List<TleSource>) {
-        sourcesDao.clearSources()
-        sourcesDao.insertSources(sources)
+        sourcesDao.updateSources(sources)
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    override fun getAllEntries(): LiveData<List<SatEntry>> {
-        return entriesDao.getAllEntries()
+    override fun getEntries(): LiveData<List<SatEntry>> {
+        return entriesDao.getEntries()
     }
 
-    override fun getSelectedEntries(): LiveData<List<SatEntry>> {
-        return entriesDao.getSelectedEntries()
-    }
-
-    override suspend fun updateEntriesFromFile(tleUri: Uri) {
+    override suspend fun updateEntriesFromFile(fileUri: Uri) {
         withContext(Dispatchers.IO) {
-            resolver.openInputStream(tleUri)?.use { stream ->
-                val tleList = TLE.importSat(stream)
-                val entries = tleList.map { SatEntry(it) }
-                entriesDao.clearEntries()
-                entriesDao.insertEntries(entries)
+            resolver.openInputStream(fileUri)?.use { stream ->
+                val importedEntries = TLE.importSat(stream).map { SatEntry(it) }
+                entriesDao.updateEntries(importedEntries)
             }
         }
     }
 
-    override suspend fun updateEntriesFromUrl(urlList: List<TleSource>) {
+    override suspend fun updateEntriesFromSources(sources: List<TleSource>) {
         withContext(Dispatchers.IO) {
-            val streams = getStreamsForSources(urlList)
-            val entries = getEntriesForStreams(streams)
-            entriesDao.clearEntries()
-            entriesDao.insertEntries(entries)
+            val streams = mutableListOf<InputStream>()
+            sources.forEach { source ->
+                val request = Request.Builder().url(source.url).build()
+                val stream = client.newCall(request).execute().body?.byteStream()
+                stream?.let { inputStream -> streams.add(inputStream) }
+            }
+            val importedEntries = mutableListOf<SatEntry>()
+            streams.forEach { stream ->
+                val entries = TLE.importSat(stream).map { tle -> SatEntry(tle) }
+                importedEntries.addAll(entries)
+            }
+            entriesDao.updateEntries(importedEntries)
         }
     }
 
-    override suspend fun updateEntriesSelection(catNumList: List<Int>) {
-        entriesDao.clearEntriesSelection()
-        catNumList.forEach { entriesDao.updateEntrySelection(it) }
+    override suspend fun updateEntriesSelection(satIds: List<Int>) {
+        entriesDao.updateEntriesSelection(satIds)
     }
 
-    private fun getStreamsForSources(urlList: List<TleSource>): MutableList<InputStream> {
-        val streams = mutableListOf<InputStream>()
-        urlList.withIndex().forEach {
-            val request = Request.Builder().url(it.value.url).build()
-            val stream = client.newCall(request).execute().body?.byteStream()
-            stream?.let { inputStream -> streams.add(inputStream) }
-        }
-        return streams
+    override suspend fun getTransmittersForSatId(satId: Int): List<SatTrans> {
+        return transmittersDao.getTransmittersForSatId(satId)
     }
-
-    private fun getEntriesForStreams(streams: MutableList<InputStream>): MutableList<SatEntry> {
-        val entries = mutableListOf<SatEntry>()
-        streams.forEach {
-            val list = TLE.importSat(it).map { tle -> SatEntry(tle) }
-            entries.addAll(list)
-        }
-        return entries
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     override suspend fun updateTransmitters() {
-        transDao.clearTransmitters()
-        transDao.insertTransmitters(api.fetchTransList())
-    }
-
-    override suspend fun getTransmittersByCatNum(catNum: Int): List<SatTrans> {
-        return transDao.getTransmittersForCatNum(catNum)
+        transmittersDao.updateTransmitters(api.getTransmitters())
     }
 }

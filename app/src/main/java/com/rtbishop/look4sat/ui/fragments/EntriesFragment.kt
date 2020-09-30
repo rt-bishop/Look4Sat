@@ -54,24 +54,18 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { showImportFromFileDialog() }
-            searchBar.setOnQueryTextListener(entriesAdapter)
             selectAll.setOnClickListener { entriesAdapter.selectAll() }
-            entriesFab.setOnClickListener { goToPassesAndCalculateForSelection() }
+            entriesFab.setOnClickListener { navigateToPasses() }
+            searchBar.setOnQueryTextListener(entriesAdapter)
+            searchBar.clearFocus()
         }
     }
 
     private fun setupObservers() {
-        viewModel.tleSources.observe(viewLifecycleOwner, { tleSources = it })
-        viewModel.allEntries.observe(viewLifecycleOwner, {
+        viewModel.getSources().observe(viewLifecycleOwner, { tleSources = it })
+        viewModel.getEntries().observe(viewLifecycleOwner, {
             entriesAdapter.setEntries(it as MutableList<SatEntry>)
         })
-    }
-
-    private fun goToPassesAndCalculateForSelection() {
-        val catNumList = mutableListOf<Int>()
-        entriesAdapter.getEntries().forEach { if (it.isSelected) catNumList.add(it.catNum) }
-        viewModel.updateEntriesSelection(catNumList)
-        requireView().findNavController().navigate(R.id.action_entries_to_passes)
     }
 
     private fun showImportFromWebDialog() {
@@ -84,6 +78,13 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             type = "*/*"
             startActivityForResult(this, pickFileReqCode)
         }
+    }
+
+    private fun navigateToPasses() {
+        val catNumList = mutableListOf<Int>()
+        entriesAdapter.getEntries().forEach { if (it.isSelected) catNumList.add(it.catNum) }
+        viewModel.updateEntriesSelection(catNumList)
+        requireView().findNavController().navigate(R.id.action_entries_to_passes)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

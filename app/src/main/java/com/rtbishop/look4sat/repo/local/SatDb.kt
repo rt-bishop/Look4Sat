@@ -28,16 +28,16 @@ import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.utility.Converters
 
 @Database(
-    entities = [SatTrans::class, SatEntry::class, TleSource::class],
+    entities = [TleSource::class, SatEntry::class, SatTrans::class],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class SatDb : RoomDatabase() {
 
+    abstract fun sourcesDao(): SourcesDao
+
     abstract fun entriesDao(): EntriesDao
 
-    abstract fun transDao(): TransDao
-
-    abstract fun sourcesDao(): SourcesDao
+    abstract fun transmittersDao(): TransmittersDao
 }

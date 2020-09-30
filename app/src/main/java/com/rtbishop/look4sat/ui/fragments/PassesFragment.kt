@@ -32,6 +32,7 @@ import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
+import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
@@ -51,7 +52,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     private lateinit var binding: FragmentPassesBinding
     private var isTimerSet: Boolean = false
     private val passesAdapter = PassesAdapter()
-    private var satPassList = mutableListOf<SatPass>()
+    private var selectedEntries = listOf<SatEntry>()
+    private var passes = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,20 +64,24 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         setupComponents()
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (passesAdapter.itemCount == 0) {
-            viewModel.calculatePasses()
-        }
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        if (selectedEntries.isEmpty()) {
+//            viewModel.calculatePassesForEntries(selectedEntries)
+//        }
+//    }
 
     private fun setupObservers() {
-        viewModel.getPassList().observe(viewLifecycleOwner, { result ->
+        viewModel.getEntries().observe(viewLifecycleOwner, { allEntries ->
+            selectedEntries = allEntries.filter { it.isSelected }
+//            viewModel.calculatePassesForEntries(selectedEntries)
+        })
+        viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> {
-                    satPassList = result.data
-                    passesAdapter.setList(satPassList)
-                    setTimer()
+                    passes = result.data
+                    passesAdapter.setList(passes)
+                    setTimerForPasses(passes)
                 }
                 is Result.InProgress -> {
                 }
@@ -95,11 +101,11 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 val passPrefs = viewModel.getPassPrefs()
                 showSatPassPrefsDialog(passPrefs.hoursAhead, passPrefs.minEl)
             }
-            passesFab.setOnClickListener { viewModel.calculatePasses() }
+            passesFab.setOnClickListener { viewModel.calculatePassesForEntries(selectedEntries) }
         }
         passesAdapter.setShouldUseUTC(viewModel.shouldUseUTC())
-        passesAdapter.setList(satPassList)
-        setTimer()
+        passesAdapter.setList(passes)
+        setTimerForPasses(passes)
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
@@ -125,7 +131,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                         }
                         else -> {
                             viewModel.setPassPrefs(hours, elevation)
-                            viewModel.calculatePasses()
+                            viewModel.calculatePassesForEntries(selectedEntries)
                         }
                     }
                 } else getString(R.string.err_enter_value).snack(requireView())
@@ -140,8 +146,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         }
     }
 
-    private fun setTimer() {
-        if (satPassList.isNotEmpty()) {
+    private fun setTimerForPasses(passes: List<SatPass>) {
+        if (passes.isNotEmpty()) {
             resetTimer()
             val timeNow = Date()
             try {
@@ -158,11 +164,11 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setTimerForNext(timeNow: Date) {
-        val nextPass = satPassList.first { it.pass.startTime.after(timeNow) }
+        val nextPass = passes.first { it.pass.startTime.after(timeNow) }
         val millisBeforeStart = nextPass.pass.startTime.time.minus(timeNow.time)
         aosTimer = object : CountDownTimer(millisBeforeStart, 1000) {
             override fun onFinish() {
-                setTimer()
+                setTimerForPasses(passes)
             }
 
             override fun onTick(millisUntilFinished: Long) {
@@ -173,11 +179,11 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setTimerForLast(timeNow: Date) {
-        val lastPass = satPassList.last()
+        val lastPass = passes.last()
         val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow.time)
         aosTimer = object : CountDownTimer(millisBeforeEnd, 1000) {
             override fun onFinish() {
-                viewModel.calculatePasses()
+                viewModel.calculatePassesForEntries(selectedEntries)
             }
 
             override fun onTick(millisUntilFinished: Long) {

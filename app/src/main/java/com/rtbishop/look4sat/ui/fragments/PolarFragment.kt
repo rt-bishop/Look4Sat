@@ -107,7 +107,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun observePasses() {
-        viewModel.getPassList().observe(viewLifecycleOwner, { result ->
+        viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
                 satPass = result.data[args.satPassIndex]
                 polarView = PolarView(mainActivity, satPass)

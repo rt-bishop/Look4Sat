@@ -123,7 +123,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun setupObservers() {
-        viewModel.getPassList().observe(viewLifecycleOwner, { satPasses ->
+        viewModel.getPasses().observe(viewLifecycleOwner, { satPasses ->
             when (satPasses) {
                 is Result.Success -> {
                     if (satPasses.data.isNotEmpty()) {

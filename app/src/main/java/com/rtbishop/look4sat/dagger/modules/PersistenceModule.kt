@@ -24,7 +24,7 @@ import androidx.room.Room
 import com.rtbishop.look4sat.repo.local.EntriesDao
 import com.rtbishop.look4sat.repo.local.SatDb
 import com.rtbishop.look4sat.repo.local.SourcesDao
-import com.rtbishop.look4sat.repo.local.TransDao
+import com.rtbishop.look4sat.repo.local.TransmittersDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -40,8 +40,8 @@ class PersistenceModule {
 
     @Singleton
     @Provides
-    fun provideTransDao(db: SatDb): TransDao {
-        return db.transDao()
+    fun provideTransDao(db: SatDb): TransmittersDao {
+        return db.transmittersDao()
     }
 
     @Singleton

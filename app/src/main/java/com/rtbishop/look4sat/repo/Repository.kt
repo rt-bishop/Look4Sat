@@ -14,19 +14,17 @@ interface Repository {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    fun getAllEntries(): LiveData<List<SatEntry>>
+    fun getEntries(): LiveData<List<SatEntry>>
 
-    fun getSelectedEntries(): LiveData<List<SatEntry>>
+    suspend fun updateEntriesFromFile(fileUri: Uri)
 
-    suspend fun updateEntriesFromFile(tleUri: Uri)
+    suspend fun updateEntriesFromSources(sources: List<TleSource>)
 
-    suspend fun updateEntriesFromUrl(urlList: List<TleSource>)
-
-    suspend fun updateEntriesSelection(catNumList: List<Int>)
+    suspend fun updateEntriesSelection(satIds: List<Int>)
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     suspend fun updateTransmitters()
 
-    suspend fun getTransmittersByCatNum(catNum: Int): List<SatTrans>
+    suspend fun getTransmittersForSatId(satId: Int): List<SatTrans>
 }

@@ -20,30 +20,36 @@
 package com.rtbishop.look4sat.repo.local
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.rtbishop.look4sat.data.SatEntry
 
 @Dao
 interface EntriesDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertEntries(entries: List<SatEntry>)
-
     @Query("SELECT * FROM entries ORDER BY name ASC")
-    fun getAllEntries(): LiveData<List<SatEntry>>
+    fun getEntries(): LiveData<List<SatEntry>>
 
-    @Query("SELECT * FROM entries WHERE isSelected = 1 ORDER BY name ASC")
-    fun getSelectedEntries(): LiveData<List<SatEntry>>
-
-    @Query("UPDATE entries SET isSelected = 1 WHERE catNum == :catNum")
-    suspend fun updateEntrySelection(catNum: Int)
-
-    @Query("UPDATE entries SET isSelected = 0")
-    suspend fun clearEntriesSelection()
+    @Transaction
+    suspend fun updateEntries(entries: List<SatEntry>) {
+        clearEntries()
+        insertEntries(entries)
+    }
 
     @Query("DELETE FROM entries")
     suspend fun clearEntries()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
+
+    @Transaction
+    suspend fun updateEntriesSelection(satIds: List<Int>) {
+        clearSelection()
+        updateSelection(satIds)
+    }
+
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearSelection()
+
+    @Query("UPDATE entries SET isSelected = 1 WHERE catNum IN (:satIds)")
+    suspend fun updateSelection(satIds: List<Int>)
 }

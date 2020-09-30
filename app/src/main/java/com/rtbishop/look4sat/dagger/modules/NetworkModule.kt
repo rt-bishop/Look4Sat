@@ -19,7 +19,7 @@
 
 package com.rtbishop.look4sat.dagger.modules
 
-import com.rtbishop.look4sat.repo.remote.TransApi
+import com.rtbishop.look4sat.repo.remote.TransmittersApi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -38,11 +38,11 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideTransApi(): TransApi {
+    fun provideTransApi(): TransmittersApi {
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(TransApi::class.java)
+            .create(TransmittersApi::class.java)
     }
 }

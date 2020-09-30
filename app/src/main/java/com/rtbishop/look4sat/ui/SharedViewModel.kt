@@ -27,7 +27,6 @@ import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -39,20 +38,18 @@ class SharedViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
+    private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
+
     init {
         if (prefsManager.isFirstLaunch()) {
             setDefaultTleSources()
         }
     }
 
-    val tleSources = repository.getSources()
-    val allEntries = repository.getAllEntries()
-    val selectedEntries = repository.getSelectedEntries()
-
-    private var calculationJob: Job? = null
-    private val _satPassList = MutableLiveData<Result<MutableList<SatPass>>>()
-    fun getPassList(): LiveData<Result<MutableList<SatPass>>> = _satPassList
-    fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersByCatNum(id)) }
+    fun getSources() = repository.getSources()
+    fun getEntries() = repository.getEntries()
+    fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
+    fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersForSatId(id)) }
 
     fun getPassPrefs(): PassPrefs {
         return prefsManager.getPassPrefs()
@@ -66,8 +63,8 @@ class SharedViewModel @Inject constructor(
         return prefsManager.getStationPosition()
     }
 
-    fun updateStationPosition() {
-        prefsManager.updateStationPosition()
+    fun setStationPositionFromGPS() {
+        prefsManager.setStationPositionFromGPS()
     }
 
     fun shouldUseUTC(): Boolean {
@@ -79,43 +76,35 @@ class SharedViewModel @Inject constructor(
     }
 
     fun updateEntriesFromFile(uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val selected = selectedEntries.value!!.map { it.catNum }
+        viewModelScope.launch {
             repository.updateEntriesFromFile(uri)
-            repository.updateEntriesSelection(selected)
         }
     }
 
-    fun updateSatelliteData(list: List<TleSource>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val selected = selectedEntries.value!!.map { it.catNum }
-            repository.updateSources(list)
-            repository.updateEntriesFromUrl(list)
+    fun updateEntriesFromSources(sources: List<TleSource>) {
+        viewModelScope.launch {
+            repository.updateSources(sources)
+            repository.updateEntriesFromSources(sources)
             repository.updateTransmitters()
-            repository.updateEntriesSelection(selected)
         }
     }
 
-    fun updateEntriesSelection(catNumList: MutableList<Int>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateEntriesSelection(catNumList)
-            calculatePasses()
+    fun updateEntriesSelection(satIds: MutableList<Int>) {
+        viewModelScope.launch {
+            repository.updateEntriesSelection(satIds)
         }
     }
 
-    fun calculatePasses() {
-        _satPassList.postValue(Result.InProgress)
-        calculationJob?.cancel()
-        var passList = mutableListOf<SatPass>()
-        val dateNow = Date()
-        val gsp = prefsManager.getStationPosition()
-        calculationJob = viewModelScope.launch(Dispatchers.Default) {
-            repository.getSelectedEntries().value?.forEach {
-                passList.addAll(getPassesForEntries(it, dateNow, gsp))
+    fun calculatePassesForEntries(entries: List<SatEntry>) {
+        _passes.value = Result.InProgress
+        val dateNow = Date(System.currentTimeMillis())
+        val passes = mutableListOf<SatPass>()
+        viewModelScope.launch(Dispatchers.Default) {
+            entries.forEach {
+                passes.addAll(getPassesForEntries(it, dateNow, getStationPosition()))
             }
-            val hoursAhead = prefsManager.getPassPrefs().hoursAhead
-            passList = filterAndSortPasses(passList, dateNow, hoursAhead)
-            _satPassList.postValue(Result.Success(passList))
+            val filteredPasses = filterAndSortPasses(passes, dateNow, getPassPrefs().hoursAhead)
+            _passes.postValue(Result.Success(filteredPasses))
         }
     }
 

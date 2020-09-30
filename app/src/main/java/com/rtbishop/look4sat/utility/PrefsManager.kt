@@ -68,7 +68,7 @@ class PrefsManager @Inject constructor(
         return GroundStationPosition(lat, lon, alt)
     }
 
-    fun updateStationPosition() {
+    fun setStationPositionFromGPS() {
         try {
             locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)?.let {
                 val lat = it.latitude.round(4)
