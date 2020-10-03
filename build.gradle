@@ -30,7 +30,6 @@ buildscript {
         room_version = '2.2.5'
         dagger_version = '2.29.1'
         retrofit_version = '2.9.0'
-        okhttp_version = '4.9.0'
         openStreetMap_version = '6.1.8'
         predict4java_version = '1.3.1'
     }

@@ -21,18 +21,18 @@ package com.rtbishop.look4sat.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 @Entity(tableName = "transmitters")
 data class SatTrans(
-    @PrimaryKey @SerializedName("uuid") val uuid: String,
-    @SerializedName("description") val description: String,
-    @SerializedName("alive") val isAlive: Boolean,
-    @SerializedName("uplink_low") val uplinkLow: Long?,
-    @SerializedName("uplink_high") val uplinkHigh: Long?,
-    @SerializedName("downlink_low") val downlinkLow: Long?,
-    @SerializedName("downlink_high") val downlinkHigh: Long?,
-    @SerializedName("mode") val mode: String?,
-    @SerializedName("invert") val isInverted: Boolean,
-    @SerializedName("norad_cat_id") val catNum: Int
+    @PrimaryKey @Json(name = "uuid") val uuid: String,
+    @Json(name = "description") val description: String,
+    @Json(name = "alive") val isAlive: Boolean,
+    @Json(name = "uplink_low") val uplinkLow: Long?,
+    @Json(name = "uplink_high") val uplinkHigh: Long?,
+    @Json(name = "downlink_low") val downlinkLow: Long?,
+    @Json(name = "downlink_high") val downlinkHigh: Long?,
+    @Json(name = "mode") val mode: String?,
+    @Json(name = "invert") val isInverted: Boolean,
+    @Json(name = "norad_cat_id") val catNum: Int
 )

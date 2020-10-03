@@ -72,7 +72,7 @@ class DefaultRepository @Inject constructor(
             val streams = mutableListOf<InputStream>()
             sources.forEach { source ->
                 val request = Request.Builder().url(source.url).build()
-                val stream = client.newCall(request).execute().body?.byteStream()
+                val stream = client.newCall(request).execute().body()?.byteStream()
                 stream?.let { inputStream -> streams.add(inputStream) }
             }
             val importedEntries = mutableListOf<SatEntry>()
