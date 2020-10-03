@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
@@ -22,6 +22,7 @@ import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
+import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,22 +43,24 @@ import kotlin.math.sqrt
 class MapFragment : Fragment(R.layout.fragment_map) {
 
     @Inject
-    lateinit var modelFactory: ViewModelFactory
+    lateinit var factory: ViewModelFactory
+
+    @Inject
+    lateinit var prefsManager: PrefsManager
 
     private lateinit var mainActivity: FragmentActivity
-    private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentMapBinding
     private lateinit var trackPaint: Paint
     private lateinit var footprintPaint: Paint
     private lateinit var selectedPass: SatPass
     private val dateNow = Date(System.currentTimeMillis())
+    private val viewModel: SharedViewModel by activityViewModels { factory }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMapBinding.bind(view)
         mainActivity = requireActivity()
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
-        viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity.applicationContext)
         Configuration.getInstance().load(mainActivity.applicationContext, prefs)
@@ -78,7 +81,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
 
         setupMapView()
-        setupPosOverlay(viewModel.getStationPosition())
+        setupPosOverlay(prefsManager.getStationPosition())
         setupObservers()
     }
 

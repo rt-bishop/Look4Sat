@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,7 +26,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     lateinit var factory: ViewModelFactory
 
     private lateinit var binding: FragmentEntriesBinding
-    private lateinit var viewModel: SharedViewModel
+    private val viewModel: SharedViewModel by activityViewModels { factory }
     private val pickFileReqCode = 100
     private val entriesAdapter = EntriesAdapter()
     private var tleSources = listOf<TleSource>()
@@ -35,7 +35,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
         (requireActivity().application as Look4SatApp).appComponent.inject(this)
-        viewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
         setupComponents()
         setupObservers()
     }
@@ -51,6 +50,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 layoutManager = linearLayoutMgr
                 adapter = entriesAdapter
                 addItemDecoration(divider)
+                setHasFixedSize(true)
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { showImportFromFileDialog() }
@@ -64,6 +64,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private fun setupObservers() {
         viewModel.getSources().observe(viewLifecycleOwner, { tleSources = it })
         viewModel.getEntries().observe(viewLifecycleOwner, {
+            viewModel.setSelectedEntries(it)
             entriesAdapter.setEntries(it as MutableList<SatEntry>)
         })
     }
@@ -81,9 +82,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun navigateToPasses() {
-        val catNumList = mutableListOf<Int>()
-        entriesAdapter.getEntries().forEach { if (it.isSelected) catNumList.add(it.catNum) }
-        viewModel.updateEntriesSelection(catNumList)
+        binding.searchBar.clearFocus()
+        viewModel.updateEntriesSelection(entriesAdapter.getEntries())
         requireView().findNavController().navigate(R.id.action_entries_to_passes)
     }
 

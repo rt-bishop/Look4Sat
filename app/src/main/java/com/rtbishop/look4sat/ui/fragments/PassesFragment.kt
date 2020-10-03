@@ -19,25 +19,27 @@
 
 package com.rtbishop.look4sat.ui.fragments
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.dagger.ViewModelFactory
 import com.rtbishop.look4sat.data.Result
-import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.PassesAdapter
+import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities
+import com.rtbishop.look4sat.utility.Utilities.getRotationAnimator
 import com.rtbishop.look4sat.utility.Utilities.snack
 import java.util.*
 import javax.inject.Inject
@@ -47,44 +49,35 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     @Inject
     lateinit var factory: ViewModelFactory
 
-    private lateinit var viewModel: SharedViewModel
+    @Inject
+    lateinit var prefsManager: PrefsManager
+
     private lateinit var aosTimer: CountDownTimer
     private lateinit var binding: FragmentPassesBinding
-    private var isTimerSet: Boolean = false
+    private lateinit var animator: ObjectAnimator
+    private val viewModel: SharedViewModel by activityViewModels { factory }
     private val passesAdapter = PassesAdapter()
-    private var selectedEntries = listOf<SatEntry>()
+    private var isTimerSet: Boolean = false
     private var passes = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPassesBinding.bind(view)
         (requireActivity().application as Look4SatApp).appComponent.inject(this)
-        viewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
-        setupObservers()
         setupComponents()
+        setupObservers()
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        if (selectedEntries.isEmpty()) {
-//            viewModel.calculatePassesForEntries(selectedEntries)
-//        }
-//    }
-
     private fun setupObservers() {
-        viewModel.getEntries().observe(viewLifecycleOwner, { allEntries ->
-            selectedEntries = allEntries.filter { it.isSelected }
-//            viewModel.calculatePassesForEntries(selectedEntries)
-        })
         viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> {
+                    animator.cancel()
                     passes = result.data
                     passesAdapter.setList(passes)
                     setTimerForPasses(passes)
                 }
-                is Result.InProgress -> {
-                }
+                is Result.InProgress -> animator.start()
             }
         })
     }
@@ -96,15 +89,22 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 adapter = passesAdapter
                 isVerticalScrollBarEnabled = false
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                setHasFixedSize(true)
             }
             passesFilter.setOnClickListener {
-                val passPrefs = viewModel.getPassPrefs()
+                val passPrefs = prefsManager.getPassPrefs()
                 showSatPassPrefsDialog(passPrefs.hoursAhead, passPrefs.minEl)
             }
-            passesFab.setOnClickListener { viewModel.calculatePassesForEntries(selectedEntries) }
+            animator = passesFab.getRotationAnimator()
+            passesFab.setOnClickListener {
+                if (animator.isRunning) {
+                    animator.cancel()
+                } else {
+                    viewModel.calculatePasses()
+                }
+            }
         }
-        passesAdapter.setShouldUseUTC(viewModel.shouldUseUTC())
-        passesAdapter.setList(passes)
+        passesAdapter.setShouldUseUTC(prefsManager.shouldUseUTC())
         setTimerForPasses(passes)
     }
 
@@ -130,8 +130,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                             getString(R.string.pref_min_el_input_error).snack(requireView())
                         }
                         else -> {
-                            viewModel.setPassPrefs(hours, elevation)
-                            viewModel.calculatePassesForEntries(selectedEntries)
+                            prefsManager.setPassPrefs(hours, elevation)
+                            viewModel.calculatePasses()
                         }
                     }
                 } else getString(R.string.err_enter_value).snack(requireView())
@@ -183,7 +183,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow.time)
         aosTimer = object : CountDownTimer(millisBeforeEnd, 1000) {
             override fun onFinish() {
-                viewModel.calculatePassesForEntries(selectedEntries)
+                viewModel.calculatePasses()
             }
 
             override fun onTick(millisUntilFinished: Long) {

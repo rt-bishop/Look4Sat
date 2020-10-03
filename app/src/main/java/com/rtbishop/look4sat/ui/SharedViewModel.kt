@@ -22,7 +22,10 @@ package com.rtbishop.look4sat.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.rtbishop.look4sat.data.*
+import com.rtbishop.look4sat.data.Result
+import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.SatPass
+import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.repo.Repository
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -39,6 +42,7 @@ class SharedViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
+    private var selectedEntries = emptyList<SatEntry>()
 
     init {
         if (prefsManager.isFirstLaunch()) {
@@ -46,34 +50,14 @@ class SharedViewModel @Inject constructor(
         }
     }
 
+    fun setSelectedEntries(entries: List<SatEntry>) {
+        selectedEntries = entries.filter { it.isSelected }
+    }
+
     fun getSources() = repository.getSources()
     fun getEntries() = repository.getEntries()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
     fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersForSatId(id)) }
-
-    fun getPassPrefs(): PassPrefs {
-        return prefsManager.getPassPrefs()
-    }
-
-    fun setPassPrefs(hoursAhead: Int, minEl: Double) {
-        prefsManager.setPassPrefs(hoursAhead, minEl)
-    }
-
-    fun getStationPosition(): GroundStationPosition {
-        return prefsManager.getStationPosition()
-    }
-
-    fun setStationPositionFromGPS() {
-        prefsManager.setStationPositionFromGPS()
-    }
-
-    fun shouldUseUTC(): Boolean {
-        return prefsManager.shouldUseUTC()
-    }
-
-    fun shouldUseCompass(): Boolean {
-        return prefsManager.shouldUseCompass()
-    }
 
     fun updateEntriesFromFile(uri: Uri) {
         viewModelScope.launch {
@@ -89,31 +73,35 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun updateEntriesSelection(satIds: MutableList<Int>) {
+    fun updateEntriesSelection(entries: List<SatEntry>) {
         viewModelScope.launch {
-            repository.updateEntriesSelection(satIds)
+            selectedEntries = entries.filter { it.isSelected }
+            calculatePasses()
+            repository.updateEntriesSelection(selectedEntries.map { it.catNum })
         }
     }
 
-    fun calculatePassesForEntries(entries: List<SatEntry>) {
+    fun calculatePasses(dateNow: Date = Date(System.currentTimeMillis())) {
         _passes.value = Result.InProgress
-        val dateNow = Date(System.currentTimeMillis())
-        val passes = mutableListOf<SatPass>()
         viewModelScope.launch(Dispatchers.Default) {
-            entries.forEach {
-                passes.addAll(getPassesForEntries(it, dateNow, getStationPosition()))
+            val passes = mutableListOf<SatPass>()
+            selectedEntries.forEach {
+                passes.addAll(getPassesForEntries(it, dateNow, prefsManager.getStationPosition()))
             }
-            val filteredPasses = filterAndSortPasses(passes, dateNow, getPassPrefs().hoursAhead)
+            val filteredPasses =
+                filterAndSortPasses(passes, dateNow, prefsManager.getPassPrefs().hoursAhead)
             _passes.postValue(Result.Success(filteredPasses))
         }
     }
 
     private fun setDefaultTleSources() {
-        val defaultTleSources = listOf(
-            TleSource("https://celestrak.com/NORAD/elements/active.txt"),
-            TleSource("https://amsat.org/tle/current/nasabare.txt")
-        )
-        viewModelScope.launch { repository.updateSources(defaultTleSources) }
+        viewModelScope.launch {
+            val defaultTleSources = listOf(
+                TleSource("https://celestrak.com/NORAD/elements/active.txt"),
+                TleSource("https://amsat.org/tle/current/nasabare.txt")
+            )
+            repository.updateSources(defaultTleSources)
+        }
     }
 
     private fun getPassesForEntries(

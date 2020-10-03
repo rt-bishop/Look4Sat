@@ -25,7 +25,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,6 +38,7 @@ import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
+import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -47,24 +48,26 @@ import kotlin.math.round
 class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     @Inject
-    lateinit var modelFactory: ViewModelFactory
+    lateinit var factory: ViewModelFactory
+
+    @Inject
+    lateinit var prefsManager: PrefsManager
 
     private lateinit var mainActivity: FragmentActivity
-    private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentPolarBinding
     private lateinit var satPass: SatPass
     private lateinit var sensorManager: SensorManager
-    private var polarView: PolarView? = null
+    private val viewModel: SharedViewModel by activityViewModels { factory }
     private val args: PolarFragmentArgs by navArgs()
     private val transmitterAdapter = TransAdapter()
     private var magneticDeclination = 0f
+    private var polarView: PolarView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mainActivity = requireActivity()
         binding = FragmentPolarBinding.bind(view)
         (mainActivity.application as Look4SatApp).appComponent.inject(this)
-        viewModel = ViewModelProvider(mainActivity, modelFactory).get(SharedViewModel::class.java)
         sensorManager = mainActivity.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         binding.recycler.apply {
             layoutManager = LinearLayoutManager(mainActivity)
@@ -76,7 +79,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.shouldUseCompass()) {
+        if (prefsManager.shouldUseCompass()) {
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
             }
@@ -85,7 +88,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.shouldUseCompass()) {
+        if (prefsManager.shouldUseCompass()) {
             sensorManager.unregisterListener(this)
         }
     }
@@ -134,7 +137,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun calculateMagneticDeclination() {
-        val position = viewModel.getStationPosition()
+        val position = prefsManager.getStationPosition()
         val geoField = GeomagneticField(
             position.latitude.toFloat(),
             position.longitude.toFloat(),

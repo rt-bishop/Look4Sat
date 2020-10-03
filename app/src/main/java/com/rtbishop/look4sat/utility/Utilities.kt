@@ -30,7 +30,7 @@ object Utilities {
 
     fun View.getRotationAnimator(): ObjectAnimator {
         return ObjectAnimator.ofFloat(this, "rotation", 0f, 360f).apply {
-            duration = 800
+            duration = 333
             repeatCount = ObjectAnimator.INFINITE
             repeatMode = ObjectAnimator.RESTART
             interpolator = LinearInterpolator()
