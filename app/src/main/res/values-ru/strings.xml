@@ -26,8 +26,6 @@
     <string name="menu_prefs">Настройки</string>
     <string name="menu_about">Инфо</string>
 
-    <string name="dialog_select_sat">Выберите спутники для слежения</string>
-    <string name="dialog_show_track">Показать трассу орбиты для</string>
     <string name="dialog_filter_passes">Фильтровать пролеты</string>
     <string name="dialog_tle_sources">Управление источниками TLE</string>
     <string name="dialog_entries_hint">ID / Имя</string>
@@ -65,8 +63,6 @@
 
     <string name="pat_azimuth">Аз: %.1f°</string>
     <string name="pat_elevation">Элев: %.1f°</string>
-    <string name="pat_latitude">Шир: %.1f°</string>
-    <string name="pat_longitude">Дол: %.1f°</string>
     <string name="pat_distance">Дист: %.0fкм</string>
     <string name="pat_altitude">Выс: %.0fкм</string>
 
@@ -123,7 +119,6 @@
     <string name="btn_no">Нет</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Отмена</string>
-    <string name="btn_all_none">Все/Нет</string>
 
     <string name="https_only">Используйте протокол HTTPS</string>
     <string name="sat_import">Импорт спутников</string>

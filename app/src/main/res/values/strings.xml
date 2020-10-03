@@ -27,8 +27,6 @@
     <string name="menu_prefs">Settings</string>
     <string name="menu_about">Info</string>
 
-    <string name="dialog_select_sat">Select satellites to track</string>
-    <string name="dialog_show_track">Show ground track for</string>
     <string name="dialog_filter_passes">Filter passes</string>
     <string name="dialog_tle_sources">Manage TLE sources</string>
     <string name="dialog_entries_hint">ID / Name</string>
@@ -69,8 +67,6 @@
 
     <string name="pat_azimuth">Az: %.1f°</string>
     <string name="pat_elevation">El: %.1f°</string>
-    <string name="pat_latitude">Lat: %.1f°</string>
-    <string name="pat_longitude">Lon: %.1f°</string>
     <string name="pat_distance">Dst: %.0f km</string>
     <string name="pat_altitude">Alt: %.0f km</string>
 
@@ -130,7 +126,6 @@
     <string name="btn_no">No</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="btn_all_none">All/None</string>
 
     <string name="tle_source" translatable="false">https://</string>
     <string name="https_only">Please use HTTPS URLs only</string>
