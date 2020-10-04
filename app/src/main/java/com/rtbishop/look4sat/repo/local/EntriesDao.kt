@@ -41,6 +41,9 @@ interface EntriesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
 
+    @Query("SELECT catNum FROM entries WHERE isSelected = 1")
+    suspend fun getEntriesSelection(): List<Int>
+
     @Transaction
     suspend fun updateEntriesSelection(satIds: List<Int>) {
         clearSelection()

@@ -62,7 +62,9 @@ class DefaultRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             resolver.openInputStream(fileUri)?.use { stream ->
                 val importedEntries = TLE.importSat(stream).map { SatEntry(it) }
+                val selection = entriesDao.getEntriesSelection()
                 entriesDao.updateEntries(importedEntries)
+                entriesDao.updateEntriesSelection(selection)
             }
         }
     }
@@ -80,7 +82,9 @@ class DefaultRepository @Inject constructor(
                 val entries = TLE.importSat(stream).map { tle -> SatEntry(tle) }
                 importedEntries.addAll(entries)
             }
+            val selection = entriesDao.getEntriesSelection()
             entriesDao.updateEntries(importedEntries)
+            entriesDao.updateEntriesSelection(selection)
         }
     }
 
