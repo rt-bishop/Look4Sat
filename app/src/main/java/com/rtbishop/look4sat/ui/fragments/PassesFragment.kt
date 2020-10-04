@@ -106,6 +106,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         }
         passesAdapter.setShouldUseUTC(prefsManager.shouldUseUTC())
         setTimerForPasses(passes)
+        viewModel.triggerCalculation()
     }
 
     private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
