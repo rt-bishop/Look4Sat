@@ -22,7 +22,7 @@ package com.rtbishop.look4sat.dagger.modules
 import android.content.Context
 import androidx.room.Room
 import com.rtbishop.look4sat.repo.local.EntriesDao
-import com.rtbishop.look4sat.repo.local.SatDb
+import com.rtbishop.look4sat.repo.local.SatelliteDb
 import com.rtbishop.look4sat.repo.local.SourcesDao
 import com.rtbishop.look4sat.repo.local.TransmittersDao
 import dagger.Module
@@ -34,26 +34,25 @@ class PersistenceModule {
 
     @Singleton
     @Provides
-    fun provideEntriesDao(db: SatDb): EntriesDao {
+    fun provideEntriesDao(db: SatelliteDb): EntriesDao {
         return db.entriesDao()
     }
 
     @Singleton
     @Provides
-    fun provideTransDao(db: SatDb): TransmittersDao {
+    fun provideTransDao(db: SatelliteDb): TransmittersDao {
         return db.transmittersDao()
     }
 
     @Singleton
     @Provides
-    fun providesSourcesDao(db: SatDb): SourcesDao {
+    fun providesSourcesDao(db: SatelliteDb): SourcesDao {
         return db.sourcesDao()
     }
 
     @Singleton
     @Provides
-    fun provideSatDb(context: Context): SatDb {
-        return Room.databaseBuilder(context, SatDb::class.java, "satDb")
-            .build()
+    fun provideSatDb(context: Context): SatelliteDb {
+        return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
     }
 }

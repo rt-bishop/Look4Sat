@@ -20,7 +20,10 @@
 package com.rtbishop.look4sat.ui
 
 import android.net.Uri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatEntry
@@ -57,7 +60,7 @@ class SharedViewModel @Inject constructor(
     fun getSources() = repository.getSources()
     fun getEntries() = repository.getEntries()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
-    fun getTransmittersForSat(id: Int) = liveData { emit(repository.getTransmittersForSatId(id)) }
+    fun getTransmittersForSat(satId: Int) = repository.getTransmittersForSat(satId)
 
     fun updateEntriesFromFile(uri: Uri) {
         viewModelScope.launch {

@@ -1,5 +1,6 @@
 package com.rtbishop.look4sat.repo.local
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rtbishop.look4sat.data.SatTrans
 
@@ -7,7 +8,7 @@ import com.rtbishop.look4sat.data.SatTrans
 interface TransmittersDao {
 
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :satId")
-    suspend fun getTransmittersForSatId(satId: Int): List<SatTrans>
+    fun getTransmittersForSat(satId: Int): LiveData<List<SatTrans>>
 
     @Transaction
     suspend fun updateTransmitters(transmitters: List<SatTrans>) {

@@ -33,7 +33,7 @@ import com.rtbishop.look4sat.utility.Converters
     exportSchema = false
 )
 @TypeConverters(Converters::class)
-abstract class SatDb : RoomDatabase() {
+abstract class SatelliteDb : RoomDatabase() {
 
     abstract fun sourcesDao(): SourcesDao
 

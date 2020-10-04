@@ -92,8 +92,8 @@ class DefaultRepository @Inject constructor(
         entriesDao.updateEntriesSelection(satIds)
     }
 
-    override suspend fun getTransmittersForSatId(satId: Int): List<SatTrans> {
-        return transmittersDao.getTransmittersForSatId(satId)
+    override fun getTransmittersForSat(satId: Int): LiveData<List<SatTrans>> {
+        return transmittersDao.getTransmittersForSat(satId)
     }
 
     override suspend fun updateTransmitters() {

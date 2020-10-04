@@ -26,5 +26,5 @@ interface Repository {
 
     suspend fun updateTransmitters()
 
-    suspend fun getTransmittersForSatId(satId: Int): List<SatTrans>
+    fun getTransmittersForSat(satId: Int): LiveData<List<SatTrans>>
 }
