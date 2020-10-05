@@ -17,38 +17,35 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.dagger.modules
+package com.rtbishop.look4sat.di
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.location.LocationManager
-import androidx.preference.PreferenceManager
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.repo.remote.TransmittersApi
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.scopes.ActivityScoped
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
-class UtilityModule {
+@InstallIn(ActivityComponent::class)
+class NetworkModule {
 
-    @Singleton
+    @ActivityScoped
     @Provides
-    fun provideSharedPreferences(context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context)
+    fun provideWebClient(): OkHttpClient {
+        return OkHttpClient()
     }
 
-    @Singleton
+    @ActivityScoped
     @Provides
-    fun provideLocationManager(context: Context): LocationManager {
-        return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    }
-
-    @Singleton
-    @Provides
-    fun providePrefsManager(
-        sharedPreferences: SharedPreferences,
-        locationManager: LocationManager
-    ): PrefsManager {
-        return PrefsManager(sharedPreferences, locationManager)
+    fun provideTransApi(): TransmittersApi {
+        return Retrofit.Builder()
+            .baseUrl("https://db.satnogs.org/api/")
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+            .create(TransmittersApi::class.java)
     }
 }

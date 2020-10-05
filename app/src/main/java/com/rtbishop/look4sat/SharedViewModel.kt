@@ -17,13 +17,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.*
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatEntry
@@ -35,13 +34,13 @@ import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SharedViewModel @Inject constructor(
+class SharedViewModel @ViewModelInject constructor(
     private val prefsManager: PrefsManager,
-    private val repository: Repository
+    private val repository: Repository,
+    @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()

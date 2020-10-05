@@ -27,7 +27,9 @@ import androidx.preference.PreferenceFragmentCompat
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities.snack
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PrefsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 

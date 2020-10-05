@@ -24,11 +24,13 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.SourcesAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SourcesDialog(sources: List<TleSource>, private val viewModel: SharedViewModel) :
     AppCompatDialogFragment() {
 

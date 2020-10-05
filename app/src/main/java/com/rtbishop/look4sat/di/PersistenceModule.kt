@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.dagger.modules
+package com.rtbishop.look4sat.di
 
 import android.content.Context
 import androidx.room.Room
@@ -27,32 +27,36 @@ import com.rtbishop.look4sat.repo.local.SourcesDao
 import com.rtbishop.look4sat.repo.local.TransmittersDao
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 
 @Module
+@InstallIn(ActivityComponent::class)
 class PersistenceModule {
 
-    @Singleton
+    @ActivityScoped
     @Provides
     fun provideEntriesDao(db: SatelliteDb): EntriesDao {
         return db.entriesDao()
     }
 
-    @Singleton
+    @ActivityScoped
     @Provides
     fun provideTransDao(db: SatelliteDb): TransmittersDao {
         return db.transmittersDao()
     }
 
-    @Singleton
+    @ActivityScoped
     @Provides
     fun providesSourcesDao(db: SatelliteDb): SourcesDao {
         return db.sourcesDao()
     }
 
-    @Singleton
+    @ActivityScoped
     @Provides
-    fun provideSatDb(context: Context): SatelliteDb {
+    fun provideSatDb(@ActivityContext context: Context): SatelliteDb {
         return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
     }
 }

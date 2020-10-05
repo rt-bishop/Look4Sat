@@ -14,15 +14,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.PrefsManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,10 +39,8 @@ import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+@AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map) {
-
-    @Inject
-    lateinit var factory: ViewModelFactory
 
     @Inject
     lateinit var prefsManager: PrefsManager
@@ -54,13 +51,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var footprintPaint: Paint
     private lateinit var selectedPass: SatPass
     private val dateNow = Date(System.currentTimeMillis())
-    private val viewModel: SharedViewModel by activityViewModels { factory }
+    private val viewModel: SharedViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMapBinding.bind(view)
         mainActivity = requireActivity()
-        (mainActivity.application as Look4SatApp).appComponent.inject(this)
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(mainActivity.applicationContext)
         Configuration.getInstance().load(mainActivity.applicationContext, prefs)

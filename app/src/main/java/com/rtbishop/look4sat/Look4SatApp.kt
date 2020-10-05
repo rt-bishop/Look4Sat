@@ -20,12 +20,7 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import com.rtbishop.look4sat.dagger.AppComponent
-import com.rtbishop.look4sat.dagger.DaggerAppComponent
+import dagger.hilt.android.HiltAndroidApp
 
-class Look4SatApp : Application() {
-
-    val appComponent: AppComponent by lazy {
-        DaggerAppComponent.factory().create(applicationContext)
-    }
-}
+@HiltAndroidApp
+class Look4SatApp : Application()

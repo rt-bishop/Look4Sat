@@ -29,26 +29,23 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.TransAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
 import com.rtbishop.look4sat.utility.PrefsManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.round
 
+@AndroidEntryPoint
 class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
-
-    @Inject
-    lateinit var factory: ViewModelFactory
 
     @Inject
     lateinit var prefsManager: PrefsManager
@@ -57,7 +54,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     private lateinit var binding: FragmentPolarBinding
     private lateinit var satPass: SatPass
     private lateinit var sensorManager: SensorManager
-    private val viewModel: SharedViewModel by activityViewModels { factory }
+    private val viewModel: SharedViewModel by activityViewModels()
     private val args: PolarFragmentArgs by navArgs()
     private val transmitterAdapter = TransAdapter()
     private var magneticDeclination = 0f
@@ -67,7 +64,6 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         super.onViewCreated(view, savedInstanceState)
         mainActivity = requireActivity()
         binding = FragmentPolarBinding.bind(view)
-        (mainActivity.application as Look4SatApp).appComponent.inject(this)
         sensorManager = mainActivity.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         binding.recycler.apply {
             layoutManager = LinearLayoutManager(mainActivity)

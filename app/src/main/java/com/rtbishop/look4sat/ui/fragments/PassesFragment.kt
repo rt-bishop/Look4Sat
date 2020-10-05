@@ -29,25 +29,22 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.PassesAdapter
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities
 import com.rtbishop.look4sat.utility.Utilities.getRotationAnimator
 import com.rtbishop.look4sat.utility.Utilities.snack
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes) {
-
-    @Inject
-    lateinit var factory: ViewModelFactory
 
     @Inject
     lateinit var prefsManager: PrefsManager
@@ -56,14 +53,13 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     private lateinit var binding: FragmentPassesBinding
     private lateinit var animator: ObjectAnimator
     private lateinit var passesAdapter: PassesAdapter
-    private val viewModel: SharedViewModel by activityViewModels { factory }
+    private val viewModel: SharedViewModel by activityViewModels()
     private var isTimerSet: Boolean = false
     private var passes = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPassesBinding.bind(view)
-        (requireActivity().application as Look4SatApp).appComponent.inject(this)
         setupComponents()
         setupObservers()
     }

@@ -10,23 +10,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.rtbishop.look4sat.Look4SatApp
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.dagger.ViewModelFactory
+import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.ui.adapters.EntriesAdapter
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
-    @Inject
-    lateinit var factory: ViewModelFactory
-
     private lateinit var binding: FragmentEntriesBinding
-    private val viewModel: SharedViewModel by activityViewModels { factory }
+    private val viewModel: SharedViewModel by activityViewModels()
     private val pickFileReqCode = 100
     private val entriesAdapter = EntriesAdapter()
     private var tleSources = listOf<TleSource>()
@@ -34,7 +30,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
-        (requireActivity().application as Look4SatApp).appComponent.inject(this)
         setupComponents()
         setupObservers()
     }
