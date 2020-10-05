@@ -33,14 +33,18 @@ import com.rtbishop.look4sat.ui.fragments.PassesFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PassesAdapter(private var satPassList: MutableList<SatPass> = mutableListOf()) :
+class PassesAdapter(context: Context, private var shouldUseUTC: Boolean = false) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var shouldUseUTC: Boolean = false
-
-    fun setShouldUseUTC(boolean: Boolean) {
-        shouldUseUTC = boolean
-    }
+    private val satIdFormat = context.getString(R.string.pass_satId)
+    private val azFormat = context.getString(R.string.pat_azimuth)
+    private val elevFormat = context.getString(R.string.pat_elevation)
+    private val aosAzFormat = context.getString(R.string.pass_aos_az)
+    private val losAzFormat = context.getString(R.string.pass_los_az)
+    private val dateFormat = context.getString(R.string.pass_dateTime)
+    private val timeZoneUTC = TimeZone.getTimeZone("UTC")
+    private val simpleDateFormat = SimpleDateFormat(dateFormat, Locale.getDefault())
+    private var satPassList: MutableList<SatPass> = mutableListOf()
 
     fun setList(list: MutableList<SatPass>) {
         satPassList = list
@@ -48,18 +52,18 @@ class PassesAdapter(private var satPassList: MutableList<SatPass> = mutableListO
     }
 
     fun updateRecycler() {
-        val timeNow = Date()
+        val timeNow = System.currentTimeMillis()
         val iterator = satPassList.listIterator()
         while (iterator.hasNext()) {
             val satPass = iterator.next()
             if (satPass.progress < 100) {
-                val timeStart = satPass.pass.startTime
-                val timeEnd = satPass.pass.endTime
-                if (timeNow.after(timeStart)) {
+                val timeStart = satPass.pass.startTime.time
+                val timeEnd = satPass.pass.endTime.time
+                if (timeNow.minus(timeStart) > 0) {
                     satPass.active = true
                     val index = satPassList.indexOf(satPass)
-                    val deltaTotal = timeEnd.time.minus(timeStart.time)
-                    val deltaNow = timeNow.time.minus(timeStart.time)
+                    val deltaTotal = timeEnd.minus(timeStart)
+                    val deltaNow = timeNow.minus(timeStart)
                     satPass.progress = ((deltaNow.toFloat() / deltaTotal.toFloat()) * 100).toInt()
                     notifyItemChanged(index)
                 }
@@ -104,26 +108,21 @@ class PassesAdapter(private var satPassList: MutableList<SatPass> = mutableListO
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(satPass: SatPass) {
-            val context: Context = itemView.context
-            if (satPass.active) binding.passLeoImg.setImageResource(R.drawable.ic_pass_active)
-            else binding.passLeoImg.setImageResource(R.drawable.ic_pass_inactive)
+            binding.apply {
+                if (satPass.active) passLeoImg.setImageResource(R.drawable.ic_pass_active)
+                else passLeoImg.setImageResource(R.drawable.ic_pass_inactive)
 
-            binding.passLeoSatName.text = satPass.tle.name
-            binding.passLeoSatId.text =
-                String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
-            binding.passLeoMaxEl.text =
-                String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
-            binding.passLeoAosAz.text =
-                String.format(context.getString(R.string.pass_aos_az), satPass.pass.aosAzimuth)
-            binding.passLeoLosAz.text =
-                String.format(context.getString(R.string.pass_los_az), satPass.pass.losAzimuth)
-            binding.passLeoProgress.progress = satPass.progress
+                passLeoSatName.text = satPass.tle.name
+                passLeoSatId.text = String.format(satIdFormat, satPass.tle.catnum)
+                passLeoMaxEl.text = String.format(elevFormat, satPass.pass.maxEl)
+                passLeoAosAz.text = String.format(aosAzFormat, satPass.pass.aosAzimuth)
+                passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth)
+                passLeoProgress.progress = satPass.progress
 
-            val dateFormat =
-                SimpleDateFormat(context.getString(R.string.pass_dateTime), Locale.getDefault())
-            if (shouldUseUTC) dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-            binding.passLeoAosTime.text = dateFormat.format(satPass.pass.startTime)
-            binding.passLeoLosTime.text = dateFormat.format(satPass.pass.endTime)
+                if (shouldUseUTC) simpleDateFormat.timeZone = timeZoneUTC
+                passLeoAosTime.text = simpleDateFormat.format(satPass.pass.startTime)
+                passLeoLosTime.text = simpleDateFormat.format(satPass.pass.endTime)
+            }
 
             itemView.setOnClickListener {
                 val passIndex = satPassList.indexOf(satPass)
@@ -137,16 +136,15 @@ class PassesAdapter(private var satPassList: MutableList<SatPass> = mutableListO
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(satPass: SatPass) {
-            val context: Context = itemView.context
             val satPos = satPass.predictor.getSatPos(satPass.pass.startTime)
-            val azimuth = satPos.azimuth * 180 / Math.PI
+            val azimuth = Math.toDegrees(satPos.azimuth)
 
-            binding.passGeoName.text = satPass.tle.name
-            binding.passGeoId.text =
-                String.format(context.getString(R.string.pass_satId), satPass.tle.catnum)
-            binding.passGeoAz.text = String.format(context.getString(R.string.pat_azimuth), azimuth)
-            binding.passGeoEl.text =
-                String.format(context.getString(R.string.pat_elevation), satPass.pass.maxEl)
+            binding.apply {
+                passGeoName.text = satPass.tle.name
+                passGeoId.text = String.format(satIdFormat, satPass.tle.catnum)
+                passGeoAz.text = String.format(azFormat, azimuth)
+                passGeoEl.text = String.format(elevFormat, satPass.pass.maxEl)
+            }
 
             itemView.setOnClickListener {
                 val passIndex = satPassList.indexOf(satPass)

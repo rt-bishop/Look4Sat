@@ -55,8 +55,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     private lateinit var aosTimer: CountDownTimer
     private lateinit var binding: FragmentPassesBinding
     private lateinit var animator: ObjectAnimator
+    private lateinit var passesAdapter: PassesAdapter
     private val viewModel: SharedViewModel by activityViewModels { factory }
-    private val passesAdapter = PassesAdapter()
     private var isTimerSet: Boolean = false
     private var passes = mutableListOf<SatPass>()
 
@@ -83,6 +83,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setupComponents() {
+        passesAdapter = PassesAdapter(requireContext(), prefsManager.shouldUseUTC())
         binding.apply {
             passesRecycler.apply {
                 layoutManager = LinearLayoutManager(requireContext())
@@ -104,7 +105,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 }
             }
         }
-        passesAdapter.setShouldUseUTC(prefsManager.shouldUseUTC())
         setTimerForPasses(passes)
         viewModel.triggerCalculation()
     }
