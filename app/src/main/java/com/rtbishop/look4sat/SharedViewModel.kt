@@ -28,7 +28,9 @@ import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.data.TleSource
-import com.rtbishop.look4sat.repo.Repository
+import com.rtbishop.look4sat.repo.EntriesRepo
+import com.rtbishop.look4sat.repo.SourcesRepo
+import com.rtbishop.look4sat.repo.TransmittersRepo
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +41,9 @@ import javax.inject.Singleton
 @Singleton
 class SharedViewModel @ViewModelInject constructor(
     private val prefsManager: PrefsManager,
-    private val repository: Repository,
+    private val sourcesRepo: SourcesRepo,
+    private val entriesRepo: EntriesRepo,
+    private val transmittersRepo: TransmittersRepo,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -53,10 +57,10 @@ class SharedViewModel @ViewModelInject constructor(
         }
     }
 
-    fun getSources() = repository.getSources()
-    fun getEntries() = repository.getEntries()
+    fun getSources() = sourcesRepo.getSources()
+    fun getEntries() = entriesRepo.getEntries()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
-    fun getTransmittersForSat(satId: Int) = repository.getTransmittersForSat(satId)
+    fun getTransmittersForSat(satId: Int) = transmittersRepo.getTransmittersForSat(satId)
 
     fun triggerCalculation() {
         if (shouldTriggerCalculation) {
@@ -71,15 +75,15 @@ class SharedViewModel @ViewModelInject constructor(
 
     fun updateEntriesFromFile(uri: Uri) {
         viewModelScope.launch {
-            repository.updateEntriesFromFile(uri)
+            entriesRepo.updateEntriesFromFile(uri)
         }
     }
 
     fun updateEntriesFromSources(sources: List<TleSource>) {
         viewModelScope.launch {
-            repository.updateSources(sources)
-            repository.updateEntriesFromSources(sources)
-            repository.updateTransmitters()
+            sourcesRepo.updateSources(sources)
+            entriesRepo.updateEntriesFromSources(sources)
+            transmittersRepo.updateTransmitters()
         }
     }
 
@@ -87,7 +91,7 @@ class SharedViewModel @ViewModelInject constructor(
         viewModelScope.launch {
             selectedEntries = entries.filter { it.isSelected }
             calculatePasses()
-            repository.updateEntriesSelection(selectedEntries.map { it.catNum })
+            entriesRepo.updateEntriesSelection(selectedEntries.map { it.catNum })
         }
     }
 
@@ -111,7 +115,7 @@ class SharedViewModel @ViewModelInject constructor(
                 TleSource("https://celestrak.com/NORAD/elements/active.txt"),
                 TleSource("https://amsat.org/tle/current/nasabare.txt")
             )
-            repository.updateSources(defaultTleSources)
+            sourcesRepo.updateSources(defaultTleSources)
         }
     }
 

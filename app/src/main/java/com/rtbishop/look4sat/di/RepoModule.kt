@@ -21,8 +21,7 @@ package com.rtbishop.look4sat.di
 
 import android.content.ContentResolver
 import android.content.Context
-import com.rtbishop.look4sat.repo.DefaultRepository
-import com.rtbishop.look4sat.repo.Repository
+import com.rtbishop.look4sat.repo.*
 import com.rtbishop.look4sat.repo.local.EntriesDao
 import com.rtbishop.look4sat.repo.local.SourcesDao
 import com.rtbishop.look4sat.repo.local.TransmittersDao
@@ -47,21 +46,26 @@ class RepoModule {
 
     @ActivityScoped
     @Provides
-    fun provideDefaultRepository(
+    fun provideEntriesRepo(
         resolver: ContentResolver,
         client: OkHttpClient,
-        transmittersApi: TransmittersApi,
-        entriesDao: EntriesDao,
+        entriesDao: EntriesDao
+    ): EntriesRepo {
+        return DefaultEntriesRepo(resolver, client, entriesDao)
+    }
+
+    @ActivityScoped
+    @Provides
+    fun provideSourcesRepo(sourcesDao: SourcesDao): SourcesRepo {
+        return DefaultSourcesRepo(sourcesDao)
+    }
+
+    @ActivityScoped
+    @Provides
+    fun provideTransmittersRepo(
         transmittersDao: TransmittersDao,
-        sourcesDao: SourcesDao
-    ): Repository {
-        return DefaultRepository(
-            resolver,
-            client,
-            transmittersApi,
-            entriesDao,
-            sourcesDao,
-            transmittersDao
-        )
+        transmittersApi: TransmittersApi
+    ): TransmittersRepo {
+        return DefaultTransmittersRepo(transmittersDao, transmittersApi)
     }
 }
