@@ -65,14 +65,9 @@ android {
 dependencies {
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
-    implementation "androidx.core:core-ktx:$ktx_version"
-    implementation "androidx.preference:preference:$preference_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
-    implementation "androidx.navigation:navigation-runtime-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.preference:preference:$preference_version"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -85,7 +80,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
 
-    implementation "org.osmdroid:osmdroid-android:$openStreetMap_version"
-
+    implementation "com.github.AppIntro:AppIntro:$app_intro_version"
+    implementation "org.osmdroid:osmdroid-android:$osmdroid_version"
     implementation "com.github.davidmoten:predict4java:$predict4java_version"
 }
