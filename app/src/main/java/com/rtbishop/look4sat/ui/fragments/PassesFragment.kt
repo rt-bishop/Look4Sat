@@ -21,7 +21,6 @@ package com.rtbishop.look4sat.ui.fragments
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
@@ -49,12 +48,10 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     @Inject
     lateinit var prefsManager: PrefsManager
 
-    private lateinit var aosTimer: CountDownTimer
     private lateinit var binding: FragmentPassesBinding
     private lateinit var animator: ObjectAnimator
     private lateinit var passesAdapter: PassesAdapter
     private val viewModel: SharedViewModel by activityViewModels()
-    private var isTimerSet: Boolean = false
     private var passes = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,10 +68,13 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                     animator.cancel()
                     passes = result.data
                     passesAdapter.setList(passes)
-                    setTimerForPasses(passes)
                 }
                 is Result.InProgress -> animator.start()
             }
+        })
+        viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, { currentTime ->
+            tickMainTimer(currentTime)
+            passesAdapter.tickPasses(currentTime)
         })
     }
 
@@ -101,7 +101,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 }
             }
         }
-        setTimerForPasses(passes)
         viewModel.triggerCalculation()
     }
 
@@ -143,58 +142,19 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         }
     }
 
-    private fun setTimerForPasses(passes: List<SatPass>) {
+    private fun tickMainTimer(timeNow: Long) {
         if (passes.isNotEmpty()) {
-            resetTimer()
-            val timeNow = Date()
             try {
-                setTimerForNext(timeNow)
+                val nextPass = passes.first { it.pass.startTime.time.minus(timeNow) > 0 }
+                val millisBeforeStart = nextPass.pass.startTime.time.minus(timeNow)
+                binding.passesTimer.text = Utilities.formatForTimer(millisBeforeStart)
             } catch (e: NoSuchElementException) {
-                setTimerForLast(timeNow)
-            } finally {
-                aosTimer.start()
-                isTimerSet = true
+                val lastPass = passes.last()
+                val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow)
+                binding.passesTimer.text = Utilities.formatForTimer(millisBeforeEnd)
             }
         } else {
-            resetTimer(true)
+            binding.passesTimer.text = Utilities.formatForTimer(0L)
         }
-    }
-
-    private fun setTimerForNext(timeNow: Date) {
-        val nextPass = passes.first { it.pass.startTime.after(timeNow) }
-        val millisBeforeStart = nextPass.pass.startTime.time.minus(timeNow.time)
-        aosTimer = object : CountDownTimer(millisBeforeStart, 1000) {
-            override fun onFinish() {
-                setTimerForPasses(passes)
-            }
-
-            override fun onTick(millisUntilFinished: Long) {
-                binding.passesTimer.text = Utilities.formatForTimer(millisUntilFinished)
-                passesAdapter.updateRecycler()
-            }
-        }
-    }
-
-    private fun setTimerForLast(timeNow: Date) {
-        val lastPass = passes.last()
-        val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow.time)
-        aosTimer = object : CountDownTimer(millisBeforeEnd, 1000) {
-            override fun onFinish() {
-                viewModel.calculatePasses()
-            }
-
-            override fun onTick(millisUntilFinished: Long) {
-                binding.passesTimer.text = Utilities.formatForTimer(millisUntilFinished)
-                passesAdapter.updateRecycler()
-            }
-        }
-    }
-
-    private fun resetTimer(resetToNull: Boolean = false) {
-        if (isTimerSet) {
-            aosTimer.cancel()
-            isTimerSet = false
-        }
-        if (resetToNull) binding.passesTimer.text = String.format("%02d:%02d:%02d", 0, 0, 0)
     }
 }

@@ -51,8 +51,7 @@ class PassesAdapter(context: Context, private var shouldUseUTC: Boolean = false)
         notifyDataSetChanged()
     }
 
-    fun updateRecycler() {
-        val timeNow = System.currentTimeMillis()
+    fun tickPasses(timeNow: Long) {
         val iterator = satPassList.listIterator()
         while (iterator.hasNext()) {
             val satPass = iterator.next()

@@ -34,6 +34,7 @@ import com.rtbishop.look4sat.repo.TransmittersRepo
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Singleton
@@ -47,6 +48,7 @@ class SharedViewModel @ViewModelInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val _currentTimeMillis = MutableLiveData(System.currentTimeMillis())
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
     private var selectedEntries = emptyList<SatEntry>()
     private var shouldTriggerCalculation = true
@@ -55,10 +57,12 @@ class SharedViewModel @ViewModelInject constructor(
         if (prefsManager.isFirstLaunch()) {
             updateDefaultSourcesAndEntries()
         }
+        startApplicationTimer()
     }
 
     fun getSources() = sourcesRepo.getSources()
     fun getEntries() = entriesRepo.getEntries()
+    fun getCurrentTimeMillis(): LiveData<Long> = _currentTimeMillis
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
     fun getTransmittersForSat(satId: Int) = transmittersRepo.getTransmittersForSat(satId)
 
@@ -115,6 +119,15 @@ class SharedViewModel @ViewModelInject constructor(
             TleSource("https://amsat.org/tle/current/nasabare.txt")
         )
         updateEntriesFromSources(defaultTleSources)
+    }
+
+    private fun startApplicationTimer(tickMillis: Long = 1000L) {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                delay(tickMillis)
+                _currentTimeMillis.postValue(System.currentTimeMillis())
+            }
+        }
     }
 
     private fun getPassesForEntries(
