@@ -53,7 +53,7 @@ class SharedViewModel @ViewModelInject constructor(
 
     init {
         if (prefsManager.isFirstLaunch()) {
-            setDefaultTleSources()
+            updateDefaultSourcesAndEntries()
         }
     }
 
@@ -109,14 +109,12 @@ class SharedViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun setDefaultTleSources() {
-        viewModelScope.launch {
-            val defaultTleSources = listOf(
-                TleSource("https://celestrak.com/NORAD/elements/active.txt"),
-                TleSource("https://amsat.org/tle/current/nasabare.txt")
-            )
-            sourcesRepo.updateSources(defaultTleSources)
-        }
+    private fun updateDefaultSourcesAndEntries() {
+        val defaultTleSources = listOf(
+            TleSource("https://celestrak.com/NORAD/elements/active.txt"),
+            TleSource("https://amsat.org/tle/current/nasabare.txt")
+        )
+        updateEntriesFromSources(defaultTleSources)
     }
 
     private fun getPassesForEntries(
