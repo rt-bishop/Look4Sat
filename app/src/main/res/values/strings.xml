@@ -52,8 +52,7 @@
     <string name="no_downlink_doppler">Curr. downlink: null</string>
     <string name="no_trans">No transceivers found for this satellite</string>
 
-    <string name="err_update_data">Please, update satellite data</string>
-    <string name="err_enter_value">Please, enter the value</string>
+    <string name="error_updating_data">Error importing satellite data</string>
 
     <string name="pass_satName" translatable="false">%s</string>
     <string name="pass_satId" translatable="false">ID: %d</string>

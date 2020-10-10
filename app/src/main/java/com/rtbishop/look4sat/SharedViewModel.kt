@@ -24,10 +24,7 @@ import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.rtbishop.look4sat.data.Result
-import com.rtbishop.look4sat.data.SatEntry
-import com.rtbishop.look4sat.data.SatPass
-import com.rtbishop.look4sat.data.TleSource
+import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repo.EntriesRepo
 import com.rtbishop.look4sat.repo.SourcesRepo
 import com.rtbishop.look4sat.repo.TransmittersRepo
@@ -50,6 +47,7 @@ class SharedViewModel @ViewModelInject constructor(
 
     private val _currentTimeMillis = MutableLiveData(System.currentTimeMillis())
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
+    private val _appEvent = MutableLiveData<Event<Any>>()
     private var selectedEntries = emptyList<SatEntry>()
     private var shouldTriggerCalculation = true
 
@@ -64,7 +62,12 @@ class SharedViewModel @ViewModelInject constructor(
     fun getEntries() = entriesRepo.getEntries()
     fun getCurrentTimeMillis(): LiveData<Long> = _currentTimeMillis
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
+    fun getAppEvent(): LiveData<Event<Any>> = _appEvent
     fun getTransmittersForSat(satId: Int) = transmittersRepo.getTransmittersForSat(satId)
+
+    fun postAppEvent(event: Event<Any>) {
+        _appEvent.value = event
+    }
 
     fun triggerCalculation() {
         if (shouldTriggerCalculation) {
@@ -79,15 +82,23 @@ class SharedViewModel @ViewModelInject constructor(
 
     fun updateEntriesFromFile(uri: Uri) {
         viewModelScope.launch {
-            entriesRepo.updateEntriesFromFile(uri)
+            try {
+                entriesRepo.updateEntriesFromFile(uri)
+            } catch (exception: Exception) {
+                postAppEvent(Event(exception))
+            }
         }
     }
 
     fun updateEntriesFromSources(sources: List<TleSource>) {
         viewModelScope.launch {
-            sourcesRepo.updateSources(sources)
-            entriesRepo.updateEntriesFromSources(sources)
-            transmittersRepo.updateTransmitters()
+            try {
+                sourcesRepo.updateSources(sources)
+                entriesRepo.updateEntriesFromSources(sources)
+                transmittersRepo.updateTransmitters()
+            } catch (exception: Exception) {
+                postAppEvent(Event(exception))
+            }
         }
     }
 

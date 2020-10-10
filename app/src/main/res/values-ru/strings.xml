@@ -51,8 +51,7 @@
     <string name="no_downlink_doppler">Тек. нисход: нет</string>
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
-    <string name="err_update_data">Пожалуйста, обновите данные спутников</string>
-    <string name="err_enter_value">Пожалуйста, введите значение</string>
+    <string name="error_updating_data">Ошибка импорта спутников</string>
 
     <string name="pass_aos_az">НПС — %2d°</string>
     <string name="pass_los_az">%2d° — КПС</string>

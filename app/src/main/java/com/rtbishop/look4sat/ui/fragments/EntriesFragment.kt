@@ -16,6 +16,7 @@ import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.adapters.EntriesAdapter
+import com.rtbishop.look4sat.utility.Utilities.snack
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,6 +62,11 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         viewModel.getEntries().observe(viewLifecycleOwner, {
             viewModel.setSelectedEntries(it)
             entriesAdapter.setEntries(it as MutableList<SatEntry>)
+        })
+        viewModel.getAppEvent().observe(viewLifecycleOwner, { event ->
+            event.getContentIfNotHandled()?.let {
+                getString(R.string.error_updating_data).snack(requireView())
+            }
         })
     }
 
