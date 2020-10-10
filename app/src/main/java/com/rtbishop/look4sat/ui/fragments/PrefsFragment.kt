@@ -35,10 +35,8 @@ class PrefsFragment : PreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
-        val provider = EditTextPreference.SimpleSummaryProvider.getInstance()
 
         findPreference<EditTextPreference>(PrefsManager.keyLatitude)?.apply {
-            summaryProvider = provider
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER or
                         InputType.TYPE_NUMBER_FLAG_DECIMAL or
@@ -55,7 +53,6 @@ class PrefsFragment : PreferenceFragmentCompat(),
         }
 
         findPreference<EditTextPreference>(PrefsManager.keyLongitude)?.apply {
-            summaryProvider = provider
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER or
                         InputType.TYPE_NUMBER_FLAG_DECIMAL or
@@ -72,7 +69,6 @@ class PrefsFragment : PreferenceFragmentCompat(),
         }
 
         findPreference<EditTextPreference>(PrefsManager.keyAltitude)?.apply {
-            summaryProvider = provider
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER or
                         InputType.TYPE_NUMBER_FLAG_DECIMAL or

@@ -31,10 +31,11 @@
     <string name="dialog_tle_sources">Manage TLE sources</string>
     <string name="dialog_entries_hint">ID / Name</string>
 
-    <string name="pref_hours_ahead_hint">Hours ahead</string>
+    <string name="pref_passes_preferences">Passes preferences</string>
+    <string name="pref_hours_ahead">Hours ahead</string>
     <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
     <string name="pref_hours_ahead_input_error">Set the value between 1h and 168h</string>
-    <string name="pref_min_el_hint">Minimum elevation</string>
+    <string name="pref_minimal_elevation">Minimal elevation</string>
     <string name="pref_min_el_summary">Show passes with max elevation above</string>
     <string name="pref_min_el_input_error">Set the value between 0° and 90°</string>
 

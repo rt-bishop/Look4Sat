@@ -24,7 +24,6 @@ import android.location.LocationManager
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.PassPrefs
-import com.rtbishop.look4sat.utility.Utilities.getDouble
 import com.rtbishop.look4sat.utility.Utilities.putDouble
 import com.rtbishop.look4sat.utility.Utilities.round
 import javax.inject.Inject
@@ -34,6 +33,8 @@ class PrefsManager @Inject constructor(
     private val locationManager: LocationManager
 ) {
     companion object {
+        const val hoursAhead = "hoursAhead"
+        const val minimalElevation = "minimalElevation"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minEl"
         const val keyLatitude = "latitude"
@@ -41,15 +42,13 @@ class PrefsManager @Inject constructor(
         const val keyAltitude = "altitude"
         const val keyCompass = "compass"
         const val keyTimeUtc = "timeUTC"
-        const val defaultHoursAhead = 8
-        const val defaultMinEl = 16.0
         const val defaultGSP = "0.0"
         const val keyIsFirstLaunch = "keyIsFirstLaunch"
     }
 
     fun getPassPrefs(): PassPrefs {
-        val hoursAhead = preferences.getInt(keyHoursAhead, defaultHoursAhead)
-        val minEl = preferences.getDouble(keyMinElevation, defaultMinEl)
+        val hoursAhead = preferences.getInt(hoursAhead, 8)
+        val minEl = preferences.getInt(minimalElevation, 16).toDouble()
         return PassPrefs(hoursAhead, minEl)
     }
 

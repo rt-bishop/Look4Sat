@@ -30,10 +30,11 @@
     <string name="dialog_tle_sources">Управление источниками TLE</string>
     <string name="dialog_entries_hint">ID / Имя</string>
 
-    <string name="pref_hours_ahead_hint">Количество часов</string>
+    <string name="pref_passes_preferences">Настройки пролетов</string>
+    <string name="pref_hours_ahead">Количество часов</string>
     <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
     <string name="pref_hours_ahead_input_error">Введите значение между 1ч и 168ч</string>
-    <string name="pref_min_el_hint">Минимальная элевация</string>
+    <string name="pref_minimal_elevation">Минимальная элевация</string>
     <string name="pref_min_el_summary">Показать пролеты с элевацией более</string>
     <string name="pref_min_el_input_error">Введите значение между 0° и 90°</string>
 
@@ -45,8 +46,8 @@
     <string name="pref_alt_title">Высота, м</string>
     <string name="pref_alt_input_error">Введите значение между -413м и 8850м</string>
     <string name="pref_other_title">Другие настройки</string>
-    <string name="pref_compass_title">Использовать компас при отображении полярных координат</string>
-    <string name="pref_time_utc_title">Показывать время пролёта по UTC</string>
+    <string name="pref_compass_title">Использовать компас</string>
+    <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
     <string name="no_mode">Модуляция: нет</string>
     <string name="no_uplink">Восход: нет</string>

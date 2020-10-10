@@ -17,29 +17,63 @@
   ~ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/pref_gsp_title">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:title="@string/pref_gsp_title"
+        app:iconSpaceReserved="false">
         <EditTextPreference
             android:defaultValue="0.0"
             android:key="latitude"
-            android:title="@string/pref_lat_title" />
+            android:title="@string/pref_lat_title"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
         <EditTextPreference
             android:defaultValue="0.0"
             android:key="longitude"
-            android:title="@string/pref_lon_title" />
+            android:title="@string/pref_lon_title"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
         <EditTextPreference
             android:defaultValue="0.0"
             android:key="altitude"
-            android:title="@string/pref_alt_title" />
+            android:title="@string/pref_alt_title"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_other_title">
+    <PreferenceCategory
+        android:title="@string/pref_passes_preferences"
+        app:iconSpaceReserved="false">
+        <SeekBarPreference
+            android:key="hoursAhead"
+            android:max="72"
+            android:title="@string/pref_hours_ahead"
+            app:defaultValue="8"
+            app:iconSpaceReserved="false"
+            app:min="1"
+            app:showSeekBarValue="true" />
+        <SeekBarPreference
+            android:key="minimalElevation"
+            android:max="72"
+            android:title="@string/pref_minimal_elevation"
+            app:adjustable="false"
+            app:defaultValue="16"
+            app:iconSpaceReserved="false"
+            app:min="0"
+            app:showSeekBarValue="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_other_title"
+        app:iconSpaceReserved="false">
         <SwitchPreference
             android:defaultValue="false"
             android:key="timeUTC"
-            android:title="@string/pref_time_utc_title" />
+            android:title="@string/pref_time_utc_title"
+            app:iconSpaceReserved="false" />
         <SwitchPreference
             android:defaultValue="true"
             android:key="compass"
-            android:title="@string/pref_compass_title" />
+            android:title="@string/pref_compass_title"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 </PreferenceScreen>
