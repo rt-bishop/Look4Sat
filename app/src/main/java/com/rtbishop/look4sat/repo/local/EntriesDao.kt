@@ -47,12 +47,12 @@ interface EntriesDao {
     @Transaction
     suspend fun updateEntriesSelection(satIds: List<Int>) {
         clearSelection()
-        updateSelection(satIds)
+        satIds.forEach { updateSelection(it) }
     }
 
     @Query("UPDATE entries SET isSelected = 0")
     suspend fun clearSelection()
 
-    @Query("UPDATE entries SET isSelected = 1 WHERE catNum IN (:satIds)")
-    suspend fun updateSelection(satIds: List<Int>)
+    @Query("UPDATE entries SET isSelected = 1 WHERE catNum = :satId")
+    suspend fun updateSelection(satId: Int)
 }
