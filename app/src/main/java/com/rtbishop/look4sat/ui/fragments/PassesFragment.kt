@@ -22,8 +22,6 @@ package com.rtbishop.look4sat.ui.fragments
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,7 +35,6 @@ import com.rtbishop.look4sat.ui.adapters.PassesAdapter
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities
 import com.rtbishop.look4sat.utility.Utilities.getRotationAnimator
-import com.rtbishop.look4sat.utility.Utilities.snack
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -88,10 +85,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 setHasFixedSize(true)
             }
-            passesFilter.setOnClickListener {
-                val passPrefs = prefsManager.getPassPrefs()
-                showSatPassPrefsDialog(passPrefs.hoursAhead, passPrefs.minEl)
-            }
             animator = passesFab.getRotationAnimator()
             passesFab.setOnClickListener {
                 if (animator.isRunning) {
@@ -102,44 +95,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             }
         }
         viewModel.triggerCalculation()
-    }
-
-    private fun showSatPassPrefsDialog(hoursAhead: Int, minEl: Double) {
-        val satPassPrefView = View.inflate(requireContext(), R.layout.dialog_passes, null)
-        val etHoursAhead = satPassPrefView.findViewById<EditText>(R.id.pref_et_hoursAhead)
-        val etMinEl = satPassPrefView.findViewById<EditText>(R.id.pref_et_minEl)
-        etHoursAhead.setText(hoursAhead.toString())
-        etMinEl.setText(minEl.toString())
-
-        AlertDialog.Builder(requireContext()).apply {
-            setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                val hoursString = etHoursAhead.text.toString()
-                val minElString = etMinEl.text.toString()
-                if (hoursString.isNotEmpty() && minElString.isNotEmpty()) {
-                    val hours = hoursString.toInt()
-                    val elevation = minElString.toDouble()
-                    when {
-                        hours < 1 || hours > 168 -> {
-                            getString(R.string.pref_hours_ahead_input_error).snack(requireView())
-                        }
-                        elevation < 0 || elevation > 90 -> {
-                            getString(R.string.pref_min_el_input_error).snack(requireView())
-                        }
-                        else -> {
-                            prefsManager.setPassPrefs(hours, elevation)
-                            viewModel.calculatePasses()
-                        }
-                    }
-                } else getString(R.string.err_enter_value).snack(requireView())
-
-            }
-            setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
-                dialog.cancel()
-            }
-            setView(satPassPrefView)
-            create()
-            show()
-        }
     }
 
     private fun tickMainTimer(timeNow: Long) {

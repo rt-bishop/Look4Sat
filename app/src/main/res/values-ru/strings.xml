@@ -26,17 +26,12 @@
     <string name="menu_prefs">Настройки</string>
     <string name="menu_about">Инфо</string>
 
-    <string name="dialog_filter_passes">Фильтровать пролеты</string>
     <string name="dialog_tle_sources">Управление источниками TLE</string>
     <string name="dialog_entries_hint">ID / Имя</string>
 
-    <string name="pref_passes_preferences">Настройки пролетов</string>
-    <string name="pref_hours_ahead">Количество часов</string>
-    <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
-    <string name="pref_hours_ahead_input_error">Введите значение между 1ч и 168ч</string>
-    <string name="pref_minimal_elevation">Минимальная элевация</string>
-    <string name="pref_min_el_summary">Показать пролеты с элевацией более</string>
-    <string name="pref_min_el_input_error">Введите значение между 0° и 90°</string>
+    <string name="pass_prefs_title">Настройки пролетов спутников</string>
+    <string name="hours_ahead_title">Количество часов</string>
+    <string name="minimal_elevation_title">Минимальная элевация</string>
 
     <string name="pref_gsp_title">Местоположение наземной станции</string>
     <string name="pref_lat_title">Широта, град</string>

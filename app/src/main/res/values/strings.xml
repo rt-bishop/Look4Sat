@@ -27,17 +27,12 @@
     <string name="menu_prefs">Settings</string>
     <string name="menu_about">Info</string>
 
-    <string name="dialog_filter_passes">Filter passes</string>
     <string name="dialog_tle_sources">Manage TLE sources</string>
     <string name="dialog_entries_hint">ID / Name</string>
 
-    <string name="pref_passes_preferences">Passes preferences</string>
-    <string name="pref_hours_ahead">Hours ahead</string>
-    <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
-    <string name="pref_hours_ahead_input_error">Set the value between 1h and 168h</string>
-    <string name="pref_minimal_elevation">Minimal elevation</string>
-    <string name="pref_min_el_summary">Show passes with max elevation above</string>
-    <string name="pref_min_el_input_error">Set the value between 0° and 90°</string>
+    <string name="pass_prefs_title">Satellite pass preferences</string>
+    <string name="hours_ahead_title">Hours ahead</string>
+    <string name="minimal_elevation_title">Minimal elevation</string>
 
     <string name="pref_gsp_title">Ground station position</string>
     <string name="pref_lat_title">Latitude, deg</string>
