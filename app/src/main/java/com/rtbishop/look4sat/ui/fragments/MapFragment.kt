@@ -72,7 +72,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         footprintPaint = Paint().apply {
             style = Paint.Style.FILL_AND_STROKE
-            color = ContextCompat.getColor(mainActivity, R.color.satOsmTemp)
+            color = ContextCompat.getColor(mainActivity, R.color.satFootprint)
             isAntiAlias = true
         }
 

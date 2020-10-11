@@ -19,17 +19,15 @@
 
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents">
+    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/themeAccent</item>
         <item name="colorSecondary">@color/themeAccent</item>
-        <item name="colorSurface">@color/backgroundDark</item>
+        <item name="colorSurface">@color/darkBackground</item>
 
-        <item name="colorOnPrimary">@color/backgroundDark</item>
-        <item name="colorOnSecondary">@color/backgroundDark</item>
-        <item name="colorOnSurface">@color/themeLight</item>
+        <item name="colorOnPrimary">@color/darkBackground</item>
+        <item name="colorOnSecondary">@color/darkBackground</item>
+        <item name="colorOnSurface">@color/themePrimText</item>
 
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
@@ -49,14 +47,14 @@
     <style name="PolarViewText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textColor">@color/themePrimText</item>
         <item name="android:textSize">15sp</item>
     </style>
 
     <style name="CardTransText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textColor">@color/themePrimText</item>
         <item name="android:textSize">15sp</item>
     </style>
 
@@ -96,14 +94,14 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textColor">@color/themePrimText</item>
         <item name="android:textSize">16sp</item>
     </style>
 
     <style name="AboutRegular">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textColor">@color/themePrimText</item>
         <item name="android:textSize">15sp</item>
     </style>
 

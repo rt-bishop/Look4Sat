@@ -29,7 +29,7 @@ class PolarView(context: Context) : View(context) {
 
     private val radarPaint = Paint().apply {
         isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.themeLight)
+        color = ContextCompat.getColor(context, R.color.themePrimText)
         style = Paint.Style.STROKE
         strokeWidth = scale
     }
