@@ -42,9 +42,11 @@
 
         <TextView
             android:id="@+id/id_name"
-            style="@style/MapOsmSatInfo.Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/pat_osm_idName"
+            android:textColor="@color/secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -52,33 +54,41 @@
 
         <TextView
             android:id="@+id/altitude"
-            style="@style/MapOsmSatInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="@string/pat_altitude"
+            android:textColor="@color/secondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/id_name" />
 
         <TextView
             android:id="@+id/distance"
-            style="@style/MapOsmSatInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:text="@string/pat_distance"
+            android:textColor="@color/secondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/altitude"
             app:layout_constraintTop_toBottomOf="@+id/altitude" />
 
         <TextView
             android:id="@+id/velocity"
-            style="@style/MapOsmSatInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:text="@string/pat_osm_vel"
+            android:textColor="@color/secondary"
             app:layout_constraintBaseline_toBaselineOf="@+id/altitude"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/lat_lon"
-            style="@style/MapOsmSatInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/pat_osm_latLon"
+            android:textColor="@color/secondary"
             app:layout_constraintBaseline_toBaselineOf="@+id/distance"
             app:layout_constraintEnd_toEndOf="@+id/velocity" />
 
@@ -86,8 +96,12 @@
 
     <TextView
         android:id="@+id/copyright"
-        style="@style/MapOsmCopyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="@string/osmCopyright"
+        android:textColor="@color/secondary"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

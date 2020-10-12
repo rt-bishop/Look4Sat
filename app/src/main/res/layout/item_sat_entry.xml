@@ -27,5 +27,4 @@
     android:paddingStart="24dp"
     android:paddingEnd="20dp"
     android:text="@string/placeholder"
-    android:textColor="@color/themePrimText"
     android:textSize="17sp" />

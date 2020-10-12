@@ -18,17 +18,26 @@
   -->
 
 <resources>
-    <!-- main colors -->
-    <color name="themeAccent">#FFE082</color>
-    <color name="themePrimText">#E8E8E8</color>
-    <color name="themeSecText">#808080</color>
-    <!-- background colors -->
-    <color name="primBackground">#282828</color>
-    <color name="secBackground">#242424</color>
-    <color name="themeDark">#191919</color>
-    <color name="darkBackground">#121212</color>
-    <color name="mapInfoLayout">#66000000</color>
-    <!-- satellite colors -->
-    <color name="satTrack">#CE2029</color>
+    <!-- theme colors -->
+    <color name="primary">#191919</color> <!---->
+    <color name="onPrimary">#E0E0E0</color> <!---->
+    <color name="primaryVariant">#242424</color>
+
+    <color name="secondary">#FFE082</color> <!---->
+    <color name="onSecondary">#121212</color>
+    <color name="secondaryVariant">#B00020</color>
+
+    <color name="error">#B00020</color>
+    <color name="onError">#E0E0E0</color>
+
+    <color name="surface">#121212</color>
+    <color name="onSurface">#E0E0E0</color>
+
+    <color name="background">#121212</color> <!---->
+    <color name="onBackground">#E0E0E0</color>
+
+    <!-- map colors -->
+    <color name="satTrack">#B00020</color>
     <color name="satFootprint">#26FFE082</color>
+    <color name="mapInfoLayout">#66000000</color>
 </resources>

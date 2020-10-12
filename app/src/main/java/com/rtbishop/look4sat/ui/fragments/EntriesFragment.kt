@@ -41,7 +41,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 val linearLayoutMgr = LinearLayoutManager(requireContext())
                 val divider = DividerItemDecoration(requireContext(), linearLayoutMgr.orientation)
                 val drawable = ResourcesCompat
-                    .getDrawable(resources, R.drawable.entries_divider, requireActivity().theme)
+                    .getDrawable(resources, R.drawable.rec_entries_divider, requireActivity().theme)
                 drawable?.let { divider.setDrawable(it) }
                 layoutManager = linearLayoutMgr
                 adapter = entriesAdapter

@@ -8,10 +8,12 @@
 
     <TextView
         android:id="@+id/tleSourcesTitle"
-        style="@style/DialogText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="10dp"
         android:text="@string/dialog_tle_sources"
+        android:textSize="17sp"
         app:layout_constraintEnd_toStartOf="@+id/tleSourceBtnAdd"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -51,27 +53,33 @@
 
     <TextView
         android:id="@+id/tleSourcesWarning"
-        style="@style/DialogText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="@string/https_only"
+        android:textSize="17sp"
         app:layout_constraintStart_toStartOf="@+id/tleSourcesTitle"
         app:layout_constraintTop_toBottomOf="@+id/tleSourcesTitle" />
 
     <TextView
         android:id="@+id/tleSourcesBtnNeg"
-        style="@style/DialogText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:text="@string/btn_cancel"
+        android:textSize="17sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/tleSourcesBtnPos"
         app:layout_constraintEnd_toStartOf="@+id/tleSourcesBtnPos"
         app:layout_constraintHorizontal_chainStyle="spread_inside" />
 
     <TextView
         android:id="@+id/tleSourcesBtnPos"
-        style="@style/DialogText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/btn_ok"
+        android:textSize="17sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/tleSourceBtnAdd" />
 

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Look4Sat. Amateur radio and weather satellite tracker and passes predictor for Android.
   ~ Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
   ~
@@ -34,24 +33,30 @@
 
         <TextView
             android:id="@+id/trans_description"
-            style="@style/CardTransText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/trans_description"
+            android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="@+id/trans_img"
             app:layout_constraintStart_toEndOf="@+id/trans_img"
             app:layout_constraintTop_toTopOf="@+id/trans_img" />
 
         <TextView
             android:id="@+id/trans_downlink"
-            style="@style/CardTransText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/trans_down_lowHigh"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/trans_img_downlink"
             app:layout_constraintTop_toBottomOf="@+id/trans_description" />
 
         <TextView
             android:id="@+id/trans_uplink"
-            style="@style/CardTransText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/trans_up_lowHigh"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/trans_img_uplink"
@@ -72,17 +77,21 @@
 
         <TextView
             android:id="@+id/trans_downlink_doppler"
-            style="@style/CardTransText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
             android:text="@string/trans_down_lowHigh_doppler"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/trans_img_downlink_doppler"
             app:layout_constraintTop_toBottomOf="@+id/separator" />
 
         <TextView
             android:id="@+id/trans_uplink_doppler"
-            style="@style/CardTransText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/trans_up_lowHigh_doppler"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/trans_img_uplink_doppler"
@@ -90,19 +99,23 @@
 
         <TextView
             android:id="@+id/trans_mode"
-            style="@style/CardTransText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:layout_marginBottom="2dp"
             android:text="@string/trans_mode"
+            android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trans_uplink_doppler" />
 
         <TextView
             android:id="@+id/trans_inverted"
-            style="@style/CardTransText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/trans_inverted"
+            android:textSize="15sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/trans_mode"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -176,7 +189,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trans_downlink_doppler"
             app:srcCompat="@drawable/ic_trans_doppler" />
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

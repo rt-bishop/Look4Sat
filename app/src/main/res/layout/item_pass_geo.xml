@@ -56,8 +56,11 @@
 
         <TextView
             android:id="@+id/pass_geo_name"
-            style="@style/CardPassName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/pass_satName"
+            android:textColor="@color/secondary"
+            android:textSize="16sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_id"
             app:layout_constraintEnd_toStartOf="@+id/pass_geo_id"
             app:layout_constraintHorizontal_bias="0.02"
@@ -65,17 +68,22 @@
 
         <TextView
             android:id="@+id/pass_geo_id"
-            style="@style/CardPassName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/pass_satId"
+            android:textColor="@color/secondary"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/pass_geo_el"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/pass_geo_az"
-            style="@style/CardPassText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:text="@string/pat_azimuth"
+            android:textSize="15sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_el"
             app:layout_constraintEnd_toStartOf="@+id/pass_geo_el"
             app:layout_constraintHorizontal_bias="0.5"
@@ -84,11 +92,13 @@
 
         <TextView
             android:id="@+id/pass_geo_el"
-            style="@style/CardPassText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="6dp"
             android:layout_marginBottom="4dp"
             android:text="@string/pat_elevation"
+            android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/pass_geo_az"

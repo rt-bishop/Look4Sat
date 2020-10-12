@@ -46,8 +46,10 @@
 
         <TextView
             android:id="@+id/pass_leo_losAz"
-            style="@style/CardPassText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/pass_los_az"
+            android:textSize="15sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_maxEl"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_progress"
             app:layout_constraintHorizontal_bias="1.0"
@@ -55,17 +57,22 @@
 
         <TextView
             android:id="@+id/pass_leo_satId"
-            style="@style/CardPassName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/pass_satId"
+            android:textColor="@color/secondary"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_progress"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/pass_leo_maxEl"
-            style="@style/CardPassText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="@string/pat_elevation"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -83,10 +90,11 @@
 
         <TextView
             android:id="@+id/pass_leo_satName"
-            style="@style/CardPassName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_satName"
+            android:textColor="@color/secondary"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/pass_leo_satId"
             app:layout_constraintEnd_toStartOf="@+id/pass_leo_satId"
             app:layout_constraintHorizontal_bias="0.02"
@@ -95,8 +103,10 @@
 
         <TextView
             android:id="@+id/pass_leo_aosAz"
-            style="@style/CardPassText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/pass_aos_az"
+            android:textSize="15sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_maxEl"
             app:layout_constraintEnd_toStartOf="@+id/pass_leo_maxEl"
             app:layout_constraintHorizontal_bias="0.0"
@@ -104,8 +114,10 @@
 
         <TextView
             android:id="@+id/pass_leo_aosTime"
-            style="@style/CardPassText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/pass_dateTime"
+            android:textSize="15sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_losTime"
             app:layout_constraintEnd_toStartOf="@+id/pass_leo_losTime"
             app:layout_constraintHorizontal_bias="0.5"
@@ -114,9 +126,11 @@
 
         <TextView
             android:id="@+id/pass_leo_losTime"
-            style="@style/CardPassText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:text="@string/pass_dateTime"
+            android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_progress"
             app:layout_constraintHorizontal_bias="0.5"

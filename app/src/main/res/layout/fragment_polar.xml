@@ -34,33 +34,41 @@
 
     <TextView
         android:id="@+id/azimuth"
-        style="@style/PolarViewText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="@string/pat_azimuth"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="@+id/frame"
         app:layout_constraintTop_toTopOf="@+id/frame" />
 
     <TextView
         android:id="@+id/elevation"
-        style="@style/PolarViewText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:text="@string/pat_elevation"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="@+id/frame"
         app:layout_constraintTop_toTopOf="@+id/frame" />
 
     <TextView
         android:id="@+id/altitude"
-        style="@style/PolarViewText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="@string/pat_altitude"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/frame"
         app:layout_constraintStart_toStartOf="@+id/frame" />
 
     <TextView
         android:id="@+id/distance"
-        style="@style/PolarViewText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:text="@string/pat_distance"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/frame"
         app:layout_constraintEnd_toEndOf="@+id/frame" />
 
@@ -76,11 +84,12 @@
 
     <TextView
         android:id="@+id/no_trans_msg"
-        style="@style/PolarViewText"
         android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="@string/no_trans"
+        android:textSize="15sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

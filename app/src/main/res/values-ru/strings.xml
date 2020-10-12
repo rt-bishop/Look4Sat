@@ -115,6 +115,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Отмена</string>
 
+    <string name="tle_source">Источник TLE</string>
     <string name="https_only">Используйте протокол HTTPS</string>
     <string name="sat_import">Импорт спутников</string>
 </resources>

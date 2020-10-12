@@ -7,7 +7,7 @@
             <size
                 android:width="1dp"
                 android:height="0.5dp" />
-            <solid android:color="@color/themeSecText" />
+            <solid android:color="#808080" />
         </shape>
     </item>
 </layer-list>

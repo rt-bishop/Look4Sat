@@ -30,10 +30,13 @@
 
         <TextView
             android:id="@+id/title"
-            style="@style/AboutTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="16dp"
             android:text="@string/app_name"
+            android:textColor="@color/secondary"
+            android:textSize="42sp"
             app:layout_constraintBottom_toBottomOf="@+id/title_img"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -57,38 +60,48 @@
 
         <TextView
             android:id="@+id/version"
-            style="@style/AboutSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
+            android:gravity="center"
             android:text="@string/app_version"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <TextView
             android:id="@+id/subtitle"
-            style="@style/AboutSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
+            android:gravity="center"
             android:text="@string/about_subtitle"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/version" />
 
         <TextView
             android:id="@+id/thanks"
-            style="@style/AboutSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:gravity="center"
             android:text="@string/about_thanks_to"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/subtitle"
             app:layout_constraintStart_toStartOf="@+id/subtitle"
             app:layout_constraintTop_toBottomOf="@+id/subtitle" />
 
         <TextView
             android:id="@+id/message"
-            style="@style/AboutRegular"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"

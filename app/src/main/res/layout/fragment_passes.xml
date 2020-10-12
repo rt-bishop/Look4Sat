@@ -31,7 +31,7 @@
             android:id="@+id/passes_bar"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:background="@color/themeDark"
+            android:background="@color/primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/digital_dismay"
             android:text="@string/timer_zero"
-            android:textColor="@color/themeAccent"
+            android:textColor="@color/secondary"
             android:textSize="48sp"
             app:layout_constraintBottom_toBottomOf="@+id/passes_bar"
             app:layout_constraintEnd_toEndOf="parent"
