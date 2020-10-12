@@ -168,10 +168,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             passList.forEach {
                 val satPos = it.predictor.getSatPos(dateNow)
                 var lat = Math.toDegrees(satPos.latitude)
-                var lon = Math.toDegrees(satPos.longitude)
-
                 if (lat > 85.05) lat = 85.05
                 else if (lat < -85.05) lat = -85.05
+                var lon = Math.toDegrees(satPos.longitude)
                 if (lon > 180.0) lon -= 360.0
 
                 SatItem(it.tle.name, it.tle.name, GeoPoint(lat, lon), it).apply {
@@ -204,8 +203,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun setSatInfo(satPass: SatPass) {
         val satPos = satPass.predictor.getSatPos(dateNow)
-        val satLat = Math.toDegrees(satPos.latitude).toFloat()
-        var satLon = Math.toDegrees(satPos.longitude).toFloat()
+
+        var satLat = Math.toDegrees(satPos.latitude)
+        if (satLat > 85.05) satLat = 85.05
+        else if (satLat < -85.05) satLat = -85.05
+
+        var satLon = Math.toDegrees(satPos.longitude)
         if (satLon > 180f) satLon -= 360f
 
         binding.idName.text =
@@ -242,9 +245,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         var oldLon = 0.0
         positions.forEach {
-            val newLat = Math.toDegrees(it.latitude)
+            var newLat = Math.toDegrees(it.latitude)
+            if (newLat > 85.05) newLat = 85.05
+            else if (newLat < -85.05) newLat = -85.05
+
             var newLon = Math.toDegrees(it.longitude)
             if (newLon > 180.0) newLon -= 360.0
+
             if (oldLon < -170.0 && newLon > 170.0 || oldLon > 170.0 && newLon < -170.0) {
                 val currentPoints = mutableListOf<GeoPoint>()
                 currentPoints.addAll(trackPoints)
@@ -275,10 +282,10 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         rangeCircle.withIndex().forEach {
             var lat = it.value.lat
-            var lon = it.value.lon
-
             if (lat > 85.05) lat = 85.05
             else if (lat < -85.05) lat = -85.05
+
+            var lon = it.value.lon
             if (lon > 180.0) lon -= 360.0
 
             if (it.index == 0) zeroPoint = GeoPoint(lat, lon)
