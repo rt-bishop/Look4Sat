@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_satName"
-            android:textColor="@color/secondary"
+            android:textColor="@color/themeLight"
             android:textSize="16sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_id"
             app:layout_constraintEnd_toStartOf="@+id/pass_geo_id"
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/pass_satId"
-            android:textColor="@color/secondary"
+            android:textColor="@color/themeLight"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/pass_geo_el"
             app:layout_constraintTop_toTopOf="parent" />

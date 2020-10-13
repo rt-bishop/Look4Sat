@@ -29,13 +29,13 @@ class PolarView(context: Context) : View(context) {
 
     private val radarPaint = Paint().apply {
         isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.onPrimary)
+        color = ContextCompat.getColor(context, R.color.greyLight)
         style = Paint.Style.STROKE
         strokeWidth = scale
     }
     private val txtPaint = Paint().apply {
         isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.secondary)
+        color = ContextCompat.getColor(context, R.color.themeLight)
         textSize = txtSize
     }
     private val trackPaint = Paint().apply {
@@ -46,7 +46,7 @@ class PolarView(context: Context) : View(context) {
     }
     private val satPaint = Paint().apply {
         isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.secondary)
+        color = ContextCompat.getColor(context, R.color.themeLight)
         style = Paint.Style.FILL
     }
 

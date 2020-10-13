@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/pass_satId"
-            android:textColor="@color/secondary"
+            android:textColor="@color/themeLight"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_progress"
             app:layout_constraintTop_toTopOf="parent" />
@@ -93,7 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_satName"
-            android:textColor="@color/secondary"
+            android:textColor="@color/themeLight"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/pass_leo_satId"
             app:layout_constraintEnd_toStartOf="@+id/pass_leo_satId"

@@ -17,7 +17,7 @@
   ~ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
   -->
 
-<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.checkbox.MaterialCheckBox xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sat_entry_checkbox"
     android:layout_width="match_parent"
     android:layout_height="34dp"

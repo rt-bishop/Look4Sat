@@ -19,23 +19,9 @@
 
 <resources>
     <!-- theme colors -->
-    <color name="primary">#191919</color> <!---->
-    <color name="onPrimary">#E0E0E0</color> <!---->
-    <color name="primaryVariant">#242424</color>
-
-    <color name="secondary">#FFE082</color> <!---->
-    <color name="onSecondary">#121212</color>
-    <color name="secondaryVariant">#B00020</color>
-
-    <color name="error">#B00020</color>
-    <color name="onError">#E0E0E0</color>
-
-    <color name="surface">#121212</color>
-    <color name="onSurface">#E0E0E0</color>
-
-    <color name="background">#121212</color> <!---->
-    <color name="onBackground">#E0E0E0</color>
-
+    <color name="themeLight">#FFE082</color>
+    <color name="greyDark">#121212</color>
+    <color name="greyLight">#E0E0E0</color>
     <!-- map colors -->
     <color name="satTrack">#B00020</color>
     <color name="satFootprint">#26FFE082</color>

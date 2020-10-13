@@ -30,7 +30,6 @@
             android:id="@+id/entries_bar"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:background="@color/primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +49,6 @@
             android:id="@+id/import_web"
             android:layout_width="64dp"
             android:layout_height="48dp"
-            android:backgroundTint="@color/background"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_update_web"
             app:layout_constraintBottom_toBottomOf="@+id/import_file"
@@ -62,7 +60,6 @@
             android:layout_width="64dp"
             android:layout_height="48dp"
             android:layout_marginEnd="4dp"
-            android:backgroundTint="@color/background"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_update_file"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,7 +80,6 @@
             android:id="@+id/select_all"
             android:layout_width="64dp"
             android:layout_height="48dp"
-            android:backgroundTint="@color/primary"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_select_all"
             app:layout_constraintEnd_toEndOf="@+id/import_file"
@@ -106,6 +102,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_margin="24dp"
+        android:contentDescription="@string/placeholder"
         android:src="@drawable/ic_proceed"
         app:fabSize="mini" />
 
