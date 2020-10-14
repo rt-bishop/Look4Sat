@@ -32,7 +32,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/azimuth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         app:layout_constraintStart_toStartOf="@+id/frame"
         app:layout_constraintTop_toTopOf="@+id/frame" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/elevation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="@+id/frame"
         app:layout_constraintTop_toTopOf="@+id/frame" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/altitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/frame"
         app:layout_constraintStart_toStartOf="@+id/frame" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frame" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/no_trans_msg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -27,18 +27,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/passes_bar"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/passes_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:elevation="4dp"
             android:fontFamily="@font/digital_dismay"
             android:text="@string/timer_zero"
             android:textColor="@color/themeLight"

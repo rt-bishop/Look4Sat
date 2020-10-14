@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_margin="4dp">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tleSourcesTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tleSourcesWarning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
         app:layout_constraintStart_toStartOf="@+id/tleSourcesTitle"
         app:layout_constraintTop_toBottomOf="@+id/tleSourcesTitle" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tleSourcesBtnNeg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
         app:layout_constraintEnd_toStartOf="@+id/tleSourcesBtnPos"
         app:layout_constraintHorizontal_chainStyle="spread_inside" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tleSourcesBtnPos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

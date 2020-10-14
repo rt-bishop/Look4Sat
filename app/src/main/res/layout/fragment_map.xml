@@ -40,7 +40,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/id_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/altitude"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/id_name" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
             app:layout_constraintStart_toStartOf="@+id/altitude"
             app:layout_constraintTop_toBottomOf="@+id/altitude" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/velocity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/altitude"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/lat_lon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/copyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

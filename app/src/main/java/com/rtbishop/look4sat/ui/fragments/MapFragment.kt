@@ -87,7 +87,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             setTileSource(getWikimediaTileSource())
             minZoomLevel = 2.5
             maxZoomLevel = 6.0
-            controller.setZoom(minZoomLevel)
+            controller.setZoom(3.0)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
             isHorizontalMapRepetitionEnabled = false
             isVerticalMapRepetitionEnabled = false
@@ -123,13 +123,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun setupObservers() {
         viewModel.getPasses().observe(viewLifecycleOwner, { satPasses ->
-            when (satPasses) {
-                is Result.Success -> {
-                    if (satPasses.data.isNotEmpty()) {
-                        val filteredPasses = satPasses.data.distinctBy { it.tle }
-                        selectedPass = filteredPasses[0]
-                        setupSatOverlay(filteredPasses)
-                    }
+            if (satPasses is Result.Success) {
+                if (satPasses.data.isNotEmpty()) {
+                    val filteredPasses = satPasses.data.distinctBy { it.tle }
+                    selectedPass = filteredPasses[0]
+                    setupSatOverlay(filteredPasses)
                 }
             }
         })

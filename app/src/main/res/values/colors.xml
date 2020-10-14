@@ -22,6 +22,7 @@
     <color name="themeLight">#FFE082</color>
     <color name="greyDark">#121212</color>
     <color name="greyLight">#E0E0E0</color>
+    <color name="greySurface">#242424</color>
     <!-- map colors -->
     <color name="satTrack">#B00020</color>
     <color name="satFootprint">#26FFE082</color>

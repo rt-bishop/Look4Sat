@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/version"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/version" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/thanks"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
             app:layout_constraintStart_toStartOf="@+id/subtitle"
             app:layout_constraintTop_toBottomOf="@+id/subtitle" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
