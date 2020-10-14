@@ -108,19 +108,15 @@ class PassesAdapter(context: Context, private var shouldUseUTC: Boolean = false)
 
         fun bind(satPass: SatPass) {
             binding.apply {
-                if (satPass.active) passLeoImg.setImageResource(R.drawable.ic_pass_active)
-                else passLeoImg.setImageResource(R.drawable.ic_pass_inactive)
-
+                if (shouldUseUTC) simpleDateFormat.timeZone = timeZoneUTC
+                val startTime = simpleDateFormat.format(satPass.pass.startTime)
+                val endTime = simpleDateFormat.format(satPass.pass.endTime)
                 passLeoSatName.text = satPass.tle.name
                 passLeoSatId.text = String.format(satIdFormat, satPass.tle.catnum)
+                passLeoAosAz.text = String.format(aosAzFormat, startTime, satPass.pass.aosAzimuth)
                 passLeoMaxEl.text = String.format(elevFormat, satPass.pass.maxEl)
-                passLeoAosAz.text = String.format(aosAzFormat, satPass.pass.aosAzimuth)
-                passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth)
+                passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth, endTime)
                 passLeoProgress.progress = satPass.progress
-
-                if (shouldUseUTC) simpleDateFormat.timeZone = timeZoneUTC
-                passLeoAosTime.text = simpleDateFormat.format(satPass.pass.startTime)
-                passLeoLosTime.text = simpleDateFormat.format(satPass.pass.endTime)
             }
 
             itemView.setOnClickListener {

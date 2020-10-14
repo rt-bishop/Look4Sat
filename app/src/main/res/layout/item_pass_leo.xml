@@ -22,21 +22,19 @@
     android:id="@+id/pass_leo_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="4dp"
-    android:layout_marginTop="2dp"
-    android:layout_marginEnd="4dp"
-    android:layout_marginBottom="2dp"
-    app:cardElevation="1dp">
+    app:cardCornerRadius="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/pass_leo_bg"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@string/placeholder"
+            android:scaleType="centerCrop"
+            android:src="@drawable/card_pass_bg"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,104 +45,64 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_los_az"
-            android:textSize="15sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_maxEl"
-            app:layout_constraintEnd_toEndOf="@+id/pass_leo_progress"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/pass_leo_maxEl" />
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_aosAz"
+            app:layout_constraintEnd_toEndOf="@+id/pass_leo_satId"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/pass_leo_aosAz" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_leo_satId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginEnd="6dp"
             android:text="@string/pass_satId"
+            android:textSize="15sp"
             android:textColor="@color/themeLight"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/pass_leo_progress"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_satName"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_leo_maxEl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:text="@string/pat_elevation"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pass_leo_satId" />
-
-        <ImageView
-            android:id="@+id/pass_leo_img"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:contentDescription="@string/placeholder"
-            app:layout_constraintBottom_toBottomOf="@+id/pass_leo_satName"
-            app:layout_constraintStart_toStartOf="@+id/pass_leo_progress"
-            app:layout_constraintTop_toTopOf="@+id/pass_leo_satName"
-            app:srcCompat="@drawable/ic_pass_inactive" />
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_aosAz"
+            app:layout_constraintEnd_toEndOf="@+id/pass_leo_losAz"
+            app:layout_constraintStart_toStartOf="@+id/pass_leo_aosAz" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_leo_satName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="2dp"
+            android:textSize="15sp"
             android:text="@string/pass_satName"
             android:textColor="@color/themeLight"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@+id/pass_leo_satId"
-            app:layout_constraintEnd_toStartOf="@+id/pass_leo_satId"
-            app:layout_constraintHorizontal_bias="0.02"
-            app:layout_constraintStart_toEndOf="@+id/pass_leo_img"
-            app:layout_constraintTop_toTopOf="@+id/pass_leo_satId" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_leo_aosAz"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_aos_az"
-            android:textSize="15sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_maxEl"
-            app:layout_constraintEnd_toStartOf="@+id/pass_leo_maxEl"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/pass_leo_progress" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/pass_leo_aosTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pass_dateTime"
-            android:textSize="15sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_losTime"
-            app:layout_constraintEnd_toStartOf="@+id/pass_leo_losTime"
+            app:layout_constraintEnd_toStartOf="@+id/pass_leo_losAz"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="@+id/pass_leo_progress" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/pass_leo_losTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="@string/pass_dateTime"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/pass_leo_progress"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/pass_leo_aosTime"
-            app:layout_constraintTop_toBottomOf="@+id/pass_leo_progress" />
+            app:layout_constraintStart_toStartOf="@+id/pass_leo_satName"
+            app:layout_constraintTop_toBottomOf="@+id/pass_leo_satName" />
 
         <ProgressBar
             android:id="@+id/pass_leo_progress"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
             android:layout_height="14dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pass_leo_maxEl" />
+            android:layout_marginBottom="2dp"
+            app:layout_constraintBottom_toBottomOf="@+id/pass_leo_bg"
+            app:layout_constraintEnd_toEndOf="@+id/pass_leo_losAz"
+            app:layout_constraintStart_toStartOf="@+id/pass_leo_aosAz"
+            app:layout_constraintTop_toBottomOf="@+id/pass_leo_aosAz" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

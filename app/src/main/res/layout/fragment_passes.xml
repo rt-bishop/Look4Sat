@@ -32,7 +32,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             app:cardCornerRadius="0dp"
-            app:cardElevation="2dp"
+            app:cardElevation="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -55,7 +55,9 @@
             android:id="@+id/passes_recycler"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
             android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

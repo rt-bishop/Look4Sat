@@ -20,7 +20,7 @@
         android:id="@+id/nav_bottom"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        app:elevation="2dp"
+        app:elevation="1dp"
         app:itemIconTint="@color/nav_bottom_item"
         app:itemTextColor="@color/nav_bottom_item"
         app:labelVisibilityMode="labeled"

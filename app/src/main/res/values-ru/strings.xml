@@ -53,9 +53,6 @@
 
     <string name="error_updating_data">Ошибка импорта спутников</string>
 
-    <string name="pass_aos_az">НПС — %2d°</string>
-    <string name="pass_los_az">%2d° — КПС</string>
-
     <string name="pat_azimuth">Аз: %.1f°</string>
     <string name="pat_elevation">Элев: %.1f°</string>
     <string name="pat_distance">Дист: %.0fкм</string>

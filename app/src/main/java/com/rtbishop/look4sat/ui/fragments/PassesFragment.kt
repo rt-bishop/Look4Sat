@@ -22,8 +22,10 @@ package com.rtbishop.look4sat.ui.fragments
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
@@ -60,14 +62,11 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
 
     private fun setupObservers() {
         viewModel.getPasses().observe(viewLifecycleOwner, { result ->
-            when (result) {
-                is Result.Success -> {
-                    animator.cancel()
-                    passes = result.data
-                    passesAdapter.setList(passes)
-                }
-                is Result.InProgress -> animator.start()
-            }
+            if (result is Result.Success) {
+                animator.cancel()
+                passes = result.data
+                passesAdapter.setList(passes)
+            } else if (result is Result.InProgress) animator.start()
         })
         viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, { currentTime ->
             tickMainTimer(currentTime)
@@ -79,10 +78,16 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         passesAdapter = PassesAdapter(requireContext(), prefsManager.shouldUseUTC())
         binding.apply {
             passesRecycler.apply {
-                layoutManager = LinearLayoutManager(requireContext())
+                val linearLayoutMgr = LinearLayoutManager(requireContext())
+                val divider = DividerItemDecoration(requireContext(), linearLayoutMgr.orientation)
+                val drawable = ResourcesCompat
+                    .getDrawable(resources, R.drawable.rec_passes_divider, requireActivity().theme)
+                drawable?.let { divider.setDrawable(it) }
+                layoutManager = linearLayoutMgr
                 adapter = passesAdapter
                 isVerticalScrollBarEnabled = false
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addItemDecoration(divider)
                 setHasFixedSize(true)
             }
             animator = passesFab.getRotationAnimator()

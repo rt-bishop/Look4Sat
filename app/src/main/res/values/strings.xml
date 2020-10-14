@@ -55,10 +55,10 @@
     <string name="error_updating_data">Error importing satellite data</string>
 
     <string name="pass_satName" translatable="false">%s</string>
-    <string name="pass_satId" translatable="false">ID: %d</string>
-    <string name="pass_aos_az">AOS — %2d°</string>
-    <string name="pass_los_az">%2d° — LOS</string>
-    <string name="pass_dateTime" translatable="false">dd MMM - HH:mm:ss</string>
+    <string name="pass_satId" translatable="false">ID:%d</string>
+    <string name="pass_aos_az" translatable="false">%s — %2d°</string>
+    <string name="pass_los_az" translatable="false">%2d° — %s</string>
+    <string name="pass_dateTime" translatable="false">HH:mm:ss</string>
 
     <string name="pat_azimuth">Az: %.1f°</string>
     <string name="pat_elevation">El: %.1f°</string>
