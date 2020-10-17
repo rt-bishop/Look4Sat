@@ -28,10 +28,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/entries_bar"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            app:cardCornerRadius="0dp"
-            app:cardElevation="1dp"
+            style="@style/TopBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

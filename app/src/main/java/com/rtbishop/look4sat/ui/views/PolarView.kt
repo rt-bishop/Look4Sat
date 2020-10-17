@@ -22,16 +22,16 @@ class PolarView(context: Context) : View(context) {
     private val polarWidth = resources.displayMetrics.widthPixels
     private val polarCenter = polarWidth / 2f
     private val scale = resources.displayMetrics.density
-    private val radius = polarWidth * 0.49f
-    private val txtSize = scale * 15
+    private val radius = polarWidth * 0.48f
+    private val txtSize = scale * 16
     private val path: Path = Path()
-    private var azimuth = 0f
+    private val piDiv2 = Math.PI / 2.0
 
     private val radarPaint = Paint().apply {
         isAntiAlias = true
         color = ContextCompat.getColor(context, R.color.greyLight)
         style = Paint.Style.STROKE
-        strokeWidth = scale
+        strokeWidth = scale * 1.6f
     }
     private val txtPaint = Paint().apply {
         isAntiAlias = true
@@ -42,7 +42,7 @@ class PolarView(context: Context) : View(context) {
         isAntiAlias = true
         color = ContextCompat.getColor(context, R.color.satTrack)
         style = Paint.Style.STROKE
-        strokeWidth = scale
+        strokeWidth = scale * 1.6f
     }
     private val satPaint = Paint().apply {
         isAntiAlias = true
@@ -51,13 +51,10 @@ class PolarView(context: Context) : View(context) {
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.rotate(-azimuth, polarCenter, polarCenter)
         canvas.translate(polarCenter, polarCenter)
         drawRadarView(canvas)
         drawRadarText(canvas)
-        if (!pass.tle.isDeepspace) {
-            drawPassTrajectory(canvas, pass)
-        }
+        if (!pass.tle.isDeepspace) drawPassTrajectory(canvas, pass)
         drawSatellite(canvas, pass)
     }
 
@@ -99,18 +96,16 @@ class PolarView(context: Context) : View(context) {
         if (satPos.elevation > 0) {
             val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
             val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            cvs.drawCircle(x, -y, txtSize / 3, satPaint)
+            cvs.drawCircle(x, -y, txtSize / 2.6f, satPaint)
         }
     }
 
     private fun sph2CartX(azimuth: Double, elevation: Double, r: Double): Float {
-        val piDiv2 = Math.PI / 2.0
         val radius = r * (piDiv2 - elevation) / piDiv2
         return (radius * cos(piDiv2 - azimuth)).toFloat()
     }
 
     private fun sph2CartY(azimuth: Double, elevation: Double, r: Double): Float {
-        val piDiv2 = Math.PI / 2.0
         val radius = r * (piDiv2 - elevation) / piDiv2
         return (radius * sin(piDiv2 - azimuth)).toFloat()
     }

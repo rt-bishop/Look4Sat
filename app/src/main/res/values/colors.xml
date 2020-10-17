@@ -22,9 +22,9 @@
     <color name="themeLight">#FFE082</color>
     <color name="themeDark">#FFCA28</color>
     <color name="greyDark">#121212</color>
-    <color name="greyLight">#C0C0C0</color>
+    <color name="greyLight">#D0D0D0</color>
     <color name="greyDivider">#808080</color>
-    <color name="greySurface">#1d1d1d</color>
+    <color name="greySurface">#1e1e1e</color>
     <!-- map colors -->
     <color name="satTrack">#B00020</color>
     <color name="satFootprint">#26FFE082</color>

@@ -24,9 +24,7 @@ import android.hardware.*
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
@@ -37,9 +35,8 @@ import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.ui.adapters.TransAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.RecyclerDivider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.round
@@ -50,24 +47,26 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     @Inject
     lateinit var prefsManager: PrefsManager
 
-    private lateinit var mainActivity: FragmentActivity
+    private lateinit var transmitterAdapter: TransAdapter
     private lateinit var binding: FragmentPolarBinding
     private lateinit var satPass: SatPass
     private lateinit var sensorManager: SensorManager
     private val viewModel: SharedViewModel by activityViewModels()
     private val args: PolarFragmentArgs by navArgs()
-    private val transmitterAdapter = TransAdapter()
     private var magneticDeclination = 0f
     private var polarView: PolarView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainActivity = requireActivity()
         binding = FragmentPolarBinding.bind(view)
-        sensorManager = mainActivity.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        transmitterAdapter = TransAdapter(requireContext())
         binding.recycler.apply {
-            layoutManager = LinearLayoutManager(mainActivity)
+            setHasFixedSize(true)
             adapter = transmitterAdapter
+            isVerticalScrollBarEnabled = false
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
         }
         calculateMagneticDeclination()
         observePasses()
@@ -109,11 +108,18 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
                 satPass = result.data[args.satPassIndex]
-                polarView = PolarView(mainActivity, satPass)
+                polarView = PolarView(requireContext(), satPass)
                 binding.frame.addView(polarView)
+                observeTimer()
                 observeTransmitters()
-                refreshText()
             }
+        })
+    }
+
+    private fun observeTimer() {
+        viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, {
+            transmitterAdapter.notifyDataSetChanged()
+            setPassText(Date(it))
         })
     }
 
@@ -122,7 +128,6 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
             if (it.isNotEmpty()) {
                 transmitterAdapter.setPredictor(satPass.predictor)
                 transmitterAdapter.setList(it)
-                transmitterAdapter.notifyDataSetChanged()
                 binding.recycler.visibility = View.VISIBLE
                 binding.noTransMsg.visibility = View.INVISIBLE
             } else {
@@ -133,33 +138,22 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun calculateMagneticDeclination() {
-        val position = prefsManager.getStationPosition()
-        val geoField = GeomagneticField(
-            position.latitude.toFloat(),
-            position.longitude.toFloat(),
-            position.heightAMSL.toFloat(),
-            System.currentTimeMillis()
-        )
-        magneticDeclination = geoField.declination
-    }
-
-    private fun refreshText() {
-        lifecycleScope.launch {
-            while (true) {
-                setPassText()
-                polarView?.invalidate()
-                transmitterAdapter.notifyDataSetChanged()
-                delay(3000)
-            }
+        prefsManager.getStationPosition().let {
+            magneticDeclination = GeomagneticField(
+                it.latitude.toFloat(),
+                it.longitude.toFloat(),
+                it.heightAMSL.toFloat(),
+                System.currentTimeMillis()
+            ).declination
         }
     }
 
-    private fun setPassText() {
-        val satPos = satPass.predictor.getSatPos(Date())
-        val polarAz = mainActivity.getString(R.string.pat_azimuth)
-        val polarEl = mainActivity.getString(R.string.pat_elevation)
-        val polarRng = mainActivity.getString(R.string.pat_distance)
-        val polarAlt = mainActivity.getString(R.string.pat_altitude)
+    private fun setPassText(date: Date) {
+        val satPos = satPass.predictor.getSatPos(date)
+        val polarAz = getString(R.string.pat_azimuth)
+        val polarEl = getString(R.string.pat_elevation)
+        val polarRng = getString(R.string.pat_distance)
+        val polarAlt = getString(R.string.pat_altitude)
         binding.azimuth.text = String.format(polarAz, Math.toDegrees(satPos.azimuth))
         binding.elevation.text = String.format(polarEl, Math.toDegrees(satPos.elevation))
         binding.distance.text = String.format(polarRng, satPos.range)

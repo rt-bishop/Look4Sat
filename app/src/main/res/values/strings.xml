@@ -46,10 +46,7 @@
     <string name="pref_time_utc_title">Show pass time in UTC</string>
 
     <string name="no_mode">Mode: null</string>
-    <string name="no_uplink">Uplink: null</string>
-    <string name="no_downlink">Downlink: null</string>
-    <string name="no_uplink_doppler">Curr. uplink: null</string>
-    <string name="no_downlink_doppler">Curr. downlink: null</string>
+    <string name="no_downlink_doppler">null</string>
     <string name="no_trans">No transceivers found for this satellite</string>
 
     <string name="error_updating_data">Error importing satellite data</string>
@@ -69,17 +66,11 @@
     <string name="pat_osm_latLon">Lat: %.1f°, Lon: %.1f°</string>
     <string name="pat_osm_vel">Vel: %.2f km/s</string>
 
-    <string name="trans_description" translatable="false">%s</string>
     <string name="trans_mode">Mode: %s</string>
     <string name="trans_inverted">Inverted: %s</string>
-    <string name="trans_up_low">Uplink: %.4fMHz</string>
-    <string name="trans_up_lowHigh">Uplink: %.4f - %.4fMHz</string>
-    <string name="trans_down_low">Downlink: %.4fMHz</string>
-    <string name="trans_down_lowHigh">Downlink: %.4f - %.4fMHz</string>
-    <string name="trans_up_low_doppler">Curr. uplink: %.4fMHz</string>
-    <string name="trans_up_lowHigh_doppler">Curr. uplink: %.4f - %.4fMHz</string>
-    <string name="trans_down_low_doppler">Curr. downlink: %.4fMHz</string>
-    <string name="trans_down_lowHigh_doppler">Curr. downlink: %.4f - %.4fMHz</string>
+    <string name="trans_description" translatable="false">%s</string>
+    <string name="trans_down_low_doppler" translatable="false">%.4f</string>
+    <string name="trans_down_lowHigh_doppler" translatable="false">%.4f - %.4f</string>
 
     <string name="about_subtitle">
         Amateur radio and weather satellites passes calculator for Android</string>

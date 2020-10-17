@@ -30,17 +30,25 @@ import com.rtbishop.look4sat.databinding.ItemTransBinding
 import com.rtbishop.look4sat.utility.PassPredictor
 import java.util.*
 
-class TransAdapter : RecyclerView.Adapter<TransAdapter.TransHolder>() {
+class TransAdapter(context: Context) : RecyclerView.Adapter<TransAdapter.TransHolder>() {
 
-    private var transmittersList = emptyList<SatTrans>()
     private lateinit var predictor: PassPredictor
+    private val divider = 1000000f
+    private val strNo = context.getString(R.string.btn_no)
+    private val strYes = context.getString(R.string.btn_yes)
+    private val mode = context.getString(R.string.trans_mode)
+    private val formatLink = context.getString(R.string.trans_down_low_doppler)
+    private val formatLinkNull = context.getString(R.string.no_downlink_doppler)
+    private val isInverted = context.getString(R.string.trans_inverted)
+    private var transmittersList = emptyList<SatTrans>()
 
-    fun setPredictor(predict: PassPredictor) {
-        predictor = predict
+    fun setPredictor(predictor: PassPredictor) {
+        this.predictor = predictor
     }
 
     fun setList(list: List<SatTrans>) {
         transmittersList = list
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
@@ -61,82 +69,24 @@ class TransAdapter : RecyclerView.Adapter<TransAdapter.TransHolder>() {
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(satTrans: SatTrans) {
-            val context: Context = itemView.context
-            val freqDivider = 1000000f
+            val dateNow = Date()
+            binding.description.text = satTrans.description
 
-            binding.transDescription.text = satTrans.description
+            if (satTrans.downlinkLow != null) {
+                val downFreq = predictor.getDownlinkFreq(satTrans.downlinkLow, dateNow) / divider
+                binding.downlink.text = String.format(formatLink, downFreq)
+            } else binding.downlink.text = formatLinkNull
 
-            if (satTrans.downlinkLow != null && satTrans.downlinkHigh == null) {
-                binding.transDownlink.text = String
-                    .format(
-                        context.getString(R.string.trans_down_low),
-                        satTrans.downlinkLow / freqDivider
-                    )
-                binding.transDownlinkDoppler.text = String
-                    .format(
-                        context.getString(R.string.trans_down_low_doppler),
-                        predictor.getDownlinkFreq(satTrans.downlinkLow, Date()) / freqDivider
-                    )
-            } else if (satTrans.downlinkLow != null && satTrans.downlinkHigh != null) {
-                binding.transDownlink.text = String
-                    .format(
-                        context.getString(R.string.trans_down_lowHigh),
-                        satTrans.downlinkLow / freqDivider,
-                        satTrans.downlinkHigh / freqDivider
-                    )
-                binding.transDownlinkDoppler.text = String
-                    .format(
-                        context.getString(R.string.trans_down_lowHigh_doppler),
-                        predictor.getDownlinkFreq(satTrans.downlinkLow, Date()) / freqDivider,
-                        predictor.getDownlinkFreq(satTrans.downlinkHigh, Date()) / freqDivider
-                    )
-            } else {
-                binding.transDownlink.text = context.getString(R.string.no_downlink)
-                binding.transDownlinkDoppler.text = context.getString(R.string.no_downlink_doppler)
-            }
+            if (satTrans.uplinkLow != null) {
+                val upFreq = predictor.getUplinkFreq(satTrans.uplinkLow, dateNow) / divider
+                binding.uplink.text = String.format(formatLink, upFreq)
+            } else binding.uplink.text = formatLinkNull
 
-            if (satTrans.uplinkLow != null && satTrans.uplinkHigh == null) {
-                binding.transUplink.text = String.format(
-                    context.getString(R.string.trans_up_low),
-                    satTrans.uplinkLow / freqDivider
-                )
-                binding.transUplinkDoppler.text = String.format(
-                    context.getString(R.string.trans_up_low_doppler),
-                    predictor.getUplinkFreq(satTrans.uplinkLow, Date()) / freqDivider
-                )
-            } else if (satTrans.uplinkLow != null && satTrans.uplinkHigh != null) {
-                binding.transUplink.text = String.format(
-                    context.getString(R.string.trans_up_lowHigh),
-                    satTrans.uplinkLow / freqDivider,
-                    satTrans.uplinkHigh / freqDivider
-                )
-                binding.transUplinkDoppler.text = String.format(
-                    context.getString(R.string.trans_up_lowHigh_doppler),
-                    predictor.getUplinkFreq(satTrans.uplinkLow, Date()) / freqDivider,
-                    predictor.getUplinkFreq(satTrans.uplinkHigh, Date()) / freqDivider
-                )
-            } else {
-                binding.transUplink.text = context.getString(R.string.no_uplink)
-                binding.transUplinkDoppler.text = context.getString(R.string.no_uplink_doppler)
-            }
+            if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)
+            else binding.mode.text = String.format(mode, strNo)
 
-            if (satTrans.mode != null) {
-                binding.transMode.text =
-                    String.format(context.getString(R.string.trans_mode), satTrans.mode)
-            } else {
-                binding.transMode.text = context.getString(R.string.no_mode)
-            }
-            if (satTrans.isInverted) {
-                binding.transInverted.text = String.format(
-                    context.getString(R.string.trans_inverted),
-                    context.getString(R.string.btn_yes)
-                )
-            } else {
-                binding.transInverted.text = String.format(
-                    context.getString(R.string.trans_inverted),
-                    context.getString(R.string.btn_no)
-                )
-            }
+            if (satTrans.isInverted) binding.isInverted.text = String.format(isInverted, strYes)
+            else binding.isInverted.text = String.format(isInverted, strNo)
         }
     }
 }
