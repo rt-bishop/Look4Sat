@@ -20,6 +20,7 @@
 package com.rtbishop.look4sat.utility
 
 import android.content.SharedPreferences
+import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
@@ -54,6 +55,14 @@ class PrefsManager @Inject constructor(
         val lon = preferences.getString(keyLongitude, defaultGSP)!!.toDouble()
         val alt = preferences.getString(keyAltitude, defaultGSP)!!.toDouble()
         return GroundStationPosition(lat, lon, alt)
+    }
+
+    fun getMagDeclination(): Float {
+        val stationPosition = getStationPosition()
+        val lat = stationPosition.latitude.toFloat()
+        val lon = stationPosition.longitude.toFloat()
+        val alt = stationPosition.heightAMSL.toFloat()
+        return GeomagneticField(lat, lon, alt, System.currentTimeMillis()).declination
     }
 
     fun setStationPositionFromGPS() {

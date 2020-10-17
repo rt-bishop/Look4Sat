@@ -33,7 +33,7 @@ import com.rtbishop.look4sat.ui.fragments.PassesFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PassesAdapter(context: Context, private var shouldUseUTC: Boolean = false) :
+class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val satIdFormat = context.getString(R.string.pass_satId)
@@ -55,21 +55,23 @@ class PassesAdapter(context: Context, private var shouldUseUTC: Boolean = false)
         val iterator = satPassList.listIterator()
         while (iterator.hasNext()) {
             val satPass = iterator.next()
-            if (satPass.progress < 100) {
-                val timeStart = satPass.pass.startTime.time
-                val timeEnd = satPass.pass.endTime.time
-                if (timeNow.minus(timeStart) > 0) {
-                    satPass.active = true
+            if (!satPass.tle.isDeepspace) {
+                if (satPass.progress < 100) {
+                    val timeStart = satPass.pass.startTime.time
+                    if (timeNow > timeStart) {
+                        satPass.active = true
+                        val timeEnd = satPass.pass.endTime.time
+                        val index = satPassList.indexOf(satPass)
+                        val deltaNow = timeNow.minus(timeStart).toFloat()
+                        val deltaTotal = timeEnd.minus(timeStart).toFloat()
+                        satPass.progress = ((deltaNow / deltaTotal) * 100).toInt()
+                        notifyItemChanged(index)
+                    }
+                } else {
                     val index = satPassList.indexOf(satPass)
-                    val deltaTotal = timeEnd.minus(timeStart)
-                    val deltaNow = timeNow.minus(timeStart)
-                    satPass.progress = ((deltaNow.toFloat() / deltaTotal.toFloat()) * 100).toInt()
-                    notifyItemChanged(index)
+                    iterator.remove()
+                    notifyItemRemoved(index)
                 }
-            } else {
-                val index = satPassList.indexOf(satPass)
-                iterator.remove()
-                notifyItemRemoved(index)
             }
         }
     }
@@ -120,9 +122,11 @@ class PassesAdapter(context: Context, private var shouldUseUTC: Boolean = false)
             }
 
             itemView.setOnClickListener {
-                val passIndex = satPassList.indexOf(satPass)
-                val action = PassesFragmentDirections.actionPassToPolar(passIndex)
-                itemView.findNavController().navigate(action)
+                if (satPass.progress < 100) {
+                    val passIndex = satPassList.indexOf(satPass)
+                    val action = PassesFragmentDirections.actionPassToPolar(passIndex)
+                    itemView.findNavController().navigate(action)
+                }
             }
         }
     }

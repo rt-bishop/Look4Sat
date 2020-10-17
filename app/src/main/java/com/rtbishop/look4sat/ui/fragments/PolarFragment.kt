@@ -20,7 +20,10 @@
 package com.rtbishop.look4sat.ui.fragments
 
 import android.content.Context
-import android.hardware.*
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -68,7 +71,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
         }
-        calculateMagneticDeclination()
+        magneticDeclination = prefsManager.getMagDeclination()
         observePasses()
     }
 
@@ -76,7 +79,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         super.onResume()
         if (prefsManager.shouldUseCompass()) {
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
-                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
             }
         }
     }
@@ -110,16 +113,9 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
                 satPass = result.data[args.satPassIndex]
                 polarView = PolarView(requireContext(), satPass)
                 binding.frame.addView(polarView)
-                observeTimer()
                 observeTransmitters()
+                observeTimer()
             }
-        })
-    }
-
-    private fun observeTimer() {
-        viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, {
-            transmitterAdapter.notifyDataSetChanged()
-            setPassText(Date(it))
         })
     }
 
@@ -137,15 +133,12 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         })
     }
 
-    private fun calculateMagneticDeclination() {
-        prefsManager.getStationPosition().let {
-            magneticDeclination = GeomagneticField(
-                it.latitude.toFloat(),
-                it.longitude.toFloat(),
-                it.heightAMSL.toFloat(),
-                System.currentTimeMillis()
-            ).declination
-        }
+    private fun observeTimer() {
+        viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, {
+            setPassText(Date(it))
+            polarView?.invalidate()
+            transmitterAdapter.notifyDataSetChanged()
+        })
     }
 
     private fun setPassText(date: Date) {
