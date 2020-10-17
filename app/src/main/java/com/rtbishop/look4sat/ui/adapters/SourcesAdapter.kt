@@ -19,11 +19,10 @@
 
 package com.rtbishop.look4sat.ui.adapters
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.ItemTleSourceBinding
@@ -43,11 +42,10 @@ class SourcesAdapter(private var sources: MutableList<TleSource>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TleSourceHolder {
         val binding = ItemTleSourceBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
-        return TleSourceHolder(binding.root, binding, TleSourceWatcher())
+        return TleSourceHolder(binding.root, binding)
     }
 
     override fun onBindViewHolder(holder: TleSourceHolder, position: Int) {
-        holder.textWatcher.updatePosition(position)
         holder.bind(sources[position])
     }
 
@@ -55,35 +53,16 @@ class SourcesAdapter(private var sources: MutableList<TleSource>) :
         return sources.size
     }
 
-    inner class TleSourceHolder(
-        itemView: View, val binding: ItemTleSourceBinding, val textWatcher: TleSourceWatcher
-    ) :
+    inner class TleSourceHolder(itemView: View, val binding: ItemTleSourceBinding) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(source: TleSource) {
             binding.tleSourceUrl.setText(source.url)
-            binding.tleSourceUrl.addTextChangedListener(textWatcher)
-            binding.tleSourceBtnDel.setOnClickListener {
+            binding.tleSourceUrl.doOnTextChanged { text, _, _, _ -> source.url = text.toString() }
+            binding.tleSourceInputLayout.setEndIconOnClickListener {
                 sources.remove(source)
                 notifyItemRemoved(adapterPosition)
             }
-        }
-    }
-
-    inner class TleSourceWatcher : TextWatcher {
-
-        private var position = 0
-
-        fun updatePosition(position: Int) {
-            this.position = position
-        }
-
-        override fun afterTextChanged(s: Editable?) {}
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            sources[position].url = s.toString()
         }
     }
 }

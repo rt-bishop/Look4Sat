@@ -21,9 +21,9 @@ package com.rtbishop.look4sat.ui.fragments
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
@@ -39,8 +39,8 @@ class SourcesDialog(sources: List<TleSource>, private val viewModel: SharedViewM
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = DialogSourcesBinding.inflate(requireActivity().layoutInflater).apply {
             tleSourcesRecycler.apply {
-                layoutManager = LinearLayoutManager(requireContext())
                 adapter = sourcesAdapter
+                layoutManager = LinearLayoutManager(requireContext())
             }
             tleSourceBtnAdd.setOnClickListener {
                 val tempSources = sourcesAdapter.getSources()
@@ -58,10 +58,7 @@ class SourcesDialog(sources: List<TleSource>, private val viewModel: SharedViewM
 
         return Dialog(requireActivity()).apply {
             setContentView(binding.root)
-            window?.setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
+            window?.setBackgroundDrawableResource(R.drawable.ic_launcher_background)
         }
     }
 }

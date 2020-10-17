@@ -26,7 +26,7 @@
     <string name="menu_prefs">Настройки</string>
     <string name="menu_about">Инфо</string>
 
-    <string name="dialog_tle_sources">Управление источниками TLE</string>
+    <string name="dialog_tle_sources">Управление TLE</string>
     <string name="dialog_entries_hint">ID / Имя</string>
 
     <string name="pass_prefs_title">Настройки пролетов спутников</string>
@@ -100,8 +100,9 @@
     <string name="btn_no">Нет</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Отмена</string>
+    <string name="btn_update">Обновить</string>
 
     <string name="tle_source">Источник TLE</string>
-    <string name="https_only">Используйте протокол HTTPS</string>
+    <string name="https_only">Используйте HTTPS</string>
     <string name="sat_import">Импорт спутников</string>
 </resources>

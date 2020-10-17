@@ -2,54 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tleSourcesDialog"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="4dp">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="4dp">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tleSourcesTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="6dp"
         android:text="@string/dialog_tle_sources"
-        android:textSize="17sp"
-        app:layout_constraintEnd_toStartOf="@+id/tleSourceBtnAdd"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:textSize="16sp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tleSourcesRecycler"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/tleSourceBtnAdd"
-        android:layout_width="36dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="10dp"
-        android:contentDescription="@string/placeholder"
-        app:layout_constraintBottom_toBottomOf="@+id/tleSourcesWarning"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tleSourcesTitle"
-        app:layout_constraintTop_toTopOf="@+id/tleSourcesTitle"
-        app:srcCompat="@drawable/ic_add" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tleSourcesRecycler"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/tleSourcesBtnPos"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tleSourceBtnAdd"
-        app:layout_constraintVertical_chainStyle="packed">
-
-    </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tleSourcesWarning"
@@ -58,29 +24,58 @@
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="@string/https_only"
-        android:textSize="17sp"
-        app:layout_constraintStart_toStartOf="@+id/tleSourcesTitle"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/tleSourcesRecycler"
         app:layout_constraintTop_toBottomOf="@+id/tleSourcesTitle" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <ImageButton
+        android:id="@+id/tleSourceBtnAdd"
+        android:layout_width="48dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/greySurface"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_add"
+        app:layout_constraintBottom_toBottomOf="@+id/tleSourcesWarning"
+        app:layout_constraintEnd_toEndOf="@+id/tleSourcesRecycler"
+        app:layout_constraintTop_toTopOf="@+id/tleSourcesTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tleSourcesRecycler"
+        android:layout_width="266dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tleSourcesWarning">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/tleSourcesBtnNeg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:backgroundTint="@color/greySurface"
         android:text="@string/btn_cancel"
-        android:textSize="17sp"
+        android:textAllCaps="false"
+        android:textColor="@color/themeLight"
         app:layout_constraintBaseline_toBaselineOf="@+id/tleSourcesBtnPos"
-        app:layout_constraintEnd_toStartOf="@+id/tleSourcesBtnPos"
-        app:layout_constraintHorizontal_chainStyle="spread_inside" />
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="@+id/tleSourcesRecycler" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/tleSourcesBtnPos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/btn_ok"
-        android:textSize="17sp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:backgroundTint="@color/greySurface"
+        android:text="@string/btn_update"
+        android:textAllCaps="false"
+        android:textColor="@color/themeLight"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/tleSourceBtnAdd" />
+        app:layout_constraintEnd_toEndOf="@+id/tleSourcesRecycler"
+        app:layout_constraintTop_toBottomOf="@+id/tleSourcesRecycler" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

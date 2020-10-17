@@ -112,6 +112,7 @@
     <string name="btn_no">No</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_update">Update</string>
 
     <string name="tle_source">TLE source</string>
     <string name="https_only">Please use HTTPS URLs only</string>
