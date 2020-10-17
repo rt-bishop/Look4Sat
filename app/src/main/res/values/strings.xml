@@ -128,4 +128,5 @@
     <string name="osmCopyright" translatable="false">Wikimedia maps | Map data © OpenStreetMap contributors</string>
     <string name="sat_import">Import satellite data</string>
     <string name="timer_zero" translatable="false">00:00:00</string>
+    <string name="timer_placeholder" translatable="false">-</string>
 </resources>

@@ -22,7 +22,7 @@
     android:id="@+id/pass_leo_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -47,7 +47,6 @@
             android:text="@string/pass_los_az"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_aosAz"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_satId"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/pass_leo_aosAz" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -56,7 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/pass_satId"
-            android:textSize="15sp"
             android:textColor="@color/themeLight"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_satName"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -75,8 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_marginTop="2dp"
-            android:textSize="15sp"
+            android:layout_marginTop="4dp"
             android:text="@string/pass_satName"
             android:textColor="@color/themeLight"
             app:layout_constraintStart_toStartOf="parent"
@@ -86,9 +83,9 @@
             android:id="@+id/pass_leo_aosAz"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
             android:text="@string/pass_aos_az"
             app:layout_constraintEnd_toStartOf="@+id/pass_leo_losAz"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="@+id/pass_leo_satName"
             app:layout_constraintTop_toBottomOf="@+id/pass_leo_satName" />

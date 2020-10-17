@@ -22,10 +22,8 @@ package com.rtbishop.look4sat.ui.fragments
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
@@ -35,6 +33,7 @@ import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.adapters.PassesAdapter
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.Utilities
 import com.rtbishop.look4sat.utility.Utilities.getRotationAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,17 +77,12 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         passesAdapter = PassesAdapter(requireContext(), prefsManager.shouldUseUTC())
         binding.apply {
             passesRecycler.apply {
-                val linearLayoutMgr = LinearLayoutManager(requireContext())
-                val divider = DividerItemDecoration(requireContext(), linearLayoutMgr.orientation)
-                val drawable = ResourcesCompat
-                    .getDrawable(resources, R.drawable.rec_passes_divider, requireActivity().theme)
-                drawable?.let { divider.setDrawable(it) }
-                layoutManager = linearLayoutMgr
+                setHasFixedSize(true)
                 adapter = passesAdapter
                 isVerticalScrollBarEnabled = false
+                layoutManager = LinearLayoutManager(context)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(divider)
-                setHasFixedSize(true)
+                addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
             }
             animator = passesFab.getRotationAnimator()
             passesFab.setOnClickListener {

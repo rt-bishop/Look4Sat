@@ -4,11 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
@@ -16,6 +14,7 @@ import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.adapters.EntriesAdapter
+import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.Utilities.snack
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,9 +22,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private lateinit var binding: FragmentEntriesBinding
+    private lateinit var entriesAdapter: EntriesAdapter
     private val viewModel: SharedViewModel by activityViewModels()
     private val pickFileReqCode = 100
-    private val entriesAdapter = EntriesAdapter()
     private var tleSources = listOf<TleSource>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,17 +35,13 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupComponents() {
+        entriesAdapter = EntriesAdapter()
         binding.apply {
             entriesRecycler.apply {
-                val linearLayoutMgr = LinearLayoutManager(requireContext())
-                val divider = DividerItemDecoration(requireContext(), linearLayoutMgr.orientation)
-                val drawable = ResourcesCompat
-                    .getDrawable(resources, R.drawable.rec_entries_divider, requireActivity().theme)
-                drawable?.let { divider.setDrawable(it) }
-                layoutManager = linearLayoutMgr
-                adapter = entriesAdapter
-                addItemDecoration(divider)
                 setHasFixedSize(true)
+                adapter = entriesAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { showImportFromFileDialog() }

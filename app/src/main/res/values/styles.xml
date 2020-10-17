@@ -21,17 +21,8 @@
 
     <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/themeLight</item>
-        <item name="colorOnPrimary">@color/greyDark</item>
-
         <item name="colorSecondary">@color/themeLight</item>
-        <item name="colorOnSecondary">@color/greyDark</item>
-
-        <item name="colorSurface">@color/greyDark</item>
-        <item name="colorOnSurface">@color/greyLight</item>
-
-        <item name="android:colorBackground">@color/greyDark</item>
-        <item name="colorOnBackground">@color/greyLight</item>
-
+        <item name="colorPrimaryVariant">@color/themeDark</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 

@@ -20,11 +20,12 @@
 <com.google.android.material.checkbox.MaterialCheckBox xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sat_entry_checkbox"
     android:layout_width="match_parent"
-    android:layout_height="34dp"
+    android:layout_height="32dp"
     android:background="@null"
     android:button="@null"
     android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
     android:paddingStart="24dp"
     android:paddingEnd="20dp"
     android:text="@string/placeholder"
-    android:textSize="17sp" />
+    android:textColor="@color/greyLight"
+    android:textSize="16sp" />
