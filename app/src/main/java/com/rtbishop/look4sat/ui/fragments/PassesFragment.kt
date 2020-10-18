@@ -19,7 +19,6 @@
 
 package com.rtbishop.look4sat.ui.fragments
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -35,7 +34,6 @@ import com.rtbishop.look4sat.ui.adapters.PassesAdapter
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.Utilities
-import com.rtbishop.look4sat.utility.Utilities.getRotationAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -47,7 +45,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     lateinit var prefsManager: PrefsManager
 
     private lateinit var binding: FragmentPassesBinding
-    private lateinit var animator: ObjectAnimator
     private lateinit var passesAdapter: PassesAdapter
     private val viewModel: SharedViewModel by activityViewModels()
     private var passes = mutableListOf<SatPass>()
@@ -62,10 +59,14 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     private fun setupObservers() {
         viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
-                animator.cancel()
+                binding.passesProgress.visibility = View.INVISIBLE
+                binding.passesRecycler.visibility = View.VISIBLE
                 passes = result.data
                 passesAdapter.setList(passes)
-            } else if (result is Result.InProgress) animator.start()
+            } else if (result is Result.InProgress) {
+                binding.passesRecycler.visibility = View.INVISIBLE
+                binding.passesProgress.visibility = View.VISIBLE
+            }
         })
         viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, { currentTime ->
             tickMainTimer(currentTime)
@@ -84,14 +85,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
             }
-            animator = passesFab.getRotationAnimator()
-            passesFab.setOnClickListener {
-                if (animator.isRunning) {
-                    animator.cancel()
-                } else {
-                    viewModel.calculatePasses()
-                }
-            }
+            passesFab.setOnClickListener { viewModel.calculatePasses() }
         }
         viewModel.triggerCalculation()
     }

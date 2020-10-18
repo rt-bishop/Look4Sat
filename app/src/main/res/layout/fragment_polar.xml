@@ -45,7 +45,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/textView"
+        android:id="@+id/stub_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="4dp"
@@ -59,7 +59,7 @@
         app:layout_constraintTop_toTopOf="@+id/polar_timer" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/textView2"
+        android:id="@+id/stub_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="4dp"
