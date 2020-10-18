@@ -59,11 +59,19 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     private fun setupObservers() {
         viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
-                binding.passesProgress.visibility = View.INVISIBLE
-                binding.passesRecycler.visibility = View.VISIBLE
-                passes = result.data
-                passesAdapter.setList(passes)
+                if (result.data.isEmpty()) {
+                    binding.passesProgress.visibility = View.INVISIBLE
+                    binding.passesRecycler.visibility = View.INVISIBLE
+                    binding.passesError.visibility = View.VISIBLE
+                } else {
+                    passes = result.data
+                    passesAdapter.setList(passes)
+                    binding.passesError.visibility = View.INVISIBLE
+                    binding.passesProgress.visibility = View.INVISIBLE
+                    binding.passesRecycler.visibility = View.VISIBLE
+                }
             } else if (result is Result.InProgress) {
+                binding.passesError.visibility = View.INVISIBLE
                 binding.passesRecycler.visibility = View.INVISIBLE
                 binding.passesProgress.visibility = View.VISIBLE
             }

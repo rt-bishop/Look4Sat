@@ -122,4 +122,5 @@
     <string name="timer_placeholder" translatable="false">-</string>
     <string name="entries_update">TLE data update:</string>
     <string name="entries_error">Please update TLE data</string>
+    <string name="passes_error">No satellites were selected</string>
 </resources>

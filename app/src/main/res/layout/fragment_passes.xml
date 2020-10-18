@@ -98,6 +98,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/passes_bar" />
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/passes_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/passes_error"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passes_bar" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -105,9 +117,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="32dp"
         android:contentDescription="@string/placeholder"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/ic_refresh" />
+        android:src="@drawable/ic_refresh"
+        app:fabSize="mini" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
