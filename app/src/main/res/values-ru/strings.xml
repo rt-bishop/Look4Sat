@@ -104,5 +104,6 @@
 
     <string name="tle_source">Источник TLE</string>
     <string name="https_only">Используйте HTTPS</string>
-    <string name="sat_import">Импорт спутников</string>
+    <string name="entries_update">Обновить данные TLE:</string>
+    <string name="entries_error">Пожалуйста, обновите данные TLE</string>
 </resources>

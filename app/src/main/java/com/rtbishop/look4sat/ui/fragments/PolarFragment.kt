@@ -134,7 +134,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun observeTimer() {
-        viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, {
+        viewModel.getAppTimer().observe(viewLifecycleOwner, {
             setPassText(it)
             polarView?.invalidate()
             transmitterAdapter.notifyDataSetChanged()

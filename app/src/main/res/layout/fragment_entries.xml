@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:elevation="4dp"
-            android:text="@string/sat_import"
+            android:text="@string/entries_update"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@+id/import_web"
             app:layout_constraintStart_toStartOf="parent"
@@ -94,10 +94,34 @@
             android:id="@+id/entries_recycler"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_bar" />
+
+        <ProgressBar
+            android:id="@+id/entries_progress"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/entries_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/entries_error"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

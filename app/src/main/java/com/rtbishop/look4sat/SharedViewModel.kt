@@ -20,10 +20,11 @@
 package com.rtbishop.look4sat
 
 import android.net.Uri
-import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.*
-import com.github.amsacode.predict4java.GroundStationPosition
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repo.EntriesRepo
 import com.rtbishop.look4sat.repo.SourcesRepo
@@ -41,33 +42,26 @@ class SharedViewModel @ViewModelInject constructor(
     private val prefsManager: PrefsManager,
     private val sourcesRepo: SourcesRepo,
     private val entriesRepo: EntriesRepo,
-    private val transmittersRepo: TransmittersRepo,
-    @Assisted private val savedStateHandle: SavedStateHandle
+    private val transmittersRepo: TransmittersRepo
 ) : ViewModel() {
 
-    private val _currentTimeMillis = MutableLiveData(System.currentTimeMillis())
+    private val _appTimer = MutableLiveData(System.currentTimeMillis())
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
-    private val _appEvent = MutableLiveData<Event<Any>>()
+    private val _appEvent = MutableLiveData<Event<Int>>()
     private var selectedEntries = emptyList<SatEntry>()
     private var shouldTriggerCalculation = true
 
     init {
-        if (prefsManager.isFirstLaunch()) {
-            updateDefaultSourcesAndEntries()
-        }
+        if (prefsManager.isFirstLaunch()) updateDefaultSourcesAndEntries()
         startApplicationTimer()
     }
 
+    fun getAppEvent(): LiveData<Event<Int>> = _appEvent
+    fun getAppTimer(): LiveData<Long> = _appTimer
     fun getSources() = sourcesRepo.getSources()
     fun getEntries() = entriesRepo.getEntries()
-    fun getCurrentTimeMillis(): LiveData<Long> = _currentTimeMillis
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
-    fun getAppEvent(): LiveData<Event<Any>> = _appEvent
     fun getTransmittersForSat(satId: Int) = transmittersRepo.getTransmittersForSat(satId)
-
-    fun postAppEvent(event: Event<Any>) {
-        _appEvent.value = event
-    }
 
     fun triggerCalculation() {
         if (shouldTriggerCalculation) {
@@ -76,28 +70,41 @@ class SharedViewModel @ViewModelInject constructor(
         }
     }
 
-    fun setSelectedEntries(entries: List<SatEntry>) {
+    fun calculatePasses(dateNow: Date = Date(System.currentTimeMillis())) {
+        shouldTriggerCalculation = false
+        _passes.value = Result.InProgress
+        viewModelScope.launch(Dispatchers.Default) {
+            val passes = mutableListOf<SatPass>()
+            selectedEntries.forEach { passes.addAll(getPasses(it, dateNow)) }
+            val filteredPasses = sortList(passes, dateNow)
+            _passes.postValue(Result.Success(filteredPasses))
+        }
+    }
+
+    fun setEntries(entries: List<SatEntry>) {
         selectedEntries = entries.filter { it.isSelected }
     }
 
     fun updateEntriesFromFile(uri: Uri) {
+        postAppEvent(Event(0))
         viewModelScope.launch {
             try {
                 entriesRepo.updateEntriesFromFile(uri)
             } catch (exception: Exception) {
-                postAppEvent(Event(exception))
+                postAppEvent(Event(1))
             }
         }
     }
 
     fun updateEntriesFromSources(sources: List<TleSource>) {
+        postAppEvent(Event(0))
         viewModelScope.launch {
             try {
                 sourcesRepo.updateSources(sources)
                 entriesRepo.updateEntriesFromSources(sources)
                 transmittersRepo.updateTransmitters()
             } catch (exception: Exception) {
-                postAppEvent(Event(exception))
+                postAppEvent(Event(1))
             }
         }
     }
@@ -110,18 +117,39 @@ class SharedViewModel @ViewModelInject constructor(
         }
     }
 
-    fun calculatePasses(dateNow: Date = Date(System.currentTimeMillis())) {
-        shouldTriggerCalculation = false
-        _passes.value = Result.InProgress
-        viewModelScope.launch(Dispatchers.Default) {
-            val passes = mutableListOf<SatPass>()
-            selectedEntries.forEach {
-                passes.addAll(getPassesForEntries(it, dateNow, prefsManager.getStationPosition()))
+    private fun postAppEvent(event: Event<Int>) {
+        _appEvent.value = event
+    }
+
+    private fun startApplicationTimer(tickMillis: Long = 1000L) {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                delay(tickMillis)
+                _appTimer.postValue(System.currentTimeMillis())
             }
-            val filteredPasses =
-                filterAndSortPasses(passes, dateNow, prefsManager.getPassPrefs().hoursAhead)
-            _passes.postValue(Result.Success(filteredPasses))
         }
+    }
+
+    private fun getPasses(entry: SatEntry, dateNow: Date): MutableList<SatPass> {
+        val gsp = prefsManager.getStationPosition()
+        val predictor = PassPredictor(entry.tle, gsp)
+        val hoursAhead = prefsManager.getPassPrefs().hoursAhead
+        val passes = predictor.getPasses(dateNow, hoursAhead, true)
+        val passList = passes.map { SatPass(entry.tle, predictor, it) }
+        return passList as MutableList<SatPass>
+    }
+
+    private fun sortList(passes: MutableList<SatPass>, dateNow: Date): MutableList<SatPass> {
+        val hoursAhead = prefsManager.getPassPrefs().hoursAhead
+        val dateFuture = Calendar.getInstance().apply {
+            this.time = dateNow
+            this.add(Calendar.HOUR, hoursAhead)
+        }.time
+        passes.removeAll { it.pass.startTime.after(dateFuture) }
+        passes.removeAll { it.pass.endTime.before(dateNow) }
+        passes.removeAll { it.pass.maxEl < prefsManager.getPassPrefs().minEl }
+        passes.sortBy { it.pass.startTime }
+        return passes
     }
 
     private fun updateDefaultSourcesAndEntries() {
@@ -130,44 +158,5 @@ class SharedViewModel @ViewModelInject constructor(
             TleSource("https://amsat.org/tle/current/nasabare.txt")
         )
         updateEntriesFromSources(defaultTleSources)
-    }
-
-    private fun startApplicationTimer(tickMillis: Long = 1000L) {
-        viewModelScope.launch(Dispatchers.IO) {
-            while (true) {
-                delay(tickMillis)
-                _currentTimeMillis.postValue(System.currentTimeMillis())
-            }
-        }
-    }
-
-    private fun getPassesForEntries(
-        entry: SatEntry,
-        dateNow: Date,
-        gsp: GroundStationPosition
-    ): MutableList<SatPass> {
-        val predictor = PassPredictor(entry.tle, gsp)
-        val hoursAhead = prefsManager.getPassPrefs().hoursAhead
-        val passes = predictor.getPasses(dateNow, hoursAhead, true)
-        val passList = passes.map { SatPass(entry.tle, predictor, it) }
-        return passList as MutableList<SatPass>
-    }
-
-    private fun filterAndSortPasses(
-        passes: MutableList<SatPass>,
-        dateNow: Date,
-        hoursAhead: Int
-    ): MutableList<SatPass> {
-        val dateFuture = Calendar.getInstance().let {
-            it.time = dateNow
-            it.add(Calendar.HOUR, hoursAhead)
-            it.time
-        }
-        val minEl = prefsManager.getPassPrefs().minEl
-        passes.removeAll { it.pass.startTime.after(dateFuture) }
-        passes.removeAll { it.pass.endTime.before(dateNow) }
-        passes.removeAll { it.pass.maxEl < minEl }
-        passes.sortBy { it.pass.startTime }
-        return passes
     }
 }

@@ -55,12 +55,20 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private fun setupObservers() {
         viewModel.getSources().observe(viewLifecycleOwner, { tleSources = it })
         viewModel.getEntries().observe(viewLifecycleOwner, {
-            viewModel.setSelectedEntries(it)
-            entriesAdapter.setEntries(it as MutableList<SatEntry>)
+            if (it.isNullOrEmpty()) setError()
+            else {
+                viewModel.setEntries(it)
+                entriesAdapter.setEntries(it as MutableList<SatEntry>)
+                setLoaded()
+            }
         })
         viewModel.getAppEvent().observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.let {
-                getString(R.string.error_updating_data).snack(requireView())
+                if (it == 0) setLoading()
+                else if (it == 1) {
+                    getString(R.string.error_updating_data).snack(requireView())
+                    setError()
+                }
             }
         })
     }
@@ -75,6 +83,24 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             type = "*/*"
             startActivityForResult(this, pickFileReqCode)
         }
+    }
+
+    private fun setLoaded() {
+        binding.entriesError.visibility = View.INVISIBLE
+        binding.entriesProgress.visibility = View.INVISIBLE
+        binding.entriesRecycler.visibility = View.VISIBLE
+    }
+
+    private fun setLoading() {
+        binding.entriesError.visibility = View.INVISIBLE
+        binding.entriesRecycler.visibility = View.INVISIBLE
+        binding.entriesProgress.visibility = View.VISIBLE
+    }
+
+    private fun setError() {
+        binding.entriesProgress.visibility = View.INVISIBLE
+        binding.entriesRecycler.visibility = View.INVISIBLE
+        binding.entriesError.visibility = View.VISIBLE
     }
 
     private fun navigateToPasses() {

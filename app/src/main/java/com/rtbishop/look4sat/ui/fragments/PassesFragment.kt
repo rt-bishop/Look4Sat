@@ -68,7 +68,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 binding.passesProgress.visibility = View.VISIBLE
             }
         })
-        viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, { currentTime ->
+        viewModel.getAppTimer().observe(viewLifecycleOwner, { currentTime ->
             tickMainTimer(currentTime)
             passesAdapter.tickPasses(currentTime)
         })
