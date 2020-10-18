@@ -28,6 +28,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
@@ -39,6 +40,7 @@ import com.rtbishop.look4sat.ui.adapters.TransAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.RecyclerDivider
+import com.rtbishop.look4sat.utility.Utilities
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -135,14 +137,15 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     private fun observeTimer() {
         viewModel.getCurrentTimeMillis().observe(viewLifecycleOwner, {
-            setPassText(Date(it))
+            setPassText(it)
             polarView?.invalidate()
             transmitterAdapter.notifyDataSetChanged()
         })
     }
 
-    private fun setPassText(date: Date) {
-        val satPos = satPass.predictor.getSatPos(date)
+    private fun setPassText(timeNow: Long) {
+        val dateNow = Date(timeNow)
+        val satPos = satPass.predictor.getSatPos(dateNow)
         val polarAz = getString(R.string.pat_azimuth)
         val polarEl = getString(R.string.pat_elevation)
         val polarRng = getString(R.string.pat_distance)
@@ -151,5 +154,17 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         binding.elevation.text = String.format(polarEl, Math.toDegrees(satPos.elevation))
         binding.distance.text = String.format(polarRng, satPos.range)
         binding.altitude.text = String.format(polarAlt, satPos.altitude)
+
+        if (dateNow.before(satPass.pass.startTime)) {
+            val millisBeforeStart = satPass.pass.startTime.time.minus(timeNow)
+            binding.polarTimer.text = Utilities.formatForTimer(millisBeforeStart)
+        } else {
+            val millisBeforeEnd = satPass.pass.endTime.time.minus(timeNow)
+            binding.polarTimer.text = Utilities.formatForTimer(millisBeforeEnd)
+            if (dateNow.after(satPass.pass.endTime)) {
+                binding.polarTimer.text = Utilities.formatForTimer(0L)
+                findNavController().navigateUp()
+            }
+        }
     }
 }

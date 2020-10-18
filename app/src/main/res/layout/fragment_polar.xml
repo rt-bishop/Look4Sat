@@ -30,6 +30,48 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/polar_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        android:fontFamily="@font/digital_dismay"
+        android:text="@string/timer_zero"
+        android:textColor="@color/themeLight"
+        android:textSize="48sp"
+        app:layout_constraintBottom_toBottomOf="@+id/polar_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/polar_bar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        android:fontFamily="@font/digital_dismay"
+        android:text="@string/timer_placeholder"
+        android:textColor="@color/themeLight"
+        android:textSize="48sp"
+        app:layout_constraintBottom_toBottomOf="@+id/polar_timer"
+        app:layout_constraintEnd_toStartOf="@+id/polar_timer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/polar_timer" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        android:fontFamily="@font/digital_dismay"
+        android:text="@string/timer_placeholder"
+        android:textColor="@color/themeLight"
+        android:textSize="48sp"
+        app:layout_constraintBottom_toBottomOf="@+id/polar_timer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/polar_timer"
+        app:layout_constraintTop_toTopOf="@+id/polar_timer" />
+
     <FrameLayout
         android:id="@+id/frame"
         android:layout_width="match_parent"
