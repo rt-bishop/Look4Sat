@@ -29,7 +29,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
@@ -57,7 +56,6 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     private lateinit var satPass: SatPass
     private lateinit var sensorManager: SensorManager
     private val viewModel: SharedViewModel by activityViewModels()
-    private val args: PolarFragmentArgs by navArgs()
     private var magneticDeclination = 0f
     private var polarView: PolarView? = null
 
@@ -112,7 +110,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     private fun observePasses() {
         viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
-                satPass = result.data[args.satPassIndex]
+                satPass = result.data[requireArguments().getInt("index")]
                 polarView = PolarView(requireContext(), satPass)
                 binding.frame.addView(polarView)
                 observeTransmitters()
@@ -163,7 +161,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
             binding.polarTimer.text = Utilities.formatForTimer(millisBeforeEnd)
             if (dateNow.after(satPass.pass.endTime)) {
                 binding.polarTimer.text = Utilities.formatForTimer(0L)
-                findNavController().navigateUp()
+                findNavController().navigate(R.id.action_polar_to_passes)
             }
         }
     }

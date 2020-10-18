@@ -23,13 +23,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
-import com.rtbishop.look4sat.ui.fragments.PassesFragmentDirections
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -123,9 +123,8 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
 
             itemView.setOnClickListener {
                 if (satPass.progress < 100) {
-                    val passIndex = satPassList.indexOf(satPass)
-                    val action = PassesFragmentDirections.actionPassToPolar(passIndex)
-                    itemView.findNavController().navigate(action)
+                    val bundle = bundleOf("index" to satPassList.indexOf(satPass))
+                    itemView.findNavController().navigate(R.id.action_passes_to_polar, bundle)
                 }
             }
         }
@@ -146,9 +145,8 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
             }
 
             itemView.setOnClickListener {
-                val passIndex = satPassList.indexOf(satPass)
-                val action = PassesFragmentDirections.actionPassToPolar(passIndex)
-                itemView.findNavController().navigate(action)
+                val bundle = bundleOf("index" to satPassList.indexOf(satPass))
+                itemView.findNavController().navigate(R.id.action_passes_to_polar, bundle)
             }
         }
     }

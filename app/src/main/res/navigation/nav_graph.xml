@@ -41,7 +41,7 @@
         android:name="com.rtbishop.look4sat.ui.fragments.PassesFragment"
         tools:layout="@layout/fragment_passes">
         <action
-            android:id="@+id/action_pass_to_polar"
+            android:id="@+id/action_passes_to_polar"
             app:destination="@id/nav_polar"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -53,9 +53,15 @@
         android:id="@+id/nav_polar"
         android:name="com.rtbishop.look4sat.ui.fragments.PolarFragment"
         tools:layout="@layout/fragment_polar">
-        <argument
-            android:name="satPassIndex"
-            app:argType="integer" />
+        <action
+            android:id="@+id/action_polar_to_passes"
+            app:destination="@id/nav_passes"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/nav_passes"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
