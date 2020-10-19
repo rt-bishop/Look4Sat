@@ -28,89 +28,112 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/title_img"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/placeholder"
+            android:src="@drawable/ic_menu_entries"
+            app:layout_constraintBottom_toBottomOf="@+id/title"
+            app:layout_constraintEnd_toStartOf="@+id/title"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/title" />
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
             android:text="@string/app_name"
             android:textColor="@color/themeLight"
-            android:textSize="42sp"
-            app:layout_constraintBottom_toBottomOf="@+id/title_img"
+            android:textSize="48sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/title_img"
-            app:layout_constraintTop_toTopOf="@+id/title_img" />
-
-        <ImageView
-            android:id="@+id/title_img"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="4dp"
-            android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_menu_entries"
-            app:layout_constraintEnd_toStartOf="@+id/title"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/version"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
-            android:gravity="center"
+            android:layout_marginTop="4dp"
             android:text="@string/app_version"
-            android:textSize="16sp"
+            android:textColor="@color/themeLight"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/subtitle"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
-            android:gravity="center"
             android:text="@string/about_subtitle"
-            android:textSize="16sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/version" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/thanks"
-            android:layout_width="0dp"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_github"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="@string/about_thanks_to"
+            android:backgroundTint="@color/greySurface"
+            android:text="@string/btn_github"
+            android:textAllCaps="false"
+            android:textColor="@color/themeLight"
             android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/subtitle"
-            app:layout_constraintStart_toStartOf="@+id/subtitle"
+            app:icon="@drawable/ic_github"
+            app:iconTint="@color/themeLight"
+            app:layout_constraintEnd_toStartOf="@+id/btn_fdroid"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subtitle" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_fdroid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/greySurface"
+            android:text="@string/btn_fdroid"
+            android:textAllCaps="false"
+            android:textColor="@color/themeLight"
+            android:textSize="16sp"
+            app:icon="@drawable/ic_fdroid"
+            app:iconTint="@color/themeLight"
+            app:layout_constraintBaseline_toBaselineOf="@+id/btn_github"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_github" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/about_thanks_list"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="@string/about_thanks"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/thanks" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_github" />
+
+        <TextView
+            android:id="@+id/warranty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="@string/about_warranty"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/message"
+            app:layout_constraintStart_toStartOf="@+id/message"
+            app:layout_constraintTop_toBottomOf="@+id/message" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

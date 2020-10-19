@@ -66,7 +66,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             event.getContentIfNotHandled()?.let {
                 if (it == 0) setLoading()
                 else if (it == 1) {
-                    getString(R.string.error_updating_data).snack(requireView())
+                    getString(R.string.entries_update_error).snack(requireView())
                     setError()
                 }
             }

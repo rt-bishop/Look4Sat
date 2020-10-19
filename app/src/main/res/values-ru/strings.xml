@@ -20,19 +20,43 @@
 <resources>
     <string name="app_version">Версия: %s</string>
 
+    <string name="btn_yes">Да</string>
+    <string name="btn_no">Нет</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="btn_update">Обновить</string>
+
     <string name="menu_entries">Спутники</string>
     <string name="menu_passes">Пролеты</string>
-    <string name="menu_map">Карта Мира</string>
+    <string name="menu_map">Карта</string>
     <string name="menu_prefs">Настройки</string>
     <string name="menu_about">Инфо</string>
 
-    <string name="dialog_tle_sources">Управление TLE</string>
-    <string name="dialog_entries_hint">ID / Имя</string>
+    <string name="sources_title">Управление TLE</string>
+    <string name="sources_hint">Источник TLE</string>
+    <string name="sources_https">Только протокол HTTPS</string>
 
-    <string name="pass_prefs_title">Настройки пролетов спутников</string>
-    <string name="hours_ahead_title">Количество часов</string>
-    <string name="minimal_elevation_title">Минимальная элевация</string>
+    <string name="entries_update">Обновить спутники:</string>
+    <string name="entries_search_hint">Поиск по имени / Id</string>
+    <string name="entries_no_data">Пожалуйста, обновите спутники</string>
+    <string name="entries_update_error">Ошибка обновления спутников</string>
 
+    <string name="passes_error">Нет выбранных спутников</string>
+
+    <string name="trans_mode">Модуляция: %s</string>
+    <string name="trans_no_mode">Модуляция: нет</string>
+    <string name="trans_inverted">Инверсия: %s</string>
+    <string name="trans_no_data">Не найдены трансиверы для этого спутника</string>
+
+    <string name="pat_azimuth">Аз: %.1f°</string>
+    <string name="pat_elevation">Элев: %.1f°</string>
+    <string name="pat_distance">Дист: %.0fкм</string>
+    <string name="pat_altitude">Выс: %.0fкм</string>
+    <string name="pat_osm_latLon">Шир: %.1f°, Дол: %.1f°</string>
+    <string name="pat_osm_vel">Скор: %.2f км/с</string>
+
+    <string name="pref_pass_title">Настройки пролетов спутников</string>
+    <string name="pref_hours_title">Количество часов</string>
+    <string name="pref_elev_title">Минимальная элевация</string>
     <string name="pref_gsp_title">Местоположение наземной станции</string>
     <string name="pref_lat_title">Широта, град</string>
     <string name="pref_lat_input_error">Введите значение между -90° и 90°</string>
@@ -44,67 +68,20 @@
     <string name="pref_compass_title">Использовать компас</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
-    <string name="no_mode">Модуляция: нет</string>
-    <string name="no_downlink_doppler">нет</string>
-    <string name="no_trans">Не найдены трансиверы для этого спутника</string>
-
-    <string name="error_updating_data">Ошибка импорта спутников</string>
-
-    <string name="pat_azimuth">Аз: %.1f°</string>
-    <string name="pat_elevation">Элев: %.1f°</string>
-    <string name="pat_distance">Дист: %.0fкм</string>
-    <string name="pat_altitude">Выс: %.0fкм</string>
-
-    <string name="pat_osm_latLon">Шир: %.1f°, Дол: %.1f°</string>
-    <string name="pat_osm_vel">Скор: %.2f км/с</string>
-
-    <string name="trans_mode">Модуляция: %s</string>
-    <string name="trans_inverted">Инверсия: %s</string>
-
-    <string name="about_subtitle">Приложение для слежения за спутниками радио и погоды
-        для платформы Android</string>
-    <string name="about_thanks_to">Большое спасибо:</string>
-    <string name="about_thanks_list">— Вам за использование этого приложения! Желаю всегда чистого неба над головой!\n
-
-        \n— David A. B. Johnson, <a href="https://github.com/g4dpz">G4DPZ</a>, автору библиотеки
-        predict4java, которую приложение использует для вычисления орбит спутников по модели SGP4.\n
-
-        \n— <a href="https://github.com/davidmoten">Dave Moten</a> за создание форка и добавления
-        библиотеки в репозиторий maven, что значительно облегчило интеграцию в приложение.
-        Библиотека predict4java доступна по лицензии
-        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.\n
-
-        \n— Alexandru Csete, <a href="https://github.com/csete">OZ9AEC</a>, за его замечательную
-        программу Gpredict, которая вдохновила меня на создание Look4Sat.\n
-
-        \n— Доктору <a href="https://celestrak.com/webmaster.php">T.S. Kelso</a> за его бесценный
-        вклад в развитие космической отрасли и за его сайт <a href="https://celestrak.com/">Celestrak</a>,
-        который хранит, обновляет и предоставляет доступ к файлам TLE.\n
-
-        \n— Команде <a href="https://libre.space/">Libre Space Foundation</a> и их проекту SatNOGS,
-        который предоставляет замечательное <a href="https://db.satnogs.org/api/">API</a>
-        и <a href="https://db.satnogs.org/">базу данных</a> с огромным количеством информации
-        о спутниках, их телеметрии и трансиверах, которую приложение использует под капотом.\n
-
-        \n— Ребятам из Square за создание библиотек OkHttp, Okio, Retrofit и за доступ
-        к ним по лицензии <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a>.\n
-
-        \n— Ребятам из Google и AOSP за создание самой лучшей мобильной ОС, доступной
-        на сегодняшний день. За их Google Play Services и за библиотеки Gson и Dagger2.\n
-
-        \nЭто программное обеспечение поставляется без каких либо гарантий. Подробности содержатся
-        в лицензии <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
-    </string>
-
-    <string name="btn_yes">Да</string>
-    <string name="btn_no">Нет</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_cancel">Отмена</string>
-    <string name="btn_update">Обновить</string>
-
-    <string name="tle_source">Источник TLE</string>
-    <string name="https_only">Используйте HTTPS</string>
-    <string name="entries_update">Обновить данные TLE:</string>
-    <string name="entries_error">Пожалуйста, обновите данные TLE</string>
-    <string name="passes_error">Нет выбранных спутников</string>
+    <string name="about_subtitle">Трекер спутников для Android</string>
+    <string name="about_thanks">Огромное спасибо:
+        \n— Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
+        \n— <a href="https://github.com/g4dpz">David A. B. Johnson</a> и
+        <a href="https://github.com/davidmoten">Dave Moten</a> за работу над библиотекой predict4java и
+        открытие доступа к ней по лицензии <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
+        \n— <a href="https://github.com/csete">Alexandru Csete</a> за его замечательную
+        программу Gpredict, которая вдохновила меня на создание Look4Sat.
+        \n— <a href="https://celestrak.com/webmaster.php">Доктору T.S. Kelso</a> за его сайт
+        <a href="https://celestrak.com/">Celestrak</a>, который предоставляет доступ к файлам орбит Two-Line Element.
+        \n— <a href="https://libre.space/">Libre Space Foundation</a> за проект
+        <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с огромным количеством информации о спутниках.
+        \n— <a href="https://square.github.io/">Square</a> за библиотеки OkHttp, Retrofit, Moshi и доступ
+        к ним по лицензии <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a></string>
+    <string name="about_warranty">Это ПО поставляется без гарантий.
+        Подробности в лицензии <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a></string>
 </resources>

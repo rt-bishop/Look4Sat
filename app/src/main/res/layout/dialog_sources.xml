@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:text="@string/dialog_tle_sources"
+        android:text="@string/sources_title"
         android:textSize="16sp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="@+id/tleSourcesRecycler"
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
-        android:text="@string/https_only"
+        android:text="@string/sources_https"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/tleSourcesRecycler"
         app:layout_constraintTop_toBottomOf="@+id/tleSourcesTitle" />

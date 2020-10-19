@@ -12,7 +12,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="@string/tle_source"
+        android:hint="@string/sources_hint"
         app:endIconDrawable="@drawable/ic_map_sat"
         app:endIconMode="custom"
         app:layout_constraintBottom_toBottomOf="parent"

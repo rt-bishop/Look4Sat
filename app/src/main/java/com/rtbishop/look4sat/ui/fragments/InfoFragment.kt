@@ -37,13 +37,17 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
         super.onViewCreated(view, savedInstanceState)
         FragmentInfoBinding.bind(view).apply {
             version.text = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
+            btnGithub.setOnClickListener {
+                gotoUrl("https://github.com/rt-bishop/Look4Sat/")
+            }
+            btnFdroid.setOnClickListener {
+                gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
+            }
             message.movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
-    private fun gotoGitHub() {
-        val gitHubUrl = "https://github.com/rt-bishop/LookingSat"
-        val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(gitHubUrl))
-        startActivity(githubIntent)
+    private fun gotoUrl(url: String) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 }

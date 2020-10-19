@@ -37,8 +37,8 @@ class TransAdapter(context: Context) : RecyclerView.Adapter<TransAdapter.TransHo
     private val strNo = context.getString(R.string.btn_no)
     private val strYes = context.getString(R.string.btn_yes)
     private val mode = context.getString(R.string.trans_mode)
-    private val formatLink = context.getString(R.string.trans_down_low_doppler)
-    private val formatLinkNull = context.getString(R.string.no_downlink_doppler)
+    private val formatLink = context.getString(R.string.trans_link_low)
+    private val formatLinkNull = context.getString(R.string.trans_no_link)
     private val isInverted = context.getString(R.string.trans_inverted)
     private var transmittersList = emptyList<SatTrans>()
 
@@ -74,12 +74,12 @@ class TransAdapter(context: Context) : RecyclerView.Adapter<TransAdapter.TransHo
 
             if (satTrans.downlinkLow != null) {
                 val downFreq = predictor.getDownlinkFreq(satTrans.downlinkLow, dateNow) / divider
-                binding.downlink.text = String.format(formatLink, downFreq)
+                binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downFreq)
             } else binding.downlink.text = formatLinkNull
 
             if (satTrans.uplinkLow != null) {
                 val upFreq = predictor.getUplinkFreq(satTrans.uplinkLow, dateNow) / divider
-                binding.uplink.text = String.format(formatLink, upFreq)
+                binding.uplink.text = String.format(Locale.ENGLISH, formatLink, upFreq)
             } else binding.uplink.text = formatLinkNull
 
             if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)

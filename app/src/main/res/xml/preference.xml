@@ -42,12 +42,12 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="@string/pass_prefs_title"
+        android:title="@string/pref_pass_title"
         app:iconSpaceReserved="false">
         <SeekBarPreference
             android:key="hoursAhead"
             android:max="72"
-            android:title="@string/hours_ahead_title"
+            android:title="@string/pref_hours_title"
             app:defaultValue="8"
             app:iconSpaceReserved="false"
             app:min="1"
@@ -55,7 +55,7 @@
         <SeekBarPreference
             android:key="minimalElevation"
             android:max="72"
-            android:title="@string/minimal_elevation_title"
+            android:title="@string/pref_elev_title"
             app:adjustable="false"
             app:defaultValue="16"
             app:iconSpaceReserved="false"

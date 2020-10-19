@@ -113,7 +113,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             256,
             ".png",
             arrayOf("https://maps.wikimedia.org/osm-intl/"),
-            resources.getString(R.string.osmCopyright),
+            resources.getString(R.string.map_copyright),
             TileSourcePolicy(
                 1, TileSourcePolicy.FLAG_NO_BULK and TileSourcePolicy.FLAG_NO_PREVENTIVE and
                         TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
