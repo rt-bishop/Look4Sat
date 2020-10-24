@@ -19,15 +19,12 @@
 
 <resources>
     <string name="app_name" translatable="false">Look4Sat</string>
-    <string name="app_version">Version: %s</string>
     <string name="placeholder" translatable="false">Placeholder</string>
 
     <string name="btn_no">No</string>
     <string name="btn_yes">Yes</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_update">Update</string>
-    <string name="btn_github" translatable="false">GitHub</string>
-    <string name="btn_fdroid" translatable="false">F-Droid</string>
 
     <string name="menu_entries">Satellites</string>
     <string name="menu_passes">Passes</string>
@@ -88,8 +85,12 @@
     <string name="pref_time_utc_title">Show pass time in UTC</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>
 
-    <string name="about_subtitle">Satellite tracker for Android</string>
-    <string name="about_thanks">Huge thanks to:
+    <string name="info_version">Version: %s</string>
+    <string name="info_subtitle">Satellite tracker for Android</string>
+    <string name="info_github" translatable="false">GitHub</string>
+    <string name="info_fdroid" translatable="false">F-Droid</string>
+    <string name="info_bmc">Buy me a coffee</string>
+    <string name="info_thanks">Huge thanks to:
         \n— You for downloading and using Look4Sat! \nMay your sky always be clear!
         \n— <a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java library and making it
@@ -103,6 +104,6 @@
         \n— <a href="https://square.github.io/">Square</a> for epic OkHttp, Retrofit and Moshi libs
         available under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a> license.
     </string>
-    <string name="about_warranty">This application comes with absolutely no warranty. See the
+    <string name="info_warranty">This application comes with absolutely no warranty. See the
         <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> for details.</string>
 </resources>

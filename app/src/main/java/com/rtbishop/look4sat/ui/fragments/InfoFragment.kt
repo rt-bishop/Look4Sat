@@ -36,14 +36,18 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         FragmentInfoBinding.bind(view).apply {
-            version.text = String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
-            btnGithub.setOnClickListener {
+            infoVersion.text =
+                String.format(getString(R.string.info_version), BuildConfig.VERSION_NAME)
+            infoGithub.setOnClickListener {
                 gotoUrl("https://github.com/rt-bishop/Look4Sat/")
             }
-            btnFdroid.setOnClickListener {
+            infoFdroid.setOnClickListener {
                 gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
             }
-            message.movementMethod = LinkMovementMethod.getInstance()
+            infoBmc.setOnClickListener {
+                gotoUrl("https://www.buymeacoffee.com/rtbishop")
+            }
+            infoThanks.movementMethod = LinkMovementMethod.getInstance()
         }
     }
 

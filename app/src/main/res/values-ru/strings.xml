@@ -18,8 +18,6 @@
   -->
 
 <resources>
-    <string name="app_version">Версия: %s</string>
-
     <string name="btn_yes">Да</string>
     <string name="btn_no">Нет</string>
     <string name="btn_cancel">Отмена</string>
@@ -68,8 +66,10 @@
     <string name="pref_compass_title">Использовать компас</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
-    <string name="about_subtitle">Трекер спутников для Android</string>
-    <string name="about_thanks">Огромное спасибо:
+    <string name="info_version">Версия: %s</string>
+    <string name="info_subtitle">Трекер спутников для Android</string>
+    <string name="info_bmc">Угостить кофе</string>
+    <string name="info_thanks">Огромное спасибо:
         \n— Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
         \n— <a href="https://github.com/g4dpz">David A. B. Johnson</a> и
         <a href="https://github.com/davidmoten">Dave Moten</a> за работу над библиотекой predict4java и
@@ -82,6 +82,6 @@
         <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с огромным количеством информации о спутниках.
         \n— <a href="https://square.github.io/">Square</a> за библиотеки OkHttp, Retrofit, Moshi и доступ
         к ним по лицензии <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a></string>
-    <string name="about_warranty">Это ПО поставляется без гарантий.
+    <string name="info_warranty">Это ПО поставляется без гарантий.
         Подробности в лицензии <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a></string>
 </resources>

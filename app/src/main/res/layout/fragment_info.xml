@@ -29,20 +29,20 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/title_img"
+            android:id="@+id/infoTitleImg"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_menu_entries"
-            app:layout_constraintBottom_toBottomOf="@+id/title"
-            app:layout_constraintEnd_toStartOf="@+id/title"
+            app:layout_constraintBottom_toBottomOf="@+id/infoTitle"
+            app:layout_constraintEnd_toStartOf="@+id/infoTitle"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/title" />
+            app:layout_constraintTop_toTopOf="@+id/infoTitle" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/title"
+            android:id="@+id/infoTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -50,90 +50,88 @@
             android:textColor="@color/themeLight"
             android:textSize="48sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/title_img"
+            app:layout_constraintStart_toEndOf="@+id/infoTitleImg"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/version"
+            android:id="@+id/infoVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/app_version"
+            android:text="@string/info_version"
             android:textColor="@color/themeLight"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
+            app:layout_constraintTop_toBottomOf="@+id/infoTitle" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/subtitle"
+            android:id="@+id/infoSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/about_subtitle"
+            android:text="@string/info_subtitle"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/version" />
+            app:layout_constraintTop_toBottomOf="@+id/infoVersion" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_github"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/infoGithub"
+            style="@style/InfoButton"
             android:layout_marginTop="16dp"
-            android:backgroundTint="@color/greySurface"
-            android:text="@string/btn_github"
-            android:textAllCaps="false"
-            android:textColor="@color/themeLight"
-            android:textSize="16sp"
+            android:text="@string/info_github"
             app:icon="@drawable/ic_github"
-            app:iconTint="@color/themeLight"
-            app:layout_constraintEnd_toStartOf="@+id/btn_fdroid"
+            app:layout_constraintEnd_toStartOf="@+id/infoFdroid"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subtitle" />
+            app:layout_constraintTop_toBottomOf="@+id/infoSubtitle" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_fdroid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/greySurface"
-            android:text="@string/btn_fdroid"
-            android:textAllCaps="false"
-            android:textColor="@color/themeLight"
-            android:textSize="16sp"
+            android:id="@+id/infoFdroid"
+            style="@style/InfoButton"
+            android:text="@string/info_fdroid"
             app:icon="@drawable/ic_fdroid"
-            app:iconTint="@color/themeLight"
-            app:layout_constraintBaseline_toBaselineOf="@+id/btn_github"
+            app:layout_constraintBaseline_toBaselineOf="@+id/infoGithub"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btn_github" />
+            app:layout_constraintStart_toEndOf="@+id/infoGithub" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/infoBmc"
+            style="@style/InfoButton"
+            android:layout_marginTop="16dp"
+            android:text="@string/info_bmc"
+            app:icon="@drawable/ic_bmc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/infoGithub" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/message"
+            android:id="@+id/infoThanks"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:gravity="center"
-            android:text="@string/about_thanks"
+            android:text="@string/info_thanks"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_github" />
+            app:layout_constraintTop_toBottomOf="@+id/infoBmc" />
 
         <TextView
-            android:id="@+id/warranty"
+            android:id="@+id/infoWarranty"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:text="@string/about_warranty"
+            android:text="@string/info_warranty"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/message"
-            app:layout_constraintStart_toStartOf="@+id/message"
-            app:layout_constraintTop_toBottomOf="@+id/message" />
+            app:layout_constraintEnd_toEndOf="@+id/infoThanks"
+            app:layout_constraintStart_toStartOf="@+id/infoThanks"
+            app:layout_constraintTop_toBottomOf="@+id/infoThanks" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
