@@ -7,11 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.SatEntry
-import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.adapters.EntriesAdapter
 import com.rtbishop.look4sat.utility.RecyclerDivider
@@ -25,7 +25,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private lateinit var entriesAdapter: EntriesAdapter
     private val viewModel: SharedViewModel by activityViewModels()
     private val pickFileReqCode = 100
-    private var tleSources = listOf<TleSource>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,7 +52,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupObservers() {
-        viewModel.getSources().observe(viewLifecycleOwner, { tleSources = it })
         viewModel.getEntries().observe(viewLifecycleOwner, {
             if (it.isNullOrEmpty()) setError()
             else {
@@ -74,7 +72,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun showImportFromWebDialog() {
-        SourcesDialog(tleSources, viewModel).show(childFragmentManager, "SourcesDialog")
+        findNavController().navigate(R.id.nav_dialog_sources)
     }
 
     private fun showImportFromFileDialog() {

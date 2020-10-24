@@ -27,16 +27,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.ItemTleSourceBinding
 
-class SourcesAdapter(private var sources: MutableList<TleSource>) :
+class SourcesAdapter(private var sources: MutableList<TleSource> = mutableListOf()) :
     RecyclerView.Adapter<SourcesAdapter.TleSourceHolder>() {
 
-    fun getSources(): MutableList<TleSource> {
-        return sources
+    fun addSource() {
+        val emptySource = TleSource()
+        if (!sources.contains(emptySource)) {
+            sources.add(emptySource)
+            notifyItemInserted(itemCount - 1)
+        }
     }
 
-    fun setSources(list: MutableList<TleSource>) {
-        sources = list
-        notifyDataSetChanged()
+    fun getSources(): List<TleSource> {
+        return sources.filter { it.url != String() && it.url != " " && it.url.contains("https://") }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TleSourceHolder {
@@ -53,7 +56,7 @@ class SourcesAdapter(private var sources: MutableList<TleSource>) :
         return sources.size
     }
 
-    inner class TleSourceHolder(itemView: View, val binding: ItemTleSourceBinding) :
+    inner class TleSourceHolder(itemView: View, private val binding: ItemTleSourceBinding) :
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(source: TleSource) {

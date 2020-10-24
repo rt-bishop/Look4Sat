@@ -4,6 +4,7 @@
     android:id="@+id/tleSourcesDialog"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@color/greyDark"
     android:padding="4dp">
 
     <com.google.android.material.textview.MaterialTextView

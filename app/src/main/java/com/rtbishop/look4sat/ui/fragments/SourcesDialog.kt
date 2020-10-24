@@ -19,9 +19,12 @@
 
 package com.rtbishop.look4sat.ui.fragments
 
-import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
@@ -31,34 +34,32 @@ import com.rtbishop.look4sat.ui.adapters.SourcesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SourcesDialog(sources: List<TleSource>, private val viewModel: SharedViewModel) :
-    AppCompatDialogFragment() {
+class SourcesDialog : AppCompatDialogFragment() {
 
-    private val sourcesAdapter = SourcesAdapter(sources as MutableList<TleSource>)
+    private val viewModel: SharedViewModel by activityViewModels()
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding = DialogSourcesBinding.inflate(requireActivity().layoutInflater).apply {
-            tleSourcesRecycler.apply {
-                adapter = sourcesAdapter
-                layoutManager = LinearLayoutManager(requireContext())
-            }
-            tleSourceBtnAdd.setOnClickListener {
-                val tempSources = sourcesAdapter.getSources()
-                tempSources.add(TleSource(String()))
-                sourcesAdapter.setSources(tempSources)
-            }
-            tleSourcesBtnPos.setOnClickListener {
-                val filteredSources = sourcesAdapter.getSources()
-                    .filter { it.url != String() && it.url != " " && it.url.contains("https://") }
-                viewModel.updateEntriesFromSources(filteredSources)
-                dismiss()
-            }
-            tleSourcesBtnNeg.setOnClickListener { dismiss() }
-        }
+    override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
+        return inflater.inflate(R.layout.dialog_sources, group, false)
+    }
 
-        return Dialog(requireActivity()).apply {
-            setContentView(binding.root)
-            window?.setBackgroundDrawableResource(R.drawable.ic_launcher_background)
-        }
+    override fun onViewCreated(view: View, state: Bundle?) {
+        super.onViewCreated(view, state)
+        viewModel.getSources().observe(viewLifecycleOwner, { sources ->
+            val sourcesAdapter = SourcesAdapter(sources as MutableList<TleSource>)
+            DialogSourcesBinding.bind(view).apply {
+                tleSourcesRecycler.apply {
+                    adapter = sourcesAdapter
+                    layoutManager = LinearLayoutManager(requireContext())
+                }
+                tleSourceBtnAdd.setOnClickListener {
+                    sourcesAdapter.addSource()
+                }
+                tleSourcesBtnPos.setOnClickListener {
+                    viewModel.updateEntriesFromSources(sourcesAdapter.getSources())
+                    dismiss()
+                }
+                tleSourcesBtnNeg.setOnClickListener { dismiss() }
+            }
+        })
     }
 }

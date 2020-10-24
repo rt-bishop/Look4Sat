@@ -77,5 +77,9 @@
         android:id="@+id/nav_info"
         android:name="com.rtbishop.look4sat.ui.fragments.InfoFragment"
         tools:layout="@layout/fragment_info" />
+    <dialog
+        android:id="@+id/nav_dialog_sources"
+        android:name="com.rtbishop.look4sat.ui.fragments.SourcesDialog"
+        tools:layout="@layout/dialog_sources" />
 
 </navigation>
