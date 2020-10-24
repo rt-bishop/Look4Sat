@@ -30,7 +30,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
         setupComponents()
-        setupObservers()
+        observeEntries()
     }
 
     private fun setupComponents() {
@@ -51,15 +51,19 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         }
     }
 
-    private fun setupObservers() {
-        viewModel.getEntries().observe(viewLifecycleOwner, {
-            if (it.isNullOrEmpty()) setError()
+    private fun observeEntries() {
+        viewModel.getEntries().observe(viewLifecycleOwner, { entries ->
+            if (entries.isNullOrEmpty()) setError()
             else {
-                viewModel.setEntries(it)
-                entriesAdapter.setEntries(it as MutableList<SatEntry>)
+                viewModel.setEntries(entries)
+                entriesAdapter.setEntries(entries as MutableList<SatEntry>)
                 setLoaded()
             }
+            observeEvents()
         })
+    }
+
+    private fun observeEvents() {
         viewModel.getAppEvent().observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.let {
                 if (it == 0) setLoading()

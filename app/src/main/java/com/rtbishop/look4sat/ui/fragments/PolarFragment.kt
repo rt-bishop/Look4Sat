@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.Result
@@ -63,14 +64,6 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPolarBinding.bind(view)
         sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        transmitterAdapter = TransAdapter(requireContext())
-        binding.recycler.apply {
-            setHasFixedSize(true)
-            adapter = transmitterAdapter
-            isVerticalScrollBarEnabled = false
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
-        }
         magneticDeclination = prefsManager.getMagDeclination()
         observePasses()
     }
@@ -114,22 +107,30 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
                 polarView = PolarView(requireContext(), satPass)
                 binding.frame.addView(polarView)
                 observeTransmitters()
-                observeTimer()
             }
         })
     }
 
     private fun observeTransmitters() {
-        viewModel.getTransmittersForSat(satPass.tle.catnum).observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()) {
-                transmitterAdapter.setPredictor(satPass.predictor)
-                transmitterAdapter.setList(it)
-                binding.recycler.visibility = View.VISIBLE
+        viewModel.getTransmittersForSat(satPass.tle.catnum).observe(viewLifecycleOwner, { list ->
+            transmitterAdapter = TransAdapter(requireContext(), satPass)
+            if (list.isNotEmpty()) {
+                transmitterAdapter.setData(list)
+                binding.recycler.apply {
+                    setHasFixedSize(true)
+                    adapter = transmitterAdapter
+                    isVerticalScrollBarEnabled = false
+                    layoutManager = LinearLayoutManager(context)
+                    (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                    addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
+                    visibility = View.VISIBLE
+                }
                 binding.noTransMsg.visibility = View.INVISIBLE
             } else {
                 binding.recycler.visibility = View.INVISIBLE
                 binding.noTransMsg.visibility = View.VISIBLE
             }
+            observeTimer()
         })
     }
 
@@ -137,7 +138,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         viewModel.getAppTimer().observe(viewLifecycleOwner, {
             setPassText(it)
             polarView?.invalidate()
-            transmitterAdapter.notifyDataSetChanged()
+            transmitterAdapter.tickTransmitters()
         })
     }
 

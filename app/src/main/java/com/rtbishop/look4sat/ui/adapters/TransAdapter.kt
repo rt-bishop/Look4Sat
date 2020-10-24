@@ -25,14 +25,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.data.SatTrans
 import com.rtbishop.look4sat.databinding.ItemTransBinding
-import com.rtbishop.look4sat.utility.PassPredictor
 import java.util.*
 
-class TransAdapter(context: Context) : RecyclerView.Adapter<TransAdapter.TransHolder>() {
+class TransAdapter(context: Context, private val satPass: SatPass) :
+    RecyclerView.Adapter<TransAdapter.TransHolder>() {
 
-    private lateinit var predictor: PassPredictor
     private val divider = 1000000f
     private val strNo = context.getString(R.string.btn_no)
     private val strYes = context.getString(R.string.btn_yes)
@@ -40,15 +40,23 @@ class TransAdapter(context: Context) : RecyclerView.Adapter<TransAdapter.TransHo
     private val formatLink = context.getString(R.string.trans_link_low)
     private val formatLinkNull = context.getString(R.string.trans_no_link)
     private val isInverted = context.getString(R.string.trans_inverted)
+    private val predictor = satPass.predictor
     private var transmittersList = emptyList<SatTrans>()
 
-    fun setPredictor(predictor: PassPredictor) {
-        this.predictor = predictor
-    }
-
-    fun setList(list: List<SatTrans>) {
+    fun setData(list: List<SatTrans>) {
         transmittersList = list
         notifyDataSetChanged()
+    }
+
+    fun tickTransmitters() {
+        if (!satPass.tle.isDeepspace and satPass.active) {
+            val iterator = transmittersList.listIterator()
+            while (iterator.hasNext()) {
+                val trans = iterator.next()
+                val index = transmittersList.indexOf(trans)
+                notifyItemChanged(index)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -69,8 +77,32 @@ class TransAdapter(context: Context) : RecyclerView.Adapter<TransAdapter.TransHo
         RecyclerView.ViewHolder(itemView) {
 
         fun bind(satTrans: SatTrans) {
-            val dateNow = Date()
             binding.description.text = satTrans.description
+
+            if (satPass.tle.isDeepspace or !satPass.active) setRegularFreq(satTrans)
+            else setDopplerFreq(satTrans)
+
+            if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)
+            else binding.mode.text = String.format(mode, strNo)
+
+            if (satTrans.isInverted) binding.isInverted.text = String.format(isInverted, strYes)
+            else binding.isInverted.text = String.format(isInverted, strNo)
+        }
+
+        private fun setRegularFreq(satTrans: SatTrans) {
+            if (satTrans.downlinkLow != null) {
+                val downFreq = satTrans.downlinkLow / divider
+                binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downFreq)
+            } else binding.downlink.text = formatLinkNull
+
+            if (satTrans.uplinkLow != null) {
+                val upFreq = satTrans.uplinkLow / divider
+                binding.uplink.text = String.format(Locale.ENGLISH, formatLink, upFreq)
+            } else binding.uplink.text = formatLinkNull
+        }
+
+        private fun setDopplerFreq(satTrans: SatTrans) {
+            val dateNow = Date()
 
             if (satTrans.downlinkLow != null) {
                 val downFreq = predictor.getDownlinkFreq(satTrans.downlinkLow, dateNow) / divider
@@ -81,12 +113,6 @@ class TransAdapter(context: Context) : RecyclerView.Adapter<TransAdapter.TransHo
                 val upFreq = predictor.getUplinkFreq(satTrans.uplinkLow, dateNow) / divider
                 binding.uplink.text = String.format(Locale.ENGLISH, formatLink, upFreq)
             } else binding.uplink.text = formatLinkNull
-
-            if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)
-            else binding.mode.text = String.format(mode, strNo)
-
-            if (satTrans.isInverted) binding.isInverted.text = String.format(isInverted, strYes)
-            else binding.isInverted.text = String.format(isInverted, strNo)
         }
     }
 }

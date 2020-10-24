@@ -10,7 +10,7 @@ object Utilities {
 
     fun formatForTimer(millis: Long): String {
         val format = "%02d:%02d:%02d"
-        val hours = TimeUnit.MILLISECONDS.toHours(millis) % 60
+        val hours = TimeUnit.MILLISECONDS.toHours(millis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60
         val seconds = TimeUnit.MILLISECONDS.toSeconds(millis) % 60
         return String.format(format, hours, minutes, seconds)
