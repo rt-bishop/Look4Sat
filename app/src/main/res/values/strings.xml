@@ -71,16 +71,14 @@
     <string name="pat_osm_latLon">Lat: %.1f°, Lon: %.1f°</string>
     <string name="pat_osm_vel">Vel: %.2f km/s</string>
 
+    <string name="pref_gsp_title">Ground station position</string>
+    <string name="pref_pos_gps">Set position from GPS</string>
+    <string name="pref_pos_gps_success">Position updated successfully</string>
+    <string name="pref_pos_gps_null">Location is switched off</string>
+    <string name="pref_pos_gps_error">Check your location permissions</string>
     <string name="pref_pass_title">Satellite pass preferences</string>
     <string name="pref_hours_title">Hours ahead</string>
     <string name="pref_elev_title">Minimal elevation</string>
-    <string name="pref_gsp_title">Ground station position</string>
-    <string name="pref_lat_title">Latitude, deg</string>
-    <string name="pref_lat_input_error">Set the value between -90° and 90°</string>
-    <string name="pref_lon_title">Longitude, deg</string>
-    <string name="pref_lon_input_error">Set the value between -180° and 180°</string>
-    <string name="pref_alt_title">Altitude, m</string>
-    <string name="pref_alt_input_error">Set the value between -413m and 8850m</string>
     <string name="pref_other_title">Other</string>
     <string name="pref_time_utc_title">Show pass time in UTC</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>

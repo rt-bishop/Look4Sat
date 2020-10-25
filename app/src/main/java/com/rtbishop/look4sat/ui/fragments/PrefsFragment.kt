@@ -19,81 +19,56 @@
 
 package com.rtbishop.look4sat.ui.fragments
 
-import android.content.SharedPreferences
+import android.location.LocationManager
 import android.os.Bundle
-import android.text.InputType
-import androidx.preference.EditTextPreference
+import android.view.View
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.Utilities.round
 import com.rtbishop.look4sat.utility.Utilities.snack
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class PrefsFragment : PreferenceFragmentCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener {
+class PrefsFragment : PreferenceFragmentCompat() {
+
+    @Inject
+    lateinit var locationManager: LocationManager
+
+    @Inject
+    lateinit var prefsManager: PrefsManager
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
+    }
 
-        findPreference<EditTextPreference>(PrefsManager.keyLatitude)?.apply {
-            setOnBindEditTextListener {
-                it.inputType = InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_DECIMAL or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED
-            }
-            setOnPreferenceChangeListener { _, newValue ->
-                val valueStr = newValue.toString()
-                if (valueStr.isEmpty() || valueStr == "-" || valueStr.toDouble() < -90.0 || valueStr.toDouble() > 90.0) {
-                    getString(R.string.pref_lat_input_error).snack(requireView())
-                    return@setOnPreferenceChangeListener false
-                }
-                return@setOnPreferenceChangeListener true
-            }
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        findPreference<EditTextPreference>(PrefsManager.keyLongitude)?.apply {
-            setOnBindEditTextListener {
-                it.inputType = InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_DECIMAL or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED
-            }
-            setOnPreferenceChangeListener { _, newValue ->
-                val valueStr = newValue.toString()
-                if (valueStr.isEmpty() || valueStr == "-" || valueStr.toDouble() < -180.0 || valueStr.toDouble() > 180.0) {
-                    getString(R.string.pref_lon_input_error).snack(requireView())
-                    return@setOnPreferenceChangeListener false
-                }
-                return@setOnPreferenceChangeListener true
-            }
-        }
-
-        findPreference<EditTextPreference>(PrefsManager.keyAltitude)?.apply {
-            setOnBindEditTextListener {
-                it.inputType = InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_DECIMAL or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED
-            }
-            setOnPreferenceChangeListener { _, newValue ->
-                val valueStr = newValue.toString()
-                if (valueStr.isEmpty() || valueStr == "-" || valueStr.toDouble() < -413.0 || valueStr.toDouble() > 8850.0) {
-                    getString(R.string.pref_alt_input_error).snack(requireView())
-                    return@setOnPreferenceChangeListener false
-                }
-                return@setOnPreferenceChangeListener true
+        findPreference<Preference>(PrefsManager.keyPositionGPS)?.apply {
+            setOnPreferenceClickListener {
+                setPositionFromGPS()
+                return@setOnPreferenceClickListener true
             }
         }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {}
-
-    override fun onResume() {
-        super.onResume()
-        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    private fun setPositionFromGPS() {
+        try {
+            val location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
+            if (location != null) {
+                val latitude = location.latitude.round(4)
+                val longitude = location.longitude.round(4)
+                val altitude = location.altitude.round(1)
+                prefsManager.setStationPosition(latitude, longitude, altitude)
+                getString(R.string.pref_pos_gps_success).snack(requireView())
+            } else {
+                getString(R.string.pref_pos_gps_null).snack(requireView())
+            }
+        } catch (e: SecurityException) {
+            getString(R.string.pref_pos_gps_error).snack(requireView())
+        }
     }
 }

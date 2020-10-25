@@ -35,9 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
-import javax.inject.Singleton
 
-@Singleton
 class SharedViewModel @ViewModelInject constructor(
     private val prefsManager: PrefsManager,
     private val sourcesRepo: SourcesRepo,

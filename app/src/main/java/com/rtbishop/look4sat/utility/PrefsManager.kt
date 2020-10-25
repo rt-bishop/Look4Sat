@@ -21,40 +21,45 @@ package com.rtbishop.look4sat.utility
 
 import android.content.SharedPreferences
 import android.hardware.GeomagneticField
-import android.location.LocationManager
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.PassPrefs
-import com.rtbishop.look4sat.utility.Utilities.round
 import javax.inject.Inject
 
-class PrefsManager @Inject constructor(
-    private val preferences: SharedPreferences,
-    private val locationManager: LocationManager
-) {
+class PrefsManager @Inject constructor(private val preferences: SharedPreferences) {
     companion object {
-        const val hoursAhead = "hoursAhead"
-        const val minimalElevation = "minimalElevation"
         const val keyLatitude = "latitude"
         const val keyLongitude = "longitude"
         const val keyAltitude = "altitude"
         const val keyCompass = "compass"
-        const val keyTimeUtc = "timeUTC"
-        const val defaultGSP = "0.0"
-        const val keyIsFirstLaunch = "keyIsFirstLaunch"
+        const val keyTimeUTC = "timeUTC"
+        const val keyHoursAhead = "hoursAhead"
+        const val keyMinElevation = "minElevation"
+        const val keyPositionGPS = "setPositionGPS"
+        const val keyIsFirstLaunch = "isFirstLaunch"
     }
 
     fun getPassPrefs(): PassPrefs {
-        val hoursAhead = preferences.getInt(hoursAhead, 8)
-        val minEl = preferences.getInt(minimalElevation, 16).toDouble()
+        val hoursAhead = preferences.getInt(keyHoursAhead, 8)
+        val minEl = preferences.getInt(keyMinElevation, 16).toDouble()
         return PassPrefs(hoursAhead, minEl)
     }
 
     fun getStationPosition(): GroundStationPosition {
+        val defaultGSP = "0.0"
         val lat = preferences.getString(keyLatitude, defaultGSP)!!.toDouble()
         val lon = preferences.getString(keyLongitude, defaultGSP)!!.toDouble()
         val alt = preferences.getString(keyAltitude, defaultGSP)!!.toDouble()
         return GroundStationPosition(lat, lon, alt)
+    }
+
+    fun setStationPosition(latitude: Double, longitude: Double, altitude: Double) {
+        preferences.edit {
+            putString(keyLatitude, latitude.toString())
+            putString(keyLongitude, longitude.toString())
+            putString(keyAltitude, altitude.toString())
+            apply()
+        }
     }
 
     fun getMagDeclination(): Float {
@@ -65,25 +70,8 @@ class PrefsManager @Inject constructor(
         return GeomagneticField(lat, lon, alt, System.currentTimeMillis()).declination
     }
 
-    fun setStationPositionFromGPS() {
-        try {
-            locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)?.let {
-                val lat = it.latitude.round(4)
-                val lon = it.longitude.round(4)
-                val alt = it.altitude.round(1)
-                preferences.edit {
-                    putString(keyLatitude, lat.toString())
-                    putString(keyLongitude, lon.toString())
-                    putString(keyAltitude, alt.toString())
-                    apply()
-                }
-            }
-        } catch (e: SecurityException) {
-        }
-    }
-
     fun shouldUseUTC(): Boolean {
-        return preferences.getBoolean(keyTimeUtc, false)
+        return preferences.getBoolean(keyTimeUTC, false)
     }
 
     fun shouldUseCompass(): Boolean {

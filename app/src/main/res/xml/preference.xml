@@ -22,24 +22,10 @@
     <PreferenceCategory
         android:title="@string/pref_gsp_title"
         app:iconSpaceReserved="false">
-        <EditTextPreference
-            android:defaultValue="0.0"
-            android:key="latitude"
-            android:title="@string/pref_lat_title"
-            app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            android:defaultValue="0.0"
-            android:key="longitude"
-            android:title="@string/pref_lon_title"
-            app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            android:defaultValue="0.0"
-            android:key="altitude"
-            android:title="@string/pref_alt_title"
-            app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:key="setPositionGPS"
+            android:title="@string/pref_pos_gps"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/pref_pass_title"
@@ -53,7 +39,7 @@
             app:min="1"
             app:showSeekBarValue="true" />
         <SeekBarPreference
-            android:key="minimalElevation"
+            android:key="minElevation"
             android:max="72"
             android:title="@string/pref_elev_title"
             app:adjustable="false"

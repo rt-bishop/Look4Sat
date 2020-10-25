@@ -23,7 +23,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.preference.PreferenceManager
-import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,10 +41,5 @@ object UtilityModule {
     @Provides
     fun getLocationManager(@ActivityContext context: Context): LocationManager {
         return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    }
-
-    @Provides
-    fun getPrefsManager(prefs: SharedPreferences, locationManager: LocationManager): PrefsManager {
-        return PrefsManager(prefs, locationManager)
     }
 }

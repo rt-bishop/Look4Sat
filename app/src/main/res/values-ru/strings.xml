@@ -52,16 +52,14 @@
     <string name="pat_osm_latLon">Шир: %.1f°, Дол: %.1f°</string>
     <string name="pat_osm_vel">Скор: %.2f км/с</string>
 
+    <string name="pref_gsp_title">Местоположение наземной станции</string>
+    <string name="pref_pos_gps">Установить позицию по данным GPS</string>
+    <string name="pref_pos_gps_success">Позиция успешно обновлена</string>
+    <string name="pref_pos_gps_null">Местоположение отключено</string>
+    <string name="pref_pos_gps_error">Нет разрешения использовать геоданные</string>
     <string name="pref_pass_title">Настройки пролетов спутников</string>
     <string name="pref_hours_title">Количество часов</string>
     <string name="pref_elev_title">Минимальная элевация</string>
-    <string name="pref_gsp_title">Местоположение наземной станции</string>
-    <string name="pref_lat_title">Широта, град</string>
-    <string name="pref_lat_input_error">Введите значение между -90° и 90°</string>
-    <string name="pref_lon_title">Долгота, град</string>
-    <string name="pref_lon_input_error">Введите значение между -180° и 180°</string>
-    <string name="pref_alt_title">Высота, м</string>
-    <string name="pref_alt_input_error">Введите значение между -413м и 8850м</string>
     <string name="pref_other_title">Другие настройки</string>
     <string name="pref_compass_title">Использовать компас</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
