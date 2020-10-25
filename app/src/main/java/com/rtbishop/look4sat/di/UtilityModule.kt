@@ -29,30 +29,23 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.scopes.ActivityScoped
 
 @Module
 @InstallIn(ActivityComponent::class)
-class UtilityModule {
+object UtilityModule {
 
-    @ActivityScoped
     @Provides
-    fun provideSharedPreferences(@ActivityContext context: Context): SharedPreferences {
+    fun getSharedPreferences(@ActivityContext context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    @ActivityScoped
     @Provides
-    fun provideLocationManager(@ActivityContext context: Context): LocationManager {
+    fun getLocationManager(@ActivityContext context: Context): LocationManager {
         return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
-    @ActivityScoped
     @Provides
-    fun providePrefsManager(
-        sharedPreferences: SharedPreferences,
-        locationManager: LocationManager
-    ): PrefsManager {
-        return PrefsManager(sharedPreferences, locationManager)
+    fun getPrefsManager(prefs: SharedPreferences, locationManager: LocationManager): PrefsManager {
+        return PrefsManager(prefs, locationManager)
     }
 }

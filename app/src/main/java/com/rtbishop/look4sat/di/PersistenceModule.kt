@@ -30,33 +30,28 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.scopes.ActivityScoped
 
 @Module
 @InstallIn(ActivityComponent::class)
-class PersistenceModule {
+object PersistenceModule {
 
-    @ActivityScoped
     @Provides
-    fun provideEntriesDao(db: SatelliteDb): EntriesDao {
+    fun getEntriesDao(db: SatelliteDb): EntriesDao {
         return db.entriesDao()
     }
 
-    @ActivityScoped
     @Provides
-    fun provideTransDao(db: SatelliteDb): TransmittersDao {
-        return db.transmittersDao()
-    }
-
-    @ActivityScoped
-    @Provides
-    fun providesSourcesDao(db: SatelliteDb): SourcesDao {
+    fun getSourcesDao(db: SatelliteDb): SourcesDao {
         return db.sourcesDao()
     }
 
-    @ActivityScoped
     @Provides
-    fun provideSatDb(@ActivityContext context: Context): SatelliteDb {
+    fun getTransmittersDao(db: SatelliteDb): TransmittersDao {
+        return db.transmittersDao()
+    }
+
+    @Provides
+    fun getSatelliteDb(@ActivityContext context: Context): SatelliteDb {
         return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
     }
 }

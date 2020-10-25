@@ -76,7 +76,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun showImportFromWebDialog() {
-        findNavController().navigate(R.id.nav_dialog_sources)
+        findNavController().navigate(R.id.action_entries_to_dialog_sources)
     }
 
     private fun showImportFromFileDialog() {

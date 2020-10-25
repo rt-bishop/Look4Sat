@@ -31,41 +31,31 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.scopes.ActivityScoped
 import okhttp3.OkHttpClient
 
 @Module
 @InstallIn(ActivityComponent::class)
-class RepoModule {
+object RepoModule {
 
-    @ActivityScoped
     @Provides
-    fun provideContentResolver(@ActivityContext context: Context): ContentResolver {
-        return context.applicationContext.contentResolver
-    }
-
-    @ActivityScoped
-    @Provides
-    fun provideEntriesRepo(
-        resolver: ContentResolver,
-        client: OkHttpClient,
-        entriesDao: EntriesDao
-    ): EntriesRepo {
+    fun getEntriesRepo(resolver: ContentResolver, client: OkHttpClient, entriesDao: EntriesDao)
+            : EntriesRepo {
         return DefaultEntriesRepo(resolver, client, entriesDao)
     }
 
-    @ActivityScoped
     @Provides
-    fun provideSourcesRepo(sourcesDao: SourcesDao): SourcesRepo {
+    fun getSourcesRepo(sourcesDao: SourcesDao): SourcesRepo {
         return DefaultSourcesRepo(sourcesDao)
     }
 
-    @ActivityScoped
     @Provides
-    fun provideTransmittersRepo(
-        transmittersDao: TransmittersDao,
-        transmittersApi: TransmittersApi
-    ): TransmittersRepo {
-        return DefaultTransmittersRepo(transmittersDao, transmittersApi)
+    fun getTransmittersRepo(transDao: TransmittersDao, transApi: TransmittersApi)
+            : TransmittersRepo {
+        return DefaultTransmittersRepo(transDao, transApi)
+    }
+
+    @Provides
+    fun getContentResolver(@ActivityContext context: Context): ContentResolver {
+        return context.applicationContext.contentResolver
     }
 }

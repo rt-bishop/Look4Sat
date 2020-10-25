@@ -24,24 +24,21 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.scopes.ActivityScoped
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 @InstallIn(ActivityComponent::class)
-class NetworkModule {
+object NetworkModule {
 
-    @ActivityScoped
     @Provides
-    fun provideWebClient(): OkHttpClient {
+    fun getOkHttpClient(): OkHttpClient {
         return OkHttpClient()
     }
 
-    @ActivityScoped
     @Provides
-    fun provideTransApi(): TransmittersApi {
+    fun getTransmittersApi(): TransmittersApi {
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
             .addConverterFactory(MoshiConverterFactory.create())
