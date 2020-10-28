@@ -26,7 +26,7 @@ import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.PassPrefs
 import javax.inject.Inject
 
-class PrefsManager @Inject constructor(private val preferences: SharedPreferences) {
+class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
     companion object {
         const val keyLatitude = "latitude"
         const val keyLongitude = "longitude"
