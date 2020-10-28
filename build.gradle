@@ -31,6 +31,7 @@ buildscript {
         retrofit_version = '2.9.0'
         osmdroid_version = '6.1.8'
         predict4java_version = '1.3.1'
+        leak_canary_version = '2.5'
         junit_version = '4.13.1'
     }
     repositories {

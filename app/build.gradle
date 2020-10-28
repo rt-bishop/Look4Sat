@@ -87,5 +87,7 @@ dependencies {
     implementation "org.osmdroid:osmdroid-android:$osmdroid_version"
     implementation "com.github.davidmoten:predict4java:$predict4java_version"
 
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
+
     testImplementation "junit:junit:$junit_version"
 }
