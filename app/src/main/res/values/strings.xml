@@ -72,7 +72,6 @@
     <string name="pref_refresh_rate_input_error">Set the value between 250ms and 10000ms</string>
     <string name="pref_compass_key" translatable="false">compass</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>
-
     <string name="pref_time_utc_key" translatable="false">timeUTC</string>
     <string name="pref_time_utc_title">Show pass time in UTC</string>
 
@@ -92,7 +91,7 @@
     <string name="pass_satId" translatable="false">ID: %d</string>
     <string name="pass_aos_az">AOS — %2d°</string>
     <string name="pass_los_az">%2d° — LOS</string>
-    <string name="pass_dateTime" translatable="false">dd MMM @ HH:mm:ss</string>
+    <string name="pass_dateTime">dd MMM @ HH:mm:ss</string>
 
     <string name="pat_location" translatable="false">%.4f</string>
     <string name="pat_azimuth">Az: %.1f°</string>

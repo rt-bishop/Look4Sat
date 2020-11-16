@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Look4Sat. Amateur radio and weather satellite tracker and passes predictor for Android.
+  ~ Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
+  ~
+  ~ This program is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with this program; if not, write to the Free Software Foundation, Inc.,
+  ~ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  -->
+
+<resources>
+    <string name="app_version">版本：%s</string>
+
+    <string name="drawer_lat_text">纬度：</string>
+    <string name="drawer_lon_text">经度：</string>
+
+    <string name="update_loc">更新我的位置</string>
+    <string name="update_loc_success">定位已更新</string>
+    <string name="update_loc_failure">定位失败，请检查权限</string>
+    <string name="import_data_file">从文件导入卫星数据</string>
+    <string name="import_data_web">从网络导入卫星数据</string>
+    <string name="import_data_success">卫星数据更新成功</string>
+    <string name="import_data_failure">卫星数据导入失败</string>
+    <string name="goto_github">GitHub 项目主页</string>
+
+    <string name="menu_pass_list">过境卫星列表</string>
+    <string name="menu_map_view">世界地图</string>
+    <string name="menu_map_osm">世界地图（演示）</string>
+    <string name="menu_settings">设置</string>
+    <string name="menu_about">关于</string>
+
+    <string name="dialog_select_sat">选择您要追踪的卫星</string>
+    <string name="dialog_show_track">展示哪颗卫星的星下点轨迹？</string>
+    <string name="dialog_filter_passes">过滤过境卫星</string>
+    <string name="dialog_tle_sources">管理 TLE 数据源</string>
+    <string name="dialog_entries_hint">卫星名称/分类号</string>
+
+    <string name="pref_hours_ahead_hint">小时</string>
+    <string name="pref_hours_ahead_summary">展示将在 X 小时之内经过的卫星</string>
+    <string name="pref_hours_ahead_input_error">请在 1h 到 168h 间选择</string>
+    <string name="pref_min_el_hint">高度角</string>
+    <string name="pref_min_el_summary">仅展示最大高度角不低于此值的过境卫星</string>
+    <string name="pref_min_el_input_error">请在 0° 到 90° 间选择</string>
+
+    <string name="pref_gsp_title">地面站位置</string>
+    <string name="pref_lat_title">纬度，度</string>
+    <string name="pref_lat_input_error">请在 -90° 到 90° 间选择</string>
+    <string name="pref_lon_title">经度，度</string>
+    <string name="pref_lon_input_error">请在 -180° 到 180° 间选择</string>
+    <string name="pref_alt_title">海拔高度，米</string>
+    <string name="pref_alt_input_error">请在 -413m 到 8850m 间选择</string>
+    <string name="pref_other_title">其他</string>
+    <string name="pref_refresh_rate_title">刷新频率，毫秒</string>
+    <string name="pref_refresh_rate_input_error">请在 250ms 到 10000ms 间选择</string>
+    <string name="pref_compass_title">随传感器旋转极坐标视图</string>
+    <string name="pref_time_utc_title">以 UTC 展示卫星过境时间</string>
+
+    <string name="no_mode">模式：未知</string>
+    <string name="no_trans">无线电资料尚未收录</string>
+
+    <string name="err_no_permissions">定位权限获取失败，请检查系统设置</string>
+    <string name="err_update_data">请先更新卫星数据</string>
+    <string name="err_enter_value">请输入一个值</string>
+    <string name="err_no_sat_selected">未选择卫星</string>
+
+    <string name="pass_dateTime">MM月dd日 @ HH:mm:ss</string>
+    <string name="pat_azimuth">方位角 %.1f°</string>
+    <string name="pat_elevation">高度角 %.1f°</string>
+    <string name="pat_latitude">纬度 %.1f°</string>
+    <string name="pat_longitude">经度 %.1f°</string>
+    <string name="pat_distance">距离 %.0f km</string>
+    <string name="pat_altitude">高度 %.0f km</string>
+    <string name="pat_osm_latLon">纬度：%.1f°，经度：%.1f°</string>
+    <string name="pat_osm_vel">速度：%.2f km/s</string>
+
+    <string name="trans_mode">模式：%s</string>
+    <string name="trans_inverted">边带反转：%s</string>
+    <string name="trans_up_low">上行频率：%.4f MHz</string>
+    <string name="trans_up_lowHigh">上行频率：%.4f - %.4fMHz</string>
+    <string name="trans_down_low">下行频率：%.4f MHz</string>
+    <string name="trans_down_lowHigh">下行频率：%.4f - %.4fMHz</string>
+    <string name="trans_up_low_doppler">频移上行：%.4f MHz</string>
+    <string name="trans_up_lowHigh_doppler">频移上行：%.4f - %.4fMHz</string>
+    <string name="trans_down_low_doppler">频移下行：%.4f MHz</string>
+    <string name="trans_down_lowHigh_doppler">频移下行：%.4f - %.4fMHz</string>
+
+    <string name="info_swipe_text">下拉屏幕刷新过境卫星列表</string>
+    <string name="info_main_text">
+        Look4Sat 使用两行轨道要素（TLE）格式的数据来计算卫星位置，请通过左侧的主菜单导入卫星 TLE 数据。\n\n
+        导入完成后，过境卫星信息将在此处列出，您可以点击列表中的卫星查看其详细资料。</string>
+    <string name="info_select_text">点击右侧按钮选择您要追踪的卫星</string>
+
+    <string name="about_subtitle">业余无线电与气象卫星过境时间计算器</string>
+    <string name="about_thanks_to">特别鸣谢：</string>
+    <string name="about_thanks_list">— 正在使用本程序的您！祝您的天空永远晴朗！\n
+
+        \n— David A. B. Johnson「<a href="https://github.com/g4dpz">G4DPZ</a>」，
+        本程序基于 SGP4 模型的卫星轨道计算全都依靠他所开发的 predict4java 软件库完成。\n
+
+        \n— <a href="https://github.com/davidmoten">Dave Moten</a>，
+        他将 predict4java 封装成 Maven 项目，使得我们能轻而易举地将此库集成进自己的软件。Predict4java 以
+        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> 许可协议发布。\n
+
+        \n— 以 Alexandru Csete「<a href="https://github.com/csete">OZ9AEC</a>」为首的 Gpredict 开发团队，
+        Look4Sat 的诞生和后续设计都离不开他们这款伟大作品的启发。\n
+
+        \n— <a href="https://celestrak.com/webmaster.php">T.S. Kelso</a> 博士，他建立了
+        <a href="https://celestrak.com/">Celestrak</a> 网站来记录、更新和发布卫星 TLE 数据，
+        对行业领域的贡献不可估量。\n
+
+        \n— <a href="https://libre.space/">自由太空基金会</a>和基金会旗下 SatNOGS 项目。
+        本软件中展示的卫星遥测、信标与转发器等无线电数据便是取自于
+        他们海纳百川的<a href="https://db.satnogs.org/">卫星数据库</a>
+        和极为便利的 <a href="https://db.satnogs.org/api/">API</a> 接口。\n
+
+        \n— Square 公司的开发者们，他们慷慨地将所开发的 OkHttp、Okio 和 Retrofit 等优秀软件库以
+        <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a> 协议开源。\n
+
+        \n— 谷歌和 AOSP 开发团队，他们构筑了今日最优秀的移动操作系统。
+        本软件中使用的 Google Play 服务，Gson 和 Dagger2 也同样来自谷歌团队。\n
+
+        \n本程序为自由软件，在适用法律许可范围内，作者不对本程序提供任何品质担保。详见
+        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> 许可协议。
+    </string>
+
+    <string name="btn_yes">是</string>
+    <string name="btn_no">否</string>
+    <string name="btn_ok">确定</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_all_none">全选/不选</string>
+
+    <string name="map_gsp">地面站</string>
+    <string name="tle_source">TLE 数据源</string>
+    <string name="https_only">请使用 HTTPS 网址</string>
+</resources>
