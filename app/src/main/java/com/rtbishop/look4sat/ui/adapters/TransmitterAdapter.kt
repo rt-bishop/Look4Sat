@@ -91,8 +91,10 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
                         predictor.getDownlinkFreq(transmitter.downlinkHigh, Date()) / freqDivider
                     )
             } else {
-                binding.transDownlink.text = context.getString(R.string.no_downlink)
-                binding.transDownlinkDoppler.text = context.getString(R.string.no_downlink_doppler)
+                binding.transDownlink.visibility = View.GONE
+                binding.transDownlinkDoppler.visibility = View.GONE
+                binding.transImgDownlink.visibility = View.GONE
+                binding.transImgDownlinkDoppler.visibility = View.GONE
             }
 
             if (transmitter.uplinkLow != null && transmitter.uplinkHigh == null) {
@@ -116,8 +118,10 @@ class TransmitterAdapter : RecyclerView.Adapter<TransmitterAdapter.TransmitterHo
                     predictor.getUplinkFreq(transmitter.uplinkHigh, Date()) / freqDivider
                 )
             } else {
-                binding.transUplink.text = context.getString(R.string.no_uplink)
-                binding.transUplinkDoppler.text = context.getString(R.string.no_uplink_doppler)
+                binding.transUplink.visibility = View.GONE
+                binding.transUplinkDoppler.visibility = View.GONE
+                binding.transImgUplink.visibility = View.GONE
+                binding.transImgUplinkDoppler.visibility = View.GONE
             }
 
             if (transmitter.mode != null) {

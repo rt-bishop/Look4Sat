@@ -77,10 +77,6 @@
     <string name="pref_time_utc_title">Show pass time in UTC</string>
 
     <string name="no_mode">Mode: null</string>
-    <string name="no_uplink">Uplink: null</string>
-    <string name="no_downlink">Downlink: null</string>
-    <string name="no_uplink_doppler">Curr. uplink: null</string>
-    <string name="no_downlink_doppler">Curr. downlink: null</string>
     <string name="no_trans">No transceivers found for this satellite</string>
 
     <string name="err_no_permissions">Missing permissions</string>

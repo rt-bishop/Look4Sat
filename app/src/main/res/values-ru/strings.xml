@@ -63,14 +63,9 @@
     <string name="pref_refresh_rate_input_error">Введите значение между 250мс и 10000мс</string>
     <string name="pref_compass_title">Использовать компас при отображении полярных координат</string>
 
-    <string name="pref_time_utc_key" translatable="false">timeUTC</string>
     <string name="pref_time_utc_title">Показывать время пролёта по UTC</string>
 
     <string name="no_mode">Модуляция: нет</string>
-    <string name="no_uplink">Восход: нет</string>
-    <string name="no_downlink">Нисход: нет</string>
-    <string name="no_uplink_doppler">Тек. восход: нет</string>
-    <string name="no_downlink_doppler">Тек. нисход: нет</string>
     <string name="no_trans">Не найдены трансиверы для этого спутника</string>
 
     <string name="err_no_permissions">Отсутствуют необходимые разрешения</string>

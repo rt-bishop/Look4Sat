@@ -73,7 +73,7 @@
         <TextView
             android:id="@+id/trans_downlink_doppler"
             style="@style/CardTransText"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="2dp"
             android:text="@string/trans_down_lowHigh_doppler"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/trans_img_downlink_doppler"
