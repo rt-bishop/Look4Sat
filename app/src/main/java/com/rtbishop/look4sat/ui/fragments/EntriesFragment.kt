@@ -21,8 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
-    private lateinit var binding: FragmentEntriesBinding
-    private lateinit var entriesAdapter: EntriesAdapter
+    private var binding: FragmentEntriesBinding? = null
+    private var entriesAdapter: EntriesAdapter? = null
     private val viewModel: SharedViewModel by activityViewModels()
     private val pickFileReqCode = 100
 
@@ -35,7 +35,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private fun setupComponents() {
         entriesAdapter = EntriesAdapter()
-        binding.apply {
+        binding?.apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = entriesAdapter
@@ -44,7 +44,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { showImportFromFileDialog() }
-            selectAll.setOnClickListener { entriesAdapter.selectAll() }
+            selectAll.setOnClickListener { entriesAdapter?.selectAll() }
             entriesFab.setOnClickListener { navigateToPasses() }
             searchBar.setOnQueryTextListener(entriesAdapter)
             searchBar.clearFocus()
@@ -56,7 +56,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             if (entries.isNullOrEmpty()) setError()
             else {
                 viewModel.setEntries(entries)
-                entriesAdapter.setEntries(entries as MutableList<SatEntry>)
+                entriesAdapter?.setEntries(entries as MutableList<SatEntry>)
                 setLoaded()
             }
             observeEvents()
@@ -88,26 +88,32 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setLoaded() {
-        binding.entriesError.visibility = View.INVISIBLE
-        binding.entriesProgress.visibility = View.INVISIBLE
-        binding.entriesRecycler.visibility = View.VISIBLE
+        binding?.apply {
+            entriesError.visibility = View.INVISIBLE
+            entriesProgress.visibility = View.INVISIBLE
+            entriesRecycler.visibility = View.VISIBLE
+        }
     }
 
     private fun setLoading() {
-        binding.entriesError.visibility = View.INVISIBLE
-        binding.entriesRecycler.visibility = View.INVISIBLE
-        binding.entriesProgress.visibility = View.VISIBLE
+        binding?.apply {
+            entriesError.visibility = View.INVISIBLE
+            entriesRecycler.visibility = View.INVISIBLE
+            entriesProgress.visibility = View.VISIBLE
+        }
     }
 
     private fun setError() {
-        binding.entriesProgress.visibility = View.INVISIBLE
-        binding.entriesRecycler.visibility = View.INVISIBLE
-        binding.entriesError.visibility = View.VISIBLE
+        binding?.apply {
+            entriesProgress.visibility = View.INVISIBLE
+            entriesRecycler.visibility = View.INVISIBLE
+            entriesError.visibility = View.VISIBLE
+        }
     }
 
     private fun navigateToPasses() {
-        binding.searchBar.clearFocus()
-        viewModel.updateEntriesSelection(entriesAdapter.getEntries())
+        binding?.searchBar?.clearFocus()
+        entriesAdapter?.let { viewModel.updateEntriesSelection(it.getEntries()) }
         requireView().findNavController().navigate(R.id.action_entries_to_passes)
     }
 
@@ -115,5 +121,11 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         if (requestCode == pickFileReqCode && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.also { uri -> viewModel.updateEntriesFromFile(uri) }
         } else super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onDestroyView() {
+        entriesAdapter = null
+        binding = null
+        super.onDestroyView()
     }
 }

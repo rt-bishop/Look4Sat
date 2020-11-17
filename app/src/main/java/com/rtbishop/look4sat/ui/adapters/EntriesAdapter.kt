@@ -20,7 +20,6 @@
 package com.rtbishop.look4sat.ui.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
@@ -94,7 +93,7 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatEntryHolder>(),
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatEntryHolder {
         val binding = ItemSatEntryBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
-        return SatEntryHolder(binding.root, binding)
+        return SatEntryHolder(binding)
     }
 
     override fun onBindViewHolder(holder: SatEntryHolder, position: Int) {
@@ -105,8 +104,8 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatEntryHolder>(),
         return currentEntries.size
     }
 
-    inner class SatEntryHolder(itemView: View, private val binding: ItemSatEntryBinding) :
-        RecyclerView.ViewHolder(itemView) {
+    inner class SatEntryHolder(private val binding: ItemSatEntryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(satEntry: SatEntry) {
             binding.satEntryCheckbox.text = satEntry.name

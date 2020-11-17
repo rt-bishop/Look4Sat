@@ -21,7 +21,6 @@ package com.rtbishop.look4sat.ui.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
@@ -89,11 +88,11 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
         return if (viewType == 0) {
             val bindingLeo = ItemPassLeoBinding
                 .inflate(LayoutInflater.from(parent.context), parent, false)
-            SatPassLeoHolder(bindingLeo.root, bindingLeo)
+            SatPassLeoHolder(bindingLeo)
         } else {
             val bindingGeo = ItemPassGeoBinding
                 .inflate(LayoutInflater.from(parent.context), parent, false)
-            SatPassGeoHolder(bindingGeo.root, bindingGeo)
+            SatPassGeoHolder(bindingGeo)
         }
     }
 
@@ -105,8 +104,8 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
         }
     }
 
-    inner class SatPassLeoHolder(itemView: View, private val binding: ItemPassLeoBinding) :
-        RecyclerView.ViewHolder(itemView) {
+    inner class SatPassLeoHolder(private val binding: ItemPassLeoBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(satPass: SatPass) {
             binding.apply {
@@ -130,8 +129,8 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
         }
     }
 
-    inner class SatPassGeoHolder(itemView: View, private val binding: ItemPassGeoBinding) :
-        RecyclerView.ViewHolder(itemView) {
+    inner class SatPassGeoHolder(private val binding: ItemPassGeoBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(satPass: SatPass) {
             val satPos = satPass.predictor.getSatPos(satPass.pass.startTime)

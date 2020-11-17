@@ -56,3 +56,6 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+/app/release/app-release.aab
+/app/release/app-release.apk
+/app/release/output-metadata.json

@@ -19,10 +19,10 @@
 
 buildscript {
     ext {
-        gradle_version = '4.1.0'
+        gradle_version = '4.1.1'
         gradle_plugin_version = '1.4.10'
         material_version = '1.2.1'
-        constraint_layout_version = '2.0.2'
+        constraint_layout_version = '2.0.4'
         navigation_version = '2.3.1'
         preference_version = '1.1.1'
         room_version = '2.2.5'

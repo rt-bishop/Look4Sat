@@ -21,7 +21,6 @@ package com.rtbishop.look4sat.ui.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
@@ -66,15 +65,15 @@ class TransAdapter(context: Context, private val satPass: SatPass) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransHolder {
         val binding = ItemTransBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
-        return TransHolder(binding.root, binding)
+        return TransHolder(binding)
     }
 
     override fun onBindViewHolder(holder: TransHolder, position: Int) {
         holder.bind(transmittersList[position])
     }
 
-    inner class TransHolder(itemView: View, private val binding: ItemTransBinding) :
-        RecyclerView.ViewHolder(itemView) {
+    inner class TransHolder(private val binding: ItemTransBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(satTrans: SatTrans) {
             binding.description.text = satTrans.description

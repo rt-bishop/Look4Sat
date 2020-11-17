@@ -20,7 +20,6 @@
 package com.rtbishop.look4sat.ui.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
@@ -45,7 +44,7 @@ class SourcesAdapter(private var sources: MutableList<TleSource> = mutableListOf
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TleSourceHolder {
         val binding = ItemTleSourceBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
-        return TleSourceHolder(binding.root, binding)
+        return TleSourceHolder(binding)
     }
 
     override fun onBindViewHolder(holder: TleSourceHolder, position: Int) {
@@ -56,8 +55,8 @@ class SourcesAdapter(private var sources: MutableList<TleSource> = mutableListOf
         return sources.size
     }
 
-    inner class TleSourceHolder(itemView: View, private val binding: ItemTleSourceBinding) :
-        RecyclerView.ViewHolder(itemView) {
+    inner class TleSourceHolder(private val binding: ItemTleSourceBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(source: TleSource) {
             binding.tleSourceUrl.setText(source.url)
