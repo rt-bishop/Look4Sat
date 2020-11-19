@@ -12,11 +12,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
-        binding.navBottom.setupWithNavController(navHost.navController)
+        ActivityMainBinding.inflate(layoutInflater).apply {
+            setContentView(root)
+            val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
+            navBottom.setupWithNavController(navHost.navController)
+        }
     }
 }

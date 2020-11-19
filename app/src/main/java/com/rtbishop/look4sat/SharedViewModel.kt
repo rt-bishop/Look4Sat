@@ -50,7 +50,10 @@ class SharedViewModel @ViewModelInject constructor(
     private var shouldTriggerCalculation = true
 
     init {
-        if (prefsManager.isFirstLaunch()) updateDefaultSourcesAndEntries()
+        if (prefsManager.isFirstLaunch()) {
+            updateDefaultSourcesAndEntries()
+            prefsManager.setFirstLaunchDone()
+        }
         startApplicationTimer()
     }
 

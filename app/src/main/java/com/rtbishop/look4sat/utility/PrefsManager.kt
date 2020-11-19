@@ -79,13 +79,13 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
     }
 
     fun isFirstLaunch(): Boolean {
-        val isFirstLaunch = preferences.getBoolean(keyIsFirstLaunch, true)
-        return if (isFirstLaunch) {
-            preferences.edit {
-                putBoolean(keyIsFirstLaunch, false)
-                apply()
-            }
-            isFirstLaunch
-        } else isFirstLaunch
+        return preferences.getBoolean(keyIsFirstLaunch, true)
+    }
+
+    fun setFirstLaunchDone() {
+        preferences.edit {
+            putBoolean(keyIsFirstLaunch, false)
+            apply()
+        }
     }
 }

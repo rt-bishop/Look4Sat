@@ -25,6 +25,7 @@ buildscript {
         constraint_layout_version = '2.0.4'
         navigation_version = '2.3.1'
         preference_version = '1.1.1'
+        view_pager2_version = '1.0.0'
         room_version = '2.2.5'
         hilt_version = '2.29.1-alpha'
         hilt_viewmodel_version = '1.0.0-alpha02'
