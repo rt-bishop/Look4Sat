@@ -19,20 +19,26 @@
 
 package com.rtbishop.look4sat.ui.fragments
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities.round
-import com.rtbishop.look4sat.utility.Utilities.snack
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PrefsFragment : PreferenceFragmentCompat() {
+
+    private val locPermReqCode = 1000
+    private val locPermString = Manifest.permission.ACCESS_FINE_LOCATION
 
     @Inject
     lateinit var locationManager: LocationManager
@@ -56,19 +62,30 @@ class PrefsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setPositionFromGPS() {
-        try {
+        val locPermResult = ContextCompat.checkSelfPermission(requireContext(), locPermString)
+        if (locPermResult == PackageManager.PERMISSION_GRANTED) {
             val location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
             if (location != null) {
                 val latitude = location.latitude.round(4)
                 val longitude = location.longitude.round(4)
                 val altitude = location.altitude.round(1)
                 prefsManager.setStationPosition(latitude, longitude, altitude)
-                getString(R.string.pref_pos_gps_success).snack(requireView())
-            } else {
-                getString(R.string.pref_pos_gps_null).snack(requireView())
-            }
-        } catch (e: SecurityException) {
-            getString(R.string.pref_pos_gps_error).snack(requireView())
+                showSnack(getString(R.string.pref_pos_gps_success))
+            } else showSnack(getString(R.string.pref_pos_gps_null))
+        } else requestPermissions(arrayOf(locPermString), locPermReqCode)
+    }
+
+    private fun showSnack(message: String) {
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+            .setAnchorView(R.id.nav_bottom)
+            .show()
+    }
+
+    override fun onRequestPermissionsResult(code: Int, perms: Array<out String>, result: IntArray) {
+        if (code == locPermReqCode) {
+            if (result.isNotEmpty() && result[0] == PackageManager.PERMISSION_GRANTED) {
+                setPositionFromGPS()
+            } else showSnack(getString(R.string.pref_pos_gps_error))
         }
     }
 }

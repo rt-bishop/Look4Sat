@@ -52,6 +52,7 @@ class SplashActivity : FragmentActivity() {
 
     private fun startMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 
     private inner class SplashPagerAdapter(activity: FragmentActivity) :

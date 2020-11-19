@@ -17,10 +17,6 @@ object Utilities {
         return String.format(format, hours, minutes, seconds)
     }
 
-    fun String.snack(view: View) {
-        Snackbar.make(view, this, Snackbar.LENGTH_SHORT).show()
-    }
-
     fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }

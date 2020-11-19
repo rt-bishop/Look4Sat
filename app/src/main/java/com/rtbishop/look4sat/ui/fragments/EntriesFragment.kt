@@ -9,13 +9,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.adapters.EntriesAdapter
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.Utilities.snack
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -68,7 +68,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             event.getContentIfNotHandled()?.let {
                 if (it == 0) setLoading()
                 else if (it == 1) {
-                    getString(R.string.entries_update_error).snack(requireView())
+                    val errorMsg = getString(R.string.entries_update_error)
+                    Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
                     setError()
                 }
             }
