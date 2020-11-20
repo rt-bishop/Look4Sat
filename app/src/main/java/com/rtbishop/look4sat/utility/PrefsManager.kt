@@ -36,6 +36,7 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
         const val keyPositionGPS = "setPositionGPS"
+        const val keyPositionQTH = "setPositionQTH"
         const val keyIsFirstLaunch = "isFirstLaunch"
     }
 

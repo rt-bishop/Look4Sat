@@ -26,6 +26,10 @@
             android:key="setPositionGPS"
             android:title="@string/pref_pos_gps"
             app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:key="setPositionQTH"
+            android:title="@string/pref_pos_qth"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/pref_pass_title"

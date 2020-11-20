@@ -30,6 +30,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.Utilities
 import com.rtbishop.look4sat.utility.Utilities.round
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -59,6 +60,27 @@ class PrefsFragment : PreferenceFragmentCompat() {
                 return@setOnPreferenceClickListener true
             }
         }
+
+        findPreference<Preference>(PrefsManager.keyPositionQTH)?.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                setPositionFromQth(newValue.toString())
+            }
+        }
+    }
+
+    private fun setPositionFromQth(qthLocator: String): Boolean {
+        val qthPattern = "[A-X][A-X][0-9][0-9][a-x][a-x]".toRegex()
+        return if (qthLocator.matches(qthPattern)) {
+            val location = Utilities.qthToGSP(qthLocator)
+            val latitude = location.latitude.round(4)
+            val longitude = location.longitude.round(4)
+            prefsManager.setStationPosition(latitude, longitude, location.heightAMSL)
+            showSnack(getString(R.string.pref_pos_success))
+            true
+        } else {
+            showSnack(getString(R.string.pref_pos_qth_error))
+            false
+        }
     }
 
     private fun setPositionFromGPS() {
@@ -70,7 +92,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
                 val longitude = location.longitude.round(4)
                 val altitude = location.altitude.round(1)
                 prefsManager.setStationPosition(latitude, longitude, altitude)
-                showSnack(getString(R.string.pref_pos_gps_success))
+                showSnack(getString(R.string.pref_pos_success))
             } else showSnack(getString(R.string.pref_pos_gps_null))
         } else requestPermissions(arrayOf(locPermString), locPermReqCode)
     }
