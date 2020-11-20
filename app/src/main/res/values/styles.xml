@@ -19,15 +19,28 @@
 
 <resources>
 
+    <style name="AppTheme.Splash" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_drawable</item>
+    </style>
+
     <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/themeLight</item>
         <item name="colorSecondary">@color/themeLight</item>
         <item name="colorPrimaryVariant">@color/themeDark</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <item name="snackbarStyle">@style/Snackbar</item>
+        <item name="snackbarTextViewStyle">@style/Snackbar.Text</item>
     </style>
 
-    <style name="AppTheme.Splash" parent="AppTheme">
-        <item name="android:windowBackground">@drawable/splash_drawable</item>
+    <style name="Snackbar" parent="@style/Widget.MaterialComponents.Snackbar">
+        <item name="backgroundTint">@color/greySurface</item>
+    </style>
+
+    <style name="Snackbar.Text" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAlignment">center</item>
     </style>
 
     <style name="TopBar">
