@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.ui.activities
+package com.rtbishop.look4sat.ui.mainScreen
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

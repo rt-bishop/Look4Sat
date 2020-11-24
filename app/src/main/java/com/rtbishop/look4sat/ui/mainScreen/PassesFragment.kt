@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.rtbishop.look4sat.ui.fragments
+package com.rtbishop.look4sat.ui.mainScreen
 
 import android.os.Bundle
 import android.view.View

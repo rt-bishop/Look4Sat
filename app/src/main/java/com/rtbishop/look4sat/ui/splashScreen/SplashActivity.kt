@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.ui.splash
+package com.rtbishop.look4sat.ui.splashScreen
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,7 +8,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivitySplashBinding
-import com.rtbishop.look4sat.ui.activities.MainActivity
+import com.rtbishop.look4sat.ui.mainScreen.MainActivity
 import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -62,9 +62,9 @@ class SplashActivity : FragmentActivity() {
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> SplashTleFragment()
-                1 -> SplashPosFragment()
-                else -> SplashTleFragment()
+                0 -> TleFragment()
+                1 -> PosFragment()
+                else -> TleFragment()
             }
         }
     }

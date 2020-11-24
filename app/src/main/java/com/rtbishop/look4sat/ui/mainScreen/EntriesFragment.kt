@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.ui.fragments
+package com.rtbishop.look4sat.ui.mainScreen
 
 import android.content.Intent
 import android.os.Bundle

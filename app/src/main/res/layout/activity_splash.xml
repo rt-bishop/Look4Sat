@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.splash.SplashActivity">
+    tools:context=".ui.splashScreen.SplashActivity">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/splashPager"
