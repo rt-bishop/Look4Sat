@@ -85,6 +85,14 @@
     <string name="pref_time_utc_title">Show pass time in UTC</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>
 
+    <string name="splash_tle_title" translatable="false">Two-Line Element set</string>
+    <string name="splash_tle_msg">Look4Sat uses a TLE set to compute the position of
+        the satellites. The TLE data looses precision over time, so it is recommended to update
+        it weekly via the buttons in the Satellites tab</string>
+    <string name="splash_loc_msg">Look4Sat needs to know your position to deliver the accurate
+        passes predictions. Please set the position using the buttons (GPS, QTH Locator)
+        in the Settings tab</string>
+
     <string name="info_version">Version: %s</string>
     <string name="info_subtitle">Satellite tracker for Android</string>
     <string name="info_github" translatable="false">GitHub</string>

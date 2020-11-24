@@ -66,6 +66,13 @@
     <string name="pref_compass_title">Использовать компас</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
+    <string name="splash_tle_msg">Look4Sat использует двухстрочный набор элементов TLE
+        для вычисления положения спутников. Со временем TLE теряют точность, рекомендуется
+        их обновлять примерно раз в неделю. Это можно сделать через меню "Спутники"</string>
+    <string name="splash_loc_msg">Look4Sat нужно знать местоположение, чтобы корректно рассчитывать
+        орбиты и пролёты спутников относительно него. Пожалуйста, установите позицию
+        (GPS, Локатор QTH) через меню "Настройки"</string>
+
     <string name="info_version">Версия: %s</string>
     <string name="info_subtitle">Трекер спутников для Android</string>
     <string name="info_bmc">Угостить кофе</string>

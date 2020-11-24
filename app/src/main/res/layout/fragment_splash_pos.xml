@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.splash.SplashPosFragment">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/splashPosTitleCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/greySurface"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/splashPosIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread_inside">
+
+        <TextView
+            android:id="@+id/splashPosTitle"
+            style="@style/SplashText"
+            android:text="@string/pref_gsp_title" />
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/splashPosIcon"
+        style="@style/SplashText.Icon"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_map_pos"
+        app:layout_constraintBottom_toTopOf="@+id/splashPosMsgCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/splashPosTitleCard" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/splashPosMsgCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="48dp"
+        android:backgroundTint="@color/greySurface"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/splashPosIcon">
+
+        <TextView
+            android:id="@+id/splashPosMsg"
+            style="@style/SplashText.Msg"
+            android:text="@string/splash_loc_msg" />
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

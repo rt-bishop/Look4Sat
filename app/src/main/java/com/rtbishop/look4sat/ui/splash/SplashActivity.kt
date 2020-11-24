@@ -16,7 +16,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SplashActivity : FragmentActivity() {
 
-    private val pagesCount = 3
+    private val pagesCount = 2
 
     @Inject
     lateinit var prefsManager: PrefsManager
@@ -41,7 +41,7 @@ class SplashActivity : FragmentActivity() {
                         }
                     }
                 })
-//                isUserInputEnabled = false
+                isUserInputEnabled = false
             }
             splashNext.setOnClickListener {
                 if (splashPager.currentItem < pagesCount - 1) splashPager.currentItem++
@@ -62,10 +62,9 @@ class SplashActivity : FragmentActivity() {
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> FirstFragment()
-                1 -> SecondFragment()
-                2 -> ThirdFragment()
-                else -> FirstFragment()
+                0 -> SplashTleFragment()
+                1 -> SplashPosFragment()
+                else -> SplashTleFragment()
             }
         }
     }
