@@ -21,7 +21,6 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "kotlin-kapt"
-    id "kotlin-android-extensions"
     id "dagger.hilt.android.plugin"
 }
 
@@ -35,7 +34,6 @@ android {
         targetSdkVersion 30
         versionCode 18
         versionName "1.4.8"
-        resConfigs "en", "ru"
     }
 
     buildTypes {
@@ -49,11 +47,6 @@ android {
         }
     }
 
-    configurations {
-        all {
-            exclude module: "commons-logging"
-        }
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

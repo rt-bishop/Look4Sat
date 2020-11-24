@@ -20,14 +20,14 @@
 buildscript {
     ext {
         gradle_version = '4.1.1'
-        gradle_plugin_version = '1.4.10'
+        gradle_plugin_version = '1.4.20'
         material_version = '1.2.1'
         constraint_layout_version = '2.0.4'
         navigation_version = '2.3.1'
         preference_version = '1.1.1'
         view_pager2_version = '1.0.0'
         room_version = '2.2.5'
-        hilt_version = '2.29.1-alpha'
+        hilt_version = '2.30-alpha'
         hilt_viewmodel_version = '1.0.0-alpha02'
         retrofit_version = '2.9.0'
         osmdroid_version = '6.1.8'
