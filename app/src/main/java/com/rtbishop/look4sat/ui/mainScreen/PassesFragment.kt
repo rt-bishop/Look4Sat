@@ -44,8 +44,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     @Inject
     lateinit var prefsManager: PrefsManager
 
-    private lateinit var binding: FragmentPassesBinding
-    private lateinit var passesAdapter: PassesAdapter
+    private var binding: FragmentPassesBinding? = null
+    private var passesAdapter: PassesAdapter? = null
     private val viewModel: SharedViewModel by activityViewModels()
     private var passes = mutableListOf<SatPass>()
 
@@ -60,33 +60,39 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
                 if (result.data.isEmpty()) {
-                    binding.passesProgress.visibility = View.INVISIBLE
-                    binding.passesRecycler.visibility = View.INVISIBLE
-                    binding.passesError.visibility = View.VISIBLE
+                    binding?.apply {
+                        passesProgress.visibility = View.INVISIBLE
+                        passesRecycler.visibility = View.INVISIBLE
+                        passesError.visibility = View.VISIBLE
+                    }
                 } else {
                     passes = result.data
-                    passesAdapter.setList(passes)
-                    binding.passesError.visibility = View.INVISIBLE
-                    binding.passesProgress.visibility = View.INVISIBLE
-                    binding.passesRecycler.visibility = View.VISIBLE
+                    passesAdapter?.setList(passes)
+                    binding?.apply {
+                        passesError.visibility = View.INVISIBLE
+                        passesProgress.visibility = View.INVISIBLE
+                        passesRecycler.visibility = View.VISIBLE
+                    }
                 }
             } else if (result is Result.InProgress) {
                 passes.clear()
-                binding.passesTimer.text = Utilities.formatForTimer(0L)
-                binding.passesError.visibility = View.INVISIBLE
-                binding.passesRecycler.visibility = View.INVISIBLE
-                binding.passesProgress.visibility = View.VISIBLE
+                binding?.apply {
+                    passesTimer.text = Utilities.formatForTimer(0L)
+                    passesError.visibility = View.INVISIBLE
+                    passesRecycler.visibility = View.INVISIBLE
+                    passesProgress.visibility = View.VISIBLE
+                }
             }
         })
         viewModel.getAppTimer().observe(viewLifecycleOwner, { currentTime ->
             tickMainTimer(currentTime)
-            passesAdapter.tickPasses(currentTime)
+            passesAdapter?.tickPasses(currentTime)
         })
     }
 
     private fun setupComponents() {
         passesAdapter = PassesAdapter(requireContext(), prefsManager.shouldUseUTC())
-        binding.apply {
+        binding?.apply {
             passesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = passesAdapter
@@ -105,14 +111,20 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             try {
                 val nextPass = passes.first { it.pass.startTime.time.minus(timeNow) > 0 }
                 val millisBeforeStart = nextPass.pass.startTime.time.minus(timeNow)
-                binding.passesTimer.text = Utilities.formatForTimer(millisBeforeStart)
+                binding?.passesTimer?.text = Utilities.formatForTimer(millisBeforeStart)
             } catch (e: NoSuchElementException) {
                 val lastPass = passes.last()
                 val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow)
-                binding.passesTimer.text = Utilities.formatForTimer(millisBeforeEnd)
+                binding?.passesTimer?.text = Utilities.formatForTimer(millisBeforeEnd)
             }
         } else {
-            binding.passesTimer.text = Utilities.formatForTimer(0L)
+            binding?.passesTimer?.text = Utilities.formatForTimer(0L)
         }
+    }
+
+    override fun onDestroyView() {
+        passesAdapter = null
+        binding = null
+        super.onDestroyView()
     }
 }
