@@ -37,6 +37,7 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
 
     private val satIdFormat = context.getString(R.string.pass_satId)
     private val azFormat = context.getString(R.string.pat_azimuth)
+    private val altFormat = context.getString(R.string.pat_altitude)
     private val elevFormat = context.getString(R.string.pat_elevation)
     private val aosAzFormat = context.getString(R.string.pass_aosAz)
     private val maxElFormat = context.getString(R.string.pass_maxEl)
@@ -143,14 +144,13 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(satPass: SatPass) {
-            val satPos = satPass.predictor.getSatPos(satPass.pass.startTime)
-            val azimuth = Math.toDegrees(satPos.azimuth)
-
+            val satPos = satPass.predictor.getSatPos(Date())
             binding.apply {
-                passGeoName.text = satPass.tle.name
-                passGeoId.text = String.format(satIdFormat, satPass.tle.catnum)
-                passGeoAz.text = String.format(azFormat, azimuth)
-                passGeoEl.text = String.format(elevFormat, satPass.pass.maxEl)
+                passGeoSatName.text = satPass.tle.name
+                passGeoSatId.text = String.format(satIdFormat, satPass.tle.catnum)
+                passGeoAz.text = String.format(azFormat, Math.toDegrees(satPos.azimuth))
+                passGeoAlt.text = String.format(altFormat, satPos.altitude)
+                passGeoEl.text = String.format(elevFormat, Math.toDegrees(satPos.elevation))
             }
 
             itemView.setOnClickListener {

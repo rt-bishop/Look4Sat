@@ -41,42 +41,51 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/pass_geo_name"
+            android:id="@+id/pass_geo_satName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="4dp"
             android:text="@string/pass_satName"
             android:textColor="@color/themeLight"
-            app:layout_constraintEnd_toStartOf="@+id/pass_geo_id"
+            app:layout_constraintEnd_toStartOf="@+id/pass_geo_satId"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/pass_geo_id"
+            android:id="@+id/pass_geo_satId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/pass_satId"
             android:textColor="@color/themeLight"
-            app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_name"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_satName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/pass_geo_name" />
+            app:layout_constraintStart_toEndOf="@+id/pass_geo_satName" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_geo_az"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="3dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="4dp"
             android:text="@string/pat_azimuth"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/pass_geo_el"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toEndOf="@+id/pass_geo_bg"
-            app:layout_constraintStart_toStartOf="@+id/pass_geo_name"
-            app:layout_constraintTop_toBottomOf="@+id/pass_geo_name" />
+            app:layout_constraintStart_toStartOf="@+id/pass_geo_satName"
+            app:layout_constraintTop_toBottomOf="@+id/pass_geo_satName" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/pass_geo_alt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pat_altitude"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_az"
+            app:layout_constraintEnd_toEndOf="@+id/pass_geo_el"
+            app:layout_constraintStart_toStartOf="@+id/pass_geo_az" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_geo_el"
@@ -84,7 +93,8 @@
             android:layout_height="wrap_content"
             android:text="@string/pat_elevation"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_geo_az"
-            app:layout_constraintEnd_toEndOf="@+id/pass_geo_id"
+            app:layout_constraintEnd_toEndOf="@+id/pass_geo_satId"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/pass_geo_az" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
