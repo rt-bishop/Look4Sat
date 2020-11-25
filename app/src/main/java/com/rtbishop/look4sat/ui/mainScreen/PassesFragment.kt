@@ -71,6 +71,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                     binding.passesRecycler.visibility = View.VISIBLE
                 }
             } else if (result is Result.InProgress) {
+                passes.clear()
+                binding.passesTimer.text = Utilities.formatForTimer(0L)
                 binding.passesError.visibility = View.INVISIBLE
                 binding.passesRecycler.visibility = View.INVISIBLE
                 binding.passesProgress.visibility = View.VISIBLE
