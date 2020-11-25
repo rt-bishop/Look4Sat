@@ -40,6 +40,10 @@
 
     <string name="passes_error">Нет выбранных спутников</string>
 
+    <string name="pass_aosAz">НПС — %2d°</string>
+    <string name="pass_maxEl">МаксЭлев: %.1f°</string>
+    <string name="pass_losAz">%2d° — КПС</string>
+
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_no_mode">Модуляция: нет</string>
     <string name="trans_inverted">Инверсия: %s</string>

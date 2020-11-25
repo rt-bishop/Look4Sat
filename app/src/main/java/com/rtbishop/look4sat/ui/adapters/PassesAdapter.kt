@@ -38,11 +38,16 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
     private val satIdFormat = context.getString(R.string.pass_satId)
     private val azFormat = context.getString(R.string.pat_azimuth)
     private val elevFormat = context.getString(R.string.pat_elevation)
-    private val aosAzFormat = context.getString(R.string.pass_aos_az)
-    private val losAzFormat = context.getString(R.string.pass_los_az)
-    private val dateFormat = context.getString(R.string.pass_dateTime)
+    private val aosAzFormat = context.getString(R.string.pass_aosAz)
+    private val maxElFormat = context.getString(R.string.pass_maxEl)
+    private val losAzFormat = context.getString(R.string.pass_losAz)
+    private val startTimeFormat = context.getString(R.string.pass_startTime)
+    private val tcaTimeFormat = context.getString(R.string.pass_tcaTime)
+    private val endTimeFormat = context.getString(R.string.pass_endTime)
     private val timeZoneUTC = TimeZone.getTimeZone("UTC")
-    private val simpleDateFormat = SimpleDateFormat(dateFormat, Locale.getDefault())
+    private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
+    private val tcaFormat = SimpleDateFormat(tcaTimeFormat, Locale.getDefault())
+    private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
     private var satPassList: MutableList<SatPass> = mutableListOf()
 
     fun setList(list: MutableList<SatPass>) {
@@ -109,14 +114,19 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
 
         fun bind(satPass: SatPass) {
             binding.apply {
-                if (shouldUseUTC) simpleDateFormat.timeZone = timeZoneUTC
-                val startTime = simpleDateFormat.format(satPass.pass.startTime)
-                val endTime = simpleDateFormat.format(satPass.pass.endTime)
+                if (shouldUseUTC) {
+                    startFormat.timeZone = timeZoneUTC
+                    tcaFormat.timeZone = timeZoneUTC
+                    endFormat.timeZone = timeZoneUTC
+                }
                 passLeoSatName.text = satPass.tle.name
                 passLeoSatId.text = String.format(satIdFormat, satPass.tle.catnum)
-                passLeoAosAz.text = String.format(aosAzFormat, startTime, satPass.pass.aosAzimuth)
-                passLeoMaxEl.text = String.format(elevFormat, satPass.pass.maxEl)
-                passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth, endTime)
+                passLeoAosAz.text = String.format(aosAzFormat, satPass.pass.aosAzimuth)
+                passLeoMaxEl.text = String.format(maxElFormat, satPass.pass.maxEl)
+                passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth)
+                passLeoStart.text = startFormat.format(satPass.pass.startTime)
+                passLeoTca.text = tcaFormat.format(satPass.pass.tca)
+                passLeoEnd.text = endFormat.format(satPass.pass.endTime)
                 passLeoProgress.progress = satPass.progress
             }
 
