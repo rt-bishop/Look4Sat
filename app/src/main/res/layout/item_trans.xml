@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="4dp"
             android:text="@string/trans_mode"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"

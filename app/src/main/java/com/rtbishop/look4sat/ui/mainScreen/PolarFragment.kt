@@ -154,16 +154,20 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         binding.distance.text = String.format(polarRng, satPos.range)
         binding.altitude.text = String.format(polarAlt, satPos.altitude)
 
-        if (dateNow.before(satPass.pass.startTime)) {
-            val millisBeforeStart = satPass.pass.startTime.time.minus(timeNow)
-            binding.polarTimer.text = Utilities.formatForTimer(millisBeforeStart)
-        } else {
-            val millisBeforeEnd = satPass.pass.endTime.time.minus(timeNow)
-            binding.polarTimer.text = Utilities.formatForTimer(millisBeforeEnd)
-            if (dateNow.after(satPass.pass.endTime)) {
-                binding.polarTimer.text = Utilities.formatForTimer(0L)
-                findNavController().navigate(R.id.action_polar_to_passes)
+        if (!satPass.tle.isDeepspace) {
+            if (dateNow.before(satPass.pass.startTime)) {
+                val millisBeforeStart = satPass.pass.startTime.time.minus(timeNow)
+                binding.polarTimer.text = Utilities.formatForTimer(millisBeforeStart)
+            } else {
+                val millisBeforeEnd = satPass.pass.endTime.time.minus(timeNow)
+                binding.polarTimer.text = Utilities.formatForTimer(millisBeforeEnd)
+                if (dateNow.after(satPass.pass.endTime)) {
+                    binding.polarTimer.text = Utilities.formatForTimer(0L)
+                    findNavController().navigate(R.id.action_polar_to_passes)
+                }
             }
+        } else {
+            binding.polarTimer.text = Utilities.formatForTimer(0L)
         }
     }
 }

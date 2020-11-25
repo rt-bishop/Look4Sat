@@ -103,10 +103,10 @@
             app:layout_constraintTop_toBottomOf="@+id/pass_leo_aosAz" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/pass_leo_tca"
+            android:id="@+id/pass_leo_alt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pass_tcaTime"
+            android:text="@string/pat_altitude"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_start"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_end"
             app:layout_constraintStart_toStartOf="@+id/pass_leo_start" />
@@ -130,7 +130,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/pass_leo_bg"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_end"
             app:layout_constraintStart_toStartOf="@+id/pass_leo_start"
-            app:layout_constraintTop_toBottomOf="@+id/pass_leo_tca" />
+            app:layout_constraintTop_toBottomOf="@+id/pass_leo_alt" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

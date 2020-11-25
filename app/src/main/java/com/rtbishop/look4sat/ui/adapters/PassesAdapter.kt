@@ -35,6 +35,7 @@ import java.util.*
 class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private val currentDate = Date()
     private val satIdFormat = context.getString(R.string.pass_satId)
     private val azFormat = context.getString(R.string.pat_azimuth)
     private val altFormat = context.getString(R.string.pat_altitude)
@@ -43,11 +44,9 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
     private val maxElFormat = context.getString(R.string.pass_maxEl)
     private val losAzFormat = context.getString(R.string.pass_losAz)
     private val startTimeFormat = context.getString(R.string.pass_startTime)
-    private val tcaTimeFormat = context.getString(R.string.pass_tcaTime)
     private val endTimeFormat = context.getString(R.string.pass_endTime)
     private val timeZoneUTC = TimeZone.getTimeZone("UTC")
     private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
-    private val tcaFormat = SimpleDateFormat(tcaTimeFormat, Locale.getDefault())
     private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
     private var satPassList: MutableList<SatPass> = mutableListOf()
 
@@ -57,6 +56,7 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
     }
 
     fun tickPasses(timeNow: Long) {
+        currentDate.time = timeNow
         val iterator = satPassList.listIterator()
         while (iterator.hasNext()) {
             val satPass = iterator.next()
@@ -114,10 +114,10 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(satPass: SatPass) {
+            val satPos = satPass.predictor.getSatPos(currentDate)
             binding.apply {
                 if (shouldUseUTC) {
                     startFormat.timeZone = timeZoneUTC
-                    tcaFormat.timeZone = timeZoneUTC
                     endFormat.timeZone = timeZoneUTC
                 }
                 passLeoSatName.text = satPass.tle.name
@@ -126,7 +126,7 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
                 passLeoMaxEl.text = String.format(maxElFormat, satPass.pass.maxEl)
                 passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth)
                 passLeoStart.text = startFormat.format(satPass.pass.startTime)
-                passLeoTca.text = tcaFormat.format(satPass.pass.tca)
+                passLeoAlt.text = String.format(altFormat, satPos.altitude)
                 passLeoEnd.text = endFormat.format(satPass.pass.endTime)
                 passLeoProgress.progress = satPass.progress
             }
@@ -144,7 +144,7 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(satPass: SatPass) {
-            val satPos = satPass.predictor.getSatPos(Date())
+            val satPos = satPass.predictor.getSatPos(currentDate)
             binding.apply {
                 passGeoSatName.text = satPass.tle.name
                 passGeoSatId.text = String.format(satIdFormat, satPass.tle.catnum)
