@@ -37,7 +37,7 @@ class PrefsManager @Inject constructor(private val preferences: SharedPreference
         const val keyMinElevation = "minElevation"
         const val keyPositionGPS = "setPositionGPS"
         const val keyPositionQTH = "setPositionQTH"
-        const val keyIsFirstLaunch = "isFirstLaunch"
+        const val keyIsFirstLaunch = "shouldShowSplash"
     }
 
     fun getPassPrefs(): PassPrefs {

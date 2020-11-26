@@ -132,8 +132,7 @@
         android:layout_gravity="bottom|center"
         android:layout_margin="@dimen/fab_padding"
         android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_arrow"
-        app:fabSize="mini" />
+        android:src="@drawable/ic_arrow" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

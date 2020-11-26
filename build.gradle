@@ -27,7 +27,7 @@ buildscript {
         preference_version = '1.1.1'
         view_pager2_version = '1.0.0'
         room_version = '2.2.5'
-        hilt_version = '2.30-alpha'
+        hilt_version = '2.30.1-alpha'
         hilt_viewmodel_version = '1.0.0-alpha02'
         retrofit_version = '2.9.0'
         osmdroid_version = '6.1.8'

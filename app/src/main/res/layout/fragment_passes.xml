@@ -119,7 +119,6 @@
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="@dimen/fab_padding"
         android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_refresh"
-        app:fabSize="mini" />
+        android:src="@drawable/ic_refresh" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

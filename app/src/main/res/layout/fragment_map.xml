@@ -102,10 +102,9 @@
         android:layout_marginBottom="@dimen/fab_padding"
         android:contentDescription="@string/placeholder"
         android:rotation="180"
-        app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_arrow" />
+        app:srcCompat="@drawable/ic_next" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabNext"
@@ -114,10 +113,9 @@
         android:layout_marginEnd="@dimen/fab_padding"
         android:layout_marginBottom="@dimen/fab_padding"
         android:contentDescription="@string/placeholder"
-        app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_arrow" />
+        app:srcCompat="@drawable/ic_next" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/copyright"
