@@ -46,6 +46,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var trackPaint: Paint
     private lateinit var footprintPaint: Paint
     private lateinit var selectedPass: SatPass
+    private lateinit var allPasses: List<SatPass>
     private val dateNow = Date()
     private val viewModel: SharedViewModel by activityViewModels()
     private var iconPos: Drawable? = null
@@ -122,9 +123,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         viewModel.getPasses().observe(viewLifecycleOwner, { satPasses ->
             if (satPasses is Result.Success) {
                 if (satPasses.data.isNotEmpty()) {
-                    val filteredPasses = satPasses.data.distinctBy { it.tle }
-                    selectedPass = filteredPasses[0]
-                    setupSatOverlay(filteredPasses)
+                    allPasses = satPasses.data.distinctBy { it.tle }
+                    selectedPass = allPasses[0]
+                    binding.fabPrev.setOnClickListener { changeSelection(true) }
+                    binding.fabNext.setOnClickListener { changeSelection(false) }
+                    setupSatOverlay(allPasses)
                 }
             }
         })
@@ -134,13 +137,25 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         lifecycleScope.launch {
             while (true) {
                 dateNow.time = System.currentTimeMillis()
+                setSatDetails(selectedPass)
                 binding.mapView.overlays[3] = getSatMarkers(passList)
-                binding.mapView.overlays[2] = getSatFootprint(selectedPass)
-                setSatInfo(selectedPass)
                 binding.mapView.invalidate()
                 delay(2000)
             }
         }
+    }
+
+    private fun changeSelection(decrement: Boolean) {
+        val index = allPasses.indexOf(selectedPass)
+        selectedPass = if (decrement) {
+            if (index > 0) allPasses[index - 1] else allPasses[allPasses.size - 1]
+        } else {
+            if (index < allPasses.size - 1) allPasses[index + 1] else allPasses[0]
+        }
+        val satPos = selectedPass.predictor.getSatPos(dateNow)
+        val osmPos = getOsmPosition(satPos.latitude, satPos.longitude, true)
+        setSatDetails(selectedPass)
+        binding.mapView.controller.animateTo(GeoPoint(osmPos.lat, osmPos.lon))
     }
 
     private suspend fun getSatMarkers(passList: List<SatPass>): Overlay =
@@ -169,7 +184,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         setSatInfo(satPass)
         binding.mapView.overlays[1] = getSatTrack(satPass)
         binding.mapView.overlays[2] = getSatFootprint(satPass)
-        binding.mapView.invalidate()
     }
 
     private fun setSatInfo(satPass: SatPass) {
