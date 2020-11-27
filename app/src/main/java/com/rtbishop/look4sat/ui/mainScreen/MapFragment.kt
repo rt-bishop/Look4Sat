@@ -18,6 +18,7 @@ import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
+import com.rtbishop.look4sat.utility.Utilities
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.ITileSource
@@ -38,10 +39,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var trackPaint: Paint
     private lateinit var footprintPaint: Paint
     private lateinit var nameFormat: String
+    private lateinit var qthFormat: String
     private lateinit var altFormat: String
     private lateinit var distFormat: String
     private lateinit var velFormat: String
     private lateinit var latLonFormat: String
+    private lateinit var coverageFormat: String
     private lateinit var selectedSat: SatPass
     private val dateNow = Date()
     private val viewModel: MapViewModel by viewModels()
@@ -72,10 +75,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             isAntiAlias = true
         }
         nameFormat = getString(R.string.pat_osm_idName)
+        qthFormat = getString(R.string.map_qth)
         altFormat = getString(R.string.pat_altitude)
         distFormat = getString(R.string.pat_distance)
         velFormat = getString(R.string.pat_osm_vel)
         latLonFormat = getString(R.string.pat_osm_latLon)
+        coverageFormat = getString(R.string.map_coverage)
     }
 
     private fun setupMapView() {
@@ -135,12 +140,15 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private fun setSelectedSatDetails(satPass: SatPass) {
         val satPos = satPass.predictor.getSatPos(dateNow)
         val osmPos = viewModel.getOsmPosition(satPos.latitude, satPos.longitude, true)
+        val qthLoc = Utilities.locToQTH(osmPos.lat, osmPos.lon)
         binding?.apply {
             idName.text = String.format(nameFormat, satPass.tle.catnum, satPass.tle.name)
+            qthLocator.text = String.format(qthFormat, qthLoc)
             altitude.text = String.format(altFormat, satPos.altitude)
             distance.text = String.format(distFormat, satPos.range)
             velocity.text = String.format(velFormat, viewModel.getSatVelocity(satPos.altitude))
             latLon.text = String.format(latLonFormat, osmPos.lat, osmPos.lon)
+            mapCoverage.text = String.format(coverageFormat, satPos.rangeCircleRadiusKm * 2)
             mapView.overlays[1] = getSatTrack(satPass)
             mapView.overlays[2] = getSatFootprint(satPass)
             mapView.invalidate()
@@ -178,7 +186,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         val trackOverlay = FolderOverlay()
         val trackPoints = mutableListOf<GeoPoint>()
         var oldLon = 0.0
-
         positions.forEach {
             val osmPos = viewModel.getOsmPosition(it.latitude, it.longitude, true)
             if (oldLon < -170.0 && osmPos.lon > 170.0 || oldLon > 170.0 && osmPos.lon < -170.0) {
@@ -194,7 +201,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             oldLon = osmPos.lon
             trackPoints.add(GeoPoint(osmPos.lat, osmPos.lon))
         }
-
         Polyline().apply {
             outlinePaint.set(trackPaint)
             setPoints(trackPoints)
@@ -204,17 +210,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun getSatFootprint(pass: SatPass): Overlay {
-        val rangeCircle = pass.predictor.getSatPos(dateNow).rangeCircle
         val rangePoints = mutableListOf<GeoPoint>()
-        var zeroPoint = GeoPoint(0.0, 0.0)
-
-        rangeCircle.withIndex().forEach {
+        pass.predictor.getSatPos(dateNow).rangeCircle.withIndex().forEach {
             val osmPos = viewModel.getOsmPosition(it.value.lat, it.value.lon, false)
-            if (it.index == 0) zeroPoint = GeoPoint(osmPos.lat, osmPos.lon)
             rangePoints.add(GeoPoint(osmPos.lat, osmPos.lon))
         }
-
-        rangePoints.add(zeroPoint)
         return Polygon().apply {
             fillPaint.set(footprintPaint)
             outlinePaint.set(footprintPaint)

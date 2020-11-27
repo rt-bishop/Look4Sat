@@ -63,13 +63,15 @@
     <string name="trans_link_lowHigh" translatable="false">%.4f - %.4f</string>
     <string name="trans_no_data">No transceivers found for this satellite</string>
 
+    <string name="map_qth" translatable="false">QTH: %s</string>
+    <string name="map_coverage">Coverage: %.0f km</string>
     <string name="map_copyright" translatable="false">Wikimedia maps | Map data © OpenStreetMap contributors</string>
 
     <string name="pat_azimuth">Az: %.1f°</string>
     <string name="pat_elevation">El: %.1f°</string>
     <string name="pat_distance">Dst: %.0f km</string>
     <string name="pat_altitude">Alt: %.0f km</string>
-    <string name="pat_osm_idName" translatable="false">%s / %s</string>
+    <string name="pat_osm_idName" translatable="false">Id:%s / %s</string>
     <string name="pat_osm_latLon">Lat: %.1f°, Lon: %.1f°</string>
     <string name="pat_osm_vel">Vel: %.2f km/s</string>
 

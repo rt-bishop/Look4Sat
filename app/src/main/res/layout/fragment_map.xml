@@ -24,13 +24,15 @@
     android:keepScreenOn="true">
 
     <org.osmdroid.views.MapView
-        android:id="@+id/map_view"
+        android:id="@+id/mapView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+    </org.osmdroid.views.MapView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -41,56 +43,89 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/id_name"
+            android:id="@+id/qthLocator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:text="@string/map_qth"
+            android:textColor="@color/themeLight"
+            app:layout_constraintBaseline_toBaselineOf="@+id/velocity"
+            app:layout_constraintEnd_toEndOf="@+id/distance"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/velocity" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/idName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:text="@string/pat_osm_idName"
             android:textColor="@color/themeLight"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="@+id/distance"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="@+id/altitude"
+            app:layout_constraintTop_toBottomOf="@+id/latLon" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/altitude"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="4dp"
             android:text="@string/pat_altitude"
             android:textColor="@color/themeLight"
+            app:layout_constraintEnd_toStartOf="@+id/distance"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/id_name" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="6dp"
             android:text="@string/pat_distance"
             android:textColor="@color/themeLight"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/altitude"
-            app:layout_constraintTop_toBottomOf="@+id/altitude" />
+            app:layout_constraintBaseline_toBaselineOf="@+id/altitude"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/altitude" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/velocity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="4dp"
             android:text="@string/pat_osm_vel"
             android:textColor="@color/themeLight"
-            app:layout_constraintBaseline_toBaselineOf="@+id/altitude"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/qthLocator"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="@+id/altitude"
+            app:layout_constraintTop_toBottomOf="@+id/idName" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/lat_lon"
+            android:id="@+id/latLon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pat_osm_latLon"
             android:textColor="@color/themeLight"
-            app:layout_constraintBaseline_toBaselineOf="@+id/distance"
-            app:layout_constraintEnd_toEndOf="@+id/velocity" />
+            app:layout_constraintBaseline_toBaselineOf="@+id/altitude"
+            app:layout_constraintEnd_toEndOf="@+id/distance"
+            app:layout_constraintStart_toStartOf="@+id/altitude" />
+
+        <TextView
+            android:id="@+id/mapCoverage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/map_coverage"
+            android:textColor="@color/themeLight"
+            app:layout_constraintBaseline_toBaselineOf="@+id/velocity"
+            app:layout_constraintEnd_toEndOf="@+id/qthLocator"
+            app:layout_constraintStart_toStartOf="@+id/velocity" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
