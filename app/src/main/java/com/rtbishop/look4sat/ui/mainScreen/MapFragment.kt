@@ -64,7 +64,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         trackPaint = Paint().apply {
             strokeWidth = 2f
             style = Paint.Style.STROKE
-            color = ContextCompat.getColor(requireContext(), R.color.satTrack)
+            color = Color.RED
             strokeCap = Paint.Cap.ROUND
             strokeJoin = Paint.Join.ROUND
             isAntiAlias = true
@@ -112,11 +112,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             }
         })
         viewModel.getSelectedPass().observe(viewLifecycleOwner, { satPass ->
-            satPass?.let {
-                selectedSat = satPass
-                setSelectedSatDetails(satPass)
-                scrollToSat(satPass)
-            }
+            selectedSat = satPass
+            setSelectedSatDetails(satPass)
+            scrollToSat(satPass)
         })
         viewModel.getSatMarkers().observe(viewLifecycleOwner, {
             setMarkers(it)
@@ -223,7 +221,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun getColorFilter(): ColorMatrixColorFilter {
-        val targetColor = ContextCompat.getColor(requireContext(), R.color.satTrack)
+        val targetColor = Color.RED
         val newR = Color.red(targetColor) / 255f
         val newG = Color.green(targetColor) / 255f
         val newB = Color.blue(targetColor) / 255f

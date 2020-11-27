@@ -9,6 +9,7 @@ import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Position
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.utility.PrefsManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -23,8 +24,8 @@ class MapViewModel @ViewModelInject constructor(prefsManager: PrefsManager) : Vi
     private val _gsp = MutableLiveData(prefsManager.getStationPosition())
     fun getGSP(): LiveData<GroundStationPosition> = _gsp
 
-    private val _selectedPass = MutableLiveData<SatPass?>()
-    fun getSelectedPass(): LiveData<SatPass?> = _selectedPass
+    private val _selectedPass = MutableLiveData<SatPass>()
+    fun getSelectedPass(): LiveData<SatPass> = _selectedPass
 
     private val _satMarkers = MutableLiveData<Map<SatPass, Position>>()
     fun getSatMarkers(): LiveData<Map<SatPass, Position>> = _satMarkers
@@ -36,16 +37,15 @@ class MapViewModel @ViewModelInject constructor(prefsManager: PrefsManager) : Vi
     }
 
     private fun calculateSatPos(passes: List<SatPass>) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             while (true) {
                 val passesMap = mutableMapOf<SatPass, Position>()
                 dateNow.time = System.currentTimeMillis()
                 passes.forEach {
                     val satPos = it.predictor.getSatPos(dateNow)
-                    val osmPos = getOsmPosition(satPos.latitude, satPos.longitude, true)
-                    passesMap[it] = osmPos
+                    passesMap[it] = getOsmPosition(satPos.latitude, satPos.longitude, true)
                 }
-                _satMarkers.value = passesMap
+                _satMarkers.postValue(passesMap)
                 delay(2000)
             }
         }

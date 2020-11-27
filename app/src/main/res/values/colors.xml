@@ -26,7 +26,6 @@
     <color name="greyDivider">#808080</color>
     <color name="greySurface">#1e1e1e</color>
     <!-- map colors -->
-    <color name="satTrack">#D50000</color>
     <color name="satFootprint">#26FFE082</color>
     <color name="mapInfoLayout">#66000000</color>
 </resources>

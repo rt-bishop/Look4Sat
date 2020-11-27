@@ -20,9 +20,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
     <item android:drawable="@drawable/ic_launcher_background" />
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/splash_front" />
-    </item>
+    <item
+        android:drawable="@drawable/splash_foreground"
+        android:gravity="center" />
 </layer-list>

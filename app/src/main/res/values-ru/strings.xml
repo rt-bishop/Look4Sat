@@ -38,7 +38,7 @@
     <string name="entries_no_data">Пожалуйста, обновите спутники</string>
     <string name="entries_update_error">Ошибка обновления спутников</string>
 
-    <string name="passes_error">Нет выбранных спутников</string>
+    <string name="passes_error">Нет предстоящих пролётов</string>
 
     <string name="pass_aosAz">НПС - %2d°</string>
     <string name="pass_maxEl">МаксЭлев: %.1f°</string>

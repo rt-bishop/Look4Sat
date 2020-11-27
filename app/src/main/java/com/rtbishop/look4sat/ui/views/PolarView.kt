@@ -2,6 +2,7 @@ package com.rtbishop.look4sat.ui.views
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.view.View
@@ -23,7 +24,7 @@ class PolarView(context: Context) : View(context) {
     private val polarCenter = polarWidth / 2f
     private val scale = resources.displayMetrics.density
     private val radius = polarWidth * 0.48f
-    private val txtSize = scale * 16
+    private val txtSize = scale * 16f
     private val path: Path = Path()
     private val piDiv2 = Math.PI / 2.0
 
@@ -31,7 +32,7 @@ class PolarView(context: Context) : View(context) {
         isAntiAlias = true
         color = ContextCompat.getColor(context, R.color.greyLight)
         style = Paint.Style.STROKE
-        strokeWidth = scale * 1.6f
+        strokeWidth = scale * 2f
     }
     private val txtPaint = Paint().apply {
         isAntiAlias = true
@@ -40,9 +41,9 @@ class PolarView(context: Context) : View(context) {
     }
     private val trackPaint = Paint().apply {
         isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.satTrack)
+        color = Color.RED
         style = Paint.Style.STROKE
-        strokeWidth = scale * 1.6f
+        strokeWidth = scale * 2f
     }
     private val satPaint = Paint().apply {
         isAntiAlias = true
@@ -96,7 +97,7 @@ class PolarView(context: Context) : View(context) {
         if (satPos.elevation > 0) {
             val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
             val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            cvs.drawCircle(x, -y, txtSize / 2.6f, satPaint)
+            cvs.drawCircle(x, -y, txtSize / 2.4f, satPaint)
         }
     }
 
