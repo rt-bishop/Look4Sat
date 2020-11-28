@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Position
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
@@ -36,23 +35,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     @Inject
     lateinit var preferences: SharedPreferences
     private lateinit var binding: FragmentMapBinding
-    private lateinit var nameFormat: String
-    private lateinit var qthFormat: String
-    private lateinit var altFormat: String
-    private lateinit var distFormat: String
-    private lateinit var velFormat: String
-    private lateinit var latLonFormat: String
-    private lateinit var coverageFormat: String
-    private val viewModel: MapViewModel by viewModels()
+    private val mapViewModel: MapViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupComponents(view)
-        setupObservers()
-    }
-
-    private fun setupComponents(view: View) {
         Configuration.getInstance().load(requireContext().applicationContext, preferences)
         binding = FragmentMapBinding.bind(view).apply {
             mapView.apply {
@@ -70,35 +57,29 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
         }
-        nameFormat = getString(R.string.pat_osm_idName)
-        qthFormat = getString(R.string.map_qth)
-        altFormat = getString(R.string.pat_altitude)
-        distFormat = getString(R.string.pat_distance)
-        velFormat = getString(R.string.pat_osm_vel)
-        latLonFormat = getString(R.string.pat_osm_latLon)
-        coverageFormat = getString(R.string.map_coverage)
+        setupObservers()
     }
 
     private fun setupObservers() {
-        viewModel.getGSP().observe(viewLifecycleOwner, { setupPosOverlay(it) })
+        mapViewModel.getGSP().observe(viewLifecycleOwner, { setupPosOverlay(it) })
         sharedViewModel.getPasses().observe(viewLifecycleOwner, {
             if (it is Result.Success && it.data.isNotEmpty()) {
-                viewModel.setPasses(it.data)
-                binding.fabPrev.setOnClickListener { viewModel.changeSelection(true) }
-                binding.fabNext.setOnClickListener { viewModel.changeSelection(false) }
+                mapViewModel.setPasses(it.data)
+                binding.fabPrev.setOnClickListener { mapViewModel.scrollSelection(true) }
+                binding.fabNext.setOnClickListener { mapViewModel.scrollSelection(false) }
             }
         })
-        viewModel.getSelectedSat().observe(viewLifecycleOwner, { setSelectedSatDetails(it) })
-        viewModel.getSatMarkers().observe(viewLifecycleOwner, { setMarkers(it) })
+        mapViewModel.getSelectedSat().observe(viewLifecycleOwner, { setSelectedSatDetails(it) })
+        mapViewModel.getSatMarkers().observe(viewLifecycleOwner, { setMarkers(it) })
     }
 
-    private fun setupPosOverlay(gsp: GroundStationPosition) {
+    private fun setupPosOverlay(osmPos: Position) {
         binding.apply {
             Marker(mapView).apply {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pos)
-                position = GeoPoint(gsp.latitude, gsp.longitude)
+                position = GeoPoint(osmPos.lat, osmPos.lon)
                 mapView.overlays[0] = this
                 mapView.invalidate()
             }
@@ -107,13 +88,14 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun setSelectedSatDetails(sat: SelectedSat) {
         binding.apply {
-            idName.text = String.format(nameFormat, sat.catNum, sat.name)
-            qthLocator.text = String.format(qthFormat, sat.qthLoc)
-            altitude.text = String.format(altFormat, sat.altitude)
-            distance.text = String.format(distFormat, sat.range)
-            velocity.text = String.format(velFormat, sat.velocity)
-            latLon.text = String.format(latLonFormat, sat.osmPos.lat, sat.osmPos.lon)
-            mapCoverage.text = String.format(coverageFormat, sat.coverage)
+            idName.text = String.format(getString(R.string.pat_osm_idName), sat.catNum, sat.name)
+            qthLocator.text = String.format(getString(R.string.map_qth), sat.qthLoc)
+            altitude.text = String.format(getString(R.string.pat_altitude), sat.altitude)
+            distance.text = String.format(getString(R.string.pat_distance), sat.range)
+            velocity.text = String.format(getString(R.string.pat_osm_vel), sat.velocity)
+            latLon.text =
+                String.format(getString(R.string.pat_osm_latLon), sat.osmPos.lat, sat.osmPos.lon)
+            mapCoverage.text = String.format(getString(R.string.map_coverage), sat.coverage)
             mapView.overlays[1] = sat.groundTrack
             mapView.overlays[2] = sat.footprint
             mapView.invalidate()
@@ -130,7 +112,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_sat)
                     position = GeoPoint(it.value.lat, it.value.lon)
                     setOnMarkerClickListener { _, _ ->
-                        viewModel.setSelectedSat(it.key)
+                        mapViewModel.selectSatellite(it.key)
                         return@setOnMarkerClickListener true
                     }
                     markers.add(this)
