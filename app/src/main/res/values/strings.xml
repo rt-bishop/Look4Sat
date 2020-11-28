@@ -85,6 +85,8 @@
     <string name="pref_pass_title">Satellite pass preferences</string>
     <string name="pref_hours_title">Hours ahead</string>
     <string name="pref_elev_title">Minimal elevation</string>
+    <string name="pref_map_labels_title">Map preferences</string>
+    <string name="pref_map_labels">Use text labels instead of icons</string>
     <string name="pref_other_title">Other</string>
     <string name="pref_time_utc_title">Show pass time in UTC</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>

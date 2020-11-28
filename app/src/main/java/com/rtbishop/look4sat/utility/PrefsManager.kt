@@ -26,12 +26,13 @@ import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.PassPrefs
 import javax.inject.Inject
 
-class PrefsManager @Inject constructor(private val preferences: SharedPreferences) {
+class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
     companion object {
         const val keyLatitude = "latitude"
         const val keyLongitude = "longitude"
         const val keyAltitude = "altitude"
         const val keyCompass = "compass"
+        const val keyTextLabels = "shouldUseTextLabels"
         const val keyTimeUTC = "timeUTC"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
@@ -69,6 +70,10 @@ class PrefsManager @Inject constructor(private val preferences: SharedPreference
         val lon = stationPosition.longitude.toFloat()
         val alt = stationPosition.heightAMSL.toFloat()
         return GeomagneticField(lat, lon, alt, System.currentTimeMillis()).declination
+    }
+
+    fun shouldUseTextLabels(): Boolean {
+        return preferences.getBoolean(keyTextLabels, false)
     }
 
     fun shouldUseUTC(): Boolean {

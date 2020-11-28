@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.ui.mainScreen
 
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -17,6 +16,7 @@ import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.data.SelectedSat
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
+import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.ITileSource
@@ -33,14 +33,14 @@ import javax.inject.Inject
 class MapFragment : Fragment(R.layout.fragment_map) {
 
     @Inject
-    lateinit var preferences: SharedPreferences
+    lateinit var prefsManager: PrefsManager
     private lateinit var binding: FragmentMapBinding
     private val mapViewModel: MapViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getInstance().load(requireContext().applicationContext, preferences)
+        Configuration.getInstance().load(requireContext(), prefsManager.preferences)
         binding = FragmentMapBinding.bind(view).apply {
             mapView.apply {
                 setMultiTouchControls(true)
@@ -106,16 +106,34 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         binding.apply {
             val markers = FolderOverlay()
             map.entries.forEach {
-                Marker(mapView).apply {
-                    setInfoWindow(null)
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                    icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_sat)
-                    position = GeoPoint(it.value.lat, it.value.lon)
-                    setOnMarkerClickListener { _, _ ->
-                        mapViewModel.selectSatellite(it.key)
-                        return@setOnMarkerClickListener true
+                if (prefsManager.shouldUseTextLabels()) {
+                    Marker(mapView).apply {
+                        setInfoWindow(null)
+                        textLabelFontSize = 24
+                        textLabelBackgroundColor = Color.TRANSPARENT
+                        textLabelForegroundColor =
+                            ContextCompat.getColor(requireContext(), R.color.themeLight)
+                        setTextIcon(it.key.tle.name)
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        position = GeoPoint(it.value.lat, it.value.lon)
+                        setOnMarkerClickListener { _, _ ->
+                            mapViewModel.selectSatellite(it.key)
+                            return@setOnMarkerClickListener true
+                        }
+                        markers.add(this)
                     }
-                    markers.add(this)
+                } else {
+                    Marker(mapView).apply {
+                        setInfoWindow(null)
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_sat)
+                        position = GeoPoint(it.value.lat, it.value.lon)
+                        setOnMarkerClickListener { _, _ ->
+                            mapViewModel.selectSatellite(it.key)
+                            return@setOnMarkerClickListener true
+                        }
+                        markers.add(this)
+                    }
                 }
             }
             mapView.overlays[3] = markers

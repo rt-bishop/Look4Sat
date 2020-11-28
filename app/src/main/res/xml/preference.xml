@@ -53,6 +53,15 @@
             app:showSeekBarValue="true" />
     </PreferenceCategory>
     <PreferenceCategory
+        android:title="@string/pref_map_labels_title"
+        app:iconSpaceReserved="false">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="shouldUseTextLabels"
+            android:title="@string/pref_map_labels"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:title="@string/pref_other_title"
         app:iconSpaceReserved="false">
         <SwitchPreference

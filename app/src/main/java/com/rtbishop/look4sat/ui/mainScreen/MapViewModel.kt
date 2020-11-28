@@ -139,8 +139,8 @@ class MapViewModel @ViewModelInject constructor(val prefsManager: PrefsManager) 
 
     private fun getSatFootprint(satPos: SatPos): Overlay {
         val rangePoints = mutableListOf<GeoPoint>()
-        satPos.rangeCircle.withIndex().forEach {
-            val osmPos = getOsmPosition(it.value.lat, it.value.lon, false)
+        satPos.rangeCircle.forEach {
+            val osmPos = getOsmPosition(it.lat, it.lon, false)
             rangePoints.add(GeoPoint(osmPos.lat, osmPos.lon))
         }
         return Polygon().apply {
