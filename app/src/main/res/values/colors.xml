@@ -25,7 +25,5 @@
     <color name="greyLight">#D0D0D0</color>
     <color name="greyDivider">#808080</color>
     <color name="greySurface">#1e1e1e</color>
-    <!-- map colors -->
-    <color name="satFootprint">#26FFE082</color>
     <color name="mapInfoLayout">#66000000</color>
 </resources>

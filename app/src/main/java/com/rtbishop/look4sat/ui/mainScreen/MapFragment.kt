@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -17,8 +16,8 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.SharedViewModel
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
+import com.rtbishop.look4sat.data.SelectedSat
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
-import com.rtbishop.look4sat.utility.Utilities
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.ITileSource
@@ -36,8 +35,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     @Inject
     lateinit var preferences: SharedPreferences
-    private lateinit var trackPaint: Paint
-    private lateinit var footprintPaint: Paint
+    private lateinit var binding: FragmentMapBinding
     private lateinit var nameFormat: String
     private lateinit var qthFormat: String
     private lateinit var altFormat: String
@@ -45,46 +43,18 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var velFormat: String
     private lateinit var latLonFormat: String
     private lateinit var coverageFormat: String
-    private lateinit var selectedSat: SatPass
-    private val dateNow = Date()
     private val viewModel: MapViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    private var binding: FragmentMapBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupComponents(view)
-        setupMapView()
         setupObservers()
     }
 
     private fun setupComponents(view: View) {
         Configuration.getInstance().load(requireContext().applicationContext, preferences)
-        binding = FragmentMapBinding.bind(view)
-        trackPaint = Paint().apply {
-            strokeWidth = 2f
-            style = Paint.Style.STROKE
-            color = Color.RED
-            strokeCap = Paint.Cap.ROUND
-            strokeJoin = Paint.Join.ROUND
-            isAntiAlias = true
-        }
-        footprintPaint = Paint().apply {
-            style = Paint.Style.FILL_AND_STROKE
-            color = ContextCompat.getColor(requireContext(), R.color.satFootprint)
-            isAntiAlias = true
-        }
-        nameFormat = getString(R.string.pat_osm_idName)
-        qthFormat = getString(R.string.map_qth)
-        altFormat = getString(R.string.pat_altitude)
-        distFormat = getString(R.string.pat_distance)
-        velFormat = getString(R.string.pat_osm_vel)
-        latLonFormat = getString(R.string.pat_osm_latLon)
-        coverageFormat = getString(R.string.map_coverage)
-    }
-
-    private fun setupMapView() {
-        binding?.apply {
+        binding = FragmentMapBinding.bind(view).apply {
             mapView.apply {
                 setMultiTouchControls(true)
                 setTileSource(getTileSource())
@@ -100,6 +70,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
         }
+        nameFormat = getString(R.string.pat_osm_idName)
+        qthFormat = getString(R.string.map_qth)
+        altFormat = getString(R.string.pat_altitude)
+        distFormat = getString(R.string.pat_distance)
+        velFormat = getString(R.string.pat_osm_vel)
+        latLonFormat = getString(R.string.pat_osm_latLon)
+        coverageFormat = getString(R.string.map_coverage)
     }
 
     private fun setupObservers() {
@@ -107,23 +84,16 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         sharedViewModel.getPasses().observe(viewLifecycleOwner, {
             if (it is Result.Success && it.data.isNotEmpty()) {
                 viewModel.setPasses(it.data)
-                binding?.fabPrev?.setOnClickListener { viewModel.changeSelection(true) }
-                binding?.fabNext?.setOnClickListener { viewModel.changeSelection(false) }
+                binding.fabPrev.setOnClickListener { viewModel.changeSelection(true) }
+                binding.fabNext.setOnClickListener { viewModel.changeSelection(false) }
             }
         })
-        viewModel.getSelectedPass().observe(viewLifecycleOwner, { satPass ->
-            selectedSat = satPass
-            setSelectedSatDetails(satPass)
-            scrollToSat(satPass)
-        })
-        viewModel.getSatMarkers().observe(viewLifecycleOwner, {
-            setMarkers(it)
-            setSelectedSatDetails(selectedSat)
-        })
+        viewModel.getSelectedSat().observe(viewLifecycleOwner, { setSelectedSatDetails(it) })
+        viewModel.getSatMarkers().observe(viewLifecycleOwner, { setMarkers(it) })
     }
 
     private fun setupPosOverlay(gsp: GroundStationPosition) {
-        binding?.apply {
+        binding.apply {
             Marker(mapView).apply {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -135,33 +105,23 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setSelectedSatDetails(satPass: SatPass) {
-        val satPos = satPass.predictor.getSatPos(dateNow)
-        val osmPos = viewModel.getOsmPosition(satPos.latitude, satPos.longitude, true)
-        val qthLoc = Utilities.locToQTH(osmPos.lat, osmPos.lon)
-        binding?.apply {
-            idName.text = String.format(nameFormat, satPass.tle.catnum, satPass.tle.name)
-            qthLocator.text = String.format(qthFormat, qthLoc)
-            altitude.text = String.format(altFormat, satPos.altitude)
-            distance.text = String.format(distFormat, satPos.range)
-            velocity.text = String.format(velFormat, viewModel.getSatVelocity(satPos.altitude))
-            latLon.text = String.format(latLonFormat, osmPos.lat, osmPos.lon)
-            mapCoverage.text = String.format(coverageFormat, satPos.rangeCircleRadiusKm * 2)
-            mapView.overlays[1] = getSatTrack(satPass)
-            mapView.overlays[2] = getSatFootprint(satPass)
+    private fun setSelectedSatDetails(sat: SelectedSat) {
+        binding.apply {
+            idName.text = String.format(nameFormat, sat.catNum, sat.name)
+            qthLocator.text = String.format(qthFormat, sat.qthLoc)
+            altitude.text = String.format(altFormat, sat.altitude)
+            distance.text = String.format(distFormat, sat.range)
+            velocity.text = String.format(velFormat, sat.velocity)
+            latLon.text = String.format(latLonFormat, sat.osmPos.lat, sat.osmPos.lon)
+            mapCoverage.text = String.format(coverageFormat, sat.coverage)
+            mapView.overlays[1] = sat.groundTrack
+            mapView.overlays[2] = sat.footprint
             mapView.invalidate()
         }
     }
 
-    private fun scrollToSat(satPass: SatPass) {
-        val satPos = satPass.predictor.getSatPos(dateNow)
-        val osmPos = viewModel.getOsmPosition(satPos.latitude, satPos.longitude, true)
-        binding?.mapView?.controller?.animateTo(GeoPoint(osmPos.lat, osmPos.lon))
-    }
-
     private fun setMarkers(map: Map<SatPass, Position>) {
-        dateNow.time = System.currentTimeMillis()
-        binding?.apply {
+        binding.apply {
             val markers = FolderOverlay()
             map.entries.forEach {
                 Marker(mapView).apply {
@@ -169,54 +129,15 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_sat)
                     position = GeoPoint(it.value.lat, it.value.lon)
-                    setOnMarkerClickListener { _, _ -> viewModel.setSelectedSat(it.key) }
+                    setOnMarkerClickListener { _, _ ->
+                        viewModel.setSelectedSat(it.key)
+                        return@setOnMarkerClickListener true
+                    }
                     markers.add(this)
                 }
             }
             mapView.overlays[3] = markers
             mapView.invalidate()
-        }
-    }
-
-    private fun getSatTrack(pass: SatPass): Overlay {
-        val period = (24 * 60 / pass.tle.meanmo).toInt()
-        val positions = pass.predictor.getPositions(dateNow, 20, 0, period * 3)
-        val trackOverlay = FolderOverlay()
-        val trackPoints = mutableListOf<GeoPoint>()
-        var oldLon = 0.0
-        positions.forEach {
-            val osmPos = viewModel.getOsmPosition(it.latitude, it.longitude, true)
-            if (oldLon < -170.0 && osmPos.lon > 170.0 || oldLon > 170.0 && osmPos.lon < -170.0) {
-                val currentPoints = mutableListOf<GeoPoint>()
-                currentPoints.addAll(trackPoints)
-                Polyline().apply {
-                    outlinePaint.set(trackPaint)
-                    setPoints(currentPoints)
-                    trackOverlay.add(this)
-                }
-                trackPoints.clear()
-            }
-            oldLon = osmPos.lon
-            trackPoints.add(GeoPoint(osmPos.lat, osmPos.lon))
-        }
-        Polyline().apply {
-            outlinePaint.set(trackPaint)
-            setPoints(trackPoints)
-            trackOverlay.add(this)
-        }
-        return trackOverlay
-    }
-
-    private fun getSatFootprint(pass: SatPass): Overlay {
-        val rangePoints = mutableListOf<GeoPoint>()
-        pass.predictor.getSatPos(dateNow).rangeCircle.withIndex().forEach {
-            val osmPos = viewModel.getOsmPosition(it.value.lat, it.value.lon, false)
-            rangePoints.add(GeoPoint(osmPos.lat, osmPos.lon))
-        }
-        return Polygon().apply {
-            fillPaint.set(footprintPaint)
-            outlinePaint.set(footprintPaint)
-            points = rangePoints
         }
     }
 
@@ -253,10 +174,5 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
         )
         return XYTileSource("wikimedia", 2, 6, 256, ".png", sources, copyright, policy)
-    }
-
-    override fun onDestroyView() {
-        binding = null
-        super.onDestroyView()
     }
 }
