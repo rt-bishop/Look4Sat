@@ -1,0 +1,9 @@
+New interface with BottomNavigation bar
+New map interface with satellite data overlay
+Added basic onboarding screen
+Added polar fragment AOS/LOS timer
+Added more satellite data to passes ViewHolders
+Added the ability to set location via QTH locator
+Sources and entries update on first launch
+Removed unnecessary permissions from Manifest
+Fixed memory leaks and various bugs, code cleanup

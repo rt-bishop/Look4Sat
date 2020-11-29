@@ -1,1 +1,1 @@
-Satellite tracker and passes predictor
+Amateur radio satellite tracker and pass predictor

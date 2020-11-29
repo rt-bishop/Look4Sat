@@ -1,9 +1,21 @@
-Amateur radio and weather satellite tracker and passes predictor for Android
+Let this app look for satellites for you!
+
+Thanks to the huge database provided by Celestrak and SatNOGS you have access to more than 3000
+active satellites orbiting Earth at this very moment. You can search the entire DB by satellite
+name or by NORAD catalog number. Track them with ease!
+
+Satellite positions and passes are calculated relative to your location. In order to get reliable
+predictions set the observation position using GPS or QTH Locator in the Settings menu.
+
+The application is built using predict4java library, Kotlin, Coroutines, Dagger2, Retrofit2, Moshi,
+Architecture Components and Jetpack Navigation. It is now and always will be completely ad-free
+and open-source. Make sure you check the app developer's
+<a href="https://github.com/rt-bishop/Look4Sat">GitHub repository</a>.
 
 <b>Main features:</b><ul>
-<li>Calculating satellite passes for up to one week (168 hours)</li>
-<li>Calculating passes for the current or manually entered location</li>
+<li>Predicting satellite positions and passes for up to 4 days (96 hours)</li>
 <li>Showing the list of currently active and upcoming satellite passes</li>
 <li>Showing the active pass progress, polar trajectory and transceivers info</li>
 <li>Showing the satellite positional data, footprint and ground track on a map</li>
-<li>Offline first: calculations are made offline. Weekly update of satellite data is recommended.</li></ul>
+<li>Custom TLE data import is available via files with TXT or TLE extensions</li>
+<li>Offline first: calculations are made offline. Weekly update of TLE data is recommended.</li></ul>
