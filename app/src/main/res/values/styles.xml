@@ -61,6 +61,8 @@
     <style name="TimerText">
         <item name="android:textColor">@color/themeLight</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:clickable">false</item>
+        <item name="android:focusable">false</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 

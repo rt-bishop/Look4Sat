@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:elevation="4dp"
         android:text="@string/timer_zero"
-        android:textSize="42sp"
+        android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="@+id/polar_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/polar_bar"
