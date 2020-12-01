@@ -40,7 +40,7 @@
     <string name="trans_no_mode">Mode: null</string>
     <string name="trans_inverted">Inverted: %s</string>
     <string name="trans_description" translatable="false">%s</string>
-    <string name="trans_no_link" translatable="false">- -</string>
+    <string name="trans_no_link" translatable="false">- - . - -</string>
     <string name="trans_link_low" translatable="false">%.4f</string>
     <string name="trans_link_lowHigh" translatable="false">%.4f - %.4f</string>
     <string name="trans_no_data">No transceivers found for this satellite</string>

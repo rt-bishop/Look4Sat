@@ -58,4 +58,10 @@
         <item name="textAllCaps">false</item>
     </style>
 
+    <style name="TimerText">
+        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
 </resources>
