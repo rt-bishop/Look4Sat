@@ -20,29 +20,31 @@
 package com.rtbishop.look4sat
 
 import android.net.Uri
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repo.EntriesRepo
-import com.rtbishop.look4sat.repo.SourcesRepo
+import com.rtbishop.look4sat.repo.DefaultSourcesRepo
 import com.rtbishop.look4sat.repo.TransmittersRepo
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
-class SharedViewModel @ViewModelInject constructor(
+@HiltViewModel
+class SharedViewModel @Inject constructor(
     private val prefsManager: PrefsManager,
-    private val sourcesRepo: SourcesRepo,
+    private val sourcesRepo: DefaultSourcesRepo,
     private val entriesRepo: EntriesRepo,
     private val transmittersRepo: TransmittersRepo
 ) : ViewModel() {
-
+    
     private val _appTimer = MutableLiveData(System.currentTimeMillis())
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
     private val _appEvent = MutableLiveData<Event<Int>>()

@@ -21,41 +21,49 @@ package com.rtbishop.look4sat.di
 
 import android.content.ContentResolver
 import android.content.Context
-import com.rtbishop.look4sat.repo.*
+import androidx.room.Room
 import com.rtbishop.look4sat.repo.local.EntriesDao
+import com.rtbishop.look4sat.repo.local.SatelliteDb
 import com.rtbishop.look4sat.repo.local.SourcesDao
 import com.rtbishop.look4sat.repo.local.TransmittersDao
-import com.rtbishop.look4sat.repo.remote.TransmittersApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.qualifiers.ActivityContext
-import okhttp3.OkHttpClient
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ActivityComponent::class)
-object RepoModule {
-
+@InstallIn(SingletonComponent::class)
+object RepositoryModule {
+    
     @Provides
-    fun getEntriesRepo(resolver: ContentResolver, client: OkHttpClient, entriesDao: EntriesDao)
-            : EntriesRepo {
-        return DefaultEntriesRepo(resolver, client, entriesDao)
+    @Singleton
+    fun getContentResolver(@ApplicationContext context: Context): ContentResolver {
+        return context.contentResolver
     }
-
+    
     @Provides
-    fun getSourcesRepo(sourcesDao: SourcesDao): SourcesRepo {
-        return DefaultSourcesRepo(sourcesDao)
+    @Singleton
+    fun getEntriesDao(db: SatelliteDb): EntriesDao {
+        return db.entriesDao()
     }
-
+    
     @Provides
-    fun getTransmittersRepo(transDao: TransmittersDao, transApi: TransmittersApi)
-            : TransmittersRepo {
-        return DefaultTransmittersRepo(transDao, transApi)
+    @Singleton
+    fun getSourcesDao(db: SatelliteDb): SourcesDao {
+        return db.sourcesDao()
     }
-
+    
     @Provides
-    fun getContentResolver(@ActivityContext context: Context): ContentResolver {
-        return context.applicationContext.contentResolver
+    @Singleton
+    fun getTransmittersDao(db: SatelliteDb): TransmittersDao {
+        return db.transmittersDao()
+    }
+    
+    @Provides
+    @Singleton
+    fun getSatelliteDb(@ApplicationContext context: Context): SatelliteDb {
+        return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
     }
 }

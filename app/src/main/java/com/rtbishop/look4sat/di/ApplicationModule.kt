@@ -20,38 +20,29 @@
 package com.rtbishop.look4sat.di
 
 import android.content.Context
-import androidx.room.Room
-import com.rtbishop.look4sat.repo.local.EntriesDao
-import com.rtbishop.look4sat.repo.local.SatelliteDb
-import com.rtbishop.look4sat.repo.local.SourcesDao
-import com.rtbishop.look4sat.repo.local.TransmittersDao
+import android.content.SharedPreferences
+import android.location.LocationManager
+import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
-@InstallIn(ActivityComponent::class)
-object PersistenceModule {
-
+@InstallIn(SingletonComponent::class)
+object ApplicationModule {
+    
     @Provides
-    fun getEntriesDao(db: SatelliteDb): EntriesDao {
-        return db.entriesDao()
+    @Singleton
+    fun getLocationManager(@ApplicationContext context: Context): LocationManager {
+        return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
-
+    
     @Provides
-    fun getSourcesDao(db: SatelliteDb): SourcesDao {
-        return db.sourcesDao()
-    }
-
-    @Provides
-    fun getTransmittersDao(db: SatelliteDb): TransmittersDao {
-        return db.transmittersDao()
-    }
-
-    @Provides
-    fun getSatelliteDb(@ActivityContext context: Context): SatelliteDb {
-        return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
+    @Singleton
+    fun getSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(context)
     }
 }
