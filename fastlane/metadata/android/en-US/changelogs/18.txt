@@ -1,4 +1,0 @@
-Switched to software (fusion) rotation sensor
-Added magnetic declination calculation for true north
-Doppler shift calculation was added by @tekk
-Added OpenStreetMaps-based world view, work in progress...
