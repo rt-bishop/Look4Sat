@@ -68,7 +68,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 setMultiTouchControls(true)
                 setTileSource(getTileSource())
                 val minZoom = getMinZoom(resources.displayMetrics.heightPixels)
-                minZoomLevel = 2.5
+                minZoomLevel = minZoom
                 maxZoomLevel = 6.0
                 controller.setZoom(minZoom + 0.5)
                 zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)

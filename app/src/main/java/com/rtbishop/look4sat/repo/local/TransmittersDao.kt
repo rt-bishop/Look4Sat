@@ -19,15 +19,15 @@
 
 package com.rtbishop.look4sat.repo.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rtbishop.look4sat.data.SatTrans
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransmittersDao {
-
+    
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :satId")
-    fun getTransmittersForSat(satId: Int): LiveData<List<SatTrans>>
+    fun getTransmittersForSat(satId: Int): Flow<List<SatTrans>>
 
     @Transaction
     suspend fun updateTransmitters(transmitters: List<SatTrans>) {

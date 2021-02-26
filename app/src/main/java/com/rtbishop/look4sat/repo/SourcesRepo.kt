@@ -19,14 +19,14 @@
 
 package com.rtbishop.look4sat.repo
 
-import androidx.lifecycle.LiveData
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.repo.local.SourcesDao
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SourcesRepo @Inject constructor(private val sourcesDao: SourcesDao) {
     
-    fun getSources(): LiveData<List<TleSource>> {
+    fun getSources(): Flow<List<TleSource>> {
         return sourcesDao.getSources()
     }
     

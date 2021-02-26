@@ -19,15 +19,15 @@
 
 package com.rtbishop.look4sat.repo.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rtbishop.look4sat.data.TleSource
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SourcesDao {
-
+    
     @Query("SELECT * FROM sources")
-    fun getSources(): LiveData<List<TleSource>>
+    fun getSources(): Flow<List<TleSource>>
 
     @Transaction
     suspend fun updateSources(sources: List<TleSource>) {

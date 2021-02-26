@@ -19,15 +19,15 @@
 
 package com.rtbishop.look4sat.repo.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.rtbishop.look4sat.data.SatEntry
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EntriesDao {
-
+    
     @Query("SELECT * FROM entries ORDER BY name ASC")
-    fun getEntries(): LiveData<List<SatEntry>>
+    fun getEntries(): Flow<List<SatEntry>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)

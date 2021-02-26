@@ -21,12 +21,12 @@ package com.rtbishop.look4sat.repo
 
 import android.content.ContentResolver
 import android.net.Uri
-import androidx.lifecycle.LiveData
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.repo.local.EntriesDao
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -39,7 +39,7 @@ class EntriesRepo @Inject constructor(
     private val entriesDao: EntriesDao
 ) {
     
-    fun getEntries(): LiveData<List<SatEntry>> {
+    fun getEntries(): Flow<List<SatEntry>> {
         return entriesDao.getEntries()
     }
     

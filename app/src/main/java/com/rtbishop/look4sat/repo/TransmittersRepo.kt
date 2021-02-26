@@ -19,10 +19,10 @@
 
 package com.rtbishop.look4sat.repo
 
-import androidx.lifecycle.LiveData
 import com.rtbishop.look4sat.data.SatTrans
 import com.rtbishop.look4sat.repo.local.TransmittersDao
 import com.rtbishop.look4sat.repo.remote.TransmittersApi
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class TransmittersRepo @Inject constructor(
@@ -30,7 +30,7 @@ class TransmittersRepo @Inject constructor(
     private val transmittersApi: TransmittersApi
 ) {
     
-    fun getTransmittersForSat(satId: Int): LiveData<List<SatTrans>> {
+    fun getTransmittersForSat(satId: Int): Flow<List<SatTrans>> {
         return transmittersDao.getTransmittersForSat(satId)
     }
     

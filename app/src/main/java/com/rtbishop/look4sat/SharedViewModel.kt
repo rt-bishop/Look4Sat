@@ -20,10 +20,7 @@
 package com.rtbishop.look4sat
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repo.EntriesRepo
 import com.rtbishop.look4sat.repo.SourcesRepo
@@ -50,7 +47,7 @@ class SharedViewModel @Inject constructor(
     private val _appEvent = MutableLiveData<Event<Int>>()
     private var selectedEntries = emptyList<SatEntry>()
     private var shouldTriggerCalculation = true
-
+    
     init {
         if (prefsManager.isFirstLaunch()) {
             updateDefaultSourcesAndEntries()
@@ -58,21 +55,22 @@ class SharedViewModel @Inject constructor(
         }
         startApplicationTimer()
     }
-
+    
     fun getAppEvent(): LiveData<Event<Int>> = _appEvent
     fun getAppTimer(): LiveData<Long> = _appTimer
-    fun getSources() = sourcesRepo.getSources()
-    fun getEntries() = entriesRepo.getEntries()
+    fun getSources() = sourcesRepo.getSources().asLiveData()
+    fun getEntries() = entriesRepo.getEntries().asLiveData()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
-    fun getTransmittersForSat(satId: Int) = transmittersRepo.getTransmittersForSat(satId)
-
+    fun getTransmittersForSat(satId: Int) =
+        transmittersRepo.getTransmittersForSat(satId).asLiveData()
+    
     fun triggerCalculation() {
         if (shouldTriggerCalculation) {
             shouldTriggerCalculation = false
             calculatePasses()
         }
     }
-
+    
     fun calculatePasses(dateNow: Date = Date(System.currentTimeMillis())) {
         shouldTriggerCalculation = false
         _passes.value = Result.InProgress
