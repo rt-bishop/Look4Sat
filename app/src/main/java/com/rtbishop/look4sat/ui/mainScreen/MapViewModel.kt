@@ -21,7 +21,6 @@ package com.rtbishop.look4sat.ui.mainScreen
 
 import android.graphics.Color
 import android.graphics.Paint
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,21 +31,25 @@ import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.data.SelectedSat
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class MapViewModel @ViewModelInject constructor(val prefsManager: PrefsManager) : ViewModel() {
-
+@HiltViewModel
+class MapViewModel @Inject constructor(val prefsManager: PrefsManager) : ViewModel() {
+    
     private val dateNow = Date()
     private val trackPaint = Paint().apply {
         strokeWidth = 2f
@@ -183,14 +186,12 @@ class MapViewModel @ViewModelInject constructor(val prefsManager: PrefsManager) 
 
     private fun getOsmPosition(lat: Double, lon: Double, inRadians: Boolean): Position {
         return if (inRadians) {
-            var osmLat = Math.toDegrees(lat)
-            var osmLon = Math.toDegrees(lon)
-            if (osmLat > 85.05) osmLat = 85.05 else if (osmLat < -85.05) osmLat = -85.05
-            if (osmLon > 180f) osmLon -= 360f
+            val osmLat = MapView.getTileSystem().cleanLatitude(Math.toDegrees(lat))
+            val osmLon = MapView.getTileSystem().cleanLongitude(Math.toDegrees(lon))
             Position(osmLat, osmLon)
         } else {
-            val osmLat = if (lat > 85.05) 85.05 else if (lat < -85.05) -85.05 else lat
-            val osmLon = if (lon > 180.0) lon - 360.0 else lon
+            val osmLat = MapView.getTileSystem().cleanLatitude(lat)
+            val osmLon = MapView.getTileSystem().cleanLongitude(lon)
             Position(osmLat, osmLon)
         }
     }
