@@ -42,7 +42,6 @@ class SharedViewModel @Inject constructor(
     private val transmittersRepo: TransmittersRepo
 ) : ViewModel() {
     
-    private val _appTimer = MutableLiveData(System.currentTimeMillis())
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
     private val _appEvent = MutableLiveData<Event<Int>>()
     private var selectedEntries = emptyList<SatEntry>()
@@ -53,11 +52,16 @@ class SharedViewModel @Inject constructor(
             updateDefaultSourcesAndEntries()
             prefsManager.setFirstLaunchDone()
         }
-        startApplicationTimer()
     }
     
     fun getAppEvent(): LiveData<Event<Int>> = _appEvent
-    fun getAppTimer(): LiveData<Long> = _appTimer
+    fun getAppTimer() = liveData {
+        while (true) {
+            emit(System.currentTimeMillis())
+            delay(1000)
+        }
+    }
+    
     fun getSources() = sourcesRepo.getSources().asLiveData()
     fun getEntries() = entriesRepo.getEntries().asLiveData()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
@@ -120,15 +124,6 @@ class SharedViewModel @Inject constructor(
 
     private fun postAppEvent(event: Event<Int>) {
         _appEvent.value = event
-    }
-
-    private fun startApplicationTimer(tickMillis: Long = 1000L) {
-        viewModelScope.launch(Dispatchers.IO) {
-            while (true) {
-                delay(tickMillis)
-                _appTimer.postValue(System.currentTimeMillis())
-            }
-        }
     }
 
     private fun getPasses(entry: SatEntry, dateNow: Date): MutableList<SatPass> {
