@@ -133,8 +133,13 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private fun navigateToPasses() {
         binding?.searchBar?.clearFocus()
-        entriesAdapter?.let { viewModel.updateEntriesSelection(it.getEntries()) }
-        requireView().findNavController().navigate(R.id.action_entries_to_passes)
+        entriesAdapter?.let {
+            val entries = it.getEntries()
+            if (entries.isNotEmpty()) {
+                viewModel.updateEntriesSelection(entries)
+                requireView().findNavController().navigate(R.id.action_entries_to_passes)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
