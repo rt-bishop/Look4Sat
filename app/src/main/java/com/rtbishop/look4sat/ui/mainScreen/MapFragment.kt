@@ -43,7 +43,9 @@ import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.*
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -55,6 +57,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var binding: FragmentMapBinding
     private val mapViewModel: MapViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val minLat = MapView.getTileSystem().minLatitude
+    private val maxLat = MapView.getTileSystem().maxLatitude
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,14 +67,15 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             mapView.apply {
                 setMultiTouchControls(true)
                 setTileSource(getTileSource())
+                val minZoom = getMinZoom(resources.displayMetrics.heightPixels)
                 minZoomLevel = 2.5
                 maxZoomLevel = 6.0
-                controller.setZoom(3.0)
+                controller.setZoom(minZoom + 0.5)
                 zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
                 overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
                 overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
                 overlayManager.tilesOverlay.setColorFilter(getColorFilter())
-                setScrollableAreaLimitLatitude(85.0, -85.0, 0)
+                setScrollableAreaLimitLatitude(maxLat, minLat, 0)
                 // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
@@ -183,6 +188,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         tintedMatrix.preConcat(negativeMatrix)
         return ColorMatrixColorFilter(tintedMatrix)
     }
+    
+    private fun getMinZoom(screenHeight: Int): Double {
+        val minZoom = MapView.getTileSystem().getLatitudeZoom(maxLat, minLat, screenHeight)
+        Timber.d("Min zoom level for this screen: $minZoom")
+        return minZoom
+    }
 
     private fun getTileSource(): ITileSource {
         val copyright = resources.getString(R.string.map_copyright)
@@ -191,6 +202,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             1, TileSourcePolicy.FLAG_NO_BULK and TileSourcePolicy.FLAG_NO_PREVENTIVE and
                     TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
         )
-        return XYTileSource("wikimedia", 2, 6, 256, ".png", sources, copyright, policy)
+        return XYTileSource("wikimedia", 0, 6, 256, ".png", sources, copyright, policy)
     }
 }
