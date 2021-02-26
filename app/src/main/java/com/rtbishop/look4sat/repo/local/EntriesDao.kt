@@ -29,15 +29,6 @@ interface EntriesDao {
     @Query("SELECT * FROM entries ORDER BY name ASC")
     fun getEntries(): LiveData<List<SatEntry>>
 
-    @Transaction
-    suspend fun updateEntries(entries: List<SatEntry>) {
-        clearEntries()
-        insertEntries(entries)
-    }
-
-    @Query("DELETE FROM entries")
-    suspend fun clearEntries()
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
 

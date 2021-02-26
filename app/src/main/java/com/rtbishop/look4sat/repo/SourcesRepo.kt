@@ -24,7 +24,7 @@ import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.repo.local.SourcesDao
 import javax.inject.Inject
 
-class DefaultSourcesRepo @Inject constructor(private val sourcesDao: SourcesDao) {
+class SourcesRepo @Inject constructor(private val sourcesDao: SourcesDao) {
     
     fun getSources(): LiveData<List<TleSource>> {
         return sourcesDao.getSources()

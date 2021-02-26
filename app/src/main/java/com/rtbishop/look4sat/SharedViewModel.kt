@@ -26,7 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repo.EntriesRepo
-import com.rtbishop.look4sat.repo.DefaultSourcesRepo
+import com.rtbishop.look4sat.repo.SourcesRepo
 import com.rtbishop.look4sat.repo.TransmittersRepo
 import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -40,7 +40,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SharedViewModel @Inject constructor(
     private val prefsManager: PrefsManager,
-    private val sourcesRepo: DefaultSourcesRepo,
+    private val sourcesRepo: SourcesRepo,
     private val entriesRepo: EntriesRepo,
     private val transmittersRepo: TransmittersRepo
 ) : ViewModel() {
