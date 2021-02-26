@@ -41,7 +41,6 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.ITileSource
 import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
 import org.osmdroid.tileprovider.tilesource.XYTileSource
-import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
@@ -71,7 +70,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
                 overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
                 overlayManager.tilesOverlay.setColorFilter(getColorFilter())
-                setScrollableAreaLimitDouble(BoundingBox(85.05, 180.0, -85.05, -180.0))
+                setScrollableAreaLimitLatitude(85.0, -85.0, 0)
                 // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
