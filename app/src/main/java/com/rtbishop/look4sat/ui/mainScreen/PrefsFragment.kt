@@ -31,7 +31,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.Utilities
-import com.rtbishop.look4sat.utility.Utilities.round
+import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

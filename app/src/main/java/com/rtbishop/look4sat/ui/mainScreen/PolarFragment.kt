@@ -40,7 +40,7 @@ import com.rtbishop.look4sat.ui.adapters.TransAdapter
 import com.rtbishop.look4sat.ui.views.PolarView
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.Utilities
+import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -157,17 +157,17 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         if (!satPass.tle.isDeepspace) {
             if (dateNow.before(satPass.pass.startTime)) {
                 val millisBeforeStart = satPass.pass.startTime.time.minus(timeNow)
-                binding.polarTimer.text = Utilities.formatForTimer(millisBeforeStart)
+                binding.polarTimer.text = millisBeforeStart.formatForTimer()
             } else {
                 val millisBeforeEnd = satPass.pass.endTime.time.minus(timeNow)
-                binding.polarTimer.text = Utilities.formatForTimer(millisBeforeEnd)
+                binding.polarTimer.text = millisBeforeEnd.formatForTimer()
                 if (dateNow.after(satPass.pass.endTime)) {
-                    binding.polarTimer.text = Utilities.formatForTimer(0L)
+                    binding.polarTimer.text = 0L.formatForTimer()
                     findNavController().navigate(R.id.action_polar_to_passes)
                 }
             }
         } else {
-            binding.polarTimer.text = Utilities.formatForTimer(0L)
+            binding.polarTimer.text = 0L.formatForTimer()
         }
     }
 }

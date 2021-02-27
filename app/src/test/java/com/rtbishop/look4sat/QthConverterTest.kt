@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 package com.rtbishop.look4sat
 
 import com.rtbishop.look4sat.utility.QthConverter
-import com.rtbishop.look4sat.utility.Utilities.round
+import com.rtbishop.look4sat.utility.round
 import org.junit.Test
 
 class QthConverterTest {

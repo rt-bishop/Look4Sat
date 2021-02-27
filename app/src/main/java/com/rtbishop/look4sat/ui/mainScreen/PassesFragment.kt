@@ -33,7 +33,7 @@ import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.adapters.PassesAdapter
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.Utilities
+import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -77,7 +77,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             } else if (result is Result.InProgress) {
                 passes.clear()
                 binding?.apply {
-                    passesTimer.text = Utilities.formatForTimer(0L)
+                    passesTimer.text = 0L.formatForTimer()
                     passesError.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.INVISIBLE
                     passesProgress.visibility = View.VISIBLE
@@ -111,14 +111,14 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             try {
                 val nextPass = passes.first { it.pass.startTime.time.minus(timeNow) > 0 }
                 val millisBeforeStart = nextPass.pass.startTime.time.minus(timeNow)
-                binding?.passesTimer?.text = Utilities.formatForTimer(millisBeforeStart)
+                binding?.passesTimer?.text = millisBeforeStart.formatForTimer()
             } catch (e: NoSuchElementException) {
                 val lastPass = passes.last()
                 val millisBeforeEnd = lastPass.pass.endTime.time.minus(timeNow)
-                binding?.passesTimer?.text = Utilities.formatForTimer(millisBeforeEnd)
+                binding?.passesTimer?.text = millisBeforeEnd.formatForTimer()
             }
         } else {
-            binding?.passesTimer?.text = Utilities.formatForTimer(0L)
+            binding?.passesTimer?.text = 0L.formatForTimer()
         }
     }
 
