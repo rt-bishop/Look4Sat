@@ -21,12 +21,13 @@ package com.rtbishop.look4sat
 
 import android.net.Uri
 import androidx.lifecycle.*
+import com.github.amsacode.predict4java.SatelliteFactory
 import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repo.EntriesRepo
 import com.rtbishop.look4sat.repo.SourcesRepo
 import com.rtbishop.look4sat.repo.TransmittersRepo
-import com.rtbishop.look4sat.utility.PassPredictor
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.getPredictor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -128,7 +129,7 @@ class SharedViewModel @Inject constructor(
 
     private fun getPasses(entry: SatEntry, dateNow: Date): MutableList<SatPass> {
         val gsp = prefsManager.getStationPosition()
-        val predictor = PassPredictor(entry.tle, gsp)
+        val predictor = SatelliteFactory.createSatellite(entry.tle).getPredictor(gsp)
         val hoursAhead = prefsManager.getPassPrefs().hoursAhead
         val passes = predictor.getPasses(dateNow, hoursAhead, true)
         val passList = passes.map { SatPass(entry.tle, predictor, it) }

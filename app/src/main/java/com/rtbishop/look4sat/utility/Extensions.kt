@@ -19,6 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 package com.rtbishop.look4sat.utility
 
+import com.github.amsacode.predict4java.GroundStationPosition
+import com.github.amsacode.predict4java.Satellite
 import java.util.concurrent.TimeUnit
 
 fun Long.formatForTimer(): String {
@@ -33,4 +35,8 @@ fun Double.round(decimals: Int): Double {
     var multiplier = 1.0
     repeat(decimals) { multiplier *= 10 }
     return kotlin.math.round(this * multiplier) / multiplier
+}
+
+fun Satellite.getPredictor(stationPosition: GroundStationPosition): PassPredictor {
+    return PassPredictor(this, stationPosition)
 }
