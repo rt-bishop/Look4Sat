@@ -25,20 +25,21 @@ import javax.inject.Inject
 class QthConverter @Inject constructor() {
     
     fun qthToLocation(qthString: String): GroundStationPosition? {
-        if (!isValidQTH(qthString)) return null
-        val lonFirst = (qthString[0].toUpperCase().toInt() - 65) * 20
-        val latFirst = (qthString[1].toUpperCase().toInt() - 65) * 10
-        val lonSecond = qthString[2].toString().toInt() * 2
-        val latSecond = qthString[3].toString().toInt()
-        val lonThird = (((qthString[4].toLowerCase().toInt() - 97) / 12.0) + (1.0 / 24.0)) - 180
-        val latThird = (((qthString[5].toLowerCase().toInt() - 97) / 24.0) + (1.0 / 48.0)) - 90
-        val longitude = lonFirst + lonSecond + lonThird
-        val latitude = latFirst + latSecond + latThird
+        val trimmedQth = qthString.take(6)
+        if (!isValidQTH(trimmedQth)) return null
+        val lonFirst = (trimmedQth[0].toUpperCase().toInt() - 65) * 20
+        val latFirst = (trimmedQth[1].toUpperCase().toInt() - 65) * 10
+        val lonSecond = trimmedQth[2].toString().toInt() * 2
+        val latSecond = trimmedQth[3].toString().toInt()
+        val lonThird = (((trimmedQth[4].toLowerCase().toInt() - 97) / 12.0) + (1.0 / 24.0)) - 180
+        val latThird = (((trimmedQth[5].toLowerCase().toInt() - 97) / 24.0) + (1.0 / 48.0)) - 90
+        val longitude = (lonFirst + lonSecond + lonThird).round(4)
+        val latitude = (latFirst + latSecond + latThird).round(4)
         return GroundStationPosition(latitude, longitude, 0.0)
     }
     
     fun locationToQTH(lat: Double, lon: Double): String? {
-        if (!isValidLoc(lat, lon)) return null
+        if (!isValidLocation(lat, lon)) return null
         val tempLon = if (lon > 180.0) lon - 360 else lon
         val upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
         val lower = "abcdefghijklmnopqrstuvwx"
@@ -58,7 +59,7 @@ class QthConverter @Inject constructor() {
         return qthString.matches(qthPattern)
     }
     
-    private fun isValidLoc(lat: Double, lon: Double): Boolean {
+    private fun isValidLocation(lat: Double, lon: Double): Boolean {
         return (lat > -90.0 && lat < 90.0) && (lon > -180.0 && lon < 360.0)
     }
 }

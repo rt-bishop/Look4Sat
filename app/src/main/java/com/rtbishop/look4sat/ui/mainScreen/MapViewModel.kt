@@ -30,7 +30,7 @@ import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.data.SelectedSat
 import com.rtbishop.look4sat.utility.PrefsManager
-import com.rtbishop.look4sat.utility.Utilities
+import com.rtbishop.look4sat.utility.QthConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -48,7 +48,10 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 @HiltViewModel
-class MapViewModel @Inject constructor(val prefsManager: PrefsManager) : ViewModel() {
+class MapViewModel @Inject constructor(
+    private val prefsManager: PrefsManager,
+    private val qthConverter: QthConverter
+) : ViewModel() {
     
     private val dateNow = Date()
     private val trackPaint = Paint().apply {
@@ -109,7 +112,7 @@ class MapViewModel @Inject constructor(val prefsManager: PrefsManager) : ViewMod
         withContext(Dispatchers.Default) {
             val satPos = pass.predictor.getSatPos(dateNow)
             val osmPos = getOsmPosition(satPos.latitude, satPos.longitude, true)
-            val qthLoc = Utilities.locToQTH(osmPos.lat, osmPos.lon)
+            val qthLoc = qthConverter.locationToQTH(osmPos.lat, osmPos.lon) ?: "-- --"
             val velocity = getSatVelocity(satPos.altitude)
             val coverage = satPos.rangeCircleRadiusKm * 2
             val footprint = getSatFootprint(satPos)

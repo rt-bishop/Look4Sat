@@ -30,59 +30,59 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.PrefsManager
-import com.rtbishop.look4sat.utility.Utilities
+import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PrefsFragment : PreferenceFragmentCompat() {
-
+    
     private val locPermReqCode = 1000
     private val locPermString = Manifest.permission.ACCESS_FINE_LOCATION
-
+    
     @Inject
     lateinit var locationManager: LocationManager
-
+    
     @Inject
     lateinit var prefsManager: PrefsManager
-
+    
+    @Inject
+    lateinit var qthConverter: QthConverter
+    
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
     }
-
+    
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        
         findPreference<Preference>(PrefsManager.keyPositionGPS)?.apply {
             setOnPreferenceClickListener {
                 setPositionFromGPS()
                 return@setOnPreferenceClickListener true
             }
         }
-
+        
         findPreference<Preference>(PrefsManager.keyPositionQTH)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 setPositionFromQth(newValue.toString())
             }
         }
     }
-
-    private fun setPositionFromQth(qthLocator: String): Boolean {
-        val qthPattern = "[A-X][A-X][0-9][0-9][a-x][a-x]".toRegex()
-        return if (qthLocator.matches(qthPattern)) {
-            val location = Utilities.qthToGSP(qthLocator)
-            val latitude = location.latitude.round(4)
-            val longitude = location.longitude.round(4)
-            prefsManager.setStationPosition(latitude, longitude, location.heightAMSL)
-            showSnack(getString(R.string.pref_pos_success))
-            true
-        } else {
+    
+    private fun setPositionFromQth(qthString: String): Boolean {
+        val loc = qthConverter.qthToLocation(qthString)
+        return if (loc == null) {
             showSnack(getString(R.string.pref_pos_qth_error))
             false
+        } else {
+            prefsManager.setStationPosition(loc.latitude, loc.longitude, loc.heightAMSL)
+            showSnack(getString(R.string.pref_pos_success))
+            true
         }
     }
-
+    
     private fun setPositionFromGPS() {
         val locPermResult = ContextCompat.checkSelfPermission(requireContext(), locPermString)
         if (locPermResult == PackageManager.PERMISSION_GRANTED) {
