@@ -25,14 +25,13 @@ import androidx.room.TypeConverters
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatTrans
 import com.rtbishop.look4sat.data.TleSource
-import com.rtbishop.look4sat.utility.Converters
 
 @Database(
     entities = [TleSource::class, SatEntry::class, SatTrans::class],
     version = 1,
     exportSchema = false
 )
-@TypeConverters(Converters::class)
+@TypeConverters(com.rtbishop.look4sat.utility.TypeConverters::class)
 abstract class SatelliteDb : RoomDatabase() {
 
     abstract fun sourcesDao(): SourcesDao

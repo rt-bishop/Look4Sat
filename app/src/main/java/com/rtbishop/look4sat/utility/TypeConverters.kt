@@ -21,19 +21,26 @@ package com.rtbishop.look4sat.utility
 
 import androidx.room.TypeConverter
 import com.github.amsacode.predict4java.TLE
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
-class Converters {
-    private val jsonConverter = Moshi.Builder().build()
-    private val jsonAdapter = jsonConverter.adapter(TLE::class.java)
-
+object TypeConverters {
+    
+    private lateinit var tleAdapter: JsonAdapter<TLE>
+    
+    fun initialize(moshi: Moshi) {
+        tleAdapter = moshi.adapter(TLE::class.java)
+    }
+    
+    @JvmStatic
     @TypeConverter
     fun tleToString(tle: TLE): String {
-        return jsonAdapter.toJson(tle)
+        return tleAdapter.toJson(tle)
     }
-
+    
+    @JvmStatic
     @TypeConverter
     fun tleFromString(string: String): TLE? {
-        return jsonAdapter.fromJson(string)
+        return tleAdapter.fromJson(string)
     }
 }

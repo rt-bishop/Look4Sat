@@ -20,6 +20,7 @@
 package com.rtbishop.look4sat.di
 
 import com.rtbishop.look4sat.repo.remote.TransmittersApi
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +38,12 @@ object NetworkModule {
     @Singleton
     fun getOkHttpClient(): OkHttpClient {
         return OkHttpClient()
+    }
+    
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi {
+        return Moshi.Builder().build()
     }
     
     @Provides

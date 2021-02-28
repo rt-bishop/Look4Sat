@@ -23,7 +23,6 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.rtbishop.look4sat.data.PassPrefs
 import javax.inject.Inject
 
 class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
@@ -40,13 +39,15 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
         const val keyPositionQTH = "setPositionQTH"
         const val keyIsFirstLaunch = "shouldShowSplash"
     }
-
-    fun getPassPrefs(): PassPrefs {
-        val hoursAhead = preferences.getInt(keyHoursAhead, 8)
-        val minEl = preferences.getInt(keyMinElevation, 16).toDouble()
-        return PassPrefs(hoursAhead, minEl)
+    
+    fun getHoursAhead(): Int {
+        return preferences.getInt(keyHoursAhead, 8)
     }
-
+    
+    fun getMinElevation(): Double {
+        return preferences.getInt(keyMinElevation, 16).toDouble()
+    }
+    
     fun getStationPosition(): GroundStationPosition {
         val defaultGSP = "0.0"
         val lat = preferences.getString(keyLatitude, defaultGSP)!!.toDouble()

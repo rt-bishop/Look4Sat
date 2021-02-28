@@ -130,21 +130,21 @@ class SharedViewModel @Inject constructor(
     private fun getPasses(entry: SatEntry, dateNow: Date): MutableList<SatPass> {
         val gsp = prefsManager.getStationPosition()
         val predictor = SatelliteFactory.createSatellite(entry.tle).getPredictor(gsp)
-        val hoursAhead = prefsManager.getPassPrefs().hoursAhead
+        val hoursAhead = prefsManager.getHoursAhead()
         val passes = predictor.getPasses(dateNow, hoursAhead, true)
         val passList = passes.map { SatPass(entry.tle, predictor, it) }
         return passList as MutableList<SatPass>
     }
 
     private fun sortList(passes: MutableList<SatPass>, dateNow: Date): MutableList<SatPass> {
-        val hoursAhead = prefsManager.getPassPrefs().hoursAhead
+        val hoursAhead = prefsManager.getHoursAhead()
         val dateFuture = Calendar.getInstance().apply {
             this.time = dateNow
             this.add(Calendar.HOUR, hoursAhead)
         }.time
         passes.removeAll { it.pass.startTime.after(dateFuture) }
         passes.removeAll { it.pass.endTime.before(dateNow) }
-        passes.removeAll { it.pass.maxEl < prefsManager.getPassPrefs().minEl }
+        passes.removeAll { it.pass.maxEl < prefsManager.getMinElevation() }
         passes.sortBy { it.pass.startTime }
         return passes
     }

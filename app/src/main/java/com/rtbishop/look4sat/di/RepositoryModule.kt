@@ -26,6 +26,8 @@ import com.rtbishop.look4sat.repo.local.EntriesDao
 import com.rtbishop.look4sat.repo.local.SatelliteDb
 import com.rtbishop.look4sat.repo.local.SourcesDao
 import com.rtbishop.look4sat.repo.local.TransmittersDao
+import com.rtbishop.look4sat.utility.TypeConverters
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -63,7 +65,8 @@ object RepositoryModule {
     
     @Provides
     @Singleton
-    fun getSatelliteDb(@ApplicationContext context: Context): SatelliteDb {
+    fun getSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
+        TypeConverters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
     }
 }
