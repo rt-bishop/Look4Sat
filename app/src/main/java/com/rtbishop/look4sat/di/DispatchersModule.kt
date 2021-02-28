@@ -33,15 +33,15 @@ object DispatchersModule {
     
     @Provides
     @DefaultDispatcher
-    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+    fun getDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
     
     @Provides
     @IoDispatcher
-    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+    fun getIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
     
     @Provides
     @MainDispatcher
-    fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+    fun getMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 }
 
 @Qualifier

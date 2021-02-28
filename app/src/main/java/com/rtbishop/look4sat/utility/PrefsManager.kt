@@ -26,6 +26,7 @@ import com.github.amsacode.predict4java.GroundStationPosition
 import javax.inject.Inject
 
 class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
+    
     companion object {
         const val keyLatitude = "latitude"
         const val keyLongitude = "longitude"
@@ -61,7 +62,6 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
             putString(keyLatitude, latitude.toString())
             putString(keyLongitude, longitude.toString())
             putString(keyAltitude, altitude.toString())
-            apply()
         }
     }
 
@@ -90,9 +90,6 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
     }
 
     fun setFirstLaunchDone() {
-        preferences.edit {
-            putBoolean(keyIsFirstLaunch, false)
-            apply()
-        }
+        preferences.edit { putBoolean(keyIsFirstLaunch, false) }
     }
 }

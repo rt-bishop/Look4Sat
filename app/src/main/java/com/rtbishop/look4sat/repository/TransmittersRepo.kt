@@ -17,42 +17,24 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
 
-package com.rtbishop.look4sat.di
+package com.rtbishop.look4sat.repository
 
+import com.rtbishop.look4sat.data.SatTrans
+import com.rtbishop.look4sat.repository.localData.TransmittersDao
 import com.rtbishop.look4sat.repository.remoteData.TransmittersApi
-import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
+class TransmittersRepo @Inject constructor(
+    private val transmittersApi: TransmittersApi,
+    private val transmittersDao: TransmittersDao
+) {
     
-    @Provides
-    @Singleton
-    fun getOkHttpClient(): OkHttpClient {
-        return OkHttpClient()
+    fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
+        return transmittersDao.getTransmittersForSat(catNum)
     }
     
-    @Provides
-    @Singleton
-    fun getMoshi(): Moshi {
-        return Moshi.Builder().build()
-    }
-    
-    @Provides
-    @Singleton
-    fun getTransmittersApi(): TransmittersApi {
-        return Retrofit.Builder()
-            .baseUrl("https://db.satnogs.org/api/")
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(TransmittersApi::class.java)
+    suspend fun updateTransmitters() {
+        transmittersDao.insertTransmitters(transmittersApi.fetchTransmitters())
     }
 }

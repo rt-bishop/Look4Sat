@@ -17,42 +17,27 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
 
-package com.rtbishop.look4sat.di
+package com.rtbishop.look4sat.repository.localData
 
-import com.rtbishop.look4sat.repository.remoteData.TransmittersApi
-import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Singleton
+import androidx.room.*
+import com.rtbishop.look4sat.data.TleSource
+import kotlinx.coroutines.flow.Flow
 
-@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
+@Dao
+interface SourcesDao {
     
-    @Provides
-    @Singleton
-    fun getOkHttpClient(): OkHttpClient {
-        return OkHttpClient()
+    @Query("SELECT * FROM sources")
+    fun getSources(): Flow<List<TleSource>>
+
+    @Transaction
+    suspend fun updateSources(sources: List<TleSource>) {
+        clearSources()
+        insertSources(sources)
     }
-    
-    @Provides
-    @Singleton
-    fun getMoshi(): Moshi {
-        return Moshi.Builder().build()
-    }
-    
-    @Provides
-    @Singleton
-    fun getTransmittersApi(): TransmittersApi {
-        return Retrofit.Builder()
-            .baseUrl("https://db.satnogs.org/api/")
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(TransmittersApi::class.java)
-    }
+
+    @Query("DELETE FROM sources")
+    suspend fun clearSources()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSources(sources: List<TleSource>)
 }

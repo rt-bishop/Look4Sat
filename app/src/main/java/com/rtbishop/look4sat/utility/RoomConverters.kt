@@ -17,42 +17,30 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
 
-package com.rtbishop.look4sat.di
+package com.rtbishop.look4sat.utility
 
-import com.rtbishop.look4sat.repository.remoteData.TransmittersApi
+import androidx.room.TypeConverter
+import com.github.amsacode.predict4java.TLE
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
+object RoomConverters {
     
-    @Provides
-    @Singleton
-    fun getOkHttpClient(): OkHttpClient {
-        return OkHttpClient()
+    private lateinit var tleAdapter: JsonAdapter<TLE>
+    
+    fun initialize(moshi: Moshi) {
+        tleAdapter = moshi.adapter(TLE::class.java)
     }
     
-    @Provides
-    @Singleton
-    fun getMoshi(): Moshi {
-        return Moshi.Builder().build()
+    @JvmStatic
+    @TypeConverter
+    fun tleToString(tle: TLE): String {
+        return tleAdapter.toJson(tle)
     }
     
-    @Provides
-    @Singleton
-    fun getTransmittersApi(): TransmittersApi {
-        return Retrofit.Builder()
-            .baseUrl("https://db.satnogs.org/api/")
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(TransmittersApi::class.java)
+    @JvmStatic
+    @TypeConverter
+    fun tleFromString(string: String): TLE? {
+        return tleAdapter.fromJson(string)
     }
 }

@@ -22,11 +22,11 @@ package com.rtbishop.look4sat.di
 import android.content.ContentResolver
 import android.content.Context
 import androidx.room.Room
-import com.rtbishop.look4sat.repo.local.EntriesDao
-import com.rtbishop.look4sat.repo.local.SatelliteDb
-import com.rtbishop.look4sat.repo.local.SourcesDao
-import com.rtbishop.look4sat.repo.local.TransmittersDao
-import com.rtbishop.look4sat.utility.TypeConverters
+import com.rtbishop.look4sat.repository.localData.EntriesDao
+import com.rtbishop.look4sat.repository.localData.SatelliteDb
+import com.rtbishop.look4sat.repository.localData.SourcesDao
+import com.rtbishop.look4sat.repository.localData.TransmittersDao
+import com.rtbishop.look4sat.utility.RoomConverters
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -66,7 +66,7 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun getSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
-        TypeConverters.initialize(moshi)
+        RoomConverters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
     }
 }

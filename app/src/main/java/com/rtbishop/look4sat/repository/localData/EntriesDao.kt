@@ -17,42 +17,36 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
 
-package com.rtbishop.look4sat.di
+package com.rtbishop.look4sat.repository.localData
 
-import com.rtbishop.look4sat.repository.remoteData.TransmittersApi
-import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Singleton
+import androidx.room.*
+import com.rtbishop.look4sat.data.SatEntry
+import kotlinx.coroutines.flow.Flow
 
-@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
+@Dao
+interface EntriesDao {
     
-    @Provides
-    @Singleton
-    fun getOkHttpClient(): OkHttpClient {
-        return OkHttpClient()
+    @Query("SELECT * FROM entries ORDER BY name ASC")
+    fun getEntries(): Flow<List<SatEntry>>
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
+    
+    @Query("SELECT * FROM entries WHERE isSelected = 1")
+    suspend fun getSelectedEntries(): List<SatEntry>
+    
+    @Query("SELECT catNum FROM entries WHERE isSelected = 1")
+    suspend fun getSelectedCatNums(): List<Int>
+    
+    @Transaction
+    suspend fun updateEntriesSelection(catNums: List<Int>) {
+        clearSelection()
+        catNums.forEach { catNum -> updateSelection(catNum) }
     }
     
-    @Provides
-    @Singleton
-    fun getMoshi(): Moshi {
-        return Moshi.Builder().build()
-    }
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearSelection()
     
-    @Provides
-    @Singleton
-    fun getTransmittersApi(): TransmittersApi {
-        return Retrofit.Builder()
-            .baseUrl("https://db.satnogs.org/api/")
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(TransmittersApi::class.java)
-    }
+    @Query("UPDATE entries SET isSelected = 1 WHERE catNum = :catNum")
+    suspend fun updateSelection(catNum: Int)
 }
