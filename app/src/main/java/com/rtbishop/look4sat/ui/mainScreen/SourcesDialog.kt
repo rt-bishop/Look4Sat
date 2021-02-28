@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,6 +48,10 @@ class SourcesDialog : AppCompatDialogFragment() {
         viewModel.getSources().observe(viewLifecycleOwner, { sources ->
             val sourcesAdapter = SourcesAdapter(sources as MutableList<TleSource>)
             DialogSourcesBinding.bind(view).apply {
+                dialog?.window?.setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
                 tleSourcesRecycler.apply {
                     adapter = sourcesAdapter
                     layoutManager = LinearLayoutManager(requireContext())

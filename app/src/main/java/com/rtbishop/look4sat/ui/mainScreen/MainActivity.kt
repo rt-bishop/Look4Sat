@@ -25,17 +25,24 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
+import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
+    
+    @Inject
+    lateinit var prefsManager: PrefsManager
+    
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         ActivityMainBinding.inflate(layoutInflater).apply {
             setContentView(root)
             val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
             navBottom.setupWithNavController(navHost.navController)
+            if (prefsManager.isFirstLaunch()) navHost.navController.navigate(R.id.nav_dialog_splash)
         }
     }
 }

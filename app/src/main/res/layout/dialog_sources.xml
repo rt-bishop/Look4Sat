@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tleSourcesDialog"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/greyDark"
     android:padding="4dp">
@@ -32,17 +32,18 @@
     <ImageButton
         android:id="@+id/tleSourceBtnAdd"
         android:layout_width="48dp"
-        android:layout_height="0dp"
+        android:layout_height="48dp"
         android:backgroundTint="@color/greySurface"
         android:contentDescription="@string/placeholder"
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="@+id/tleSourcesWarning"
+        app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toEndOf="@+id/tleSourcesRecycler"
         app:layout_constraintTop_toTopOf="@+id/tleSourcesTitle" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tleSourcesRecycler"
-        android:layout_width="266dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"

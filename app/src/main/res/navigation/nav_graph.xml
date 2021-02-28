@@ -70,5 +70,9 @@
         android:id="@+id/nav_dialog_sources"
         android:name="com.rtbishop.look4sat.ui.mainScreen.SourcesDialog"
         tools:layout="@layout/dialog_sources" />
+    <dialog
+        android:id="@+id/nav_dialog_splash"
+        android:name="com.rtbishop.look4sat.ui.mainScreen.SplashDialog"
+        tools:layout="@layout/dialog_splash" />
 
 </navigation>

@@ -73,13 +73,10 @@
     <string name="pref_time_utc_title">Show pass time in UTC</string>
     <string name="pref_compass_title">Use sensors to rotate PolarView</string>
 
-    <string name="splash_tle_title" translatable="false">Two-Line Element set</string>
-    <string name="splash_tle_msg">Look4Sat uses a TLE set to calculate the satellite positions.
-        The TLE data looses precision over time, so it is recommended to update
-        it weekly using the buttons in the Satellites menu</string>
-    <string name="splash_loc_msg">Look4Sat needs to know your position to deliver the accurate
-        passes predictions. Please set the position using the buttons (GPS, QTH Locator)
-        in the Settings menu</string>
+    <string name="splash_tle_msg">TLE satellite data looses precision over time, so it is
+        recommended to update it every week or so</string>
+    <string name="splash_loc_msg">To get the accurate predictions please set
+        the ground station position via the Settings menu</string>
 
     <string name="info_version">Version: %s</string>
     <string name="info_subtitle">Satellite tracker and pass predictor</string>

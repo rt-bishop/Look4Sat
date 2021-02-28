@@ -14,24 +14,6 @@
         <item name="snackbarTextViewStyle">@style/Snackbar.Text</item>
     </style>
 
-    <style name="SplashText">
-        <item name="android:padding">8dp</item>
-        <item name="android:textSize">23sp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="SplashText.Msg">
-        <item name="android:textSize">17sp</item>
-    </style>
-
-    <style name="SplashText.Icon">
-        <item name="android:layout_width">128dp</item>
-        <item name="android:layout_height">128dp</item>
-    </style>
-
     <style name="Snackbar" parent="@style/Widget.MaterialComponents.Snackbar">
         <item name="backgroundTint">@color/greySurface</item>
     </style>
