@@ -103,11 +103,16 @@ class SharedViewModel @Inject constructor(
     }
 
     fun updateEntriesFromSources(sources: List<TleSource>) {
+        val sourcesList = if (sources.isEmpty()) {
+            prefsManager.getDefaultSources()
+        } else {
+            sources
+        }
         postAppEvent(Event(0))
         viewModelScope.launch {
             try {
-                sourcesRepo.updateSources(sources)
-                entriesRepo.updateEntriesFromWeb(sources)
+                sourcesRepo.updateSources(sourcesList)
+                entriesRepo.updateEntriesFromWeb(sourcesList)
                 transmittersRepo.updateTransmitters()
             } catch (exception: Exception) {
                 postAppEvent(Event(1))
@@ -150,10 +155,6 @@ class SharedViewModel @Inject constructor(
     }
 
     private fun updateDefaultSourcesAndEntries() {
-        val defaultTleSources = listOf(
-            TleSource("https://celestrak.com/NORAD/elements/active.txt"),
-            TleSource("https://amsat.org/tle/current/nasabare.txt")
-        )
-        updateEntriesFromSources(defaultTleSources)
+        updateEntriesFromSources(prefsManager.getDefaultSources())
     }
 }

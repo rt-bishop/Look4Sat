@@ -23,6 +23,7 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
+import com.rtbishop.look4sat.data.TleSource
 import javax.inject.Inject
 
 class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
@@ -84,12 +85,19 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
     fun shouldUseCompass(): Boolean {
         return preferences.getBoolean(keyCompass, true)
     }
-
+    
     fun isFirstLaunch(): Boolean {
         return preferences.getBoolean(keyIsFirstLaunch, true)
     }
-
+    
     fun setFirstLaunchDone() {
         preferences.edit { putBoolean(keyIsFirstLaunch, false) }
+    }
+    
+    fun getDefaultSources(): List<TleSource> {
+        return listOf(
+            TleSource("https://celestrak.com/NORAD/elements/active.txt"),
+            TleSource("https://amsat.org/tle/current/nasabare.txt")
+        )
     }
 }
