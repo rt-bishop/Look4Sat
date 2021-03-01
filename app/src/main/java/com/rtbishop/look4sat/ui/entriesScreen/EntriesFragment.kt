@@ -41,7 +41,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private val viewModel: SharedViewModel by activityViewModels()
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            viewModel.updateEntriesFromFile(uri)
+            uri?.let {
+                viewModel.updateEntriesFromFile(uri)
+            }
         }
     private var binding: FragmentEntriesBinding? = null
     private var entriesAdapter: EntriesAdapter? = null
