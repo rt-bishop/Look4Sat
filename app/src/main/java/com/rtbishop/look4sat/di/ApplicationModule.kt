@@ -19,6 +19,7 @@
 
 package com.rtbishop.look4sat.di
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
@@ -36,13 +37,19 @@ object ApplicationModule {
     
     @Provides
     @Singleton
-    fun getLocationManager(@ApplicationContext context: Context): LocationManager {
+    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
+        return context.contentResolver
+    }
+    
+    @Provides
+    @Singleton
+    fun provideLocationManager(@ApplicationContext context: Context): LocationManager {
         return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
     
     @Provides
     @Singleton
-    fun getSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
 }

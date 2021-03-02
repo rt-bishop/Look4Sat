@@ -19,7 +19,6 @@
 
 package com.rtbishop.look4sat.di
 
-import android.content.ContentResolver
 import android.content.Context
 import androidx.room.Room
 import com.rtbishop.look4sat.repository.localData.EntriesDao
@@ -41,31 +40,25 @@ object RepositoryModule {
     
     @Provides
     @Singleton
-    fun getContentResolver(@ApplicationContext context: Context): ContentResolver {
-        return context.contentResolver
-    }
-    
-    @Provides
-    @Singleton
-    fun getEntriesDao(db: SatelliteDb): EntriesDao {
+    fun provideEntriesDao(db: SatelliteDb): EntriesDao {
         return db.entriesDao()
     }
     
     @Provides
     @Singleton
-    fun getSourcesDao(db: SatelliteDb): SourcesDao {
+    fun provideSourcesDao(db: SatelliteDb): SourcesDao {
         return db.sourcesDao()
     }
     
     @Provides
     @Singleton
-    fun getTransmittersDao(db: SatelliteDb): TransmittersDao {
+    fun provideTransmittersDao(db: SatelliteDb): TransmittersDao {
         return db.transmittersDao()
     }
     
     @Provides
     @Singleton
-    fun getSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
+    fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
         RoomConverters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
     }

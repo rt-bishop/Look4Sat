@@ -36,19 +36,19 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun getOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient()
     }
     
     @Provides
     @Singleton
-    fun getMoshi(): Moshi {
+    fun provideMoshi(): Moshi {
         return Moshi.Builder().build()
     }
     
     @Provides
     @Singleton
-    fun getTransmittersApi(): TransmittersApi {
+    fun provideTransmittersApi(): TransmittersApi {
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
             .addConverterFactory(MoshiConverterFactory.create())
