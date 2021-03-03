@@ -35,7 +35,7 @@ import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.data.SelectedSat
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.repository.PrefsRepo
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.ITileSource
@@ -53,7 +53,7 @@ import javax.inject.Inject
 class MapFragment : Fragment(R.layout.fragment_map) {
 
     @Inject
-    lateinit var prefsManager: PrefsManager
+    lateinit var prefsRepo: PrefsRepo
     private lateinit var binding: FragmentMapBinding
     private val mapViewModel: MapViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by activityViewModels()
@@ -62,7 +62,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getInstance().load(requireContext(), prefsManager.preferences)
+        Configuration.getInstance().load(requireContext(), prefsRepo.preferences)
         binding = FragmentMapBinding.bind(view).apply {
             mapView.apply {
                 setMultiTouchControls(true)
@@ -129,7 +129,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         binding.apply {
             val markers = FolderOverlay()
             map.entries.forEach {
-                if (prefsManager.shouldUseTextLabels()) {
+                if (prefsRepo.shouldUseTextLabels()) {
                     Marker(mapView).apply {
                         setInfoWindow(null)
                         textLabelFontSize = 24

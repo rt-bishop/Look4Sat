@@ -24,9 +24,8 @@ import androidx.lifecycle.*
 import com.github.amsacode.predict4java.SatelliteFactory
 import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repository.EntriesRepo
-import com.rtbishop.look4sat.repository.SourcesRepo
+import com.rtbishop.look4sat.repository.PrefsRepo
 import com.rtbishop.look4sat.repository.TransmittersRepo
-import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.getPredictor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,8 +36,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(
-    private val prefsManager: PrefsManager,
-    private val sourcesRepo: SourcesRepo,
+    private val prefsRepo: PrefsRepo,
     private val entriesRepo: EntriesRepo,
     private val transmittersRepo: TransmittersRepo
 ) : ViewModel() {
@@ -49,9 +47,9 @@ class SharedViewModel @Inject constructor(
     private var shouldTriggerCalculation = true
     
     init {
-        if (prefsManager.isFirstLaunch()) {
+        if (prefsRepo.isFirstLaunch()) {
             updateDefaultSourcesAndEntries()
-            prefsManager.setFirstLaunchDone()
+            prefsRepo.setFirstLaunchDone()
         }
     }
     
@@ -63,7 +61,7 @@ class SharedViewModel @Inject constructor(
         }
     }
     
-    fun getSources() = sourcesRepo.getSources().asLiveData()
+    fun getSources() = liveData { emit(prefsRepo.loadTleSources()) }
     fun getEntries() = entriesRepo.getEntries().asLiveData()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
     fun getTransmittersForSat(satId: Int) =
@@ -103,16 +101,11 @@ class SharedViewModel @Inject constructor(
     }
 
     fun updateEntriesFromSources(sources: List<TleSource>) {
-        val sourcesList = if (sources.isEmpty()) {
-            prefsManager.getDefaultSources()
-        } else {
-            sources
-        }
         postAppEvent(Event(0))
         viewModelScope.launch {
             try {
-                sourcesRepo.updateSources(sourcesList)
-                entriesRepo.updateEntriesFromWeb(sourcesList)
+                prefsRepo.saveTleSources(sources)
+                entriesRepo.updateEntriesFromWeb(sources)
                 transmittersRepo.updateTransmitters()
             } catch (exception: Exception) {
                 postAppEvent(Event(1))
@@ -133,28 +126,28 @@ class SharedViewModel @Inject constructor(
     }
 
     private fun getPasses(entry: SatEntry, dateNow: Date): MutableList<SatPass> {
-        val gsp = prefsManager.getStationPosition()
+        val gsp = prefsRepo.getStationPosition()
         val predictor = SatelliteFactory.createSatellite(entry.tle).getPredictor(gsp)
-        val hoursAhead = prefsManager.getHoursAhead()
+        val hoursAhead = prefsRepo.getHoursAhead()
         val passes = predictor.getPasses(dateNow, hoursAhead, true)
         val passList = passes.map { SatPass(entry.tle, predictor, it) }
         return passList as MutableList<SatPass>
     }
 
     private fun sortList(passes: MutableList<SatPass>, dateNow: Date): MutableList<SatPass> {
-        val hoursAhead = prefsManager.getHoursAhead()
+        val hoursAhead = prefsRepo.getHoursAhead()
         val dateFuture = Calendar.getInstance().apply {
             this.time = dateNow
             this.add(Calendar.HOUR, hoursAhead)
         }.time
         passes.removeAll { it.pass.startTime.after(dateFuture) }
         passes.removeAll { it.pass.endTime.before(dateNow) }
-        passes.removeAll { it.pass.maxEl < prefsManager.getMinElevation() }
+        passes.removeAll { it.pass.maxEl < prefsRepo.getMinElevation() }
         passes.sortBy { it.pass.startTime }
         return passes
     }
 
     private fun updateDefaultSourcesAndEntries() {
-        updateEntriesFromSources(prefsManager.getDefaultSources())
+        updateEntriesFromSources(prefsRepo.loadTleSources())
     }
 }

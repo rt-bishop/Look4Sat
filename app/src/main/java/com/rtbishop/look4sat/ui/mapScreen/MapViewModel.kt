@@ -29,7 +29,7 @@ import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.data.SelectedSat
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.QthConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +49,7 @@ import kotlin.math.sqrt
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val prefsManager: PrefsManager,
+    private val prefsRepo: PrefsRepo,
     private val qthConverter: QthConverter
 ) : ViewModel() {
     
@@ -176,7 +176,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun getStationPosition(): Position {
-        val stationPosition = prefsManager.getStationPosition()
+        val stationPosition = prefsRepo.getStationPosition()
         return getOsmPosition(stationPosition.latitude, stationPosition.longitude, false)
     }
 

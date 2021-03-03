@@ -22,18 +22,23 @@ package com.rtbishop.look4sat.repository.localData
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatTrans
-import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.utility.RoomConverters
 
-@Database(entities = [TleSource::class, SatEntry::class, SatTrans::class], version = 1)
+@Database(entities = [SatEntry::class, SatTrans::class], version = 2)
 @TypeConverters(RoomConverters::class)
 abstract class SatelliteDb : RoomDatabase() {
-    
-    abstract fun sourcesDao(): SourcesDao
     
     abstract fun entriesDao(): EntriesDao
     
     abstract fun transmittersDao(): TransmittersDao
+}
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE sources")
+    }
 }

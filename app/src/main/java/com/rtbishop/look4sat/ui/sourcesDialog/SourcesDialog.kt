@@ -28,9 +28,8 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
+import com.rtbishop.look4sat.ui.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,7 +44,8 @@ class SourcesDialog : AppCompatDialogFragment() {
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
         viewModel.getSources().observe(viewLifecycleOwner, { sources ->
-            val sourcesAdapter = SourcesAdapter(sources as MutableList<TleSource>)
+            val sourcesAdapter = SourcesAdapter()
+            sourcesAdapter.setSources(sources)
             DialogSourcesBinding.bind(view).apply {
                 dialog?.window?.setLayout(
                     WindowManager.LayoutParams.MATCH_PARENT,

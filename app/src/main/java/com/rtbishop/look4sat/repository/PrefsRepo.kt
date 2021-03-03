@@ -1,34 +1,40 @@
 /*******************************************************************************
- Look4Sat. Amateur radio satellite tracker and pass predictor.
- Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
+Look4Sat. Amateur radio satellite tracker and pass predictor.
+Copyright (C) 2019, 2020 Arty Bishop (bishop.arty@gmail.com)
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
 
-package com.rtbishop.look4sat.utility
+package com.rtbishop.look4sat.repository
 
 import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import androidx.core.content.edit
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.rtbishop.look4sat.data.TleSource
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import javax.inject.Inject
 
-class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
+class PrefsRepo @Inject constructor(val preferences: SharedPreferences, val moshi: Moshi) {
+    
+    private val sourcesType = Types.newParameterizedType(List::class.java, TleSource::class.java)
+    private val sourcesAdapter = moshi.adapter<List<TleSource>>(sourcesType)
     
     companion object {
+        const val keySources = "tleSources"
         const val keyLatitude = "latitude"
         const val keyLongitude = "longitude"
         const val keyAltitude = "altitude"
@@ -94,7 +100,25 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences) {
         preferences.edit { putBoolean(keyIsFirstLaunch, false) }
     }
     
-    fun getDefaultSources(): List<TleSource> {
+    fun loadTleSources(): List<TleSource> {
+        preferences.getString(keySources, null)?.let { sourcesJson ->
+            sourcesAdapter.fromJson(sourcesJson)?.let { loadedSources ->
+                return if (loadedSources.isNotEmpty()) {
+                    loadedSources
+                } else {
+                    loadDefaultSources()
+                }
+            }
+        }
+        return loadDefaultSources()
+    }
+    
+    fun saveTleSources(sources: List<TleSource>) {
+        val sourcesJson = sourcesAdapter.toJson(sources)
+        preferences.edit { putString(keySources, sourcesJson) }
+    }
+    
+    private fun loadDefaultSources(): List<TleSource> {
         return listOf(
             TleSource("https://celestrak.com/NORAD/elements/active.txt"),
             TleSource("https://amsat.org/tle/current/nasabare.txt")

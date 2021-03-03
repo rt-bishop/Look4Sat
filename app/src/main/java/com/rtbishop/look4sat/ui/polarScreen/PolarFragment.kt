@@ -36,7 +36,7 @@ import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,7 +48,7 @@ import kotlin.math.round
 class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     @Inject
-    lateinit var prefsManager: PrefsManager
+    lateinit var prefsRepo: PrefsRepo
 
     private lateinit var transmitterAdapter: TransAdapter
     private lateinit var binding: FragmentPolarBinding
@@ -62,13 +62,13 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPolarBinding.bind(view)
         sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        magneticDeclination = prefsManager.getMagDeclination()
+        magneticDeclination = prefsRepo.getMagDeclination()
         observePasses()
     }
 
     override fun onResume() {
         super.onResume()
-        if (prefsManager.shouldUseCompass()) {
+        if (prefsRepo.shouldUseCompass()) {
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
             }
@@ -77,7 +77,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        if (prefsManager.shouldUseCompass()) {
+        if (prefsRepo.shouldUseCompass()) {
             sensorManager.unregisterListener(this)
         }
     }

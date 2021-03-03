@@ -30,7 +30,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +43,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
     lateinit var locationManager: LocationManager
     
     @Inject
-    lateinit var prefsManager: PrefsManager
+    lateinit var prefsRepo: PrefsRepo
     
     @Inject
     lateinit var qthConverter: QthConverter
@@ -64,14 +64,14 @@ class PrefsFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        findPreference<Preference>(PrefsManager.keyPositionGPS)?.apply {
+        findPreference<Preference>(PrefsRepo.keyPositionGPS)?.apply {
             setOnPreferenceClickListener {
                 setPositionFromGPS()
                 return@setOnPreferenceClickListener true
             }
         }
         
-        findPreference<Preference>(PrefsManager.keyPositionQTH)?.apply {
+        findPreference<Preference>(PrefsRepo.keyPositionQTH)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 setPositionFromQth(newValue.toString())
             }
@@ -84,7 +84,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
             showSnack(getString(R.string.pref_pos_qth_error))
             false
         } else {
-            prefsManager.setStationPosition(loc.latitude, loc.longitude, loc.heightAMSL)
+            prefsRepo.setStationPosition(loc.latitude, loc.longitude, loc.heightAMSL)
             showSnack(getString(R.string.pref_pos_success))
             true
         }
@@ -99,7 +99,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
                 val latitude = location.latitude.round(4)
                 val longitude = location.longitude.round(4)
                 val altitude = location.altitude.round(1)
-                prefsManager.setStationPosition(latitude, longitude, altitude)
+                prefsRepo.setStationPosition(latitude, longitude, altitude)
                 showSnack(getString(R.string.pref_pos_success))
             } else showSnack(getString(R.string.pref_pos_gps_null))
         } else requestPermissionLauncher.launch(locPermString)

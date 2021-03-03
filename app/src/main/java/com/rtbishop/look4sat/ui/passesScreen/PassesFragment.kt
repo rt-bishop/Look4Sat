@@ -30,7 +30,7 @@ import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +41,7 @@ import javax.inject.Inject
 class PassesFragment : Fragment(R.layout.fragment_passes) {
 
     @Inject
-    lateinit var prefsManager: PrefsManager
+    lateinit var prefsRepo: PrefsRepo
 
     private var binding: FragmentPassesBinding? = null
     private var passesAdapter: PassesAdapter? = null
@@ -90,7 +90,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setupComponents() {
-        passesAdapter = PassesAdapter(requireContext(), prefsManager.shouldUseUTC())
+        passesAdapter = PassesAdapter(requireContext(), prefsRepo.shouldUseUTC())
         binding?.apply {
             passesRecycler.apply {
                 setHasFixedSize(true)

@@ -22,8 +22,8 @@ package com.rtbishop.look4sat.di
 import android.content.Context
 import androidx.room.Room
 import com.rtbishop.look4sat.repository.localData.EntriesDao
+import com.rtbishop.look4sat.repository.localData.MIGRATION_1_2
 import com.rtbishop.look4sat.repository.localData.SatelliteDb
-import com.rtbishop.look4sat.repository.localData.SourcesDao
 import com.rtbishop.look4sat.repository.localData.TransmittersDao
 import com.rtbishop.look4sat.utility.RoomConverters
 import com.squareup.moshi.Moshi
@@ -46,12 +46,6 @@ object RepositoryModule {
     
     @Provides
     @Singleton
-    fun provideSourcesDao(db: SatelliteDb): SourcesDao {
-        return db.sourcesDao()
-    }
-    
-    @Provides
-    @Singleton
     fun provideTransmittersDao(db: SatelliteDb): TransmittersDao {
         return db.transmittersDao()
     }
@@ -60,6 +54,8 @@ object RepositoryModule {
     @Singleton
     fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
         RoomConverters.initialize(moshi)
-        return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb").build()
+        return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb")
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 }
