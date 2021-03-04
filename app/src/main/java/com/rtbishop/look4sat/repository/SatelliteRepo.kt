@@ -23,34 +23,30 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.SatTrans
 import com.rtbishop.look4sat.data.TleSource
 import com.rtbishop.look4sat.di.IoDispatcher
-import com.rtbishop.look4sat.repository.localData.EntriesDao
+import com.rtbishop.look4sat.repository.localData.SatelliteDao
+import com.rtbishop.look4sat.repository.remoteData.SatelliteService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.InputStream
 import javax.inject.Inject
 
-class EntriesRepo @Inject constructor(
-    private val entriesDao: EntriesDao,
-    private val client: OkHttpClient,
+class SatelliteRepo @Inject constructor(
     private val resolver: ContentResolver,
+    private val satelliteDao: SatelliteDao,
+    private val satelliteService: SatelliteService,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     
     fun getEntries(): Flow<List<SatEntry>> {
-        return entriesDao.getEntries()
-    }
-    
-    suspend fun getSelectedEntries(): List<SatEntry> {
-        return entriesDao.getSelectedEntries()
+        return satelliteDao.getEntries()
     }
     
     suspend fun updateEntriesSelection(catNums: List<Int>) {
-        entriesDao.updateEntriesSelection(catNums)
+        satelliteDao.updateEntriesSelection(catNums)
     }
     
     suspend fun updateEntriesFromFile(uri: Uri) {
@@ -68,8 +64,7 @@ class EntriesRepo @Inject constructor(
         withContext(ioDispatcher) {
             val streams = mutableListOf<InputStream>()
             sources.forEach { source ->
-                val request = Request.Builder().url(source.url).build()
-                val stream = client.newCall(request).execute().body()?.byteStream()
+                val stream = satelliteService.fetchFile(source.url).body()?.byteStream()
                 stream?.let { inputStream -> streams.add(inputStream) }
             }
             val importedEntries = mutableListOf<SatEntry>()
@@ -81,9 +76,17 @@ class EntriesRepo @Inject constructor(
         }
     }
     
+    fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
+        return satelliteDao.getTransmittersForSat(catNum)
+    }
+    
+    suspend fun updateTransmitters() {
+        satelliteDao.insertTransmitters(satelliteService.fetchTransmitters())
+    }
+    
     private suspend fun updateAndRestoreSelection(entries: List<SatEntry>) {
-        val selectedCatNums = entriesDao.getSelectedCatNums()
-        entriesDao.insertEntries(entries)
-        entriesDao.updateEntriesSelection(selectedCatNums)
+        val selectedCatNums = satelliteDao.getSelectedCatNums()
+        satelliteDao.insertEntries(entries)
+        satelliteDao.updateEntriesSelection(selectedCatNums)
     }
 }

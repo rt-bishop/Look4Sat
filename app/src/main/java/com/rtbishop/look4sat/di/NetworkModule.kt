@@ -19,13 +19,12 @@
 
 package com.rtbishop.look4sat.di
 
-import com.rtbishop.look4sat.repository.remoteData.TransmittersApi
+import com.rtbishop.look4sat.repository.remoteData.SatelliteService
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -36,23 +35,17 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient()
-    }
-    
-    @Provides
-    @Singleton
     fun provideMoshi(): Moshi {
         return Moshi.Builder().build()
     }
     
     @Provides
     @Singleton
-    fun provideTransmittersApi(): TransmittersApi {
+    fun provideSatDataService(): SatelliteService {
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
-            .create(TransmittersApi::class.java)
+            .create(SatelliteService::class.java)
     }
 }

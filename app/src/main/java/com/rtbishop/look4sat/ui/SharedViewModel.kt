@@ -23,9 +23,8 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.SatelliteFactory
 import com.rtbishop.look4sat.data.*
-import com.rtbishop.look4sat.repository.EntriesRepo
+import com.rtbishop.look4sat.repository.SatelliteRepo
 import com.rtbishop.look4sat.repository.PrefsRepo
-import com.rtbishop.look4sat.repository.TransmittersRepo
 import com.rtbishop.look4sat.utility.getPredictor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,8 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SharedViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
-    private val entriesRepo: EntriesRepo,
-    private val transmittersRepo: TransmittersRepo
+    private val satelliteRepo: SatelliteRepo,
 ) : ViewModel() {
     
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
@@ -62,10 +60,10 @@ class SharedViewModel @Inject constructor(
     }
     
     fun getSources() = liveData { emit(prefsRepo.loadTleSources()) }
-    fun getEntries() = entriesRepo.getEntries().asLiveData()
+    fun getEntries() = satelliteRepo.getEntries().asLiveData()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
     fun getTransmittersForSat(satId: Int) =
-        transmittersRepo.getTransmittersForSat(satId).asLiveData()
+        satelliteRepo.getTransmittersForSat(satId).asLiveData()
     
     fun triggerCalculation() {
         if (shouldTriggerCalculation) {
@@ -93,7 +91,7 @@ class SharedViewModel @Inject constructor(
         postAppEvent(Event(0))
         viewModelScope.launch {
             try {
-                entriesRepo.updateEntriesFromFile(uri)
+                satelliteRepo.updateEntriesFromFile(uri)
             } catch (exception: Exception) {
                 postAppEvent(Event(1))
             }
@@ -105,8 +103,8 @@ class SharedViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 prefsRepo.saveTleSources(sources)
-                entriesRepo.updateEntriesFromWeb(sources)
-                transmittersRepo.updateTransmitters()
+                satelliteRepo.updateEntriesFromWeb(sources)
+                satelliteRepo.updateTransmitters()
             } catch (exception: Exception) {
                 postAppEvent(Event(1))
             }
@@ -117,7 +115,7 @@ class SharedViewModel @Inject constructor(
         viewModelScope.launch {
             selectedEntries = entries.filter { it.isSelected }
             calculatePasses()
-            entriesRepo.updateEntriesSelection(selectedEntries.map { it.catNum })
+            satelliteRepo.updateEntriesSelection(selectedEntries.map { it.catNum })
         }
     }
 

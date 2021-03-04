@@ -17,25 +17,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
 
-package com.rtbishop.look4sat.repository.localData
+package com.rtbishop.look4sat.repository.remoteData
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatTrans
+import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Streaming
+import retrofit2.http.Url
 
-@Database(entities = [SatEntry::class, SatTrans::class], version = 2)
-@TypeConverters(RoomConverters::class)
-abstract class SatelliteDb : RoomDatabase() {
+interface SatelliteService {
     
-    abstract fun satelliteDao(): SatelliteDao
-}
-
-val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE sources")
-    }
+    @Streaming
+    @GET
+    suspend fun fetchFile(@Url fileUrl: String): Response<ResponseBody>
+    
+    @GET("transmitters/")
+    suspend fun fetchTransmitters(): List<SatTrans>
 }

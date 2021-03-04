@@ -21,11 +21,10 @@ package com.rtbishop.look4sat.di
 
 import android.content.Context
 import androidx.room.Room
-import com.rtbishop.look4sat.repository.localData.EntriesDao
 import com.rtbishop.look4sat.repository.localData.MIGRATION_1_2
+import com.rtbishop.look4sat.repository.localData.SatelliteDao
 import com.rtbishop.look4sat.repository.localData.SatelliteDb
-import com.rtbishop.look4sat.repository.localData.TransmittersDao
-import com.rtbishop.look4sat.utility.RoomConverters
+import com.rtbishop.look4sat.repository.localData.RoomConverters
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -40,14 +39,8 @@ object RepositoryModule {
     
     @Provides
     @Singleton
-    fun provideEntriesDao(db: SatelliteDb): EntriesDao {
-        return db.entriesDao()
-    }
-    
-    @Provides
-    @Singleton
-    fun provideTransmittersDao(db: SatelliteDb): TransmittersDao {
-        return db.transmittersDao()
+    fun provideSatDataDao(db: SatelliteDb): SatelliteDao {
+        return db.satelliteDao()
     }
     
     @Provides

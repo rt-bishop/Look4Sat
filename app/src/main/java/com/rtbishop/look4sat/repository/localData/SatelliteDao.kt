@@ -19,19 +19,38 @@
 
 package com.rtbishop.look4sat.repository.localData
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatTrans
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface TransmittersDao {
+interface SatelliteDao {
     
-    @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :catNum")
-    fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>>
+    @Query("SELECT * FROM entries ORDER BY name ASC")
+    fun getEntries(): Flow<List<SatEntry>>
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
+    
+    @Query("SELECT catNum FROM entries WHERE isSelected = 1")
+    suspend fun getSelectedCatNums(): List<Int>
+    
+    @Transaction
+    suspend fun updateEntriesSelection(catNums: List<Int>) {
+        clearSelection()
+        catNums.forEach { catNum -> updateSelection(catNum) }
+    }
+    
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearSelection()
+    
+    @Query("UPDATE entries SET isSelected = 1 WHERE catNum = :catNum")
+    suspend fun updateSelection(catNum: Int)
     
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransmitters(transmitters: List<SatTrans>)
+    
+    @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :catNum")
+    fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>>
 }
