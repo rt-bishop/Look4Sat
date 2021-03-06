@@ -102,7 +102,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
             }
             passesFab.setOnClickListener { viewModel.calculatePasses() }
         }
-        viewModel.triggerCalculation()
     }
 
     private fun tickMainTimer(timeNow: Long) {

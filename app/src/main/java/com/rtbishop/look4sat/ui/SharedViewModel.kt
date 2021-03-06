@@ -41,13 +41,13 @@ class SharedViewModel @Inject constructor(
     
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
     private val _appEvent = MutableLiveData<Event<Int>>()
-    private var shouldTriggerCalculation = true
     
     init {
         if (prefsRepo.isFirstLaunch()) {
             updateDefaultSourcesAndEntries()
             prefsRepo.setFirstLaunchDone()
         }
+        calculatePasses()
     }
     
     fun getAppEvent(): LiveData<Event<Int>> = _appEvent
@@ -64,15 +64,7 @@ class SharedViewModel @Inject constructor(
     fun getTransmittersForSat(satId: Int) =
         satelliteRepo.getTransmittersForSat(satId).asLiveData()
     
-    fun triggerCalculation() {
-        if (shouldTriggerCalculation) {
-            shouldTriggerCalculation = false
-            calculatePasses()
-        }
-    }
-    
     fun calculatePasses(dateNow: Date = Date(System.currentTimeMillis())) {
-        shouldTriggerCalculation = false
         _passes.value = Result.InProgress
         viewModelScope.launch(Dispatchers.Default) {
             val passes = mutableListOf<SatPass>()

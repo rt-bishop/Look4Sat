@@ -51,7 +51,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
         setupComponents()
-        observeEntries()
+        setupObservers()
     }
     
     private fun setupComponents() {
@@ -71,8 +71,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             searchBar.clearFocus()
         }
     }
-
-    private fun observeEntries() {
+    
+    private fun setupObservers() {
         setLoading()
         viewModel.getSatItems().observe(viewLifecycleOwner, { satItems ->
             if (satItems.isNullOrEmpty()) setError()
@@ -80,18 +80,20 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 entriesAdapter?.setItems(satItems)
                 setLoaded()
             }
-            observeEvents()
         })
-    }
-
-    private fun observeEvents() {
         viewModel.getAppEvent().observe(viewLifecycleOwner, { event ->
-            event.getContentIfNotHandled()?.let {
-                if (it == 0) setLoading()
-                else if (it == 1) {
+            event.getContentIfNotHandled()?.let { content ->
+                if (content == 0) setLoading()
+                else if (content == 1) {
                     val errorMsg = getString(R.string.entries_update_error)
                     Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
-                    setError()
+                    entriesAdapter?.let { adapter ->
+                        if (adapter.getItems().isEmpty()) {
+                            setError()
+                        } else {
+                            setLoaded()
+                        }
+                    }
                 }
             }
         })
