@@ -21,7 +21,7 @@ package com.rtbishop.look4sat.ui
 
 import android.net.Uri
 import androidx.lifecycle.*
-import com.github.amsacode.predict4java.SatelliteFactory
+import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.repository.PrefsRepo
 import com.rtbishop.look4sat.repository.SatelliteRepo
@@ -68,8 +68,8 @@ class SharedViewModel @Inject constructor(
         _passes.value = Result.InProgress
         viewModelScope.launch(Dispatchers.Default) {
             val passes = mutableListOf<SatPass>()
-            satelliteRepo.getSelectedEntries().forEach { entry ->
-                passes.addAll(getPasses(entry, dateNow))
+            satelliteRepo.getSelectedSatellites().forEach { satellite ->
+                passes.addAll(getPasses(satellite, dateNow))
             }
             val filteredPasses = sortList(passes, dateNow)
             _passes.postValue(Result.Success(filteredPasses))
@@ -112,16 +112,14 @@ class SharedViewModel @Inject constructor(
     private fun postAppEvent(event: Event<Int>) {
         _appEvent.value = event
     }
-
-    private fun getPasses(entry: SatEntry, dateNow: Date): MutableList<SatPass> {
-        val gsp = prefsRepo.getStationPosition()
-        val predictor = SatelliteFactory.createSatellite(entry.tle).getPredictor(gsp)
-        val hoursAhead = prefsRepo.getHoursAhead()
-        val passes = predictor.getPasses(dateNow, hoursAhead, true)
-        val passList = passes.map { SatPass(entry.tle, predictor, it) }
+    
+    private fun getPasses(satellite: Satellite, dateNow: Date): MutableList<SatPass> {
+        val predictor = satellite.getPredictor(prefsRepo.getStationPosition())
+        val passes = predictor.getPasses(dateNow, prefsRepo.getHoursAhead(), true)
+        val passList = passes.map { SatPass(satellite.tle, predictor, it) }
         return passList as MutableList<SatPass>
     }
-
+    
     private fun sortList(passes: MutableList<SatPass>, dateNow: Date): MutableList<SatPass> {
         val hoursAhead = prefsRepo.getHoursAhead()
         val dateFuture = Calendar.getInstance().apply {

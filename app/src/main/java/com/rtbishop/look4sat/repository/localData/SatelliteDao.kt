@@ -20,6 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 package com.rtbishop.look4sat.repository.localData
 
 import androidx.room.*
+import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.data.SatTrans
@@ -37,8 +38,8 @@ interface SatelliteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
     
-    @Query("SELECT * FROM entries WHERE isSelected = 1 ORDER BY name ASC")
-    suspend fun getSelectedEntries(): List<SatEntry>
+    @Query("SELECT tle FROM entries WHERE isSelected = 1")
+    suspend fun getSelectedSatellites(): List<Satellite>
     
     @Query("SELECT catNum FROM entries WHERE isSelected = 1")
     suspend fun getSelectedCatNums(): List<Int>

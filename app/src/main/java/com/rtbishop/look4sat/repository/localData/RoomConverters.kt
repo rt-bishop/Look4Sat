@@ -20,6 +20,8 @@ You should have received a copy of the GNU General Public License along
 package com.rtbishop.look4sat.repository.localData
 
 import androidx.room.TypeConverter
+import com.github.amsacode.predict4java.Satellite
+import com.github.amsacode.predict4java.SatelliteFactory
 import com.github.amsacode.predict4java.TLE
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -42,5 +44,12 @@ object RoomConverters {
     @TypeConverter
     fun tleFromString(string: String): TLE? {
         return tleAdapter.fromJson(string)
+    }
+    
+    @JvmStatic
+    @TypeConverter
+    fun satFromString(string: String): Satellite? {
+        val tle = tleAdapter.fromJson(string)
+        return SatelliteFactory.createSatellite(tle)
     }
 }

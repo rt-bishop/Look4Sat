@@ -21,6 +21,7 @@ package com.rtbishop.look4sat.repository
 
 import android.content.ContentResolver
 import android.net.Uri
+import com.github.amsacode.predict4java.Satellite
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatItem
@@ -46,8 +47,8 @@ class SatelliteRepo @Inject constructor(
         return satelliteDao.getSatItems()
     }
     
-    suspend fun getSelectedEntries(): List<SatEntry> {
-        return satelliteDao.getSelectedEntries()
+    suspend fun getSelectedSatellites(): List<Satellite> {
+        return satelliteDao.getSelectedSatellites()
     }
     
     suspend fun updateEntriesSelection(catNums: List<Int>) {
