@@ -22,7 +22,7 @@ package com.rtbishop.look4sat.data
 import com.github.amsacode.predict4java.Position
 import org.osmdroid.views.overlay.Overlay
 
-data class SelectedSat(
+class SelectedSat(
     val pass: SatPass,
     val catNum: Int,
     val name: String,

@@ -24,7 +24,7 @@ import androidx.room.PrimaryKey
 import com.github.amsacode.predict4java.TLE
 
 @Entity(tableName = "entries")
-data class SatEntry(
+class SatEntry(
     val tle: TLE,
     var isSelected: Boolean = false,
     @PrimaryKey val catNum: Int = tle.catnum,

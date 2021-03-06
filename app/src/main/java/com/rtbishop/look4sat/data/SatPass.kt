@@ -23,7 +23,7 @@ import com.github.amsacode.predict4java.SatPassTime
 import com.github.amsacode.predict4java.TLE
 import com.rtbishop.look4sat.utility.PassPredictor
 
-data class SatPass(
+class SatPass(
     val tle: TLE,
     val predictor: PassPredictor,
     val pass: SatPassTime,

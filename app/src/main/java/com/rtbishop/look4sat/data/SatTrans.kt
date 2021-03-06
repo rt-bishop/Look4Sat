@@ -24,7 +24,7 @@ import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 
 @Entity(tableName = "transmitters")
-data class SatTrans(
+class SatTrans(
     @PrimaryKey @field:Json(name = "uuid") val uuid: String,
     @field:Json(name = "description") val description: String,
     @field:Json(name = "alive") val isAlive: Boolean,

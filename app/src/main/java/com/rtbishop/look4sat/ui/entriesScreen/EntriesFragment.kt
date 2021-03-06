@@ -74,6 +74,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun observeEntries() {
+        setLoading()
         viewModel.getEntries().observe(viewLifecycleOwner, { entries ->
             if (entries.isNullOrEmpty()) setError()
             else {
@@ -123,7 +124,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
     
     private fun showImportFromWebDialog() {
-        findNavController().navigate(R.id.action_entries_to_dialog_sources)
+        findNavController().navigate(R.id.nav_dialog_sources)
     }
     
     private fun navigateToPasses() {
