@@ -121,7 +121,9 @@ class PrefsRepo @Inject constructor(val preferences: SharedPreferences, val mosh
     private fun loadDefaultSources(): List<TleSource> {
         return listOf(
             TleSource("https://celestrak.com/NORAD/elements/active.txt"),
-            TleSource("https://amsat.org/tle/current/nasabare.txt")
+            TleSource("https://amsat.org/tle/current/nasabare.txt"),
+            TleSource("https://www.prismnet.com/~mmccants/tles/classfd.zip"),
+            TleSource("https://www.prismnet.com/~mmccants/tles/inttles.zip")
         )
     }
 }

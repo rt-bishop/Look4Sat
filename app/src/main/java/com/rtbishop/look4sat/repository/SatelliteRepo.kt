@@ -34,6 +34,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.io.InputStream
+import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 class SatelliteRepo @Inject constructor(
@@ -59,8 +60,7 @@ class SatelliteRepo @Inject constructor(
         withContext(ioDispatcher) {
             runCatching {
                 resolver.openInputStream(uri)?.use { stream ->
-                    val importedEntries = TLE.importSat(stream).map { tle -> SatEntry(tle) }
-                    updateAndRestoreSelection(importedEntries)
+                    updateAndRestoreSelection(importEntriesFromStreams(listOf(stream)))
                 }
             }
         }
@@ -68,17 +68,9 @@ class SatelliteRepo @Inject constructor(
     
     suspend fun updateEntriesFromWeb(sources: List<TleSource>) {
         withContext(ioDispatcher) {
-            val streams = mutableListOf<InputStream>()
-            sources.forEach { source ->
-                val stream = satelliteService.fetchFile(source.url).body()?.byteStream()
-                stream?.let { inputStream -> streams.add(inputStream) }
-            }
-            val importedEntries = mutableListOf<SatEntry>()
-            streams.forEach { stream ->
-                val entries = TLE.importSat(stream).map { tle -> SatEntry(tle) }
-                importedEntries.addAll(entries)
-            }
-            updateAndRestoreSelection(importedEntries)
+            val streams = getStreamsForSources(sources)
+            val entries = importEntriesFromStreams(streams)
+            updateAndRestoreSelection(entries)
         }
     }
     
@@ -88,6 +80,32 @@ class SatelliteRepo @Inject constructor(
     
     suspend fun updateTransmitters() {
         satelliteDao.insertTransmitters(satelliteService.fetchTransmitters())
+    }
+    
+    private suspend fun getStreamsForSources(sources: List<TleSource>): List<InputStream> {
+        val streams = mutableListOf<InputStream>()
+        sources.forEach { tleSource ->
+            satelliteService.fetchFile(tleSource.url).body()?.byteStream()?.let { inputStream ->
+                if (tleSource.url.contains(".zip")) {
+                    // Handle zip stream
+                    val zipInputStream = ZipInputStream(inputStream)
+                    val zipEntry = zipInputStream.nextEntry
+                    if (zipEntry != null && !zipEntry.isDirectory) streams.add(zipInputStream)
+                } else {
+                    streams.add(inputStream)
+                }
+            }
+        }
+        return streams
+    }
+    
+    private fun importEntriesFromStreams(streams: List<InputStream>): List<SatEntry> {
+        val importedEntries = mutableListOf<SatEntry>()
+        streams.forEach { stream ->
+            val entries = TLE.importSat(stream).map { tle -> SatEntry(tle) }
+            importedEntries.addAll(entries)
+        }
+        return importedEntries
     }
     
     private suspend fun updateAndRestoreSelection(entries: List<SatEntry>) {
