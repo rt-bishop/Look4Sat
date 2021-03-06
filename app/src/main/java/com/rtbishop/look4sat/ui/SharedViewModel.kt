@@ -23,8 +23,8 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.github.amsacode.predict4java.SatelliteFactory
 import com.rtbishop.look4sat.data.*
-import com.rtbishop.look4sat.repository.SatelliteRepo
 import com.rtbishop.look4sat.repository.PrefsRepo
+import com.rtbishop.look4sat.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.getPredictor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +41,6 @@ class SharedViewModel @Inject constructor(
     
     private val _passes = MutableLiveData<Result<MutableList<SatPass>>>()
     private val _appEvent = MutableLiveData<Event<Int>>()
-    private var selectedEntries = emptyList<SatEntry>()
     private var shouldTriggerCalculation = true
     
     init {
@@ -60,7 +59,7 @@ class SharedViewModel @Inject constructor(
     }
     
     fun getSources() = liveData { emit(prefsRepo.loadTleSources()) }
-    fun getEntries() = satelliteRepo.getEntries().asLiveData()
+    fun getSatItems() = satelliteRepo.getSatItems().asLiveData()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
     fun getTransmittersForSat(satId: Int) =
         satelliteRepo.getTransmittersForSat(satId).asLiveData()
@@ -77,14 +76,12 @@ class SharedViewModel @Inject constructor(
         _passes.value = Result.InProgress
         viewModelScope.launch(Dispatchers.Default) {
             val passes = mutableListOf<SatPass>()
-            selectedEntries.forEach { passes.addAll(getPasses(it, dateNow)) }
+            satelliteRepo.getSelectedEntries().forEach { entry ->
+                passes.addAll(getPasses(entry, dateNow))
+            }
             val filteredPasses = sortList(passes, dateNow)
             _passes.postValue(Result.Success(filteredPasses))
         }
-    }
-
-    fun setEntries(entries: List<SatEntry>) {
-        selectedEntries = entries.filter { it.isSelected }
     }
 
     fun updateEntriesFromFile(uri: Uri) {
@@ -110,15 +107,16 @@ class SharedViewModel @Inject constructor(
             }
         }
     }
-
-    fun updateEntriesSelection(entries: List<SatEntry>) {
+    
+    fun updateItemsSelection(items: List<SatItem>) {
+        _passes.value = Result.InProgress
         viewModelScope.launch {
-            selectedEntries = entries.filter { it.isSelected }
+            val selectedEntries = items.filter { it.isSelected }.map { it.catNum }
+            satelliteRepo.updateEntriesSelection(selectedEntries)
             calculatePasses()
-            satelliteRepo.updateEntriesSelection(selectedEntries.map { it.catNum })
         }
     }
-
+    
     private fun postAppEvent(event: Event<Int>) {
         _appEvent.value = event
     }

@@ -29,7 +29,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.RecyclerDivider
@@ -66,7 +65,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
-            selectAll.setOnClickListener { entriesAdapter?.selectAll() }
+            selectAll.setOnClickListener { entriesAdapter?.selectAllItems() }
             entriesFab.setOnClickListener { navigateToPasses() }
             searchBar.setOnQueryTextListener(entriesAdapter)
             searchBar.clearFocus()
@@ -75,11 +74,10 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private fun observeEntries() {
         setLoading()
-        viewModel.getEntries().observe(viewLifecycleOwner, { entries ->
-            if (entries.isNullOrEmpty()) setError()
+        viewModel.getSatItems().observe(viewLifecycleOwner, { satItems ->
+            if (satItems.isNullOrEmpty()) setError()
             else {
-                viewModel.setEntries(entries)
-                entriesAdapter?.setEntries(entries as MutableList<SatEntry>)
+                entriesAdapter?.setItems(satItems)
                 setLoaded()
             }
             observeEvents()
@@ -130,9 +128,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private fun navigateToPasses() {
         binding?.searchBar?.clearFocus()
         entriesAdapter?.let {
-            val entries = it.getEntries()
-            if (entries.isNotEmpty()) {
-                viewModel.updateEntriesSelection(entries)
+            val satItems = it.getItems()
+            if (satItems.isNotEmpty()) {
+                viewModel.updateItemsSelection(satItems)
                 requireView().findNavController().navigate(R.id.action_entries_to_passes)
             }
         }

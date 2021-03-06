@@ -23,40 +23,47 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.data.SatEntry
+import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.databinding.ItemSatEntryBinding
 import java.util.*
 
-class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatEntryHolder>(),
+class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>(),
     SearchView.OnQueryTextListener {
-
+    
+    private val allItems = mutableListOf<SatItem>()
+    private val currentItems = mutableListOf<SatItem>()
     private var shouldSearchAll = true
-    private var allEntries = mutableListOf<SatEntry>()
-    private var currentEntries = mutableListOf<SatEntry>()
-
-    fun getEntries(): MutableList<SatEntry> {
-        return allEntries
+    
+    fun getItems(): List<SatItem> {
+        return allItems
     }
-
-    fun setEntries(list: MutableList<SatEntry>) {
-        allEntries = list
-        currentEntries = list
+    
+    fun setItems(items: List<SatItem>) {
+        allItems.clear()
+        allItems.addAll(items)
+        currentItems.clear()
+        currentItems.addAll(items)
         notifyDataSetChanged()
     }
-
-    fun selectAll() {
-        shouldSearchAll = if (shouldSearchAll) {
-            currentEntries.forEach { it.isSelected = true }
-            notifyDataSetChanged()
-            false
-        } else {
-            currentEntries.forEach { it.isSelected = false }
-            notifyDataSetChanged()
-            true
-        }
+    
+    fun selectAllItems() {
+        shouldSearchAll = shouldSearchAll.not()
+        currentItems.forEach { it.isSelected = it.isSelected.not() }
+        notifyDataSetChanged()
     }
-
-    private fun filterEntries(list: MutableList<SatEntry>, query: String): MutableList<SatEntry> {
+    
+    override fun onQueryTextChange(newText: String): Boolean {
+        currentItems.clear()
+        currentItems.addAll(filterItems(allItems, newText).toMutableList())
+        notifyDataSetChanged()
+        return false
+    }
+    
+    override fun onQueryTextSubmit(query: String): Boolean {
+        return false
+    }
+    
+    private fun filterItems(list: List<SatItem>, query: String): List<SatItem> {
         if (query.isEmpty()) return list
         return try {
             filterByCatNum(list, query.toInt())
@@ -64,54 +71,42 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatEntryHolder>(),
             filterByName(list, query)
         }
     }
-
-    private fun filterByCatNum(list: MutableList<SatEntry>, catNum: Int): MutableList<SatEntry> {
-        return list.filter { it.catNum == catNum } as MutableList
+    
+    private fun filterByCatNum(list: List<SatItem>, catNum: Int): List<SatItem> {
+        return list.filter { it.catNum == catNum }
     }
-
-    private fun filterByName(list: MutableList<SatEntry>, query: String): MutableList<SatEntry> {
+    
+    private fun filterByName(list: List<SatItem>, query: String): List<SatItem> {
         val defaultLocale = Locale.getDefault()
-        val filteredList = mutableListOf<SatEntry>()
         val searchQuery = query.toLowerCase(defaultLocale)
-        list.forEach {
-            val entryName = it.name.toLowerCase(defaultLocale)
-            if (entryName.contains(searchQuery)) filteredList.add(it)
+        return list.filter { satItem ->
+            val lowerCaseItem = satItem.name.toLowerCase(defaultLocale)
+            lowerCaseItem.contains(searchQuery)
         }
-        return filteredList
     }
-
-    override fun onQueryTextChange(newText: String): Boolean {
-        currentEntries = filterEntries(getEntries(), newText)
-        notifyDataSetChanged()
-        return false
+    
+    override fun getItemCount(): Int {
+        return currentItems.size
     }
-
-    override fun onQueryTextSubmit(query: String): Boolean {
-        return false
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatEntryHolder {
+    
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatItemHolder {
         val binding = ItemSatEntryBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
-        return SatEntryHolder(binding)
+        return SatItemHolder(binding)
     }
-
-    override fun onBindViewHolder(holder: SatEntryHolder, position: Int) {
-        holder.bind(currentEntries[position])
+    
+    override fun onBindViewHolder(holder: SatItemHolder, position: Int) {
+        holder.bind(currentItems[position])
     }
-
-    override fun getItemCount(): Int {
-        return currentEntries.size
-    }
-
-    inner class SatEntryHolder(private val binding: ItemSatEntryBinding) :
+    
+    inner class SatItemHolder(private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(satEntry: SatEntry) {
-            binding.satEntryCheckbox.text = satEntry.name
-            binding.satEntryCheckbox.isChecked = satEntry.isSelected
+        
+        fun bind(satItem: SatItem) {
+            binding.satEntryCheckbox.text = satItem.name
+            binding.satEntryCheckbox.isChecked = satItem.isSelected
             itemView.setOnClickListener {
-                satEntry.isSelected = binding.satEntryCheckbox.isChecked
+                satItem.isSelected = binding.satEntryCheckbox.isChecked
             }
         }
     }
