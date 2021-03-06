@@ -42,15 +42,6 @@
         android:id="@+id/nav_polar"
         android:name="com.rtbishop.look4sat.ui.polarScreen.PolarFragment"
         tools:layout="@layout/fragment_polar">
-        <action
-            android:id="@+id/action_polar_to_passes"
-            app:destination="@id/nav_passes"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@id/nav_passes"
-            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

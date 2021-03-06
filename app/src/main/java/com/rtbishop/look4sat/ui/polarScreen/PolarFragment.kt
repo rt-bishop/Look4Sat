@@ -35,8 +35,8 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.data.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.repository.PrefsRepo
+import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
@@ -161,7 +161,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
                 binding.polarTimer.text = millisBeforeEnd.formatForTimer()
                 if (dateNow.after(satPass.pass.endTime)) {
                     binding.polarTimer.text = 0L.formatForTimer()
-                    findNavController().navigate(R.id.action_polar_to_passes)
+                    findNavController().popBackStack()
                 }
             }
         } else {
