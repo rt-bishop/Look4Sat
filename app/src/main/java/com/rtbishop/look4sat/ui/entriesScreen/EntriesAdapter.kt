@@ -47,8 +47,8 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>(),
     }
     
     fun selectAllItems() {
+        currentItems.forEach { it.isSelected = shouldSearchAll }
         shouldSearchAll = shouldSearchAll.not()
-        currentItems.forEach { it.isSelected = it.isSelected.not() }
         notifyDataSetChanged()
     }
     
@@ -64,6 +64,7 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>(),
     }
     
     private fun filterItems(list: List<SatItem>, query: String): List<SatItem> {
+        shouldSearchAll = true
         if (query.isEmpty()) return list
         return try {
             filterByCatNum(list, query.toInt())

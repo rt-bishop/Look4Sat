@@ -27,6 +27,5 @@ class SatPass(
     val tle: TLE,
     val predictor: PassPredictor,
     val pass: SatPassTime,
-    var progress: Int = 0,
-    var active: Boolean = false
+    var progress: Int = 0
 )

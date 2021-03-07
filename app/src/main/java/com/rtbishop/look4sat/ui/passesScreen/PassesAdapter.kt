@@ -64,7 +64,6 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
                 if (satPass.progress < 100) {
                     val timeStart = satPass.pass.startTime.time
                     if (timeNow > timeStart) {
-                        satPass.active = true
                         val timeEnd = satPass.pass.endTime.time
                         val index = satPassList.indexOf(satPass)
                         val deltaNow = timeNow.minus(timeStart).toFloat()

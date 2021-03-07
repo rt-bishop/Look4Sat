@@ -48,7 +48,7 @@ class TransAdapter(context: Context, private val satPass: SatPass) :
     }
 
     fun tickTransmitters() {
-        if (!satPass.tle.isDeepspace and satPass.active) {
+        if (!satPass.tle.isDeepspace) {
             val iterator = transmittersList.listIterator()
             while (iterator.hasNext()) {
                 val trans = iterator.next()
@@ -78,7 +78,7 @@ class TransAdapter(context: Context, private val satPass: SatPass) :
         fun bind(satTrans: SatTrans) {
             binding.description.text = satTrans.description
 
-            if (satPass.tle.isDeepspace or !satPass.active) setRegularFreq(satTrans)
+            if (satPass.tle.isDeepspace) setRegularFreq(satTrans)
             else setDopplerFreq(satTrans)
 
             if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)
