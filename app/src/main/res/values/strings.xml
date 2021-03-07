@@ -97,6 +97,6 @@
         \n— <a href="https://square.github.io/">Square</a> for epic OkHttp, Retrofit and Moshi libs
         available under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a> license.
     </string>
-    <string name="info_warranty">This application comes with absolutely no warranty. See the
-        <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> for details.</string>
+    <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy</a>.
+        This application comes with absolutely no warranty. See the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> for details.</string>
 </resources>

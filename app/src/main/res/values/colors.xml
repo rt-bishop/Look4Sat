@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- theme colors -->
     <color name="themeLight">#FFE082</color>
     <color name="themeDark">#FFCA28</color>
     <color name="greyDark">#121212</color>
