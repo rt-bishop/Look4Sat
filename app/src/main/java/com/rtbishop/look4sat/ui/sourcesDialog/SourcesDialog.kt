@@ -41,27 +41,24 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        viewModel.getSources().observe(viewLifecycleOwner, { sources ->
-            val sourcesAdapter = SourcesAdapter()
-            sourcesAdapter.setSources(sources)
-            DialogSourcesBinding.bind(view).apply {
-                dialog?.window?.setLayout(
-                    WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT
-                )
-                tleSourcesRecycler.apply {
-                    adapter = sourcesAdapter
-                    layoutManager = LinearLayoutManager(requireContext())
-                }
-                tleSourceBtnAdd.setOnClickListener {
-                    sourcesAdapter.addSource()
-                }
-                tleSourcesBtnPos.setOnClickListener {
-                    viewModel.updateEntriesFromSources(sourcesAdapter.getSources())
-                    dismiss()
-                }
-                tleSourcesBtnNeg.setOnClickListener { dismiss() }
+        val sourcesAdapter = SourcesAdapter().apply { setSources(viewModel.getSources()) }
+        DialogSourcesBinding.bind(view).apply {
+            dialog?.window?.setLayout(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT
+            )
+            tleSourcesRecycler.apply {
+                adapter = sourcesAdapter
+                layoutManager = LinearLayoutManager(requireContext())
             }
-        })
+            tleSourceBtnAdd.setOnClickListener {
+                sourcesAdapter.addSource()
+            }
+            tleSourcesBtnPos.setOnClickListener {
+                viewModel.updateEntriesFromSources(sourcesAdapter.getSources())
+                dismiss()
+            }
+            tleSourcesBtnNeg.setOnClickListener { dismiss() }
+        }
     }
 }

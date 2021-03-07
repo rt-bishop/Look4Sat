@@ -26,13 +26,13 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import javax.inject.Inject
 
-class PrefsRepo @Inject constructor(val preferences: SharedPreferences, val moshi: Moshi) {
+class PrefsRepo @Inject constructor(val preferences: SharedPreferences, moshi: Moshi) {
     
     private val sourcesType = Types.newParameterizedType(List::class.java, TleSource::class.java)
     private val sourcesAdapter = moshi.adapter<List<TleSource>>(sourcesType)
     
     companion object {
-        const val keySources = "tleSources"
+        const val keySources = "sourcesListJson"
         const val keyLatitude = "latitude"
         const val keyLongitude = "longitude"
         const val keyAltitude = "altitude"
@@ -99,16 +99,16 @@ class PrefsRepo @Inject constructor(val preferences: SharedPreferences, val mosh
     }
     
     fun loadTleSources(): List<TleSource> {
-        preferences.getString(keySources, null)?.let { sourcesJson ->
-            sourcesAdapter.fromJson(sourcesJson)?.let { loadedSources ->
-                return if (loadedSources.isNotEmpty()) {
-                    loadedSources
-                } else {
-                    loadDefaultSources()
-                }
+        return try {
+            val sourcesString = preferences.getString(keySources, String())
+            if (sourcesString.isNullOrEmpty()) {
+                loadDefaultSources()
+            } else {
+                sourcesAdapter.fromJson(sourcesString) ?: loadDefaultSources()
             }
+        } catch (exception: ClassCastException) {
+            loadDefaultSources()
         }
-        return loadDefaultSources()
     }
     
     fun saveTleSources(sources: List<TleSource>) {

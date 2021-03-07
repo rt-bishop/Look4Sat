@@ -56,7 +56,7 @@ class SharedViewModel @Inject constructor(
         }
     }
     
-    fun getSources() = liveData { emit(prefsRepo.loadTleSources()) }
+    fun getSources() = prefsRepo.loadTleSources()
     fun getSatItems() = satelliteRepo.getSatItems().asLiveData()
     fun getPasses(): LiveData<Result<MutableList<SatPass>>> = _passes
     fun getTransmittersForSat(satId: Int) =

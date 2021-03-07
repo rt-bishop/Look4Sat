@@ -45,7 +45,9 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
             infoBmc.setOnClickListener {
                 gotoUrl("https://www.buymeacoffee.com/rtbishop")
             }
-            infoThanks.movementMethod = LinkMovementMethod.getInstance()
+            val moveMethod = LinkMovementMethod.getInstance()
+            infoThanks.movementMethod = moveMethod
+            infoWarranty.movementMethod = moveMethod
         }
     }
 
