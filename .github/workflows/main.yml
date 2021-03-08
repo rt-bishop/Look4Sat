@@ -3,55 +3,64 @@ name: Look4Sat CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - name: Checkout latest commit
+        uses: actions/checkout@v2
+
+      - name: Setup java environment
+        uses: actions/setup-java@v1
         with: {java-version: 1.8}
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build release APK and AAB after tests
-        id: unit_tests_and_build
+      - name: Run tests, assemble APK and AAB
+        id: run_tests_assemble_apk_aab
         run: |
+          chmod +x ./gradlew
           ./gradlew test
-          ./gradlew assembleRelease --stacktrace
+          ./gradlew assembleRelease
           ./gradlew bundleRelease
 
-      - uses: r0adkll/sign-android-release@v1
-        id: sign_apk
+      - name: Sign release apk
+        uses: r0adkll/sign-android-release@v1
+        id: sign_release_apk
         with:
           releaseDirectory: app/build/outputs/apk/release
-          keyStorePassword: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-          alias: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-          keyPassword: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          signingKeyBase64: ${{ secrets.KEYSTORE_FILE }}
+          signingKeyBase64: ${{ secrets.KEY_STORE }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
           BUILD_TOOLS_VERSION: "30.0.3"
 
-      - uses: r0adkll/sign-android-release@v1
-        id: sign_aab
+      - name: Sign release bundle
+        uses: r0adkll/sign-android-release@v1
+        id: sign_release_bundle
         with:
           releaseDirectory: app/build/outputs/bundle/release
-          keyStorePassword: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-          alias: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-          keyPassword: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          signingKeyBase64: ${{ secrets.KEYSTORE_FILE }}
+          signingKeyBase64: ${{ secrets.KEY_STORE }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
           BUILD_TOOLS_VERSION: "30.0.3"
 
-      - uses: actions/upload-artifact@v2
+      - name: Deploy AAB to Play Store
+        uses: r0adkll/upload-google-play@v1
+        id: deploy_bundle_to_production
         with:
-          name: Signed apk
-          path: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
+          packageName: com.rtbishop.look4sat
+          track: production
+          whatsNewDirectory: fastlane/metadata/android/en-US/changelogs
+          releaseFiles: ${{steps.sign_release_bundle.outputs.signedReleaseFile}}
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Signed app bundle
-          path: ${{steps.sign_aab.outputs.signedReleaseFile}}
+      - name: Upload files to action
+        uses: actions/upload-artifact@v2
+          with:
+            name: Look4Sat_files
+            path: |
+              ${{steps.sign_release_apk.outputs.signedReleaseFile}}
+              ${{steps.sign_release_bundle.outputs.signedReleaseFile}}
