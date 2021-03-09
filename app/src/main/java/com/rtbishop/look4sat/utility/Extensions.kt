@@ -17,6 +17,11 @@
  */
 package com.rtbishop.look4sat.utility
 
+import android.os.Bundle
+import androidx.annotation.IdRes
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigator
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Satellite
 import java.util.concurrent.TimeUnit
@@ -37,4 +42,16 @@ fun Double.round(decimals: Int): Double {
 
 fun Satellite.getPredictor(stationPosition: GroundStationPosition): PassPredictor {
     return PassPredictor(this, stationPosition)
+}
+
+fun NavController.navigateSafe(
+    @IdRes resId: Int,
+    args: Bundle? = null,
+    navOptions: NavOptions? = null,
+    navExtras: Navigator.Extras? = null
+) {
+    val action = currentDestination?.getAction(resId) ?: graph.getAction(resId)
+    if (action != null && currentDestination?.id != action.destinationId) {
+        navigate(resId, args, navOptions, navExtras)
+    }
 }
