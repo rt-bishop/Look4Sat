@@ -77,15 +77,13 @@ class PrefsFragment : PreferenceFragmentCompat() {
     }
     
     private fun setPositionFromQth(qthString: String): Boolean {
-        val loc = qthConverter.qthToLocation(qthString)
-        return if (loc == null) {
-            showSnack(getString(R.string.pref_pos_qth_error))
-            false
-        } else {
-            prefsRepo.setStationPosition(loc.latitude, loc.longitude, loc.heightAMSL)
+        qthConverter.qthToLocation(qthString)?.let { gsp ->
+            prefsRepo.setStationPosition(gsp.latitude, gsp.longitude, gsp.heightAMSL)
             showSnack(getString(R.string.pref_pos_success))
-            true
+            return true
         }
+        showSnack(getString(R.string.pref_pos_qth_error))
+        return false
     }
     
     private fun setPositionFromGPS() {

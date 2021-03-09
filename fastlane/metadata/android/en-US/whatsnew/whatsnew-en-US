@@ -1,0 +1,8 @@
+Fixed NullPointerException in EntriesFragment's update from file
+Fixed IllegalArgumentException on passes navigate action
+Fixed select all logic in Entries adapter
+Now correctly popping back stack on PolarView pass end
+Now using passes screen as a start destination
+Added zipped TLE import from Mike McCants' web site
+Added McCants' classified and integrated TLEs to default sources
+Added privacy policy to info screen, switched to GPL v3 licence

@@ -30,6 +30,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.RecyclerDivider
+import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -38,9 +39,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private val viewModel: SharedViewModel by activityViewModels()
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let {
-                viewModel.updateEntriesFromFile(uri)
-            }
+            uri?.let { viewModel.updateEntriesFromFile(uri) }
         }
     private var binding: FragmentEntriesBinding? = null
     private var entriesAdapter: EntriesAdapter? = null
@@ -73,8 +72,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private fun setupObservers() {
         setLoading()
         viewModel.getSatItems().observe(viewLifecycleOwner, { satItems ->
-            if (satItems.isNullOrEmpty()) setError()
-            else {
+            if (satItems.isNullOrEmpty()) {
+                setError()
+            } else {
                 entriesAdapter?.setItems(satItems)
                 setLoaded()
             }
@@ -131,7 +131,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             val satItems = it.getItems()
             if (satItems.isNotEmpty()) {
                 viewModel.updateItemsSelection(satItems)
-                requireView().findNavController().navigate(R.id.action_entries_to_passes)
+                requireView().findNavController().navigateSafe(R.id.action_entries_to_passes)
             }
         }
     }

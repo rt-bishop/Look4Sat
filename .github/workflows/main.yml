@@ -2,10 +2,11 @@ name: Look4Sat CI
 
 on:
   push:
-    branches: [ master ]
+    tags:
+      - '*'
 
 jobs:
-  release:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout latest commit
@@ -54,13 +55,13 @@ jobs:
           serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
           packageName: com.rtbishop.look4sat
           track: production
-          whatsNewDirectory: fastlane/metadata/android/en-US/changelogs
+          whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
           releaseFiles: ${{steps.sign_release_bundle.outputs.signedReleaseFile}}
 
       - name: Upload files to action
         uses: actions/upload-artifact@v2
-          with:
-            name: Look4Sat_files
-            path: |
-              ${{steps.sign_release_apk.outputs.signedReleaseFile}}
-              ${{steps.sign_release_bundle.outputs.signedReleaseFile}}
+        with:
+          name: Look4Sat_files
+          path: |
+            ${{steps.sign_release_apk.outputs.signedReleaseFile}}
+            ${{steps.sign_release_bundle.outputs.signedReleaseFile}}
