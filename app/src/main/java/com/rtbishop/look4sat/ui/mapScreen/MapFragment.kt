@@ -83,7 +83,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun setupObservers() {
         mapViewModel.getGSP().observe(viewLifecycleOwner, { setupPosOverlay(it) })
-        sharedViewModel.getPasses().observe(viewLifecycleOwner, {
+        sharedViewModel.passes.observe(viewLifecycleOwner, {
             if (it is Result.Success && it.data.isNotEmpty()) {
                 mapViewModel.setPasses(it.data)
                 binding.fabPrev.setOnClickListener { mapViewModel.scrollSelection(true) }

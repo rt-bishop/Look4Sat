@@ -54,7 +54,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setupObservers() {
-        viewModel.getPasses().observe(viewLifecycleOwner, { result ->
+        viewModel.passes.observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
                 if (result.data.isEmpty()) {
                     binding?.apply {

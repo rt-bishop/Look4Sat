@@ -27,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.Result
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.RecyclerDivider
@@ -70,19 +71,16 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
     
     private fun setupObservers() {
-        setLoading()
-        viewModel.getSatItems().observe(viewLifecycleOwner, { satItems ->
-            if (satItems.isNullOrEmpty()) {
-                setError()
-            } else {
-                entriesAdapter?.setItems(satItems)
-                setLoaded()
-            }
-        })
-        viewModel.getAppEvent().observe(viewLifecycleOwner, { event ->
-            event.getContentIfNotHandled()?.let { content ->
-                if (content == 0) setLoading()
-                else if (content == 1) {
+        viewModel.satData.observe(viewLifecycleOwner, { result ->
+            when (result) {
+                is Result.Success -> {
+                    entriesAdapter?.setItems(result.data)
+                    setLoaded()
+                }
+                is Result.InProgress -> {
+                    setLoading()
+                }
+                is Result.Error -> {
                     val errorMsg = getString(R.string.entries_update_error)
                     Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
                     entriesAdapter?.let { adapter ->
