@@ -5,7 +5,19 @@ plugins {
     id "dagger.hilt.android.plugin"
 }
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
@@ -20,6 +32,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             postprocessing {
                 removeUnusedCode true
                 removeUnusedResources true
