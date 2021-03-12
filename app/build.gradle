@@ -27,7 +27,11 @@ android {
         targetSdkVersion 30
         versionCode 222
         versionName "2.2.2"
-        setProperty("archivesBaseName", "look4sat" + "-v" + versionName)
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {

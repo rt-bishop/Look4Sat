@@ -16,17 +16,15 @@ jobs:
         uses: actions/setup-java@v1
         with: {java-version: 1.8}
 
-      - name: Run tests, assemble APK and AAB
-        id: run_tests_assemble_apk_aab
+      - name: Assemble APK and Bundle
         run: |
           chmod +x ./gradlew
-          ./gradlew test
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
-      - name: Sign release apk
+      - name: Sign APK
         uses: r0adkll/sign-android-release@v1
-        id: sign_release_apk
+        id: sign_apk
         with:
           releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.KEY_STORE }}
@@ -36,9 +34,9 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "30.0.3"
 
-      - name: Sign release bundle
+      - name: Sign Bundle
         uses: r0adkll/sign-android-release@v1
-        id: sign_release_bundle
+        id: sign_bundle
         with:
           releaseDirectory: app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.KEY_STORE }}
@@ -48,20 +46,18 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "30.0.3"
 
-      - name: Deploy AAB to Play Store
+      - name: Deploy Bundle to Play Store
         uses: r0adkll/upload-google-play@v1
-        id: deploy_bundle_to_production
         with:
           serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
           packageName: com.rtbishop.look4sat
           track: production
           whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
-          releaseFiles: ${{steps.sign_release_bundle.outputs.signedReleaseFile}}
+          releaseFiles: ${{steps.sign_bundle.outputs.signedReleaseFile}}
 
-      - name: Upload files to action
-        uses: actions/upload-artifact@v2
+      - name: Create release
+        uses: ncipollo/release-action@v1
         with:
-          name: Look4Sat_files
-          path: |
-            ${{steps.sign_release_apk.outputs.signedReleaseFile}}
-            ${{steps.sign_release_bundle.outputs.signedReleaseFile}}
+          artifact: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          bodyFile: fastlane/metadata/android/en-US/whatsnew/whatsnew-en-US
+          token: ${{ secrets.RELEASE_TOKEN }}
