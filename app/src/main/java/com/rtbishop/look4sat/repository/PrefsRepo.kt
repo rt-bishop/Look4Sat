@@ -25,7 +25,9 @@ import com.rtbishop.look4sat.data.TleSource
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PrefsRepo @Inject constructor(val preferences: SharedPreferences, moshi: Moshi) {
     
     private val sourcesType = Types.newParameterizedType(List::class.java, TleSource::class.java)

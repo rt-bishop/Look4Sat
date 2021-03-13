@@ -20,29 +20,26 @@ package com.rtbishop.look4sat.di
 import android.content.Context
 import androidx.room.Room
 import com.rtbishop.look4sat.repository.localData.MIGRATION_1_2
+import com.rtbishop.look4sat.repository.localData.RoomConverters
 import com.rtbishop.look4sat.repository.localData.SatelliteDao
 import com.rtbishop.look4sat.repository.localData.SatelliteDb
-import com.rtbishop.look4sat.repository.localData.RoomConverters
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
     
     @Provides
-    @Singleton
     fun provideSatDataDao(db: SatelliteDb): SatelliteDao {
         return db.satelliteDao()
     }
     
     @Provides
-    @Singleton
     fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
         RoomConverters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb")

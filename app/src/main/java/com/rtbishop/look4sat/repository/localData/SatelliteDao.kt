@@ -26,37 +26,37 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SatelliteDao {
-    
+
     @Query("SELECT * FROM entries ORDER BY name ASC")
     fun getEntries(): Flow<List<SatEntry>>
-    
+
     @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
     fun getSatItems(): Flow<List<SatItem>>
-    
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
-    
+
     @Query("SELECT tle FROM entries WHERE isSelected = 1")
     suspend fun getSelectedSatellites(): List<Satellite>
-    
+
     @Query("SELECT catNum FROM entries WHERE isSelected = 1")
     suspend fun getSelectedCatNums(): List<Int>
-    
+
     @Transaction
     suspend fun updateEntriesSelection(catNums: List<Int>) {
         clearSelection()
         catNums.forEach { catNum -> updateSelection(catNum) }
     }
-    
+
     @Query("UPDATE entries SET isSelected = 0")
     suspend fun clearSelection()
-    
+
     @Query("UPDATE entries SET isSelected = 1 WHERE catNum = :catNum")
     suspend fun updateSelection(catNum: Int)
-    
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransmitters(transmitters: List<SatTrans>)
-    
+
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :catNum")
     fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>>
 }

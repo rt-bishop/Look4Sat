@@ -31,7 +31,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -41,32 +40,30 @@ class SharedViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
     private val satelliteRepo: SatelliteRepo,
 ) : ViewModel() {
-    
+
     private val _passes = MutableStateFlow<Result<MutableList<SatPass>>>(Result.InProgress)
     val passes: LiveData<Result<MutableList<SatPass>>> = _passes.asLiveData()
-    
-    private val _satData = MutableStateFlow<Result<List<SatItem>>>(Result.InProgress)
-    val satData: LiveData<Result<List<SatItem>>> = _satData.asLiveData()
-    
+
+    val satData = satelliteRepo.satData.asLiveData()
+
     init {
         if (prefsRepo.isFirstLaunch()) {
             updateDefaultSourcesAndEntries()
             prefsRepo.setFirstLaunchDone()
         }
-        loadDataFromDb()
         calculatePasses()
     }
-    
+
     fun getAppTimer() = liveData {
         while (true) {
             emit(System.currentTimeMillis())
             delay(1000)
         }
     }
-    
+
     fun getSources() = prefsRepo.loadTleSources()
     fun getTransmittersForSat(satId: Int) = satelliteRepo.getTransmittersForSat(satId).asLiveData()
-    
+
     fun calculatePasses(dateNow: Date = Date(System.currentTimeMillis())) {
         _passes.value = Result.InProgress
         viewModelScope.launch(Dispatchers.Default) {
@@ -78,31 +75,20 @@ class SharedViewModel @Inject constructor(
             _passes.value = Result.Success(filteredPasses)
         }
     }
-    
+
     fun updateEntriesFromFile(uri: Uri) {
-        _satData.value = Result.InProgress
         viewModelScope.launch {
-            try {
-                satelliteRepo.updateEntriesFromFile(uri)
-            } catch (exception: Exception) {
-                _satData.value = Result.Error(exception)
-            }
+            satelliteRepo.updateSatDataFromFile(uri)
         }
     }
-    
+
     fun updateEntriesFromSources(sources: List<TleSource> = prefsRepo.loadTleSources()) {
-        _satData.value = Result.InProgress
         viewModelScope.launch {
-            try {
-                prefsRepo.saveTleSources(sources)
-                satelliteRepo.updateEntriesFromWeb(sources)
-                satelliteRepo.updateTransmitters()
-            } catch (exception: Exception) {
-                _satData.value = Result.Error(exception)
-            }
+            prefsRepo.saveTleSources(sources)
+            satelliteRepo.updateSatDataFromWeb(sources)
         }
     }
-    
+
     fun updateItemsSelection(items: List<SatItem>) {
         _passes.value = Result.InProgress
         viewModelScope.launch {
@@ -111,14 +97,14 @@ class SharedViewModel @Inject constructor(
             calculatePasses()
         }
     }
-    
+
     private fun getPasses(satellite: Satellite, dateNow: Date): MutableList<SatPass> {
         val predictor = satellite.getPredictor(prefsRepo.getStationPosition())
         val passes = predictor.getPasses(dateNow, prefsRepo.getHoursAhead(), true)
         val passList = passes.map { SatPass(satellite.tle, predictor, it) }
         return passList as MutableList<SatPass>
     }
-    
+
     private fun sortList(passes: MutableList<SatPass>, dateNow: Date): MutableList<SatPass> {
         val hoursAhead = prefsRepo.getHoursAhead()
         val dateFuture = Calendar.getInstance().apply {
@@ -131,18 +117,7 @@ class SharedViewModel @Inject constructor(
         passes.sortBy { it.pass.startTime }
         return passes
     }
-    
-    private fun loadDataFromDb() {
-        _satData.value = Result.InProgress
-        viewModelScope.launch {
-            satelliteRepo.getSatItems().collect { satItems: List<SatItem> ->
-                if (satItems.isNotEmpty()) {
-                    _satData.value = Result.Success(satItems)
-                }
-            }
-        }
-    }
-    
+
     private fun updateDefaultSourcesAndEntries() {
         updateEntriesFromSources()
     }

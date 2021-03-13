@@ -21,70 +21,102 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.github.amsacode.predict4java.Satellite
 import com.github.amsacode.predict4java.TLE
-import com.rtbishop.look4sat.data.SatEntry
-import com.rtbishop.look4sat.data.SatItem
-import com.rtbishop.look4sat.data.SatTrans
-import com.rtbishop.look4sat.data.TleSource
+import com.rtbishop.look4sat.data.*
+import com.rtbishop.look4sat.di.ExternalScope
 import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.repository.localData.SatelliteDao
 import com.rtbishop.look4sat.repository.remoteData.SatelliteService
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.system.measureTimeMillis
 
+@Singleton
 class SatelliteRepo @Inject constructor(
     private val resolver: ContentResolver,
     private val satelliteDao: SatelliteDao,
     private val satelliteService: SatelliteService,
+    @ExternalScope private val externalScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
-    
-    fun getSatItems(): Flow<List<SatItem>> {
-        return satelliteDao.getSatItems()
+    private val _satData = MutableStateFlow<Result<List<SatItem>>>(Result.InProgress)
+    val satData: Flow<Result<List<SatItem>>> = _satData
+
+    init {
+        loadEntriesFromDb()
     }
-    
-    suspend fun getSelectedSatellites(): List<Satellite> {
-        return satelliteDao.getSelectedSatellites()
-    }
-    
-    suspend fun updateEntriesSelection(catNums: List<Int>) {
-        satelliteDao.updateEntriesSelection(catNums)
-    }
-    
-    suspend fun updateEntriesFromFile(uri: Uri) {
-        withContext(ioDispatcher) {
-            runCatching {
-                resolver.openInputStream(uri)?.use { stream ->
-                    updateAndRestoreSelection(importEntriesFromStreams(listOf(stream)))
-                }
-            }
-        }
-    }
-    
-    suspend fun updateEntriesFromWeb(sources: List<TleSource>) {
-        withContext(ioDispatcher) {
-            val streams = getStreamsForSources(sources)
-            val entries = importEntriesFromStreams(streams)
-            updateAndRestoreSelection(entries)
-        }
-    }
-    
+
     fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
         return satelliteDao.getTransmittersForSat(catNum)
     }
-    
-    suspend fun updateTransmitters() {
-        satelliteDao.insertTransmitters(satelliteService.fetchTransmitters())
+
+    suspend fun getSelectedSatellites(): List<Satellite> {
+        return satelliteDao.getSelectedSatellites()
     }
-    
+
+    suspend fun updateEntriesSelection(catNums: List<Int>) {
+        satelliteDao.updateEntriesSelection(catNums)
+    }
+
+    suspend fun updateSatDataFromFile(uri: Uri) {
+        _satData.value = Result.InProgress
+        externalScope.launch {
+            runCatching {
+                resolver.openInputStream(uri)?.use { stream ->
+                    val entries = importEntriesFromStreams(listOf(stream))
+                    insertEntriesAndRestoreSelection(entries)
+                    loadEntriesFromDb()
+                }
+            }.onFailure { throwable: Throwable ->
+                Timber.d("$throwable")
+                _satData.value = Result.Error(throwable)
+            }
+        }
+    }
+
+    suspend fun updateSatDataFromWeb(sources: List<TleSource>) {
+        _satData.value = Result.InProgress
+        externalScope.launch {
+            val updateTimeMillis = measureTimeMillis {
+                runCatching {
+                    val transmitters = satelliteService.fetchTransmitters()
+                    val streams = getStreamsForSources(sources)
+                    val entries = importEntriesFromStreams(streams)
+                    satelliteDao.insertTransmitters(transmitters)
+                    insertEntriesAndRestoreSelection(entries)
+                    loadEntriesFromDb()
+                }.onFailure { throwable: Throwable ->
+                    Timber.d("$throwable")
+                    _satData.value = Result.Error(throwable)
+                }
+            }
+            Timber.d("Update from Web took $updateTimeMillis ms")
+        }
+    }
+
+    private fun loadEntriesFromDb() {
+        _satData.value = Result.InProgress
+        externalScope.launch {
+            satelliteDao.getSatItems().collect { satItems ->
+                _satData.value = Result.Success(satItems)
+            }
+        }
+    }
+
     private suspend fun getStreamsForSources(sources: List<TleSource>): List<InputStream> {
         val streams = mutableListOf<InputStream>()
         sources.forEach { tleSource ->
             satelliteService.fetchFile(tleSource.url).body()?.byteStream()?.let { inputStream ->
-                if (tleSource.url.contains(".zip")) {
+                if (tleSource.url.contains(".zip", true)) {
                     // Handle zip stream
                     val zipInputStream = ZipInputStream(inputStream)
                     val zipEntry = zipInputStream.nextEntry
@@ -96,17 +128,19 @@ class SatelliteRepo @Inject constructor(
         }
         return streams
     }
-    
-    private fun importEntriesFromStreams(streams: List<InputStream>): List<SatEntry> {
+
+    private suspend fun importEntriesFromStreams(streams: List<InputStream>): List<SatEntry> {
         val importedEntries = mutableListOf<SatEntry>()
-        streams.forEach { stream ->
-            val entries = TLE.importSat(stream).map { tle -> SatEntry(tle) }
-            importedEntries.addAll(entries)
+        withContext(ioDispatcher) {
+            streams.forEach { stream ->
+                val entries = TLE.importSat(stream).map { tle -> SatEntry(tle) }
+                importedEntries.addAll(entries)
+            }
         }
         return importedEntries
     }
-    
-    private suspend fun updateAndRestoreSelection(entries: List<SatEntry>) {
+
+    private suspend fun insertEntriesAndRestoreSelection(entries: List<SatEntry>) {
         val selectedCatNums = satelliteDao.getSelectedCatNums()
         satelliteDao.insertEntries(entries)
         satelliteDao.updateEntriesSelection(selectedCatNums)

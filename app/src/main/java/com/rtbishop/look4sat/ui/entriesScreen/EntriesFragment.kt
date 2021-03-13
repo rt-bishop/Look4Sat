@@ -36,7 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
-    
+
     private val viewModel: SharedViewModel by activityViewModels()
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -44,14 +44,14 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         }
     private var binding: FragmentEntriesBinding? = null
     private var entriesAdapter: EntriesAdapter? = null
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
         setupComponents()
         setupObservers()
     }
-    
+
     private fun setupComponents() {
         entriesAdapter = EntriesAdapter()
         binding?.apply {
@@ -69,7 +69,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             searchBar.clearFocus()
         }
     }
-    
+
     private fun setupObservers() {
         viewModel.satData.observe(viewLifecycleOwner, { result ->
             when (result) {
@@ -110,7 +110,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             entriesProgress.visibility = View.VISIBLE
         }
     }
-    
+
     private fun setError() {
         binding?.apply {
             entriesProgress.visibility = View.INVISIBLE
@@ -118,11 +118,11 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             entriesError.visibility = View.VISIBLE
         }
     }
-    
+
     private fun showImportFromWebDialog() {
         findNavController().navigate(R.id.nav_dialog_sources)
     }
-    
+
     private fun navigateToPasses() {
         binding?.searchBar?.clearFocus()
         entriesAdapter?.let {
