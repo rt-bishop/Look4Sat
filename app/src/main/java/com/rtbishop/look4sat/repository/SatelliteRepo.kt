@@ -26,13 +26,10 @@ import com.rtbishop.look4sat.di.ExternalScope
 import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.repository.localData.SatelliteDao
 import com.rtbishop.look4sat.repository.remoteData.SatelliteService
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.InputStream
 import java.util.zip.ZipInputStream
@@ -74,12 +71,12 @@ class SatelliteRepo @Inject constructor(
                 resolver.openInputStream(uri)?.use { stream ->
                     val entries = importEntriesFromStreams(listOf(stream))
                     insertEntriesAndRestoreSelection(entries)
-                    loadEntriesFromDb()
                 }
             }.onFailure { throwable: Throwable ->
                 Timber.d("$throwable")
                 _satData.value = Result.Error(throwable)
             }
+            loadEntriesFromDb()
         }
     }
 
@@ -88,16 +85,16 @@ class SatelliteRepo @Inject constructor(
         externalScope.launch {
             val updateTimeMillis = measureTimeMillis {
                 runCatching {
-                    val transmitters = satelliteService.fetchTransmitters()
-                    val streams = getStreamsForSources(sources)
-                    val entries = importEntriesFromStreams(streams)
-                    satelliteDao.insertTransmitters(transmitters)
+                    val streams = externalScope.async { getStreamsForSources(sources) }
+                    val transmitters = externalScope.async { satelliteService.fetchTransmitters() }
+                    val entries = importEntriesFromStreams(streams.await())
+                    satelliteDao.insertTransmitters(transmitters.await())
                     insertEntriesAndRestoreSelection(entries)
-                    loadEntriesFromDb()
                 }.onFailure { throwable: Throwable ->
                     Timber.d("$throwable")
                     _satData.value = Result.Error(throwable)
                 }
+                loadEntriesFromDb()
             }
             Timber.d("Update from Web took $updateTimeMillis ms")
         }
@@ -107,6 +104,7 @@ class SatelliteRepo @Inject constructor(
         _satData.value = Result.InProgress
         externalScope.launch {
             satelliteDao.getSatItems().collect { satItems ->
+                delay(250)
                 _satData.value = Result.Success(satItems)
             }
         }
