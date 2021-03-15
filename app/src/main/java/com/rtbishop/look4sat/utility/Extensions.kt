@@ -17,6 +17,11 @@
  */
 package com.rtbishop.look4sat.utility
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
@@ -24,6 +29,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Satellite
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.util.concurrent.TimeUnit
 
 fun Long.formatForTimer(): String {
@@ -54,4 +63,23 @@ fun NavController.navigateSafe(
     if (action != null && currentDestination?.id != action.destinationId) {
         navigate(resId, args, navOptions, navExtras)
     }
+}
+
+@ExperimentalCoroutinesApi
+fun Context.isNetworkAvailableFlow(): Flow<Boolean> = callbackFlow {
+    val callback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            offer(true)
+        }
+
+        override fun onLost(network: Network) {
+            offer(false)
+        }
+    }
+    val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    manager.registerNetworkCallback(NetworkRequest.Builder().run {
+        addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        build()
+    }, callback)
+    awaitClose { manager.unregisterNetworkCallback(callback) }
 }
