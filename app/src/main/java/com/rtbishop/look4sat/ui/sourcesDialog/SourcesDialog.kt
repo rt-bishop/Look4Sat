@@ -55,7 +55,7 @@ class SourcesDialog : AppCompatDialogFragment() {
                 sourcesAdapter.addSource()
             }
             tleSourcesBtnPos.setOnClickListener {
-                viewModel.updateEntriesFromSources(sourcesAdapter.getSources())
+                viewModel.updateSatDataFromSources(sourcesAdapter.getSources())
                 dismiss()
             }
             tleSourcesBtnNeg.setOnClickListener { dismiss() }

@@ -33,6 +33,7 @@ import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
@@ -40,11 +41,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private val viewModel: SharedViewModel by activityViewModels()
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let { viewModel.updateEntriesFromFile(uri) }
+            uri?.let { viewModel.updateSatDataFromFile(uri) }
         }
     private var binding: FragmentEntriesBinding? = null
     private var entriesAdapter: EntriesAdapter? = null
 
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
@@ -70,6 +72,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         }
     }
 
+    @ExperimentalCoroutinesApi
     private fun setupObservers() {
         viewModel.satData.observe(viewLifecycleOwner, { result ->
             when (result) {
