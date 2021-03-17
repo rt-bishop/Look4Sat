@@ -29,68 +29,58 @@ import com.rtbishop.look4sat.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.getPredictor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
+@FlowPreview
 @HiltViewModel
 class SharedViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
     private val satelliteRepo: SatelliteRepo,
 ) : ViewModel() {
 
-    private val _satData = MutableStateFlow<Result<List<SatItem>>>(Result.InProgress)
+    private val satDataState = MutableSharedFlow<Result<List<SatItem>>>(replay = 0)
+    private val satDataFlow = satelliteRepo.satDataFlow.map { Result.Success(it) }
+    val satData = flowOf(satDataState, satDataFlow).flattenMerge().asLiveData()
+
     private val _passes = MutableStateFlow<Result<MutableList<SatPass>>>(Result.InProgress)
     val passes: LiveData<Result<MutableList<SatPass>>> = _passes.asLiveData()
-    val satData = _satData.asLiveData(viewModelScope.coroutineContext)
 
     init {
         if (prefsRepo.isFirstLaunch()) {
             updateSatDataFromSources()
             prefsRepo.setFirstLaunchDone()
         }
-        loadSatData()
         calculatePasses()
     }
 
-    private fun loadSatData() {
-        viewModelScope.launch {
-            delay(8)
-            satelliteRepo.satDataFlow.map { Result.Success(it) }.collect {
-                _satData.value = it
-            }
-        }
-    }
-
     fun updateSatDataFromFile(uri: Uri) {
-        _satData.value = Result.InProgress
         viewModelScope.launch {
+            satDataState.emit(Result.InProgress)
             try {
                 satelliteRepo.updateSatDataFromFile(uri)
             } catch (exception: Exception) {
-                _satData.value = Result.Error(exception)
+                satDataState.emit(Result.Error(exception))
             }
-            loadSatData()
         }
     }
 
     fun updateSatDataFromSources(sources: List<TleSource> = prefsRepo.loadTleSources()) {
-        _satData.value = Result.InProgress
         viewModelScope.launch {
+            satDataState.emit(Result.InProgress)
             val updateMillis = measureTimeMillis {
                 try {
-                    prefsRepo.saveTleSources(sources)
                     satelliteRepo.updateSatDataFromWeb(sources)
+                    prefsRepo.saveTleSources(sources)
                 } catch (exception: Exception) {
-                    _satData.value = Result.Error(exception)
+                    satDataState.emit(Result.Error(exception))
                 }
-                loadSatData()
             }
             Timber.d("Update from WEB took $updateMillis ms")
         }

@@ -34,7 +34,9 @@ import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 @AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
@@ -77,8 +79,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         viewModel.satData.observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> {
-                    entriesAdapter?.setItems(result.data)
-                    setLoaded()
+                    if (result.data.isEmpty()) {
+                        setEmpty()
+                    } else {
+                        entriesAdapter?.setItems(result.data)
+                        setLoaded()
+                    }
                 }
                 is Result.InProgress -> {
                     setLoading()
@@ -88,7 +94,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                     Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
                     entriesAdapter?.let { adapter ->
                         if (adapter.getItems().isEmpty()) {
-                            setError()
+                            setEmpty()
                         } else {
                             setLoaded()
                         }
@@ -109,16 +115,16 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private fun setLoading() {
         binding?.apply {
             entriesError.visibility = View.INVISIBLE
-            entriesRecycler.visibility = View.INVISIBLE
             entriesProgress.visibility = View.VISIBLE
+            entriesRecycler.visibility = View.INVISIBLE
         }
     }
 
-    private fun setError() {
+    private fun setEmpty() {
         binding?.apply {
+            entriesError.visibility = View.VISIBLE
             entriesProgress.visibility = View.INVISIBLE
             entriesRecycler.visibility = View.INVISIBLE
-            entriesError.visibility = View.VISIBLE
         }
     }
 
