@@ -23,17 +23,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
+import com.rtbishop.look4sat.utility.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SourcesDialog : AppCompatDialogFragment() {
 
-    private val viewModel: SharedViewModel by activityViewModels()
+    @Inject
+    lateinit var prefsRepo: PrefsRepo
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_sources, group, false)
@@ -41,7 +43,7 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        val sourcesAdapter = SourcesAdapter().apply { setSources(viewModel.getSources()) }
+        val sourcesAdapter = SourcesAdapter().apply { setSources(prefsRepo.loadTleSources()) }
         DialogSourcesBinding.bind(view).apply {
             dialog?.window?.setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -55,7 +57,7 @@ class SourcesDialog : AppCompatDialogFragment() {
                 sourcesAdapter.addSource()
             }
             tleSourcesBtnPos.setOnClickListener {
-                viewModel.updateSatDataFromSources(sourcesAdapter.getSources())
+                setNavResult("sources", sourcesAdapter.getSources().map { it.url })
                 dismiss()
             }
             tleSourcesBtnNeg.setOnClickListener { dismiss() }

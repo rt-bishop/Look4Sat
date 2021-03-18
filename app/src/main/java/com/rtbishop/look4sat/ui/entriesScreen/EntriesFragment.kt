@@ -28,9 +28,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
+import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.RecyclerDivider
+import com.rtbishop.look4sat.utility.getNavResult
 import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -54,6 +56,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         binding = FragmentEntriesBinding.bind(view)
         setupComponents()
         setupObservers()
+        observeSourcesResult()
     }
 
     private fun setupComponents() {
@@ -102,6 +105,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 }
             }
         })
+    }
+
+    private fun observeSourcesResult() {
+        getNavResult<List<String>>(R.id.nav_entries, "sources") { result ->
+            viewModel.updateSatDataFromSources(result.map { TleSource(it) })
+        }
     }
 
     private fun setLoaded() {
