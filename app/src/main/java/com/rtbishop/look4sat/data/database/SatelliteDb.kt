@@ -15,21 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.repository.remoteData
+package com.rtbishop.look4sat.data.database
 
-import com.rtbishop.look4sat.data.SatTrans
-import okhttp3.ResponseBody
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Streaming
-import retrofit2.http.Url
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.rtbishop.look4sat.data.model.SatEntry
+import com.rtbishop.look4sat.data.model.SatTrans
 
-interface SatelliteService {
+@Database(entities = [SatEntry::class, SatTrans::class], version = 2)
+@TypeConverters(RoomConverters::class)
+abstract class SatelliteDb : RoomDatabase() {
     
-    @Streaming
-    @GET
-    suspend fun fetchFile(@Url fileUrl: String): Response<ResponseBody>
-    
-    @GET("transmitters/")
-    suspend fun fetchTransmitters(): List<SatTrans>
+    abstract fun satelliteDao(): SatelliteDao
+}
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE sources")
+    }
 }

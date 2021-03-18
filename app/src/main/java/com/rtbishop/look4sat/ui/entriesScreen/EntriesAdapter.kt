@@ -21,7 +21,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.data.SatItem
+import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.databinding.ItemSatEntryBinding
 import java.util.*
 

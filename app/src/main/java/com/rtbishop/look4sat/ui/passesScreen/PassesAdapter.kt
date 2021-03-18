@@ -24,7 +24,7 @@ import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.SatPass
+import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
 import com.rtbishop.look4sat.utility.navigateSafe

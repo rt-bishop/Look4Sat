@@ -23,7 +23,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
-import com.rtbishop.look4sat.repository.PrefsRepo
+import com.rtbishop.look4sat.data.repository.PrefsRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

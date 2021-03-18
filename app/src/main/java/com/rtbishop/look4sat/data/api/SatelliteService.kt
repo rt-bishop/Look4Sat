@@ -15,6 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.data.api
 
-class SatItem(val catNum: Int, val name: String, var isSelected: Boolean)
+import com.rtbishop.look4sat.data.model.SatTrans
+import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Streaming
+import retrofit2.http.Url
+
+interface SatelliteService {
+
+    @Streaming
+    @GET
+    suspend fun fetchFileByUrl(@Url url: String): Response<ResponseBody>
+    
+    @GET("transmitters/")
+    suspend fun fetchTransmitters(): List<SatTrans>
+}

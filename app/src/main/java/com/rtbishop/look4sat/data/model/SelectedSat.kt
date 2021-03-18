@@ -15,16 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.data.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.github.amsacode.predict4java.TLE
+import com.github.amsacode.predict4java.Position
+import org.osmdroid.views.overlay.Overlay
 
-@Entity(tableName = "entries")
-class SatEntry(
-    val tle: TLE,
-    var isSelected: Boolean = false,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name
+class SelectedSat(
+    val pass: SatPass,
+    val catNum: Int,
+    val name: String,
+    val range: Double,
+    val altitude: Double,
+    val velocity: Double,
+    val qthLoc: String,
+    val osmPos: Position,
+    val coverage: Double,
+    val footprint: Overlay,
+    val groundTrack: Overlay
 )

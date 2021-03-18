@@ -15,21 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.data.model
 
-import com.github.amsacode.predict4java.Position
-import org.osmdroid.views.overlay.Overlay
-
-class SelectedSat(
-    val pass: SatPass,
-    val catNum: Int,
-    val name: String,
-    val range: Double,
-    val altitude: Double,
-    val velocity: Double,
-    val qthLoc: String,
-    val osmPos: Position,
-    val coverage: Double,
-    val footprint: Overlay,
-    val groundTrack: Overlay
-)
+class TleSource(var url: String = String())

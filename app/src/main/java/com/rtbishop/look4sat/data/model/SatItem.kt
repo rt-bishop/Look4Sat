@@ -15,15 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.data.model
 
-import com.github.amsacode.predict4java.SatPassTime
-import com.github.amsacode.predict4java.TLE
-import com.rtbishop.look4sat.utility.PassPredictor
-
-class SatPass(
-    val tle: TLE,
-    val predictor: PassPredictor,
-    val pass: SatPassTime,
-    var progress: Int = 0
-)
+class SatItem(val catNum: Int, val name: String, var isSelected: Boolean)

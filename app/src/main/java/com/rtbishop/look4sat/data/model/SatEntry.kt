@@ -15,25 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.repository.localData
+package com.rtbishop.look4sat.data.model
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.rtbishop.look4sat.data.SatEntry
-import com.rtbishop.look4sat.data.SatTrans
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.github.amsacode.predict4java.TLE
 
-@Database(entities = [SatEntry::class, SatTrans::class], version = 2)
-@TypeConverters(RoomConverters::class)
-abstract class SatelliteDb : RoomDatabase() {
-    
-    abstract fun satelliteDao(): SatelliteDao
-}
-
-val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE sources")
-    }
-}
+@Entity(tableName = "entries")
+class SatEntry(
+    val tle: TLE,
+    var isSelected: Boolean = false,
+    @PrimaryKey val catNum: Int = tle.catnum,
+    val name: String = tle.name
+)

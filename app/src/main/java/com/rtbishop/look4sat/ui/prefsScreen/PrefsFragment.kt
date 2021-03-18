@@ -28,7 +28,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.repository.PrefsRepo
+import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.AndroidEntryPoint

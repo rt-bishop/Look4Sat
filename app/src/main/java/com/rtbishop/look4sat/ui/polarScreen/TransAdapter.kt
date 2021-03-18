@@ -22,8 +22,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.SatPass
-import com.rtbishop.look4sat.data.SatTrans
+import com.rtbishop.look4sat.data.model.SatPass
+import com.rtbishop.look4sat.data.model.SatTrans
 import com.rtbishop.look4sat.databinding.ItemTransBinding
 import java.util.*
 

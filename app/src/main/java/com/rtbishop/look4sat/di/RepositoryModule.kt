@@ -19,10 +19,10 @@ package com.rtbishop.look4sat.di
 
 import android.content.Context
 import androidx.room.Room
-import com.rtbishop.look4sat.repository.localData.MIGRATION_1_2
-import com.rtbishop.look4sat.repository.localData.RoomConverters
-import com.rtbishop.look4sat.repository.localData.SatelliteDao
-import com.rtbishop.look4sat.repository.localData.SatelliteDb
+import com.rtbishop.look4sat.data.database.MIGRATION_1_2
+import com.rtbishop.look4sat.data.database.RoomConverters
+import com.rtbishop.look4sat.data.database.SatelliteDao
+import com.rtbishop.look4sat.data.database.SatelliteDb
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides

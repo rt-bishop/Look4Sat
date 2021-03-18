@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.repository
+package com.rtbishop.look4sat.data.repository
 
 import android.content.ContentResolver
 import android.net.Uri
 import com.github.amsacode.predict4java.Satellite
 import com.github.amsacode.predict4java.TLE
-import com.rtbishop.look4sat.data.SatEntry
-import com.rtbishop.look4sat.data.SatTrans
-import com.rtbishop.look4sat.data.TleSource
+import com.rtbishop.look4sat.data.model.SatEntry
+import com.rtbishop.look4sat.data.model.SatTrans
+import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.di.IoDispatcher
-import com.rtbishop.look4sat.repository.localData.SatelliteDao
-import com.rtbishop.look4sat.repository.remoteData.SatelliteService
+import com.rtbishop.look4sat.data.database.SatelliteDao
+import com.rtbishop.look4sat.data.api.SatelliteService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -45,10 +45,10 @@ class SatelliteRepo @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    val satDataFlow = satelliteDao.getSatItems()
+    val satDataFlow = satelliteDao.getAllSatItems()
 
     fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
-        return satelliteDao.getTransmittersForSat(catNum)
+        return satelliteDao.getTransmittersByCatNum(catNum)
     }
 
     suspend fun getSelectedSatellites(): List<Satellite> {
@@ -56,7 +56,7 @@ class SatelliteRepo @Inject constructor(
     }
 
     suspend fun updateEntriesSelection(catNums: List<Int>) {
-        satelliteDao.updateEntriesSelection(catNums)
+        satelliteDao.updateSelection(catNums)
     }
 
     suspend fun updateSatDataFromFile(uri: Uri) {
@@ -91,13 +91,14 @@ class SatelliteRepo @Inject constructor(
     private suspend fun getStreamsForSources(sources: List<TleSource>): List<InputStream> {
         val streams = mutableListOf<InputStream>()
         sources.forEach { tleSource ->
-            satelliteService.fetchFile(tleSource.url).body()?.byteStream()?.let { inputStream ->
-                if (tleSource.url.contains(".zip", true)) {
-                    streams.add(getZipStream(inputStream))
-                } else {
-                    streams.add(inputStream)
+            satelliteService.fetchFileByUrl(tleSource.url).body()?.byteStream()
+                ?.let { inputStream ->
+                    if (tleSource.url.contains(".zip", true)) {
+                        streams.add(getZipStream(inputStream))
+                    } else {
+                        streams.add(inputStream)
+                    }
                 }
-            }
         }
         return streams
     }
@@ -127,6 +128,6 @@ class SatelliteRepo @Inject constructor(
     private suspend fun insertEntriesAndRestoreSelection(entries: List<SatEntry>) {
         val selectedCatNums = satelliteDao.getSelectedCatNums()
         satelliteDao.insertEntries(entries)
-        satelliteDao.updateEntriesSelection(selectedCatNums)
+        satelliteDao.updateSelection(selectedCatNums)
     }
 }

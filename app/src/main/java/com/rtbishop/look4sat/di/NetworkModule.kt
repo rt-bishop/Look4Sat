@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.di
 
-import com.rtbishop.look4sat.repository.remoteData.SatelliteService
+import com.rtbishop.look4sat.data.api.SatelliteService
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides

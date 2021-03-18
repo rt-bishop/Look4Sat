@@ -24,17 +24,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.Result
-import com.rtbishop.look4sat.data.SatPass
+import com.rtbishop.look4sat.data.model.Result
+import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.repository.PrefsRepo
+import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import java.util.*
 import javax.inject.Inject
 
+@FlowPreview
 @AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes) {
 

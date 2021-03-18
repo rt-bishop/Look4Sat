@@ -27,7 +27,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.Result
+import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.utility.RecyclerDivider

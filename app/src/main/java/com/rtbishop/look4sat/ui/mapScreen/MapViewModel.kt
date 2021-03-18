@@ -25,9 +25,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
-import com.rtbishop.look4sat.data.SatPass
-import com.rtbishop.look4sat.data.SelectedSat
-import com.rtbishop.look4sat.repository.PrefsRepo
+import com.rtbishop.look4sat.data.model.SatPass
+import com.rtbishop.look4sat.data.model.SelectedSat
+import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.QthConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

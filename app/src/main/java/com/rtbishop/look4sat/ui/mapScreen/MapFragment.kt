@@ -28,13 +28,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.github.amsacode.predict4java.Position
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.Result
-import com.rtbishop.look4sat.data.SatPass
-import com.rtbishop.look4sat.data.SelectedSat
+import com.rtbishop.look4sat.data.model.Result
+import com.rtbishop.look4sat.data.model.SatPass
+import com.rtbishop.look4sat.data.model.SelectedSat
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.repository.PrefsRepo
+import com.rtbishop.look4sat.data.repository.PrefsRepo
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.ITileSource
 import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
@@ -47,6 +48,7 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
+@FlowPreview
 @AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map) {
 
