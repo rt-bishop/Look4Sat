@@ -74,7 +74,7 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>(),
     private fun filterByCatNum(list: List<SatItem>, catNum: Int): List<SatItem> {
         return list.filter { it.catNum == catNum }
     }
-    
+
     private fun filterByName(list: List<SatItem>, query: String): List<SatItem> {
         val defaultLocale = Locale.getDefault()
         val searchQuery = query.toLowerCase(defaultLocale)
@@ -83,29 +83,32 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>(),
             lowerCaseItem.contains(searchQuery)
         }
     }
-    
-    override fun getItemCount(): Int {
-        return currentItems.size
-    }
-    
+
+    override fun getItemCount(): Int = currentItems.size
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatItemHolder {
-        val binding = ItemSatEntryBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false)
-        return SatItemHolder(binding)
+        return SatItemHolder.from(parent)
     }
-    
+
     override fun onBindViewHolder(holder: SatItemHolder, position: Int) {
         holder.bind(currentItems[position])
     }
-    
-    inner class SatItemHolder(private val binding: ItemSatEntryBinding) :
+
+    class SatItemHolder private constructor(private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        
-        fun bind(satItem: SatItem) {
-            binding.satEntryCheckbox.text = satItem.name
-            binding.satEntryCheckbox.isChecked = satItem.isSelected
+
+        fun bind(item: SatItem) {
+            binding.satEntryCheckbox.text = item.name
+            binding.satEntryCheckbox.isChecked = item.isSelected
             itemView.setOnClickListener {
-                satItem.isSelected = binding.satEntryCheckbox.isChecked
+                item.isSelected = binding.satEntryCheckbox.isChecked
+            }
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): SatItemHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                return SatItemHolder(ItemSatEntryBinding.inflate(inflater, parent, false))
             }
         }
     }
