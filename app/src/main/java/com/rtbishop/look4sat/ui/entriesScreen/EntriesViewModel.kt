@@ -45,26 +45,26 @@ class EntriesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val satDataState = MutableSharedFlow<Result<List<SatItem>>>(replay = 0)
-    private val satDataFlow = satelliteRepo.satDataFlow.map { Result.Success(it) }
+    private val satDataFlow = satelliteRepo.getAllSatItems().map { Result.Success(it) }
     val satData = flowOf(satDataState, satDataFlow).flattenMerge().asLiveData()
 
-    fun updateSatDataFromFile(uri: Uri) {
+    fun importSatDataFromFile(uri: Uri) {
         viewModelScope.launch {
             satDataState.emit(Result.InProgress)
             try {
-                satelliteRepo.updateSatDataFromFile(uri)
+                satelliteRepo.importSatDataFromFile(uri)
             } catch (exception: Exception) {
                 satDataState.emit(Result.Error(exception))
             }
         }
     }
 
-    fun updateSatDataFromSources(sources: List<TleSource> = prefsRepo.loadTleSources()) {
+    fun importSatDataFromSources(sources: List<TleSource> = prefsRepo.loadTleSources()) {
         viewModelScope.launch {
             satDataState.emit(Result.InProgress)
             val updateMillis = measureTimeMillis {
                 try {
-                    satelliteRepo.updateSatDataFromWeb(sources)
+                    satelliteRepo.importSatDataFromWeb(sources)
                     prefsRepo.saveTleSources(sources)
                 } catch (exception: Exception) {
                     satDataState.emit(Result.Error(exception))
@@ -74,10 +74,16 @@ class EntriesViewModel @Inject constructor(
         }
     }
 
-    fun updateItemsSelection(items: List<SatItem>) {
+    fun updateEntriesSelection(items: List<Int>, isSelected: Boolean) {
         viewModelScope.launch {
-            val selectedEntries = items.filter { it.isSelected }.map { it.catNum }
-            satelliteRepo.updateEntriesSelection(selectedEntries)
+//            val selectedEntries = items.filter { it.isSelected }.map { it.catNum }
+//            satelliteRepo.updateEntriesSelection(selectedEntries, isSelected)
+        }
+    }
+
+    fun updateItemSelection(catNum: Int, isSelected: Boolean) {
+        viewModelScope.launch {
+            satelliteRepo.updateItemSelection(catNum, isSelected)
         }
     }
 }

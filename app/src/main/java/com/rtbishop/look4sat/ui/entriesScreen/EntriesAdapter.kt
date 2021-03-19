@@ -19,58 +19,46 @@ package com.rtbishop.look4sat.ui.entriesScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.SearchView
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.databinding.ItemSatEntryBinding
 import java.util.*
 
-class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>(),
-    SearchView.OnQueryTextListener {
-    
-    private val allItems = mutableListOf<SatItem>()
-    private val currentItems = mutableListOf<SatItem>()
-    private var shouldSearchAll = true
-    
-    fun getItems(): List<SatItem> {
-        return allItems
+class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
+
+    private var allItems = listOf<SatItem>()
+    private var selectAll = true
+    private lateinit var entriesClickListener: EntriesClickListener
+
+    fun submitAllItems(items: List<SatItem>) {
+        allItems = items
+        listDiffer.submitList(items)
     }
-    
-    fun setItems(items: List<SatItem>) {
-        allItems.clear()
-        allItems.addAll(items)
-        currentItems.clear()
-        currentItems.addAll(items)
-        notifyDataSetChanged()
+
+    private fun submitCurrentItems(items: List<SatItem>) {
+        listDiffer.submitList(items)
     }
-    
-    fun selectAllItems() {
-        currentItems.forEach { it.isSelected = shouldSearchAll }
-        shouldSearchAll = shouldSearchAll.not()
-        notifyDataSetChanged()
+
+    fun setEntriesClickListener(listener: EntriesClickListener) {
+        entriesClickListener = listener
     }
-    
-    override fun onQueryTextChange(newText: String): Boolean {
-        currentItems.clear()
-        currentItems.addAll(filterItems(allItems, newText).toMutableList())
-        notifyDataSetChanged()
-        return false
-    }
-    
-    override fun onQueryTextSubmit(query: String): Boolean {
-        return false
-    }
-    
-    private fun filterItems(list: List<SatItem>, query: String): List<SatItem> {
-        shouldSearchAll = true
-        if (query.isEmpty()) return list
-        return try {
-            filterByCatNum(list, query.toInt())
-        } catch (e: NumberFormatException) {
-            filterByName(list, query)
+
+    fun filterItems(query: String) {
+        selectAll = true
+        if (query.isEmpty()) {
+            submitCurrentItems(allItems)
+        } else {
+            try {
+                val catNum = query.toInt()
+                submitCurrentItems(filterByCatNum(allItems, catNum))
+            } catch (e: NumberFormatException) {
+                submitCurrentItems(filterByName(allItems, query))
+            }
         }
     }
-    
+
     private fun filterByCatNum(list: List<SatItem>, catNum: Int): List<SatItem> {
         return list.filter { it.catNum == catNum }
     }
@@ -84,31 +72,52 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>(),
         }
     }
 
-    override fun getItemCount(): Int = currentItems.size
+    fun selectAllItems() {
+//        currentItems.forEach { it.isSelected = selectAll }
+//        selectAll = selectAll.not()
+//        notifyDataSetChanged()
+
+//        val catNums = listDiffer.currentList.map { it.catNum }
+//        entriesClickListener.onSelectAllClick(catNums, selectAll)
+//        selectAll = selectAll.not()
+    }
+
+    interface EntriesClickListener {
+        fun onItemClick(catNum: Int, isSelected: Boolean)
+        fun onSelectAllClick(catNums: List<Int>, isSelected: Boolean)
+    }
+
+    private val diffCallback = object : DiffUtil.ItemCallback<SatItem>() {
+        override fun areItemsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
+            return oldItem.catNum == newItem.catNum
+        }
+
+        override fun areContentsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
+            return oldItem.isSelected == newItem.isSelected
+        }
+    }
+
+    private val listDiffer = AsyncListDiffer(this, diffCallback)
+
+    override fun getItemCount(): Int = listDiffer.currentList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatItemHolder {
-        return SatItemHolder.from(parent)
+        val inflater = LayoutInflater.from(parent.context)
+        return SatItemHolder(ItemSatEntryBinding.inflate(inflater, parent, false))
     }
 
     override fun onBindViewHolder(holder: SatItemHolder, position: Int) {
-        holder.bind(currentItems[position])
+        holder.bind(listDiffer.currentList[position])
     }
 
-    class SatItemHolder private constructor(private val binding: ItemSatEntryBinding) :
+    inner class SatItemHolder(private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: SatItem) {
             binding.satEntryCheckbox.text = item.name
             binding.satEntryCheckbox.isChecked = item.isSelected
             itemView.setOnClickListener {
-                item.isSelected = binding.satEntryCheckbox.isChecked
-            }
-        }
-
-        companion object {
-            fun from(parent: ViewGroup): SatItemHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                return SatItemHolder(ItemSatEntryBinding.inflate(inflater, parent, false))
+                entriesClickListener.onItemClick(item.catNum, !item.isSelected)
             }
         }
     }

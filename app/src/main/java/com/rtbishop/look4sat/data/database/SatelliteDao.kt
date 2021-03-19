@@ -33,16 +33,19 @@ interface SatelliteDao {
     fun getAllSatItems(): Flow<List<SatItem>>
 
     @Query("SELECT tle FROM entries WHERE isSelected = 1")
-    suspend fun getSelectedSatellites(): List<Satellite>
-
-    @Query("SELECT catNum FROM entries WHERE isSelected = 1")
-    suspend fun getSelectedCatNums(): List<Int>
+    fun getSelectedSatellitesFlow(): Flow<List<Satellite>>
 
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 ORDER BY mode ASC")
     fun getAllTransmitters(): Flow<List<SatTrans>>
 
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :catNum")
     fun getTransmittersByCatNum(catNum: Int): Flow<List<SatTrans>>
+
+    @Query("SELECT tle FROM entries WHERE isSelected = 1")
+    suspend fun getSelectedSatellites(): List<Satellite>
+
+    @Query("SELECT catNum FROM entries WHERE isSelected = 1")
+    suspend fun getSelectedCatNums(): List<Int>
 
     // Insert
 
@@ -54,31 +57,31 @@ interface SatelliteDao {
 
     // Update
 
-    @Query("UPDATE entries SET isSelected = 0")
-    suspend fun clearSelection()
-
-    @Query("UPDATE entries SET isSelected = :isSelected WHERE catNum = :catNum")
-    suspend fun updateSelectionByCatNum(catNum: Int, isSelected: Boolean)
-
     @Transaction
-    suspend fun updateSelection(catNums: List<Int>) {
-        clearSelection()
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        clearEntriesSelection()
         catNums.forEach { catNum ->
-            updateSelectionByCatNum(catNum, true)
+            updateItemSelection(catNum, true)
         }
     }
 
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearEntriesSelection()
+
+    @Query("UPDATE entries SET isSelected = :isSelected WHERE catNum = :catNum")
+    suspend fun updateItemSelection(catNum: Int, isSelected: Boolean)
+
     // Delete
-
-    @Query("DELETE from entries")
-    suspend fun deleteEntries()
-
-    @Query("DELETE from transmitters")
-    suspend fun deleteTransmitters()
 
     @Transaction
     suspend fun deleteAllData() {
         deleteEntries()
         deleteTransmitters()
     }
+
+    @Query("DELETE from entries")
+    suspend fun deleteEntries()
+
+    @Query("DELETE from transmitters")
+    suspend fun deleteTransmitters()
 }

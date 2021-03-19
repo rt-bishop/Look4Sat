@@ -51,13 +51,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <SearchView
+        <EditText
             android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="20dp"
+            android:hint="@string/entries_search_hint"
             android:iconifiedByDefault="false"
-            android:queryHint="@string/entries_search_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
             app:layout_constraintEnd_toStartOf="@+id/select_all"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
@@ -97,21 +99,13 @@
             android:layout_height="wrap_content"
             android:text="@string/entries_no_data"
             android:textSize="20sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/entries_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="@dimen/fab_padding"
-        android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_arrow" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

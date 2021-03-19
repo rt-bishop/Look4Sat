@@ -20,11 +20,12 @@ package com.rtbishop.look4sat.ui.entriesScreen
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
@@ -32,24 +33,21 @@ import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
-import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @AndroidEntryPoint
-class EntriesFragment : Fragment(R.layout.fragment_entries) {
+class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.EntriesClickListener {
 
     private val viewModel: EntriesViewModel by viewModels()
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let { viewModel.updateSatDataFromFile(uri) }
+            uri?.let { viewModel.importSatDataFromFile(uri) }
         }
     private var binding: FragmentEntriesBinding? = null
     private var entriesAdapter: EntriesAdapter? = null
 
-    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
@@ -59,24 +57,28 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupComponents() {
-        entriesAdapter = EntriesAdapter()
+        entriesAdapter = EntriesAdapter().apply {
+            setEntriesClickListener(this@EntriesFragment)
+        }
         binding?.apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = entriesAdapter
                 layoutManager = LinearLayoutManager(requireContext())
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectAll.setOnClickListener { entriesAdapter?.selectAllItems() }
-            entriesFab.setOnClickListener { navigateToPasses() }
-            searchBar.setOnQueryTextListener(entriesAdapter)
+            searchBar.addTextChangedListener {
+                entriesAdapter?.filterItems(it.toString())
+                binding?.entriesRecycler?.scrollToPosition(0)
+            }
             searchBar.clearFocus()
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun setupObservers() {
         viewModel.satData.observe(viewLifecycleOwner, { result ->
             when (result) {
@@ -84,7 +86,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                     if (result.data.isEmpty()) {
                         setEmpty()
                     } else {
-                        entriesAdapter?.setItems(result.data)
+                        entriesAdapter?.submitAllItems(result.data)
                         setLoaded()
                     }
                 }
@@ -94,13 +96,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 is Result.Error -> {
                     val errorMsg = getString(R.string.entries_update_error)
                     Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
-                    entriesAdapter?.let { adapter ->
-                        if (adapter.getItems().isEmpty()) {
-                            setEmpty()
-                        } else {
-                            setLoaded()
-                        }
-                    }
                 }
             }
         })
@@ -108,7 +103,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private fun observeSourcesResult() {
         getNavResult<List<String>>(R.id.nav_entries, "sources") { result ->
-            viewModel.updateSatDataFromSources(result.map { TleSource(it) })
+            viewModel.importSatDataFromSources(result.map { TleSource(it) })
         }
     }
 
@@ -140,15 +135,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         findNavController().navigate(R.id.nav_dialog_sources)
     }
 
-    private fun navigateToPasses() {
-        binding?.searchBar?.clearFocus()
-        entriesAdapter?.let {
-            val satItems = it.getItems()
-            if (satItems.isNotEmpty()) {
-                viewModel.updateItemsSelection(satItems)
-                requireView().findNavController().navigateSafe(R.id.action_entries_to_passes)
-            }
-        }
+    override fun onItemClick(catNum: Int, isSelected: Boolean) {
+        viewModel.updateItemSelection(catNum, isSelected)
+    }
+
+    override fun onSelectAllClick(catNums: List<Int>, isSelected: Boolean) {
+        viewModel.updateEntriesSelection(catNums, isSelected)
     }
 
     override fun onDestroyView() {

@@ -21,12 +21,13 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.github.amsacode.predict4java.Satellite
 import com.github.amsacode.predict4java.TLE
+import com.rtbishop.look4sat.data.api.SatelliteService
+import com.rtbishop.look4sat.data.database.SatelliteDao
 import com.rtbishop.look4sat.data.model.SatEntry
+import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.data.model.SatTrans
 import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.di.IoDispatcher
-import com.rtbishop.look4sat.data.database.SatelliteDao
-import com.rtbishop.look4sat.data.api.SatelliteService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -45,9 +46,21 @@ class SatelliteRepo @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    val satDataFlow = satelliteDao.getAllSatItems()
+    // Query
 
-    fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
+    fun getAllSatItems(): Flow<List<SatItem>> {
+        return satelliteDao.getAllSatItems()
+    }
+
+    fun getSelectedSatellitesFlow(): Flow<List<Satellite>> {
+        return satelliteDao.getSelectedSatellitesFlow()
+    }
+
+    fun getAllTransmitters(): Flow<List<SatTrans>> {
+        return satelliteDao.getAllTransmitters()
+    }
+
+    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>> {
         return satelliteDao.getTransmittersByCatNum(catNum)
     }
 
@@ -55,11 +68,9 @@ class SatelliteRepo @Inject constructor(
         return satelliteDao.getSelectedSatellites()
     }
 
-    suspend fun updateEntriesSelection(catNums: List<Int>) {
-        satelliteDao.updateSelection(catNums)
-    }
+    // Insert
 
-    suspend fun updateSatDataFromFile(uri: Uri) {
+    suspend fun importSatDataFromFile(uri: Uri) {
         runCatching {
             resolver.openInputStream(uri)?.use { stream ->
                 val entries = importEntriesFromStreams(listOf(stream))
@@ -70,20 +81,20 @@ class SatelliteRepo @Inject constructor(
         }
     }
 
-    suspend fun updateSatDataFromWeb(sources: List<TleSource>) {
+    suspend fun importSatDataFromWeb(sources: List<TleSource>) {
         coroutineScope {
-            launch { updateEntriesFromSources(sources) }
-            launch { updateTransmitters() }
+            launch { importEntriesFromSources(sources) }
+            launch { importTransmitters() }
         }
     }
 
-    private suspend fun updateEntriesFromSources(sources: List<TleSource>) {
+    private suspend fun importEntriesFromSources(sources: List<TleSource>) {
         val streams = getStreamsForSources(sources)
         val entries = importEntriesFromStreams(streams)
         insertEntriesAndRestoreSelection(entries)
     }
 
-    private suspend fun updateTransmitters() {
+    private suspend fun importTransmitters() {
         val transmitters = satelliteService.fetchTransmitters()
         satelliteDao.insertTransmitters(transmitters)
     }
@@ -128,6 +139,22 @@ class SatelliteRepo @Inject constructor(
     private suspend fun insertEntriesAndRestoreSelection(entries: List<SatEntry>) {
         val selectedCatNums = satelliteDao.getSelectedCatNums()
         satelliteDao.insertEntries(entries)
-        satelliteDao.updateSelection(selectedCatNums)
+        satelliteDao.updateEntriesSelection(selectedCatNums, true)
+    }
+
+    // Update
+
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        satelliteDao.updateEntriesSelection(catNums, isSelected)
+    }
+
+    suspend fun updateItemSelection(catNum: Int, isSelected: Boolean) {
+        satelliteDao.updateItemSelection(catNum, isSelected)
+    }
+
+    // Delete
+
+    suspend fun deleteAllData() {
+        satelliteDao.deleteAllData()
     }
 }

@@ -57,7 +57,7 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun getTransmittersForSat(satId: Int) = satelliteRepo.getTransmittersForSat(satId).asLiveData()
+    fun getTransmittersForSat(satId: Int) = satelliteRepo.getSatTransmitters(satId).asLiveData()
 
     fun calculatePasses(dateNow: Date = Date(System.currentTimeMillis())) {
         _passes.value = Result.InProgress
