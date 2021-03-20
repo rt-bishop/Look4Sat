@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerDivider(private val resId: Int) : RecyclerView.ItemDecoration() {
 
-    override fun onDrawOver(c: Canvas, parent: RecyclerView) {
+    override fun onDrawOver(canvas: Canvas, parent: RecyclerView) {
         ContextCompat.getDrawable(parent.context, resId)?.let { drawable ->
             val leftPos = parent.paddingLeft
             val rightPos = parent.width - parent.paddingRight
@@ -35,7 +35,7 @@ class RecyclerDivider(private val resId: Int) : RecyclerView.ItemDecoration() {
                         val topPos = view.bottom + params.bottomMargin
                         val bottomPos = topPos + drawable.intrinsicHeight
                         drawable.setBounds(leftPos, topPos, rightPos, bottomPos)
-                        drawable.draw(c)
+                        drawable.draw(canvas)
                     }
                 }
             }

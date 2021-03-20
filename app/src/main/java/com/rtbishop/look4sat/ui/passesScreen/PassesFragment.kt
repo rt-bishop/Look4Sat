@@ -20,32 +20,26 @@ package com.rtbishop.look4sat.ui.passesScreen
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
-import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import java.util.*
-import javax.inject.Inject
 
 @FlowPreview
 @AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes) {
 
-    @Inject
-    lateinit var prefsRepo: PrefsRepo
-
     private var binding: FragmentPassesBinding? = null
     private var passesAdapter: PassesAdapter? = null
-    private val viewModel: SharedViewModel by activityViewModels()
+    private val viewModel: PassesViewModel by viewModels()
     private var passes = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,7 +84,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setupComponents() {
-        passesAdapter = PassesAdapter(requireContext(), prefsRepo.shouldUseUTC())
+        passesAdapter = PassesAdapter(requireContext(), viewModel.shouldUseUTC())
         binding?.apply {
             passesRecycler.apply {
                 setHasFixedSize(true)
@@ -100,7 +94,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
             }
-            passesFab.setOnClickListener { viewModel.calculatePasses() }
         }
     }
 

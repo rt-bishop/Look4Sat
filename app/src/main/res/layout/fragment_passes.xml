@@ -65,13 +65,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/passes_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_marginBottom="@dimen/fab_padding"
-        android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_refresh" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

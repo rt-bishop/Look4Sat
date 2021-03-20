@@ -41,8 +41,10 @@ class PassesRepo @Inject constructor(
     private var selectedSatellites = emptyList<Satellite>()
 
     suspend fun calculatePasses(satellites: List<Satellite>) {
-        if (satellites !== selectedSatellites) {
-            withContext(defaultDispatcher) {
+        withContext(defaultDispatcher) {
+            val newCatNums = satellites.map { it.tle.catnum }
+            val oldCatNums = selectedSatellites.map { it.tle.catnum }
+            if (newCatNums != oldCatNums) {
                 _passes.value = Result.InProgress
                 selectedSatellites = satellites
                 val refDate = Date(System.currentTimeMillis())

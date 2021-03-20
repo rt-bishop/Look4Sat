@@ -15,35 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.passesScreen
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
-import com.rtbishop.look4sat.data.model.Result
-import com.rtbishop.look4sat.data.model.SatPass
+import androidx.lifecycle.viewModelScope
+import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@FlowPreview
 @HiltViewModel
-class SharedViewModel @Inject constructor(
-    prefsRepo: PrefsRepo,
+class PassesViewModel @Inject constructor(
+    private val prefsRepo: PrefsRepo,
     private val satelliteRepo: SatelliteRepo,
+    private val passesRepo: PassesRepo
 ) : ViewModel() {
 
-    private val _passes = MutableStateFlow<Result<MutableList<SatPass>>>(Result.InProgress)
-    val passes: LiveData<Result<MutableList<SatPass>>> = _passes.asLiveData()
+    val passes = passesRepo.passes.asLiveData()
 
     init {
-        if (prefsRepo.isFirstLaunch()) {
-            prefsRepo.setFirstLaunchDone()
+        viewModelScope.launch {
+            satelliteRepo.getSelectedSatellitesFlow().collect { selectedSatellites ->
+                passesRepo.calculatePasses(selectedSatellites)
+            }
         }
     }
 
@@ -54,5 +54,7 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun getTransmittersForSat(satId: Int) = satelliteRepo.getSatTransmitters(satId).asLiveData()
+    fun shouldUseUTC(): Boolean {
+        return prefsRepo.shouldUseUTC()
+    }
 }
