@@ -15,37 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.ui
+package com.rtbishop.look4sat.ui.polarScreen
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
-import com.rtbishop.look4sat.data.model.Result
-import com.rtbishop.look4sat.data.model.SatPass
+import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
-@FlowPreview
 @HiltViewModel
-class SharedViewModel @Inject constructor(
-    prefsRepo: PrefsRepo,
-    private val satelliteRepo: SatelliteRepo,
+class PolarViewModel @Inject constructor(
+    private val prefsRepo: PrefsRepo,
+    passesRepo: PassesRepo,
+    private val satelliteRepo: SatelliteRepo
 ) : ViewModel() {
 
-    private val _passes = MutableStateFlow<Result<MutableList<SatPass>>>(Result.InProgress)
-    val passes: LiveData<Result<MutableList<SatPass>>> = _passes.asLiveData()
-
-    init {
-        if (prefsRepo.isFirstLaunch()) {
-            prefsRepo.setFirstLaunchDone()
-        }
-    }
+    val passes = passesRepo.passes.asLiveData()
 
     fun getAppTimer() = liveData {
         while (true) {

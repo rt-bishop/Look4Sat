@@ -25,16 +25,15 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
-import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.data.repository.PrefsRepo
-import com.rtbishop.look4sat.ui.SharedViewModel
+import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,7 +53,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     private lateinit var binding: FragmentPolarBinding
     private lateinit var satPass: SatPass
     private lateinit var sensorManager: SensorManager
-    private val viewModel: SharedViewModel by activityViewModels()
+    private val viewModel: PolarViewModel by viewModels()
     private var magneticDeclination = 0f
     private var polarView: PolarView? = null
 

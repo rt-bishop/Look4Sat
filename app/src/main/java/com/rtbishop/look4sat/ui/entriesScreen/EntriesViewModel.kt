@@ -59,13 +59,13 @@ class EntriesViewModel @Inject constructor(
         }
     }
 
-    fun importSatDataFromSources(sources: List<TleSource> = prefsRepo.loadTleSources()) {
+    fun importSatDataFromSources(sources: List<TleSource> = prefsRepo.loadDefaultSources()) {
         viewModelScope.launch {
             satDataState.emit(Result.InProgress)
             val updateMillis = measureTimeMillis {
                 try {
-                    satelliteRepo.importSatDataFromWeb(sources)
                     prefsRepo.saveTleSources(sources)
+                    satelliteRepo.importSatDataFromWeb(sources)
                 } catch (exception: Exception) {
                     satDataState.emit(Result.Error(exception))
                 }

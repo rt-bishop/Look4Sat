@@ -24,16 +24,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.github.amsacode.predict4java.Position
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.model.SelectedSat
-import com.rtbishop.look4sat.databinding.FragmentMapBinding
-import com.rtbishop.look4sat.ui.SharedViewModel
 import com.rtbishop.look4sat.data.repository.PrefsRepo
+import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
@@ -56,7 +54,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     lateinit var prefsRepo: PrefsRepo
     private lateinit var binding: FragmentMapBinding
     private val mapViewModel: MapViewModel by viewModels()
-    private val sharedViewModel: SharedViewModel by activityViewModels()
     private val minLat = MapView.getTileSystem().minLatitude
     private val maxLat = MapView.getTileSystem().maxLatitude
 
@@ -85,7 +82,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun setupObservers() {
         mapViewModel.getGSP().observe(viewLifecycleOwner, { setupPosOverlay(it) })
-        sharedViewModel.passes.observe(viewLifecycleOwner, {
+        mapViewModel.passes.observe(viewLifecycleOwner, {
             if (it is Result.Success && it.data.isNotEmpty()) {
                 mapViewModel.setPasses(it.data)
                 binding.fabPrev.setOnClickListener { mapViewModel.scrollSelection(true) }

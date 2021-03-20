@@ -135,7 +135,7 @@ class PrefsRepo @Inject constructor(val preferences: SharedPreferences, moshi: M
         preferences.edit { putString(keySources, sourcesJson) }
     }
     
-    private fun loadDefaultSources(): List<TleSource> {
+    fun loadDefaultSources(): List<TleSource> {
         return listOf(
             TleSource("https://celestrak.com/NORAD/elements/active.txt"),
             TleSource("https://amsat.org/tle/current/nasabare.txt"),

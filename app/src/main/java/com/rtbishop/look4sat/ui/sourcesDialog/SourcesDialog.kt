@@ -49,18 +49,18 @@ class SourcesDialog : AppCompatDialogFragment() {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-            tleSourcesRecycler.apply {
+            sourcesRecycler.apply {
                 adapter = sourcesAdapter
                 layoutManager = LinearLayoutManager(requireContext())
             }
-            tleSourceBtnAdd.setOnClickListener {
+            sourceBtnAdd.setOnClickListener {
                 sourcesAdapter.addSource()
             }
-            tleSourcesBtnPos.setOnClickListener {
+            sourcesBtnPos.setOnClickListener {
                 setNavResult("sources", sourcesAdapter.getSources().map { it.url })
                 dismiss()
             }
-            tleSourcesBtnNeg.setOnClickListener { dismiss() }
+            sourcesBtnNeg.setOnClickListener { dismiss() }
         }
     }
 }

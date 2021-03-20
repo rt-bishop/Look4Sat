@@ -39,7 +39,7 @@ class SplashDialog : AppCompatDialogFragment() {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-            splashButton.setOnClickListener { dismiss() }
+            splashOkButton.setOnClickListener { dismiss() }
         }
     }
 }

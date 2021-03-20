@@ -31,7 +31,7 @@
         android:background="@drawable/rounded_corner"
         android:contentDescription="@string/placeholder"
         android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/splashButton"
+        app:layout_constraintBottom_toTopOf="@+id/splashOkButton"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toStartOf="@+id/splashTleMsg"
         app:layout_constraintHorizontal_bias="0.5"
@@ -69,7 +69,7 @@
         app:layout_constraintTop_toTopOf="@+id/splashTleIcon" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/splashButton"
+        android:id="@+id/splashOkButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

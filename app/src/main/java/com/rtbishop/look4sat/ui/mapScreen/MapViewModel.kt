@@ -19,14 +19,12 @@ package com.rtbishop.look4sat.ui.mapScreen
 
 import android.graphics.Color
 import android.graphics.Paint
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.model.SelectedSat
+import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.utility.QthConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,9 +46,10 @@ import kotlin.math.sqrt
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
+    passesRepo: PassesRepo,
     private val qthConverter: QthConverter
 ) : ViewModel() {
-    
+
     private val dateNow = Date()
     private val trackPaint = Paint().apply {
         strokeWidth = 2f
@@ -76,6 +75,8 @@ class MapViewModel @Inject constructor(
 
     private val _satMarkers = MutableLiveData<Map<SatPass, Position>>()
     fun getSatMarkers(): LiveData<Map<SatPass, Position>> = _satMarkers
+
+    val passes = passesRepo.passes.asLiveData()
 
     fun setPasses(passesList: List<SatPass>) {
         filteredPasses = passesList.distinctBy { it.tle }

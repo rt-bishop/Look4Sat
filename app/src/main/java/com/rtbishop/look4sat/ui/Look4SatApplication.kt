@@ -15,14 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat
+package com.rtbishop.look4sat.ui
 
 import android.app.Application
+import com.rtbishop.look4sat.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @HiltAndroidApp
-class Look4SatApp : Application() {
+class Look4SatApplication : Application() {
+
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {

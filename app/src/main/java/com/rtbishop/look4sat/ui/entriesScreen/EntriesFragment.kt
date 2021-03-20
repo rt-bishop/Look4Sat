@@ -100,7 +100,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
 
     private fun observeSourcesResult() {
         getNavResult<List<String>>(R.id.nav_entries, "sources") { result ->
-            viewModel.importSatDataFromSources(result.map { TleSource(it) })
+            val sources = result.map { TleSource(it) }
+            if (sources.isNullOrEmpty()) {
+                viewModel.importSatDataFromSources()
+            } else {
+                viewModel.importSatDataFromSources(sources)
+            }
         }
     }
 
