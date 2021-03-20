@@ -76,14 +76,7 @@ class EntriesViewModel @Inject constructor(
 
     fun updateEntriesSelection(items: List<Int>, isSelected: Boolean) {
         viewModelScope.launch {
-//            val selectedEntries = items.filter { it.isSelected }.map { it.catNum }
-//            satelliteRepo.updateEntriesSelection(selectedEntries, isSelected)
-        }
-    }
-
-    fun updateItemSelection(catNum: Int, isSelected: Boolean) {
-        viewModelScope.launch {
-            satelliteRepo.updateItemSelection(catNum, isSelected)
+            satelliteRepo.updateEntriesSelection(items, isSelected)
         }
     }
 }

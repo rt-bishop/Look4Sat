@@ -28,65 +28,6 @@ import java.util.*
 
 class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
 
-    private var allItems = listOf<SatItem>()
-    private var selectAll = true
-    private lateinit var entriesClickListener: EntriesClickListener
-
-    fun submitAllItems(items: List<SatItem>) {
-        allItems = items
-        listDiffer.submitList(items)
-    }
-
-    private fun submitCurrentItems(items: List<SatItem>) {
-        listDiffer.submitList(items)
-    }
-
-    fun setEntriesClickListener(listener: EntriesClickListener) {
-        entriesClickListener = listener
-    }
-
-    fun filterItems(query: String) {
-        selectAll = true
-        if (query.isEmpty()) {
-            submitCurrentItems(allItems)
-        } else {
-            try {
-                val catNum = query.toInt()
-                submitCurrentItems(filterByCatNum(allItems, catNum))
-            } catch (e: NumberFormatException) {
-                submitCurrentItems(filterByName(allItems, query))
-            }
-        }
-    }
-
-    private fun filterByCatNum(list: List<SatItem>, catNum: Int): List<SatItem> {
-        return list.filter { it.catNum == catNum }
-    }
-
-    private fun filterByName(list: List<SatItem>, query: String): List<SatItem> {
-        val defaultLocale = Locale.getDefault()
-        val searchQuery = query.toLowerCase(defaultLocale)
-        return list.filter { satItem ->
-            val lowerCaseItem = satItem.name.toLowerCase(defaultLocale)
-            lowerCaseItem.contains(searchQuery)
-        }
-    }
-
-    fun selectAllItems() {
-//        currentItems.forEach { it.isSelected = selectAll }
-//        selectAll = selectAll.not()
-//        notifyDataSetChanged()
-
-//        val catNums = listDiffer.currentList.map { it.catNum }
-//        entriesClickListener.onSelectAllClick(catNums, selectAll)
-//        selectAll = selectAll.not()
-    }
-
-    interface EntriesClickListener {
-        fun onItemClick(catNum: Int, isSelected: Boolean)
-        fun onSelectAllClick(catNums: List<Int>, isSelected: Boolean)
-    }
-
     private val diffCallback = object : DiffUtil.ItemCallback<SatItem>() {
         override fun areItemsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
             return oldItem.catNum == newItem.catNum
@@ -96,28 +37,85 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
             return oldItem.isSelected == newItem.isSelected
         }
     }
-
     private val listDiffer = AsyncListDiffer(this, diffCallback)
+    private var allItems = emptyList<SatItem>()
+    private var shouldSelectAll = true
+    private lateinit var entriesClickListener: EntriesClickListener
+
+    interface EntriesClickListener {
+        fun updateSelection(catNums: List<Int>, isSelected: Boolean)
+    }
+
+    fun setEntriesClickListener(listener: EntriesClickListener) {
+        entriesClickListener = listener
+    }
+
+    fun submitAllItems(items: List<SatItem>) {
+        allItems = items
+        listDiffer.submitList(items)
+    }
+
+    fun selectAllItems() {
+        val catNums = listDiffer.currentList.map { it.catNum }
+        entriesClickListener.updateSelection(catNums, shouldSelectAll)
+        shouldSelectAll = !shouldSelectAll
+    }
+
+    fun filterItems(query: String) {
+        if (query.isEmpty()) {
+            submitCurrentItems(allItems)
+        } else {
+            try {
+                filterByCatNum(query.toInt())
+            } catch (e: NumberFormatException) {
+                filterByName(query)
+            }
+        }
+        shouldSelectAll = true
+    }
+
+    private fun submitCurrentItems(items: List<SatItem>) {
+        listDiffer.submitList(items)
+    }
+
+    private fun filterByCatNum(catNum: Int) {
+        submitCurrentItems(allItems.filter { it.catNum == catNum })
+    }
+
+    private fun filterByName(query: String) {
+        val searchQuery = query.toLowerCase(Locale.getDefault())
+        val filteredItems = allItems.filter { satItem ->
+            val lowerCaseItem = satItem.name.toLowerCase(Locale.getDefault())
+            lowerCaseItem.contains(searchQuery)
+        }
+        submitCurrentItems(filteredItems)
+    }
 
     override fun getItemCount(): Int = listDiffer.currentList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatItemHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return SatItemHolder(ItemSatEntryBinding.inflate(inflater, parent, false))
+        return SatItemHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: SatItemHolder, position: Int) {
-        holder.bind(listDiffer.currentList[position])
+        holder.bind(listDiffer.currentList[position], entriesClickListener)
     }
 
-    inner class SatItemHolder(private val binding: ItemSatEntryBinding) :
+    class SatItemHolder private constructor(private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: SatItem) {
-            binding.satEntryCheckbox.text = item.name
-            binding.satEntryCheckbox.isChecked = item.isSelected
+        fun bind(item: SatItem, clickListener: EntriesClickListener) {
+            binding.satItemCheckbox.text = item.name
+            binding.satItemCheckbox.isChecked = item.isSelected
             itemView.setOnClickListener {
-                entriesClickListener.onItemClick(item.catNum, !item.isSelected)
+                clickListener.updateSelection(listOf(item.catNum), item.isSelected.not())
+            }
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): SatItemHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                return SatItemHolder(ItemSatEntryBinding.inflate(inflater, parent, false))
             }
         }
     }

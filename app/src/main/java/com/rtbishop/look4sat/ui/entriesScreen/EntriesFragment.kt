@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.ui.entriesScreen
 
 import android.os.Bundle
+import android.text.Editable
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
@@ -45,21 +46,20 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let { viewModel.importSatDataFromFile(uri) }
         }
+    private val entriesAdapter = EntriesAdapter().apply {
+        setEntriesClickListener(this@EntriesFragment)
+    }
     private var binding: FragmentEntriesBinding? = null
-    private var entriesAdapter: EntriesAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEntriesBinding.bind(view)
         setupComponents()
-        setupObservers()
+        observeSatelliteData()
         observeSourcesResult()
     }
 
     private fun setupComponents() {
-        entriesAdapter = EntriesAdapter().apply {
-            setEntriesClickListener(this@EntriesFragment)
-        }
         binding?.apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
@@ -70,23 +70,20 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
-            selectAll.setOnClickListener { entriesAdapter?.selectAllItems() }
-            searchBar.addTextChangedListener {
-                entriesAdapter?.filterItems(it.toString())
-                binding?.entriesRecycler?.scrollToPosition(0)
-            }
+            selectAll.setOnClickListener { entriesAdapter.selectAllItems() }
+            searchBar.addTextChangedListener { query -> filterByQuery(query) }
             searchBar.clearFocus()
         }
     }
 
-    private fun setupObservers() {
+    private fun observeSatelliteData() {
         viewModel.satData.observe(viewLifecycleOwner, { result ->
             when (result) {
                 is Result.Success -> {
                     if (result.data.isEmpty()) {
                         setEmpty()
                     } else {
-                        entriesAdapter?.submitAllItems(result.data)
+                        entriesAdapter.submitAllItems(result.data)
                         setLoaded()
                     }
                 }
@@ -131,20 +128,20 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         }
     }
 
+    private fun filterByQuery(it: Editable?) {
+        entriesAdapter.filterItems(it.toString())
+        binding?.entriesRecycler?.scrollToPosition(0)
+    }
+
     private fun showImportFromWebDialog() {
         findNavController().navigate(R.id.nav_dialog_sources)
     }
 
-    override fun onItemClick(catNum: Int, isSelected: Boolean) {
-        viewModel.updateItemSelection(catNum, isSelected)
-    }
-
-    override fun onSelectAllClick(catNums: List<Int>, isSelected: Boolean) {
+    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
         viewModel.updateEntriesSelection(catNums, isSelected)
     }
 
     override fun onDestroyView() {
-        entriesAdapter = null
         binding = null
         super.onDestroyView()
     }

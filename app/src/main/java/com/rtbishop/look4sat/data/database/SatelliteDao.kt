@@ -58,10 +58,17 @@ interface SatelliteDao {
     // Update
 
     @Transaction
-    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+    suspend fun restoreEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         clearEntriesSelection()
         catNums.forEach { catNum ->
-            updateItemSelection(catNum, true)
+            updateItemSelection(catNum, isSelected)
+        }
+    }
+
+    @Transaction
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        catNums.forEach { catNum ->
+            updateItemSelection(catNum, isSelected)
         }
     }
 

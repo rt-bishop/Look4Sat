@@ -139,17 +139,13 @@ class SatelliteRepo @Inject constructor(
     private suspend fun insertEntriesAndRestoreSelection(entries: List<SatEntry>) {
         val selectedCatNums = satelliteDao.getSelectedCatNums()
         satelliteDao.insertEntries(entries)
-        satelliteDao.updateEntriesSelection(selectedCatNums, true)
+        satelliteDao.restoreEntriesSelection(selectedCatNums, true)
     }
 
     // Update
 
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         satelliteDao.updateEntriesSelection(catNums, isSelected)
-    }
-
-    suspend fun updateItemSelection(catNum: Int, isSelected: Boolean) {
-        satelliteDao.updateItemSelection(catNum, isSelected)
     }
 
     // Delete
