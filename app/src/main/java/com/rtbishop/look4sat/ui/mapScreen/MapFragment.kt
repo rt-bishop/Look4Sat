@@ -26,9 +26,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.github.amsacode.predict4java.Position
+import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.model.Result
-import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.model.SelectedSat
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
@@ -77,18 +76,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
         }
+        binding.fabPrev.setOnClickListener { mapViewModel.scrollSelection(true) }
+        binding.fabNext.setOnClickListener { mapViewModel.scrollSelection(false) }
         setupObservers()
     }
 
     private fun setupObservers() {
-        mapViewModel.getGSP().observe(viewLifecycleOwner, { setupPosOverlay(it) })
-        mapViewModel.passes.observe(viewLifecycleOwner, {
-            if (it is Result.Success && it.data.isNotEmpty()) {
-                mapViewModel.setPasses(it.data)
-                binding.fabPrev.setOnClickListener { mapViewModel.scrollSelection(true) }
-                binding.fabNext.setOnClickListener { mapViewModel.scrollSelection(false) }
-            }
-        })
+        mapViewModel.stationPosition.observe(viewLifecycleOwner, { setupPosOverlay(it) })
         mapViewModel.getSelectedSat().observe(viewLifecycleOwner, { setSelectedSatDetails(it) })
         mapViewModel.getSatMarkers().observe(viewLifecycleOwner, { setMarkers(it) })
     }
@@ -122,7 +116,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setMarkers(map: Map<SatPass, Position>) {
+    private fun setMarkers(map: Map<Satellite, Position>) {
         binding.apply {
             val markers = FolderOverlay()
             map.entries.forEach {
@@ -185,7 +179,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         tintedMatrix.preConcat(negativeMatrix)
         return ColorMatrixColorFilter(tintedMatrix)
     }
-    
+
     private fun getMinZoom(screenHeight: Int): Double {
         val minZoom = MapView.getTileSystem().getLatitudeZoom(maxLat, minLat, screenHeight)
         Timber.d("Min zoom level for this screen: $minZoom")
