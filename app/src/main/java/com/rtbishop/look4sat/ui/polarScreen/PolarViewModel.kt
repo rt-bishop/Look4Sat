@@ -30,17 +30,25 @@ import javax.inject.Inject
 @HiltViewModel
 class PolarViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
-    passesRepo: PassesRepo,
+    private val passesRepo: PassesRepo,
     private val satelliteRepo: SatelliteRepo
 ) : ViewModel() {
-
-    val passes = passesRepo.passes.asLiveData()
 
     fun getAppTimer() = liveData {
         while (true) {
             emit(System.currentTimeMillis())
             delay(1000)
         }
+    }
+
+    fun getPasses() = passesRepo.passes.asLiveData()
+
+    fun shouldUseCompass(): Boolean {
+        return prefsRepo.shouldUseCompass()
+    }
+
+    fun getMagDeclination(): Float {
+        return prefsRepo.getMagDeclination()
     }
 
     fun getTransmittersForSat(satId: Int) = satelliteRepo.getSatTransmitters(satId).asLiveData()

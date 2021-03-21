@@ -17,7 +17,6 @@
  */
 package com.rtbishop.look4sat.ui.passesScreen
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
@@ -31,22 +30,9 @@ import com.rtbishop.look4sat.utility.navigateSafe
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false) :
+class PassesAdapter(private val shouldUseUTC: Boolean = false) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val currentDate = Date()
-    private val satIdFormat = context.getString(R.string.pass_satId)
-    private val azFormat = context.getString(R.string.pat_azimuth)
-    private val altFormat = context.getString(R.string.pat_altitude)
-    private val elevFormat = context.getString(R.string.pat_elevation)
-    private val aosAzFormat = context.getString(R.string.pass_aosAz)
-    private val maxElFormat = context.getString(R.string.pass_maxEl)
-    private val losAzFormat = context.getString(R.string.pass_losAz)
-    private val startTimeFormat = context.getString(R.string.pass_startTime)
-    private val endTimeFormat = context.getString(R.string.pass_endTime)
-    private val timeZoneUTC = TimeZone.getTimeZone("UTC")
-    private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
-    private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
     private var satPassList: MutableList<SatPass> = mutableListOf()
 
     fun setList(list: MutableList<SatPass>) {
@@ -55,11 +41,10 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
     }
 
     fun tickPasses(timeNow: Long) {
-        currentDate.time = timeNow
         val iterator = satPassList.listIterator()
         while (iterator.hasNext()) {
             val satPass = iterator.next()
-            if (!satPass.tle.isDeepspace) {
+            if (!satPass.satellite.tle.isDeepspace) {
                 if (satPass.progress < 100) {
                     val timeStart = satPass.pass.startTime.time
                     if (timeNow > timeStart) {
@@ -84,42 +69,49 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (satPassList[position].tle.isDeepspace) 1
+        return if (satPassList[position].satellite.tle.isDeepspace) 1
         else 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == 0) {
-            val bindingLeo = ItemPassLeoBinding
-                .inflate(LayoutInflater.from(parent.context), parent, false)
-            SatPassLeoHolder(bindingLeo)
+            SatPassLeoHolder.from(parent)
         } else {
-            val bindingGeo = ItemPassGeoBinding
-                .inflate(LayoutInflater.from(parent.context), parent, false)
-            SatPassGeoHolder(bindingGeo)
+            SatPassGeoHolder.from(parent)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder.itemViewType == 0) {
-            (holder as SatPassLeoHolder).bind(satPassList[position])
+            (holder as SatPassLeoHolder).bind(satPassList[position], position, shouldUseUTC)
         } else {
-            (holder as SatPassGeoHolder).bind(satPassList[position])
+            (holder as SatPassGeoHolder).bind(satPassList[position], position)
         }
     }
 
-    inner class SatPassLeoHolder(private val binding: ItemPassLeoBinding) :
+    class SatPassLeoHolder private constructor(private val binding: ItemPassLeoBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(satPass: SatPass) {
-            val satPos = satPass.predictor.getSatPos(currentDate)
+        private val satIdFormat = itemView.context.getString(R.string.pass_satId)
+        private val altFormat = itemView.context.getString(R.string.pat_altitude)
+        private val aosAzFormat = itemView.context.getString(R.string.pass_aosAz)
+        private val maxElFormat = itemView.context.getString(R.string.pass_maxEl)
+        private val losAzFormat = itemView.context.getString(R.string.pass_losAz)
+        private val startTimeFormat = itemView.context.getString(R.string.pass_startTime)
+        private val endTimeFormat = itemView.context.getString(R.string.pass_endTime)
+        private val timeZoneUTC = TimeZone.getTimeZone("UTC")
+        private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
+        private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
+
+        fun bind(satPass: SatPass, position: Int, shouldUseUTC: Boolean) {
+            val satPos = satPass.predictor.getSatPos(Date())
             binding.apply {
                 if (shouldUseUTC) {
                     startFormat.timeZone = timeZoneUTC
                     endFormat.timeZone = timeZoneUTC
                 }
-                passLeoSatName.text = satPass.tle.name
-                passLeoSatId.text = String.format(satIdFormat, satPass.tle.catnum)
+                passLeoSatName.text = satPass.satellite.tle.name
+                passLeoSatId.text = String.format(satIdFormat, satPass.satellite.tle.catnum)
                 passLeoAosAz.text = String.format(aosAzFormat, satPass.pass.aosAzimuth)
                 passLeoMaxEl.text = String.format(maxElFormat, satPass.pass.maxEl)
                 passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth)
@@ -131,29 +123,48 @@ class PassesAdapter(context: Context, private val shouldUseUTC: Boolean = false)
 
             itemView.setOnClickListener {
                 if (satPass.progress < 100) {
-                    val bundle = bundleOf("index" to satPassList.indexOf(satPass))
+                    val bundle = bundleOf("index" to position)
                     itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
                 }
             }
         }
+
+        companion object {
+            fun from(parent: ViewGroup): SatPassLeoHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                return SatPassLeoHolder(ItemPassLeoBinding.inflate(inflater, parent, false))
+            }
+        }
     }
 
-    inner class SatPassGeoHolder(private val binding: ItemPassGeoBinding) :
+    class SatPassGeoHolder private constructor(private val binding: ItemPassGeoBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(satPass: SatPass) {
-            val satPos = satPass.predictor.getSatPos(currentDate)
+        private val satIdFormat = itemView.context.getString(R.string.pass_satId)
+        private val azFormat = itemView.context.getString(R.string.pat_azimuth)
+        private val altFormat = itemView.context.getString(R.string.pat_altitude)
+        private val elevFormat = itemView.context.getString(R.string.pat_elevation)
+
+        fun bind(satPass: SatPass, position: Int) {
+            val satPos = satPass.predictor.getSatPos(Date())
             binding.apply {
-                passGeoSatName.text = satPass.tle.name
-                passGeoSatId.text = String.format(satIdFormat, satPass.tle.catnum)
+                passGeoSatName.text = satPass.satellite.tle.name
+                passGeoSatId.text = String.format(satIdFormat, satPass.satellite.tle.catnum)
                 passGeoAz.text = String.format(azFormat, Math.toDegrees(satPos.azimuth))
                 passGeoAlt.text = String.format(altFormat, satPos.altitude)
                 passGeoEl.text = String.format(elevFormat, Math.toDegrees(satPos.elevation))
             }
 
             itemView.setOnClickListener {
-                val bundle = bundleOf("index" to satPassList.indexOf(satPass))
+                val bundle = bundleOf("index" to position)
                 itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
+            }
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): SatPassGeoHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                return SatPassGeoHolder(ItemPassGeoBinding.inflate(inflater, parent, false))
             }
         }
     }

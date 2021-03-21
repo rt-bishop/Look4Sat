@@ -37,10 +37,10 @@ import java.util.*
 @AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes) {
 
-    private var binding: FragmentPassesBinding? = null
-    private var passesAdapter: PassesAdapter? = null
     private val viewModel: PassesViewModel by viewModels()
     private var passes = mutableListOf<SatPass>()
+    private var binding: FragmentPassesBinding? = null
+    private var passesAdapter: PassesAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -84,7 +84,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setupComponents() {
-        passesAdapter = PassesAdapter(requireContext(), viewModel.shouldUseUTC())
+        passesAdapter = PassesAdapter(viewModel.shouldUseUTC())
         binding?.apply {
             passesRecycler.apply {
                 setHasFixedSize(true)

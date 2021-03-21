@@ -32,22 +32,17 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
-import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import java.util.*
-import javax.inject.Inject
 import kotlin.math.round
 
 @FlowPreview
 @AndroidEntryPoint
 class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
-
-    @Inject
-    lateinit var prefsRepo: PrefsRepo
 
     private lateinit var transmitterAdapter: TransAdapter
     private lateinit var binding: FragmentPolarBinding
@@ -61,13 +56,13 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPolarBinding.bind(view)
         sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        magneticDeclination = prefsRepo.getMagDeclination()
+        magneticDeclination = viewModel.getMagDeclination()
         observePasses()
     }
 
     override fun onResume() {
         super.onResume()
-        if (prefsRepo.shouldUseCompass()) {
+        if (viewModel.shouldUseCompass()) {
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
             }
@@ -76,7 +71,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        if (prefsRepo.shouldUseCompass()) {
+        if (viewModel.shouldUseCompass()) {
             sensorManager.unregisterListener(this)
         }
     }
@@ -98,7 +93,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun observePasses() {
-        viewModel.passes.observe(viewLifecycleOwner, { result ->
+        viewModel.getPasses().observe(viewLifecycleOwner, { result ->
             if (result is Result.Success) {
                 satPass = result.data[requireArguments().getInt("index")]
                 polarView = PolarView(requireContext()).apply { setPass(satPass) }
@@ -109,26 +104,27 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun observeTransmitters() {
-        viewModel.getTransmittersForSat(satPass.tle.catnum).observe(viewLifecycleOwner, { list ->
-            transmitterAdapter = TransAdapter(requireContext(), satPass)
-            if (list.isNotEmpty()) {
-                transmitterAdapter.setData(list)
-                binding.recycler.apply {
-                    setHasFixedSize(true)
-                    adapter = transmitterAdapter
-                    isVerticalScrollBarEnabled = false
-                    layoutManager = LinearLayoutManager(context)
-                    (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                    addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
-                    visibility = View.VISIBLE
+        viewModel.getTransmittersForSat(satPass.satellite.tle.catnum)
+            .observe(viewLifecycleOwner, { list ->
+                transmitterAdapter = TransAdapter(satPass)
+                if (list.isNotEmpty()) {
+                    transmitterAdapter.setData(list)
+                    binding.recycler.apply {
+                        setHasFixedSize(true)
+                        adapter = transmitterAdapter
+                        isVerticalScrollBarEnabled = false
+                        layoutManager = LinearLayoutManager(context)
+                        (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                        addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
+                        visibility = View.VISIBLE
+                    }
+                    binding.noTransMsg.visibility = View.INVISIBLE
+                } else {
+                    binding.recycler.visibility = View.INVISIBLE
+                    binding.noTransMsg.visibility = View.VISIBLE
                 }
-                binding.noTransMsg.visibility = View.INVISIBLE
-            } else {
-                binding.recycler.visibility = View.INVISIBLE
-                binding.noTransMsg.visibility = View.VISIBLE
-            }
-            observeTimer()
-        })
+                observeTimer()
+            })
     }
 
     private fun observeTimer() {
@@ -151,7 +147,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         binding.distance.text = String.format(polarRng, satPos.range)
         binding.altitude.text = String.format(polarAlt, satPos.altitude)
 
-        if (!satPass.tle.isDeepspace) {
+        if (!satPass.satellite.tle.isDeepspace) {
             if (dateNow.before(satPass.pass.startTime)) {
                 val millisBeforeStart = satPass.pass.startTime.time.minus(timeNow)
                 binding.polarTimer.text = millisBeforeStart.formatForTimer()

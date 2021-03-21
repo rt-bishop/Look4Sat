@@ -24,19 +24,9 @@ import com.github.amsacode.predict4java.Satellite
 import java.util.*
 
 class PassPredictor(private val satellite: Satellite, private val qth: GroundStationPosition) {
-    private val oneQuarterOrbitMin = (24.0 * 60.0 / satellite.tle.meanmo / 4.0).toInt()
-    private val speedOfLight = 2.99792458E8
 
-    fun getDownlinkFreq(freq: Long, date: Date): Long {
-        val rangeRate = getSatPos(date).rangeRate
-        return (freq.toDouble() * (speedOfLight - rangeRate * 1000.0) / speedOfLight).toLong()
-    }
-    
-    fun getUplinkFreq(freq: Long, date: Date): Long {
-        val rangeRate = getSatPos(date).rangeRate
-        return (freq.toDouble() * (speedOfLight + rangeRate * 1000.0) / speedOfLight).toLong()
-    }
-    
+    private val oneQuarterOrbitMin = (24.0 * 60.0 / satellite.tle.meanmo / 4.0).toInt()
+
     fun getSatPos(date: Date): SatPos {
         return satellite.getPosition(qth, date)
     }
@@ -81,10 +71,9 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
         val satPos = getSatPos(refDate)
         val startDate = Date(refDate.time - 24 * 60L * 60L * 1000L)
         val endDate = Date(refDate.time + 24 * 60L * 60L * 1000L)
-        val aosAzimuth = (satPos.azimuth / (2.0 * Math.PI) * 360.0).toInt()
-        val losAzimuth = (satPos.azimuth / (2.0 * Math.PI) * 360.0).toInt()
-        val maxEl = satPos.elevation / (2.0 * Math.PI) * 360.0
-        return SatPassTime(startDate, endDate, "pole", aosAzimuth, losAzimuth, maxEl)
+        val azimuth = Math.toDegrees(satPos.azimuth).toInt()
+        val maxEl = Math.toDegrees(satPos.elevation)
+        return SatPassTime(startDate, endDate, "pole", azimuth, azimuth, maxEl)
     }
     
     private fun nextNearEarthPass(refDate: Date, windBack: Boolean = false): SatPassTime {
@@ -127,7 +116,7 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
         } while (satPos.elevation < 0.0)
 
         val startDate = satPos.time
-        val aosAzimuth = (satPos.azimuth / (2.0 * Math.PI) * 360.0).toInt()
+        val aosAzimuth = Math.toDegrees(satPos.azimuth).toInt()
 
         // find when sat goes below
         do {
@@ -147,8 +136,8 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
         } while (satPos.elevation > 0.0)
 
         val endDate = satPos.time
-        val losAzimuth = (satPos.azimuth / (2.0 * Math.PI) * 360.0).toInt()
-        val maxEl = maxElevation / (2.0 * Math.PI) * 360.0
+        val losAzimuth = Math.toDegrees(satPos.azimuth).toInt()
+        val maxEl = Math.toDegrees(maxElevation)
         return SatPassTime(startDate, endDate, "pole", aosAzimuth, losAzimuth, maxEl)
     }
 }

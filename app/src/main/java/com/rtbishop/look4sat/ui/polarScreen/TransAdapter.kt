@@ -17,7 +17,6 @@
  */
 package com.rtbishop.look4sat.ui.polarScreen
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -25,19 +24,12 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.model.SatTrans
 import com.rtbishop.look4sat.databinding.ItemTransBinding
+import com.rtbishop.look4sat.utility.PassPredictor
+import com.rtbishop.look4sat.utility.getDopplerFreq
 import java.util.*
 
-class TransAdapter(context: Context, private val satPass: SatPass) :
-    RecyclerView.Adapter<TransAdapter.TransHolder>() {
+class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapter.TransHolder>() {
 
-    private val divider = 1000000f
-    private val strNo = context.getString(R.string.btn_no)
-    private val strYes = context.getString(R.string.btn_yes)
-    private val mode = context.getString(R.string.trans_mode)
-    private val formatLink = context.getString(R.string.trans_link_low)
-    private val formatLinkNull = context.getString(R.string.trans_no_link)
-    private val isInverted = context.getString(R.string.trans_inverted)
-    private val predictor = satPass.predictor
     private var transmittersList = emptyList<SatTrans>()
 
     fun setData(list: List<SatTrans>) {
@@ -46,7 +38,7 @@ class TransAdapter(context: Context, private val satPass: SatPass) :
     }
 
     fun tickTransmitters() {
-        if (!satPass.tle.isDeepspace) {
+        if (!pass.satellite.tle.isDeepspace) {
             val iterator = transmittersList.listIterator()
             while (iterator.hasNext()) {
                 val trans = iterator.next()
@@ -61,23 +53,29 @@ class TransAdapter(context: Context, private val satPass: SatPass) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransHolder {
-        val binding = ItemTransBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false)
-        return TransHolder(binding)
+        return TransHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: TransHolder, position: Int) {
-        holder.bind(transmittersList[position])
+        holder.bind(transmittersList[position], pass)
     }
 
-    inner class TransHolder(private val binding: ItemTransBinding) :
+    class TransHolder private constructor(private val binding: ItemTransBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(satTrans: SatTrans) {
+        private val divider = 1000000f
+        private val strNo = itemView.context.getString(R.string.btn_no)
+        private val strYes = itemView.context.getString(R.string.btn_yes)
+        private val mode = itemView.context.getString(R.string.trans_mode)
+        private val formatLink = itemView.context.getString(R.string.trans_link_low)
+        private val formatLinkNull = itemView.context.getString(R.string.trans_no_link)
+        private val isInverted = itemView.context.getString(R.string.trans_inverted)
+
+        fun bind(satTrans: SatTrans, satPass: SatPass) {
             binding.description.text = satTrans.description
 
-            if (satPass.tle.isDeepspace) setRegularFreq(satTrans)
-            else setDopplerFreq(satTrans)
+            if (satPass.satellite.tle.isDeepspace) setRegularFreq(satTrans)
+            else setDopplerFreq(satTrans, satPass.predictor)
 
             if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)
             else binding.mode.text = String.format(mode, strNo)
@@ -98,18 +96,27 @@ class TransAdapter(context: Context, private val satPass: SatPass) :
             } else binding.uplink.text = formatLinkNull
         }
 
-        private fun setDopplerFreq(satTrans: SatTrans) {
+        private fun setDopplerFreq(satTrans: SatTrans, predictor: PassPredictor) {
             val dateNow = Date()
 
             if (satTrans.downlinkLow != null) {
-                val downFreq = predictor.getDownlinkFreq(satTrans.downlinkLow, dateNow) / divider
-                binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downFreq)
+                val rangeRate = predictor.getSatPos(dateNow).rangeRate
+                val freq = satTrans.downlinkLow.getDopplerFreq(rangeRate, true) / divider
+                binding.downlink.text = String.format(Locale.ENGLISH, formatLink, freq)
             } else binding.downlink.text = formatLinkNull
 
             if (satTrans.uplinkLow != null) {
-                val upFreq = predictor.getUplinkFreq(satTrans.uplinkLow, dateNow) / divider
-                binding.uplink.text = String.format(Locale.ENGLISH, formatLink, upFreq)
+                val rangeRate = predictor.getSatPos(dateNow).rangeRate
+                val freq = satTrans.uplinkLow.getDopplerFreq(rangeRate, false) / divider
+                binding.uplink.text = String.format(Locale.ENGLISH, formatLink, freq)
             } else binding.uplink.text = formatLinkNull
+        }
+
+        companion object {
+            fun from(parent: ViewGroup): TransHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                return TransHolder(ItemTransBinding.inflate(inflater, parent, false))
+            }
         }
     }
 }

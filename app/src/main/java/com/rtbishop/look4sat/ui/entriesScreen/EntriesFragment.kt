@@ -46,10 +46,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let { viewModel.importSatDataFromFile(uri) }
         }
-    private val entriesAdapter = EntriesAdapter().apply {
-        setEntriesClickListener(this@EntriesFragment)
-    }
     private var binding: FragmentEntriesBinding? = null
+    private var entriesAdapter: EntriesAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,6 +58,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
     }
 
     private fun setupComponents() {
+        entriesAdapter = EntriesAdapter().apply {
+            setEntriesClickListener(this@EntriesFragment)
+        }
         binding?.apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
@@ -70,7 +71,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
-            selectAll.setOnClickListener { entriesAdapter.selectAllItems() }
+            selectAll.setOnClickListener { entriesAdapter?.selectAllItems() }
             searchBar.addTextChangedListener { query -> filterByQuery(query) }
             searchBar.clearFocus()
         }
@@ -83,7 +84,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
                     if (result.data.isEmpty()) {
                         setEmpty()
                     } else {
-                        entriesAdapter.submitAllItems(result.data)
+                        entriesAdapter?.submitAllItems(result.data)
                         setLoaded()
                     }
                 }
@@ -134,7 +135,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
     }
 
     private fun filterByQuery(it: Editable?) {
-        entriesAdapter.filterItems(it.toString())
+        entriesAdapter?.filterItems(it.toString())
         binding?.entriesRecycler?.scrollToPosition(0)
     }
 
@@ -147,6 +148,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
     }
 
     override fun onDestroyView() {
+        entriesAdapter = null
         binding = null
         super.onDestroyView()
     }

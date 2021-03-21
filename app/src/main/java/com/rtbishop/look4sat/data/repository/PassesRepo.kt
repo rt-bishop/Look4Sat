@@ -35,7 +35,8 @@ class PassesRepo @Inject constructor(
     private val prefsRepo: PrefsRepo,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
-    private val _passes = MutableStateFlow<Result<MutableList<SatPass>>>(Result.InProgress)
+    private val _passes =
+        MutableStateFlow<Result<MutableList<SatPass>>>(Result.Success(mutableListOf()))
     val passes: StateFlow<Result<MutableList<SatPass>>> = _passes
 
     private var selectedSatellites = emptyList<Satellite>()
@@ -61,7 +62,7 @@ class PassesRepo @Inject constructor(
     private fun getPasses(satellite: Satellite, refDate: Date): MutableList<SatPass> {
         val predictor = satellite.getPredictor(prefsRepo.getStationPosition())
         val passes = predictor.getPasses(refDate, prefsRepo.getHoursAhead(), true)
-        val passList = passes.map { SatPass(satellite.tle, predictor, it) }
+        val passList = passes.map { SatPass(satellite, predictor, it) }
         return passList as MutableList<SatPass>
     }
 

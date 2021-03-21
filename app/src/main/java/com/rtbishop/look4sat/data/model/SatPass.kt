@@ -18,11 +18,11 @@
 package com.rtbishop.look4sat.data.model
 
 import com.github.amsacode.predict4java.SatPassTime
-import com.github.amsacode.predict4java.TLE
+import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.utility.PassPredictor
 
 class SatPass(
-    val tle: TLE,
+    val satellite: Satellite,
     val predictor: PassPredictor,
     val pass: SatPassTime,
     var progress: Int = 0

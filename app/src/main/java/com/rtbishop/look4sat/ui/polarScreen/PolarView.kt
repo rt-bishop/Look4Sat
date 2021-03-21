@@ -72,7 +72,7 @@ class PolarView(context: Context) : View(context) {
         canvas.translate(polarCenter, polarCenter)
         drawRadarView(canvas)
         drawRadarText(canvas)
-        if (!satPass.tle.isDeepspace) drawPassTrajectory(canvas, satPass)
+        if (!satPass.satellite.tle.isDeepspace) drawPassTrajectory(canvas, satPass)
         drawSatellite(canvas, satPass)
     }
     
