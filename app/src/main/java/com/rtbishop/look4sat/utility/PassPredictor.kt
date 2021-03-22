@@ -18,19 +18,30 @@
 package com.rtbishop.look4sat.utility
 
 import com.github.amsacode.predict4java.GroundStationPosition
-import com.github.amsacode.predict4java.SatPassTime
 import com.github.amsacode.predict4java.SatPos
 import com.github.amsacode.predict4java.Satellite
+import com.rtbishop.look4sat.data.model.SatPassTime
 import java.util.*
 
 class PassPredictor(private val satellite: Satellite, private val qth: GroundStationPosition) {
 
     private val oneQuarterOrbitMin = (24.0 * 60.0 / satellite.tle.meanmo / 4.0).toInt()
+    private val speedOfLight = 2.99792458E8
+
+    fun getDownlinkFreq(freq: Long, date: Date): Long {
+        val rangeRate = getSatPos(date).rangeRate
+        return (freq.toDouble() * (speedOfLight - rangeRate * 1000.0) / speedOfLight).toLong()
+    }
+
+    fun getUplinkFreq(freq: Long, date: Date): Long {
+        val rangeRate = getSatPos(date).rangeRate
+        return (freq.toDouble() * (speedOfLight + rangeRate * 1000.0) / speedOfLight).toLong()
+    }
 
     fun getSatPos(date: Date): SatPos {
         return satellite.getPosition(qth, date)
     }
-    
+
     fun getPositions(refDate: Date, stepSeconds: Int, minBefore: Int, minAfter: Int): List<SatPos> {
         val positions = mutableListOf<SatPos>()
         val endDate = Date(refDate.time + minAfter * 60L * 1000L)
@@ -57,9 +68,10 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
                 do {
                     if (count > 0) shouldWindBack = false
                     val pass = nextNearEarthPass(startDate, shouldWindBack)
-                    lastAosDate = pass.startTime
+                    lastAosDate = pass.getStartTime()
                     passes.add(pass)
-                    startDate = Date(pass.endTime.time + (oneQuarterOrbitMin * 3) * 60L * 1000L)
+                    startDate =
+                        Date(pass.getEndTime().time + (oneQuarterOrbitMin * 3) * 60L * 1000L)
                     count++
                 } while (lastAosDate < endDate)
             }
@@ -73,7 +85,7 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
         val endDate = Date(refDate.time + 24 * 60L * 60L * 1000L)
         val azimuth = Math.toDegrees(satPos.azimuth).toInt()
         val maxEl = Math.toDegrees(satPos.elevation)
-        return SatPassTime(startDate, endDate, "pole", azimuth, azimuth, maxEl)
+        return SatPassTime(startDate, endDate, azimuth, azimuth, maxEl)
     }
     
     private fun nextNearEarthPass(refDate: Date, windBack: Boolean = false): SatPassTime {
@@ -138,6 +150,6 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
         val endDate = satPos.time
         val losAzimuth = Math.toDegrees(satPos.azimuth).toInt()
         val maxEl = Math.toDegrees(maxElevation)
-        return SatPassTime(startDate, endDate, "pole", aosAzimuth, losAzimuth, maxEl)
+        return SatPassTime(startDate, endDate, aosAzimuth, losAzimuth, maxEl)
     }
 }

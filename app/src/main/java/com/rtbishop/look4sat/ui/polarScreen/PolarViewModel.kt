@@ -20,11 +20,14 @@ package com.rtbishop.look4sat.ui.polarScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import com.rtbishop.look4sat.data.model.Result
+import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,6 +41,14 @@ class PolarViewModel @Inject constructor(
         while (true) {
             emit(System.currentTimeMillis())
             delay(1000)
+        }
+    }
+
+    fun getPass(passId: Int) = liveData {
+        passesRepo.passes.collect { passes ->
+            if (passes is Result.Success) {
+                emit(passes.data[passId])
+            }
         }
     }
 

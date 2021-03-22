@@ -46,9 +46,9 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
             val satPass = iterator.next()
             if (!satPass.satellite.tle.isDeepspace) {
                 if (satPass.progress < 100) {
-                    val timeStart = satPass.pass.startTime.time
+                    val timeStart = satPass.pass.getStartTime().time
                     if (timeNow > timeStart) {
-                        val timeEnd = satPass.pass.endTime.time
+                        val timeEnd = satPass.pass.getEndTime().time
                         val index = satPassList.indexOf(satPass)
                         val deltaNow = timeNow.minus(timeStart).toFloat()
                         val deltaTotal = timeEnd.minus(timeStart).toFloat()
@@ -115,9 +115,9 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
                 passLeoAosAz.text = String.format(aosAzFormat, satPass.pass.aosAzimuth)
                 passLeoMaxEl.text = String.format(maxElFormat, satPass.pass.maxEl)
                 passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth)
-                passLeoStart.text = startFormat.format(satPass.pass.startTime)
+                passLeoStart.text = startFormat.format(satPass.pass.getStartTime())
                 passLeoAlt.text = String.format(altFormat, satPos.altitude)
-                passLeoEnd.text = endFormat.format(satPass.pass.endTime)
+                passLeoEnd.text = endFormat.format(satPass.pass.getEndTime())
                 passLeoProgress.progress = satPass.progress
             }
 

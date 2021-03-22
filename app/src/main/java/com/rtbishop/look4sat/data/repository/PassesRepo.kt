@@ -72,10 +72,10 @@ class PassesRepo @Inject constructor(
             this.time = refDate
             this.add(Calendar.HOUR, hoursAhead)
         }.time
-        passes.removeAll { it.pass.startTime.after(dateFuture) }
-        passes.removeAll { it.pass.endTime.before(refDate) }
+        passes.removeAll { it.pass.getStartTime().after(dateFuture) }
+        passes.removeAll { it.pass.getEndTime().before(refDate) }
         passes.removeAll { it.pass.maxEl < prefsRepo.getMinElevation() }
-        passes.sortBy { it.pass.startTime }
+        passes.sortBy { it.pass.getStartTime() }
         return passes
     }
 }

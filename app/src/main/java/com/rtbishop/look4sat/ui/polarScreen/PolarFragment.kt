@@ -30,7 +30,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
@@ -57,7 +56,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         binding = FragmentPolarBinding.bind(view)
         sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         magneticDeclination = viewModel.getMagDeclination()
-        observePasses()
+        observePass()
     }
 
     override fun onResume() {
@@ -92,15 +91,23 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         polarView?.rotation = -(roundedAzimuth + magneticDeclination)
     }
 
-    private fun observePasses() {
-        viewModel.getPasses().observe(viewLifecycleOwner, { result ->
-            if (result is Result.Success) {
-                satPass = result.data[requireArguments().getInt("index")]
-                polarView = PolarView(requireContext()).apply { setPass(satPass) }
-                binding.frame.addView(polarView)
-                observeTransmitters()
-            }
+    private fun observePass() {
+        val passId = requireArguments().getInt("index")
+        viewModel.getPass(passId).observe(viewLifecycleOwner, { pass ->
+            satPass = pass
+            polarView = PolarView(requireContext()).apply { setPass(pass) }
+            binding.frame.addView(polarView)
+            observeTransmitters()
         })
+
+//        viewModel.getPasses().observe(viewLifecycleOwner, { result ->
+//            if (result is Result.Success) {
+//                satPass = result.data[requireArguments().getInt("index")]
+//                polarView = PolarView(requireContext()).apply { setPass(satPass) }
+//                binding.frame.addView(polarView)
+//                observeTransmitters()
+//            }
+//        })
     }
 
     private fun observeTransmitters() {
@@ -148,13 +155,13 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         binding.altitude.text = String.format(polarAlt, satPos.altitude)
 
         if (!satPass.satellite.tle.isDeepspace) {
-            if (dateNow.before(satPass.pass.startTime)) {
-                val millisBeforeStart = satPass.pass.startTime.time.minus(timeNow)
+            if (dateNow.before(satPass.pass.getStartTime())) {
+                val millisBeforeStart = satPass.pass.getStartTime().time.minus(timeNow)
                 binding.polarTimer.text = millisBeforeStart.formatForTimer()
             } else {
-                val millisBeforeEnd = satPass.pass.endTime.time.minus(timeNow)
+                val millisBeforeEnd = satPass.pass.getEndTime().time.minus(timeNow)
                 binding.polarTimer.text = millisBeforeEnd.formatForTimer()
-                if (dateNow.after(satPass.pass.endTime)) {
+                if (dateNow.after(satPass.pass.getEndTime())) {
                     binding.polarTimer.text = 0L.formatForTimer()
                     findNavController().popBackStack()
                 }
