@@ -51,15 +51,6 @@ fun Long.formatForTimer(): String {
     return String.format(format, hours, minutes, seconds)
 }
 
-fun Long.getDopplerFreq(rangeRate: Double, isDownlink: Boolean): Long {
-    val speedOfLight = 2.99792458E8
-    return if (isDownlink) {
-        (this.toDouble() * (speedOfLight - rangeRate * 1000.0) / speedOfLight).toLong()
-    } else {
-        (this.toDouble() * (speedOfLight + rangeRate * 1000.0) / speedOfLight).toLong()
-    }
-}
-
 fun Double.round(decimals: Int): Double {
     var multiplier = 1.0
     repeat(decimals) { multiplier *= 10 }

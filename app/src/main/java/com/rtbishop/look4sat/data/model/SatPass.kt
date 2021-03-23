@@ -17,12 +17,31 @@
  */
 package com.rtbishop.look4sat.data.model
 
-import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.utility.PassPredictor
+import java.util.*
 
-class SatPass(
-    val satellite: Satellite,
-    val predictor: PassPredictor,
-    val pass: SatPassTime,
+data class SatPass(
+    val catNum: Int,
+    val name: String,
+    val isDeepSpace: Boolean,
+    private val aosTime: Long,
+    val aosAzimuth: Double,
+    private val losTime: Long,
+    val losAzimuth: Double,
+    private val tcaTime: Long,
+    val tcaAzimuth: Double,
+    val altitude: Double,
+    val maxElevation: Double,
+    val predictor: PassPredictor
+) {
+    val startDate: Date
+        get() = Date(aosTime)
+
+    val endDate: Date
+        get() = Date(losTime)
+
+    val tcaDate: Date
+        get() = Date(tcaTime)
+
     var progress: Int = 0
-)
+}

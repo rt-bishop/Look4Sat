@@ -44,11 +44,11 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
         val iterator = satPassList.listIterator()
         while (iterator.hasNext()) {
             val satPass = iterator.next()
-            if (!satPass.satellite.tle.isDeepspace) {
+            if (!satPass.isDeepSpace) {
                 if (satPass.progress < 100) {
-                    val timeStart = satPass.pass.getStartTime().time
+                    val timeStart = satPass.startDate.time
                     if (timeNow > timeStart) {
-                        val timeEnd = satPass.pass.getEndTime().time
+                        val timeEnd = satPass.endDate.time
                         val index = satPassList.indexOf(satPass)
                         val deltaNow = timeNow.minus(timeStart).toFloat()
                         val deltaTotal = timeEnd.minus(timeStart).toFloat()
@@ -69,7 +69,7 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (satPassList[position].satellite.tle.isDeepspace) 1
+        return if (satPassList[position].isDeepSpace) 1
         else 0
     }
 
@@ -104,20 +104,19 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
         private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
 
         fun bind(satPass: SatPass, position: Int, shouldUseUTC: Boolean) {
-            val satPos = satPass.predictor.getSatPos(Date())
             binding.apply {
                 if (shouldUseUTC) {
                     startFormat.timeZone = timeZoneUTC
                     endFormat.timeZone = timeZoneUTC
                 }
-                passLeoSatName.text = satPass.satellite.tle.name
-                passLeoSatId.text = String.format(satIdFormat, satPass.satellite.tle.catnum)
-                passLeoAosAz.text = String.format(aosAzFormat, satPass.pass.aosAzimuth)
-                passLeoMaxEl.text = String.format(maxElFormat, satPass.pass.maxEl)
-                passLeoLosAz.text = String.format(losAzFormat, satPass.pass.losAzimuth)
-                passLeoStart.text = startFormat.format(satPass.pass.getStartTime())
-                passLeoAlt.text = String.format(altFormat, satPos.altitude)
-                passLeoEnd.text = endFormat.format(satPass.pass.getEndTime())
+                passLeoSatName.text = satPass.name
+                passLeoSatId.text = String.format(satIdFormat, satPass.catNum)
+                passLeoAosAz.text = String.format(aosAzFormat, satPass.aosAzimuth)
+                passLeoMaxEl.text = String.format(maxElFormat, satPass.maxElevation)
+                passLeoLosAz.text = String.format(losAzFormat, satPass.losAzimuth)
+                passLeoStart.text = startFormat.format(satPass.startDate)
+                passLeoAlt.text = String.format(altFormat, satPass.altitude)
+                passLeoEnd.text = endFormat.format(satPass.endDate)
                 passLeoProgress.progress = satPass.progress
             }
 
@@ -146,13 +145,12 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
         private val elevFormat = itemView.context.getString(R.string.pat_elevation)
 
         fun bind(satPass: SatPass, position: Int) {
-            val satPos = satPass.predictor.getSatPos(Date())
             binding.apply {
-                passGeoSatName.text = satPass.satellite.tle.name
-                passGeoSatId.text = String.format(satIdFormat, satPass.satellite.tle.catnum)
-                passGeoAz.text = String.format(azFormat, Math.toDegrees(satPos.azimuth))
-                passGeoAlt.text = String.format(altFormat, satPos.altitude)
-                passGeoEl.text = String.format(elevFormat, Math.toDegrees(satPos.elevation))
+                passGeoSatName.text = satPass.name
+                passGeoSatId.text = String.format(satIdFormat, satPass.catNum)
+                passGeoAz.text = String.format(azFormat, satPass.tcaAzimuth)
+                passGeoAlt.text = String.format(altFormat, satPass.altitude)
+                passGeoEl.text = String.format(elevFormat, satPass.maxElevation)
             }
 
             itemView.setOnClickListener {

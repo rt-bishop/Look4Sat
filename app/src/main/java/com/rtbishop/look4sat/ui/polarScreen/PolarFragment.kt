@@ -99,19 +99,10 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
             binding.frame.addView(polarView)
             observeTransmitters()
         })
-
-//        viewModel.getPasses().observe(viewLifecycleOwner, { result ->
-//            if (result is Result.Success) {
-//                satPass = result.data[requireArguments().getInt("index")]
-//                polarView = PolarView(requireContext()).apply { setPass(satPass) }
-//                binding.frame.addView(polarView)
-//                observeTransmitters()
-//            }
-//        })
     }
 
     private fun observeTransmitters() {
-        viewModel.getTransmittersForSat(satPass.satellite.tle.catnum)
+        viewModel.getSatTransmitters(satPass.catNum)
             .observe(viewLifecycleOwner, { list ->
                 transmitterAdapter = TransAdapter(satPass)
                 if (list.isNotEmpty()) {
@@ -154,14 +145,14 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         binding.distance.text = String.format(polarRng, satPos.range)
         binding.altitude.text = String.format(polarAlt, satPos.altitude)
 
-        if (!satPass.satellite.tle.isDeepspace) {
-            if (dateNow.before(satPass.pass.getStartTime())) {
-                val millisBeforeStart = satPass.pass.getStartTime().time.minus(timeNow)
+        if (!satPass.isDeepSpace) {
+            if (dateNow.before(satPass.startDate)) {
+                val millisBeforeStart = satPass.startDate.time.minus(timeNow)
                 binding.polarTimer.text = millisBeforeStart.formatForTimer()
             } else {
-                val millisBeforeEnd = satPass.pass.getEndTime().time.minus(timeNow)
+                val millisBeforeEnd = satPass.endDate.time.minus(timeNow)
                 binding.polarTimer.text = millisBeforeEnd.formatForTimer()
-                if (dateNow.after(satPass.pass.getEndTime())) {
+                if (dateNow.after(satPass.endDate)) {
                     binding.polarTimer.text = 0L.formatForTimer()
                     findNavController().popBackStack()
                 }

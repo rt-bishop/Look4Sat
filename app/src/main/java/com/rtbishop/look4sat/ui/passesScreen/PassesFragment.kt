@@ -100,12 +100,12 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     private fun tickMainTimer(timeNow: Long) {
         if (passes.isNotEmpty()) {
             try {
-                val nextPass = passes.first { it.pass.getStartTime().time.minus(timeNow) > 0 }
-                val millisBeforeStart = nextPass.pass.getStartTime().time.minus(timeNow)
+                val nextPass = passes.first { it.startDate.time.minus(timeNow) > 0 }
+                val millisBeforeStart = nextPass.startDate.time.minus(timeNow)
                 binding?.passesTimer?.text = millisBeforeStart.formatForTimer()
             } catch (e: NoSuchElementException) {
                 val lastPass = passes.last()
-                val millisBeforeEnd = lastPass.pass.getEndTime().time.minus(timeNow)
+                val millisBeforeEnd = lastPass.endDate.time.minus(timeNow)
                 binding?.passesTimer?.text = millisBeforeEnd.formatForTimer()
             }
         } else {

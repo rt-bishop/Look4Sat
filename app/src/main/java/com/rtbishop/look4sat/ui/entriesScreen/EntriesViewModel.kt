@@ -46,7 +46,8 @@ class EntriesViewModel @Inject constructor(
 
     private val satDataState = MutableSharedFlow<Result<List<SatItem>>>(replay = 0)
     private val satDataFlow = satelliteRepo.getAllSatItems().map { Result.Success(it) }
-    val satData = flowOf(satDataState, satDataFlow).flattenMerge().asLiveData()
+    val satData =
+        flowOf(satDataState, satDataFlow).flattenMerge().asLiveData(viewModelScope.coroutineContext)
 
     fun importSatDataFromFile(uri: Uri) {
         viewModelScope.launch {

@@ -62,8 +62,7 @@ class PassesRepo @Inject constructor(
     private fun getPasses(satellite: Satellite, refDate: Date): MutableList<SatPass> {
         val predictor = satellite.getPredictor(prefsRepo.getStationPosition())
         val passes = predictor.getPasses(refDate, prefsRepo.getHoursAhead(), true)
-        val passList = passes.map { SatPass(satellite, predictor, it) }
-        return passList as MutableList<SatPass>
+        return passes as MutableList<SatPass>
     }
 
     private fun filterPasses(passes: MutableList<SatPass>, refDate: Date): MutableList<SatPass> {
@@ -72,10 +71,10 @@ class PassesRepo @Inject constructor(
             this.time = refDate
             this.add(Calendar.HOUR, hoursAhead)
         }.time
-        passes.removeAll { it.pass.getStartTime().after(dateFuture) }
-        passes.removeAll { it.pass.getEndTime().before(refDate) }
-        passes.removeAll { it.pass.maxEl < prefsRepo.getMinElevation() }
-        passes.sortBy { it.pass.getStartTime() }
+        passes.removeAll { it.startDate.after(dateFuture) }
+        passes.removeAll { it.endDate.before(refDate) }
+        passes.removeAll { it.maxElevation < prefsRepo.getMinElevation() }
+        passes.sortBy { it.startDate }
         return passes
     }
 }

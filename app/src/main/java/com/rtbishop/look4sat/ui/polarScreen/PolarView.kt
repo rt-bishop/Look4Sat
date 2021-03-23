@@ -72,7 +72,7 @@ class PolarView(context: Context) : View(context) {
         canvas.translate(polarCenter, polarCenter)
         drawRadarView(canvas)
         drawRadarText(canvas)
-        if (!satPass.satellite.tle.isDeepspace) drawPassTrajectory(canvas, satPass)
+        if (!satPass.isDeepSpace) drawPassTrajectory(canvas, satPass)
         drawSatellite(canvas, satPass)
     }
     
@@ -92,13 +92,13 @@ class PolarView(context: Context) : View(context) {
     }
 
     private fun drawPassTrajectory(cvs: Canvas, satPass: SatPass) {
-        val startTime = satPass.pass.getStartTime()
-        val endTime = satPass.pass.getEndTime()
+        val startTime = satPass.startDate
+        val endTime = satPass.endDate
         while (startTime.before(endTime)) {
             val satPos = satPass.predictor.getSatPos(startTime)
             val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
             val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            if (startTime.compareTo(satPass.pass.getStartTime()) == 0) {
+            if (startTime.compareTo(satPass.startDate) == 0) {
                 path.moveTo(x, -y)
             } else {
                 path.lineTo(x, -y)

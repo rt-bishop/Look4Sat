@@ -20,8 +20,8 @@ package com.rtbishop.look4sat.ui.polarScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.data.model.Result
-import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
@@ -52,8 +52,6 @@ class PolarViewModel @Inject constructor(
         }
     }
 
-    fun getPasses() = passesRepo.passes.asLiveData()
-
     fun shouldUseCompass(): Boolean {
         return prefsRepo.shouldUseCompass()
     }
@@ -62,5 +60,6 @@ class PolarViewModel @Inject constructor(
         return prefsRepo.getMagDeclination()
     }
 
-    fun getTransmittersForSat(satId: Int) = satelliteRepo.getSatTransmitters(satId).asLiveData()
+    fun getSatTransmitters(satId: Int) =
+        satelliteRepo.getSatTransmitters(satId).asLiveData(viewModelScope.coroutineContext)
 }

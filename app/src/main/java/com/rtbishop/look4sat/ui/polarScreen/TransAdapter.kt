@@ -25,7 +25,6 @@ import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.model.SatTrans
 import com.rtbishop.look4sat.databinding.ItemTransBinding
 import com.rtbishop.look4sat.utility.PassPredictor
-import com.rtbishop.look4sat.utility.getDopplerFreq
 import java.util.*
 
 class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapter.TransHolder>() {
@@ -38,13 +37,8 @@ class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapte
     }
 
     fun tickTransmitters() {
-        if (!pass.satellite.tle.isDeepspace) {
-            val iterator = transmittersList.listIterator()
-            while (iterator.hasNext()) {
-                val trans = iterator.next()
-                val index = transmittersList.indexOf(trans)
-                notifyItemChanged(index)
-            }
+        if (!pass.isDeepSpace) {
+            notifyDataSetChanged()
         }
     }
 
@@ -63,6 +57,7 @@ class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapte
     class TransHolder private constructor(private val binding: ItemTransBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        private val dateNow = Date()
         private val divider = 1000000f
         private val strNo = itemView.context.getString(R.string.btn_no)
         private val strYes = itemView.context.getString(R.string.btn_yes)
@@ -74,7 +69,7 @@ class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapte
         fun bind(satTrans: SatTrans, satPass: SatPass) {
             binding.description.text = satTrans.description
 
-            if (satPass.satellite.tle.isDeepspace) setRegularFreq(satTrans)
+            if (satPass.isDeepSpace) setRegularFreq(satTrans)
             else setDopplerFreq(satTrans, satPass.predictor)
 
             if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)
@@ -97,18 +92,14 @@ class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapte
         }
 
         private fun setDopplerFreq(satTrans: SatTrans, predictor: PassPredictor) {
-            val dateNow = Date()
-
             if (satTrans.downlinkLow != null) {
-                val rangeRate = predictor.getSatPos(dateNow).rangeRate
-                val freq = satTrans.downlinkLow.getDopplerFreq(rangeRate, true) / divider
-                binding.downlink.text = String.format(Locale.ENGLISH, formatLink, freq)
+                val downlink = predictor.getDownlinkFreq(satTrans.downlinkLow, dateNow) / divider
+                binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downlink)
             } else binding.downlink.text = formatLinkNull
 
             if (satTrans.uplinkLow != null) {
-                val rangeRate = predictor.getSatPos(dateNow).rangeRate
-                val freq = satTrans.uplinkLow.getDopplerFreq(rangeRate, false) / divider
-                binding.uplink.text = String.format(Locale.ENGLISH, formatLink, freq)
+                val uplink = predictor.getUplinkFreq(satTrans.uplinkLow, dateNow) / divider
+                binding.uplink.text = String.format(Locale.ENGLISH, formatLink, uplink)
             } else binding.uplink.text = formatLinkNull
         }
 

@@ -26,7 +26,6 @@ import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,13 +36,11 @@ class PassesViewModel @Inject constructor(
     private val passesRepo: PassesRepo
 ) : ViewModel() {
 
-    val passes = passesRepo.passes.asLiveData()
+    val passes = passesRepo.passes.asLiveData(viewModelScope.coroutineContext)
 
     init {
         viewModelScope.launch {
-            satelliteRepo.getSelectedSatellitesFlow().collect { selectedSatellites ->
-                passesRepo.calculatePasses(selectedSatellites)
-            }
+            passesRepo.calculatePasses(satelliteRepo.getSelectedSatellites())
         }
     }
 

@@ -20,7 +20,7 @@ package com.rtbishop.look4sat.utility
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.SatPos
 import com.github.amsacode.predict4java.Satellite
-import com.rtbishop.look4sat.data.model.SatPassTime
+import com.rtbishop.look4sat.data.model.SatPass
 import java.util.*
 
 class PassPredictor(private val satellite: Satellite, private val qth: GroundStationPosition) {
@@ -53,9 +53,9 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
         }
         return positions
     }
-    
-    fun getPasses(refDate: Date, hoursAhead: Int, windBack: Boolean): List<SatPassTime> {
-        val passes = mutableListOf<SatPassTime>()
+
+    fun getPasses(refDate: Date, hoursAhead: Int, windBack: Boolean): List<SatPass> {
+        val passes = mutableListOf<SatPass>()
         val endDate = Date(refDate.time + hoursAhead * 60L * 60L * 1000L)
         var startDate = refDate
         var shouldWindBack = windBack
@@ -68,34 +68,45 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
                 do {
                     if (count > 0) shouldWindBack = false
                     val pass = nextNearEarthPass(startDate, shouldWindBack)
-                    lastAosDate = pass.getStartTime()
+                    lastAosDate = pass.startDate
                     passes.add(pass)
                     startDate =
-                        Date(pass.getEndTime().time + (oneQuarterOrbitMin * 3) * 60L * 1000L)
+                        Date(pass.endDate.time + (oneQuarterOrbitMin * 3) * 60L * 1000L)
                     count++
                 } while (lastAosDate < endDate)
             }
         }
         return passes
     }
-    
-    private fun nextDeepSpacePass(refDate: Date): SatPassTime {
+
+    private fun nextDeepSpacePass(refDate: Date): SatPass {
         val satPos = getSatPos(refDate)
-        val startDate = Date(refDate.time - 24 * 60L * 60L * 1000L)
-        val endDate = Date(refDate.time + 24 * 60L * 60L * 1000L)
-        val azimuth = Math.toDegrees(satPos.azimuth).toInt()
-        val maxEl = Math.toDegrees(satPos.elevation)
-        return SatPassTime(startDate, endDate, azimuth, azimuth, maxEl)
+        val id = satellite.tle.catnum
+        val name = satellite.tle.name
+        val isDeep = satellite.tle.isDeepspace
+        val aos = Date(refDate.time - 24 * 60L * 60L * 1000L).time
+        val los = Date(refDate.time + 24 * 60L * 60L * 1000L).time
+        val tca = Date((aos + los) / 2).time
+        val az = Math.toDegrees(satPos.azimuth)
+        val elev = Math.toDegrees(satPos.elevation)
+        val alt = satPos.altitude
+        return SatPass(id, name, isDeep, aos, az, los, az, tca, az, alt, elev, this)
     }
-    
-    private fun nextNearEarthPass(refDate: Date, windBack: Boolean = false): SatPassTime {
+
+    private fun nextNearEarthPass(refDate: Date, windBack: Boolean = false): SatPass {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
             clear()
             timeInMillis = refDate.time
         }
-        var maxElevation = 0.0
+        val id = satellite.tle.catnum
+        val name = satellite.tle.name
+        val isDeep = satellite.tle.isDeepspace
+
         var elevation: Double
-        
+        var maxElevation = 0.0
+        var alt = 0.0
+        var tcaAz = 0.0
+
         // wind back time 1/4 of an orbit
         if (windBack) calendar.add(Calendar.MINUTE, -oneQuarterOrbitMin)
         var satPos = getSatPos(calendar.time)
@@ -115,7 +126,11 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
             calendar.add(Calendar.SECOND, 60)
             satPos = getSatPos(calendar.time)
             elevation = satPos.elevation
-            if (elevation > maxElevation) maxElevation = elevation
+            if (elevation > maxElevation) {
+                maxElevation = elevation
+                alt = satPos.altitude
+                tcaAz = Math.toDegrees(satPos.azimuth)
+            }
         } while (satPos.elevation < 0.0)
 
         // refine to 3 seconds
@@ -124,18 +139,26 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
             calendar.add(Calendar.SECOND, 3)
             satPos = getSatPos(calendar.time)
             elevation = satPos.elevation
-            if (elevation > maxElevation) maxElevation = elevation
+            if (elevation > maxElevation) {
+                maxElevation = elevation
+                alt = satPos.altitude
+                tcaAz = Math.toDegrees(satPos.azimuth)
+            }
         } while (satPos.elevation < 0.0)
 
-        val startDate = satPos.time
-        val aosAzimuth = Math.toDegrees(satPos.azimuth).toInt()
+        val aos = satPos.time.time
+        val aosAz = Math.toDegrees(satPos.azimuth)
 
         // find when sat goes below
         do {
             calendar.add(Calendar.SECOND, 30)
             satPos = getSatPos(calendar.time)
             elevation = satPos.elevation
-            if (elevation > maxElevation) maxElevation = elevation
+            if (elevation > maxElevation) {
+                maxElevation = elevation
+                alt = satPos.altitude
+                tcaAz = Math.toDegrees(satPos.azimuth)
+            }
         } while (satPos.elevation > 0.0)
 
         // refine to 3 seconds
@@ -144,12 +167,17 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
             calendar.add(Calendar.SECOND, 3)
             satPos = getSatPos(calendar.time)
             elevation = satPos.elevation
-            if (elevation > maxElevation) maxElevation = elevation
+            if (elevation > maxElevation) {
+                maxElevation = elevation
+                alt = satPos.altitude
+                tcaAz = Math.toDegrees(satPos.azimuth)
+            }
         } while (satPos.elevation > 0.0)
 
-        val endDate = satPos.time
-        val losAzimuth = Math.toDegrees(satPos.azimuth).toInt()
-        val maxEl = Math.toDegrees(maxElevation)
-        return SatPassTime(startDate, endDate, aosAzimuth, losAzimuth, maxEl)
+        val los = satPos.time.time
+        val losAz = Math.toDegrees(satPos.azimuth)
+        val tca = Date((aos + los) / 2).time
+        val elev = Math.toDegrees(maxElevation)
+        return SatPass(id, name, isDeep, aos, aosAz, los, losAz, tca, tcaAz, alt, elev, this)
     }
 }
