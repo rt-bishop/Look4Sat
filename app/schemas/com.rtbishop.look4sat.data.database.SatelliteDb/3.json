@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "24170ecaf2ab85adb66aa3b557134997",
+    "version": 3,
+    "identityHash": "53fa623fc55b279c50d33e6263866a89",
     "entities": [
       {
         "tableName": "entries",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "transmitters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `description` TEXT NOT NULL, `isAlive` INTEGER NOT NULL, `uplink` INTEGER, `downlink` INTEGER, `mode` TEXT, `isInverted` INTEGER NOT NULL, `catNum` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `info` TEXT NOT NULL, `isAlive` INTEGER NOT NULL, `downlink` INTEGER, `uplink` INTEGER, `mode` TEXT, `isInverted` INTEGER NOT NULL, `catNum` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -53,8 +53,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "description",
-            "columnName": "description",
+            "fieldPath": "info",
+            "columnName": "info",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -65,14 +65,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "uplink",
-            "columnName": "uplink",
+            "fieldPath": "downlink",
+            "columnName": "downlink",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "downlink",
-            "columnName": "downlink",
+            "fieldPath": "uplink",
+            "columnName": "uplink",
             "affinity": "INTEGER",
             "notNull": false
           },
@@ -108,7 +108,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24170ecaf2ab85adb66aa3b557134997')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '53fa623fc55b279c50d33e6263866a89')"
     ]
   }
 }

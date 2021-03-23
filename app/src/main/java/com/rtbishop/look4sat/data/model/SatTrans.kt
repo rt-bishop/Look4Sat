@@ -24,12 +24,10 @@ import com.squareup.moshi.Json
 @Entity(tableName = "transmitters")
 class SatTrans(
     @PrimaryKey @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "description") val description: String,
+    @field:Json(name = "description") val info: String,
     @field:Json(name = "alive") val isAlive: Boolean,
-    @field:Json(name = "uplink_low") val uplinkLow: Long?,
-    @field:Json(name = "uplink_high") val uplinkHigh: Long?,
-    @field:Json(name = "downlink_low") val downlinkLow: Long?,
-    @field:Json(name = "downlink_high") val downlinkHigh: Long?,
+    @field:Json(name = "downlink_low") val downlink: Long?,
+    @field:Json(name = "uplink_low") val uplink: Long?,
     @field:Json(name = "mode") val mode: String?,
     @field:Json(name = "invert") val isInverted: Boolean,
     @field:Json(name = "norad_cat_id") val catNum: Int

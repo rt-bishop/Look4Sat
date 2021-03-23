@@ -67,7 +67,7 @@ class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapte
         private val isInverted = itemView.context.getString(R.string.trans_inverted)
 
         fun bind(satTrans: SatTrans, satPass: SatPass) {
-            binding.description.text = satTrans.description
+            binding.description.text = satTrans.info
 
             if (satPass.isDeepSpace) setRegularFreq(satTrans)
             else setDopplerFreq(satTrans, satPass.predictor)
@@ -80,25 +80,25 @@ class TransAdapter(private val pass: SatPass) : RecyclerView.Adapter<TransAdapte
         }
 
         private fun setRegularFreq(satTrans: SatTrans) {
-            if (satTrans.downlinkLow != null) {
-                val downFreq = satTrans.downlinkLow / divider
+            if (satTrans.downlink != null) {
+                val downFreq = satTrans.downlink / divider
                 binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downFreq)
             } else binding.downlink.text = formatLinkNull
 
-            if (satTrans.uplinkLow != null) {
-                val upFreq = satTrans.uplinkLow / divider
+            if (satTrans.uplink != null) {
+                val upFreq = satTrans.uplink / divider
                 binding.uplink.text = String.format(Locale.ENGLISH, formatLink, upFreq)
             } else binding.uplink.text = formatLinkNull
         }
 
         private fun setDopplerFreq(satTrans: SatTrans, predictor: PassPredictor) {
-            if (satTrans.downlinkLow != null) {
-                val downlink = predictor.getDownlinkFreq(satTrans.downlinkLow, dateNow) / divider
+            if (satTrans.downlink != null) {
+                val downlink = predictor.getDownlinkFreq(satTrans.downlink, dateNow) / divider
                 binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downlink)
             } else binding.downlink.text = formatLinkNull
 
-            if (satTrans.uplinkLow != null) {
-                val uplink = predictor.getUplinkFreq(satTrans.uplinkLow, dateNow) / divider
+            if (satTrans.uplink != null) {
+                val uplink = predictor.getUplinkFreq(satTrans.uplink, dateNow) / divider
                 binding.uplink.text = String.format(Locale.ENGLISH, formatLink, uplink)
             } else binding.uplink.text = formatLinkNull
         }

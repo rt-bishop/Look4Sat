@@ -19,10 +19,7 @@ package com.rtbishop.look4sat.di
 
 import android.content.Context
 import androidx.room.Room
-import com.rtbishop.look4sat.data.database.MIGRATION_1_2
-import com.rtbishop.look4sat.data.database.RoomConverters
-import com.rtbishop.look4sat.data.database.SatelliteDao
-import com.rtbishop.look4sat.data.database.SatelliteDb
+import com.rtbishop.look4sat.data.database.*
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -44,6 +41,7 @@ object RepositoryModule {
         RoomConverters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "satDb")
             .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .build()
     }
 }

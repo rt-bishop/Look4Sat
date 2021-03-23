@@ -25,15 +25,24 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rtbishop.look4sat.data.model.SatEntry
 import com.rtbishop.look4sat.data.model.SatTrans
 
-@Database(entities = [SatEntry::class, SatTrans::class], version = 2)
+@Database(entities = [SatEntry::class, SatTrans::class], version = 3)
 @TypeConverters(RoomConverters::class)
 abstract class SatelliteDb : RoomDatabase() {
-    
+
     abstract fun satelliteDao(): SatelliteDao
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE sources")
+    }
+}
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE trans_backup (uuid TEXT NOT NULL, info TEXT NOT NULL, isAlive INTEGER NOT NULL, downlink INTEGER, uplink INTEGER, mode TEXT, isInverted INTEGER NOT NULL, catNum INTEGER NOT NULL, PRIMARY KEY(uuid))")
+        database.execSQL("INSERT INTO trans_backup (uuid, info, isAlive, downlink, uplink, mode, isInverted, catNum) SELECT uuid, description, isAlive, downlinkLow, uplinkLow, mode, isInverted, catNum FROM transmitters")
+        database.execSQL("DROP TABLE transmitters")
+        database.execSQL("ALTER TABLE trans_backup RENAME TO transmitters")
     }
 }
