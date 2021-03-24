@@ -32,9 +32,6 @@ interface SatelliteDao {
     @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
     fun getAllSatItems(): Flow<List<SatItem>>
 
-    @Query("SELECT tle FROM entries WHERE isSelected = 1")
-    fun getSelectedSatellitesFlow(): Flow<List<Satellite>>
-
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 ORDER BY mode ASC")
     fun getAllTransmitters(): Flow<List<SatTrans>>
 

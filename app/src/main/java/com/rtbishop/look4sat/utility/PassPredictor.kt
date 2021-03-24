@@ -42,14 +42,15 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
         return satellite.getPosition(qth, date)
     }
 
-    fun getPositions(refDate: Date, stepSeconds: Int, minBefore: Int, minAfter: Int): List<SatPos> {
+    fun getPositions(refDate: Date, stepSec: Int, minBefore: Int, orbits: Double): List<SatPos> {
         val positions = mutableListOf<SatPos>()
-        val endDate = Date(refDate.time + minAfter * 60L * 1000L)
+        val orbitalPeriod = 24 * 60 / satellite.tle.meanmo
+        val endDate = Date(refDate.time + (orbitalPeriod * orbits * 60L * 1000L).toLong())
         val startDate = Date(refDate.time - minBefore * 60L * 1000L)
         var currentDate = startDate
         while (currentDate.before(endDate)) {
             positions.add(getSatPos(currentDate))
-            currentDate = Date(currentDate.time + stepSeconds * 1000)
+            currentDate = Date(currentDate.time + stepSec * 1000)
         }
         return positions
     }

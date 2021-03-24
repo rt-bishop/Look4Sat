@@ -29,7 +29,6 @@ import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Overlay
@@ -77,21 +76,16 @@ class MapViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            satelliteRepo.getSelectedSatellitesFlow().collect { satellites ->
-                if (satellites.isNotEmpty()) {
-                    filteredSats = satellites
-                    selectedSat = satellites.first()
-                    try {
-                        while (true) {
-                            ensureActive()
-                            dateNow.time = System.currentTimeMillis()
-                            _selectedSat.value = getDataForSelSatellite(selectedSat)
-                            _satMarkers.value = getDataForAllSatellites(filteredSats)
-                            delay(2000)
-                        }
-                    } catch (e: Exception) {
-
-                    }
+            val satellites = satelliteRepo.getSelectedSatellites()
+            if (satellites.isNotEmpty()) {
+                filteredSats = satellites
+                selectedSat = satellites.first()
+                while (true) {
+                    ensureActive()
+                    dateNow.time = System.currentTimeMillis()
+                    _selectedSat.value = getDataForSelSatellite(selectedSat)
+                    _satMarkers.value = getDataForAllSatellites(filteredSats)
+                    delay(2000)
                 }
             }
         }
@@ -147,7 +141,7 @@ class MapViewModel @Inject constructor(
         }
 
     private fun getSatTrack(satellite: Satellite): Overlay {
-        val positions = satellite.getPredictor(gsp).getPositions(dateNow, 20, 5, 2)
+        val positions = satellite.getPredictor(gsp).getPositions(dateNow, 15, 3, 3.2)
         val trackOverlay = FolderOverlay()
         val trackPoints = mutableListOf<GeoPoint>()
         var oldLon = 0.0
