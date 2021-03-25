@@ -29,6 +29,7 @@ interface SatelliteDao {
 
     // Query
 
+    @Transaction
     @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
     fun getAllSatItems(): Flow<List<SatItem>>
 

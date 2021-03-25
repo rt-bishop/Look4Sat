@@ -17,4 +17,17 @@
  */
 package com.rtbishop.look4sat.data.model
 
-class SatItem(val catNum: Int, val name: String, var isSelected: Boolean)
+import androidx.room.Relation
+
+data class SatItem(
+    val catNum: Int,
+    val name: String,
+    var isSelected: Boolean,
+    @Relation(
+        parentColumn = "catNum",
+        entity = SatTrans::class,
+        entityColumn = "catNum",
+        projection = ["mode"]
+    )
+    val modes: List<String>
+)
