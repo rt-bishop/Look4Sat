@@ -48,6 +48,8 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     private lateinit var satPass: SatPass
     private lateinit var sensorManager: SensorManager
     private val viewModel: PolarViewModel by viewModels()
+    private val rotationMatrix = FloatArray(9)
+    private val orientationValues = FloatArray(3)
     private var magneticDeclination = 0f
     private var polarView: PolarView? = null
 
@@ -63,7 +65,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         super.onResume()
         if (viewModel.shouldUseCompass()) {
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
-                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
+                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME)
             }
         }
     }
@@ -82,13 +84,13 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun calculateAzimuth(event: SensorEvent) {
-        val rotationValues = FloatArray(9)
-        SensorManager.getRotationMatrixFromVector(rotationValues, event.values)
-        val orientationValues = FloatArray(3)
-        SensorManager.getOrientation(rotationValues, orientationValues)
-        val magneticAzimuth = ((orientationValues[0] * 57.2957795f) + 360f) % 360f
-        val roundedAzimuth = round(magneticAzimuth * 100) / 100
-        polarView?.rotation = -(roundedAzimuth + magneticDeclination)
+        if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
+            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+            SensorManager.getOrientation(rotationMatrix, orientationValues)
+            val magneticAzimuth = (Math.toDegrees(orientationValues[0].toDouble()) + 360f) % 360f
+            val roundedAzimuth = (round(magneticAzimuth * 10) / 10).toFloat()
+            polarView?.rotation = -(roundedAzimuth + magneticDeclination)
+        }
     }
 
     private fun observePass() {
