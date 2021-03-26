@@ -23,6 +23,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.view.Surface
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,6 +38,7 @@ import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import java.util.*
+import kotlin.math.atan2
 import kotlin.math.round
 
 @FlowPreview
@@ -84,10 +86,33 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun calculateAzimuth(event: SensorEvent) {
+//        if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
+//            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+//            SensorManager.getOrientation(rotationMatrix, orientationValues)
+//            val magneticAzimuth = (Math.toDegrees(orientationValues[0].toDouble()) + 360f) % 360f
+//            val roundedAzimuth = (round(magneticAzimuth * 10) / 10).toFloat()
+//            polarView?.rotation = -(roundedAzimuth + magneticDeclination)
+//        }
+
         if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
             SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-            SensorManager.getOrientation(rotationMatrix, orientationValues)
-            val magneticAzimuth = (Math.toDegrees(orientationValues[0].toDouble()) + 360f) % 360f
+            val (matrixColumn, sense) = when (val rotation =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    requireContext().display?.rotation
+                } else {
+                    @Suppress("DEPRECATION")
+                    requireActivity().windowManager.defaultDisplay.rotation
+                }
+            ) {
+                Surface.ROTATION_0 -> Pair(0, 1)
+                Surface.ROTATION_90 -> Pair(1, -1)
+                Surface.ROTATION_180 -> Pair(0, -1)
+                Surface.ROTATION_270 -> Pair(1, 1)
+                else -> error("Invalid screen rotation value: $rotation")
+            }
+            val x = sense * rotationMatrix[matrixColumn]
+            val y = sense * rotationMatrix[matrixColumn + 3]
+            val magneticAzimuth = (Math.toDegrees(-atan2(y, x).toDouble()) + 360f) % 360f
             val roundedAzimuth = (round(magneticAzimuth * 10) / 10).toFloat()
             polarView?.rotation = -(roundedAzimuth + magneticDeclination)
         }
