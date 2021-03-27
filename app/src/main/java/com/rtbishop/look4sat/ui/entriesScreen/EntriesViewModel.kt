@@ -28,10 +28,8 @@ import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flattenMerge
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -44,31 +42,56 @@ class EntriesViewModel @Inject constructor(
     private val satelliteRepo: SatelliteRepo
 ) : ViewModel() {
 
-    private val satDataState = MutableSharedFlow<Result<List<SatItem>>>(replay = 0)
-    private val satDataFlow = satelliteRepo.getAllSatItems().map { Result.Success(it) }
-    val satData =
-        flowOf(satDataState, satDataFlow).flattenMerge().asLiveData(viewModelScope.coroutineContext)
+    private val allSatItems = mutableListOf<SatItem>()
+    private val satDataState = MutableStateFlow<Result<List<SatItem>>>(Result.InProgress)
+    val satData = satDataState.asLiveData(viewModelScope.coroutineContext)
+
+    init {
+        viewModelScope.launch {
+            satelliteRepo.getAllSatItems().collect { items ->
+                allSatItems.clear()
+                allSatItems.addAll(items)
+                filterByModes(getModesSelection())
+            }
+        }
+    }
+
+    fun getModesSelection(): List<String> {
+        return prefsRepo.loadModesSelection()
+    }
+
+    fun filterByModes(modes: List<String>) {
+        if (modes.isEmpty()) {
+            satDataState.value = Result.Success(allSatItems)
+        } else {
+            val itemsWithModes = allSatItems.filter { item ->
+                item.modes.any { mode -> mode in modes }
+            }
+            satDataState.value = Result.Success(itemsWithModes)
+        }
+        prefsRepo.saveModesSelection(modes)
+    }
 
     fun importSatDataFromFile(uri: Uri) {
         viewModelScope.launch {
-            satDataState.emit(Result.InProgress)
+            satDataState.value = Result.InProgress
             try {
                 satelliteRepo.importSatDataFromFile(uri)
             } catch (exception: Exception) {
-                satDataState.emit(Result.Error(exception))
+                satDataState.value = Result.Error(exception)
             }
         }
     }
 
     fun importSatDataFromSources(sources: List<TleSource> = prefsRepo.loadDefaultSources()) {
         viewModelScope.launch {
-            satDataState.emit(Result.InProgress)
+            satDataState.value = Result.InProgress
             val updateMillis = measureTimeMillis {
                 try {
                     prefsRepo.saveTleSources(sources)
                     satelliteRepo.importSatDataFromWeb(sources)
                 } catch (exception: Exception) {
-                    satDataState.emit(Result.Error(exception))
+                    satDataState.value = Result.Error(exception)
                 }
             }
             Timber.d("Update from WEB took $updateMillis ms")

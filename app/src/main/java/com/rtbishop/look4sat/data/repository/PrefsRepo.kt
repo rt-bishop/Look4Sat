@@ -35,6 +35,7 @@ class PrefsRepo @Inject constructor(val preferences: SharedPreferences, moshi: M
     
     companion object {
         const val keySources = "sourcesListJson"
+        const val keyModes = "satModes"
         const val keyLatitude = "latitude"
         const val keyLongitude = "longitude"
         const val keyAltitude = "altitude"
@@ -117,7 +118,7 @@ class PrefsRepo @Inject constructor(val preferences: SharedPreferences, moshi: M
         val sourcesJson = sourcesAdapter.toJson(sources)
         preferences.edit { putString(keySources, sourcesJson) }
     }
-    
+
     fun loadDefaultSources(): List<TleSource> {
         return listOf(
             TleSource("https://celestrak.com/NORAD/elements/active.txt"),
@@ -125,5 +126,19 @@ class PrefsRepo @Inject constructor(val preferences: SharedPreferences, moshi: M
             TleSource("https://www.prismnet.com/~mmccants/tles/classfd.zip"),
             TleSource("https://www.prismnet.com/~mmccants/tles/inttles.zip")
         )
+    }
+
+    fun saveModesSelection(modes: List<String>) {
+        val modesSet = modes.toSet()
+        preferences.edit {
+            putStringSet(keyModes, modesSet)
+        }
+    }
+
+    fun loadModesSelection(): List<String> {
+        preferences.getStringSet(keyModes, setOf())?.let { modesSet ->
+            return modesSet.toList().sorted()
+        }
+        return emptyList()
     }
 }

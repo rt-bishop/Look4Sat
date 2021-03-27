@@ -99,4 +99,5 @@
     </string>
     <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy</a>
         \nThis app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.</string>
+    <string name="modes_title">Choose transmitter mode</string>
 </resources>

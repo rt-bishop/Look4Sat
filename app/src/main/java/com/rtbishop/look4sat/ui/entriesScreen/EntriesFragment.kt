@@ -27,6 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
@@ -71,6 +72,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
             }
             importWeb.setOnClickListener { showImportFromWebDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
+            selectMode.setOnClickListener { showModesDialog() }
             selectAll.setOnClickListener { entriesAdapter?.selectAllItems() }
             searchBar.addTextChangedListener { query -> filterByQuery(query) }
             searchBar.clearFocus()
@@ -85,6 +87,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
                         setEmpty()
                     } else {
                         entriesAdapter?.submitAllItems(result.data)
+                        binding?.entriesRecycler?.smoothScrollToPosition(0)
                         setLoaded()
                     }
                 }
@@ -101,11 +104,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
 
     private fun observeSourcesResult() {
         getNavResult<List<String>>(R.id.nav_entries, "sources") { result ->
-            val sources = result.map { TleSource(it) }
-            if (sources.isNullOrEmpty()) {
-                viewModel.importSatDataFromSources()
-            } else {
-                viewModel.importSatDataFromSources(sources)
+            result.map { TleSource(it) }.let { sources ->
+                if (sources.isNullOrEmpty()) {
+                    viewModel.importSatDataFromSources()
+                } else {
+                    viewModel.importSatDataFromSources(sources)
+                }
             }
         }
     }
@@ -134,13 +138,44 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         }
     }
 
-    private fun filterByQuery(it: Editable?) {
-        entriesAdapter?.filterItems(it.toString())
-        binding?.entriesRecycler?.scrollToPosition(0)
+    private fun filterByQuery(query: Editable?) {
+        entriesAdapter?.filterItems(query.toString())
+        binding?.entriesRecycler?.smoothScrollToPosition(0)
     }
 
     private fun showImportFromWebDialog() {
         findNavController().navigate(R.id.nav_dialog_sources)
+    }
+
+    private fun showModesDialog() {
+        val modes = arrayOf(
+            "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
+            "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
+            "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
+            "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
+            "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
+        )
+        val savedModes = BooleanArray(modes.size)
+        val selectedModes = viewModel.getModesSelection().toMutableList()
+        selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
+        MaterialAlertDialogBuilder(requireContext()).apply {
+            setTitle(getString(R.string.modes_title))
+            setMultiChoiceItems(modes, savedModes) { _, which, isChecked ->
+                if (isChecked) {
+                    selectedModes.add(modes[which])
+                } else if (selectedModes.contains(modes[which])) {
+                    selectedModes.remove(modes[which])
+                }
+            }
+            setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+                viewModel.filterByModes(selectedModes)
+            }
+            setNeutralButton(getString(android.R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            create()
+            show()
+        }
     }
 
     override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
