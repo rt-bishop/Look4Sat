@@ -34,30 +34,30 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         }
 
         override fun areContentsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
-            return oldItem.isSelected == newItem.isSelected
+            return oldItem.isSelected != newItem.isSelected
         }
     }
     private val listDiffer = AsyncListDiffer(this, diffCallback)
-    private var allItems = emptyList<SatItem>()
+    private val allItems = mutableListOf<SatItem>()
     private var shouldSelectAll = true
-    private lateinit var entriesClickListener: EntriesClickListener
 
-    interface EntriesClickListener {
-        fun updateSelection(catNums: List<Int>, isSelected: Boolean)
-    }
-
-    fun setEntriesClickListener(listener: EntriesClickListener) {
-        entriesClickListener = listener
+    fun getSelectedIds(): List<Int> {
+        return allItems.filter { it.isSelected }.map { it.catNum }
     }
 
     fun submitAllItems(items: List<SatItem>) {
-        allItems = items
+        allItems.clear()
+        allItems.addAll(items)
         listDiffer.submitList(items)
     }
 
-    fun selectAllItems() {
-        val catNums = listDiffer.currentList.map { it.catNum }
-        entriesClickListener.updateSelection(catNums, shouldSelectAll)
+    fun selectCurrentItems() {
+        val newList = mutableListOf<SatItem>()
+        listDiffer.currentList.forEach { item ->
+            item.isSelected = shouldSelectAll
+            newList.add(item)
+        }
+        submitCurrentItems(newList)
         shouldSelectAll = !shouldSelectAll
     }
 
@@ -82,11 +82,11 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         submitCurrentItems(allItems.filter { it.catNum == catNum })
     }
 
-    private fun filterByName(query: String) {
-        val searchQuery = query.toLowerCase(Locale.getDefault())
-        val filteredItems = allItems.filter { satItem ->
-            val lowerCaseItem = satItem.name.toLowerCase(Locale.getDefault())
-            lowerCaseItem.contains(searchQuery)
+    private fun filterByName(name: String) {
+        val satName = name.toLowerCase(Locale.getDefault())
+        val filteredItems = allItems.filter { item ->
+            val itemName = item.name.toLowerCase(Locale.getDefault())
+            itemName.contains(satName)
         }
         submitCurrentItems(filteredItems)
     }
@@ -98,18 +98,16 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
     }
 
     override fun onBindViewHolder(holder: SatItemHolder, position: Int) {
-        holder.bind(listDiffer.currentList[position], entriesClickListener)
+        holder.bind(listDiffer.currentList[position])
     }
 
     class SatItemHolder private constructor(private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: SatItem, clickListener: EntriesClickListener) {
+        fun bind(item: SatItem) {
             binding.satItemCheckbox.text = item.name
             binding.satItemCheckbox.isChecked = item.isSelected
-            itemView.setOnClickListener {
-                clickListener.updateSelection(listOf(item.catNum), item.isSelected.not())
-            }
+            itemView.setOnClickListener { item.isSelected = item.isSelected.not() }
         }
 
         companion object {

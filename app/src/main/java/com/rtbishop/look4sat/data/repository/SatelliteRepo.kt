@@ -52,10 +52,6 @@ class SatelliteRepo @Inject constructor(
         return satelliteDao.getAllSatItems()
     }
 
-    fun getAllTransmitters(): Flow<List<SatTrans>> {
-        return satelliteDao.getAllTransmitters()
-    }
-
     fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>> {
         return satelliteDao.getTransmittersByCatNum(catNum)
     }
@@ -135,18 +131,12 @@ class SatelliteRepo @Inject constructor(
     private suspend fun insertEntriesAndRestoreSelection(entries: List<SatEntry>) {
         val selectedCatNums = satelliteDao.getSelectedCatNums()
         satelliteDao.insertEntries(entries)
-        satelliteDao.restoreEntriesSelection(selectedCatNums, true)
+        satelliteDao.updateEntriesSelection(selectedCatNums, true)
     }
 
     // Update
 
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         satelliteDao.updateEntriesSelection(catNums, isSelected)
-    }
-
-    // Delete
-
-    suspend fun deleteAllData() {
-        satelliteDao.deleteAllData()
     }
 }

@@ -27,7 +27,6 @@ import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -35,7 +34,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
-@FlowPreview
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
@@ -98,9 +96,7 @@ class EntriesViewModel @Inject constructor(
         }
     }
 
-    fun updateEntriesSelection(items: List<Int>, isSelected: Boolean) {
-        viewModelScope.launch {
-            satelliteRepo.updateEntriesSelection(items, isSelected)
-        }
+    suspend fun updateEntriesSelection(items: List<Int>, isSelected: Boolean) {
+        satelliteRepo.updateEntriesSelection(items, isSelected)
     }
 }

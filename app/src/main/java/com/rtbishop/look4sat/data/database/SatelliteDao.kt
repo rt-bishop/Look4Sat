@@ -33,9 +33,6 @@ interface SatelliteDao {
     @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
     fun getAllSatItems(): Flow<List<SatItem>>
 
-    @Query("SELECT * FROM transmitters WHERE isAlive = 1 ORDER BY mode ASC")
-    fun getAllTransmitters(): Flow<List<SatTrans>>
-
     @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :catNum")
     fun getTransmittersByCatNum(catNum: Int): Flow<List<SatTrans>>
 
@@ -56,15 +53,8 @@ interface SatelliteDao {
     // Update
 
     @Transaction
-    suspend fun restoreEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        clearEntriesSelection()
-        catNums.forEach { catNum ->
-            updateItemSelection(catNum, isSelected)
-        }
-    }
-
-    @Transaction
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        clearEntriesSelection()
         catNums.forEach { catNum ->
             updateItemSelection(catNum, isSelected)
         }

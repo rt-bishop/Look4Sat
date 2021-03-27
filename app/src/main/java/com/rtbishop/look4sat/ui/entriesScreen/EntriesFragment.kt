@@ -18,12 +18,12 @@
 package com.rtbishop.look4sat.ui.entriesScreen
 
 import android.os.Bundle
-import android.text.Editable
 import android.view.View
+import android.widget.SearchView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -31,16 +31,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
+import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 
-@FlowPreview
 @AndroidEntryPoint
-class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.EntriesClickListener {
+class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryTextListener {
 
     private val viewModel: EntriesViewModel by viewModels()
     private val filePicker =
@@ -52,17 +52,13 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentEntriesBinding.bind(view)
-        setupComponents()
-        observeSatelliteData()
-        observeSourcesResult()
+        setupComponents(view)
+        setupObservers()
     }
 
-    private fun setupComponents() {
-        entriesAdapter = EntriesAdapter().apply {
-            setEntriesClickListener(this@EntriesFragment)
-        }
-        binding?.apply {
+    private fun setupComponents(view: View) {
+        entriesAdapter = EntriesAdapter()
+        binding = FragmentEntriesBinding.bind(view).apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = entriesAdapter
@@ -70,39 +66,23 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
-            importWeb.setOnClickListener { showImportFromWebDialog() }
+            importWeb.setOnClickListener { findNavController().navigate(R.id.nav_dialog_sources) }
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectMode.setOnClickListener { showModesDialog() }
-            selectAll.setOnClickListener { entriesAdapter?.selectAllItems() }
-            searchBar.addTextChangedListener { query -> filterByQuery(query) }
-            searchBar.clearFocus()
+            selectAll.setOnClickListener { entriesAdapter?.selectCurrentItems() }
+            entriesSubmit.setOnClickListener { updateEntriesSelection() }
+            searchBar.setOnQueryTextListener(this@EntriesFragment)
         }
     }
 
-    private fun observeSatelliteData() {
+    private fun setupObservers() {
         viewModel.satData.observe(viewLifecycleOwner, { result ->
             when (result) {
-                is Result.Success -> {
-                    if (result.data.isEmpty()) {
-                        setEmpty()
-                    } else {
-                        entriesAdapter?.submitAllItems(result.data)
-                        binding?.entriesRecycler?.smoothScrollToPosition(0)
-                        setLoaded()
-                    }
-                }
-                is Result.InProgress -> {
-                    setLoading()
-                }
-                is Result.Error -> {
-                    val errorMsg = getString(R.string.entries_update_error)
-                    Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
-                }
+                is Result.Success -> setLoaded(result.data)
+                is Result.InProgress -> setLoading()
+                is Result.Error -> setError()
             }
         })
-    }
-
-    private fun observeSourcesResult() {
         getNavResult<List<String>>(R.id.nav_entries, "sources") { result ->
             result.map { TleSource(it) }.let { sources ->
                 if (sources.isNullOrEmpty()) {
@@ -114,11 +94,21 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         }
     }
 
-    private fun setLoaded() {
-        binding?.apply {
-            entriesError.visibility = View.INVISIBLE
-            entriesProgress.visibility = View.INVISIBLE
-            entriesRecycler.visibility = View.VISIBLE
+    private fun setLoaded(items: List<SatItem>) {
+        if (items.isEmpty()) {
+            binding?.apply {
+                entriesError.visibility = View.VISIBLE
+                entriesProgress.visibility = View.INVISIBLE
+                entriesRecycler.visibility = View.INVISIBLE
+            }
+        } else {
+            entriesAdapter?.submitAllItems(items)
+            binding?.apply {
+                entriesError.visibility = View.INVISIBLE
+                entriesProgress.visibility = View.INVISIBLE
+                entriesRecycler.visibility = View.VISIBLE
+                entriesRecycler.scrollToPosition(0)
+            }
         }
     }
 
@@ -130,21 +120,29 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         }
     }
 
-    private fun setEmpty() {
+    private fun setError() {
         binding?.apply {
-            entriesError.visibility = View.VISIBLE
+            entriesError.visibility = View.INVISIBLE
             entriesProgress.visibility = View.INVISIBLE
-            entriesRecycler.visibility = View.INVISIBLE
+            entriesRecycler.visibility = View.VISIBLE
         }
+        val errorMsg = getString(R.string.entries_update_error)
+        Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
     }
 
-    private fun filterByQuery(query: Editable?) {
-        entriesAdapter?.filterItems(query.toString())
-        binding?.entriesRecycler?.smoothScrollToPosition(0)
+    private fun filterAndScroll(query: String) {
+        entriesAdapter?.filterItems(query)
+        binding?.entriesRecycler?.scrollToPosition(0)
     }
 
-    private fun showImportFromWebDialog() {
-        findNavController().navigate(R.id.nav_dialog_sources)
+    private fun updateEntriesSelection() {
+        setLoading()
+        lifecycleScope.launch {
+            entriesAdapter?.getSelectedIds()?.let { ids ->
+                viewModel.updateEntriesSelection(ids, true)
+            }
+            findNavController().navigate(R.id.nav_passes)
+        }
     }
 
     private fun showModesDialog() {
@@ -161,10 +159,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         MaterialAlertDialogBuilder(requireContext()).apply {
             setTitle(getString(R.string.modes_title))
             setMultiChoiceItems(modes, savedModes) { _, which, isChecked ->
-                if (isChecked) {
-                    selectedModes.add(modes[which])
-                } else if (selectedModes.contains(modes[which])) {
-                    selectedModes.remove(modes[which])
+                when {
+                    isChecked -> selectedModes.add(modes[which])
+                    selectedModes.contains(modes[which]) -> selectedModes.remove(modes[which])
                 }
             }
             setPositiveButton(getString(android.R.string.ok)) { _, _ ->
@@ -178,8 +175,13 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), EntriesAdapter.Entr
         }
     }
 
-    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        viewModel.updateEntriesSelection(catNums, isSelected)
+    override fun onQueryTextSubmit(query: String): Boolean {
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String): Boolean {
+        filterAndScroll(newText)
+        return true
     }
 
     override fun onDestroyView() {
