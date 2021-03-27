@@ -20,6 +20,8 @@
     <string name="entries_no_data">Пожалуйста, обновите спутники</string>
     <string name="entries_update_error">Ошибка обновления спутников</string>
 
+    <string name="modes_title">Выберите модуляцию трансивера</string>
+
     <string name="passes_error">Нет предстоящих пролётов</string>
 
     <string name="pass_aosAz">НПС - %.1f°</string>
@@ -79,5 +81,4 @@
         к ним по лицензии <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a></string>
     <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Политика конфиденциальности</a>
         \nЭто ПО поставляется без гарантий. \nПодробности в лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.</string>
-    <string name="modes_title">Выберите модуляцию трансивера</string>
 </resources>

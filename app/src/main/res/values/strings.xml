@@ -23,6 +23,8 @@
     <string name="entries_no_data">Please update TLE data</string>
     <string name="entries_update_error">Error importing satellite data</string>
 
+    <string name="modes_title">Choose transceiver mode</string>
+
     <string name="timer_zero" translatable="false">00:00:00</string>
     <string name="timer_placeholder" translatable="false">-</string>
 
@@ -99,5 +101,4 @@
     </string>
     <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy</a>
         \nThis app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.</string>
-    <string name="modes_title">Choose transmitter mode</string>
 </resources>

@@ -87,8 +87,8 @@ class SatelliteRepo @Inject constructor(
     }
 
     private suspend fun importTransmitters() {
-        val transmitters = satelliteService.fetchTransmitters()
-        satelliteDao.insertTransmitters(transmitters)
+        val transmitters = satelliteService.fetchTransmitters().filter { it.isAlive }
+        satelliteDao.updateTransmitters(transmitters)
     }
 
     private suspend fun getStreamsForSources(sources: List<TleSource>): List<InputStream> {

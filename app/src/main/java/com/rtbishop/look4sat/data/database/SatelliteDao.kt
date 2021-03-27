@@ -33,7 +33,7 @@ interface SatelliteDao {
     @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
     fun getAllSatItems(): Flow<List<SatItem>>
 
-    @Query("SELECT * FROM transmitters WHERE isAlive = 1 and catNum = :catNum")
+    @Query("SELECT * FROM transmitters WHERE catNum = :catNum")
     fun getTransmittersByCatNum(catNum: Int): Flow<List<SatTrans>>
 
     @Query("SELECT tle FROM entries WHERE isSelected = 1")
@@ -46,6 +46,12 @@ interface SatelliteDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
+
+    @Transaction
+    suspend fun updateTransmitters(transmitters: List<SatTrans>) {
+        deleteTransmitters()
+        insertTransmitters(transmitters)
+    }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransmitters(transmitters: List<SatTrans>)
