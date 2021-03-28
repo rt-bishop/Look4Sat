@@ -107,9 +107,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             altitude.text = String.format(getString(R.string.pat_altitude), sat.altitude)
             distance.text = String.format(getString(R.string.pat_distance), sat.range)
             velocity.text = String.format(getString(R.string.pat_osm_vel), sat.velocity)
-            latLon.text =
-                String.format(getString(R.string.pat_osm_latLon), sat.osmPos.lat, sat.osmPos.lon)
-            mapCoverage.text = String.format(getString(R.string.map_coverage), sat.coverage)
+            mapLat.text = String.format(getString(R.string.pat_osm_lat), sat.osmPos.lat)
+            mapLon.text = String.format(getString(R.string.pat_osm_lon), sat.osmPos.lon)
             mapView.overlays[1] = sat.groundTrack
             mapView.overlays[2] = sat.footprint
             mapView.invalidate()

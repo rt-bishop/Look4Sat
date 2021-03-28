@@ -48,4 +48,9 @@
         <item name="android:includeFontPadding">false</item>
     </style>
 
+    <style name="MapInfoText">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/themeLight</item>
+    </style>
+
 </resources>

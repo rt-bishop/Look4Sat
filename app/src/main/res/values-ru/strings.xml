@@ -33,14 +33,16 @@
     <string name="trans_inverted">Инверсия: %s</string>
     <string name="trans_no_data">Не найдены трансиверы для этого спутника</string>
 
+    <string name="map_qth">QTH Локатор: %s</string>
     <string name="map_coverage">Покрытие: %.0fкм</string>
 
-    <string name="pat_azimuth">Азим: %.1f°</string>
-    <string name="pat_elevation">Элев: %.1f°</string>
-    <string name="pat_distance">Дст: %.0fкм</string>
-    <string name="pat_altitude">Выс: %.0fкм</string>
-    <string name="pat_osm_latLon">Шир: %.1f°, Дол: %.1f°</string>
-    <string name="pat_osm_vel">Скр: %.2fкм/с</string>
+    <string name="pat_azimuth">Азимут: %.1f°</string>
+    <string name="pat_elevation">Элевация: %.1f°</string>
+    <string name="pat_distance">Дистанция: %.0fкм</string>
+    <string name="pat_altitude">Высота: %.0fкм</string>
+    <string name="pat_osm_lat">Широта: %.1f°</string>
+    <string name="pat_osm_lon">Долгота: %.1f°</string>
+    <string name="pat_osm_vel">Скорость: %.2fкм/с</string>
 
     <string name="pref_gsp_title">Местоположение наземной станции</string>
     <string name="pref_pos_gps">Установить позицию по данным GPS</string>
