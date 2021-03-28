@@ -23,11 +23,9 @@ import android.widget.SearchView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
@@ -37,7 +35,6 @@ import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryTextListener {
@@ -57,7 +54,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
     }
 
     private fun setupComponents(view: View) {
-        entriesAdapter = EntriesAdapter()
+        entriesAdapter = EntriesAdapter().apply {
+            setEntriesClickListener(viewModel)
+        }
         binding = FragmentEntriesBinding.bind(view).apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
@@ -70,7 +69,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectMode.setOnClickListener { showModesDialog() }
             selectAll.setOnClickListener { entriesAdapter?.selectCurrentItems() }
-            entriesSubmit.setOnClickListener { updateEntriesSelection() }
             searchBar.setOnQueryTextListener(this@EntriesFragment)
         }
     }
@@ -97,14 +95,14 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
     private fun setLoaded(items: List<SatItem>) {
         if (items.isEmpty()) {
             binding?.apply {
-                entriesError.visibility = View.VISIBLE
+                entriesEmptyError.visibility = View.VISIBLE
                 entriesProgress.visibility = View.INVISIBLE
                 entriesRecycler.visibility = View.INVISIBLE
             }
         } else {
             entriesAdapter?.submitAllItems(items)
             binding?.apply {
-                entriesError.visibility = View.INVISIBLE
+                entriesEmptyError.visibility = View.INVISIBLE
                 entriesProgress.visibility = View.INVISIBLE
                 entriesRecycler.visibility = View.VISIBLE
                 entriesRecycler.scrollToPosition(0)
@@ -114,7 +112,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
 
     private fun setLoading() {
         binding?.apply {
-            entriesError.visibility = View.INVISIBLE
+            entriesEmptyError.visibility = View.INVISIBLE
             entriesProgress.visibility = View.VISIBLE
             entriesRecycler.visibility = View.INVISIBLE
         }
@@ -122,7 +120,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
 
     private fun setError() {
         binding?.apply {
-            entriesError.visibility = View.INVISIBLE
+            entriesEmptyError.visibility = View.INVISIBLE
             entriesProgress.visibility = View.INVISIBLE
             entriesRecycler.visibility = View.VISIBLE
         }
@@ -130,49 +128,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
         Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
     }
 
-    private fun filterAndScroll(query: String) {
-        entriesAdapter?.filterItems(query)
-        binding?.entriesRecycler?.scrollToPosition(0)
-    }
-
-    private fun updateEntriesSelection() {
-        setLoading()
-        lifecycleScope.launch {
-            entriesAdapter?.getSelectedIds()?.let { ids ->
-                viewModel.updateEntriesSelection(ids, true)
-            }
-            findNavController().navigate(R.id.nav_passes)
-        }
-    }
-
     private fun showModesDialog() {
-        val modes = arrayOf(
-            "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
-            "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
-            "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
-            "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
-            "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
-        )
-        val savedModes = BooleanArray(modes.size)
-        val selectedModes = viewModel.getModesSelection().toMutableList()
-        selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
-        MaterialAlertDialogBuilder(requireContext()).apply {
-            setTitle(getString(R.string.modes_title))
-            setMultiChoiceItems(modes, savedModes) { _, which, isChecked ->
-                when {
-                    isChecked -> selectedModes.add(modes[which])
-                    selectedModes.contains(modes[which]) -> selectedModes.remove(modes[which])
-                }
-            }
-            setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                viewModel.filterByModes(selectedModes)
-            }
-            setNeutralButton(getString(android.R.string.cancel)) { dialog, _ ->
-                dialog.dismiss()
-            }
-            create()
-            show()
-        }
+        viewModel.createModesDialog(requireContext()).show()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -180,7 +137,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        filterAndScroll(newText)
+        entriesAdapter?.filterItems(newText)
+        binding?.entriesRecycler?.scrollToPosition(0)
         return true
     }
 

@@ -103,7 +103,7 @@
             app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/entries_error"
+            android:id="@+id/entries_empty_error"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/entries_no_data"
@@ -115,15 +115,6 @@
             app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/entries_submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="@dimen/fab_padding"
-        android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_arrow" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

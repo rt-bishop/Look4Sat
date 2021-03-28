@@ -40,9 +40,14 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
     private val listDiffer = AsyncListDiffer(this, diffCallback)
     private val allItems = mutableListOf<SatItem>()
     private var shouldSelectAll = true
+    private lateinit var entriesClickListener: EntriesClickListener
 
-    fun getSelectedIds(): List<Int> {
-        return allItems.filter { it.isSelected }.map { it.catNum }
+    interface EntriesClickListener {
+        fun updateSelection(catNums: List<Int>, isSelected: Boolean)
+    }
+
+    fun setEntriesClickListener(listener: EntriesClickListener) {
+        entriesClickListener = listener
     }
 
     fun submitAllItems(items: List<SatItem>) {
@@ -58,6 +63,7 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
             newList.add(item)
         }
         submitCurrentItems(newList)
+        entriesClickListener.updateSelection(newList.map { it.catNum }, shouldSelectAll)
         shouldSelectAll = !shouldSelectAll
     }
 
@@ -98,16 +104,19 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
     }
 
     override fun onBindViewHolder(holder: SatItemHolder, position: Int) {
-        holder.bind(listDiffer.currentList[position])
+        holder.bind(listDiffer.currentList[position], entriesClickListener)
     }
 
     class SatItemHolder private constructor(private val binding: ItemSatEntryBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: SatItem) {
+        fun bind(item: SatItem, listener: EntriesClickListener) {
             binding.satItemCheckbox.text = item.name
             binding.satItemCheckbox.isChecked = item.isSelected
-            itemView.setOnClickListener { item.isSelected = item.isSelected.not() }
+            itemView.setOnClickListener {
+                item.isSelected = item.isSelected.not()
+                listener.updateSelection(listOf(item.catNum), item.isSelected.not())
+            }
         }
 
         companion object {

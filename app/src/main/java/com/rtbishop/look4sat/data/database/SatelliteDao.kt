@@ -29,12 +29,12 @@ interface SatelliteDao {
 
     // Query
 
-    @Transaction
-    @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
-    fun getAllSatItems(): Flow<List<SatItem>>
-
     @Query("SELECT * FROM transmitters WHERE catNum = :catNum")
     fun getTransmittersByCatNum(catNum: Int): Flow<List<SatTrans>>
+
+    @Transaction
+    @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
+    suspend fun getAllSatItems(): List<SatItem>
 
     @Query("SELECT tle FROM entries WHERE isSelected = 1")
     suspend fun getSelectedSatellites(): List<Satellite>
@@ -59,8 +59,15 @@ interface SatelliteDao {
     // Update
 
     @Transaction
-    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+    suspend fun restoreEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         clearEntriesSelection()
+        catNums.forEach { catNum ->
+            updateItemSelection(catNum, isSelected)
+        }
+    }
+
+    @Transaction
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         catNums.forEach { catNum ->
             updateItemSelection(catNum, isSelected)
         }
@@ -73,15 +80,6 @@ interface SatelliteDao {
     suspend fun updateItemSelection(catNum: Int, isSelected: Boolean)
 
     // Delete
-
-    @Transaction
-    suspend fun deleteAllData() {
-        deleteEntries()
-        deleteTransmitters()
-    }
-
-    @Query("DELETE from entries")
-    suspend fun deleteEntries()
 
     @Query("DELETE from transmitters")
     suspend fun deleteTransmitters()

@@ -17,10 +17,14 @@
  */
 package com.rtbishop.look4sat.ui.entriesScreen
 
+import android.content.Context
 import android.net.Uri
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.data.model.TleSource
@@ -28,7 +32,6 @@ import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -38,27 +41,24 @@ import kotlin.system.measureTimeMillis
 class EntriesViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
     private val satelliteRepo: SatelliteRepo
-) : ViewModel() {
+) : ViewModel(), EntriesAdapter.EntriesClickListener {
 
-    private val allSatItems = mutableListOf<SatItem>()
+    private var allSatItems = listOf<SatItem>()
     private val satDataState = MutableStateFlow<Result<List<SatItem>>>(Result.InProgress)
     val satData = satDataState.asLiveData(viewModelScope.coroutineContext)
 
     init {
+        loadAndFilterData()
+    }
+
+    private fun loadAndFilterData() {
         viewModelScope.launch {
-            satelliteRepo.getAllSatItems().collect { items ->
-                allSatItems.clear()
-                allSatItems.addAll(items)
-                filterByModes(getModesSelection())
-            }
+            allSatItems = satelliteRepo.getAllSatItems()
+            filterByModes(prefsRepo.loadModesSelection())
         }
     }
 
-    fun getModesSelection(): List<String> {
-        return prefsRepo.loadModesSelection()
-    }
-
-    fun filterByModes(modes: List<String>) {
+    private fun filterByModes(modes: List<String>) {
         if (modes.isEmpty()) {
             satDataState.value = Result.Success(allSatItems)
         } else {
@@ -75,6 +75,7 @@ class EntriesViewModel @Inject constructor(
             satDataState.value = Result.InProgress
             try {
                 satelliteRepo.importSatDataFromFile(uri)
+                loadAndFilterData()
             } catch (exception: Exception) {
                 satDataState.value = Result.Error(exception)
             }
@@ -88,6 +89,7 @@ class EntriesViewModel @Inject constructor(
                 try {
                     prefsRepo.saveTleSources(sources)
                     satelliteRepo.importSatDataFromWeb(sources)
+                    loadAndFilterData()
                 } catch (exception: Exception) {
                     satDataState.value = Result.Error(exception)
                 }
@@ -96,7 +98,38 @@ class EntriesViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateEntriesSelection(items: List<Int>, isSelected: Boolean) {
-        satelliteRepo.updateEntriesSelection(items, isSelected)
+    fun createModesDialog(context: Context): AlertDialog {
+        val modes = arrayOf(
+            "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
+            "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
+            "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
+            "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
+            "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
+        )
+        val savedModes = BooleanArray(modes.size)
+        val selectedModes = prefsRepo.loadModesSelection().toMutableList()
+        selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
+        val dialogBuilder = MaterialAlertDialogBuilder(context).apply {
+            setTitle(context.getString(R.string.modes_title))
+            setMultiChoiceItems(modes, savedModes) { _, which, isChecked ->
+                when {
+                    isChecked -> selectedModes.add(modes[which])
+                    selectedModes.contains(modes[which]) -> selectedModes.remove(modes[which])
+                }
+            }
+            setPositiveButton(context.getString(android.R.string.ok)) { _, _ ->
+                filterByModes(selectedModes)
+            }
+            setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+        }
+        return dialogBuilder.create()
+    }
+
+    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
+        viewModelScope.launch {
+            satelliteRepo.updateEntriesSelection(catNums, isSelected)
+        }
     }
 }
