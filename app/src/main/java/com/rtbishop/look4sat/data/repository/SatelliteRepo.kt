@@ -52,8 +52,8 @@ class SatelliteRepo @Inject constructor(
         return satelliteDao.getTransmittersByCatNum(catNum)
     }
 
-    suspend fun getAllSatItems(): List<SatItem> {
-        return satelliteDao.getAllSatItems()
+    fun getItemsFlow(): Flow<List<SatItem>> {
+        return satelliteDao.getItemsFlow()
     }
 
     suspend fun getSelectedSatellites(): List<Satellite> {

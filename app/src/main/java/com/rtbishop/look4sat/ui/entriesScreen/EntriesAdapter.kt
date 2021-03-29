@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.databinding.ItemSatEntryBinding
-import java.util.*
 
 class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
 
@@ -67,34 +66,8 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         shouldSelectAll = !shouldSelectAll
     }
 
-    fun filterItems(query: String) {
-        if (query.isEmpty()) {
-            submitCurrentItems(allItems)
-        } else {
-            try {
-                filterByCatNum(query.toInt())
-            } catch (e: NumberFormatException) {
-                filterByName(query)
-            }
-        }
-        shouldSelectAll = true
-    }
-
     private fun submitCurrentItems(items: List<SatItem>) {
         listDiffer.submitList(items)
-    }
-
-    private fun filterByCatNum(catNum: Int) {
-        submitCurrentItems(allItems.filter { it.catNum == catNum })
-    }
-
-    private fun filterByName(name: String) {
-        val satName = name.toLowerCase(Locale.getDefault())
-        val filteredItems = allItems.filter { item ->
-            val itemName = item.name.toLowerCase(Locale.getDefault())
-            itemName.contains(satName)
-        }
-        submitCurrentItems(filteredItems)
     }
 
     override fun getItemCount(): Int = listDiffer.currentList.size
@@ -114,7 +87,6 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
             binding.satItemCheckbox.text = item.name
             binding.satItemCheckbox.isChecked = item.isSelected
             itemView.setOnClickListener {
-                item.isSelected = item.isSelected.not()
                 listener.updateSelection(listOf(item.catNum), item.isSelected.not())
             }
         }

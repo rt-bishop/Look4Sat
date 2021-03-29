@@ -34,7 +34,7 @@ interface SatelliteDao {
 
     @Transaction
     @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
-    suspend fun getAllSatItems(): List<SatItem>
+    fun getItemsFlow(): Flow<List<SatItem>>
 
     @Query("SELECT tle FROM entries WHERE isSelected = 1")
     suspend fun getSelectedSatellites(): List<Satellite>

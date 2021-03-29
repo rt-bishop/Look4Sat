@@ -137,14 +137,13 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        entriesAdapter?.filterItems(newText)
-        binding?.entriesRecycler?.scrollToPosition(0)
+        viewModel.setNewQuery(newText)
         return true
     }
 
     override fun onDestroyView() {
+        super.onDestroyView()
         entriesAdapter = null
         binding = null
-        super.onDestroyView()
     }
 }

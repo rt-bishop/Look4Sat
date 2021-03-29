@@ -20,9 +20,7 @@ package com.rtbishop.look4sat.ui.entriesScreen
 import android.content.Context
 import android.net.Uri
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
@@ -31,9 +29,10 @@ import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
@@ -43,55 +42,39 @@ class EntriesViewModel @Inject constructor(
     private val satelliteRepo: SatelliteRepo
 ) : ViewModel(), EntriesAdapter.EntriesClickListener {
 
-    private var allSatItems = listOf<SatItem>()
-    private val satDataState = MutableStateFlow<Result<List<SatItem>>>(Result.InProgress)
-    val satData = satDataState.asLiveData(viewModelScope.coroutineContext)
-
-    init {
-        loadAndFilterData()
+    private val transModes = MutableLiveData(prefsRepo.loadModesSelection())
+    private val currentQuery = MutableLiveData(String())
+    private val itemsWithModes = transModes.switchMap { modes ->
+        liveData { satelliteRepo.getItemsFlow().collect { emit(filterByModes(it, modes)) } }
     }
-
-    private fun loadAndFilterData() {
-        viewModelScope.launch {
-            allSatItems = satelliteRepo.getAllSatItems()
-            filterByModes(prefsRepo.loadModesSelection())
-        }
+    private val itemsWithQuery = currentQuery.switchMap { query ->
+        itemsWithModes.map { items -> Result.Success(filterByQuery(items, query)) }
     }
-
-    private fun filterByModes(modes: List<String>) {
-        if (modes.isEmpty()) {
-            satDataState.value = Result.Success(allSatItems)
-        } else {
-            val itemsWithModes = allSatItems.filter { item ->
-                item.modes.any { mode -> mode in modes }
-            }
-            satDataState.value = Result.Success(itemsWithModes)
-        }
-        prefsRepo.saveModesSelection(modes)
+    private val _satData = MediatorLiveData<Result<List<SatItem>>>().apply {
+        addSource(itemsWithQuery) { value -> this.value = value }
     }
+    val satData: LiveData<Result<List<SatItem>>> = _satData
 
     fun importSatDataFromFile(uri: Uri) {
         viewModelScope.launch {
-            satDataState.value = Result.InProgress
+            _satData.value = Result.InProgress
             try {
                 satelliteRepo.importSatDataFromFile(uri)
-                loadAndFilterData()
             } catch (exception: Exception) {
-                satDataState.value = Result.Error(exception)
+                _satData.value = Result.Error(exception)
             }
         }
     }
 
     fun importSatDataFromSources(sources: List<TleSource> = prefsRepo.loadDefaultSources()) {
         viewModelScope.launch {
-            satDataState.value = Result.InProgress
+            _satData.value = Result.InProgress
             val updateMillis = measureTimeMillis {
                 try {
                     prefsRepo.saveTleSources(sources)
                     satelliteRepo.importSatDataFromWeb(sources)
-                    loadAndFilterData()
                 } catch (exception: Exception) {
-                    satDataState.value = Result.Error(exception)
+                    _satData.value = Result.Error(exception)
                 }
             }
             Timber.d("Update from WEB took $updateMillis ms")
@@ -118,13 +101,39 @@ class EntriesViewModel @Inject constructor(
                 }
             }
             setPositiveButton(context.getString(android.R.string.ok)) { _, _ ->
-                filterByModes(selectedModes)
+                setNewModes(selectedModes)
             }
             setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
         }
         return dialogBuilder.create()
+    }
+
+    fun setNewQuery(newQuery: String) {
+        currentQuery.value = newQuery
+    }
+
+    private fun setNewModes(newModes: List<String>) {
+        transModes.value = newModes
+        prefsRepo.saveModesSelection(newModes)
+    }
+
+    private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {
+        if (modes.isEmpty()) return items
+        return items.filter { item -> item.modes.any { mode -> mode in modes } }
+    }
+
+    private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
+        if (query.isBlank()) return items
+        return try {
+            items.filter { it.catNum == query.toInt() }
+        } catch (e: Exception) {
+            items.filter { item ->
+                val itemName = item.name.toLowerCase(Locale.getDefault())
+                itemName.contains(query.toLowerCase(Locale.getDefault()))
+            }
+        }
     }
 
     override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
