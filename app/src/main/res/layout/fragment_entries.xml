@@ -1,120 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/entries_bar"
+        style="@style/TopBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/entries_bar"
-            style="@style/TopBar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/import_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:elevation="4dp"
+        android:text="@string/entries_update"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/import_web"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/import_web" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/import_msg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:elevation="4dp"
-            android:text="@string/entries_update"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/import_web"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/import_web" />
+    <ImageButton
+        android:id="@+id/import_web"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/greyDark"
+        android:contentDescription="@string/placeholder"
+        android:elevation="4dp"
+        android:src="@drawable/ic_update_web"
+        app:layout_constraintBottom_toBottomOf="@+id/import_file"
+        app:layout_constraintEnd_toStartOf="@+id/import_file"
+        app:layout_constraintTop_toTopOf="@+id/import_file" />
 
-        <ImageButton
-            android:id="@+id/import_web"
-            android:layout_width="64dp"
-            android:layout_height="48dp"
-            android:backgroundTint="@color/greyDark"
-            android:contentDescription="@string/placeholder"
-            android:elevation="4dp"
-            android:src="@drawable/ic_update_web"
-            app:layout_constraintBottom_toBottomOf="@+id/import_file"
-            app:layout_constraintEnd_toStartOf="@+id/import_file"
-            app:layout_constraintTop_toTopOf="@+id/import_file" />
+    <ImageButton
+        android:id="@+id/import_file"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="@color/greyDark"
+        android:contentDescription="@string/placeholder"
+        android:elevation="4dp"
+        android:src="@drawable/ic_update_file"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/import_file"
-            android:layout_width="64dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="4dp"
-            android:backgroundTint="@color/greyDark"
-            android:contentDescription="@string/placeholder"
-            android:elevation="4dp"
-            android:src="@drawable/ic_update_file"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <SearchView
+        android:id="@+id/search_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="@string/entries_search_hint"
+        app:layout_constraintEnd_toStartOf="@+id/select_mode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
-        <SearchView
-            android:id="@+id/search_bar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:iconifiedByDefault="false"
-            android:queryHint="@string/entries_search_hint"
-            app:layout_constraintEnd_toStartOf="@+id/select_mode"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
+    <ImageButton
+        android:id="@+id/select_mode"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/greySurface"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_satellite"
+        app:layout_constraintBottom_toBottomOf="@+id/select_all"
+        app:layout_constraintEnd_toStartOf="@+id/select_all"
+        app:layout_constraintTop_toTopOf="@+id/select_all" />
 
-        <ImageButton
-            android:id="@+id/select_mode"
-            android:layout_width="64dp"
-            android:layout_height="48dp"
-            android:backgroundTint="@color/greySurface"
-            android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_satellite"
-            app:layout_constraintBottom_toBottomOf="@+id/select_all"
-            app:layout_constraintEnd_toStartOf="@+id/select_all"
-            app:layout_constraintTop_toTopOf="@+id/select_all" />
+    <ImageButton
+        android:id="@+id/select_all"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/greySurface"
+        android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_select_all"
+        app:layout_constraintEnd_toEndOf="@+id/import_file"
+        app:layout_constraintTop_toBottomOf="@+id/import_file" />
 
-        <ImageButton
-            android:id="@+id/select_all"
-            android:layout_width="64dp"
-            android:layout_height="48dp"
-            android:backgroundTint="@color/greySurface"
-            android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_select_all"
-            app:layout_constraintEnd_toEndOf="@+id/import_file"
-            app:layout_constraintTop_toBottomOf="@+id/import_file" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/entries_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_bar" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/entries_recycler"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_bar" />
+    <ProgressBar
+        android:id="@+id/entries_progress"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
-        <ProgressBar
-            android:id="@+id/entries_progress"
-            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/entries_empty_error"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/entries_no_data"
-            android:textSize="20sp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+</androidx.constraintlayout.widget.ConstraintLayout>

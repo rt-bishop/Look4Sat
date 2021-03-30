@@ -37,8 +37,6 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         }
     }
     private val listDiffer = AsyncListDiffer(this, diffCallback)
-    private val allItems = mutableListOf<SatItem>()
-    private var shouldSelectAll = true
     private lateinit var entriesClickListener: EntriesClickListener
 
     interface EntriesClickListener {
@@ -49,24 +47,7 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         entriesClickListener = listener
     }
 
-    fun submitAllItems(items: List<SatItem>) {
-        allItems.clear()
-        allItems.addAll(items)
-        listDiffer.submitList(items)
-    }
-
-    fun selectCurrentItems() {
-        val newList = mutableListOf<SatItem>()
-        listDiffer.currentList.forEach { item ->
-            item.isSelected = shouldSelectAll
-            newList.add(item)
-        }
-        submitCurrentItems(newList)
-        entriesClickListener.updateSelection(newList.map { it.catNum }, shouldSelectAll)
-        shouldSelectAll = !shouldSelectAll
-    }
-
-    private fun submitCurrentItems(items: List<SatItem>) {
+    fun submitItems(items: List<SatItem>) {
         listDiffer.submitList(items)
     }
 

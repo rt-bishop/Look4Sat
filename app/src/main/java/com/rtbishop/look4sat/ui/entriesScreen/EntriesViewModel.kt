@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.ui.entriesScreen
 
 import android.content.Context
 import android.net.Uri
+import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -40,7 +41,7 @@ import kotlin.system.measureTimeMillis
 class EntriesViewModel @Inject constructor(
     private val prefsRepo: PrefsRepo,
     private val satelliteRepo: SatelliteRepo
-) : ViewModel(), EntriesAdapter.EntriesClickListener {
+) : ViewModel(), EntriesAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
 
     private val transModes = MutableLiveData(prefsRepo.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
@@ -53,6 +54,7 @@ class EntriesViewModel @Inject constructor(
     private val _satData = MediatorLiveData<Result<List<SatItem>>>().apply {
         addSource(itemsWithQuery) { value -> this.value = value }
     }
+    private var shouldSelectAll = true
     val satData: LiveData<Result<List<SatItem>>> = _satData
 
     fun importSatDataFromFile(uri: Uri) {
@@ -66,19 +68,35 @@ class EntriesViewModel @Inject constructor(
         }
     }
 
-    fun importSatDataFromSources(sources: List<TleSource> = prefsRepo.loadDefaultSources()) {
+    fun importSatDataFromSources(sources: List<TleSource>) {
         viewModelScope.launch {
             _satData.value = Result.InProgress
+            val satSources = if (sources.isNotEmpty()) sources
+            else prefsRepo.loadDefaultSources()
             val updateMillis = measureTimeMillis {
                 try {
-                    prefsRepo.saveTleSources(sources)
-                    satelliteRepo.importSatDataFromWeb(sources)
+                    prefsRepo.saveTleSources(satSources)
+                    satelliteRepo.importSatDataFromWeb(satSources)
                 } catch (exception: Exception) {
                     _satData.value = Result.Error(exception)
                 }
             }
             Timber.d("Update from WEB took $updateMillis ms")
         }
+    }
+
+    fun selectCurrentItems() {
+        val newList = mutableListOf<SatItem>()
+        val currentValue = _satData.value
+        if (currentValue is Result.Success) {
+            currentValue.data.forEach { item ->
+                item.isSelected = shouldSelectAll
+                newList.add(item)
+            }
+        }
+        _satData.value = Result.Success(newList)
+        updateSelection(newList.map { it.catNum }, shouldSelectAll)
+        shouldSelectAll = !shouldSelectAll
     }
 
     fun createModesDialog(context: Context): AlertDialog {
@@ -101,7 +119,8 @@ class EntriesViewModel @Inject constructor(
                 }
             }
             setPositiveButton(context.getString(android.R.string.ok)) { _, _ ->
-                setNewModes(selectedModes)
+                transModes.value = selectedModes
+                prefsRepo.saveModesSelection(selectedModes)
             }
             setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
@@ -110,13 +129,17 @@ class EntriesViewModel @Inject constructor(
         return dialogBuilder.create()
     }
 
-    fun setNewQuery(newQuery: String) {
-        currentQuery.value = newQuery
+    override fun onQueryTextSubmit(query: String): Boolean {
+        return true
     }
 
-    private fun setNewModes(newModes: List<String>) {
-        transModes.value = newModes
-        prefsRepo.saveModesSelection(newModes)
+    override fun onQueryTextChange(newText: String): Boolean {
+        currentQuery.value = newText
+        return true
+    }
+
+    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
+        viewModelScope.launch { satelliteRepo.updateEntriesSelection(catNums, isSelected) }
     }
 
     private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {
@@ -133,12 +156,6 @@ class EntriesViewModel @Inject constructor(
                 val itemName = item.name.toLowerCase(Locale.getDefault())
                 itemName.contains(query.toLowerCase(Locale.getDefault()))
             }
-        }
-    }
-
-    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        viewModelScope.launch {
-            satelliteRepo.updateEntriesSelection(catNums, isSelected)
         }
     }
 }

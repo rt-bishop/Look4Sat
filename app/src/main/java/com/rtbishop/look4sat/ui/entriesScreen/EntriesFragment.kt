@@ -19,7 +19,6 @@ package com.rtbishop.look4sat.ui.entriesScreen
 
 import android.os.Bundle
 import android.view.View
-import android.widget.SearchView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,27 +36,24 @@ import com.rtbishop.look4sat.utility.getNavResult
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryTextListener {
+class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private val viewModel: EntriesViewModel by viewModels()
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let { viewModel.importSatDataFromFile(uri) }
         }
-    private var binding: FragmentEntriesBinding? = null
-    private var entriesAdapter: EntriesAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupComponents(view)
-        setupObservers()
     }
 
     private fun setupComponents(view: View) {
-        entriesAdapter = EntriesAdapter().apply {
+        val entriesAdapter = EntriesAdapter().apply {
             setEntriesClickListener(viewModel)
         }
-        binding = FragmentEntriesBinding.bind(view).apply {
+        val binding = FragmentEntriesBinding.bind(view).apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = entriesAdapter
@@ -68,82 +64,49 @@ class EntriesFragment : Fragment(R.layout.fragment_entries), SearchView.OnQueryT
             importWeb.setOnClickListener { findNavController().navigate(R.id.nav_dialog_sources) }
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectMode.setOnClickListener { showModesDialog() }
-            selectAll.setOnClickListener { entriesAdapter?.selectCurrentItems() }
-            searchBar.setOnQueryTextListener(this@EntriesFragment)
+            selectAll.setOnClickListener { viewModel.selectCurrentItems() }
+            searchBar.setOnQueryTextListener(viewModel)
         }
-    }
-
-    private fun setupObservers() {
-        viewModel.satData.observe(viewLifecycleOwner, { result ->
-            when (result) {
-                is Result.Success -> setLoaded(result.data)
-                is Result.InProgress -> setLoading()
-                is Result.Error -> setError()
-            }
+        viewModel.satData.observe(viewLifecycleOwner, { satData ->
+            handleSatData(satData, binding, entriesAdapter)
         })
-        getNavResult<List<String>>(R.id.nav_entries, "sources") { result ->
-            result.map { TleSource(it) }.let { sources ->
-                if (sources.isNullOrEmpty()) {
-                    viewModel.importSatDataFromSources()
-                } else {
-                    viewModel.importSatDataFromSources(sources)
-                }
-            }
+        getNavResult<List<String>>(R.id.nav_entries, "sources") { navResult ->
+            handleNavResult(navResult)
         }
-    }
-
-    private fun setLoaded(items: List<SatItem>) {
-        if (items.isEmpty()) {
-            binding?.apply {
-                entriesEmptyError.visibility = View.VISIBLE
-                entriesProgress.visibility = View.INVISIBLE
-                entriesRecycler.visibility = View.INVISIBLE
-            }
-        } else {
-            entriesAdapter?.submitAllItems(items)
-            binding?.apply {
-                entriesEmptyError.visibility = View.INVISIBLE
-                entriesProgress.visibility = View.INVISIBLE
-                entriesRecycler.visibility = View.VISIBLE
-                entriesRecycler.scrollToPosition(0)
-            }
-        }
-    }
-
-    private fun setLoading() {
-        binding?.apply {
-            entriesEmptyError.visibility = View.INVISIBLE
-            entriesProgress.visibility = View.VISIBLE
-            entriesRecycler.visibility = View.INVISIBLE
-        }
-    }
-
-    private fun setError() {
-        binding?.apply {
-            entriesEmptyError.visibility = View.INVISIBLE
-            entriesProgress.visibility = View.INVISIBLE
-            entriesRecycler.visibility = View.VISIBLE
-        }
-        val errorMsg = getString(R.string.entries_update_error)
-        Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun showModesDialog() {
         viewModel.createModesDialog(requireContext()).show()
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        return true
+    private fun handleSatData(
+        result: Result<List<SatItem>>,
+        binding: FragmentEntriesBinding,
+        entriesAdapter: EntriesAdapter
+    ) {
+        when (result) {
+            is Result.Success -> {
+                entriesAdapter.submitItems(result.data)
+                binding.entriesProgress.visibility = View.INVISIBLE
+                binding.entriesRecycler.visibility = View.VISIBLE
+                binding.entriesRecycler.scrollToPosition(0)
+            }
+            is Result.InProgress -> {
+                binding.entriesProgress.visibility = View.VISIBLE
+                binding.entriesRecycler.visibility = View.INVISIBLE
+            }
+            is Result.Error -> {
+                binding.entriesProgress.visibility = View.INVISIBLE
+                binding.entriesRecycler.visibility = View.VISIBLE
+                val errorMsg = getString(R.string.entries_update_error)
+                Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    override fun onQueryTextChange(newText: String): Boolean {
-        viewModel.setNewQuery(newText)
-        return true
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        entriesAdapter = null
-        binding = null
+    private fun handleNavResult(result: List<String>) {
+        result.map { sourceUrl -> TleSource(sourceUrl) }.let { sources ->
+            viewModel.importSatDataFromSources(sources)
+        }
     }
 }

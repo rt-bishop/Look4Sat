@@ -19,8 +19,7 @@
     <string name="sources_https">Protocol HTTPS only</string>
 
     <string name="entries_update">TLE data update:</string>
-    <string name="entries_search_hint">Search by Name / Id</string>
-    <string name="entries_no_data">Please update TLE data</string>
+    <string name="entries_search_hint">Name / Id</string>
     <string name="entries_update_error">Error importing satellite data</string>
 
     <string name="modes_title">Choose transceiver mode</string>

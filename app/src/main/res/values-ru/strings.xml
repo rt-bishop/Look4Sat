@@ -16,8 +16,7 @@
     <string name="sources_https">Только протокол HTTPS</string>
 
     <string name="entries_update">Обновить спутники:</string>
-    <string name="entries_search_hint">Поиск по имени / Id</string>
-    <string name="entries_no_data">Пожалуйста, обновите спутники</string>
+    <string name="entries_search_hint">Имя / Номер</string>
     <string name="entries_update_error">Ошибка обновления спутников</string>
 
     <string name="modes_title">Выберите модуляцию трансивера</string>
