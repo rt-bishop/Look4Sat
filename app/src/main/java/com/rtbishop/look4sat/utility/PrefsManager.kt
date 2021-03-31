@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data.repository
+package com.rtbishop.look4sat.utility
 
 import android.content.SharedPreferences
 import android.hardware.GeomagneticField
@@ -28,7 +28,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PrefsRepo @Inject constructor(val preferences: SharedPreferences, moshi: Moshi) {
+class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi: Moshi) {
     
     private val sourcesType = Types.newParameterizedType(List::class.java, TleSource::class.java)
     private val sourcesAdapter = moshi.adapter<List<TleSource>>(sourcesType)

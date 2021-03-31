@@ -21,10 +21,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.repository.PassesRepo
-import com.rtbishop.look4sat.data.repository.PrefsRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
+import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -32,7 +31,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PolarViewModel @Inject constructor(
-    private val prefsRepo: PrefsRepo,
+    private val prefsManager: PrefsManager,
     private val passesRepo: PassesRepo,
     private val satelliteRepo: SatelliteRepo
 ) : ViewModel() {
@@ -45,19 +44,15 @@ class PolarViewModel @Inject constructor(
     }
 
     fun getPass(passId: Int) = liveData {
-        passesRepo.passes.collect { passes ->
-            if (passes is Result.Success) {
-                emit(passes.data[passId])
-            }
-        }
+        passesRepo.passes.collect { passes -> emit(passes[passId]) }
     }
 
     fun shouldUseCompass(): Boolean {
-        return prefsRepo.shouldUseCompass()
+        return prefsManager.shouldUseCompass()
     }
 
     fun getMagDeclination(): Float {
-        return prefsRepo.getMagDeclination()
+        return prefsManager.getMagDeclination()
     }
 
     fun getSatTransmitters(satId: Int) =

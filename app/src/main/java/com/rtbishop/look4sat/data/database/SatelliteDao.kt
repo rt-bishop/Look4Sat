@@ -27,22 +27,18 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SatelliteDao {
 
-    // Query
-
-    @Query("SELECT * FROM transmitters WHERE catNum = :catNum")
-    fun getTransmittersByCatNum(catNum: Int): Flow<List<SatTrans>>
-
     @Transaction
     @Query("SELECT catNum, name, isSelected FROM entries ORDER BY name ASC")
-    fun getItemsFlow(): Flow<List<SatItem>>
+    fun getSatItems(): Flow<List<SatItem>>
+
+    @Query("SELECT * FROM transmitters WHERE catNum = :catNum")
+    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>>
 
     @Query("SELECT tle FROM entries WHERE isSelected = 1")
     suspend fun getSelectedSatellites(): List<Satellite>
 
     @Query("SELECT catNum FROM entries WHERE isSelected = 1")
     suspend fun getSelectedCatNums(): List<Int>
-
-    // Insert
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
@@ -53,24 +49,21 @@ interface SatelliteDao {
         insertTransmitters(transmitters)
     }
 
+    @Query("DELETE from transmitters")
+    suspend fun deleteTransmitters()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransmitters(transmitters: List<SatTrans>)
-
-    // Update
 
     @Transaction
     suspend fun restoreEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         clearEntriesSelection()
-        catNums.forEach { catNum ->
-            updateItemSelection(catNum, isSelected)
-        }
+        catNums.forEach { catNum -> updateItemSelection(catNum, isSelected) }
     }
 
     @Transaction
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        catNums.forEach { catNum ->
-            updateItemSelection(catNum, isSelected)
-        }
+        catNums.forEach { catNum -> updateItemSelection(catNum, isSelected) }
     }
 
     @Query("UPDATE entries SET isSelected = 0")
@@ -78,9 +71,4 @@ interface SatelliteDao {
 
     @Query("UPDATE entries SET isSelected = :isSelected WHERE catNum = :catNum")
     suspend fun updateItemSelection(catNum: Int, isSelected: Boolean)
-
-    // Delete
-
-    @Query("DELETE from transmitters")
-    suspend fun deleteTransmitters()
 }

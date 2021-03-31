@@ -19,57 +19,47 @@ package com.rtbishop.look4sat.ui.passesScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
-import androidx.navigation.findNavController
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
-import com.rtbishop.look4sat.utility.navigateSafe
 import java.text.SimpleDateFormat
 import java.util.*
 
 class PassesAdapter(private val shouldUseUTC: Boolean = false) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var satPassList: MutableList<SatPass> = mutableListOf()
+    private val diffCallback = object : DiffUtil.ItemCallback<SatPass>() {
+        override fun areItemsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
+            return oldItem.catNum == newItem.catNum && oldItem.startDate == newItem.startDate
+        }
 
-    fun setList(list: MutableList<SatPass>) {
-        satPassList = list
-        notifyDataSetChanged()
-    }
-
-    fun tickPasses(timeNow: Long) {
-        val iterator = satPassList.listIterator()
-        while (iterator.hasNext()) {
-            val satPass = iterator.next()
-            if (!satPass.isDeepSpace) {
-                if (satPass.progress < 100) {
-                    val timeStart = satPass.startDate.time
-                    if (timeNow > timeStart) {
-                        val timeEnd = satPass.endDate.time
-                        val index = satPassList.indexOf(satPass)
-                        val deltaNow = timeNow.minus(timeStart).toFloat()
-                        val deltaTotal = timeEnd.minus(timeStart).toFloat()
-                        satPass.progress = ((deltaNow / deltaTotal) * 100).toInt()
-                        notifyItemChanged(index)
-                    }
-                } else {
-                    val index = satPassList.indexOf(satPass)
-                    iterator.remove()
-                    notifyItemRemoved(index)
-                }
-            }
+        override fun areContentsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
+            return false
         }
     }
+    private val listDiffer = AsyncListDiffer(this, diffCallback)
+    private lateinit var passesClickListener: PassesClickListener
 
-    override fun getItemCount(): Int {
-        return satPassList.size
+    interface PassesClickListener {
+        fun navigateToPass(satPass: SatPass)
     }
 
+    fun setPassesClickListener(listener: PassesClickListener) {
+        passesClickListener = listener
+    }
+
+    fun submitPasses(items: List<SatPass>) {
+        listDiffer.submitList(items)
+    }
+
+    override fun getItemCount() = listDiffer.currentList.size
+
     override fun getItemViewType(position: Int): Int {
-        return if (satPassList[position].isDeepSpace) 1
+        return if (listDiffer.currentList[position].isDeepSpace) 1
         else 0
     }
 
@@ -83,9 +73,11 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder.itemViewType == 0) {
-            (holder as SatPassLeoHolder).bind(satPassList[position], position, shouldUseUTC)
+            (holder as SatPassLeoHolder)
+                .bind(listDiffer.currentList[position], shouldUseUTC, passesClickListener)
         } else {
-            (holder as SatPassGeoHolder).bind(satPassList[position], position)
+            (holder as SatPassGeoHolder)
+                .bind(listDiffer.currentList[position], passesClickListener)
         }
     }
 
@@ -103,7 +95,7 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
         private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
         private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
 
-        fun bind(satPass: SatPass, position: Int, shouldUseUTC: Boolean) {
+        fun bind(satPass: SatPass, shouldUseUTC: Boolean, listener: PassesClickListener) {
             binding.apply {
                 if (shouldUseUTC) {
                     startFormat.timeZone = timeZoneUTC
@@ -119,12 +111,8 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
                 passLeoEnd.text = endFormat.format(satPass.endDate)
                 passLeoProgress.progress = satPass.progress
             }
-
             itemView.setOnClickListener {
-                if (satPass.progress < 100) {
-                    val bundle = bundleOf("index" to position)
-                    itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
-                }
+                listener.navigateToPass(satPass)
             }
         }
 
@@ -144,7 +132,7 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
         private val altFormat = itemView.context.getString(R.string.pat_altitude)
         private val elevFormat = itemView.context.getString(R.string.pat_elevation)
 
-        fun bind(satPass: SatPass, position: Int) {
+        fun bind(satPass: SatPass, listener: PassesClickListener) {
             binding.apply {
                 passGeoSatName.text = satPass.name
                 passGeoSatId.text = String.format(satIdFormat, satPass.catNum)
@@ -152,10 +140,8 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
                 passGeoAlt.text = String.format(altFormat, satPass.altitude)
                 passGeoEl.text = String.format(elevFormat, satPass.maxElevation)
             }
-
             itemView.setOnClickListener {
-                val bundle = bundleOf("index" to position)
-                itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
+                listener.navigateToPass(satPass)
             }
         }
 

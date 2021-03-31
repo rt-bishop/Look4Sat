@@ -22,7 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.repository.PrefsRepo
+import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class Look4SatActivity : AppCompatActivity() {
     
     @Inject
-    lateinit var prefsRepo: PrefsRepo
+    lateinit var prefsManager: PrefsManager
     
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -40,9 +40,8 @@ class Look4SatActivity : AppCompatActivity() {
             setContentView(root)
             val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
             navBottom.setupWithNavController(navHost.navController)
-
-            if (prefsRepo.isFirstLaunch()) {
-                prefsRepo.setFirstLaunchDone()
+            if (prefsManager.isFirstLaunch()) {
+                prefsManager.setFirstLaunchDone()
                 navHost.navController.navigate(R.id.nav_dialog_splash)
             }
         }

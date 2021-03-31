@@ -24,7 +24,7 @@ import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
 import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.data.model.SelectedSat
-import com.rtbishop.look4sat.data.repository.PrefsRepo
+import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +39,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    prefsRepo: PrefsRepo,
+    prefsManager: PrefsManager,
     private val satelliteRepo: SatelliteRepo,
     private val qthConverter: QthConverter
 ) : ViewModel() {
@@ -59,7 +59,7 @@ class MapViewModel @Inject constructor(
         isAntiAlias = true
     }
 
-    private val gsp = prefsRepo.getStationPosition()
+    private val gsp = prefsManager.getStationPosition()
 
     private var filteredSats = listOf<Satellite>()
     private lateinit var selectedSat: Satellite
@@ -118,12 +118,11 @@ class MapViewModel @Inject constructor(
             )
             val qthLoc = qthConverter.locationToQTH(osmPos.lat, osmPos.lon) ?: "-- --"
             val velocity = satPos.altitude.getOrbitalVelocity()
-            val coverage = satPos.rangeCircleRadiusKm * 2
             val footprint = getSatFootprint(satPos)
             val track = getSatTrack(satellite)
             return@withContext SelectedSat(
                 satellite, satellite.tle.catnum, satellite.tle.name, satPos.range,
-                satPos.altitude, velocity, qthLoc, osmPos, coverage, footprint, track
+                satPos.altitude, velocity, qthLoc, osmPos, footprint, track
             )
         }
 

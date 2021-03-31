@@ -18,13 +18,16 @@
 package com.rtbishop.look4sat.data.repository
 
 import com.github.amsacode.predict4java.Satellite
-import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.di.DefaultDispatcher
+import com.rtbishop.look4sat.di.ExternalScope
+import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.getPredictor
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -32,49 +35,38 @@ import javax.inject.Singleton
 
 @Singleton
 class PassesRepo @Inject constructor(
-    private val prefsRepo: PrefsRepo,
+    private val prefsManager: PrefsManager,
+    private val satelliteRepo: SatelliteRepo,
+    @ExternalScope private val externalScope: CoroutineScope,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
-    private val _passes =
-        MutableStateFlow<Result<MutableList<SatPass>>>(Result.Success(mutableListOf()))
-    val passes: StateFlow<Result<MutableList<SatPass>>> = _passes
+    private val _passes = MutableSharedFlow<List<SatPass>>()
+    val passes: SharedFlow<List<SatPass>> = _passes
 
-    private var selectedSatellites = emptyList<Satellite>()
+    init {
+        externalScope.launch { calculatePasses() }
+    }
 
-    suspend fun calculatePasses(satellites: List<Satellite>) {
+    suspend fun calculatePasses(refDate: Date = Date()) {
         withContext(defaultDispatcher) {
-            val newCatNums = satellites.map { it.tle.catnum }
-            val oldCatNums = selectedSatellites.map { it.tle.catnum }
-            if (newCatNums != oldCatNums) {
-                _passes.value = Result.InProgress
-                selectedSatellites = satellites
-                val refDate = Date(System.currentTimeMillis())
-                val allPasses = mutableListOf<SatPass>()
-                selectedSatellites.forEach { satellite ->
-                    allPasses.addAll(getPasses(satellite, refDate))
-                }
-                val filteredPasses = filterPasses(allPasses, refDate)
-                _passes.value = Result.Success(filteredPasses)
+            val allPasses = mutableListOf<SatPass>()
+            satelliteRepo.getSelectedSatellites().forEach { satellite ->
+                allPasses.addAll(getPasses(satellite, refDate))
             }
+            _passes.emit(filterPasses(allPasses, refDate))
         }
     }
 
-    private fun getPasses(satellite: Satellite, refDate: Date): MutableList<SatPass> {
-        val predictor = satellite.getPredictor(prefsRepo.getStationPosition())
-        val passes = predictor.getPasses(refDate, prefsRepo.getHoursAhead(), true)
-        return passes as MutableList<SatPass>
+    private fun getPasses(satellite: Satellite, refDate: Date): List<SatPass> {
+        val predictor = satellite.getPredictor(prefsManager.getStationPosition())
+        return predictor.getPasses(refDate, prefsManager.getHoursAhead(), true)
     }
 
-    private fun filterPasses(passes: MutableList<SatPass>, refDate: Date): MutableList<SatPass> {
-        val hoursAhead = prefsRepo.getHoursAhead()
-        val dateFuture = Calendar.getInstance().apply {
-            this.time = refDate
-            this.add(Calendar.HOUR, hoursAhead)
-        }.time
-        passes.removeAll { it.startDate.after(dateFuture) }
-        passes.removeAll { it.endDate.before(refDate) }
-        passes.removeAll { it.maxElevation < prefsRepo.getMinElevation() }
-        passes.sortBy { it.startDate }
-        return passes
+    private fun filterPasses(passes: List<SatPass>, refDate: Date): List<SatPass> {
+        val timeFuture = Date(refDate.time + (prefsManager.getHoursAhead() * 3600 * 1000))
+        return passes.filter { it.endDate.after(refDate) }
+            .filter { it.startDate.before(timeFuture) }
+            .filter { it.maxElevation > prefsManager.getMinElevation() }
+            .sortedBy { it.startDate }
     }
 }

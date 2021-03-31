@@ -27,7 +27,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.data.model.TleSource
-import com.rtbishop.look4sat.data.repository.PrefsRepo
+import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -39,14 +39,14 @@ import kotlin.system.measureTimeMillis
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val prefsRepo: PrefsRepo,
+    private val prefsManager: PrefsManager,
     private val satelliteRepo: SatelliteRepo
 ) : ViewModel(), EntriesAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
 
-    private val transModes = MutableLiveData(prefsRepo.loadModesSelection())
+    private val transModes = MutableLiveData(prefsManager.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsWithModes = transModes.switchMap { modes ->
-        liveData { satelliteRepo.getItemsFlow().collect { emit(filterByModes(it, modes)) } }
+        liveData { satelliteRepo.getSatItems().collect { emit(filterByModes(it, modes)) } }
     }
     private val itemsWithQuery = currentQuery.switchMap { query ->
         itemsWithModes.map { items -> Result.Success(filterByQuery(items, query)) }
@@ -72,10 +72,10 @@ class EntriesViewModel @Inject constructor(
         viewModelScope.launch {
             _satData.value = Result.InProgress
             val satSources = if (sources.isNotEmpty()) sources
-            else prefsRepo.loadDefaultSources()
+            else prefsManager.loadDefaultSources()
             val updateMillis = measureTimeMillis {
                 try {
-                    prefsRepo.saveTleSources(satSources)
+                    prefsManager.saveTleSources(satSources)
                     satelliteRepo.importSatDataFromWeb(satSources)
                 } catch (exception: Exception) {
                     _satData.value = Result.Error(exception)
@@ -108,7 +108,7 @@ class EntriesViewModel @Inject constructor(
             "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
         )
         val savedModes = BooleanArray(modes.size)
-        val selectedModes = prefsRepo.loadModesSelection().toMutableList()
+        val selectedModes = prefsManager.loadModesSelection().toMutableList()
         selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
         val dialogBuilder = MaterialAlertDialogBuilder(context).apply {
             setTitle(context.getString(R.string.modes_title))
@@ -120,7 +120,7 @@ class EntriesViewModel @Inject constructor(
             }
             setPositiveButton(context.getString(android.R.string.ok)) { _, _ ->
                 transModes.value = selectedModes
-                prefsRepo.saveModesSelection(selectedModes)
+                prefsManager.saveModesSelection(selectedModes)
             }
             setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()

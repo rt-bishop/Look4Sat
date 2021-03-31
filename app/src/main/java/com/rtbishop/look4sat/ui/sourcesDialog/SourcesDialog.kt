@@ -25,7 +25,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.repository.PrefsRepo
+import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
 import com.rtbishop.look4sat.utility.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +35,7 @@ import javax.inject.Inject
 class SourcesDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var prefsRepo: PrefsRepo
+    lateinit var prefsManager: PrefsManager
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_sources, group, false)
@@ -43,7 +43,7 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        val sourcesAdapter = SourcesAdapter().apply { setSources(prefsRepo.loadTleSources()) }
+        val sourcesAdapter = SourcesAdapter().apply { setSources(prefsManager.loadTleSources()) }
         DialogSourcesBinding.bind(view).apply {
             dialog?.window?.setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,

@@ -30,7 +30,6 @@ class SelectedSat(
     val velocity: Double,
     val qthLoc: String,
     val osmPos: Position,
-    val coverage: Double,
     val footprint: Overlay,
     val groundTrack: Overlay
 )

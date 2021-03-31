@@ -29,7 +29,7 @@ import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.SelectedSat
-import com.rtbishop.look4sat.data.repository.PrefsRepo
+import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -50,7 +50,7 @@ import javax.inject.Inject
 class MapFragment : Fragment(R.layout.fragment_map) {
 
     @Inject
-    lateinit var prefsRepo: PrefsRepo
+    lateinit var prefsManager: PrefsManager
     private lateinit var binding: FragmentMapBinding
     private val mapViewModel: MapViewModel by viewModels()
     private val minLat = MapView.getTileSystem().minLatitude
@@ -58,7 +58,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getInstance().load(requireContext(), prefsRepo.preferences)
+        Configuration.getInstance().load(requireContext(), prefsManager.preferences)
         binding = FragmentMapBinding.bind(view).apply {
             mapView.apply {
                 setMultiTouchControls(true)
@@ -119,7 +119,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         binding.apply {
             val markers = FolderOverlay()
             map.entries.forEach {
-                if (prefsRepo.shouldUseTextLabels()) {
+                if (prefsManager.shouldUseTextLabels()) {
                     Marker(mapView).apply {
                         setInfoWindow(null)
                         textLabelFontSize = 24

@@ -46,21 +46,17 @@ class SatelliteRepo @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    // Query
-
-    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>> {
-        return satelliteDao.getTransmittersByCatNum(catNum)
+    fun getSatItems(): Flow<List<SatItem>> {
+        return satelliteDao.getSatItems()
     }
 
-    fun getItemsFlow(): Flow<List<SatItem>> {
-        return satelliteDao.getItemsFlow()
+    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>> {
+        return satelliteDao.getSatTransmitters(catNum)
     }
 
     suspend fun getSelectedSatellites(): List<Satellite> {
         return satelliteDao.getSelectedSatellites()
     }
-
-    // Insert
 
     suspend fun importSatDataFromFile(uri: Uri) {
         runCatching {
@@ -78,6 +74,10 @@ class SatelliteRepo @Inject constructor(
             launch { importEntriesFromSources(sources) }
             launch { importTransmitters() }
         }
+    }
+
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        satelliteDao.updateEntriesSelection(catNums, isSelected)
     }
 
     private suspend fun importEntriesFromSources(sources: List<TleSource>) {
@@ -132,11 +132,5 @@ class SatelliteRepo @Inject constructor(
         val selectedCatNums = satelliteDao.getSelectedCatNums()
         satelliteDao.insertEntries(entries)
         satelliteDao.restoreEntriesSelection(selectedCatNums, true)
-    }
-
-    // Update
-
-    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        satelliteDao.updateEntriesSelection(catNums, isSelected)
     }
 }
