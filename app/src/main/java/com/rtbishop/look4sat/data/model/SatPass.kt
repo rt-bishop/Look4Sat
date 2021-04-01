@@ -32,7 +32,8 @@ data class SatPass(
     val tcaAzimuth: Double,
     val altitude: Double,
     val maxElevation: Double,
-    val predictor: PassPredictor
+    val predictor: PassPredictor,
+    var progress: Int = 0
 ) {
     val startDate: Date
         get() = Date(aosTime)
@@ -42,6 +43,4 @@ data class SatPass(
 
     val tcaDate: Date
         get() = Date(tcaTime)
-
-    var progress: Int = 0
 }

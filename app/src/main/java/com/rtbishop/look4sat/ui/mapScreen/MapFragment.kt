@@ -29,10 +29,9 @@ import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.SelectedSat
-import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
+import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.ITileSource
 import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
@@ -45,7 +44,6 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-@FlowPreview
 @AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map) {
 

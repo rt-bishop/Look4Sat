@@ -27,8 +27,8 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.data.model.TleSource
-import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
+import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -86,17 +86,11 @@ class EntriesViewModel @Inject constructor(
     }
 
     fun selectCurrentItems() {
-        val newList = mutableListOf<SatItem>()
         val currentValue = _satData.value
         if (currentValue is Result.Success) {
-            currentValue.data.forEach { item ->
-                item.isSelected = shouldSelectAll
-                newList.add(item)
-            }
+            updateSelection(currentValue.data.map { it.catNum }, shouldSelectAll)
+            shouldSelectAll = shouldSelectAll.not()
         }
-        _satData.value = Result.Success(newList)
-        updateSelection(newList.map { it.catNum }, shouldSelectAll)
-        shouldSelectAll = !shouldSelectAll
     }
 
     fun createModesDialog(context: Context): AlertDialog {

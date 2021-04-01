@@ -39,10 +39,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private val viewModel: EntriesViewModel by viewModels()
-    private val filePicker =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let { viewModel.importSatDataFromFile(uri) }
-        }
+    private val contentContract = ActivityResultContracts.GetContent()
+    private val filePicker = registerForActivityResult(contentContract) { uri ->
+        uri?.let { viewModel.importSatDataFromFile(uri) }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,7 +86,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     ) {
         when (result) {
             is Result.Success -> {
-                entriesAdapter.submitItems(result.data)
+                entriesAdapter.submitList(result.data)
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
                 binding.entriesRecycler.scrollToPosition(0)

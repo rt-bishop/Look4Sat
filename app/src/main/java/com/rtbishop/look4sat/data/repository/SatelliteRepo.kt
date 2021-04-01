@@ -64,9 +64,7 @@ class SatelliteRepo @Inject constructor(
                 val entries = importEntriesFromStreams(listOf(stream))
                 insertEntriesAndRestoreSelection(entries)
             }
-        }.onFailure { throwable: Throwable ->
-            throw throwable
-        }
+        }.onFailure { throw it }
     }
 
     suspend fun importSatDataFromWeb(sources: List<TleSource>) {
@@ -94,14 +92,13 @@ class SatelliteRepo @Inject constructor(
     private suspend fun getStreamsForSources(sources: List<TleSource>): List<InputStream> {
         val streams = mutableListOf<InputStream>()
         sources.forEach { tleSource ->
-            satelliteService.fetchFileByUrl(tleSource.url).body()?.byteStream()
-                ?.let { inputStream ->
-                    if (tleSource.url.contains(".zip", true)) {
-                        streams.add(getZipStream(inputStream))
-                    } else {
-                        streams.add(inputStream)
-                    }
+            satelliteService.fetchFileByUrl(tleSource.url).body()?.byteStream()?.let { stream ->
+                if (tleSource.url.contains(".zip", true)) {
+                    streams.add(getZipStream(stream))
+                } else {
+                    streams.add(stream)
                 }
+            }
         }
         return streams
     }

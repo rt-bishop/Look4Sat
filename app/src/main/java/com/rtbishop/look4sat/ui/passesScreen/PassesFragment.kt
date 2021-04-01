@@ -19,10 +19,8 @@ package com.rtbishop.look4sat.ui.passesScreen
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
@@ -31,15 +29,14 @@ import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
-import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 @AndroidEntryPoint
-class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
+class PassesFragment : Fragment(R.layout.fragment_passes) {
 
     private val viewModel: PassesViewModel by viewModels()
-    private var passes = listOf<SatPass>()
+    private var passes = mutableListOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,9 +44,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     }
 
     private fun setupComponents(view: View) {
-        val passesAdapter = PassesAdapter(viewModel.shouldUseUTC()).apply {
-            setPassesClickListener(this@PassesFragment)
-        }
+        val passesAdapter = PassesAdapter(viewModel.shouldUseUTC())
         val binding = FragmentPassesBinding.bind(view).apply {
             passesRecycler.apply {
                 setHasFixedSize(true)
@@ -62,46 +57,54 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             passesRefresh.setOnClickListener { viewModel.forceCalculation() }
         }
         viewModel.passes.observe(viewLifecycleOwner, { result ->
-            handlePassesResult(result, binding, passesAdapter)
+            handleNewPasses(result, passesAdapter, binding)
         })
-        viewModel.getAppTimer().observe(viewLifecycleOwner, { currentTime ->
-            tickMainTimer(currentTime, binding)
+        viewModel.getAppTimer().observe(viewLifecycleOwner, { timeNow ->
+            tickMainTimer(timeNow, passesAdapter, binding)
         })
     }
 
-    private fun handlePassesResult(
+    private fun handleNewPasses(
         result: Result<List<SatPass>>,
-        binding: FragmentPassesBinding,
-        passesAdapter: PassesAdapter
+        passesAdapter: PassesAdapter,
+        binding: FragmentPassesBinding
     ) {
-        if (result is Result.Success) {
-            if (result.data.isEmpty()) {
-                binding.apply {
-                    passesProgress.visibility = View.INVISIBLE
-                    passesRecycler.visibility = View.INVISIBLE
-                    passesError.visibility = View.VISIBLE
-                    passesTimer.text = 0L.formatForTimer()
-                }
-            } else {
-                passes = result.data
-                passesAdapter.submitPasses(result.data)
+        when (result) {
+            is Result.Success -> {
+                passes = result.data.toMutableList()
+                passesAdapter.setList(passes)
                 binding.apply {
                     passesError.visibility = View.INVISIBLE
                     passesProgress.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.VISIBLE
                 }
             }
-        } else if (result is Result.InProgress) {
-            binding.apply {
-                passesTimer.text = 0L.formatForTimer()
-                passesError.visibility = View.INVISIBLE
-                passesRecycler.visibility = View.INVISIBLE
-                passesProgress.visibility = View.VISIBLE
+            is Result.InProgress -> {
+                passes.clear()
+                binding.apply {
+                    passesTimer.text = 0L.formatForTimer()
+                    passesError.visibility = View.INVISIBLE
+                    passesRecycler.visibility = View.INVISIBLE
+                    passesProgress.visibility = View.VISIBLE
+                }
+            }
+            is Result.Error -> {
+                passes.clear()
+                binding.apply {
+                    passesTimer.text = 0L.formatForTimer()
+                    passesProgress.visibility = View.INVISIBLE
+                    passesRecycler.visibility = View.INVISIBLE
+                    passesError.visibility = View.VISIBLE
+                }
             }
         }
     }
 
-    private fun tickMainTimer(timeNow: Long, binding: FragmentPassesBinding) {
+    private fun tickMainTimer(
+        timeNow: Long,
+        passesAdapter: PassesAdapter,
+        binding: FragmentPassesBinding
+    ) {
         if (passes.isNotEmpty()) {
             try {
                 val nextPass = passes.first { it.startDate.time.minus(timeNow) > 0 }
@@ -112,15 +115,9 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 val millisBeforeEnd = lastPass.endDate.time.minus(timeNow)
                 binding.passesTimer.text = millisBeforeEnd.formatForTimer()
             }
+            passesAdapter.tickPasses(timeNow)
         } else {
             binding.passesTimer.text = 0L.formatForTimer()
-        }
-    }
-
-    override fun navigateToPass(satPass: SatPass) {
-        if (satPass.progress <= 100) {
-            val bundle = bundleOf("index" to passes.indexOf(satPass))
-            findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
         }
     }
 }

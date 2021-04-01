@@ -34,6 +34,8 @@ import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
+import timber.log.Timber
+import java.lang.IllegalArgumentException
 import java.util.*
 import javax.inject.Inject
 
@@ -179,7 +181,11 @@ class MapViewModel @Inject constructor(
         return Polygon().apply {
             fillPaint.set(footprintPaint)
             outlinePaint.set(footprintPaint)
-            points = rangePoints
+            try {
+                points = rangePoints
+            } catch (e: IllegalArgumentException) {
+                Timber.d("RangeCircle: ${satPos.rangeCircle}, RangePoints: $rangePoints")
+            }
         }
     }
 }

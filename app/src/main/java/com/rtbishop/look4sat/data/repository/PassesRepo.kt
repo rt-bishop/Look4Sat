@@ -18,16 +18,14 @@
 package com.rtbishop.look4sat.data.repository
 
 import com.github.amsacode.predict4java.Satellite
+import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.di.DefaultDispatcher
-import com.rtbishop.look4sat.di.ExternalScope
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.getPredictor
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -36,24 +34,28 @@ import javax.inject.Singleton
 @Singleton
 class PassesRepo @Inject constructor(
     private val prefsManager: PrefsManager,
-    private val satelliteRepo: SatelliteRepo,
-    @ExternalScope private val externalScope: CoroutineScope,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
-    private val _passes = MutableSharedFlow<List<SatPass>>()
-    val passes: SharedFlow<List<SatPass>> = _passes
+    private val _passes = MutableSharedFlow<Result<List<SatPass>>>(replay = 1)
+    private var selectedSatellites = emptyList<Satellite>()
+    val passes: SharedFlow<Result<List<SatPass>>> = _passes
 
-    init {
-        externalScope.launch { calculatePasses() }
+    suspend fun triggerCalculation(satellites: List<Satellite>, refDate: Date = Date()) {
+        if (satellites.isEmpty()) _passes.emit(Result.Error(Exception()))
+        val oldCatNums = selectedSatellites.map { it.tle.catnum }
+        val newCatNums = satellites.map { it.tle.catnum }
+        if (oldCatNums != newCatNums) forceCalculation(satellites, refDate)
     }
 
-    suspend fun calculatePasses(refDate: Date = Date()) {
+    suspend fun forceCalculation(satellites: List<Satellite>, refDate: Date = Date()) {
+        _passes.emit(Result.InProgress)
         withContext(defaultDispatcher) {
             val allPasses = mutableListOf<SatPass>()
-            satelliteRepo.getSelectedSatellites().forEach { satellite ->
+            selectedSatellites = satellites
+            satellites.forEach { satellite ->
                 allPasses.addAll(getPasses(satellite, refDate))
             }
-            _passes.emit(filterPasses(allPasses, refDate))
+            _passes.emit(Result.Success(filterPasses(allPasses, refDate)))
         }
     }
 

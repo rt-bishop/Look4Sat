@@ -36,12 +36,10 @@ import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.FlowPreview
 import java.util.*
 import kotlin.math.atan2
 import kotlin.math.round
 
-@FlowPreview
 @AndroidEntryPoint
 class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
@@ -120,12 +118,12 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
 
     private fun observePass() {
         val passId = requireArguments().getInt("index")
-        viewModel.getPass(passId).observe(viewLifecycleOwner, { pass ->
+        viewModel.getPass(passId).observe(viewLifecycleOwner) { pass ->
             satPass = pass
             polarView = PolarView(requireContext()).apply { setPass(pass) }
             binding.frame.addView(polarView)
             observeTransmitters()
-        })
+        }
     }
 
     private fun observeTransmitters() {

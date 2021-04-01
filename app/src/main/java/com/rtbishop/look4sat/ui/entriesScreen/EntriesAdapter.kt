@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.data.model.SatItem
-import com.rtbishop.look4sat.databinding.ItemSatEntryBinding
+import com.rtbishop.look4sat.databinding.SatItemBinding
 
 class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
 
@@ -33,35 +33,35 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         }
 
         override fun areContentsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
-            return oldItem.isSelected != newItem.isSelected
+            return oldItem.isSelected == newItem.isSelected
         }
     }
-    private val listDiffer = AsyncListDiffer(this, diffCallback)
-    private lateinit var entriesClickListener: EntriesClickListener
+    private val differ = AsyncListDiffer(this, diffCallback)
+    private lateinit var clickListener: EntriesClickListener
 
     interface EntriesClickListener {
         fun updateSelection(catNums: List<Int>, isSelected: Boolean)
     }
 
     fun setEntriesClickListener(listener: EntriesClickListener) {
-        entriesClickListener = listener
+        clickListener = listener
     }
 
-    fun submitItems(items: List<SatItem>) {
-        listDiffer.submitList(items)
+    fun submitList(items: List<SatItem>) {
+        differ.submitList(items)
     }
 
-    override fun getItemCount(): Int = listDiffer.currentList.size
+    override fun getItemCount(): Int = differ.currentList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SatItemHolder {
         return SatItemHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: SatItemHolder, position: Int) {
-        holder.bind(listDiffer.currentList[position], entriesClickListener)
+        holder.bind(differ.currentList[position], clickListener)
     }
 
-    class SatItemHolder private constructor(private val binding: ItemSatEntryBinding) :
+    class SatItemHolder private constructor(private val binding: SatItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: SatItem, listener: EntriesClickListener) {
@@ -75,7 +75,7 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         companion object {
             fun from(parent: ViewGroup): SatItemHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                return SatItemHolder(ItemSatEntryBinding.inflate(inflater, parent, false))
+                return SatItemHolder(SatItemBinding.inflate(inflater, parent, false))
             }
         }
     }

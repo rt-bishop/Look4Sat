@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -44,7 +45,11 @@ class PolarViewModel @Inject constructor(
     }
 
     fun getPass(passId: Int) = liveData {
-        passesRepo.passes.collect { passes -> emit(passes[passId]) }
+        passesRepo.passes.collect { passes ->
+            if (passes is Result.Success) {
+                emit(passes.data[passId])
+            }
+        }
     }
 
     fun shouldUseCompass(): Boolean {

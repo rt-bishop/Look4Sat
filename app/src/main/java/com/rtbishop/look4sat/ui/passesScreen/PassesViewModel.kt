@@ -21,29 +21,34 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.data.model.Result
-import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.repository.PassesRepo
-import com.rtbishop.look4sat.di.DefaultDispatcher
+import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import timber.log.Timber
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val passesRepo: PassesRepo,
     private val prefsManager: PrefsManager,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    private val satelliteRepo: SatelliteRepo,
+    private val passesRepo: PassesRepo
 ) : ViewModel() {
 
-    private val _passes = MutableStateFlow<Result<List<SatPass>>>(Result.InProgress)
-    private var passesCache = emptyList<SatPass>()
-    private var passesCalculation: Job? = null
-    val passes = _passes.asLiveData(viewModelScope.coroutineContext)
+    val passes = passesRepo.passes.asLiveData(viewModelScope.coroutineContext)
+
+    init {
+        viewModelScope.launch {
+            passesRepo.triggerCalculation(satelliteRepo.getSelectedSatellites())
+        }
+    }
+
+    fun forceCalculation() {
+        viewModelScope.launch {
+            passesRepo.forceCalculation(satelliteRepo.getSelectedSatellites())
+        }
+    }
 
     fun getAppTimer() = liveData {
         while (true) {
@@ -54,52 +59,5 @@ class PassesViewModel @Inject constructor(
 
     fun shouldUseUTC(): Boolean {
         return prefsManager.shouldUseUTC()
-    }
-
-    init {
-        viewModelScope.launch {
-            passesRepo.passes.collect { newPasses ->
-                passesCalculation?.cancelAndJoin()
-                passesCalculation = launch { handlePasses(newPasses) }
-            }
-        }
-    }
-
-    fun forceCalculation() {
-        viewModelScope.launch {
-            _passes.value = Result.InProgress
-            passesRepo.calculatePasses()
-        }
-    }
-
-    private suspend fun handlePasses(newPasses: List<SatPass>) = withContext(defaultDispatcher) {
-        if (newPasses.isEmpty()) {
-            _passes.value = Result.Success(newPasses)
-        } else {
-            while (isActive) {
-                val timeNow = System.currentTimeMillis()
-                passesCache = newPasses.toMutableList().apply {
-                    val iterator = listIterator()
-                    while (iterator.hasNext()) {
-                        val satPass = iterator.next()
-                        if (!satPass.isDeepSpace) {
-                            if (satPass.progress <= 100) {
-                                val timeStart = satPass.startDate.time
-                                if (timeNow > timeStart) {
-                                    val deltaNow = timeNow.minus(timeStart).toFloat()
-                                    val deltaTotal = satPass.endDate.time.minus(timeStart).toFloat()
-                                    satPass.progress = ((deltaNow / deltaTotal) * 100).toInt()
-                                }
-                            } else {
-                                iterator.remove()
-                            }
-                        }
-                    }
-                }
-                _passes.value = Result.Success(passesCache)
-                Timber.d("$passesCache")
-                delay(1000)
-            }
-        }
     }
 }
