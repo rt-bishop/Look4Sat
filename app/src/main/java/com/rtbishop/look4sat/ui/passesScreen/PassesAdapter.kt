@@ -21,6 +21,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.SatPass
@@ -30,46 +32,48 @@ import com.rtbishop.look4sat.utility.navigateSafe
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PassesAdapter(private val shouldUseUTC: Boolean = false) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var satPassList: MutableList<SatPass> = mutableListOf()
+    private val diffCallback = object : DiffUtil.ItemCallback<SatPass>() {
+        override fun areItemsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
+            return oldItem.catNum == newItem.catNum && oldItem.startDate == newItem.startDate
+        }
 
-    fun setList(list: MutableList<SatPass>) {
-        satPassList = list
-        notifyDataSetChanged()
+        override fun areContentsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
+            return oldItem.progress == newItem.progress
+        }
+    }
+    private val differ = AsyncListDiffer(this, diffCallback)
+    private var allPasses = emptyList<SatPass>()
+    private var currentPasses = emptyList<SatPass>()
+
+    fun submitList(passes: List<SatPass>) {
+        allPasses = passes.map { it.copy() }
+        currentPasses = passes.map { it.copy() }
+        tickDiffer(System.currentTimeMillis())
     }
 
-    fun tickPasses(timeNow: Long) {
-        val iterator = satPassList.listIterator()
-        while (iterator.hasNext()) {
-            val satPass = iterator.next()
-            if (!satPass.isDeepSpace) {
-                if (satPass.progress < 100) {
-                    val timeStart = satPass.startDate.time
-                    if (timeNow > timeStart) {
-                        val timeEnd = satPass.endDate.time
-                        val index = satPassList.indexOf(satPass)
-                        val deltaNow = timeNow.minus(timeStart).toFloat()
-                        val deltaTotal = timeEnd.minus(timeStart).toFloat()
-                        satPass.progress = ((deltaNow / deltaTotal) * 100).toInt()
-                        notifyItemChanged(index)
-                    }
-                } else {
-                    val index = satPassList.indexOf(satPass)
-                    iterator.remove()
-                    notifyItemRemoved(index)
+    fun tickDiffer(timeNow: Long) {
+        val list = currentPasses.map { it.copy() }
+        list.forEach { pass ->
+            if (!pass.isDeepSpace) {
+                val timeStart = pass.startDate.time
+                if (timeNow > timeStart) {
+                    val timeEnd = pass.endDate.time
+                    val deltaNow = timeNow.minus(timeStart).toFloat()
+                    val deltaTotal = timeEnd.minus(timeStart).toFloat()
+                    pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
                 }
             }
         }
+        currentPasses = list.filter { pass -> pass.progress < 100 }
+        differ.submitList(currentPasses)
     }
 
-    override fun getItemCount(): Int {
-        return satPassList.size
-    }
+    override fun getItemCount() = differ.currentList.size
 
     override fun getItemViewType(position: Int): Int {
-        return if (satPassList[position].isDeepSpace) 1
+        return if (differ.currentList[position].isDeepSpace) 1
         else 0
     }
 
@@ -82,10 +86,11 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val pass = differ.currentList[position]
         if (holder.itemViewType == 0) {
-            (holder as SatPassLeoHolder).bind(satPassList[position], position, shouldUseUTC)
+            (holder as SatPassLeoHolder).bind(pass, differ.currentList.indexOf(pass), isUTC)
         } else {
-            (holder as SatPassGeoHolder).bind(satPassList[position], position)
+            (holder as SatPassGeoHolder).bind(pass, differ.currentList.indexOf(pass))
         }
     }
 
@@ -103,7 +108,7 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
         private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
         private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
 
-        fun bind(satPass: SatPass, position: Int, shouldUseUTC: Boolean) {
+        fun bind(satPass: SatPass, passIndex: Int, shouldUseUTC: Boolean) {
             binding.apply {
                 if (shouldUseUTC) {
                     startFormat.timeZone = timeZoneUTC
@@ -122,7 +127,7 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
 
             itemView.setOnClickListener {
                 if (satPass.progress < 100) {
-                    val bundle = bundleOf("index" to position)
+                    val bundle = bundleOf("index" to passIndex)
                     itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
                 }
             }
@@ -144,7 +149,7 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
         private val altFormat = itemView.context.getString(R.string.pat_altitude)
         private val elevFormat = itemView.context.getString(R.string.pat_elevation)
 
-        fun bind(satPass: SatPass, position: Int) {
+        fun bind(satPass: SatPass, passIndex: Int) {
             binding.apply {
                 passGeoSatName.text = satPass.name
                 passGeoSatId.text = String.format(satIdFormat, satPass.catNum)
@@ -154,7 +159,7 @@ class PassesAdapter(private val shouldUseUTC: Boolean = false) :
             }
 
             itemView.setOnClickListener {
-                val bundle = bundleOf("index" to position)
+                val bundle = bundleOf("index" to passIndex)
                 itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
             }
         }

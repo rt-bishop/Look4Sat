@@ -51,7 +51,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 adapter = passesAdapter
                 isVerticalScrollBarEnabled = false
                 layoutManager = LinearLayoutManager(context)
-                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+//                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
             }
             passesRefresh.setOnClickListener { viewModel.forceCalculation() }
@@ -72,7 +72,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
         when (result) {
             is Result.Success -> {
                 passes = result.data.toMutableList()
-                passesAdapter.setList(passes)
+                passesAdapter.submitList(passes)
                 binding.apply {
                     passesError.visibility = View.INVISIBLE
                     passesProgress.visibility = View.INVISIBLE
@@ -115,7 +115,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 val millisBeforeEnd = lastPass.endDate.time.minus(timeNow)
                 binding.passesTimer.text = millisBeforeEnd.formatForTimer()
             }
-            passesAdapter.tickPasses(timeNow)
+//            passesAdapter.tickPasses(timeNow)
+            passesAdapter.tickDiffer(timeNow)
         } else {
             binding.passesTimer.text = 0L.formatForTimer()
         }

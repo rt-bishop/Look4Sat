@@ -46,9 +46,7 @@ class PolarViewModel @Inject constructor(
 
     fun getPass(passId: Int) = liveData {
         passesRepo.passes.collect { passes ->
-            if (passes is Result.Success) {
-                emit(passes.data[passId])
-            }
+            if (passes is Result.Success) emit(passes.data[passId])
         }
     }
 
