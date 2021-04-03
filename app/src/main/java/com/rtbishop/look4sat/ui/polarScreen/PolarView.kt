@@ -92,13 +92,13 @@ class PolarView(context: Context) : View(context) {
     }
 
     private fun drawPassTrajectory(cvs: Canvas, satPass: SatPass) {
-        val startTime = satPass.startDate
-        val endTime = satPass.endDate
+        val startTime = satPass.aosDate
+        val endTime = satPass.losDate
         while (startTime.before(endTime)) {
             val satPos = satPass.predictor.getSatPos(startTime)
             val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
             val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            if (startTime.compareTo(satPass.startDate) == 0) {
+            if (startTime.compareTo(satPass.aosDate) == 0) {
                 path.moveTo(x, -y)
             } else {
                 path.lineTo(x, -y)

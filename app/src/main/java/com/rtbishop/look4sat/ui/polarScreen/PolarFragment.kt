@@ -117,8 +117,9 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
     }
 
     private fun observePass() {
-        val passId = requireArguments().getInt("index")
-        viewModel.getPass(passId).observe(viewLifecycleOwner) { pass ->
+        val catNum = requireArguments().getInt("catNum")
+        val aosTime = requireArguments().getLong("aosTime")
+        viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
             satPass = pass
             polarView = PolarView(requireContext()).apply { setPass(pass) }
             binding.frame.addView(polarView)
@@ -171,13 +172,13 @@ class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
         binding.altitude.text = String.format(polarAlt, satPos.altitude)
 
         if (!satPass.isDeepSpace) {
-            if (dateNow.before(satPass.startDate)) {
-                val millisBeforeStart = satPass.startDate.time.minus(timeNow)
+            if (dateNow.before(satPass.aosDate)) {
+                val millisBeforeStart = satPass.aosDate.time.minus(timeNow)
                 binding.polarTimer.text = millisBeforeStart.formatForTimer()
             } else {
-                val millisBeforeEnd = satPass.endDate.time.minus(timeNow)
+                val millisBeforeEnd = satPass.losDate.time.minus(timeNow)
                 binding.polarTimer.text = millisBeforeEnd.formatForTimer()
-                if (dateNow.after(satPass.endDate)) {
+                if (dateNow.after(satPass.losDate)) {
                     binding.polarTimer.text = 0L.formatForTimer()
                     findNavController().popBackStack()
                 }

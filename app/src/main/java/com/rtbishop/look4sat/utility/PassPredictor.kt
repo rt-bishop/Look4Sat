@@ -69,10 +69,10 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundSta
                 do {
                     if (count > 0) shouldWindBack = false
                     val pass = nextNearEarthPass(startDate, shouldWindBack)
-                    lastAosDate = pass.startDate
+                    lastAosDate = pass.aosDate
                     passes.add(pass)
                     startDate =
-                        Date(pass.endDate.time + (oneQuarterOrbitMin * 3) * 60L * 1000L)
+                        Date(pass.losDate.time + (oneQuarterOrbitMin * 3) * 60L * 1000L)
                     count++
                 } while (lastAosDate < endDate)
             }

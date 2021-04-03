@@ -35,10 +35,10 @@ data class SatPass(
     val predictor: PassPredictor,
     var progress: Int = 0
 ) {
-    val startDate: Date
+    val aosDate: Date
         get() = Date(aosTime)
 
-    val endDate: Date
+    val losDate: Date
         get() = Date(losTime)
 
     val tcaDate: Date

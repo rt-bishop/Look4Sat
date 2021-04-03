@@ -19,8 +19,6 @@ package com.rtbishop.look4sat.ui.passesScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -28,15 +26,15 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
-import com.rtbishop.look4sat.utility.navigateSafe
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PassesAdapter(private val isUTC: Boolean, private val clickListener: PassesClickListener) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatPass>() {
         override fun areItemsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
-            return oldItem.catNum == newItem.catNum && oldItem.startDate == newItem.startDate
+            return oldItem.catNum == newItem.catNum && oldItem.aosDate == newItem.aosDate
         }
 
         override fun areContentsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
@@ -44,30 +42,30 @@ class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerV
         }
     }
     private val differ = AsyncListDiffer(this, diffCallback)
-    private var allPasses = emptyList<SatPass>()
     private var currentPasses = emptyList<SatPass>()
 
+    interface PassesClickListener {
+        fun navigateToPass(satPass: SatPass)
+    }
+
     fun submitList(passes: List<SatPass>) {
-        allPasses = passes.map { it.copy() }
-        currentPasses = passes.map { it.copy() }
+        currentPasses = passes
         tickDiffer(System.currentTimeMillis())
     }
 
     fun tickDiffer(timeNow: Long) {
-        val list = currentPasses.map { it.copy() }
-        list.forEach { pass ->
+        val copiedPasses = currentPasses.map { pass -> pass.copy() }
+        copiedPasses.forEach { pass ->
             if (!pass.isDeepSpace) {
-                val timeStart = pass.startDate.time
+                val timeStart = pass.aosDate.time
                 if (timeNow > timeStart) {
-                    val timeEnd = pass.endDate.time
                     val deltaNow = timeNow.minus(timeStart).toFloat()
-                    val deltaTotal = timeEnd.minus(timeStart).toFloat()
+                    val deltaTotal = pass.losDate.time.minus(timeStart).toFloat()
                     pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
                 }
             }
         }
-        currentPasses = list.filter { pass -> pass.progress < 100 }
-        differ.submitList(currentPasses)
+        differ.submitList(copiedPasses.filter { pass -> pass.progress < 100 })
     }
 
     override fun getItemCount() = differ.currentList.size
@@ -86,11 +84,10 @@ class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerV
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val pass = differ.currentList[position]
         if (holder.itemViewType == 0) {
-            (holder as SatPassLeoHolder).bind(pass, differ.currentList.indexOf(pass), isUTC)
+            (holder as SatPassLeoHolder).bind(differ.currentList[position], clickListener, isUTC)
         } else {
-            (holder as SatPassGeoHolder).bind(pass, differ.currentList.indexOf(pass))
+            (holder as SatPassGeoHolder).bind(differ.currentList[position], clickListener)
         }
     }
 
@@ -108,7 +105,7 @@ class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerV
         private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
         private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
 
-        fun bind(satPass: SatPass, passIndex: Int, shouldUseUTC: Boolean) {
+        fun bind(satPass: SatPass, listener: PassesClickListener, shouldUseUTC: Boolean) {
             binding.apply {
                 if (shouldUseUTC) {
                     startFormat.timeZone = timeZoneUTC
@@ -119,17 +116,14 @@ class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerV
                 passLeoAosAz.text = String.format(aosAzFormat, satPass.aosAzimuth)
                 passLeoMaxEl.text = String.format(maxElFormat, satPass.maxElevation)
                 passLeoLosAz.text = String.format(losAzFormat, satPass.losAzimuth)
-                passLeoStart.text = startFormat.format(satPass.startDate)
+                passLeoStart.text = startFormat.format(satPass.aosDate)
                 passLeoAlt.text = String.format(altFormat, satPass.altitude)
-                passLeoEnd.text = endFormat.format(satPass.endDate)
+                passLeoEnd.text = endFormat.format(satPass.losDate)
                 passLeoProgress.progress = satPass.progress
             }
 
             itemView.setOnClickListener {
-                if (satPass.progress < 100) {
-                    val bundle = bundleOf("index" to passIndex)
-                    itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
-                }
+                listener.navigateToPass(satPass)
             }
         }
 
@@ -149,7 +143,7 @@ class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerV
         private val altFormat = itemView.context.getString(R.string.pat_altitude)
         private val elevFormat = itemView.context.getString(R.string.pat_elevation)
 
-        fun bind(satPass: SatPass, passIndex: Int) {
+        fun bind(satPass: SatPass, listener: PassesClickListener) {
             binding.apply {
                 passGeoSatName.text = satPass.name
                 passGeoSatId.text = String.format(satIdFormat, satPass.catNum)
@@ -159,8 +153,7 @@ class PassesAdapter(private val isUTC: Boolean) : RecyclerView.Adapter<RecyclerV
             }
 
             itemView.setOnClickListener {
-                val bundle = bundleOf("index" to passIndex)
-                itemView.findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
+                listener.navigateToPass(satPass)
             }
         }
 

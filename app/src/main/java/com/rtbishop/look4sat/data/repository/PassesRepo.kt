@@ -41,21 +41,28 @@ class PassesRepo @Inject constructor(
     val passes: SharedFlow<Result<List<SatPass>>> = _passes
 
     suspend fun triggerCalculation(satellites: List<Satellite>, refDate: Date = Date()) {
-        if (satellites.isEmpty()) _passes.emit(Result.Error(Exception()))
-        val oldCatNums = selectedSatellites.map { it.tle.catnum }
-        val newCatNums = satellites.map { it.tle.catnum }
-        if (oldCatNums != newCatNums) forceCalculation(satellites, refDate)
+        if (satellites.isEmpty()) {
+            _passes.emit(Result.Error(Exception()))
+        } else {
+            val oldCatNums = selectedSatellites.map { it.tle.catnum }
+            val newCatNums = satellites.map { it.tle.catnum }
+            if (oldCatNums != newCatNums) forceCalculation(satellites, refDate)
+        }
     }
 
     suspend fun forceCalculation(satellites: List<Satellite>, refDate: Date = Date()) {
-        _passes.emit(Result.InProgress)
-        withContext(defaultDispatcher) {
-            val allPasses = mutableListOf<SatPass>()
-            selectedSatellites = satellites
-            satellites.forEach { satellite ->
-                allPasses.addAll(getPasses(satellite, refDate))
+        if (satellites.isEmpty()) {
+            _passes.emit(Result.Error(Exception()))
+        } else {
+            _passes.emit(Result.InProgress)
+            withContext(defaultDispatcher) {
+                val allPasses = mutableListOf<SatPass>()
+                selectedSatellites = satellites
+                satellites.forEach { satellite ->
+                    allPasses.addAll(getPasses(satellite, refDate))
+                }
+                _passes.emit(Result.Success(filterPasses(allPasses, refDate)))
             }
-            _passes.emit(Result.Success(filterPasses(allPasses, refDate)))
         }
     }
 
@@ -66,9 +73,9 @@ class PassesRepo @Inject constructor(
 
     private fun filterPasses(passes: List<SatPass>, refDate: Date): List<SatPass> {
         val timeFuture = Date(refDate.time + (prefsManager.getHoursAhead() * 3600 * 1000))
-        return passes.filter { it.endDate.after(refDate) }
-            .filter { it.startDate.before(timeFuture) }
+        return passes.filter { it.losDate.after(refDate) }
+            .filter { it.aosDate.before(timeFuture) }
             .filter { it.maxElevation > prefsManager.getMinElevation() }
-            .sortedBy { it.startDate }
+            .sortedBy { it.aosDate }
     }
 }

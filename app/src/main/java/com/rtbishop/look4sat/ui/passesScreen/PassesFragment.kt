@@ -19,8 +19,10 @@ package com.rtbishop.look4sat.ui.passesScreen
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
@@ -29,14 +31,15 @@ import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
+import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 @AndroidEntryPoint
-class PassesFragment : Fragment(R.layout.fragment_passes) {
+class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
     private val viewModel: PassesViewModel by viewModels()
-    private var passes = mutableListOf<SatPass>()
+    private var passes = listOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,20 +47,20 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     }
 
     private fun setupComponents(view: View) {
-        val passesAdapter = PassesAdapter(viewModel.shouldUseUTC())
+        val passesAdapter = PassesAdapter(viewModel.shouldUseUTC(), this)
         val binding = FragmentPassesBinding.bind(view).apply {
             passesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = passesAdapter
                 isVerticalScrollBarEnabled = false
                 layoutManager = LinearLayoutManager(context)
-//                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
             }
             passesRefresh.setOnClickListener { viewModel.forceCalculation() }
         }
-        viewModel.passes.observe(viewLifecycleOwner, { result ->
-            handleNewPasses(result, passesAdapter, binding)
+        viewModel.passes.observe(viewLifecycleOwner, { passesResult ->
+            handleNewPasses(passesResult, passesAdapter, binding)
         })
         viewModel.getAppTimer().observe(viewLifecycleOwner, { timeNow ->
             tickMainTimer(timeNow, passesAdapter, binding)
@@ -71,7 +74,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     ) {
         when (result) {
             is Result.Success -> {
-                passes = result.data.toMutableList()
+                passes = result.data
                 passesAdapter.submitList(passes)
                 binding.apply {
                     passesError.visibility = View.INVISIBLE
@@ -80,7 +83,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 }
             }
             is Result.InProgress -> {
-                passes.clear()
+                passes = emptyList()
                 binding.apply {
                     passesTimer.text = 0L.formatForTimer()
                     passesError.visibility = View.INVISIBLE
@@ -89,7 +92,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
                 }
             }
             is Result.Error -> {
-                passes.clear()
+                passes = emptyList()
                 binding.apply {
                     passesTimer.text = 0L.formatForTimer()
                     passesProgress.visibility = View.INVISIBLE
@@ -107,18 +110,24 @@ class PassesFragment : Fragment(R.layout.fragment_passes) {
     ) {
         if (passes.isNotEmpty()) {
             try {
-                val nextPass = passes.first { it.startDate.time.minus(timeNow) > 0 }
-                val millisBeforeStart = nextPass.startDate.time.minus(timeNow)
+                val nextPass = passes.first { it.aosDate.time.minus(timeNow) > 0 }
+                val millisBeforeStart = nextPass.aosDate.time.minus(timeNow)
                 binding.passesTimer.text = millisBeforeStart.formatForTimer()
             } catch (e: NoSuchElementException) {
                 val lastPass = passes.last()
-                val millisBeforeEnd = lastPass.endDate.time.minus(timeNow)
+                val millisBeforeEnd = lastPass.losDate.time.minus(timeNow)
                 binding.passesTimer.text = millisBeforeEnd.formatForTimer()
             }
-//            passesAdapter.tickPasses(timeNow)
             passesAdapter.tickDiffer(timeNow)
         } else {
             binding.passesTimer.text = 0L.formatForTimer()
+        }
+    }
+
+    override fun navigateToPass(satPass: SatPass) {
+        if (satPass.progress < 100) {
+            val bundle = bundleOf("catNum" to satPass.catNum, "aosTime" to satPass.aosDate.time)
+            findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
         }
     }
 }
