@@ -17,13 +17,7 @@
  */
 package com.rtbishop.look4sat.ui.polarScreen
 
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.os.Bundle
-import android.view.Surface
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,129 +31,73 @@ import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
-import kotlin.math.atan2
-import kotlin.math.round
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class PolarFragment : Fragment(R.layout.fragment_polar), SensorEventListener {
+class PolarFragment : Fragment(R.layout.fragment_polar), Orientation.OrientationListener {
 
-    private lateinit var transmitterAdapter: TransAdapter
-    private lateinit var binding: FragmentPolarBinding
-    private lateinit var satPass: SatPass
-    private lateinit var sensorManager: SensorManager
+    @Inject
+    lateinit var orientation: Orientation
+
     private val viewModel: PolarViewModel by viewModels()
-    private val rotationMatrix = FloatArray(9)
-    private val orientationValues = FloatArray(3)
-    private var magneticDeclination = 0f
     private var polarView: PolarView? = null
+    private var magneticDeclination = 0f
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentPolarBinding.bind(view)
-        sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val binding = FragmentPolarBinding.bind(view)
+        val catNum = requireArguments().getInt("catNum")
+        val aosTime = requireArguments().getLong("aosTime")
         magneticDeclination = viewModel.getMagDeclination()
-        observePass()
+        viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
+            polarView = PolarView(requireContext()).apply { setPass(pass) }
+            binding.frame.addView(polarView)
+            observeTransmitters(pass, binding)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.shouldUseCompass()) {
-            sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR).also { sensor ->
-                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME)
-            }
-        }
+        if (viewModel.shouldUseCompass()) orientation.startListening(this)
     }
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.shouldUseCompass()) {
-            sensorManager.unregisterListener(this)
-        }
+        if (viewModel.shouldUseCompass()) orientation.stopListening()
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        event?.let { calculateAzimuth(it) }
+    override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
+        polarView?.rotation = -(azimuth + magneticDeclination)
     }
 
-    private fun calculateAzimuth(event: SensorEvent) {
-//        if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
-//            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-//            SensorManager.getOrientation(rotationMatrix, orientationValues)
-//            val magneticAzimuth = (Math.toDegrees(orientationValues[0].toDouble()) + 360f) % 360f
-//            val roundedAzimuth = (round(magneticAzimuth * 10) / 10).toFloat()
-//            polarView?.rotation = -(roundedAzimuth + magneticDeclination)
-//        }
-
-        if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
-            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
-            val (matrixColumn, sense) = when (val rotation =
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                    requireContext().display?.rotation
-                } else {
-                    @Suppress("DEPRECATION")
-                    requireActivity().windowManager.defaultDisplay.rotation
+    private fun observeTransmitters(satPass: SatPass, binding: FragmentPolarBinding) {
+        viewModel.getSatTransmitters(satPass.catNum).observe(viewLifecycleOwner, { list ->
+            val transmitterAdapter = TransAdapter(satPass)
+            if (list.isNotEmpty()) {
+                transmitterAdapter.setData(list)
+                binding.recycler.apply {
+                    setHasFixedSize(true)
+                    adapter = transmitterAdapter
+                    isVerticalScrollBarEnabled = false
+                    layoutManager = LinearLayoutManager(context)
+                    (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                    addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
+                    visibility = View.VISIBLE
                 }
-            ) {
-                Surface.ROTATION_0 -> Pair(0, 1)
-                Surface.ROTATION_90 -> Pair(1, -1)
-                Surface.ROTATION_180 -> Pair(0, -1)
-                Surface.ROTATION_270 -> Pair(1, 1)
-                else -> error("Invalid screen rotation value: $rotation")
+                binding.noTransMsg.visibility = View.INVISIBLE
+            } else {
+                binding.recycler.visibility = View.INVISIBLE
+                binding.noTransMsg.visibility = View.VISIBLE
             }
-            val x = sense * rotationMatrix[matrixColumn]
-            val y = sense * rotationMatrix[matrixColumn + 3]
-            val magneticAzimuth = (Math.toDegrees(-atan2(y, x).toDouble()) + 360f) % 360f
-            val roundedAzimuth = (round(magneticAzimuth * 10) / 10).toFloat()
-            polarView?.rotation = -(roundedAzimuth + magneticDeclination)
-        }
-    }
-
-    private fun observePass() {
-        val catNum = requireArguments().getInt("catNum")
-        val aosTime = requireArguments().getLong("aosTime")
-        viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
-            satPass = pass
-            polarView = PolarView(requireContext()).apply { setPass(pass) }
-            binding.frame.addView(polarView)
-            observeTransmitters()
-        }
-    }
-
-    private fun observeTransmitters() {
-        viewModel.getSatTransmitters(satPass.catNum)
-            .observe(viewLifecycleOwner, { list ->
-                transmitterAdapter = TransAdapter(satPass)
-                if (list.isNotEmpty()) {
-                    transmitterAdapter.setData(list)
-                    binding.recycler.apply {
-                        setHasFixedSize(true)
-                        adapter = transmitterAdapter
-                        isVerticalScrollBarEnabled = false
-                        layoutManager = LinearLayoutManager(context)
-                        (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                        addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
-                        visibility = View.VISIBLE
-                    }
-                    binding.noTransMsg.visibility = View.INVISIBLE
-                } else {
-                    binding.recycler.visibility = View.INVISIBLE
-                    binding.noTransMsg.visibility = View.VISIBLE
-                }
-                observeTimer()
+            viewModel.getAppTimer().observe(viewLifecycleOwner, {
+                setPassText(it, satPass, binding)
+                polarView?.invalidate()
+                transmitterAdapter.tickTransmitters()
             })
-    }
-
-    private fun observeTimer() {
-        viewModel.getAppTimer().observe(viewLifecycleOwner, {
-            setPassText(it)
-            polarView?.invalidate()
-            transmitterAdapter.tickTransmitters()
         })
     }
 
-    private fun setPassText(timeNow: Long) {
+    private fun setPassText(timeNow: Long, satPass: SatPass, binding: FragmentPolarBinding) {
         val dateNow = Date(timeNow)
         val satPos = satPass.predictor.getSatPos(dateNow)
         val polarAz = getString(R.string.pat_azimuth)

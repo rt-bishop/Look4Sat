@@ -20,7 +20,9 @@ package com.rtbishop.look4sat.di
 import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
+import android.hardware.SensorManager
 import android.location.LocationManager
+import android.view.WindowManager
 import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
@@ -31,17 +33,27 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object ApplicationModule {
-    
+
     @Provides
     fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
         return context.contentResolver
     }
-    
+
     @Provides
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager {
         return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
-    
+
+    @Provides
+    fun provideSensorManager(@ApplicationContext context: Context): SensorManager {
+        return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+
+    @Provides
+    fun provideWindowManager(@ApplicationContext context: Context): WindowManager {
+        return context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    }
+
     @Provides
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
