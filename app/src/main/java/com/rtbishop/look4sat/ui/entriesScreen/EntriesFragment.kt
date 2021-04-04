@@ -25,7 +25,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatItem
@@ -33,6 +32,7 @@ import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
+import com.rtbishop.look4sat.utility.showSnack
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -63,7 +63,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             }
             importWeb.setOnClickListener { findNavController().navigate(R.id.nav_dialog_sources) }
             importFile.setOnClickListener { filePicker.launch("*/*") }
-            selectMode.setOnClickListener { showModesDialog() }
+            selectMode.setOnClickListener { viewModel.createModesDialog(requireContext()).show() }
             selectAll.setOnClickListener { viewModel.selectCurrentItems() }
             searchBar.setOnQueryTextListener(viewModel)
         }
@@ -73,10 +73,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         getNavResult<List<String>>(R.id.nav_entries, "sources") { navResult ->
             handleNavResult(navResult)
         }
-    }
-
-    private fun showModesDialog() {
-        viewModel.createModesDialog(requireContext()).show()
     }
 
     private fun handleSatData(
@@ -98,8 +94,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             is Result.Error -> {
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
-                val errorMsg = getString(R.string.entries_update_error)
-                Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).show()
+                requireView().showSnack(getString(R.string.entries_update_error))
             }
         }
     }

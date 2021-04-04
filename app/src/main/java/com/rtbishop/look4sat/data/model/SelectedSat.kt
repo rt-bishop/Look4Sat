@@ -21,7 +21,7 @@ import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.Satellite
 import org.osmdroid.views.overlay.Overlay
 
-class SelectedSat(
+data class SelectedSat(
     val pass: Satellite,
     val catNum: Int,
     val name: String,

@@ -31,43 +31,36 @@ import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class PolarFragment : Fragment(R.layout.fragment_polar), Orientation.OrientationListener {
-
-    @Inject
-    lateinit var orientation: Orientation
+class PolarFragment : Fragment(R.layout.fragment_polar) {
 
     private val viewModel: PolarViewModel by viewModels()
     private var polarView: PolarView? = null
-    private var magneticDeclination = 0f
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentPolarBinding.bind(view)
         val catNum = requireArguments().getInt("catNum")
         val aosTime = requireArguments().getLong("aosTime")
-        magneticDeclination = viewModel.getMagDeclination()
         viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
             polarView = PolarView(requireContext()).apply { setPass(pass) }
             binding.frame.addView(polarView)
             observeTransmitters(pass, binding)
         }
+        viewModel.azimuth.observe(viewLifecycleOwner, { trueNorthAzimuth ->
+            polarView?.rotation = -trueNorthAzimuth
+        })
     }
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.shouldUseCompass()) orientation.startListening(this)
+        viewModel.enableSensor()
     }
 
     override fun onPause() {
         super.onPause()
-        if (viewModel.shouldUseCompass()) orientation.stopListening()
-    }
-
-    override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
-        polarView?.rotation = -(azimuth + magneticDeclination)
+        viewModel.disableSensor()
     }
 
     private fun observeTransmitters(satPass: SatPass, binding: FragmentPolarBinding) {

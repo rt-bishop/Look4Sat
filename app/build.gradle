@@ -5,19 +5,7 @@ plugins {
     id "dagger.hilt.android.plugin"
 }
 
-def keystorePropertiesFile = rootProject.file("keystore.properties")
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
 android {
-    signingConfigs {
-        release {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-        }
-    }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
@@ -25,8 +13,8 @@ android {
         applicationId "com.rtbishop.look4sat"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 222
-        versionName "2.2.2"
+        versionCode 230
+        versionName "2.3.0"
         kapt {
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas")
@@ -36,7 +24,6 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
             postprocessing {
                 removeUnusedCode true
                 removeUnusedResources true

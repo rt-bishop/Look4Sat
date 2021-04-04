@@ -40,17 +40,13 @@ class Orientation @Inject constructor(
     private val mRotationMatrix = FloatArray(9)
     private val mOrientationValues = FloatArray(3)
     private val mOneRadDegrees = 57.295779513f
-    private var mLastAccuracy: Int = SensorManager.SENSOR_STATUS_UNRELIABLE
     private var mListener: OrientationListener? = null
 
     fun startListening(listener: OrientationListener) {
-        when {
-            mListener === listener -> return
-            else -> {
-                mListener = listener
-                mSensorManager.registerListener(this, mRotationSensor, 16000)
-            }
-        }
+        if (mListener !== listener) {
+            mListener = listener
+            mSensorManager.registerListener(this, mRotationSensor, 16000)
+        } else return
     }
 
     fun stopListening() {
@@ -58,16 +54,11 @@ class Orientation @Inject constructor(
         mListener = null
     }
 
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-        mLastAccuracy = accuracy
-    }
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
 
     override fun onSensorChanged(event: SensorEvent) {
-        when {
-            mListener == null -> return
-            mLastAccuracy == SensorManager.SENSOR_STATUS_UNRELIABLE -> return
-            event.sensor == mRotationSensor -> updateOrientation(event.values)
-        }
+        if (mListener == null) return
+        else if (event.sensor == mRotationSensor) updateOrientation(event.values)
     }
 
     @Suppress("DEPRECATION")

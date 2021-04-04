@@ -126,7 +126,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                             ContextCompat.getColor(requireContext(), R.color.themeLight)
                         setTextIcon(it.key.tle.name)
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                        position = GeoPoint(it.value.lat, it.value.lon)
+                        try {
+                            position = GeoPoint(it.value.lat, it.value.lon)
+                        } catch (e: IllegalArgumentException) {
+                            Timber.d("Position: $position")
+                        }
                         setOnMarkerClickListener { _, _ ->
                             mapViewModel.selectSatellite(it.key)
                             return@setOnMarkerClickListener true
@@ -138,7 +142,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                         setInfoWindow(null)
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_sat)
-                        position = GeoPoint(it.value.lat, it.value.lon)
+                        try {
+                            position = GeoPoint(it.value.lat, it.value.lon)
+                        } catch (e: IllegalArgumentException) {
+                            Timber.d("Position: $position")
+                        }
                         setOnMarkerClickListener { _, _ ->
                             mapViewModel.selectSatellite(it.key)
                             return@setOnMarkerClickListener true

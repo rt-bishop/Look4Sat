@@ -23,6 +23,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -33,6 +34,8 @@ import androidx.navigation.Navigator
 import androidx.navigation.fragment.findNavController
 import com.github.amsacode.predict4java.GroundStationPosition
 import com.github.amsacode.predict4java.Satellite
+import com.google.android.material.snackbar.Snackbar
+import com.rtbishop.look4sat.R
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -75,6 +78,12 @@ fun Double.getOrbitalVelocity(): Double {
 
 fun Satellite.getPredictor(stationPosition: GroundStationPosition): PassPredictor {
     return PassPredictor(this, stationPosition)
+}
+
+fun View.showSnack(message: String) {
+    Snackbar.make(this, message, Snackbar.LENGTH_SHORT)
+        .setAnchorView(R.id.nav_bottom)
+        .show()
 }
 
 fun NavController.navigateSafe(

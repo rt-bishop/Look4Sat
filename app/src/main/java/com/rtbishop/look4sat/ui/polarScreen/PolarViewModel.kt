@@ -17,10 +17,7 @@
  */
 package com.rtbishop.look4sat.ui.polarScreen
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
@@ -32,10 +29,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PolarViewModel @Inject constructor(
+    private val orientation: Orientation,
     private val prefsManager: PrefsManager,
     private val passesRepo: PassesRepo,
     private val satelliteRepo: SatelliteRepo
-) : ViewModel() {
+) : ViewModel(), Orientation.OrientationListener {
+
+    private val magDeclination = prefsManager.getMagDeclination()
+    private val _azimuth = MutableLiveData<Float>()
+    val azimuth: LiveData<Float> = _azimuth
 
     fun getAppTimer() = liveData {
         while (true) {
@@ -53,14 +55,18 @@ class PolarViewModel @Inject constructor(
         }
     }
 
-    fun shouldUseCompass(): Boolean {
-        return prefsManager.shouldUseCompass()
+    fun enableSensor() {
+        if (prefsManager.shouldUseCompass()) orientation.startListening(this)
     }
 
-    fun getMagDeclination(): Float {
-        return prefsManager.getMagDeclination()
+    fun disableSensor() {
+        if (prefsManager.shouldUseCompass()) orientation.stopListening()
     }
 
     fun getSatTransmitters(satId: Int) =
         satelliteRepo.getSatTransmitters(satId).asLiveData(viewModelScope.coroutineContext)
+
+    override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
+        _azimuth.value = azimuth + magDeclination
+    }
 }
