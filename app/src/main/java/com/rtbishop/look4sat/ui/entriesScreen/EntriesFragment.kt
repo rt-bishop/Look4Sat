@@ -25,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatItem
@@ -32,7 +33,6 @@ import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
-import com.rtbishop.look4sat.utility.showSnack
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -94,7 +94,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             is Result.Error -> {
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
-                requireView().showSnack(getString(R.string.entries_update_error))
+                Snackbar.make(requireView(), R.string.entries_update_error, Snackbar.LENGTH_SHORT)
+                    .setAnchorView(R.id.nav_bottom).show()
             }
         }
     }

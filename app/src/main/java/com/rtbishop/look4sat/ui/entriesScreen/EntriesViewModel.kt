@@ -142,7 +142,6 @@ class EntriesViewModel @Inject constructor(
     }
 
     private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
-        shouldSelectAll = true
         if (query.isBlank()) return items
         return try {
             items.filter { it.catNum == query.toInt() }
