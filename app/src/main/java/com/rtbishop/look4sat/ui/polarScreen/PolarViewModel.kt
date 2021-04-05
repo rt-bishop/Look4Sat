@@ -18,12 +18,18 @@
 package com.rtbishop.look4sat.ui.polarScreen
 
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.model.SatPass
+import com.rtbishop.look4sat.data.model.SatTrans
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,20 +41,18 @@ class PolarViewModel @Inject constructor(
 ) : ViewModel(), Orientation.OrientationListener {
 
     private val magDeclination = prefsManager.getMagDeclination()
+    private val _transmitters = MutableLiveData<List<SatTrans>>()
     private val _azimuth = MutableLiveData<Float>()
+    val transmitters: LiveData<List<SatTrans>> = _transmitters
     val azimuth: LiveData<Float> = _azimuth
-
-    fun getAppTimer() = liveData {
-        while (true) {
-            emit(System.currentTimeMillis())
-            delay(1000)
-        }
-    }
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
         passesRepo.passes.collect { passes ->
             val pass = passes.find { it.catNum == catNum && it.aosDate.time == aosTime }
-            pass?.let { emit(it) }
+            pass?.let { satPass ->
+                processTransmitters(satPass)
+                emit(satPass)
+            }
         }
     }
 
@@ -60,10 +64,28 @@ class PolarViewModel @Inject constructor(
         if (prefsManager.shouldUseCompass()) orientation.stopListening()
     }
 
-    fun getSatTransmitters(satId: Int) =
-        satelliteRepo.getSatTransmitters(satId).asLiveData(viewModelScope.coroutineContext)
-
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
         _azimuth.value = azimuth + magDeclination
+    }
+
+    private fun processTransmitters(satPass: SatPass) {
+        viewModelScope.launch {
+            satelliteRepo.getSatTransmitters(satPass.catNum).collect { transList ->
+                while (isActive) {
+                    val timeNow = Date()
+                    val copiedList = transList.map { it.copy() }
+                    copiedList.forEach { transmitter ->
+                        transmitter.downlink?.let {
+                            transmitter.downlink = satPass.predictor.getDownlinkFreq(it, timeNow)
+                        }
+                        transmitter.uplink?.let {
+                            transmitter.uplink = satPass.predictor.getUplinkFreq(it, timeNow)
+                        }
+                    }
+                    _transmitters.postValue(copiedList.map { it.copy() })
+                    delay(1000)
+                }
+            }
+        }
     }
 }

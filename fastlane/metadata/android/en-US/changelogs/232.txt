@@ -4,3 +4,5 @@ Switched to concurrent satellite data update
 Minor visual changes to map info
 Separated application screens logic
 Bug fixes, huge code cleanup
+Fixed recent InflatingException
+Fixed transmitters doppler frequency update logic

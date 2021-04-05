@@ -40,17 +40,18 @@ class PolarFragment : Fragment(R.layout.fragment_polar) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val binding = FragmentPolarBinding.bind(view)
-        val catNum = requireArguments().getInt("catNum")
-        val aosTime = requireArguments().getLong("aosTime")
-        viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
-            polarView = PolarView(requireContext()).apply { setPass(pass) }
-            binding.frame.addView(polarView)
-            observeTransmitters(pass, binding)
+        FragmentPolarBinding.bind(view).apply {
+            val transAdapter = TransAdapter()
+            recycler.apply {
+                setHasFixedSize(true)
+                adapter = transAdapter
+                isVerticalScrollBarEnabled = false
+                layoutManager = LinearLayoutManager(context)
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
+            }
+            setupObservers(transAdapter, this)
         }
-        viewModel.azimuth.observe(viewLifecycleOwner, { trueNorthAzimuth ->
-            polarView?.rotation = -trueNorthAzimuth
-        })
     }
 
     override fun onResume() {
@@ -63,35 +64,41 @@ class PolarFragment : Fragment(R.layout.fragment_polar) {
         viewModel.disableSensor()
     }
 
-    private fun observeTransmitters(satPass: SatPass, binding: FragmentPolarBinding) {
-        viewModel.getSatTransmitters(satPass.catNum).observe(viewLifecycleOwner, { list ->
-            val transmitterAdapter = TransAdapter(satPass)
+    private fun setupObservers(transAdapter: TransAdapter, binding: FragmentPolarBinding) {
+        val catNum = requireArguments().getInt("catNum")
+        val aosTime = requireArguments().getLong("aosTime")
+        viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
+            polarView = PolarView(requireContext()).apply { setPass(pass) }
+            binding.frame.addView(polarView)
+            observeTransmitters(pass, transAdapter, binding)
+        }
+        viewModel.azimuth.observe(viewLifecycleOwner, { trueNorthAzimuth ->
+            polarView?.rotation = -trueNorthAzimuth
+        })
+    }
+
+    private fun observeTransmitters(
+        satPass: SatPass,
+        transAdapter: TransAdapter,
+        binding: FragmentPolarBinding
+    ) {
+        viewModel.transmitters.observe(viewLifecycleOwner, { list ->
             if (list.isNotEmpty()) {
-                transmitterAdapter.setData(list)
-                binding.recycler.apply {
-                    setHasFixedSize(true)
-                    adapter = transmitterAdapter
-                    isVerticalScrollBarEnabled = false
-                    layoutManager = LinearLayoutManager(context)
-                    (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                    addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
-                    visibility = View.VISIBLE
-                }
+                transAdapter.submitList(list)
+                binding.recycler.visibility = View.VISIBLE
                 binding.noTransMsg.visibility = View.INVISIBLE
             } else {
                 binding.recycler.visibility = View.INVISIBLE
                 binding.noTransMsg.visibility = View.VISIBLE
             }
-            viewModel.getAppTimer().observe(viewLifecycleOwner, {
-                setPassText(it, satPass, binding)
-                polarView?.invalidate()
-                transmitterAdapter.tickTransmitters()
-            })
+            setPassText(satPass, binding)
+            polarView?.invalidate()
         })
     }
 
-    private fun setPassText(timeNow: Long, satPass: SatPass, binding: FragmentPolarBinding) {
-        val dateNow = Date(timeNow)
+    private fun setPassText(satPass: SatPass, binding: FragmentPolarBinding) {
+        val dateNow = Date()
+        val timeNow = System.currentTimeMillis()
         val satPos = satPass.predictor.getSatPos(dateNow)
         val polarAz = getString(R.string.pat_azimuth)
         val polarEl = getString(R.string.pat_elevation)

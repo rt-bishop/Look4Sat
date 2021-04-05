@@ -26,8 +26,8 @@ data class SatTrans(
     @PrimaryKey @field:Json(name = "uuid") val uuid: String,
     @field:Json(name = "description") val info: String,
     @field:Json(name = "alive") val isAlive: Boolean,
-    @field:Json(name = "downlink_low") val downlink: Long?,
-    @field:Json(name = "uplink_low") val uplink: Long?,
+    @field:Json(name = "downlink_low") var downlink: Long?,
+    @field:Json(name = "uplink_low") var uplink: Long?,
     @field:Json(name = "mode") val mode: String?,
     @field:Json(name = "invert") val isInverted: Boolean,
     @field:Json(name = "norad_cat_id") val catNum: Int
