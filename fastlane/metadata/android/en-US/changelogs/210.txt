@@ -1,6 +1,0 @@
-Various fixes:
-Issue #41 - Added continuous horizontal map scrolling
-Issue #42 - Now setting a correct min zoom level
-Issue #39 - Stopped clearing satellite entries on each TLE update
-Issue #46 - Fixed satellite selection clearing bug
-Issue #44 - Now accepting all valid QTH locators

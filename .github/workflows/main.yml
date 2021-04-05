@@ -58,6 +58,6 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifact: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          artifacts: ${{steps.sign_apk.outputs.signedReleaseFile}}
           bodyFile: fastlane/metadata/android/en-US/whatsnew/whatsnew-en-US
           token: ${{ secrets.RELEASE_TOKEN }}
