@@ -17,16 +17,18 @@
  */
 package com.rtbishop.look4sat.ui.passesScreen
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.rtbishop.look4sat.data.model.Result
+import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,28 +38,52 @@ class PassesViewModel @Inject constructor(
     private val passesRepo: PassesRepo
 ) : ViewModel() {
 
-    val passes = passesRepo.passes.asLiveData(viewModelScope.coroutineContext)
+    private val _passes = MutableLiveData<Result<List<SatPass>>>(Result.InProgress)
+    private var passesProcessing: Job? = null
+    val passes: LiveData<Result<List<SatPass>>> = _passes
 
     init {
         viewModelScope.launch {
+            _passes.postValue(Result.InProgress)
             passesRepo.triggerCalculation(satelliteRepo.getSelectedSatellites())
+        }
+        viewModelScope.launch {
+            passesRepo.passes.collect { passes ->
+                passesProcessing?.cancelAndJoin()
+                passesProcessing = viewModelScope.launch { tickPasses(passes) }
+            }
         }
     }
 
     fun forceCalculation() {
         viewModelScope.launch {
+            _passes.postValue(Result.InProgress)
+            passesProcessing?.cancelAndJoin()
             passesRepo.forceCalculation(satelliteRepo.getSelectedSatellites())
-        }
-    }
-
-    fun getAppTimer() = liveData {
-        while (true) {
-            emit(System.currentTimeMillis())
-            delay(1000)
         }
     }
 
     fun shouldUseUTC(): Boolean {
         return prefsManager.shouldUseUTC()
+    }
+
+    private suspend fun tickPasses(passes: List<SatPass>) = withContext(Dispatchers.Default) {
+        var currentPasses = passes
+        while (isActive) {
+            val timeNow = System.currentTimeMillis()
+            currentPasses.forEach { pass ->
+                if (!pass.isDeepSpace) {
+                    val timeStart = pass.aosDate.time
+                    if (timeNow > timeStart) {
+                        val deltaNow = timeNow.minus(timeStart).toFloat()
+                        val deltaTotal = pass.losDate.time.minus(timeStart).toFloat()
+                        pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
+                    }
+                }
+            }
+            currentPasses = currentPasses.filter { it.progress < 100 }
+            _passes.postValue(Result.Success(currentPasses.map { it.copy() }))
+            delay(1000)
+        }
     }
 }

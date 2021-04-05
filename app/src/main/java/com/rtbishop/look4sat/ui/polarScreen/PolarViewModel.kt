@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.ui.polarScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -48,10 +47,8 @@ class PolarViewModel @Inject constructor(
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
         passesRepo.passes.collect { passes ->
-            if (passes is Result.Success) {
-                val pass = passes.data.find { it.catNum == catNum && it.aosDate.time == aosTime }
-                pass?.let { emit(it) }
-            }
+            val pass = passes.find { it.catNum == catNum && it.aosDate.time == aosTime }
+            pass?.let { emit(it) }
         }
     }
 

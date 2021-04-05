@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.data.repository
 
 import com.github.amsacode.predict4java.Satellite
-import com.rtbishop.look4sat.data.model.Result
 import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.di.DefaultDispatcher
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -36,13 +35,13 @@ class PassesRepo @Inject constructor(
     private val prefsManager: PrefsManager,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
-    private val _passes = MutableSharedFlow<Result<List<SatPass>>>(replay = 1)
+    private val _passes = MutableSharedFlow<List<SatPass>>(replay = 1)
     private var selectedSatellites = emptyList<Satellite>()
-    val passes: SharedFlow<Result<List<SatPass>>> = _passes
+    val passes: SharedFlow<List<SatPass>> = _passes
 
     suspend fun triggerCalculation(satellites: List<Satellite>, refDate: Date = Date()) {
         if (satellites.isEmpty()) {
-            _passes.emit(Result.Error(Exception()))
+            _passes.emit(emptyList())
         } else {
             val oldCatNums = selectedSatellites.map { it.tle.catnum }
             val newCatNums = satellites.map { it.tle.catnum }
@@ -52,16 +51,13 @@ class PassesRepo @Inject constructor(
 
     suspend fun forceCalculation(satellites: List<Satellite>, refDate: Date = Date()) {
         if (satellites.isEmpty()) {
-            _passes.emit(Result.Error(Exception()))
+            _passes.emit(emptyList())
         } else {
-            _passes.emit(Result.InProgress)
             withContext(defaultDispatcher) {
                 val allPasses = mutableListOf<SatPass>()
                 selectedSatellites = satellites
-                satellites.forEach { satellite ->
-                    allPasses.addAll(getPasses(satellite, refDate))
-                }
-                _passes.emit(Result.Success(filterPasses(allPasses, refDate)))
+                satellites.forEach { satellite -> allPasses.addAll(getPasses(satellite, refDate)) }
+                _passes.emit(filterPasses(allPasses, refDate))
             }
         }
     }

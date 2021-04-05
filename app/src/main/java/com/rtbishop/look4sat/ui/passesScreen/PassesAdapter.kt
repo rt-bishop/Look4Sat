@@ -42,30 +42,13 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
         }
     }
     private val differ = AsyncListDiffer(this, diffCallback)
-    private var currentPasses = emptyList<SatPass>()
 
     interface PassesClickListener {
         fun navigateToPass(satPass: SatPass)
     }
 
     fun submitList(passes: List<SatPass>) {
-        currentPasses = passes
-        tickDiffer(System.currentTimeMillis())
-    }
-
-    fun tickDiffer(timeNow: Long) {
-        val copiedPasses = currentPasses.map { pass -> pass.copy() }
-        copiedPasses.forEach { pass ->
-            if (!pass.isDeepSpace) {
-                val timeStart = pass.aosDate.time
-                if (timeNow > timeStart) {
-                    val deltaNow = timeNow.minus(timeStart).toFloat()
-                    val deltaTotal = pass.losDate.time.minus(timeStart).toFloat()
-                    pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
-                }
-            }
-        }
-        differ.submitList(copiedPasses.filter { pass -> pass.progress < 100 })
+        differ.submitList(passes)
     }
 
     override fun getItemCount() = differ.currentList.size

@@ -39,7 +39,6 @@ import java.util.*
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
     private val viewModel: PassesViewModel by viewModels()
-    private var passes = listOf<SatPass>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,9 +61,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         viewModel.passes.observe(viewLifecycleOwner, { passesResult ->
             handleNewPasses(passesResult, passesAdapter, binding)
         })
-        viewModel.getAppTimer().observe(viewLifecycleOwner, { timeNow ->
-            tickMainTimer(timeNow, passesAdapter, binding)
-        })
     }
 
     private fun handleNewPasses(
@@ -74,16 +70,15 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     ) {
         when (result) {
             is Result.Success -> {
-                passes = result.data
-                passesAdapter.submitList(passes)
+                passesAdapter.submitList(result.data)
                 binding.apply {
                     passesError.visibility = View.INVISIBLE
                     passesProgress.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.VISIBLE
                 }
+                tickMainTimer(result.data, binding)
             }
             is Result.InProgress -> {
-                passes = emptyList()
                 binding.apply {
                     passesTimer.text = 0L.formatForTimer()
                     passesError.visibility = View.INVISIBLE
@@ -92,7 +87,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 }
             }
             is Result.Error -> {
-                passes = emptyList()
                 binding.apply {
                     passesTimer.text = 0L.formatForTimer()
                     passesProgress.visibility = View.INVISIBLE
@@ -103,12 +97,9 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         }
     }
 
-    private fun tickMainTimer(
-        timeNow: Long,
-        passesAdapter: PassesAdapter,
-        binding: FragmentPassesBinding
-    ) {
+    private fun tickMainTimer(passes: List<SatPass>, binding: FragmentPassesBinding) {
         if (passes.isNotEmpty()) {
+            val timeNow = System.currentTimeMillis()
             try {
                 val nextPass = passes.first { it.aosDate.time.minus(timeNow) > 0 }
                 val millisBeforeStart = nextPass.aosDate.time.minus(timeNow)
@@ -118,7 +109,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 val millisBeforeEnd = lastPass.losDate.time.minus(timeNow)
                 binding.passesTimer.text = millisBeforeEnd.formatForTimer()
             }
-            passesAdapter.tickDiffer(timeNow)
         } else {
             binding.passesTimer.text = 0L.formatForTimer()
         }
