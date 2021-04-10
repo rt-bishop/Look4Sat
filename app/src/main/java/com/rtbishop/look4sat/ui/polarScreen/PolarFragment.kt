@@ -108,6 +108,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar) {
         binding.elevation.text = String.format(polarEl, Math.toDegrees(satPos.elevation))
         binding.distance.text = String.format(polarRng, satPos.range)
         binding.altitude.text = String.format(polarAlt, satPos.altitude)
+        binding.satName.text = satPass.name
 
         if (!satPass.isDeepSpace) {
             if (dateNow.before(satPass.aosDate)) {
