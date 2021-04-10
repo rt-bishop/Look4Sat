@@ -80,6 +80,11 @@
     <string name="splash_loc_msg">To get the accurate predictions please set
         the ground station position via the Settings menu</string>
 
+    <string name="tracking_title">Tracking preferences</string>
+    <string name="tracking_rotator_switch">Antenna rotator control</string>
+    <string name="tracking_rotator_address">Rotator IP address</string>
+    <string name="tracking_rotator_port">Rotator port</string>
+
     <string name="info_version">Version: %s</string>
     <string name="info_subtitle">Satellite tracker and pass predictor</string>
     <string name="info_github" translatable="false">GitHub</string>

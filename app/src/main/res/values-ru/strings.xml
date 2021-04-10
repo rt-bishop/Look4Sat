@@ -64,6 +64,11 @@
     <string name="splash_loc_msg">Чтобы корректно рассчитывать орбиты спутников,
         установите позицию наземной станции через меню Настройки</string>
 
+    <string name="tracking_title">Настройки слежения</string>
+    <string name="tracking_rotator_switch">Управление вращателем антенны</string>
+    <string name="tracking_rotator_address">IP адрес вращателя</string>
+    <string name="tracking_rotator_port">Порт вращателя</string>
+
     <string name="info_version">Версия: %s</string>
     <string name="info_subtitle">Трекер спутников для Android</string>
     <string name="info_bmc">Угостить кофе</string>

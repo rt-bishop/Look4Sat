@@ -35,9 +35,32 @@
             app:showSeekBarValue="true" />
     </PreferenceCategory>
     <PreferenceCategory
+        android:title="@string/tracking_title"
+        app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="isRotatorEnabled"
+            android:title="@string/tracking_rotator_switch"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="127.0.0.1"
+            android:dependency="isRotatorEnabled"
+            android:key="rotatorAddress"
+            android:title="@string/tracking_rotator_address"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:defaultValue="4096"
+            android:dependency="isRotatorEnabled"
+            android:key="rotatorPort"
+            android:title="@string/tracking_rotator_port"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:title="@string/pref_map_labels_title"
         app:iconSpaceReserved="false">
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="shouldUseTextLabels"
             android:title="@string/pref_map_labels"
@@ -46,12 +69,12 @@
     <PreferenceCategory
         android:title="@string/pref_other_title"
         app:iconSpaceReserved="false">
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="timeUTC"
             android:title="@string/pref_time_utc_title"
             app:iconSpaceReserved="false" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="compass"
             android:title="@string/pref_compass_title"
