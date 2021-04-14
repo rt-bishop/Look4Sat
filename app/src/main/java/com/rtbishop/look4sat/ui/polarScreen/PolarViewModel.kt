@@ -22,13 +22,13 @@ import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.data.model.SatTrans
 import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
+import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.net.Socket
 import java.util.*
 import javax.inject.Inject
 
@@ -37,7 +37,8 @@ class PolarViewModel @Inject constructor(
     private val orientation: Orientation,
     private val prefsManager: PrefsManager,
     private val passesRepo: PassesRepo,
-    private val satelliteRepo: SatelliteRepo
+    private val satelliteRepo: SatelliteRepo,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(), Orientation.OrientationListener {
 
     private val magDeclination = prefsManager.getMagDeclination()
@@ -51,6 +52,7 @@ class PolarViewModel @Inject constructor(
             val pass = passes.find { it.catNum == catNum && it.aosDate.time == aosTime }
             pass?.let { satPass ->
                 processTransmitters(satPass)
+                initRotatorControl(satPass)
                 emit(satPass)
             }
         }
@@ -66,6 +68,27 @@ class PolarViewModel @Inject constructor(
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
         _azimuth.value = azimuth + magDeclination
+    }
+
+    private fun initRotatorControl(satPass: SatPass) {
+        viewModelScope.launch {
+            val rotatorPrefs = prefsManager.getRotatorServer()
+            if (rotatorPrefs != null) {
+                runCatching {
+                    withContext(ioDispatcher) {
+                        val client = Socket(rotatorPrefs.first, rotatorPrefs.second)
+                        val writer = client.getOutputStream()
+                        while (isActive) {
+                            val satPos = satPass.predictor.getSatPos(Date())
+                            val message = "\\set_pos ${satPos.azimuth} ${satPos.elevation}"
+                            writer?.write(message.toByteArray())
+                            delay(1000)
+                        }
+                        writer.close()
+                    }
+                }.onFailure { Timber.d(it) }
+            }
+        }
     }
 
     private fun processTransmitters(satPass: SatPass) {

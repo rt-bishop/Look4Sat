@@ -47,6 +47,9 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi
         const val keyPositionGPS = "setPositionGPS"
         const val keyPositionQTH = "setPositionQTH"
         const val keyIsFirstLaunch = "shouldShowSplash"
+        const val keyRotator = "isRotatorEnabled"
+        const val keyRotatorAddress = "rotatorAddress"
+        const val keyRotatorPort = "rotatorPort"
     }
     
     fun getHoursAhead(): Int {
@@ -59,10 +62,10 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi
     
     fun getStationPosition(): GroundStationPosition {
         val defaultGSP = "0.0"
-        val lat = preferences.getString(keyLatitude, defaultGSP)!!.toDouble()
-        val lon = preferences.getString(keyLongitude, defaultGSP)!!.toDouble()
-        val alt = preferences.getString(keyAltitude, defaultGSP)!!.toDouble()
-        return GroundStationPosition(lat, lon, alt)
+        val latitude = preferences.getString(keyLatitude, null) ?: defaultGSP
+        val longitude = preferences.getString(keyLongitude, null) ?: defaultGSP
+        val altitude = preferences.getString(keyAltitude, null) ?: defaultGSP
+        return GroundStationPosition(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
     }
 
     fun setStationPosition(latitude: Double, longitude: Double, altitude: Double) {
@@ -140,5 +143,13 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi
             return modesSet.toList().sorted()
         }
         return emptyList()
+    }
+
+    fun getRotatorServer(): Pair<String, Int>? {
+        return if (preferences.getBoolean(keyRotator, false)) {
+            val address = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
+            val port = preferences.getString(keyRotatorPort, null) ?: "4096"
+            Pair(address, port.toInt())
+        } else null
     }
 }
