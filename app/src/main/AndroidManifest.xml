@@ -3,7 +3,6 @@
     package="com.rtbishop.look4sat">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -13,11 +12,9 @@
         android:label="@string/app_name">
         <activity
             android:name=".ui.Look4SatActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

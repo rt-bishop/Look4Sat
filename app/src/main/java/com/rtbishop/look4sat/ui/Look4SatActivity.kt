@@ -17,13 +17,15 @@
  */
 package com.rtbishop.look4sat.ui
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
+import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,16 +36,16 @@ class Look4SatActivity : AppCompatActivity() {
     lateinit var prefsManager: PrefsManager
     
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        ActivityMainBinding.inflate(layoutInflater).apply {
-            setContentView(root)
-            val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
-            navBottom.setupWithNavController(navHost.navController)
-            if (prefsManager.isFirstLaunch()) {
-                prefsManager.setFirstLaunchDone()
-                navHost.navController.navigate(R.id.nav_dialog_splash)
-            }
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
+        binding.navBottom.setupWithNavController(navHost.navController)
+        if (prefsManager.isFirstLaunch()) {
+            prefsManager.setFirstLaunchDone()
+            navHost.navController.navigateSafe(R.id.nav_dialog_splash)
         }
     }
 }
