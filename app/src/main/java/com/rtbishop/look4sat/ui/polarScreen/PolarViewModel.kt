@@ -34,12 +34,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PolarViewModel @Inject constructor(
-    private val orientation: Orientation,
+    private val orientationProvider: OrientationProvider,
     private val prefsManager: PrefsManager,
     private val passesRepo: PassesRepo,
     private val satelliteRepo: SatelliteRepo,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
-) : ViewModel(), Orientation.OrientationListener {
+) : ViewModel(), OrientationProvider.OrientationListener {
 
     private val magDeclination = prefsManager.getMagDeclination()
     private val _transmitters = MutableLiveData<List<SatTrans>>()
@@ -59,11 +59,11 @@ class PolarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (prefsManager.shouldUseCompass()) orientation.startListening(this)
+        if (prefsManager.shouldUseCompass()) orientationProvider.startListening(this)
     }
 
     fun disableSensor() {
-        if (prefsManager.shouldUseCompass()) orientation.stopListening()
+        if (prefsManager.shouldUseCompass()) orientationProvider.stopListening()
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {

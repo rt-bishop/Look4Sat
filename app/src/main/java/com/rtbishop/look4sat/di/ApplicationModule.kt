@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.hardware.SensorManager
 import android.location.LocationManager
-import android.view.WindowManager
 import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
@@ -47,11 +46,6 @@ object ApplicationModule {
     @Provides
     fun provideSensorManager(@ApplicationContext context: Context): SensorManager {
         return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    }
-
-    @Provides
-    fun provideWindowManager(@ApplicationContext context: Context): WindowManager {
-        return context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     }
 
     @Provides

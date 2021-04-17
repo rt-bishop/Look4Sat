@@ -24,7 +24,6 @@ import com.github.amsacode.predict4java.Position
 import com.github.amsacode.predict4java.SatPos
 import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.data.model.SelectedSat
-import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.utility.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,7 +34,6 @@ import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 import timber.log.Timber
-import java.lang.IllegalArgumentException
 import java.util.*
 import javax.inject.Inject
 
@@ -142,7 +140,7 @@ class MapViewModel @Inject constructor(
         }
 
     private fun getSatTrack(satellite: Satellite): Overlay {
-        val positions = satellite.getPredictor(gsp).getPositions(dateNow, 15, 3, 3.2)
+        val positions = satellite.getPredictor(gsp).getPositions(dateNow, 15, 0, 3.2)
         val trackOverlay = FolderOverlay()
         val trackPoints = mutableListOf<GeoPoint>()
         var oldLon = 0.0

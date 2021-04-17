@@ -29,6 +29,7 @@ import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.formatForTimer
+import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -119,7 +120,7 @@ class PolarFragment : Fragment(R.layout.fragment_polar) {
                 binding.polarTimer.text = millisBeforeEnd.formatForTimer()
                 if (dateNow.after(satPass.losDate)) {
                     binding.polarTimer.text = 0L.formatForTimer()
-                    findNavController().popBackStack()
+                    findNavController().navigateSafe(R.id.action_polar_to_passes)
                 }
             }
         } else {

@@ -78,25 +78,23 @@
         android:id="@+id/recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="23dp"
         android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frame" />
+        app:layout_constraintTop_toBottomOf="@+id/sat_name" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/no_trans_msg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="23dp"
         android:gravity="center"
         android:text="@string/trans_no_data"
         android:textSize="15sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frame" />
+        app:layout_constraintTop_toTopOf="@+id/recycler" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/sat_name"
@@ -104,7 +102,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
         android:gravity="center"
-        android:text="Sat Name"
+        android:text="@string/placeholder"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

@@ -33,6 +33,7 @@ import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
+import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,7 +62,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
-            importWeb.setOnClickListener { findNavController().navigate(R.id.nav_dialog_sources) }
+            importWeb.setOnClickListener {
+                findNavController().navigateSafe(R.id.action_entries_to_sources)
+            }
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectMode.setOnClickListener { viewModel.createModesDialog(requireContext()).show() }
             selectAll.setOnClickListener { viewModel.selectCurrentItems() }
