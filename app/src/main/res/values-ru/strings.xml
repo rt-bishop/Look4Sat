@@ -24,6 +24,7 @@
     <string name="passes_error">Нет предстоящих пролётов</string>
 
     <string name="pass_aosAz">НПС - %.1f°</string>
+    <string name="pass_tcaAz">Азимут: %.1f°</string>
     <string name="pass_maxEl">МаксЭлев: %.1f°</string>
     <string name="pass_losAz">%.1f° - КПС</string>
 

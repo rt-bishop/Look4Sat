@@ -59,9 +59,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_maxEl"
-            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_aosAz"
-            app:layout_constraintEnd_toEndOf="@+id/pass_leo_losAz"
-            app:layout_constraintStart_toStartOf="@+id/pass_leo_aosAz" />
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_start"
+            app:layout_constraintEnd_toEndOf="@+id/pass_leo_end"
+            app:layout_constraintStart_toStartOf="@+id/pass_leo_start" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_leo_losAz"
@@ -85,13 +85,13 @@
             app:layout_constraintTop_toBottomOf="@+id/pass_leo_aosAz" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/pass_leo_alt"
+            android:id="@+id/pass_leo_tcaAz"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pat_altitude"
-            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_start"
-            app:layout_constraintEnd_toEndOf="@+id/pass_leo_end"
-            app:layout_constraintStart_toStartOf="@+id/pass_leo_start" />
+            android:text="@string/pass_tcaAz"
+            app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_aosAz"
+            app:layout_constraintEnd_toEndOf="@+id/pass_leo_losAz"
+            app:layout_constraintStart_toStartOf="@+id/pass_leo_aosAz" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pass_leo_end"
@@ -112,7 +112,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/pass_leo_bg"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_end"
             app:layout_constraintStart_toStartOf="@+id/pass_leo_start"
-            app:layout_constraintTop_toBottomOf="@+id/pass_leo_alt" />
+            app:layout_constraintTop_toBottomOf="@+id/pass_leo_maxEl" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

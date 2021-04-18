@@ -25,7 +25,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.utility.PrefsManager
-import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -45,7 +44,7 @@ class Look4SatActivity : AppCompatActivity() {
         binding.navBottom.setupWithNavController(navHost.navController)
         if (prefsManager.isFirstLaunch()) {
             prefsManager.setFirstLaunchDone()
-            navHost.navController.navigateSafe(R.id.nav_dialog_splash)
+            navHost.navController.navigate(R.id.nav_dialog_splash)
         }
     }
 }

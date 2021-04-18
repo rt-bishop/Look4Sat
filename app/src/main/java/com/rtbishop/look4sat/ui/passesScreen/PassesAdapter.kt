@@ -78,7 +78,7 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
         RecyclerView.ViewHolder(binding.root) {
 
         private val satIdFormat = itemView.context.getString(R.string.pass_satId)
-        private val altFormat = itemView.context.getString(R.string.pat_altitude)
+        private val tcaAzFormat = itemView.context.getString(R.string.pass_tcaAz)
         private val aosAzFormat = itemView.context.getString(R.string.pass_aosAz)
         private val maxElFormat = itemView.context.getString(R.string.pass_maxEl)
         private val losAzFormat = itemView.context.getString(R.string.pass_losAz)
@@ -100,7 +100,7 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
                 passLeoMaxEl.text = String.format(maxElFormat, satPass.maxElevation)
                 passLeoLosAz.text = String.format(losAzFormat, satPass.losAzimuth)
                 passLeoStart.text = startFormat.format(satPass.aosDate)
-                passLeoAlt.text = String.format(altFormat, satPass.altitude)
+                passLeoTcaAz.text = String.format(tcaAzFormat, satPass.tcaAzimuth)
                 passLeoEnd.text = endFormat.format(satPass.losDate)
                 passLeoProgress.progress = satPass.progress
             }

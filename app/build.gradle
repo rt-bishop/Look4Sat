@@ -13,8 +13,8 @@ android {
         applicationId "com.rtbishop.look4sat"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 232
-        versionName "2.3.2"
+        versionCode 240
+        versionName "2.4.0"
         kapt {
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas")
