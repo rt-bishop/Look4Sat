@@ -24,6 +24,7 @@ import com.rtbishop.look4sat.data.repository.PassesRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -76,12 +77,15 @@ class PolarViewModel @Inject constructor(
             if (rotatorPrefs != null) {
                 runCatching {
                     withContext(ioDispatcher) {
-                        val client = Socket(rotatorPrefs.first, rotatorPrefs.second)
-                        val writer = client.getOutputStream()
+                        val socket = Socket(rotatorPrefs.first, rotatorPrefs.second)
+                        val writer = socket.getOutputStream().bufferedWriter()
                         while (isActive) {
                             val satPos = satPass.predictor.getSatPos(Date())
-                            val message = "\\set_pos ${satPos.azimuth} ${satPos.elevation}"
-                            writer?.write(message.toByteArray())
+                            val azimuth = Math.toDegrees(satPos.azimuth).round(1)
+                            val elevation = Math.toDegrees(satPos.elevation).round(1)
+                            writer.write("\\set_pos $azimuth $elevation")
+                            writer.newLine()
+                            writer.flush()
                             delay(1000)
                         }
                         writer.close()
