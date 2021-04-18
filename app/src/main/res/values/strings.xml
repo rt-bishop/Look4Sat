@@ -83,7 +83,9 @@
     <string name="tracking_title">Tracking preferences</string>
     <string name="tracking_rotator_switch">Antenna rotator control</string>
     <string name="tracking_rotator_address">Rotator IP address</string>
+    <string name="tracking_rotator_address_invalid">Please enter a valid IP address</string>
     <string name="tracking_rotator_port">Rotator port</string>
+    <string name="tracking_rotator_port_invalid">Please enter a port between 1024 to 65535</string>
 
     <string name="info_version">Version: %s</string>
     <string name="info_subtitle">Satellite tracker and pass predictor</string>

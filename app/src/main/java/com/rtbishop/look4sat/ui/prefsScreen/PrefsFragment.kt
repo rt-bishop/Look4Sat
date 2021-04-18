@@ -21,9 +21,12 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
+import android.text.InputType
+import android.util.Patterns
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
@@ -70,6 +73,30 @@ class PrefsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>(PrefsManager.keyPositionQTH)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 setPositionFromQth(newValue.toString())
+            }
+        }
+
+        findPreference<EditTextPreference>(PrefsManager.keyRotatorAddress)?.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                if (Patterns.IP_ADDRESS.matcher(newValue.toString()).matches()) {
+                    return@setOnPreferenceChangeListener true
+                } else {
+                    showSnack(getString(R.string.tracking_rotator_address_invalid))
+                    return@setOnPreferenceChangeListener false
+                }
+            }
+        }
+
+        findPreference<EditTextPreference>(PrefsManager.keyRotatorPort)?.apply {
+            setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
+            setOnPreferenceChangeListener { _, newValue ->
+                val portValue = newValue.toString()
+                if (portValue.isNotEmpty() && portValue.toInt() in 1024..65535) {
+                    return@setOnPreferenceChangeListener true
+                } else {
+                    showSnack(getString(R.string.tracking_rotator_port_invalid))
+                    return@setOnPreferenceChangeListener false
+                }
             }
         }
     }

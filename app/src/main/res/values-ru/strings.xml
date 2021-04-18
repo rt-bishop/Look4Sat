@@ -65,9 +65,11 @@
         установите позицию наземной станции через меню Настройки</string>
 
     <string name="tracking_title">Настройки слежения</string>
-    <string name="tracking_rotator_switch">Управление вращателем антенны</string>
-    <string name="tracking_rotator_address">IP адрес вращателя</string>
-    <string name="tracking_rotator_port">Порт вращателя</string>
+    <string name="tracking_rotator_switch">Управление поворотным устройством</string>
+    <string name="tracking_rotator_address">IP адрес поворотного устройства</string>
+    <string name="tracking_rotator_address_invalid">Введён неправильный IP адрес</string>
+    <string name="tracking_rotator_port">Порт поворотного устройства</string>
+    <string name="tracking_rotator_port_invalid">Введите порт в диапазоне от 1024 до 65535</string>
 
     <string name="info_version">Версия: %s</string>
     <string name="info_subtitle">Трекер спутников для Android</string>
