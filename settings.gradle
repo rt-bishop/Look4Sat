@@ -1,2 +1,3 @@
+include ':core'
 include ':app'
 rootProject.name='Look4Sat'
