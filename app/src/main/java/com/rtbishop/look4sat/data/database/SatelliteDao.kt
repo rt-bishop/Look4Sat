@@ -40,8 +40,32 @@ interface SatelliteDao {
     @Query("SELECT catNum FROM entries WHERE isSelected = 1")
     suspend fun getSelectedCatNums(): List<Int>
 
+    @Transaction
+    suspend fun updateEntries(entries: List<SatEntry>) {
+        val selectedCatNums = getSelectedCatNums()
+        insertEntries(entries)
+        restoreEntriesSelection(selectedCatNums, true)
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
+
+    @Transaction
+    suspend fun restoreEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        clearEntriesSelection()
+        catNums.forEach { catNum -> updateEntrySelection(catNum, isSelected) }
+    }
+
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearEntriesSelection()
+
+    @Query("UPDATE entries SET isSelected = :isSelected WHERE catNum = :catNum")
+    suspend fun updateEntrySelection(catNum: Int, isSelected: Boolean)
+
+    @Transaction
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        catNums.forEach { catNum -> updateEntrySelection(catNum, isSelected) }
+    }
 
     @Transaction
     suspend fun updateTransmitters(transmitters: List<SatTrans>) {
@@ -54,21 +78,4 @@ interface SatelliteDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransmitters(transmitters: List<SatTrans>)
-
-    @Transaction
-    suspend fun restoreEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        clearEntriesSelection()
-        catNums.forEach { catNum -> updateEntrySelection(catNum, isSelected) }
-    }
-
-    @Transaction
-    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        catNums.forEach { catNum -> updateEntrySelection(catNum, isSelected) }
-    }
-
-    @Query("UPDATE entries SET isSelected = 0")
-    suspend fun clearEntriesSelection()
-
-    @Query("UPDATE entries SET isSelected = :isSelected WHERE catNum = :catNum")
-    suspend fun updateEntrySelection(catNum: Int, isSelected: Boolean)
 }

@@ -62,7 +62,7 @@ class SatelliteRepo @Inject constructor(
         runCatching {
             resolver.openInputStream(uri)?.use { stream ->
                 val entries = importEntriesFromStreams(listOf(stream))
-                insertEntriesAndRestoreSelection(entries)
+                satelliteDao.updateEntries(entries)
             }
         }.onFailure { throw it }
     }
@@ -81,7 +81,7 @@ class SatelliteRepo @Inject constructor(
     private suspend fun importEntriesFromSources(sources: List<TleSource>) {
         val streams = getStreamsForSources(sources)
         val entries = importEntriesFromStreams(streams)
-        insertEntriesAndRestoreSelection(entries)
+        satelliteDao.updateEntries(entries)
     }
 
     private suspend fun importTransmitters() {
@@ -123,11 +123,5 @@ class SatelliteRepo @Inject constructor(
             }
         }
         return importedEntries
-    }
-
-    private suspend fun insertEntriesAndRestoreSelection(entries: List<SatEntry>) {
-        val selectedCatNums = satelliteDao.getSelectedCatNums()
-        satelliteDao.insertEntries(entries)
-        satelliteDao.restoreEntriesSelection(selectedCatNums, true)
     }
 }
