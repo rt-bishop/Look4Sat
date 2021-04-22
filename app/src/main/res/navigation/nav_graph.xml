@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_entries"
-        android:name="com.rtbishop.look4sat.ui.entriesScreen.EntriesFragment"
+        android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
         tools:layout="@layout/fragment_entries">
         <action
             android:id="@+id/action_entries_to_passes"
@@ -27,7 +27,7 @@
 
     <fragment
         android:id="@+id/nav_passes"
-        android:name="com.rtbishop.look4sat.ui.passesScreen.PassesFragment"
+        android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
         tools:layout="@layout/fragment_passes">
         <action
             android:id="@+id/action_passes_to_polar"
@@ -40,7 +40,7 @@
 
     <fragment
         android:id="@+id/nav_polar"
-        android:name="com.rtbishop.look4sat.ui.polarScreen.PolarFragment"
+        android:name="com.rtbishop.look4sat.presentation.polarScreen.PolarFragment"
         tools:layout="@layout/fragment_polar">
         <action
             android:id="@+id/action_polar_to_passes"
@@ -55,24 +55,24 @@
 
     <fragment
         android:id="@+id/nav_map"
-        android:name="com.rtbishop.look4sat.ui.mapScreen.MapFragment"
+        android:name="com.rtbishop.look4sat.presentation.mapScreen.MapFragment"
         tools:layout="@layout/fragment_map" />
 
     <fragment
         android:id="@+id/nav_prefs"
-        android:name="com.rtbishop.look4sat.ui.prefsScreen.PrefsFragment" />
+        android:name="com.rtbishop.look4sat.presentation.prefsScreen.PrefsFragment" />
 
     <fragment
         android:id="@+id/nav_info"
-        android:name="com.rtbishop.look4sat.ui.infoScreen.InfoFragment"
+        android:name="com.rtbishop.look4sat.presentation.infoScreen.InfoFragment"
         tools:layout="@layout/fragment_info" />
     <dialog
         android:id="@+id/nav_dialog_sources"
-        android:name="com.rtbishop.look4sat.ui.sourcesDialog.SourcesDialog"
+        android:name="com.rtbishop.look4sat.presentation.sourcesDialog.SourcesDialog"
         tools:layout="@layout/dialog_sources" />
     <dialog
         android:id="@+id/nav_dialog_splash"
-        android:name="com.rtbishop.look4sat.ui.splashDialog.SplashDialog"
+        android:name="com.rtbishop.look4sat.presentation.splashDialog.SplashDialog"
         tools:layout="@layout/dialog_splash" />
 
 </navigation>

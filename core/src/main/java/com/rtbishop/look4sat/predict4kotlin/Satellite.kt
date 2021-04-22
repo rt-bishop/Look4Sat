@@ -349,9 +349,12 @@ abstract class Satellite(val tle: TLE) {
 
     companion object {
 
-        fun createSat(tle: TLE): Satellite {
-            return if (tle.isDeepspace) DeepSpaceSat(tle)
-            else NearEarthSat(tle)
+        fun createSat(tle: TLE?): Satellite? {
+            return when {
+                tle == null -> null
+                tle.isDeepspace -> DeepSpaceSat(tle)
+                else -> NearEarthSat(tle)
+            }
         }
 
         fun importTLE(tleStream: InputStream): List<TLE> {

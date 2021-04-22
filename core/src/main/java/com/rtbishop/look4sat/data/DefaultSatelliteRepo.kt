@@ -1,9 +1,9 @@
 package com.rtbishop.look4sat.data
 
+import com.rtbishop.look4sat.domain.SatelliteRepo
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.SatelliteRepo
-import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.model.SatTrans
 import com.rtbishop.look4sat.predict4kotlin.Satellite
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
@@ -23,7 +23,7 @@ class DefaultSatelliteRepo(
         return localSource.getSatItems()
     }
 
-    override fun getTransmittersForSat(catNum: Int): Flow<List<Transmitter>> {
+    override fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
         return localSource.getTransmittersForSat(catNum)
     }
 
@@ -44,12 +44,13 @@ class DefaultSatelliteRepo(
                 val entries = mutableListOf<SatEntry>()
                 val streams = mutableListOf<InputStream>()
                 sources.forEach { source ->
-                    val stream = remoteSource.fetchFileStream(source)
-                    if (source.contains(".zip", true)) {
-                        val zipStream = ZipInputStream(stream).apply { nextEntry }
-                        streams.add(zipStream)
-                    } else {
-                        streams.add(stream)
+                    remoteSource.fetchFileStream(source)?.let { stream ->
+                        if (source.contains(".zip", true)) {
+                            val zipStream = ZipInputStream(stream).apply { nextEntry }
+                            streams.add(zipStream)
+                        } else {
+                            streams.add(stream)
+                        }
                     }
                 }
                 streams.forEach { stream ->
