@@ -91,7 +91,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pos)
-                position = GeoPoint(osmPos.lat, osmPos.lon)
+                position = GeoPoint(osmPos.latitude, osmPos.longitude)
                 mapView.overlays[0] = this
                 mapView.invalidate()
             }
@@ -105,8 +105,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             altitude.text = String.format(getString(R.string.pat_altitude), sat.altitude)
             distance.text = String.format(getString(R.string.pat_distance), sat.range)
             velocity.text = String.format(getString(R.string.pat_osm_vel), sat.velocity)
-            mapLat.text = String.format(getString(R.string.pat_osm_lat), sat.osmPos.lat)
-            mapLon.text = String.format(getString(R.string.pat_osm_lon), sat.osmPos.lon)
+            mapLat.text = String.format(getString(R.string.pat_osm_lat), sat.osmPos.latitude)
+            mapLon.text = String.format(getString(R.string.pat_osm_lon), sat.osmPos.longitude)
             mapView.overlays[1] = sat.groundTrack
             mapView.overlays[2] = sat.footprint
             mapView.invalidate()
@@ -127,7 +127,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                         setTextIcon(it.key.tle.name)
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         try {
-                            position = GeoPoint(it.value.lat, it.value.lon)
+                            position = GeoPoint(it.value.latitude, it.value.longitude)
                         } catch (e: IllegalArgumentException) {
                             Timber.d("Position: $position")
                         }
@@ -143,7 +143,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_sat)
                         try {
-                            position = GeoPoint(it.value.lat, it.value.lon)
+                            position = GeoPoint(it.value.latitude, it.value.longitude)
                         } catch (e: IllegalArgumentException) {
                             Timber.d("Position: $position")
                         }

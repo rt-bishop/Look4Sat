@@ -42,21 +42,21 @@ abstract class Satellite(val tle: TLE) {
     var s4 = 0.0
     val xke = 7.43669161E-2
 
-    fun willBeSeen(pos: GroundPos): Boolean {
+    fun willBeSeen(pos: StationPosition): Boolean {
         return if (tle.meanmo < 1e-8) false else {
             var lin = tle.incl
             if (lin >= 90.0) lin = 180.0 - lin
             val sma = 331.25 * exp(ln(1440.0 / tle.meanmo) * (2.0 / 3.0))
             val apogee = sma * (1.0 + tle.eccn) - earthRadius
-            acos(earthRadius / (apogee + earthRadius)) + lin * deg2Rad > abs(pos.lat * deg2Rad)
+            acos(earthRadius / (apogee + earthRadius)) + lin * deg2Rad > abs(pos.latitude * deg2Rad)
         }
     }
 
-    fun getPredictor(pos: GroundPos): PassPredictor {
+    fun getPredictor(pos: StationPosition): PassPredictor {
         return PassPredictor(this, pos)
     }
 
-    fun getPosition(pos: GroundPos, time: Date): SatPos {
+    fun getPosition(pos: StationPosition, time: Date): SatPos {
         val satPos = SatPos()
         // Date/time at which the position and velocity were calculated
         val julUTC = calcCurrentDaynum(time) + 2444238.5
@@ -121,7 +121,7 @@ abstract class Satellite(val tle: TLE) {
         julianUTC: Double,
         positionVector: Vector4,
         velocityVector: Vector4,
-        gsPos: GroundPos,
+        gsPos: StationPosition,
         squintVector: Vector4,
         satPos: SatPos
     ) {
@@ -144,8 +144,8 @@ abstract class Satellite(val tle: TLE) {
             velocityVector.z - obsVel.z
         )
         magnitude(range)
-        val sinLat = sin(deg2Rad * gsPos.lat)
-        val cosLat = cos(deg2Rad * gsPos.lat)
+        val sinLat = sin(deg2Rad * gsPos.latitude)
+        val cosLat = cos(deg2Rad * gsPos.latitude)
         val sinTheta = sin(gsPosTheta.get())
         val cosTheta = cos(gsPosTheta.get())
         val topS = sinLat * cosTheta * range.x + sinLat * sinTheta * range.y - cosLat * range.z
@@ -163,20 +163,20 @@ abstract class Satellite(val tle: TLE) {
     // Returns the ECI position and velocity of the observer
     private fun calculateUserPosVel(
         time: Double,
-        gsPos: GroundPos,
+        gsPos: StationPosition,
         gsPosTheta: AtomicReference<Double>,
         obsPos: Vector4,
         obsVel: Vector4
     ) {
         val mFactor = 7.292115E-5
-        gsPosTheta.set(mod2PI(thetaGJD(time) + deg2Rad * gsPos.lon))
+        gsPosTheta.set(mod2PI(thetaGJD(time) + deg2Rad * gsPos.longitude))
         val c =
-            invert(sqrt(1.0 + flatFactor * (flatFactor - 2) * sqr(sin(deg2Rad * gsPos.lat))))
+            invert(sqrt(1.0 + flatFactor * (flatFactor - 2) * sqr(sin(deg2Rad * gsPos.latitude))))
         val sq = sqr(1.0 - flatFactor) * c
-        val achcp = (earthRadius * c + gsPos.alt / 1000.0) * cos(deg2Rad * gsPos.lat)
+        val achcp = (earthRadius * c + gsPos.altitude / 1000.0) * cos(deg2Rad * gsPos.latitude)
         obsPos.setXYZ(
             achcp * cos(gsPosTheta.get()), achcp * sin(gsPosTheta.get()),
-            (earthRadius * sq + gsPos.alt / 1000.0) * sin(deg2Rad * gsPos.lat)
+            (earthRadius * sq + gsPos.altitude / 1000.0) * sin(deg2Rad * gsPos.latitude)
         )
         obsVel.setXYZ(-mFactor * obsPos.y, mFactor * obsPos.x, 0.0)
         magnitude(obsPos)
@@ -357,9 +357,9 @@ abstract class Satellite(val tle: TLE) {
             }
         }
 
-        fun importTLE(tleStream: InputStream): List<TLE> {
-            val importedTles = mutableListOf<TLE>()
+        fun importElements(tleStream: InputStream): List<TLE> {
             val currentTLE = arrayOf(String(), String(), String())
+            val importedTles = mutableListOf<TLE>()
             var line = 0
             tleStream.bufferedReader().forEachLine {
                 if (line != 2) {
@@ -367,26 +367,31 @@ abstract class Satellite(val tle: TLE) {
                     line++
                 } else {
                     currentTLE[line] = it
-                    importedTles.add(parseTLE(currentTLE))
+                    parseElement(currentTLE)?.let { tle -> importedTles.add(tle) }
                     line = 0
                 }
             }
             return importedTles
         }
 
-        private fun parseTLE(tle: Array<String>): TLE {
-            val name: String = tle[0].trim()
-            val epoch: Double = tle[1].substring(18, 32).toDouble()
-            val meanmo: Double = tle[2].substring(52, 63).toDouble()
-            val eccn: Double = 1.0e-07 * tle[2].substring(26, 33).toDouble()
-            val incl: Double = tle[2].substring(8, 16).toDouble()
-            val raan: Double = tle[2].substring(17, 25).toDouble()
-            val argper: Double = tle[2].substring(34, 42).toDouble()
-            val meanan: Double = tle[2].substring(43, 51).toDouble()
-            val catnum: Int = tle[1].substring(2, 7).trim().toInt()
-            val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() /
-                    10.0.pow(tle[1].substring(60, 61).toDouble())
-            return TLE(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
+        private fun parseElement(tle: Array<String>): TLE? {
+            if (tle.size != 3) return null
+            try {
+                val name: String = tle[0].trim()
+                val epoch: Double = tle[1].substring(18, 32).toDouble()
+                val meanmo: Double = tle[2].substring(52, 63).toDouble()
+                val eccn: Double = 1.0e-07 * tle[2].substring(26, 33).toDouble()
+                val incl: Double = tle[2].substring(8, 16).toDouble()
+                val raan: Double = tle[2].substring(17, 25).toDouble()
+                val argper: Double = tle[2].substring(34, 42).toDouble()
+                val meanan: Double = tle[2].substring(43, 51).toDouble()
+                val catnum: Int = tle[1].substring(2, 7).trim().toInt()
+                val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() /
+                        10.0.pow(tle[1].substring(60, 61).toDouble())
+                return TLE(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
+            } catch (exception: Exception) {
+                return null
+            }
         }
     }
 }

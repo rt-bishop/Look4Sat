@@ -32,14 +32,14 @@ class DefaultSatelliteRepo(
     }
 
     override suspend fun importDataFromFile(stream: InputStream) = withContext(ioDispatcher) {
-        val entries = Satellite.importTLE(stream).map { tle -> SatEntry(tle) }
-        localSource.updateEntries(entries)
+        val importedEntries = Satellite.importElements(stream).map { tle -> SatEntry(tle) }
+        localSource.updateEntries(importedEntries)
     }
 
     override suspend fun importDataFromWeb(sources: List<String>) {
         coroutineScope {
             launch(ioDispatcher) {
-                val entries = mutableListOf<SatEntry>()
+                val importedEntries = mutableListOf<SatEntry>()
                 val streams = mutableListOf<InputStream>()
                 sources.forEach { source ->
                     remoteSource.fetchFileStream(source)?.let { stream ->
@@ -52,10 +52,10 @@ class DefaultSatelliteRepo(
                     }
                 }
                 streams.forEach { stream ->
-                    val importedEntries = Satellite.importTLE(stream).map { tle -> SatEntry(tle) }
-                    entries.addAll(importedEntries)
+                    val entries = Satellite.importElements(stream).map { tle -> SatEntry(tle) }
+                    importedEntries.addAll(entries)
                 }
-                localSource.updateEntries(entries)
+                localSource.updateEntries(importedEntries)
             }
             launch(ioDispatcher) {
                 val transmitters = remoteSource.fetchTransmitters().filter { it.isAlive }

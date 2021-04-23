@@ -32,7 +32,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.utility.PrefsManager
-import com.rtbishop.look4sat.utility.QthConverter
+import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -102,8 +102,8 @@ class PrefsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setPositionFromQth(qthString: String): Boolean {
-        qthConverter.qthToLocation(qthString)?.let { gsp ->
-            prefsManager.setStationPosition(gsp.lat, gsp.lon, gsp.alt)
+        qthConverter.qthToPosition(qthString)?.let { gsp ->
+            prefsManager.setStationPosition(gsp.latitude, gsp.longitude, 0.0)
             showSnack(getString(R.string.pref_pos_success))
             return true
         }

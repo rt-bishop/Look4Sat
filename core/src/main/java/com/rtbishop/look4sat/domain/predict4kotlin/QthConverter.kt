@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.utility
+package com.rtbishop.look4sat.domain.predict4kotlin
 
-import com.rtbishop.look4sat.domain.predict4kotlin.GroundPos
-import javax.inject.Inject
+import kotlin.math.round
 
-class QthConverter @Inject constructor() {
-    
-    fun qthToLocation(qthString: String): GroundPos? {
+class QthConverter {
+
+    fun qthToPosition(qthString: String): Position? {
         val trimmedQth = qthString.take(6)
         if (!isValidQTH(trimmedQth)) return null
         val lonFirst = (trimmedQth[0].toUpperCase().toInt() - 65) * 20
@@ -31,13 +30,13 @@ class QthConverter @Inject constructor() {
         val latSecond = trimmedQth[3].toString().toInt()
         val lonThird = (((trimmedQth[4].toLowerCase().toInt() - 97) / 12.0) + (1.0 / 24.0)) - 180
         val latThird = (((trimmedQth[5].toLowerCase().toInt() - 97) / 24.0) + (1.0 / 48.0)) - 90
-        val longitude = (lonFirst + lonSecond + lonThird).round(4)
-        val latitude = (latFirst + latSecond + latThird).round(4)
-        return GroundPos(latitude, longitude, 0.0)
+        val longitude = (lonFirst + lonSecond + lonThird).roundToDecimals(4)
+        val latitude = (latFirst + latSecond + latThird).roundToDecimals(4)
+        return Position(latitude, longitude)
     }
-    
-    fun locationToQTH(lat: Double, lon: Double): String? {
-        if (!isValidLocation(lat, lon)) return null
+
+    fun positionToQTH(lat: Double, lon: Double): String? {
+        if (!isValidPosition(lat, lon)) return null
         val tempLon = if (lon > 180.0) lon - 360 else lon
         val upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
         val lower = "abcdefghijklmnopqrstuvwx"
@@ -51,13 +50,19 @@ class QthConverter @Inject constructor() {
         val latThird = lower[((latitude % 1) * 24).toInt()]
         return "$lonFirst$latFirst$lonSecond$latSecond$lonThird$latThird"
     }
-    
+
     private fun isValidQTH(qthString: String): Boolean {
         val qthPattern = "[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex()
         return qthString.matches(qthPattern)
     }
-    
-    private fun isValidLocation(lat: Double, lon: Double): Boolean {
+
+    private fun isValidPosition(lat: Double, lon: Double): Boolean {
         return (lat > -90.0 && lat < 90.0) && (lon > -180.0 && lon < 360.0)
+    }
+
+    private fun Double.roundToDecimals(decimals: Int): Double {
+        var multiplier = 1.0
+        repeat(decimals) { multiplier *= 10 }
+        return round(this * multiplier) / multiplier
     }
 }

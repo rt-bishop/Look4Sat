@@ -23,6 +23,8 @@ import com.rtbishop.look4sat.data.DefaultSatelliteRepo
 import com.rtbishop.look4sat.data.LocalDataSource
 import com.rtbishop.look4sat.data.RemoteDataSource
 import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.framework.api.NetworkDataSource
+import com.rtbishop.look4sat.framework.api.SatelliteService
 import com.rtbishop.look4sat.framework.db.RoomConverters
 import com.rtbishop.look4sat.framework.db.RoomDataSource
 import com.rtbishop.look4sat.framework.db.SatelliteDao
@@ -34,15 +36,17 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object LocalSourceModule {
+object DataSourceModule {
 
     @Provides
-    fun provideLocalDataSource(satelliteDao: SatelliteDao): LocalDataSource {
-        return RoomDataSource(satelliteDao)
+    fun provideMoshi(): Moshi {
+        return Moshi.Builder().build()
     }
 
     @Provides
@@ -56,8 +60,8 @@ object LocalSourceModule {
     }
 
     @Provides
-    fun provideMoshi(): Moshi {
-        return Moshi.Builder().build()
+    fun provideLocalDataSource(satelliteDao: SatelliteDao): LocalDataSource {
+        return RoomDataSource(satelliteDao)
     }
 
     @Provides
@@ -69,5 +73,19 @@ object LocalSourceModule {
     fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
         RoomConverters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb").build()
+    }
+
+    @Provides
+    fun provideRemoteDataSource(satelliteService: SatelliteService): RemoteDataSource {
+        return NetworkDataSource(satelliteService)
+    }
+
+    @Provides
+    fun provideSatDataService(): SatelliteService {
+        return Retrofit.Builder()
+            .baseUrl("https://db.satnogs.org/api/")
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+            .create(SatelliteService::class.java)
     }
 }

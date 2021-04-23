@@ -23,6 +23,7 @@ import androidx.lifecycle.*
 import com.rtbishop.look4sat.framework.model.SelectedSat
 import com.rtbishop.look4sat.interactors.GetSelectedSatellites
 import com.rtbishop.look4sat.domain.predict4kotlin.Position
+import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPos
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.utility.*
@@ -71,7 +72,7 @@ class MapViewModel @Inject constructor(
     fun getSatMarkers(): LiveData<Map<Satellite, Position>> = _satMarkers
 
     val stationPosition = liveData {
-        emit(Position(gsp.lat.toOsmLat(), gsp.lon.toOsmLon()))
+        emit(Position(gsp.latitude.toOsmLat(), gsp.longitude.toOsmLon()))
     }
 
     init {
@@ -116,7 +117,7 @@ class MapViewModel @Inject constructor(
                 Math.toDegrees(satPos.latitude).toOsmLat(),
                 Math.toDegrees(satPos.longitude).toOsmLon()
             )
-            val qthLoc = qthConverter.locationToQTH(osmPos.lat, osmPos.lon) ?: "-- --"
+            val qthLoc = qthConverter.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
             val velocity = satPos.altitude.getOrbitalVelocity()
             val footprint = getSatFootprint(satPos)
             val track = getSatTrack(satellite)
@@ -149,7 +150,7 @@ class MapViewModel @Inject constructor(
                 Math.toDegrees(it.latitude).toOsmLat(),
                 Math.toDegrees(it.longitude).toOsmLon()
             )
-            if (oldLon < -170.0 && osmPos.lon > 170.0 || oldLon > 170.0 && osmPos.lon < -170.0) {
+            if (oldLon < -170.0 && osmPos.longitude > 170.0 || oldLon > 170.0 && osmPos.longitude < -170.0) {
                 val currentPoints = mutableListOf<GeoPoint>()
                 currentPoints.addAll(trackPoints)
                 Polyline().apply {
@@ -159,8 +160,8 @@ class MapViewModel @Inject constructor(
                 }
                 trackPoints.clear()
             }
-            oldLon = osmPos.lon
-            trackPoints.add(GeoPoint(osmPos.lat, osmPos.lon))
+            oldLon = osmPos.longitude
+            trackPoints.add(GeoPoint(osmPos.latitude, osmPos.longitude))
         }
         Polyline().apply {
             outlinePaint.set(trackPaint)
@@ -173,8 +174,8 @@ class MapViewModel @Inject constructor(
     private fun getSatFootprint(satPos: SatPos): Overlay {
         val points = mutableListOf<GeoPoint>()
         satPos.getRangeCircle().forEach {
-            val osmPos = Position(it.lat.toOsmLat(), it.lon.toOsmLon())
-            points.add(GeoPoint(osmPos.lat, osmPos.lon))
+            val osmPos = Position(it.latitude.toOsmLat(), it.longitude.toOsmLon())
+            points.add(GeoPoint(osmPos.latitude, osmPos.longitude))
         }
         return Polygon().apply {
             fillPaint.set(footprintPaint)

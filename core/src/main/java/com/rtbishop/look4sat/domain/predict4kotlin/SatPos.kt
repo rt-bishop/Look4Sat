@@ -22,39 +22,28 @@ import kotlin.math.*
 
 class SatPos {
 
-    private val earthRadiusKm = 6.378137E3
-    private val r0 = 6378.16
+    private val earthRadiusKm = 6378.16
 
     // Radians
     var azimuth = 0.0
     var elevation = 0.0
     var latitude = 0.0
     var longitude = 0.0
-
-    var time = Date()
+    var altitude = 0.0
     var range = 0.0
     var rangeRate = 0.0
-    var phase = 0.0
-    var altitude = 0.0
     var theta = 0.0
-    var eclipseDepth = 0.0
-    var eclipsed = false
-    var aboveHorizon = false
-
-    fun getDate(): Date {
-        return Date(time.time)
-    }
+    var time = Date()
 
     fun getRangeCircleRadiusKm(): Double {
-        return 0.5 * (12756.33 * acos(earthRadiusKm / (earthRadiusKm + altitude)))
+        return earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + altitude))
     }
 
     fun getRangeCircle(incrementDegrees: Double = 1.0): List<Position> {
         val positions = mutableListOf<Position>()
-        val radiusKm = this.getRangeCircleRadiusKm()
         val lat = this.latitude
         val lon = this.longitude
-        val beta = radiusKm / r0
+        val beta = getRangeCircleRadiusKm() / earthRadiusKm
         var tempAzimuth = 0
         while (tempAzimuth < 360) {
             val azimuth = tempAzimuth / 360.0 * 2.0 * Math.PI
@@ -76,22 +65,8 @@ class SatPos {
             }
             while (rangelon < 0.0) rangelon += Math.PI * 2.0
             while (rangelon > Math.PI * 2.0) rangelon -= Math.PI * 2.0
-            rangelat = (rangelat / (2.0 * Math.PI)) * 360.0
-            rangelon = (rangelon / (2.0 * Math.PI)) * 360.0
-
-            // if (rangelong < 180.0) {
-            // rangelong = -rangelong;
-            // }
-            // else if (rangelong > 180.0) {
-            // rangelong = 360.0 - rangelong;
-            // }
-            //
-            // if (rangelat < 90.0) {
-            // rangelat = -rangelat;
-            // }
-            // else if (rangelat > 90.0) {
-            // rangelat = 180.0 - rangelat;
-            // }
+            rangelat = Math.toDegrees(rangelat)
+            rangelon = Math.toDegrees(rangelon)
             positions.add(Position(rangelat, rangelon))
             tempAzimuth += incrementDegrees.toInt()
         }

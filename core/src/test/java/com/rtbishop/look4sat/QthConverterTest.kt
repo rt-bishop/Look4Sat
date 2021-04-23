@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat
 
-import com.rtbishop.look4sat.utility.QthConverter
+import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import org.junit.Test
 
 class QthConverterTest {
@@ -26,35 +26,35 @@ class QthConverterTest {
     
     @Test
     fun `Given valid QTH returns correct location`() {
-        var result = converter.qthToLocation("io91VL39FX")
+        var result = converter.qthToPosition("io91VL39FX")
         assert(result?.latitude == 51.4792 && result.longitude == -0.2083)
-        result = converter.qthToLocation("JN58TD")
+        result = converter.qthToPosition("JN58TD")
         assert(result?.latitude == 48.1458 && result.longitude == 11.6250)
-        result = converter.qthToLocation("gf15vc")
+        result = converter.qthToPosition("gf15vc")
         assert(result?.latitude == -34.8958 && result.longitude == -56.2083)
-        result = converter.qthToLocation("fm18LW")
+        result = converter.qthToPosition("fm18LW")
         assert(result?.latitude == 38.9375 && result.longitude == -77.0417)
     }
     
     @Test
     fun `Given invalid QTH returns null`() {
-        var result = converter.qthToLocation("ZZ00zz")
+        var result = converter.qthToPosition("ZZ00zz")
         assert(result == null)
-        result = converter.qthToLocation("JN58tz")
+        result = converter.qthToPosition("JN58tz")
         assert(result == null)
     }
     
     @Test
     fun `Given valid location returns correct QTH`() {
-        assert(converter.locationToQTH(51.4878, -0.2146) == "IO91vl")
-        assert(converter.locationToQTH(48.1466, 11.6083) == "JN58td")
-        assert(converter.locationToQTH(-34.91, -56.2116) == "GF15vc")
-        assert(converter.locationToQTH(38.92, -77.065) == "FM18lw")
+        assert(converter.positionToQTH(51.4878, -0.2146) == "IO91vl")
+        assert(converter.positionToQTH(48.1466, 11.6083) == "JN58td")
+        assert(converter.positionToQTH(-34.91, -56.2116) == "GF15vc")
+        assert(converter.positionToQTH(38.92, -77.065) == "FM18lw")
     }
-    
+
     @Test
     fun `Given invalid location returns null`() {
-        assert(converter.locationToQTH(91.0542, -170.1142) == null)
-        assert(converter.locationToQTH(89.0542, -240.1142) == null)
+        assert(converter.positionToQTH(91.0542, -170.1142) == null)
+        assert(converter.positionToQTH(89.0542, -240.1142) == null)
     }
 }

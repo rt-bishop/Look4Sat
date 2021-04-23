@@ -23,6 +23,7 @@ import android.content.SharedPreferences
 import android.hardware.SensorManager
 import android.location.LocationManager
 import androidx.preference.PreferenceManager
+import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,6 +33,11 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object ApplicationModule {
+
+    @Provides
+    fun provideQthConverter(): QthConverter {
+        return QthConverter()
+    }
 
     @Provides
     fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {

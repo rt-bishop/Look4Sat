@@ -21,7 +21,7 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import androidx.core.content.edit
 import com.rtbishop.look4sat.framework.model.TleSource
-import com.rtbishop.look4sat.domain.predict4kotlin.GroundPos
+import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import javax.inject.Inject
@@ -60,12 +60,12 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi
         return preferences.getInt(keyMinElevation, 16).toDouble()
     }
     
-    fun getStationPosition(): GroundPos {
+    fun getStationPosition(): StationPosition {
         val defaultGSP = "0.0"
         val latitude = preferences.getString(keyLatitude, null) ?: defaultGSP
         val longitude = preferences.getString(keyLongitude, null) ?: defaultGSP
         val altitude = preferences.getString(keyAltitude, null) ?: defaultGSP
-        return GroundPos(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
+        return StationPosition(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
     }
 
     fun setStationPosition(latitude: Double, longitude: Double, altitude: Double) {
@@ -78,9 +78,9 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi
 
     fun getMagDeclination(): Float {
         val stationPosition = getStationPosition()
-        val lat = stationPosition.lat.toFloat()
-        val lon = stationPosition.lon.toFloat()
-        val alt = stationPosition.alt.toFloat()
+        val lat = stationPosition.latitude.toFloat()
+        val lon = stationPosition.longitude.toFloat()
+        val alt = stationPosition.altitude.toFloat()
         return GeomagneticField(lat, lon, alt, System.currentTimeMillis()).declination
     }
 

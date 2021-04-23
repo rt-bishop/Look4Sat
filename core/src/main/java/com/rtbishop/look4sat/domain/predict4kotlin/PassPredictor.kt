@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.domain.predict4kotlin
 
 import java.util.*
 
-class PassPredictor(private val satellite: Satellite, private val qth: GroundPos) {
+class PassPredictor(private val satellite: Satellite, private val gsp: StationPosition) {
 
     private val oneQuarterOrbitMin = (24.0 * 60.0 / satellite.tle.meanmo / 4.0).toInt()
     private val speedOfLight = 2.99792458E8
@@ -35,7 +35,7 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundPos
     }
 
     fun getSatPos(date: Date): SatPos {
-        return satellite.getPosition(qth, date)
+        return satellite.getPosition(gsp, date)
     }
 
     fun getPositions(refDate: Date, stepSec: Int, minBefore: Int, orbits: Double): List<SatPos> {
@@ -58,7 +58,7 @@ class PassPredictor(private val satellite: Satellite, private val qth: GroundPos
         var shouldWindBack = windBack
         var lastAosDate: Date
         var count = 0
-        if (satellite.willBeSeen(qth)) {
+        if (satellite.willBeSeen(gsp)) {
             if (satellite.tle.isDeepspace) {
                 passes.add(nextDeepSpacePass(refDate))
             } else {
