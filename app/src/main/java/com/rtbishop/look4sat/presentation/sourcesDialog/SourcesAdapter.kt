@@ -21,8 +21,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.data.model.TleSource
 import com.rtbishop.look4sat.databinding.ItemTleSourceBinding
+import com.rtbishop.look4sat.framework.model.TleSource
 
 class SourcesAdapter(private val sources: MutableList<TleSource> = mutableListOf()) :
     RecyclerView.Adapter<SourcesAdapter.TleSourceHolder>() {

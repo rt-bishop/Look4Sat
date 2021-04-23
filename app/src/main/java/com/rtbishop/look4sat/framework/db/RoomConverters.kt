@@ -18,8 +18,8 @@
 package com.rtbishop.look4sat.framework.db
 
 import androidx.room.TypeConverter
-import com.rtbishop.look4sat.predict4kotlin.Satellite
-import com.rtbishop.look4sat.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.TLE
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 

@@ -4,7 +4,7 @@ import com.rtbishop.look4sat.data.LocalDataSource
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatTrans
-import com.rtbishop.look4sat.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.utility.DataMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

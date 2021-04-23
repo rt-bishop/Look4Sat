@@ -15,20 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data.model
+package com.rtbishop.look4sat.domain.predict4kotlin
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.squareup.moshi.Json
+import java.util.*
 
-@Entity(tableName = "transmitters")
-data class SatTrans(
-    @PrimaryKey @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "description") val info: String,
-    @field:Json(name = "alive") val isAlive: Boolean,
-    @field:Json(name = "downlink_low") var downlink: Long?,
-    @field:Json(name = "uplink_low") var uplink: Long?,
-    @field:Json(name = "mode") val mode: String?,
-    @field:Json(name = "invert") val isInverted: Boolean,
-    @field:Json(name = "norad_cat_id") val catNum: Int
-)
+data class SatPass(
+    val catNum: Int,
+    val name: String,
+    val isDeepSpace: Boolean,
+    private val aosTime: Long,
+    val aosAzimuth: Double,
+    private val losTime: Long,
+    val losAzimuth: Double,
+    private val tcaTime: Long,
+    val tcaAzimuth: Double,
+    val altitude: Double,
+    val maxElevation: Double,
+    val predictor: PassPredictor,
+    var progress: Int = 0
+) {
+    val aosDate: Date
+        get() = Date(aosTime)
+
+    val losDate: Date
+        get() = Date(losTime)
+
+    val tcaDate: Date
+        get() = Date(tcaTime)
+}

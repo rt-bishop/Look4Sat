@@ -4,7 +4,7 @@ import com.rtbishop.look4sat.domain.SatelliteRepo
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatTrans
-import com.rtbishop.look4sat.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -32,15 +32,13 @@ class DefaultSatelliteRepo(
     }
 
     override suspend fun importDataFromFile(stream: InputStream) = withContext(ioDispatcher) {
-        val entries = mutableListOf<SatEntry>()
-        val tleList = Satellite.importTLE(stream)
-        tleList.forEach { tle -> entries.add(SatEntry(tle)) }
+        val entries = Satellite.importTLE(stream).map { tle -> SatEntry(tle) }
         localSource.updateEntries(entries)
     }
 
     override suspend fun importDataFromWeb(sources: List<String>) {
         coroutineScope {
-            launch {
+            launch(ioDispatcher) {
                 val entries = mutableListOf<SatEntry>()
                 val streams = mutableListOf<InputStream>()
                 sources.forEach { source ->
@@ -59,7 +57,7 @@ class DefaultSatelliteRepo(
                 }
                 localSource.updateEntries(entries)
             }
-            launch {
+            launch(ioDispatcher) {
                 val transmitters = remoteSource.fetchTransmitters().filter { it.isAlive }
                 localSource.updateTransmitters(transmitters)
             }

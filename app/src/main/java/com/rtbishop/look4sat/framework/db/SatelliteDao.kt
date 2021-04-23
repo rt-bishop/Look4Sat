@@ -21,7 +21,7 @@ import androidx.room.*
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatItem
 import com.rtbishop.look4sat.framework.model.SatTrans
-import com.rtbishop.look4sat.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import kotlinx.coroutines.flow.Flow
 
 @Dao

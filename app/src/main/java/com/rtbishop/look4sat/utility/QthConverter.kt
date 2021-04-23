@@ -17,12 +17,12 @@
  */
 package com.rtbishop.look4sat.utility
 
-import com.github.amsacode.predict4java.GroundStationPosition
+import com.rtbishop.look4sat.domain.predict4kotlin.GroundPos
 import javax.inject.Inject
 
 class QthConverter @Inject constructor() {
     
-    fun qthToLocation(qthString: String): GroundStationPosition? {
+    fun qthToLocation(qthString: String): GroundPos? {
         val trimmedQth = qthString.take(6)
         if (!isValidQTH(trimmedQth)) return null
         val lonFirst = (trimmedQth[0].toUpperCase().toInt() - 65) * 20
@@ -33,7 +33,7 @@ class QthConverter @Inject constructor() {
         val latThird = (((trimmedQth[5].toLowerCase().toInt() - 97) / 24.0) + (1.0 / 48.0)) - 90
         val longitude = (lonFirst + lonSecond + lonThird).round(4)
         val latitude = (latFirst + latSecond + latThird).round(4)
-        return GroundStationPosition(latitude, longitude, 0.0)
+        return GroundPos(latitude, longitude, 0.0)
     }
     
     fun locationToQTH(lat: Double, lon: Double): String? {

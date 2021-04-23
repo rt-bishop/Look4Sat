@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.framework.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.rtbishop.look4sat.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.predict4kotlin.TLE
 
 @Entity(tableName = "entries")
 data class SatEntry(

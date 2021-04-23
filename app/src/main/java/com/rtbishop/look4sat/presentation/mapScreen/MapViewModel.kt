@@ -20,11 +20,11 @@ package com.rtbishop.look4sat.presentation.mapScreen
 import android.graphics.Color
 import android.graphics.Paint
 import androidx.lifecycle.*
-import com.github.amsacode.predict4java.Position
-import com.github.amsacode.predict4java.SatPos
-import com.github.amsacode.predict4java.Satellite
-import com.rtbishop.look4sat.data.model.SelectedSat
-import com.rtbishop.look4sat.data.repository.SatelliteRepo
+import com.rtbishop.look4sat.framework.model.SelectedSat
+import com.rtbishop.look4sat.interactors.GetSelectedSatellites
+import com.rtbishop.look4sat.domain.predict4kotlin.Position
+import com.rtbishop.look4sat.domain.predict4kotlin.SatPos
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.utility.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -39,9 +39,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    prefsManager: PrefsManager,
-    private val satelliteRepo: SatelliteRepo,
-    private val qthConverter: QthConverter
+    private val getSelectedSatellites: GetSelectedSatellites,
+    private val qthConverter: QthConverter,
+    prefsManager: PrefsManager
 ) : ViewModel() {
 
     private val dateNow = Date()
@@ -71,12 +71,12 @@ class MapViewModel @Inject constructor(
     fun getSatMarkers(): LiveData<Map<Satellite, Position>> = _satMarkers
 
     val stationPosition = liveData {
-        emit(Position(gsp.latitude.toOsmLat(), gsp.longitude.toOsmLon()))
+        emit(Position(gsp.lat.toOsmLat(), gsp.lon.toOsmLon()))
     }
 
     init {
         viewModelScope.launch {
-            val satellites = satelliteRepo.getSelectedSatellites()
+            val satellites = getSelectedSatellites()
             if (satellites.isNotEmpty()) {
                 filteredSats = satellites
                 selectedSat = satellites.first()
@@ -171,18 +171,18 @@ class MapViewModel @Inject constructor(
     }
 
     private fun getSatFootprint(satPos: SatPos): Overlay {
-        val rangePoints = mutableListOf<GeoPoint>()
-        satPos.rangeCircle.forEach {
+        val points = mutableListOf<GeoPoint>()
+        satPos.getRangeCircle().forEach {
             val osmPos = Position(it.lat.toOsmLat(), it.lon.toOsmLon())
-            rangePoints.add(GeoPoint(osmPos.lat, osmPos.lon))
+            points.add(GeoPoint(osmPos.lat, osmPos.lon))
         }
         return Polygon().apply {
             fillPaint.set(footprintPaint)
             outlinePaint.set(footprintPaint)
             try {
-                points = rangePoints
+                this.points = points
             } catch (e: IllegalArgumentException) {
-                Timber.d("RangeCircle: ${satPos.rangeCircle}, RangePoints: $rangePoints")
+                Timber.d("RangeCircle: ${satPos.getRangeCircle()}, RangePoints: $points")
             }
         }
     }

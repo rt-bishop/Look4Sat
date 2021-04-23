@@ -17,8 +17,9 @@
  */
 package com.rtbishop.look4sat.di
 
-import com.rtbishop.look4sat.data.api.SatelliteService
-import com.squareup.moshi.Moshi
+import com.rtbishop.look4sat.data.RemoteDataSource
+import com.rtbishop.look4sat.framework.api.NetworkDataSource
+import com.rtbishop.look4sat.framework.api.SatelliteService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,13 +29,13 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
-    
+object RemoteSourceModule {
+
     @Provides
-    fun provideMoshi(): Moshi {
-        return Moshi.Builder().build()
+    fun provideRemoteDataSource(satelliteService: SatelliteService): RemoteDataSource {
+        return NetworkDataSource(satelliteService)
     }
-    
+
     @Provides
     fun provideSatDataService(): SatelliteService {
         return Retrofit.Builder()

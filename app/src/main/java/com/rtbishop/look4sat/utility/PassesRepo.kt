@@ -17,9 +17,9 @@
  */
 package com.rtbishop.look4sat.utility
 
-import com.github.amsacode.predict4java.Satellite
-import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.di.DefaultDispatcher
+import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

@@ -27,10 +27,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.model.Result
-import com.rtbishop.look4sat.data.model.SatItem
-import com.rtbishop.look4sat.data.model.TleSource
+import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.framework.model.TleSource
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
 import com.rtbishop.look4sat.utility.navigateSafe

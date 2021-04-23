@@ -23,9 +23,9 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.model.SatPass
 import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
 import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
+import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import java.text.SimpleDateFormat
 import java.util.*
 

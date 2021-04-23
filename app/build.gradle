@@ -32,12 +32,6 @@ android {
             }
         }
     }
-
-    configurations {
-        all {
-            exclude module: "commons-logging"
-        }
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -68,7 +62,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
 
-    implementation "com.github.davidmoten:predict4java:$predict4java_version"
     implementation "org.osmdroid:osmdroid-android:$osmdroid_version"
     implementation "com.jakewharton.timber:timber:$timber_version"
 

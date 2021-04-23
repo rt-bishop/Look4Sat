@@ -23,8 +23,8 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.model.SatTrans
 import com.rtbishop.look4sat.databinding.ItemTransBinding
+import com.rtbishop.look4sat.domain.model.SatTrans
 import java.util.*
 
 class TransAdapter : RecyclerView.Adapter<TransAdapter.TransHolder>() {

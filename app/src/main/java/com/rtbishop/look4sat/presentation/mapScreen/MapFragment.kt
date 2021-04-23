@@ -25,11 +25,11 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.github.amsacode.predict4java.Position
-import com.github.amsacode.predict4java.Satellite
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.model.SelectedSat
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
+import com.rtbishop.look4sat.framework.model.SelectedSat
+import com.rtbishop.look4sat.domain.predict4kotlin.Position
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration

@@ -21,10 +21,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.data.model.Result
-import com.rtbishop.look4sat.data.model.SatPass
+import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.utility.PassesRepo
-import com.rtbishop.look4sat.data.repository.SatelliteRepo
+import com.rtbishop.look4sat.interactors.GetSelectedSatellites
+import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -33,9 +33,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val prefsManager: PrefsManager,
-    private val satelliteRepo: SatelliteRepo,
-    private val passesRepo: PassesRepo
+    private val getSelectedSatellites: GetSelectedSatellites,
+    private val passesRepo: PassesRepo,
+    private val prefsManager: PrefsManager
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<Result<List<SatPass>>>(Result.InProgress)
@@ -45,7 +45,7 @@ class PassesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
-            passesRepo.triggerCalculation(satelliteRepo.getSelectedSatellites())
+            passesRepo.triggerCalculation(getSelectedSatellites())
         }
         viewModelScope.launch {
             passesRepo.passes.collect { passes ->
@@ -59,7 +59,7 @@ class PassesViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
             passesProcessing?.cancelAndJoin()
-            passesRepo.forceCalculation(satelliteRepo.getSelectedSatellites())
+            passesRepo.forceCalculation(getSelectedSatellites())
         }
     }
 

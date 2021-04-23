@@ -26,8 +26,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.findNavController
-import com.github.amsacode.predict4java.GroundStationPosition
-import com.github.amsacode.predict4java.Satellite
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
@@ -62,10 +60,6 @@ fun Double.getOrbitalVelocity(): Double {
     val earthM = 5.98 * 10.0.pow(24)
     val radius = 6.37 * 10.0.pow(6) + this * 10.0.pow(3)
     return sqrt(earthG * earthM / radius) / 1000
-}
-
-fun Satellite.getPredictor(stationPosition: GroundStationPosition): PassPredictor {
-    return PassPredictor(this, stationPosition)
 }
 
 fun NavController.navigateSafe(

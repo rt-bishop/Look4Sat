@@ -2,7 +2,7 @@ package com.rtbishop.look4sat.domain
 
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatTrans
-import com.rtbishop.look4sat.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import kotlinx.coroutines.flow.Flow
 import java.io.InputStream
 

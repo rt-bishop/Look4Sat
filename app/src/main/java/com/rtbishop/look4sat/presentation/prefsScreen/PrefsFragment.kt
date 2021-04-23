@@ -103,7 +103,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
 
     private fun setPositionFromQth(qthString: String): Boolean {
         qthConverter.qthToLocation(qthString)?.let { gsp ->
-            prefsManager.setStationPosition(gsp.latitude, gsp.longitude, gsp.heightAMSL)
+            prefsManager.setStationPosition(gsp.lat, gsp.lon, gsp.alt)
             showSnack(getString(R.string.pref_pos_success))
             return true
         }

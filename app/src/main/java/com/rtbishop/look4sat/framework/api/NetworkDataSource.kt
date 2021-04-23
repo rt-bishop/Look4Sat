@@ -4,14 +4,14 @@ import com.rtbishop.look4sat.data.RemoteDataSource
 import com.rtbishop.look4sat.domain.model.SatTrans
 import java.io.InputStream
 
-class RetrofitDataSource(private val satelliteService: SatelliteService) : RemoteDataSource {
+class NetworkDataSource(private val api: SatelliteService) : RemoteDataSource {
 
     override suspend fun fetchFileStream(url: String): InputStream? {
-        return satelliteService.fetchFileByUrl(url).body()?.byteStream()
+        return api.fetchFileByUrl(url).body()?.byteStream()
     }
 
     override suspend fun fetchTransmitters(): List<SatTrans> {
-        return satelliteService.fetchTransmitters().map { trans ->
+        return api.fetchTransmitters().map { trans ->
             SatTrans(
                 trans.uuid, trans.info, trans.isAlive, trans.downlink,
                 trans.uplink, trans.mode, trans.isInverted, trans.catNum

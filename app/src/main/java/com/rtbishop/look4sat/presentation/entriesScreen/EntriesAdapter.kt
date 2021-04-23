@@ -22,8 +22,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.data.model.SatItem
 import com.rtbishop.look4sat.databinding.SatItemBinding
+import com.rtbishop.look4sat.domain.model.SatItem
 
 class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
 

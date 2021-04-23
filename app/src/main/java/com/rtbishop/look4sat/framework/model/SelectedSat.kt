@@ -17,8 +17,8 @@
  */
 package com.rtbishop.look4sat.framework.model
 
-import com.github.amsacode.predict4java.Position
-import com.github.amsacode.predict4java.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.Position
+import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import org.osmdroid.views.overlay.Overlay
 
 data class SelectedSat(
