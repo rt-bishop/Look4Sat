@@ -18,10 +18,7 @@
 package com.rtbishop.look4sat.presentation.polarScreen
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
@@ -66,6 +63,20 @@ class PolarView(context: Context) : View(context) {
         color = ContextCompat.getColor(context, R.color.themeLight)
         style = Paint.Style.FILL
     }
+    private val satBmp = ContextCompat.getDrawable(context, R.drawable.ic_sat_polar)?.let { sat ->
+        Bitmap.createBitmap(sat.intrinsicWidth, sat.intrinsicHeight, Bitmap.Config.ARGB_8888).also {
+            val canvas = Canvas(it)
+            sat.setBounds(0, 0, canvas.width, canvas.height)
+            sat.draw(canvas)
+            return@let it
+        }
+    }
+    private val orientPaint = Paint().apply {
+        isAntiAlias = true
+        color = Color.RED
+        style = Paint.Style.STROKE
+        strokeWidth = scale * 2f
+    }
 
     fun setPass(satPass: SatPass) {
         this.satPass = satPass
@@ -86,6 +97,7 @@ class PolarView(context: Context) : View(context) {
         drawRadarText(canvas)
         if (!satPass.isDeepSpace) canvas.drawPath(satTrack, trackPaint)
         drawSatellite(canvas, satPass)
+        drawOrientation(canvas, azimuth, pitch)
     }
 
     private fun createPassTrajectory(satPass: SatPass) {
@@ -121,11 +133,22 @@ class PolarView(context: Context) : View(context) {
 
     private fun drawSatellite(canvas: Canvas, satPass: SatPass) {
         val satPos = satPass.predictor.getSatPos(Date())
-        if (satPos.elevation > 0) {
+        if (satPos.elevation > 0 && satBmp != null) {
             val satX = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
             val satY = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            canvas.drawCircle(satX, -satY, txtSize / 2.4f, satPaint)
+            canvas.drawBitmap(satBmp, satX - satBmp.width / 2, -satY - satBmp.height / 2, satPaint)
         }
+    }
+
+    private fun drawOrientation(canvas: Canvas, azimuth: Float, pitch: Float) {
+        val azimuthRad = Math.toRadians(azimuth.toDouble())
+        val tmpElevation = Math.toRadians(pitch.toDouble())
+        val elevationRad = if (tmpElevation > 0.0) 0.0 else tmpElevation
+        val orientX = sph2CartX(azimuthRad, -elevationRad, radius.toDouble())
+        val orientY = sph2CartY(azimuthRad, -elevationRad, radius.toDouble())
+        canvas.drawLine(orientX - txtSize, -orientY, orientX + txtSize, -orientY, orientPaint)
+        canvas.drawLine(orientX, -orientY - txtSize, orientX, -orientY + txtSize, orientPaint)
+        canvas.drawCircle(orientX, -orientY, txtSize / 2, orientPaint)
     }
 
     private fun sph2CartX(azimuth: Double, elevation: Double, r: Double): Float {
