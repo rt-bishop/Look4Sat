@@ -18,12 +18,12 @@
 package com.rtbishop.look4sat.presentation.polarScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.utility.PassesRepo
 import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.domain.model.SatTrans
-import com.rtbishop.look4sat.interactors.GetTransmittersForSat
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import com.rtbishop.look4sat.interactors.GetTransmittersForSat
 import com.rtbishop.look4sat.utility.OrientationProvider
+import com.rtbishop.look4sat.utility.PassesRepo
 import com.rtbishop.look4sat.utility.PrefsManager
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,11 +43,10 @@ class PolarViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
-    private val magDeclination = prefsManager.getMagDeclination()
     private val _transmitters = MutableLiveData<List<SatTrans>>()
-    private val _azimuth = MutableLiveData<Float>()
+    private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
     val transmitters: LiveData<List<SatTrans>> = _transmitters
-    val azimuth: LiveData<Float> = _azimuth
+    val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
         passesRepo.passes.collect { passes ->
@@ -69,7 +68,7 @@ class PolarViewModel @Inject constructor(
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
-        _azimuth.value = azimuth + magDeclination
+        _orientation.value = Triple(azimuth + prefsManager.getMagDeclination(), pitch, roll)
     }
 
     private fun initRotatorControl(satPass: SatPass) {

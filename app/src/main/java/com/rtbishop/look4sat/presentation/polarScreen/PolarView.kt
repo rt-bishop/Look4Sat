@@ -31,15 +31,18 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class PolarView(context: Context) : View(context) {
-    
+
     private lateinit var satPass: SatPass
     private val polarWidth = resources.displayMetrics.widthPixels
     private val polarCenter = polarWidth / 2f
     private val scale = resources.displayMetrics.density
     private val radius = polarWidth * 0.48f
     private val txtSize = scale * 16f
-    private val path: Path = Path()
+    private val satTrack: Path = Path()
     private val piDiv2 = Math.PI / 2.0
+    private var azimuth: Float = 0f
+    private var pitch: Float = 0f
+    private var roll: Float = 0f
 
     private val radarPaint = Paint().apply {
         isAntiAlias = true
@@ -63,58 +66,65 @@ class PolarView(context: Context) : View(context) {
         color = ContextCompat.getColor(context, R.color.themeLight)
         style = Paint.Style.FILL
     }
-    
+
     fun setPass(satPass: SatPass) {
         this.satPass = satPass
+        createPassTrajectory(satPass)
     }
-    
+
+    fun setOrientation(azimuth: Float, pitch: Float, roll: Float) {
+        this.azimuth = azimuth
+        this.pitch = pitch
+        this.roll = roll
+        this.rotation = -azimuth
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         canvas.translate(polarCenter, polarCenter)
         drawRadarView(canvas)
         drawRadarText(canvas)
-        if (!satPass.isDeepSpace) drawPassTrajectory(canvas, satPass)
+        if (!satPass.isDeepSpace) canvas.drawPath(satTrack, trackPaint)
         drawSatellite(canvas, satPass)
     }
-    
-    private fun drawRadarView(cvs: Canvas) {
-        cvs.drawLine(-radius, 0f, radius, 0f, radarPaint)
-        cvs.drawLine(0f, -radius, 0f, radius, radarPaint)
-        cvs.drawCircle(0f, 0f, radius, radarPaint)
-        cvs.drawCircle(0f, 0f, (radius / 3) * 2, radarPaint)
-        cvs.drawCircle(0f, 0f, radius / 3, radarPaint)
-    }
 
-    private fun drawRadarText(cvs: Canvas) {
-        cvs.drawText("N", scale, -radius + txtSize - scale * 2, txtPaint)
-        cvs.drawText("30°", scale, -((radius / 3) * 2) - scale * 2, txtPaint)
-        cvs.drawText("60°", scale, -(radius / 3) - scale * 2, txtPaint)
-        cvs.drawText("90°", scale, -scale * 2, txtPaint)
-    }
-
-    private fun drawPassTrajectory(cvs: Canvas, satPass: SatPass) {
+    private fun createPassTrajectory(satPass: SatPass) {
         val startTime = satPass.aosDate
         val endTime = satPass.losDate
         while (startTime.before(endTime)) {
             val satPos = satPass.predictor.getSatPos(startTime)
-            val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-            val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val passX = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val passY = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
             if (startTime.compareTo(satPass.aosDate) == 0) {
-                path.moveTo(x, -y)
+                satTrack.moveTo(passX, -passY)
             } else {
-                path.lineTo(x, -y)
+                satTrack.lineTo(passX, -passY)
             }
             startTime.time += 15000
         }
-        cvs.drawPath(path, trackPaint)
     }
 
-    private fun drawSatellite(cvs: Canvas, satPass: SatPass) {
-        val date = Date(System.currentTimeMillis())
-        val satPos = satPass.predictor.getSatPos(date)
+    private fun drawRadarView(canvas: Canvas) {
+        canvas.drawLine(-radius, 0f, radius, 0f, radarPaint)
+        canvas.drawLine(0f, -radius, 0f, radius, radarPaint)
+        canvas.drawCircle(0f, 0f, radius, radarPaint)
+        canvas.drawCircle(0f, 0f, (radius / 3) * 2, radarPaint)
+        canvas.drawCircle(0f, 0f, radius / 3, radarPaint)
+    }
+
+    private fun drawRadarText(canvas: Canvas) {
+        canvas.drawText("N", scale, -radius + txtSize - scale * 2, txtPaint)
+        canvas.drawText("30°", scale, -((radius / 3) * 2) - scale * 2, txtPaint)
+        canvas.drawText("60°", scale, -(radius / 3) - scale * 2, txtPaint)
+        canvas.drawText("90°", scale, -scale * 2, txtPaint)
+    }
+
+    private fun drawSatellite(canvas: Canvas, satPass: SatPass) {
+        val satPos = satPass.predictor.getSatPos(Date())
         if (satPos.elevation > 0) {
-            val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-            val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            cvs.drawCircle(x, -y, txtSize / 2.4f, satPaint)
+            val satX = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val satY = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
+            canvas.drawCircle(satX, -satY, txtSize / 2.4f, satPaint)
         }
     }
 

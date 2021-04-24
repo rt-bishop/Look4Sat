@@ -73,8 +73,8 @@ class PolarFragment : Fragment(R.layout.fragment_polar) {
             binding.frame.addView(polarView)
             observeTransmitters(pass, transAdapter, binding)
         }
-        viewModel.azimuth.observe(viewLifecycleOwner, { trueNorthAzimuth ->
-            polarView?.rotation = -trueNorthAzimuth
+        viewModel.orientation.observe(viewLifecycleOwner, { orientation ->
+            polarView?.setOrientation(orientation.first, orientation.second, orientation.third)
         })
     }
 
@@ -93,7 +93,6 @@ class PolarFragment : Fragment(R.layout.fragment_polar) {
                 binding.noTransMsg.visibility = View.VISIBLE
             }
             setPassText(satPass, binding)
-            polarView?.invalidate()
         })
     }
 
