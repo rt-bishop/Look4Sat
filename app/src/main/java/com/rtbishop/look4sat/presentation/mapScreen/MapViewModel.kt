@@ -17,15 +17,16 @@
  */
 package com.rtbishop.look4sat.presentation.mapScreen
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.Paint
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.framework.model.SelectedSat
-import com.rtbishop.look4sat.interactors.GetSelectedSatellites
 import com.rtbishop.look4sat.domain.predict4kotlin.Position
 import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPos
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
+import com.rtbishop.look4sat.framework.model.SelectedSat
+import com.rtbishop.look4sat.interactors.GetSelectedSatellites
 import com.rtbishop.look4sat.utility.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -41,8 +42,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getSelectedSatellites: GetSelectedSatellites,
-    private val qthConverter: QthConverter,
-    prefsManager: PrefsManager
+    private val prefsManager: PrefsManager,
+    private val qthConverter: QthConverter
 ) : ViewModel() {
 
     private val dateNow = Date()
@@ -90,6 +91,14 @@ class MapViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun getPreferences(): SharedPreferences {
+        return prefsManager.preferences
+    }
+
+    fun shouldUseTextLabels(): Boolean {
+        return prefsManager.shouldUseTextLabels()
     }
 
     fun scrollSelection(decrement: Boolean) {

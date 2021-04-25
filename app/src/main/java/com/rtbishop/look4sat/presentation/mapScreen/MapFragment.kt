@@ -27,40 +27,33 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
-import com.rtbishop.look4sat.framework.model.SelectedSat
 import com.rtbishop.look4sat.domain.predict4kotlin.Position
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.framework.model.SelectedSat
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.ITileSource
-import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
-import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.*
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map) {
 
-    @Inject
-    lateinit var prefsManager: PrefsManager
-    private lateinit var binding: FragmentMapBinding
     private val mapViewModel: MapViewModel by viewModels()
     private val minLat = MapView.getTileSystem().minLatitude
     private val maxLat = MapView.getTileSystem().maxLatitude
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getInstance().load(requireContext(), prefsManager.preferences)
-        binding = FragmentMapBinding.bind(view).apply {
+        Configuration.getInstance().load(requireContext(), mapViewModel.getPreferences())
+        val binding = FragmentMapBinding.bind(view).apply {
             mapView.apply {
                 setMultiTouchControls(true)
-                setTileSource(getTileSource())
+                setTileSource(TileSourceFactory.WIKIMEDIA)
                 val minZoom = getMinZoom(resources.displayMetrics.heightPixels)
                 minZoomLevel = minZoom
                 maxZoomLevel = 6.0
@@ -76,16 +69,16 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
         binding.fabPrev.setOnClickListener { mapViewModel.scrollSelection(true) }
         binding.fabNext.setOnClickListener { mapViewModel.scrollSelection(false) }
-        setupObservers()
+        setupObservers(binding)
     }
 
-    private fun setupObservers() {
-        mapViewModel.stationPosition.observe(viewLifecycleOwner, { setupPosOverlay(it) })
-        mapViewModel.getSelectedSat().observe(viewLifecycleOwner, { setSelectedSatDetails(it) })
-        mapViewModel.getSatMarkers().observe(viewLifecycleOwner, { setMarkers(it) })
+    private fun setupObservers(binding: FragmentMapBinding) {
+        mapViewModel.stationPosition.observe(viewLifecycleOwner, { setupPosOverlay(it, binding) })
+        mapViewModel.getSelectedSat().observe(viewLifecycleOwner, { setSatDetails(it, binding) })
+        mapViewModel.getSatMarkers().observe(viewLifecycleOwner, { setMarkers(it, binding) })
     }
 
-    private fun setupPosOverlay(osmPos: Position) {
+    private fun setupPosOverlay(osmPos: Position, binding: FragmentMapBinding) {
         binding.apply {
             Marker(mapView).apply {
                 setInfoWindow(null)
@@ -98,7 +91,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setSelectedSatDetails(sat: SelectedSat) {
+    private fun setSatDetails(sat: SelectedSat, binding: FragmentMapBinding) {
         binding.apply {
             idName.text = String.format(getString(R.string.pat_osm_idName), sat.catNum, sat.name)
             qthLocator.text = String.format(getString(R.string.map_qth), sat.qthLoc)
@@ -113,11 +106,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setMarkers(map: Map<Satellite, Position>) {
+    private fun setMarkers(map: Map<Satellite, Position>, binding: FragmentMapBinding) {
         binding.apply {
             val markers = FolderOverlay()
             map.entries.forEach {
-                if (prefsManager.shouldUseTextLabels()) {
+                if (mapViewModel.shouldUseTextLabels()) {
                     Marker(mapView).apply {
                         setInfoWindow(null)
                         textLabelFontSize = 24
@@ -161,10 +154,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun getColorFilter(): ColorMatrixColorFilter {
-        val targetColor = Color.RED
-        val newR = Color.red(targetColor) / 255f
-        val newG = Color.green(targetColor) / 255f
-        val newB = Color.blue(targetColor) / 255f
+        val grayScaleMatrix = ColorMatrix().apply { setSaturation(0f) }
         val negativeMatrix = ColorMatrix(
             floatArrayOf(
                 -1f, 0f, 0f, 0f, 255f,
@@ -173,31 +163,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 0f, 0f, 0f, 1f, 0f
             )
         )
-        val tintedMatrix = ColorMatrix(
-            floatArrayOf(
-                newR, newG, newB, 0f, 0f,
-                newR, newG, newB, 0f, 0f,
-                newR, newG, newB, 0f, 0f,
-                0f, 0f, 0f, 0f, 255f
-            )
-        )
-        tintedMatrix.preConcat(negativeMatrix)
-        return ColorMatrixColorFilter(tintedMatrix)
+        negativeMatrix.preConcat(grayScaleMatrix)
+        return ColorMatrixColorFilter(negativeMatrix)
     }
 
     private fun getMinZoom(screenHeight: Int): Double {
-        val minZoom = MapView.getTileSystem().getLatitudeZoom(maxLat, minLat, screenHeight)
-        Timber.d("Min zoom level for this screen: $minZoom")
-        return minZoom
-    }
-
-    private fun getTileSource(): ITileSource {
-        val copyright = resources.getString(R.string.map_copyright)
-        val sources = arrayOf("https://maps.wikimedia.org/osm-intl/")
-        val policy = TileSourcePolicy(
-            1, TileSourcePolicy.FLAG_NO_BULK and TileSourcePolicy.FLAG_NO_PREVENTIVE and
-                    TileSourcePolicy.FLAG_USER_AGENT_MEANINGFUL and TileSourcePolicy.FLAG_USER_AGENT_NORMALIZED
-        )
-        return XYTileSource("wikimedia", 0, 6, 256, ".png", sources, copyright, policy)
+        return MapView.getTileSystem().getLatitudeZoom(maxLat, minLat, screenHeight)
     }
 }
