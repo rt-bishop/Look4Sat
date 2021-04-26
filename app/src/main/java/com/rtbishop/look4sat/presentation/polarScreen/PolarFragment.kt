@@ -28,7 +28,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.formatForTimer
+import com.rtbishop.look4sat.utility.toTimerString
 import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -113,17 +113,17 @@ class PolarFragment : Fragment(R.layout.fragment_polar) {
         if (!satPass.isDeepSpace) {
             if (dateNow.before(satPass.aosDate)) {
                 val millisBeforeStart = satPass.aosDate.time.minus(timeNow)
-                binding.polarTimer.text = millisBeforeStart.formatForTimer()
+                binding.polarTimer.text = millisBeforeStart.toTimerString()
             } else {
                 val millisBeforeEnd = satPass.losDate.time.minus(timeNow)
-                binding.polarTimer.text = millisBeforeEnd.formatForTimer()
+                binding.polarTimer.text = millisBeforeEnd.toTimerString()
                 if (dateNow.after(satPass.losDate)) {
-                    binding.polarTimer.text = 0L.formatForTimer()
+                    binding.polarTimer.text = 0L.toTimerString()
                     findNavController().navigateSafe(R.id.action_polar_to_passes)
                 }
             }
         } else {
-            binding.polarTimer.text = 0L.formatForTimer()
+            binding.polarTimer.text = 0L.toTimerString()
         }
     }
 }

@@ -30,7 +30,7 @@ import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.formatForTimer
+import com.rtbishop.look4sat.utility.toTimerString
 import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -80,7 +80,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             }
             is Result.InProgress -> {
                 binding.apply {
-                    passesTimer.text = 0L.formatForTimer()
+                    passesTimer.text = 0L.toTimerString()
                     passesError.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.INVISIBLE
                     passesProgress.visibility = View.VISIBLE
@@ -88,7 +88,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             }
             is Result.Error -> {
                 binding.apply {
-                    passesTimer.text = 0L.formatForTimer()
+                    passesTimer.text = 0L.toTimerString()
                     passesProgress.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.INVISIBLE
                     passesError.visibility = View.VISIBLE
@@ -103,14 +103,14 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             try {
                 val nextPass = passes.first { it.aosDate.time.minus(timeNow) > 0 }
                 val millisBeforeStart = nextPass.aosDate.time.minus(timeNow)
-                binding.passesTimer.text = millisBeforeStart.formatForTimer()
+                binding.passesTimer.text = millisBeforeStart.toTimerString()
             } catch (e: NoSuchElementException) {
                 val lastPass = passes.last()
                 val millisBeforeEnd = lastPass.losDate.time.minus(timeNow)
-                binding.passesTimer.text = millisBeforeEnd.formatForTimer()
+                binding.passesTimer.text = millisBeforeEnd.toTimerString()
             }
         } else {
-            binding.passesTimer.text = 0L.formatForTimer()
+            binding.passesTimer.text = 0L.toTimerString()
         }
     }
 

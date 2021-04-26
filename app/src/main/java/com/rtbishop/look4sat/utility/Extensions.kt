@@ -27,12 +27,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.findNavController
 import java.util.concurrent.TimeUnit
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.pow
-import kotlin.math.sqrt
 
-fun Long.formatForTimer(): String {
+fun Long.toTimerString(): String {
     val format = "%02d:%02d:%02d"
     val hours = TimeUnit.MILLISECONDS.toHours(this)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(this) % 60
@@ -44,22 +40,6 @@ fun Double.round(decimals: Int): Double {
     var multiplier = 1.0
     repeat(decimals) { multiplier *= 10 }
     return kotlin.math.round(this * multiplier) / multiplier
-}
-
-fun Double.toOsmLat(): Double {
-    return min(max(this, -85.0), 85.0)
-}
-
-fun Double.toOsmLon(): Double {
-    val newLon = if (this < -180.0) this + 360.0 else if (this > 180.0) this - 360.0 else this
-    return min(max(newLon, -180.0), 180.0)
-}
-
-fun Double.getOrbitalVelocity(): Double {
-    val earthG = 6.674 * 10.0.pow(-11)
-    val earthM = 5.98 * 10.0.pow(24)
-    val radius = 6.37 * 10.0.pow(6) + this * 10.0.pow(3)
-    return sqrt(earthG * earthM / radius) / 1000
 }
 
 fun NavController.navigateSafe(

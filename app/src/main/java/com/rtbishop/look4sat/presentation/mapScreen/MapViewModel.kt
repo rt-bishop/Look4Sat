@@ -18,76 +18,59 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.Paint
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.di.DefaultDispatcher
 import com.rtbishop.look4sat.domain.predict4kotlin.Position
 import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
-import com.rtbishop.look4sat.domain.predict4kotlin.SatPos
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import com.rtbishop.look4sat.framework.model.SelectedSat
+import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
+import com.rtbishop.look4sat.framework.model.SatData
 import com.rtbishop.look4sat.interactors.GetSelectedSatellites
-import com.rtbishop.look4sat.utility.*
+import com.rtbishop.look4sat.utility.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.FolderOverlay
-import org.osmdroid.views.overlay.Overlay
-import org.osmdroid.views.overlay.Polygon
-import org.osmdroid.views.overlay.Polyline
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getSelectedSatellites: GetSelectedSatellites,
     private val prefsManager: PrefsManager,
-    private val qthConverter: QthConverter
+    private val qthConverter: QthConverter,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val dateNow = Date()
-    private val trackPaint = Paint().apply {
-        strokeWidth = 2f
-        style = Paint.Style.STROKE
-        color = Color.RED
-        strokeCap = Paint.Cap.ROUND
-        strokeJoin = Paint.Join.ROUND
-        isAntiAlias = true
-    }
-    private val footprintPaint = Paint().apply {
-        style = Paint.Style.FILL_AND_STROKE
-        color = Color.parseColor("#26FFE082")
-        isAntiAlias = true
-    }
-
     private val gsp = prefsManager.getStationPosition()
-
-    private var filteredSats = listOf<Satellite>()
+    private var dataUpdateJob: Job? = null
+    private var allSatList = listOf<Satellite>()
     private lateinit var selectedSat: Satellite
 
-    private val _selectedSat = MutableLiveData<SelectedSat>()
-    fun getSelectedSat(): LiveData<SelectedSat> = _selectedSat
-
-    private val _satMarkers = MutableLiveData<Map<Satellite, Position>>()
-    fun getSatMarkers(): LiveData<Map<Satellite, Position>> = _satMarkers
-
-    val stationPosition = liveData {
+    val stationPos = liveData {
         emit(Position(gsp.latitude.toOsmLat(), gsp.longitude.toOsmLon()))
     }
 
+    private val _satTrack = MutableLiveData<List<List<Position>>>()
+    val satTrack: LiveData<List<List<Position>>> = _satTrack
+
+    private val _satFootprint = MutableLiveData<List<Position>>()
+    val satFootprint: LiveData<List<Position>> = _satFootprint
+
+    private val _satData = MutableLiveData<SatData>()
+    val satData: LiveData<SatData> = this._satData
+
+    private val _allSatPositions = MutableLiveData<Map<Satellite, Position>>()
+    val allSatPositions: LiveData<Map<Satellite, Position>> = _allSatPositions
+
     init {
         viewModelScope.launch {
-            val satellites = getSelectedSatellites()
-            if (satellites.isNotEmpty()) {
-                filteredSats = satellites
-                selectedSat = satellites.first()
-                while (true) {
-                    ensureActive()
-                    dateNow.time = System.currentTimeMillis()
-                    _selectedSat.value = getDataForSelSatellite(selectedSat)
-                    _satMarkers.value = getDataForAllSatellites(filteredSats)
-                    delay(2000)
+            getSelectedSatellites().also { selectedSatellites ->
+                if (selectedSatellites.isNotEmpty()) {
+                    allSatList = selectedSatellites
+                    selectSatellite(selectedSatellites.first())
                 }
             }
         }
@@ -102,98 +85,130 @@ class MapViewModel @Inject constructor(
     }
 
     fun scrollSelection(decrement: Boolean) {
-        if (filteredSats.isNotEmpty()) {
-            val index = filteredSats.indexOf(selectedSat)
+        if (allSatList.isNotEmpty()) {
+            val index = allSatList.indexOf(selectedSat)
             if (decrement) {
-                if (index > 0) selectSatellite(filteredSats[index - 1])
-                else selectSatellite(filteredSats[filteredSats.size - 1])
+                if (index > 0) selectSatellite(allSatList[index - 1])
+                else selectSatellite(allSatList[allSatList.size - 1])
             } else {
-                if (index < filteredSats.size - 1) selectSatellite(filteredSats[index + 1])
-                else selectSatellite(filteredSats[0])
+                if (index < allSatList.size - 1) selectSatellite(allSatList[index + 1])
+                else selectSatellite(allSatList[0])
             }
         }
     }
 
-    fun selectSatellite(satellite: Satellite) {
+    fun selectSatellite(satellite: Satellite, updateFreq: Long = 2000) {
         selectedSat = satellite
-        viewModelScope.launch { _selectedSat.value = getDataForSelSatellite(selectedSat) }
-    }
-
-    private suspend fun getDataForSelSatellite(satellite: Satellite): SelectedSat =
-        withContext(Dispatchers.Default) {
-            val satPos = satellite.getPredictor(gsp).getSatPos(dateNow)
-            val osmPos = Position(
-                Math.toDegrees(satPos.latitude).toOsmLat(),
-                Math.toDegrees(satPos.longitude).toOsmLon()
-            )
-            val qthLoc = qthConverter.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
-            val velocity = satPos.altitude.getOrbitalVelocity()
-            val footprint = getSatFootprint(satPos)
-            val track = getSatTrack(satellite)
-            return@withContext SelectedSat(
-                satellite, satellite.tle.catnum, satellite.tle.name, satPos.range,
-                satPos.altitude, velocity, qthLoc, osmPos, footprint, track
-            )
-        }
-
-    private suspend fun getDataForAllSatellites(satellites: List<Satellite>): Map<Satellite, Position> =
-        withContext(Dispatchers.Default) {
-            val passesMap = mutableMapOf<Satellite, Position>()
-            satellites.forEach { satellite ->
-                val satPos = satellite.getPredictor(gsp).getSatPos(dateNow)
-                passesMap[satellite] = Position(
-                    Math.toDegrees(satPos.latitude).toOsmLat(),
-                    Math.toDegrees(satPos.longitude).toOsmLon()
-                )
-            }
-            return@withContext passesMap
-        }
-
-    private fun getSatTrack(satellite: Satellite): Overlay {
-        val positions = satellite.getPredictor(gsp).getPositions(dateNow, 15, 0, 3.2)
-        val trackOverlay = FolderOverlay()
-        val trackPoints = mutableListOf<GeoPoint>()
-        var oldLon = 0.0
-        positions.forEach {
-            val osmPos = Position(
-                Math.toDegrees(it.latitude).toOsmLat(),
-                Math.toDegrees(it.longitude).toOsmLon()
-            )
-            if (oldLon < -170.0 && osmPos.longitude > 170.0 || oldLon > 170.0 && osmPos.longitude < -170.0) {
-                val currentPoints = mutableListOf<GeoPoint>()
-                currentPoints.addAll(trackPoints)
-                Polyline().apply {
-                    outlinePaint.set(trackPaint)
-                    setPoints(currentPoints)
-                    trackOverlay.add(this)
+        viewModelScope.launch {
+            dataUpdateJob?.cancelAndJoin()
+            dataUpdateJob = launch {
+                val dateNow = Date()
+                setSelectedSatTrack(selectedSat, gsp, dateNow)
+                while (isActive) {
+                    dateNow.time = System.currentTimeMillis()
+                    setSatPositions(allSatList, gsp, dateNow)
+                    setSelectedSatFootprint(selectedSat, gsp, dateNow)
+                    setSelectedSatData(selectedSat, gsp, dateNow)
+                    delay(updateFreq)
                 }
-                trackPoints.clear()
             }
-            oldLon = osmPos.longitude
-            trackPoints.add(GeoPoint(osmPos.latitude, osmPos.longitude))
         }
-        Polyline().apply {
-            outlinePaint.set(trackPaint)
-            setPoints(trackPoints)
-            trackOverlay.add(this)
-        }
-        return trackOverlay
     }
 
-    private fun getSatFootprint(satPos: SatPos): Overlay {
-        val points = mutableListOf<GeoPoint>()
-        satPos.getRangeCircle().forEach {
-            val osmPos = Position(it.latitude.toOsmLat(), it.longitude.toOsmLon())
-            points.add(GeoPoint(osmPos.latitude, osmPos.longitude))
-        }
-        return Polygon().apply {
-            fillPaint.set(footprintPaint)
-            outlinePaint.set(footprintPaint)
-            try {
-                this.points = points
-            } catch (e: IllegalArgumentException) {
-                Timber.d("RangeCircle: ${satPos.getRangeCircle()}, RangePoints: $points")
+    private suspend fun setSatPositions(list: List<Satellite>, gsp: StationPosition, date: Date) {
+        withContext(defaultDispatcher) {
+            val satPositions = mutableMapOf<Satellite, Position>()
+            list.forEach { satellite ->
+                val satPos = satellite.getPredictor(gsp).getSatPos(date)
+                val osmLat = Math.toDegrees(satPos.latitude).toOsmLat()
+                val osmLon = Math.toDegrees(satPos.longitude).toOsmLon()
+                satPositions[satellite] = Position(osmLat, osmLon)
             }
+            _allSatPositions.postValue(satPositions)
         }
+    }
+
+    private suspend fun setSelectedSatTrack(sat: Satellite, gsp: StationPosition, date: Date) {
+        withContext(defaultDispatcher) {
+            val satTracks = mutableListOf<List<Position>>()
+            val currentTrack = mutableListOf<Position>()
+            var oldLongitude = 0.0
+            sat.getPredictor(gsp).getPositions(date, 15, 0, 2.4).forEach { pos ->
+                val osmLat = Math.toDegrees(pos.latitude).toOsmLat()
+                val osmLon = Math.toDegrees(pos.longitude).toOsmLon()
+                val currentPosition = Position(osmLat, osmLon)
+                if (oldLongitude < -170.0 && currentPosition.longitude > 170.0) {
+                    // adding left terminal position
+                    currentTrack.add(Position(osmLat, -180.0))
+                    val finishedTrack = mutableListOf<Position>().apply { addAll(currentTrack) }
+                    satTracks.add(finishedTrack)
+                    currentTrack.clear()
+                } else if (oldLongitude > 170.0 && currentPosition.longitude < -170.0) {
+                    // adding right terminal position
+                    currentTrack.add(Position(osmLat, 180.0))
+                    val finishedTrack = mutableListOf<Position>().apply { addAll(currentTrack) }
+                    satTracks.add(finishedTrack)
+                    currentTrack.clear()
+                }
+                oldLongitude = currentPosition.longitude
+                currentTrack.add(currentPosition)
+            }
+            satTracks.add(currentTrack)
+            _satTrack.postValue(satTracks)
+        }
+    }
+
+    private suspend fun setSelectedSatFootprint(sat: Satellite, gsp: StationPosition, date: Date) {
+        withContext(defaultDispatcher) {
+            val satFootprint = sat.getPosition(gsp, date).getRangeCircle().map { rangePos ->
+                Position(rangePos.latitude.toOsmLat(), rangePos.longitude.toOsmLon())
+            }
+            _satFootprint.postValue(satFootprint)
+        }
+    }
+
+    private suspend fun setSelectedSatData(sat: Satellite, gsp: StationPosition, date: Date) {
+        withContext(defaultDispatcher) {
+            val satPos = sat.getPredictor(gsp).getSatPos(date)
+            val osmLat = Math.toDegrees(satPos.latitude).toOsmLat()
+            val osmLon = Math.toDegrees(satPos.longitude).toOsmLon()
+            val osmPos = Position(osmLat, osmLon)
+            val qthLoc = qthConverter.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
+            val velocity = getOrbitalVelocity(satPos.altitude)
+            val satData = SatData(
+                sat, sat.tle.catnum, sat.tle.name, satPos.range,
+                satPos.altitude, velocity, qthLoc, osmPos
+            )
+            this@MapViewModel._satData.postValue(satData)
+        }
+    }
+
+    private fun Double.toOsmLat(): Double {
+        return min(max(this, -85.0), 85.0)
+    }
+
+    private fun getOsmLat(latitude: Double): Double {
+        return min(max(latitude, -85.0), 85.0)
+    }
+
+    private fun Double.toOsmLon(): Double {
+        val newLon = if (this < -180.0) this + 360.0 else if (this > 180.0) this - 360.0 else this
+        return min(max(newLon, -180.0), 180.0)
+    }
+
+    private fun getOsmLon(longitude: Double): Double {
+        val newLongitude = when {
+            longitude < -180.0 -> longitude + 360.0
+            longitude > 180.0 -> longitude - 360.0
+            else -> longitude
+        }
+        return min(max(newLongitude, -180.0), 180.0)
+    }
+
+    private fun getOrbitalVelocity(altitude: Double): Double {
+        val earthG = 6.674 * 10.0.pow(-11)
+        val earthM = 5.98 * 10.0.pow(24)
+        val radius = 6.37 * 10.0.pow(6) + altitude * 10.0.pow(3)
+        return sqrt(earthG * earthM / radius) / 1000
     }
 }

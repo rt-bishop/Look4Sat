@@ -42,6 +42,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    kotlinOptions.useIR = true
 }
 
 dependencies {
