@@ -21,5 +21,5 @@ data class StationPosition(
     val latitude: Double,
     val longitude: Double,
     val altitude: Double,
-    val name: String = "base"
+    val name: String = "default"
 )

@@ -29,7 +29,7 @@ import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.framework.model.TleSource
 import com.rtbishop.look4sat.interactors.GetSatItems
-import com.rtbishop.look4sat.interactors.ImportDataFromFile
+import com.rtbishop.look4sat.interactors.ImportDataFromStream
 import com.rtbishop.look4sat.interactors.ImportDataFromWeb
 import com.rtbishop.look4sat.interactors.UpdateEntriesSelection
 import com.rtbishop.look4sat.utility.PrefsManager
@@ -46,7 +46,7 @@ class EntriesViewModel @Inject constructor(
     private val prefsManager: PrefsManager,
     private val resolver: ContentResolver,
     private val getSatItems: GetSatItems,
-    private val importDataFromFile: ImportDataFromFile,
+    private val importDataFromStream: ImportDataFromStream,
     private val importDataFromWeb: ImportDataFromWeb,
     private val updateEntriesSelection: UpdateEntriesSelection,
 ) : ViewModel(), EntriesAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
@@ -70,7 +70,7 @@ class EntriesViewModel @Inject constructor(
             _satData.value = Result.InProgress
             runCatching {
                 resolver.openInputStream(uri)?.use { stream ->
-                    importDataFromFile(stream)
+                    importDataFromStream(stream)
                 }
             }.onFailure { _satData.value = Result.Error(it) }
         }

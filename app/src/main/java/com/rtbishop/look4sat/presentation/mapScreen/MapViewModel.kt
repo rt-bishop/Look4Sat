@@ -50,7 +50,9 @@ class MapViewModel @Inject constructor(
     private lateinit var selectedSat: Satellite
 
     val stationPos = liveData {
-        emit(Position(gsp.latitude.toOsmLat(), gsp.longitude.toOsmLon()))
+        val osmLat = getOsmLat(gsp.latitude)
+        val osmLon = getOsmLon(gsp.longitude)
+        emit(Position(osmLat, osmLon))
     }
 
     private val _satTrack = MutableLiveData<List<List<Position>>>()
@@ -120,8 +122,8 @@ class MapViewModel @Inject constructor(
             val satPositions = mutableMapOf<Satellite, Position>()
             list.forEach { satellite ->
                 val satPos = satellite.getPredictor(gsp).getSatPos(date)
-                val osmLat = Math.toDegrees(satPos.latitude).toOsmLat()
-                val osmLon = Math.toDegrees(satPos.longitude).toOsmLon()
+                val osmLat = getOsmLat(Math.toDegrees(satPos.latitude))
+                val osmLon = getOsmLon(Math.toDegrees(satPos.longitude))
                 satPositions[satellite] = Position(osmLat, osmLon)
             }
             _allSatPositions.postValue(satPositions)
@@ -133,9 +135,9 @@ class MapViewModel @Inject constructor(
             val satTracks = mutableListOf<List<Position>>()
             val currentTrack = mutableListOf<Position>()
             var oldLongitude = 0.0
-            sat.getPredictor(gsp).getPositions(date, 15, 0, 2.4).forEach { pos ->
-                val osmLat = Math.toDegrees(pos.latitude).toOsmLat()
-                val osmLon = Math.toDegrees(pos.longitude).toOsmLon()
+            sat.getPredictor(gsp).getPositions(date, 15, 0, 2.4).forEach { satPos ->
+                val osmLat = getOsmLat(Math.toDegrees(satPos.latitude))
+                val osmLon = getOsmLon(Math.toDegrees(satPos.longitude))
                 val currentPosition = Position(osmLat, osmLon)
                 if (oldLongitude < -170.0 && currentPosition.longitude > 170.0) {
                     // adding left terminal position
@@ -161,7 +163,9 @@ class MapViewModel @Inject constructor(
     private suspend fun setSelectedSatFootprint(sat: Satellite, gsp: StationPosition, date: Date) {
         withContext(defaultDispatcher) {
             val satFootprint = sat.getPosition(gsp, date).getRangeCircle().map { rangePos ->
-                Position(rangePos.latitude.toOsmLat(), rangePos.longitude.toOsmLon())
+                val osmLat = getOsmLat(rangePos.latitude)
+                val osmLon = getOsmLon(rangePos.longitude)
+                Position(osmLat, osmLon)
             }
             _satFootprint.postValue(satFootprint)
         }
@@ -170,8 +174,8 @@ class MapViewModel @Inject constructor(
     private suspend fun setSelectedSatData(sat: Satellite, gsp: StationPosition, date: Date) {
         withContext(defaultDispatcher) {
             val satPos = sat.getPredictor(gsp).getSatPos(date)
-            val osmLat = Math.toDegrees(satPos.latitude).toOsmLat()
-            val osmLon = Math.toDegrees(satPos.longitude).toOsmLon()
+            val osmLat = getOsmLat(Math.toDegrees(satPos.latitude))
+            val osmLon = getOsmLon(Math.toDegrees(satPos.longitude))
             val osmPos = Position(osmLat, osmLon)
             val qthLoc = qthConverter.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
             val velocity = getOrbitalVelocity(satPos.altitude)
@@ -183,17 +187,8 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun Double.toOsmLat(): Double {
-        return min(max(this, -85.0), 85.0)
-    }
-
     private fun getOsmLat(latitude: Double): Double {
         return min(max(latitude, -85.0), 85.0)
-    }
-
-    private fun Double.toOsmLon(): Double {
-        val newLon = if (this < -180.0) this + 360.0 else if (this > 180.0) this - 360.0 else this
-        return min(max(newLon, -180.0), 180.0)
     }
 
     private fun getOsmLon(longitude: Double): Double {

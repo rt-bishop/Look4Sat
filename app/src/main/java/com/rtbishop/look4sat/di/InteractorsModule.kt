@@ -44,8 +44,8 @@ object InteractorsModule {
     }
 
     @Provides
-    fun provideImportDataFromFileUseCase(satelliteRepo: SatelliteRepo): ImportDataFromFile {
-        return ImportDataFromFile(satelliteRepo)
+    fun provideImportDataFromStreamUseCase(satelliteRepo: SatelliteRepo): ImportDataFromStream {
+        return ImportDataFromStream(satelliteRepo)
     }
 
     @Provides

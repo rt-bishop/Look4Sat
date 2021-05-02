@@ -92,6 +92,7 @@ class PolarView(context: Context) : View(context) {
     }
 
     override fun onDraw(canvas: Canvas) {
+        canvas.drawColor(ContextCompat.getColor(context, R.color.greyDark))
         canvas.translate(polarCenter, polarCenter)
         drawRadarView(canvas)
         drawRadarText(canvas)

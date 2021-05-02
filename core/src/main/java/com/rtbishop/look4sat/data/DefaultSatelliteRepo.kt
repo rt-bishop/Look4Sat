@@ -31,7 +31,7 @@ class DefaultSatelliteRepo(
         return localSource.getSelectedSatellites()
     }
 
-    override suspend fun importDataFromFile(stream: InputStream) = withContext(ioDispatcher) {
+    override suspend fun importDataFromStream(stream: InputStream) = withContext(ioDispatcher) {
         val importedEntries = Satellite.importElements(stream).map { tle -> SatEntry(tle) }
         localSource.updateEntries(importedEntries)
     }
@@ -42,7 +42,7 @@ class DefaultSatelliteRepo(
                 val importedEntries = mutableListOf<SatEntry>()
                 val streams = mutableListOf<InputStream>()
                 sources.forEach { source ->
-                    remoteSource.fetchFileStream(source)?.let { stream ->
+                    remoteSource.fetchDataStream(source)?.let { stream ->
                         if (source.contains(".zip", true)) {
                             val zipStream = ZipInputStream(stream).apply { nextEntry }
                             streams.add(zipStream)

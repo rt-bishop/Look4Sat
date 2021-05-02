@@ -5,7 +5,7 @@ import java.io.InputStream
 
 interface RemoteDataSource {
 
-    suspend fun fetchFileStream(url: String): InputStream?
+    suspend fun fetchDataStream(url: String): InputStream?
 
     suspend fun fetchTransmitters(): List<SatTrans>
 }

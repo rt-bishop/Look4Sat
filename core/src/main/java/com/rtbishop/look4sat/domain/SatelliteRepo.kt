@@ -14,7 +14,7 @@ interface SatelliteRepo {
 
     suspend fun getSelectedSatellites(): List<Satellite>
 
-    suspend fun importDataFromFile(stream: InputStream)
+    suspend fun importDataFromStream(stream: InputStream)
 
     suspend fun importDataFromWeb(sources: List<String>)
 

@@ -6,7 +6,7 @@ import java.io.InputStream
 
 class NetworkDataSource(private val api: SatelliteService) : RemoteDataSource {
 
-    override suspend fun fetchFileStream(url: String): InputStream? {
+    override suspend fun fetchDataStream(url: String): InputStream? {
         return api.fetchFileByUrl(url).body()?.byteStream()
     }
 

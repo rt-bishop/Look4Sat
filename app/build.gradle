@@ -67,6 +67,8 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timber_version"
 
     testImplementation "junit:junit:$junit_version"
+    testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
+    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
 }
