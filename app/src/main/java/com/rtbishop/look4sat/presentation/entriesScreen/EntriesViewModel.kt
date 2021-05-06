@@ -32,7 +32,7 @@ import com.rtbishop.look4sat.interactors.GetSatItems
 import com.rtbishop.look4sat.interactors.ImportDataFromStream
 import com.rtbishop.look4sat.interactors.ImportDataFromWeb
 import com.rtbishop.look4sat.interactors.UpdateEntriesSelection
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.framework.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -156,8 +156,8 @@ class EntriesViewModel @Inject constructor(
             items.filter { it.catNum == query.toInt() }
         } catch (e: Exception) {
             items.filter { item ->
-                val itemName = item.name.toLowerCase(Locale.getDefault())
-                itemName.contains(query.toLowerCase(Locale.getDefault()))
+                val itemName = item.name.lowercase(Locale.getDefault())
+                itemName.contains(query.lowercase(Locale.getDefault()))
             }
         }
     }

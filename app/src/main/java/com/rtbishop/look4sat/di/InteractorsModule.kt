@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.di
 
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.interactors.*
 import dagger.Module
 import dagger.Provides

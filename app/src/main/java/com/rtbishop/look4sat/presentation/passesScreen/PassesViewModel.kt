@@ -25,7 +25,7 @@ import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.utility.PassesRepo
 import com.rtbishop.look4sat.interactors.GetSelectedSatellites
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.framework.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect

@@ -19,7 +19,6 @@ package com.rtbishop.look4sat.presentation.prefsScreen
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
 import android.text.InputType
 import android.util.Patterns
@@ -31,9 +30,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.utility.PrefsManager
-import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
-import com.rtbishop.look4sat.utility.round
+import com.rtbishop.look4sat.data.LocationRepo
+import com.rtbishop.look4sat.framework.DefaultLocationSource
+import com.rtbishop.look4sat.framework.PrefsManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -41,16 +40,15 @@ import javax.inject.Inject
 class PrefsFragment : PreferenceFragmentCompat() {
 
     @Inject
-    lateinit var locationManager: LocationManager
+    lateinit var locationRepo: LocationRepo
+
     @Inject
     lateinit var prefsManager: PrefsManager
-    @Inject
-    lateinit var qthConverter: QthConverter
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                setPositionFromGPS()
+                updatePositionFromGPS()
             } else {
                 showSnack(getString(R.string.pref_pos_gps_error))
             }
@@ -63,16 +61,16 @@ class PrefsFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        findPreference<Preference>(PrefsManager.keyPositionGPS)?.apply {
+        findPreference<Preference>(DefaultLocationSource.keyPositionGPS)?.apply {
             setOnPreferenceClickListener {
-                setPositionFromGPS()
+                updatePositionFromGPS()
                 return@setOnPreferenceClickListener true
             }
         }
 
-        findPreference<Preference>(PrefsManager.keyPositionQTH)?.apply {
+        findPreference<Preference>(DefaultLocationSource.keyPositionQTH)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
-                setPositionFromQth(newValue.toString())
+                updatePositionFromQth(newValue.toString())
             }
         }
 
@@ -101,34 +99,29 @@ class PrefsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun setPositionFromQth(qthString: String): Boolean {
-        qthConverter.qthToPosition(qthString)?.let { gsp ->
-            prefsManager.setStationPosition(gsp.latitude, gsp.longitude, 0.0)
+    private fun updatePositionFromQth(qthString: String): Boolean {
+        return if (locationRepo.updatePositionFromQTH(qthString)) {
             showSnack(getString(R.string.pref_pos_success))
-            return true
+            true
+        } else {
+            showSnack(getString(R.string.pref_pos_qth_error))
+            false
         }
-        showSnack(getString(R.string.pref_pos_qth_error))
-        return false
     }
 
-    private fun setPositionFromGPS() {
+    private fun updatePositionFromGPS() {
         val locPermString = Manifest.permission.ACCESS_FINE_LOCATION
         val locPermResult = ContextCompat.checkSelfPermission(requireContext(), locPermString)
         if (locPermResult == PackageManager.PERMISSION_GRANTED) {
-            val location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
-            if (location != null) {
-                val latitude = location.latitude.round(4)
-                val longitude = location.longitude.round(4)
-                val altitude = location.altitude.round(1)
-                prefsManager.setStationPosition(latitude, longitude, altitude)
+            if (locationRepo.updatePositionFromGPS()) {
                 showSnack(getString(R.string.pref_pos_success))
             } else showSnack(getString(R.string.pref_pos_gps_null))
         } else requestPermissionLauncher.launch(locPermString)
     }
 
     private fun showSnack(message: String) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
-            .setAnchorView(R.id.nav_bottom)
-            .show()
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
+            setAnchorView(R.id.nav_bottom)
+        }.show()
     }
 }

@@ -25,7 +25,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.framework.PrefsManager
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
 import com.rtbishop.look4sat.utility.setNavResult
 import dagger.hilt.android.AndroidEntryPoint

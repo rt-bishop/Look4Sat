@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.SatelliteRepo
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatTrans
@@ -13,30 +12,30 @@ import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 
-class DefaultSatelliteRepo(
+class SatelliteRepo(
     private val localSource: LocalDataSource,
     private val remoteSource: RemoteDataSource,
     private val ioDispatcher: CoroutineDispatcher
-) : SatelliteRepo {
+) {
 
-    override fun getSatItems(): Flow<List<SatItem>> {
+    fun getSatItems(): Flow<List<SatItem>> {
         return localSource.getSatItems()
     }
 
-    override fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
+    fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
         return localSource.getTransmittersForSat(catNum)
     }
 
-    override suspend fun getSelectedSatellites(): List<Satellite> {
+    suspend fun getSelectedSatellites(): List<Satellite> {
         return localSource.getSelectedSatellites()
     }
 
-    override suspend fun importDataFromStream(stream: InputStream) = withContext(ioDispatcher) {
+    suspend fun importDataFromStream(stream: InputStream) = withContext(ioDispatcher) {
         val importedEntries = Satellite.importElements(stream).map { tle -> SatEntry(tle) }
         localSource.updateEntries(importedEntries)
     }
 
-    override suspend fun importDataFromWeb(sources: List<String>) {
+    suspend fun importDataFromWeb(sources: List<String>) {
         coroutineScope {
             launch(ioDispatcher) {
                 val importedEntries = mutableListOf<SatEntry>()
@@ -64,7 +63,7 @@ class DefaultSatelliteRepo(
         }
     }
 
-    override suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         localSource.updateEntriesSelection(catNums, isSelected)
     }
 }

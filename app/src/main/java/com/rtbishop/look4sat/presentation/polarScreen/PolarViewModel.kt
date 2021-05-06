@@ -18,13 +18,14 @@
 package com.rtbishop.look4sat.presentation.polarScreen
 
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.LocationRepo
 import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.domain.model.SatTrans
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.interactors.GetTransmittersForSat
-import com.rtbishop.look4sat.utility.OrientationProvider
+import com.rtbishop.look4sat.framework.OrientationProvider
 import com.rtbishop.look4sat.utility.PassesRepo
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.framework.PrefsManager
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -36,6 +37,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PolarViewModel @Inject constructor(
+    private val locationRepo: LocationRepo,
     private val orientationProvider: OrientationProvider,
     private val prefsManager: PrefsManager,
     private val passesRepo: PassesRepo,
@@ -68,7 +70,7 @@ class PolarViewModel @Inject constructor(
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
-        _orientation.value = Triple(azimuth + prefsManager.getMagDeclination(), pitch, roll)
+        _orientation.value = Triple(azimuth + locationRepo.getMagDeclination(), pitch, roll)
     }
 
     private fun initRotatorControl(satPass: SatPass) {

@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.mapScreen
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -40,9 +41,13 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.*
 import timber.log.Timber
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map) {
+
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
 
     private val viewModel: MapViewModel by viewModels()
     private val minLat = MapView.getTileSystem().minLatitude
@@ -63,7 +68,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getInstance().load(requireContext(), viewModel.getPreferences())
+        Configuration.getInstance().load(requireContext(), sharedPreferences)
         val binding = FragmentMapBinding.bind(view).apply {
             mapView.apply {
                 setMultiTouchControls(true)
@@ -183,7 +188,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun renderSatData(satData: SatData, binding: FragmentMapBinding) {
         binding.apply {
-            idName.text = String.format(getString(R.string.pat_osm_idName), satData.catNum, satData.name)
+            idName.text =
+                String.format(getString(R.string.pat_osm_idName), satData.catNum, satData.name)
             qthLocator.text = String.format(getString(R.string.map_qth), satData.qthLoc)
             altitude.text = String.format(getString(R.string.pat_altitude), satData.altitude)
             distance.text = String.format(getString(R.string.pat_distance), satData.range)

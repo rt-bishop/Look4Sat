@@ -15,20 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.utility
+package com.rtbishop.look4sat.framework
 
 import android.content.SharedPreferences
-import android.hardware.GeomagneticField
 import androidx.core.content.edit
 import com.rtbishop.look4sat.framework.model.TleSource
-import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi: Moshi) {
+class PrefsManager @Inject constructor(private val preferences: SharedPreferences, moshi: Moshi) {
     
     private val sourcesType = Types.newParameterizedType(List::class.java, TleSource::class.java)
     private val sourcesAdapter = moshi.adapter<List<TleSource>>(sourcesType)
@@ -36,16 +34,11 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi
     companion object {
         const val keySources = "sourcesListJson"
         const val keyModes = "satModes"
-        const val keyLatitude = "latitude"
-        const val keyLongitude = "longitude"
-        const val keyAltitude = "altitude"
         const val keyCompass = "compass"
         const val keyTextLabels = "shouldUseTextLabels"
         const val keyTimeUTC = "timeUTC"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
-        const val keyPositionGPS = "setPositionGPS"
-        const val keyPositionQTH = "setPositionQTH"
         const val keyIsFirstLaunch = "shouldShowSplash"
         const val keyRotator = "isRotatorEnabled"
         const val keyRotatorAddress = "rotatorAddress"
@@ -58,30 +51,6 @@ class PrefsManager @Inject constructor(val preferences: SharedPreferences, moshi
     
     fun getMinElevation(): Double {
         return preferences.getInt(keyMinElevation, 16).toDouble()
-    }
-    
-    fun getStationPosition(): StationPosition {
-        val defaultGSP = "0.0"
-        val latitude = preferences.getString(keyLatitude, null) ?: defaultGSP
-        val longitude = preferences.getString(keyLongitude, null) ?: defaultGSP
-        val altitude = preferences.getString(keyAltitude, null) ?: defaultGSP
-        return StationPosition(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
-    }
-
-    fun setStationPosition(latitude: Double, longitude: Double, altitude: Double) {
-        preferences.edit {
-            putString(keyLatitude, latitude.toString())
-            putString(keyLongitude, longitude.toString())
-            putString(keyAltitude, altitude.toString())
-        }
-    }
-
-    fun getMagDeclination(): Float {
-        val stationPosition = getStationPosition()
-        val lat = stationPosition.latitude.toFloat()
-        val lon = stationPosition.longitude.toFloat()
-        val alt = stationPosition.altitude.toFloat()
-        return GeomagneticField(lat, lon, alt, System.currentTimeMillis()).declination
     }
 
     fun shouldUseTextLabels(): Boolean {

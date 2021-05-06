@@ -15,11 +15,6 @@ android {
         targetSdkVersion 30
         versionCode 240
         versionName "2.4.0"
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas")
-            }
-        }
     }
 
     buildTypes {

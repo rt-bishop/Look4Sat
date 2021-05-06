@@ -17,9 +17,11 @@
  */
 package com.rtbishop.look4sat.utility
 
+import com.rtbishop.look4sat.data.LocationRepo
 import com.rtbishop.look4sat.di.DefaultDispatcher
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
+import com.rtbishop.look4sat.framework.PrefsManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -30,6 +32,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PassesRepo @Inject constructor(
+    private val locationRepo: LocationRepo,
     private val prefsManager: PrefsManager,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) {
@@ -61,7 +64,7 @@ class PassesRepo @Inject constructor(
     }
 
     private fun getPasses(satellite: Satellite, refDate: Date): List<SatPass> {
-        val predictor = satellite.getPredictor(prefsManager.getStationPosition())
+        val predictor = satellite.getPredictor(locationRepo.getStationPosition())
         return predictor.getPasses(refDate, prefsManager.getHoursAhead(), true)
     }
 

@@ -24,12 +24,12 @@ class QthConverter {
     fun qthToPosition(qthString: String): Position? {
         val trimmedQth = qthString.take(6)
         if (!isValidQTH(trimmedQth)) return null
-        val lonFirst = (trimmedQth[0].toUpperCase().toInt() - 65) * 20
-        val latFirst = (trimmedQth[1].toUpperCase().toInt() - 65) * 10
+        val lonFirst = (trimmedQth[0].uppercaseChar().code - 65) * 20
+        val latFirst = (trimmedQth[1].uppercaseChar().code - 65) * 10
         val lonSecond = trimmedQth[2].toString().toInt() * 2
         val latSecond = trimmedQth[3].toString().toInt()
-        val lonThird = (((trimmedQth[4].toLowerCase().toInt() - 97) / 12.0) + (1.0 / 24.0)) - 180
-        val latThird = (((trimmedQth[5].toLowerCase().toInt() - 97) / 24.0) + (1.0 / 48.0)) - 90
+        val lonThird = (((trimmedQth[4].lowercaseChar().code - 97) / 12.0) + (1.0 / 24.0)) - 180
+        val latThird = (((trimmedQth[5].lowercaseChar().code - 97) / 24.0) + (1.0 / 48.0)) - 90
         val longitude = (lonFirst + lonSecond + lonThird).roundToDecimals(4)
         val latitude = (latFirst + latSecond + latThird).roundToDecimals(4)
         return Position(latitude, longitude)

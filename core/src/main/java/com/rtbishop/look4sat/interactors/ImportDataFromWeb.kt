@@ -1,6 +1,6 @@
 package com.rtbishop.look4sat.interactors
 
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.data.SatelliteRepo
 
 class ImportDataFromWeb(private val satelliteRepo: SatelliteRepo) {
 

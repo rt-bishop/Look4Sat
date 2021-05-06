@@ -17,16 +17,15 @@
  */
 package com.rtbishop.look4sat.presentation.mapScreen
 
-import android.content.SharedPreferences
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.LocationRepo
 import com.rtbishop.look4sat.di.DefaultDispatcher
 import com.rtbishop.look4sat.domain.predict4kotlin.Position
-import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
 import com.rtbishop.look4sat.framework.model.SatData
 import com.rtbishop.look4sat.interactors.GetSelectedSatellites
-import com.rtbishop.look4sat.utility.PrefsManager
+import com.rtbishop.look4sat.framework.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -40,11 +39,11 @@ import kotlin.math.sqrt
 class MapViewModel @Inject constructor(
     private val getSelectedSatellites: GetSelectedSatellites,
     private val prefsManager: PrefsManager,
-    private val qthConverter: QthConverter,
+    private val locationRepo: LocationRepo,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val gsp = prefsManager.getStationPosition()
+    private val gsp = locationRepo.getStationPosition()
     private var dataUpdateJob: Job? = null
     private var allSatList = listOf<Satellite>()
     private lateinit var selectedSat: Satellite
@@ -76,10 +75,6 @@ class MapViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun getPreferences(): SharedPreferences {
-        return prefsManager.preferences
     }
 
     fun shouldUseTextLabels(): Boolean {
@@ -177,7 +172,7 @@ class MapViewModel @Inject constructor(
             val osmLat = getOsmLat(Math.toDegrees(satPos.latitude))
             val osmLon = getOsmLon(Math.toDegrees(satPos.longitude))
             val osmPos = Position(osmLat, osmLon)
-            val qthLoc = qthConverter.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
+            val qthLoc = locationRepo.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
             val velocity = getOrbitalVelocity(satPos.altitude)
             val satData = SatData(
                 sat, sat.tle.catnum, sat.tle.name, satPos.range,

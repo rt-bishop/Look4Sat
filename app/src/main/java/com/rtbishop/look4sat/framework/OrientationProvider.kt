@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.utility
+package com.rtbishop.look4sat.framework
 
 import android.hardware.Sensor
 import android.hardware.SensorEvent

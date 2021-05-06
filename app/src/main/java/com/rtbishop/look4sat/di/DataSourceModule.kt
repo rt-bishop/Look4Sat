@@ -18,11 +18,12 @@
 package com.rtbishop.look4sat.di
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.location.LocationManager
 import androidx.room.Room
-import com.rtbishop.look4sat.data.DefaultSatelliteRepo
-import com.rtbishop.look4sat.data.LocalDataSource
-import com.rtbishop.look4sat.data.RemoteDataSource
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.data.*
+import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
+import com.rtbishop.look4sat.framework.DefaultLocationSource
 import com.rtbishop.look4sat.framework.api.NetworkDataSource
 import com.rtbishop.look4sat.framework.api.SatelliteService
 import com.rtbishop.look4sat.framework.db.RoomConverters
@@ -51,12 +52,30 @@ object DataSourceModule {
 
     @Provides
     @Singleton
-    fun provideDefaultRepository(
+    fun provideLocationSource(
+        locationManager: LocationManager,
+        preferences: SharedPreferences
+    ): LocationSource {
+        return DefaultLocationSource(locationManager, preferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationRepo(
+        locationSource: LocationSource,
+        qthConverter: QthConverter
+    ): LocationRepo {
+        return LocationRepo(locationSource, qthConverter)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSatelliteRepo(
         localSource: LocalDataSource,
         remoteSource: RemoteDataSource,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): SatelliteRepo {
-        return DefaultSatelliteRepo(localSource, remoteSource, ioDispatcher)
+        return SatelliteRepo(localSource, remoteSource, ioDispatcher)
     }
 
     @Provides
