@@ -3,9 +3,9 @@ package com.rtbishop.look4sat.interactors
 import com.rtbishop.look4sat.data.SatelliteRepo
 import java.io.InputStream
 
-class ImportDataFromStream(private val satelliteRepo: SatelliteRepo) {
+class UpdateEntriesFromFile(private val satelliteRepo: SatelliteRepo) {
 
     suspend operator fun invoke(stream: InputStream) {
-        satelliteRepo.importDataFromStream(stream)
+        satelliteRepo.updateEntriesFromFile(stream)
     }
 }

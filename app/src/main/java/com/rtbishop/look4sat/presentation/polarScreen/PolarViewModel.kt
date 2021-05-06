@@ -18,14 +18,13 @@
 package com.rtbishop.look4sat.presentation.polarScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.LocationRepo
+import com.rtbishop.look4sat.data.PreferenceSource
 import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.domain.model.SatTrans
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
-import com.rtbishop.look4sat.interactors.GetTransmittersForSat
+import com.rtbishop.look4sat.interactors.GetSatTransmitters
 import com.rtbishop.look4sat.framework.OrientationProvider
-import com.rtbishop.look4sat.utility.PassesRepo
-import com.rtbishop.look4sat.framework.PrefsManager
+import com.rtbishop.look4sat.data.PassesRepo
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -37,11 +36,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PolarViewModel @Inject constructor(
-    private val locationRepo: LocationRepo,
     private val orientationProvider: OrientationProvider,
-    private val prefsManager: PrefsManager,
+    private val preferenceSource: PreferenceSource,
     private val passesRepo: PassesRepo,
-    private val getTransmittersForSat: GetTransmittersForSat,
+    private val getSatTransmitters: GetSatTransmitters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
@@ -62,20 +60,20 @@ class PolarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (prefsManager.shouldUseCompass()) orientationProvider.startListening(this)
+        if (preferenceSource.shouldUseCompass()) orientationProvider.startListening(this)
     }
 
     fun disableSensor() {
-        if (prefsManager.shouldUseCompass()) orientationProvider.stopListening()
+        if (preferenceSource.shouldUseCompass()) orientationProvider.stopListening()
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
-        _orientation.value = Triple(azimuth + locationRepo.getMagDeclination(), pitch, roll)
+        _orientation.value = Triple(azimuth + preferenceSource.getMagDeclination(), pitch, roll)
     }
 
     private fun initRotatorControl(satPass: SatPass) {
         viewModelScope.launch {
-            val rotatorPrefs = prefsManager.getRotatorServer()
+            val rotatorPrefs = preferenceSource.getRotatorServer()
             if (rotatorPrefs != null) {
                 runCatching {
                     withContext(ioDispatcher) {
@@ -99,7 +97,7 @@ class PolarViewModel @Inject constructor(
 
     private fun processTransmitters(satPass: SatPass) {
         viewModelScope.launch {
-            getTransmittersForSat(satPass.catNum).collect { transList ->
+            getSatTransmitters(satPass.catNum).collect { transList ->
                 while (isActive) {
                     val timeNow = Date()
                     val copiedList = transList.map { it.copy() }

@@ -29,7 +29,7 @@ class RoomDataSource(private val satelliteDao: SatelliteDao) : LocalDataSource {
         satelliteDao.updateEntriesSelection(catNums, isSelected)
     }
 
-    override fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>> {
+    override fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>> {
         return satelliteDao.getSatTransmitters(catNum)
             .map { satTransList -> DataMapper.satTransListToDomainTransList(satTransList) }
     }

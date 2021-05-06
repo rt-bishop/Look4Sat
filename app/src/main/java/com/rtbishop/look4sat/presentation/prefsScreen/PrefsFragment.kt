@@ -30,9 +30,8 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.LocationRepo
-import com.rtbishop.look4sat.framework.DefaultLocationSource
-import com.rtbishop.look4sat.framework.PrefsManager
+import com.rtbishop.look4sat.data.PreferenceSource
+import com.rtbishop.look4sat.framework.PreferencesProvider
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -40,10 +39,7 @@ import javax.inject.Inject
 class PrefsFragment : PreferenceFragmentCompat() {
 
     @Inject
-    lateinit var locationRepo: LocationRepo
-
-    @Inject
-    lateinit var prefsManager: PrefsManager
+    lateinit var preferenceSource: PreferenceSource
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -61,20 +57,20 @@ class PrefsFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        findPreference<Preference>(DefaultLocationSource.keyPositionGPS)?.apply {
+        findPreference<Preference>(PreferencesProvider.keyPositionGPS)?.apply {
             setOnPreferenceClickListener {
                 updatePositionFromGPS()
                 return@setOnPreferenceClickListener true
             }
         }
 
-        findPreference<Preference>(DefaultLocationSource.keyPositionQTH)?.apply {
+        findPreference<Preference>(PreferencesProvider.keyPositionQTH)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 updatePositionFromQth(newValue.toString())
             }
         }
 
-        findPreference<EditTextPreference>(PrefsManager.keyRotatorAddress)?.apply {
+        findPreference<EditTextPreference>(PreferencesProvider.keyRotatorAddress)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 if (Patterns.IP_ADDRESS.matcher(newValue.toString()).matches()) {
                     return@setOnPreferenceChangeListener true
@@ -85,7 +81,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
             }
         }
 
-        findPreference<EditTextPreference>(PrefsManager.keyRotatorPort)?.apply {
+        findPreference<EditTextPreference>(PreferencesProvider.keyRotatorPort)?.apply {
             setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
             setOnPreferenceChangeListener { _, newValue ->
                 val portValue = newValue.toString()
@@ -100,7 +96,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
     }
 
     private fun updatePositionFromQth(qthString: String): Boolean {
-        return if (locationRepo.updatePositionFromQTH(qthString)) {
+        return if (preferenceSource.updatePositionFromQTH(qthString)) {
             showSnack(getString(R.string.pref_pos_success))
             true
         } else {
@@ -113,7 +109,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
         val locPermString = Manifest.permission.ACCESS_FINE_LOCATION
         val locPermResult = ContextCompat.checkSelfPermission(requireContext(), locPermString)
         if (locPermResult == PackageManager.PERMISSION_GRANTED) {
-            if (locationRepo.updatePositionFromGPS()) {
+            if (preferenceSource.updatePositionFromGPS()) {
                 showSnack(getString(R.string.pref_pos_success))
             } else showSnack(getString(R.string.pref_pos_gps_null))
         } else requestPermissionLauncher.launch(locPermString)

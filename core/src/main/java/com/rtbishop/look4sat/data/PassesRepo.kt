@@ -15,26 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.utility
+package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.data.LocationRepo
-import com.rtbishop.look4sat.di.DefaultDispatcher
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import com.rtbishop.look4sat.framework.PrefsManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class PassesRepo @Inject constructor(
-    private val locationRepo: LocationRepo,
-    private val prefsManager: PrefsManager,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+class PassesRepo(
+    private val preferenceSource: PreferenceSource,
+    private val defaultDispatcher: CoroutineDispatcher
 ) {
     private val _passes = MutableSharedFlow<List<SatPass>>(replay = 1)
     private var selectedSatellites = emptyList<Satellite>()
@@ -64,15 +57,15 @@ class PassesRepo @Inject constructor(
     }
 
     private fun getPasses(satellite: Satellite, refDate: Date): List<SatPass> {
-        val predictor = satellite.getPredictor(locationRepo.getStationPosition())
-        return predictor.getPasses(refDate, prefsManager.getHoursAhead(), true)
+        val predictor = satellite.getPredictor(preferenceSource.loadStationPosition())
+        return predictor.getPasses(refDate, preferenceSource.getHoursAhead(), true)
     }
 
     private fun filterPasses(passes: List<SatPass>, refDate: Date): List<SatPass> {
-        val timeFuture = Date(refDate.time + (prefsManager.getHoursAhead() * 3600 * 1000))
+        val timeFuture = Date(refDate.time + (preferenceSource.getHoursAhead() * 3600 * 1000))
         return passes.filter { it.losDate.after(refDate) }
             .filter { it.aosDate.before(timeFuture) }
-            .filter { it.maxElevation > prefsManager.getMinElevation() }
+            .filter { it.maxElevation > preferenceSource.getMinElevation() }
             .sortedBy { it.aosDate }
     }
 }

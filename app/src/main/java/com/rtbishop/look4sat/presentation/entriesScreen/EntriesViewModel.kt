@@ -26,32 +26,29 @@ import androidx.lifecycle.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.framework.model.Result
-import com.rtbishop.look4sat.framework.model.TleSource
 import com.rtbishop.look4sat.interactors.GetSatItems
-import com.rtbishop.look4sat.interactors.ImportDataFromStream
-import com.rtbishop.look4sat.interactors.ImportDataFromWeb
+import com.rtbishop.look4sat.interactors.UpdateEntriesFromFile
+import com.rtbishop.look4sat.interactors.UpdateEntriesFromWeb
 import com.rtbishop.look4sat.interactors.UpdateEntriesSelection
-import com.rtbishop.look4sat.framework.PrefsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
-import kotlin.system.measureTimeMillis
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val prefsManager: PrefsManager,
+    private val preferenceSource: PreferencesProvider,
     private val resolver: ContentResolver,
     private val getSatItems: GetSatItems,
-    private val importDataFromStream: ImportDataFromStream,
-    private val importDataFromWeb: ImportDataFromWeb,
+    private val updateEntriesFromFile: UpdateEntriesFromFile,
+    private val updateEntriesFromWeb: UpdateEntriesFromWeb,
     private val updateEntriesSelection: UpdateEntriesSelection,
 ) : ViewModel(), EntriesAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
 
-    private val transModes = MutableLiveData(prefsManager.loadModesSelection())
+    private val transModes = MutableLiveData(preferenceSource.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsWithModes = transModes.switchMap { modes ->
         liveData { getSatItems().collect { emit(filterByModes(it, modes)) } }
@@ -65,32 +62,22 @@ class EntriesViewModel @Inject constructor(
     private var shouldSelectAll = true
     val satData: LiveData<Result<List<SatItem>>> = _satData
 
-    fun importSatDataFromFile(uri: Uri) {
+    fun updateEntriesFromFile(uri: Uri) {
         viewModelScope.launch {
             _satData.value = Result.InProgress
             runCatching {
-                resolver.openInputStream(uri)?.use { stream ->
-                    importDataFromStream(stream)
-                }
+                resolver.openInputStream(uri)?.use { stream -> updateEntriesFromFile(stream) }
             }.onFailure { _satData.value = Result.Error(it) }
         }
     }
 
-    fun importSatDataFromSources(sources: List<TleSource>) {
+    fun updateEntriesFromWeb(sources: List<String>?) {
         viewModelScope.launch {
             _satData.value = Result.InProgress
-            val satSources = if (sources.isNotEmpty()) sources
-            else prefsManager.loadDefaultSources()
-            val updateMillis = measureTimeMillis {
-                try {
-                    prefsManager.saveTleSources(satSources)
-                    importDataFromWeb(satSources.map { it.url })
-                } catch (exception: Exception) {
-                    _satData.value = Result.Error(exception)
-                    Timber.d(exception)
-                }
-            }
-            Timber.d("Update from WEB took $updateMillis ms")
+            runCatching {
+                if (sources == null) updateEntriesFromWeb()
+                else updateEntriesFromWeb(sources)
+            }.onFailure { _satData.value = Result.Error(it) }
         }
     }
 
@@ -111,7 +98,7 @@ class EntriesViewModel @Inject constructor(
             "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
         )
         val savedModes = BooleanArray(modes.size)
-        val selectedModes = prefsManager.loadModesSelection().toMutableList()
+        val selectedModes = preferenceSource.loadModesSelection().toMutableList()
         selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
         val dialogBuilder = MaterialAlertDialogBuilder(context).apply {
             setTitle(context.getString(R.string.modes_title))
@@ -123,7 +110,7 @@ class EntriesViewModel @Inject constructor(
             }
             setPositiveButton(context.getString(android.R.string.ok)) { _, _ ->
                 transModes.value = selectedModes
-                prefsManager.saveModesSelection(selectedModes)
+                preferenceSource.saveModesSelection(selectedModes)
             }
             setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()

@@ -39,18 +39,18 @@ object InteractorsModule {
     }
 
     @Provides
-    fun provideGetTransmittersForSatUseCase(satelliteRepo: SatelliteRepo): GetTransmittersForSat {
-        return GetTransmittersForSat(satelliteRepo)
+    fun provideGetSatTransmittersUseCase(satelliteRepo: SatelliteRepo): GetSatTransmitters {
+        return GetSatTransmitters(satelliteRepo)
     }
 
     @Provides
-    fun provideImportDataFromStreamUseCase(satelliteRepo: SatelliteRepo): ImportDataFromStream {
-        return ImportDataFromStream(satelliteRepo)
+    fun provideUpdateEntriesFromFileUseCase(satelliteRepo: SatelliteRepo): UpdateEntriesFromFile {
+        return UpdateEntriesFromFile(satelliteRepo)
     }
 
     @Provides
-    fun provideImportDataFromWebUseCase(satelliteRepo: SatelliteRepo): ImportDataFromWeb {
-        return ImportDataFromWeb(satelliteRepo)
+    fun provideUpdateEntriesFromWebUseCase(satelliteRepo: SatelliteRepo): UpdateEntriesFromWeb {
+        return UpdateEntriesFromWeb(satelliteRepo)
     }
 
     @Provides

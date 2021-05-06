@@ -10,13 +10,13 @@ interface LocalDataSource {
 
     fun getSatItems(): Flow<List<SatItem>>
 
+    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>>
+
     suspend fun getSelectedSatellites(): List<Satellite>
 
     suspend fun updateEntries(entries: List<SatEntry>)
 
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean)
-
-    fun getTransmittersForSat(catNum: Int): Flow<List<SatTrans>>
 
     suspend fun updateTransmitters(satelliteTrans: List<SatTrans>)
 }

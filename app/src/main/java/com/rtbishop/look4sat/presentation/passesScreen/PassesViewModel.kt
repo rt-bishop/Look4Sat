@@ -22,10 +22,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.framework.model.Result
-import com.rtbishop.look4sat.utility.PassesRepo
+import com.rtbishop.look4sat.data.PassesRepo
 import com.rtbishop.look4sat.interactors.GetSelectedSatellites
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
-import com.rtbishop.look4sat.framework.PrefsManager
+import com.rtbishop.look4sat.framework.PreferencesProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -35,7 +35,7 @@ import javax.inject.Inject
 class PassesViewModel @Inject constructor(
     private val getSelectedSatellites: GetSelectedSatellites,
     private val passesRepo: PassesRepo,
-    private val prefsManager: PrefsManager
+    private val preferenceSource: PreferencesProvider
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<Result<List<SatPass>>>(Result.InProgress)
@@ -64,7 +64,7 @@ class PassesViewModel @Inject constructor(
     }
 
     fun shouldUseUTC(): Boolean {
-        return prefsManager.shouldUseUTC()
+        return preferenceSource.shouldUseUTC()
     }
 
     private suspend fun tickPasses(passes: List<SatPass>) = withContext(Dispatchers.Default) {

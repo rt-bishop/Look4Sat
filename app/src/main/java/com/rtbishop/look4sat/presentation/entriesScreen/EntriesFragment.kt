@@ -22,18 +22,14 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.framework.model.TleSource
+import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.getNavResult
-import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -42,7 +38,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private val viewModel: EntriesViewModel by viewModels()
     private val contentContract = ActivityResultContracts.GetContent()
     private val filePicker = registerForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.importSatDataFromFile(uri) }
+        uri?.let { viewModel.updateEntriesFromFile(uri) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,9 +58,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
-            importWeb.setOnClickListener {
-                findNavController().navigateSafe(R.id.action_entries_to_sources)
-            }
+            importWeb.setOnClickListener { viewModel.updateEntriesFromWeb(null) }
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectMode.setOnClickListener { viewModel.createModesDialog(requireContext()).show() }
             selectAll.setOnClickListener { viewModel.selectCurrentItems() }
@@ -73,9 +67,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
             handleSatData(satData, binding, entriesAdapter)
         })
-        getNavResult<List<String>>(R.id.nav_entries, "sources") { navResult ->
-            handleNavResult(navResult)
-        }
     }
 
     private fun handleSatData(
@@ -97,15 +88,11 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             is Result.Error -> {
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
-                Snackbar.make(requireView(), R.string.entries_update_error, Snackbar.LENGTH_SHORT)
-                    .setAnchorView(R.id.nav_bottom).show()
+                val errorMsg = getString(R.string.entries_update_error)
+                Snackbar.make(requireView(), errorMsg, Snackbar.LENGTH_SHORT).apply {
+                    setAnchorView(R.id.nav_bottom)
+                }.show()
             }
-        }
-    }
-
-    private fun handleNavResult(result: List<String>) {
-        result.map { sourceUrl -> TleSource(sourceUrl) }.let { sources ->
-            viewModel.importSatDataFromSources(sources)
         }
     }
 }

@@ -16,13 +16,6 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_entries_to_sources"
-            app:destination="@id/nav_dialog_sources"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
     <fragment
@@ -66,10 +59,6 @@
         android:id="@+id/nav_info"
         android:name="com.rtbishop.look4sat.presentation.infoScreen.InfoFragment"
         tools:layout="@layout/fragment_info" />
-    <dialog
-        android:id="@+id/nav_dialog_sources"
-        android:name="com.rtbishop.look4sat.presentation.sourcesDialog.SourcesDialog"
-        tools:layout="@layout/dialog_sources" />
     <dialog
         android:id="@+id/nav_dialog_splash"
         android:name="com.rtbishop.look4sat.presentation.splashDialog.SplashDialog"
