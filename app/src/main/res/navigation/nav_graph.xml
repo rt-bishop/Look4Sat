@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_entries"
-        android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
+        android:name="com.rtbishop.look4sat.presentation.satItemScreen.SatItemFragment"
         tools:layout="@layout/fragment_entries">
         <action
             android:id="@+id/action_entries_to_passes"
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/nav_passes"
-        android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
+        android:name="com.rtbishop.look4sat.presentation.satPassScreen.SatPassFragment"
         tools:layout="@layout/fragment_passes">
         <action
             android:id="@+id/action_passes_to_polar"
@@ -33,7 +33,7 @@
 
     <fragment
         android:id="@+id/nav_polar"
-        android:name="com.rtbishop.look4sat.presentation.polarScreen.PolarFragment"
+        android:name="com.rtbishop.look4sat.presentation.satPassInfoScreen.PassInfoFragment"
         tools:layout="@layout/fragment_polar">
         <action
             android:id="@+id/action_polar_to_passes"
@@ -48,20 +48,20 @@
 
     <fragment
         android:id="@+id/nav_map"
-        android:name="com.rtbishop.look4sat.presentation.mapScreen.MapFragment"
+        android:name="com.rtbishop.look4sat.presentation.satMapScreen.SatMapFragment"
         tools:layout="@layout/fragment_map" />
 
     <fragment
         android:id="@+id/nav_prefs"
-        android:name="com.rtbishop.look4sat.presentation.prefsScreen.PrefsFragment" />
+        android:name="com.rtbishop.look4sat.presentation.appSettingsScreen.AppSettingsFragment" />
 
     <fragment
         android:id="@+id/nav_info"
-        android:name="com.rtbishop.look4sat.presentation.infoScreen.InfoFragment"
+        android:name="com.rtbishop.look4sat.presentation.appInfoScreen.AppInfoFragment"
         tools:layout="@layout/fragment_info" />
     <dialog
         android:id="@+id/nav_dialog_splash"
-        android:name="com.rtbishop.look4sat.presentation.splashDialog.SplashDialog"
+        android:name="com.rtbishop.look4sat.presentation.appSplashDialog.AppSplashDialog"
         tools:layout="@layout/dialog_splash" />
 
 </navigation>

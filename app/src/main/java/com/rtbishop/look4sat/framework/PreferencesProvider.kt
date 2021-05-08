@@ -21,7 +21,7 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
-import com.rtbishop.look4sat.data.PreferenceSource
+import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
 import com.rtbishop.look4sat.utility.round
@@ -31,7 +31,7 @@ class PreferencesProvider @Inject constructor(
     private val qthConverter: QthConverter,
     private val locationManager: LocationManager,
     private val preferences: SharedPreferences
-) : PreferenceSource {
+) : PreferencesSource {
 
     companion object {
         const val keyModes = "satModes"

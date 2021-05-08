@@ -24,8 +24,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
-import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,7 +34,7 @@ import javax.inject.Inject
 class Look4SatActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var preferenceSource: PreferencesProvider
+    lateinit var preferenceSource: PreferencesSource
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
