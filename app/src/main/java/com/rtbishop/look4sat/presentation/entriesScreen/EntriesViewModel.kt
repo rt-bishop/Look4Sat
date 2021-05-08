@@ -25,13 +25,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.framework.model.Result
-import com.rtbishop.look4sat.interactors.GetSatItems
-import com.rtbishop.look4sat.interactors.UpdateEntriesFromFile
-import com.rtbishop.look4sat.interactors.UpdateEntriesFromWeb
-import com.rtbishop.look4sat.interactors.UpdateEntriesSelection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -42,16 +39,13 @@ import javax.inject.Inject
 class EntriesViewModel @Inject constructor(
     private val preferenceSource: PreferencesProvider,
     private val resolver: ContentResolver,
-    private val getSatItems: GetSatItems,
-    private val updateEntriesFromFile: UpdateEntriesFromFile,
-    private val updateEntriesFromWeb: UpdateEntriesFromWeb,
-    private val updateEntriesSelection: UpdateEntriesSelection,
+    private val satelliteRepo: SatelliteRepo,
 ) : ViewModel(), EntriesAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
 
     private val transModes = MutableLiveData(preferenceSource.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsWithModes = transModes.switchMap { modes ->
-        liveData { getSatItems().collect { emit(filterByModes(it, modes)) } }
+        liveData { satelliteRepo.getSatItems().collect { emit(filterByModes(it, modes)) } }
     }
     private val itemsWithQuery = currentQuery.switchMap { query ->
         itemsWithModes.map { items -> Result.Success(filterByQuery(items, query)) }
@@ -66,7 +60,9 @@ class EntriesViewModel @Inject constructor(
         viewModelScope.launch {
             _satData.value = Result.InProgress
             runCatching {
-                resolver.openInputStream(uri)?.use { stream -> updateEntriesFromFile(stream) }
+                resolver.openInputStream(uri)?.use { stream ->
+                    satelliteRepo.updateEntriesFromFile(stream)
+                }
             }.onFailure { _satData.value = Result.Error(it) }
         }
     }
@@ -75,8 +71,8 @@ class EntriesViewModel @Inject constructor(
         viewModelScope.launch {
             _satData.value = Result.InProgress
             runCatching {
-                if (sources == null) updateEntriesFromWeb()
-                else updateEntriesFromWeb(sources)
+                if (sources == null) satelliteRepo.updateEntriesFromWeb()
+                else satelliteRepo.updateEntriesFromWeb(sources)
             }.onFailure { _satData.value = Result.Error(it) }
         }
     }
@@ -129,7 +125,7 @@ class EntriesViewModel @Inject constructor(
     }
 
     override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        viewModelScope.launch { updateEntriesSelection(catNums, isSelected) }
+        viewModelScope.launch { satelliteRepo.updateEntriesSelection(catNums, isSelected) }
     }
 
     private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {

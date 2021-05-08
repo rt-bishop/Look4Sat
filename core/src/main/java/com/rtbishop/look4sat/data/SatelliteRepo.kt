@@ -17,6 +17,12 @@ class SatelliteRepo(
     private val remoteSource: RemoteDataSource,
     private val ioDispatcher: CoroutineDispatcher
 ) {
+    private val defaultSources = listOf(
+        "https://celestrak.com/NORAD/elements/active.txt",
+        "https://amsat.org/tle/current/nasabare.txt",
+        "https://www.prismnet.com/~mmccants/tles/classfd.zip",
+        "https://www.prismnet.com/~mmccants/tles/inttles.zip"
+    )
 
     fun getSatItems(): Flow<List<SatItem>> {
         return localSource.getSatItems()
@@ -34,7 +40,7 @@ class SatelliteRepo(
         localSource.updateEntries(importSatEntries(stream))
     }
 
-    suspend fun updateEntriesFromWeb(sources: List<String>) {
+    suspend fun updateEntriesFromWeb(sources: List<String> = defaultSources) {
         coroutineScope {
             launch(ioDispatcher) {
                 val streams = mutableListOf<InputStream>()

@@ -21,11 +21,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.data.PassesRepo
-import com.rtbishop.look4sat.interactors.GetSelectedSatellites
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.framework.PreferencesProvider
+import com.rtbishop.look4sat.framework.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val getSelectedSatellites: GetSelectedSatellites,
+    private val satelliteRepo: SatelliteRepo,
     private val passesRepo: PassesRepo,
     private val preferenceSource: PreferencesProvider
 ) : ViewModel() {
@@ -45,7 +45,7 @@ class PassesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
-            passesRepo.triggerCalculation(getSelectedSatellites())
+            passesRepo.triggerCalculation(satelliteRepo.getSelectedSatellites())
         }
         viewModelScope.launch {
             passesRepo.passes.collect { passes ->
@@ -59,7 +59,7 @@ class PassesViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
             passesProcessing?.cancelAndJoin()
-            passesRepo.forceCalculation(getSelectedSatellites())
+            passesRepo.forceCalculation(satelliteRepo.getSelectedSatellites())
         }
     }
 

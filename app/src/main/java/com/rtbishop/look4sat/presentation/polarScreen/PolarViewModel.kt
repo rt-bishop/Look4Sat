@@ -18,13 +18,13 @@
 package com.rtbishop.look4sat.presentation.polarScreen
 
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.PassesRepo
 import com.rtbishop.look4sat.data.PreferenceSource
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.di.IoDispatcher
 import com.rtbishop.look4sat.domain.model.SatTrans
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
-import com.rtbishop.look4sat.interactors.GetSatTransmitters
 import com.rtbishop.look4sat.framework.OrientationProvider
-import com.rtbishop.look4sat.data.PassesRepo
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -39,7 +39,7 @@ class PolarViewModel @Inject constructor(
     private val orientationProvider: OrientationProvider,
     private val preferenceSource: PreferenceSource,
     private val passesRepo: PassesRepo,
-    private val getSatTransmitters: GetSatTransmitters,
+    private val satelliteRepo: SatelliteRepo,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
@@ -97,7 +97,7 @@ class PolarViewModel @Inject constructor(
 
     private fun processTransmitters(satPass: SatPass) {
         viewModelScope.launch {
-            getSatTransmitters(satPass.catNum).collect { transList ->
+            satelliteRepo.getSatTransmitters(satPass.catNum).collect { transList ->
                 while (isActive) {
                     val timeNow = Date()
                     val copiedList = transList.map { it.copy() }

@@ -19,12 +19,12 @@ package com.rtbishop.look4sat.presentation.mapScreen
 
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.PreferenceSource
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.di.DefaultDispatcher
 import com.rtbishop.look4sat.domain.predict4kotlin.Position
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
 import com.rtbishop.look4sat.framework.model.SatData
-import com.rtbishop.look4sat.interactors.GetSelectedSatellites
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -36,7 +36,7 @@ import kotlin.math.sqrt
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val getSelectedSatellites: GetSelectedSatellites,
+    private val satelliteRepo: SatelliteRepo,
     private val preferenceSource: PreferenceSource,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -66,7 +66,7 @@ class MapViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getSelectedSatellites().also { selectedSatellites ->
+            satelliteRepo.getSelectedSatellites().also { selectedSatellites ->
                 if (selectedSatellites.isNotEmpty()) {
                     allSatList = selectedSatellites
                     selectSatellite(selectedSatellites.first())
