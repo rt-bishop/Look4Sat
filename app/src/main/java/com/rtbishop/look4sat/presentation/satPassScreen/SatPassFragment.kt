@@ -17,8 +17,10 @@
  */
 package com.rtbishop.look4sat.presentation.satPassScreen
 
+import android.Manifest
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,12 +28,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.toTimerString
 import com.rtbishop.look4sat.utility.navigateSafe
+import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -39,6 +41,10 @@ import java.util.*
 class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.PassesClickListener {
 
     private val viewModel: SatPassViewModel by viewModels()
+    private val permRequest = ActivityResultContracts.RequestPermission()
+    private val permRequestLauncher = registerForActivityResult(permRequest) {
+        viewModel.triggerInitialSetup()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,6 +66,9 @@ class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.Passe
         }
         viewModel.passes.observe(viewLifecycleOwner, { passesResult ->
             handleNewPasses(passesResult, passesAdapter, binding)
+        })
+        viewModel.isFirstLaunchDone.observe(viewLifecycleOwner, { setupDone ->
+            if (!setupDone) permRequestLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         })
     }
 

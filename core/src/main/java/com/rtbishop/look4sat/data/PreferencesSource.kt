@@ -26,9 +26,9 @@ interface PreferencesSource {
 
     fun shouldUseCompass(): Boolean
 
-    fun isFirstLaunch(): Boolean
+    fun isSetupDone(): Boolean
 
-    fun setFirstLaunchDone()
+    fun setSetupDone()
 
     fun saveModesSelection(modes: List<String>)
 

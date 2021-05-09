@@ -40,7 +40,7 @@ class PreferencesProvider @Inject constructor(
         const val keyTimeUTC = "timeUTC"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
-        const val keyIsFirstLaunch = "shouldShowSplash"
+        const val keyInitialSetup = "initialSetupDone"
         const val keyRotator = "isRotatorEnabled"
         const val keyRotatorAddress = "rotatorAddress"
         const val keyRotatorPort = "rotatorPort"
@@ -123,12 +123,12 @@ class PreferencesProvider @Inject constructor(
         return preferences.getBoolean(keyCompass, true)
     }
 
-    override fun isFirstLaunch(): Boolean {
-        return preferences.getBoolean(keyIsFirstLaunch, true)
+    override fun isSetupDone(): Boolean {
+        return preferences.getBoolean(keyInitialSetup, false)
     }
 
-    override fun setFirstLaunchDone() {
-        preferences.edit { putBoolean(keyIsFirstLaunch, false) }
+    override fun setSetupDone() {
+        preferences.edit { putBoolean(keyInitialSetup, true) }
     }
 
     override fun saveModesSelection(modes: List<String>) {

@@ -24,17 +24,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
-import com.rtbishop.look4sat.utility.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class Look4SatActivity : AppCompatActivity() {
-
-    @Inject
-    lateinit var preferenceSource: PreferencesSource
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,9 +39,5 @@ class Look4SatActivity : AppCompatActivity() {
         setContentView(binding.root)
         val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         binding.navBottom.setupWithNavController(navHost.navController)
-        if (preferenceSource.isFirstLaunch()) {
-            preferenceSource.setFirstLaunchDone()
-            navHost.navController.navigateSafe(R.id.nav_dialog_splash)
-        }
     }
 }

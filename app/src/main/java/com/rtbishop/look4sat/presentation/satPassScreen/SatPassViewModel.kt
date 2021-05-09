@@ -35,23 +35,42 @@ import javax.inject.Inject
 class SatPassViewModel @Inject constructor(
     private val satDataRepository: SatDataRepository,
     private val satPassRepository: SatPassRepository,
-    private val preferenceSource: PreferencesSource
+    private val preferencesSource: PreferencesSource
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<Result<List<SatPass>>>(Result.InProgress)
+    private val _isFirstLaunchDone = MutableLiveData<Boolean>()
     private var passesProcessing: Job? = null
     val passes: LiveData<Result<List<SatPass>>> = _passes
+    val isFirstLaunchDone: LiveData<Boolean> = _isFirstLaunchDone
 
     init {
-        viewModelScope.launch {
-            _passes.postValue(Result.InProgress)
-            satPassRepository.triggerCalculation(satDataRepository.getSelectedSatellites())
+        if (preferencesSource.isSetupDone()) {
+            viewModelScope.launch {
+                _passes.postValue(Result.InProgress)
+                satPassRepository.triggerCalculation(satDataRepository.getSelectedSatellites())
+            }
+        } else {
+            _isFirstLaunchDone.value = false
         }
         viewModelScope.launch {
             satPassRepository.passes.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch { tickPasses(passes) }
             }
+        }
+    }
+
+    fun triggerInitialSetup() {
+        preferencesSource.updatePositionFromGPS()
+        viewModelScope.launch {
+            _passes.postValue(Result.InProgress)
+            satDataRepository.updateEntriesFromWeb()
+            val defaultCatNums = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
+            satDataRepository.updateEntriesSelection(defaultCatNums, true)
+            satPassRepository.forceCalculation(satDataRepository.getSelectedSatellites())
+            preferencesSource.setSetupDone()
+            _isFirstLaunchDone.value = true
         }
     }
 
@@ -64,7 +83,7 @@ class SatPassViewModel @Inject constructor(
     }
 
     fun shouldUseUTC(): Boolean {
-        return preferenceSource.shouldUseUTC()
+        return preferencesSource.shouldUseUTC()
     }
 
     private suspend fun tickPasses(passes: List<SatPass>) = withContext(Dispatchers.Default) {
