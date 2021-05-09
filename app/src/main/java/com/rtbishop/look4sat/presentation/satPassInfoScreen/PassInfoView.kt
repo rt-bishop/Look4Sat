@@ -18,7 +18,10 @@
 package com.rtbishop.look4sat.presentation.satPassInfoScreen
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
@@ -62,14 +65,6 @@ class PassInfoView(context: Context) : View(context) {
         isAntiAlias = true
         color = ContextCompat.getColor(context, R.color.themeLight)
         style = Paint.Style.FILL
-    }
-    private val satBmp = ContextCompat.getDrawable(context, R.drawable.ic_sat_polar)?.let { sat ->
-        Bitmap.createBitmap(sat.intrinsicWidth, sat.intrinsicHeight, Bitmap.Config.ARGB_8888).also {
-            val canvas = Canvas(it)
-            sat.setBounds(0, 0, canvas.width, canvas.height)
-            sat.draw(canvas)
-            return@let it
-        }
     }
     private val orientPaint = Paint().apply {
         isAntiAlias = true
@@ -134,10 +129,10 @@ class PassInfoView(context: Context) : View(context) {
 
     private fun drawSatellite(canvas: Canvas, satPass: SatPass) {
         val satPos = satPass.predictor.getSatPos(Date())
-        if (satPos.elevation > 0 && satBmp != null) {
-            val satX = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-            val satY = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            canvas.drawBitmap(satBmp, satX - satBmp.width / 2, -satY - satBmp.height / 2, satPaint)
+        if (satPos.elevation > 0) {
+            val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
+            val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
+            canvas.drawCircle(x, -y, txtSize / 2.4f, satPaint)
         }
     }
 
