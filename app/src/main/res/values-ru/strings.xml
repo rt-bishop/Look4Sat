@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="btn_yes">Да</string>
-    <string name="btn_no">Нет</string>
-    <string name="btn_cancel">Отмена</string>
-    <string name="btn_update">Обновить</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
     <string name="menu_entries">Спутники</string>
     <string name="menu_passes">Пролеты</string>
@@ -11,9 +9,9 @@
     <string name="menu_prefs">Настройки</string>
     <string name="menu_about">Инфо</string>
 
-    <string name="sources_title">Управление TLE</string>
-    <string name="sources_hint">Источник TLE</string>
-    <string name="sources_https">Только протокол HTTPS</string>
+    <string name="sources_title">Введите HTTPS адрес источника</string>
+    <string name="sources_hint">URL источника</string>
+    <string name="sources_error">Пожалуйста, проверьте URL</string>
 
     <string name="entries_update">Обновить спутники:</string>
     <string name="entries_search_hint">Имя / Номер</string>
@@ -60,11 +58,6 @@
     <string name="pref_compass_title">Использовать компас</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
-    <string name="splash_tle_msg">Данные спутников теряют точность со временем, поэтому
-        их рекомендуется обновлять примерно раз в неделю</string>
-    <string name="splash_loc_msg">Чтобы корректно рассчитывать орбиты спутников,
-        установите позицию наземной станции через меню Настройки</string>
-
     <string name="tracking_title">Настройки слежения</string>
     <string name="tracking_rotator_switch">Управление поворотным устройством</string>
     <string name="tracking_rotator_address">IP адрес поворотного устройства</string>
@@ -74,7 +67,7 @@
 
     <string name="info_version">Версия: %s</string>
     <string name="info_subtitle">Трекер спутников для Android</string>
-    <string name="info_bmc">Угостить кофе</string>
+    <string name="info_bmc">Поддержать</string>
     <string name="info_thanks">Огромное спасибо:
         \n— Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
         \n— <a href="https://github.com/g4dpz">David A. B. Johnson</a> и

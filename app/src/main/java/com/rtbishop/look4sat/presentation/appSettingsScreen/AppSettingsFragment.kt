@@ -28,10 +28,10 @@ import androidx.core.content.ContextCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.framework.PreferencesProvider
+import com.rtbishop.look4sat.utility.showSnack
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -46,7 +46,7 @@ class AppSettingsFragment : PreferenceFragmentCompat() {
             if (isGranted) {
                 updatePositionFromGPS()
             } else {
-                showSnack(getString(R.string.pref_pos_gps_error))
+                requireView().showSnack(getString(R.string.pref_pos_gps_error))
             }
         }
 
@@ -75,7 +75,7 @@ class AppSettingsFragment : PreferenceFragmentCompat() {
                 if (Patterns.IP_ADDRESS.matcher(newValue.toString()).matches()) {
                     return@setOnPreferenceChangeListener true
                 } else {
-                    showSnack(getString(R.string.tracking_rotator_address_invalid))
+                    requireView().showSnack(getString(R.string.tracking_rotator_address_invalid))
                     return@setOnPreferenceChangeListener false
                 }
             }
@@ -88,7 +88,7 @@ class AppSettingsFragment : PreferenceFragmentCompat() {
                 if (portValue.isNotEmpty() && portValue.toInt() in 1024..65535) {
                     return@setOnPreferenceChangeListener true
                 } else {
-                    showSnack(getString(R.string.tracking_rotator_port_invalid))
+                    requireView().showSnack(getString(R.string.tracking_rotator_port_invalid))
                     return@setOnPreferenceChangeListener false
                 }
             }
@@ -97,10 +97,10 @@ class AppSettingsFragment : PreferenceFragmentCompat() {
 
     private fun updatePositionFromQth(qthString: String): Boolean {
         return if (preferencesSource.updatePositionFromQTH(qthString)) {
-            showSnack(getString(R.string.pref_pos_success))
+            requireView().showSnack(getString(R.string.pref_pos_success))
             true
         } else {
-            showSnack(getString(R.string.pref_pos_qth_error))
+            requireView().showSnack(getString(R.string.pref_pos_qth_error))
             false
         }
     }
@@ -110,14 +110,10 @@ class AppSettingsFragment : PreferenceFragmentCompat() {
         val locPermResult = ContextCompat.checkSelfPermission(requireContext(), locPermString)
         if (locPermResult == PackageManager.PERMISSION_GRANTED) {
             if (preferencesSource.updatePositionFromGPS()) {
-                showSnack(getString(R.string.pref_pos_success))
-            } else showSnack(getString(R.string.pref_pos_gps_null))
+                requireView().showSnack(getString(R.string.pref_pos_success))
+            } else {
+                requireView().showSnack(getString(R.string.pref_pos_gps_null))
+            }
         } else requestPermissionLauncher.launch(locPermString)
-    }
-
-    private fun showSnack(message: String) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
-            setAnchorView(R.id.nav_bottom)
-        }.show()
     }
 }

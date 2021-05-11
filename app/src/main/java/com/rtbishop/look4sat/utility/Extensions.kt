@@ -18,10 +18,13 @@
 package com.rtbishop.look4sat.utility
 
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
+import com.google.android.material.snackbar.Snackbar
+import com.rtbishop.look4sat.R
 import java.util.concurrent.TimeUnit
 
 fun Long.toTimerString(): String {
@@ -36,6 +39,12 @@ fun Double.round(decimals: Int): Double {
     var multiplier = 1.0
     repeat(decimals) { multiplier *= 10 }
     return kotlin.math.round(this * multiplier) / multiplier
+}
+
+fun View.showSnack(message: String, isAnchored: Boolean = true) {
+    Snackbar.make(this, message, Snackbar.LENGTH_SHORT).apply {
+        if (isAnchored) setAnchorView(R.id.nav_bottom)
+    }.show()
 }
 
 fun NavController.navigateSafe(

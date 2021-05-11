@@ -58,8 +58,8 @@ class SatTransAdapter : RecyclerView.Adapter<SatTransAdapter.TransHolder>() {
         RecyclerView.ViewHolder(binding.root) {
 
         private val divider = 1000000f
-        private val strNo = itemView.context.getString(R.string.btn_no)
-        private val strYes = itemView.context.getString(R.string.btn_yes)
+        private val strNo = itemView.context.getString(R.string.no)
+        private val strYes = itemView.context.getString(R.string.yes)
         private val mode = itemView.context.getString(R.string.trans_mode)
         private val formatLink = itemView.context.getString(R.string.trans_link_low)
         private val formatLinkNull = itemView.context.getString(R.string.trans_no_link)

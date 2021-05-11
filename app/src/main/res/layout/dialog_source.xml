@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:hint="@string/sources_hint">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/sourceUrl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:inputType="textUri" />
+
+</com.google.android.material.textfield.TextInputLayout>

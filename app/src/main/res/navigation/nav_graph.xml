@@ -59,9 +59,5 @@
         android:id="@+id/nav_info"
         android:name="com.rtbishop.look4sat.presentation.appInfoScreen.AppInfoFragment"
         tools:layout="@layout/fragment_info" />
-    <dialog
-        android:id="@+id/nav_dialog_splash"
-        android:name="com.rtbishop.look4sat.presentation.appSplashDialog.AppSplashDialog"
-        tools:layout="@layout/dialog_splash" />
 
 </navigation>
