@@ -18,10 +18,7 @@
 package com.rtbishop.look4sat.presentation.satPassInfoScreen
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
@@ -33,49 +30,49 @@ import kotlin.math.sin
 class PassInfoView(context: Context) : View(context) {
 
     private lateinit var satPass: SatPass
-    private val polarWidth = resources.displayMetrics.widthPixels
-    private val polarCenter = polarWidth / 2f
     private val scale = resources.displayMetrics.density
-    private val radius = polarWidth * 0.48f
-    private val txtSize = scale * 16f
-    private val satTrack: Path = Path()
+    private val radarWidth = resources.displayMetrics.widthPixels
+    private val radarCenter = radarWidth / 2f
+    private val radarRadius = radarWidth * 0.48f
     private val piDiv2 = Math.PI / 2.0
+    private val arrowPath = Path()
+    private val satTrack: Path = Path()
+    private val strokeSize = scale * 2f
+    private val satSize = scale * 8f
+    private val txtSize = scale * 16f
+    private val radarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.greyLight)
+        style = Paint.Style.STROKE
+        strokeWidth = strokeSize
+    }
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.themeLight)
+        textSize = txtSize
+    }
+    private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.RED
+        style = Paint.Style.STROKE
+        strokeWidth = strokeSize
+    }
+    private val satPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.themeLight)
+        style = Paint.Style.FILL
+    }
+    private val arrowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.themeLight)
+        style = Paint.Style.FILL
+        strokeWidth = strokeSize
+    }
     private var azimuth: Float = 0f
     private var pitch: Float = 0f
     private var roll: Float = 0f
 
-    private val radarPaint = Paint().apply {
-        isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.greyLight)
-        style = Paint.Style.STROKE
-        strokeWidth = scale * 2f
-    }
-    private val txtPaint = Paint().apply {
-        isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.themeLight)
-        textSize = txtSize
-    }
-    private val trackPaint = Paint().apply {
-        isAntiAlias = true
-        color = Color.RED
-        style = Paint.Style.STROKE
-        strokeWidth = scale * 2f
-    }
-    private val satPaint = Paint().apply {
-        isAntiAlias = true
-        color = ContextCompat.getColor(context, R.color.themeLight)
-        style = Paint.Style.FILL
-    }
-    private val orientPaint = Paint().apply {
-        isAntiAlias = true
-        color = Color.RED
-        style = Paint.Style.STROKE
-        strokeWidth = scale * 2f
-    }
-
     fun setPass(satPass: SatPass) {
         this.satPass = satPass
-        createPassTrajectory(satPass)
+        if (!satPass.isDeepSpace) {
+            createPassTrajectory(satPass)
+            createPassTrajectoryArrow()
+        }
     }
 
     fun setOrientation(azimuth: Float, pitch: Float, roll: Float) {
@@ -88,63 +85,83 @@ class PassInfoView(context: Context) : View(context) {
 
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(ContextCompat.getColor(context, R.color.greyDark))
-        canvas.translate(polarCenter, polarCenter)
+        canvas.translate(radarCenter, radarCenter)
         drawRadarView(canvas)
         drawRadarText(canvas)
-        if (!satPass.isDeepSpace) canvas.drawPath(satTrack, trackPaint)
+        if (!satPass.isDeepSpace) {
+            canvas.drawPath(satTrack, trackPaint)
+            canvas.drawPath(satTrack, arrowPaint)
+        }
         drawSatellite(canvas, satPass)
-        drawOrientation(canvas, azimuth, pitch)
+        drawCrosshair(canvas, azimuth, pitch)
     }
 
     private fun createPassTrajectory(satPass: SatPass) {
-        val startTime = satPass.aosDate
-        val endTime = satPass.losDate
-        while (startTime.before(endTime)) {
-            val satPos = satPass.predictor.getSatPos(startTime)
-            val passX = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-            val passY = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            if (startTime.compareTo(satPass.aosDate) == 0) {
+        val currentTime = satPass.aosDate
+        while (currentTime.before(satPass.losDate)) {
+            val satPos = satPass.predictor.getSatPos(currentTime)
+            val passX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
+            val passY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
+            if (currentTime.compareTo(satPass.aosDate) == 0) {
                 satTrack.moveTo(passX, -passY)
             } else {
                 satTrack.lineTo(passX, -passY)
             }
-            startTime.time += 15000
+            currentTime.time += 15000
         }
     }
 
+    private fun createPassTrajectoryArrow() {
+        val radius = satSize
+        val sides = 3
+        val angle = 2.0 * Math.PI / sides
+        arrowPath.moveTo((radius * cos(angle)).toFloat(), (radius * sin(angle)).toFloat())
+        for (i in 1 until sides) {
+            val x = (radius * cos(angle - angle * i)).toFloat()
+            val y = (radius * sin(angle - angle * i)).toFloat()
+            arrowPath.lineTo(x, y)
+        }
+        arrowPath.close()
+        val trackLength = PathMeasure(satTrack, false).length
+        val quarter = trackLength / 4f
+        val center = trackLength / 2f
+        val effect = PathDashPathEffect(arrowPath, center, quarter, PathDashPathEffect.Style.ROTATE)
+        arrowPaint.pathEffect = effect
+    }
+
     private fun drawRadarView(canvas: Canvas) {
-        canvas.drawLine(-radius, 0f, radius, 0f, radarPaint)
-        canvas.drawLine(0f, -radius, 0f, radius, radarPaint)
-        canvas.drawCircle(0f, 0f, radius, radarPaint)
-        canvas.drawCircle(0f, 0f, (radius / 3) * 2, radarPaint)
-        canvas.drawCircle(0f, 0f, radius / 3, radarPaint)
+        canvas.drawLine(-radarRadius, 0f, radarRadius, 0f, radarPaint)
+        canvas.drawLine(0f, -radarRadius, 0f, radarRadius, radarPaint)
+        canvas.drawCircle(0f, 0f, radarRadius, radarPaint)
+        canvas.drawCircle(0f, 0f, (radarRadius / 3) * 2, radarPaint)
+        canvas.drawCircle(0f, 0f, radarRadius / 3, radarPaint)
     }
 
     private fun drawRadarText(canvas: Canvas) {
-        canvas.drawText("N", scale, -radius + txtSize - scale * 2, txtPaint)
-        canvas.drawText("30°", scale, -((radius / 3) * 2) - scale * 2, txtPaint)
-        canvas.drawText("60°", scale, -(radius / 3) - scale * 2, txtPaint)
-        canvas.drawText("90°", scale, -scale * 2, txtPaint)
+        canvas.drawText("N", scale, -radarRadius + txtSize - strokeSize, textPaint)
+        canvas.drawText("30°", scale, -((radarRadius / 3) * 2) - strokeSize, textPaint)
+        canvas.drawText("60°", scale, -(radarRadius / 3) - strokeSize, textPaint)
+        canvas.drawText("90°", scale, -strokeSize, textPaint)
     }
 
     private fun drawSatellite(canvas: Canvas, satPass: SatPass) {
         val satPos = satPass.predictor.getSatPos(Date())
         if (satPos.elevation > 0) {
-            val x = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-            val y = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-            canvas.drawCircle(x, -y, txtSize / 2.4f, satPaint)
+            val satX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
+            val satY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
+            canvas.drawCircle(satX, -satY, satSize, satPaint)
         }
     }
 
-    private fun drawOrientation(canvas: Canvas, azimuth: Float, pitch: Float) {
+    private fun drawCrosshair(canvas: Canvas, azimuth: Float, pitch: Float) {
         val azimuthRad = Math.toRadians(azimuth.toDouble())
         val tmpElevation = Math.toRadians(pitch.toDouble())
         val elevationRad = if (tmpElevation > 0.0) 0.0 else tmpElevation
-        val orientX = sph2CartX(azimuthRad, -elevationRad, radius.toDouble())
-        val orientY = sph2CartY(azimuthRad, -elevationRad, radius.toDouble())
-        canvas.drawLine(orientX - txtSize, -orientY, orientX + txtSize, -orientY, orientPaint)
-        canvas.drawLine(orientX, -orientY - txtSize, orientX, -orientY + txtSize, orientPaint)
-        canvas.drawCircle(orientX, -orientY, txtSize / 2, orientPaint)
+        val crossX = sph2CartX(azimuthRad, -elevationRad, radarRadius.toDouble())
+        val crossY = sph2CartY(azimuthRad, -elevationRad, radarRadius.toDouble())
+        canvas.drawLine(crossX - txtSize, -crossY, crossX + txtSize, -crossY, trackPaint)
+        canvas.drawLine(crossX, -crossY - txtSize, crossX, -crossY + txtSize, trackPaint)
+        canvas.drawCircle(crossX, -crossY, txtSize / 2, trackPaint)
     }
 
     private fun sph2CartX(azimuth: Double, elevation: Double, r: Double): Float {
