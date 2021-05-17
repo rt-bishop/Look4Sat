@@ -60,8 +60,8 @@ class SatMapViewModel @Inject constructor(
     private val _satData = MutableLiveData<SatData>()
     val satData: LiveData<SatData> = this._satData
 
-    private val _allSatPositions = MutableLiveData<Map<Satellite, Position>>()
-    val allSatPositions: LiveData<Map<Satellite, Position>> = _allSatPositions
+    private val _satPositions = MutableLiveData<Map<Satellite, Position>>()
+    val satPositions: LiveData<Map<Satellite, Position>> = _satPositions
 
     init {
         viewModelScope.launch {
@@ -118,7 +118,7 @@ class SatMapViewModel @Inject constructor(
                 val osmLon = clipLon(Math.toDegrees(satPos.longitude))
                 satPositions[satellite] = Position(osmLat, osmLon)
             }
-            _allSatPositions.postValue(satPositions)
+            _satPositions.postValue(satPositions)
         }
     }
 

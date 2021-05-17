@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Look4Sat</string>
-    <string name="placeholder" translatable="false">Placeholder</string>
+    <string name="placeholder" translatable="false">dummy</string>
 
     <string name="no">No</string>
     <string name="yes">Yes</string>
@@ -60,7 +60,7 @@
 
     <string name="pref_gsp_title">Ground station position</string>
     <string name="pref_pos_gps">Set position from GPS data</string>
-    <string name="pref_pos_gps_null">Location is switched off</string>
+    <string name="pref_pos_gps_null">No geolocation data</string>
     <string name="pref_pos_gps_error">Check your location permissions</string>
     <string name="pref_pos_qth">Set position from QTH locator</string>
     <string name="pref_pos_qth_error">Invalid QTH locator</string>

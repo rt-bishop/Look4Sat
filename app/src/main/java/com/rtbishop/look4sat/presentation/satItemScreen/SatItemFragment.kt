@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogSourceBinding
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
@@ -64,7 +65,7 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
             importWeb.setOnClickListener { viewModel.updateEntriesFromWeb(null) }
             importSource.setOnClickListener { showSourceDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
-            selectMode.setOnClickListener { viewModel.createModesDialog(requireContext()).show() }
+            selectMode.setOnClickListener { showModesDialog() }
             selectAll.setOnClickListener { viewModel.selectCurrentItems() }
             searchBar.setOnQueryTextListener(viewModel)
         }
@@ -111,6 +112,35 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
                 }
             }
             setNeutralButton(android.R.string.cancel, null)
+        }
+        dialogBuilder.create().show()
+    }
+
+    private fun showModesDialog() {
+        val modes = arrayOf(
+            "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
+            "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
+            "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
+            "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
+            "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
+        )
+        val savedModes = BooleanArray(modes.size)
+        val selectedModes = viewModel.loadSelectedModes().toMutableList()
+        selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
+        val dialogBuilder = MaterialAlertDialogBuilder(requireContext()).apply {
+            setTitle(context.getString(R.string.modes_title))
+            setMultiChoiceItems(modes, savedModes) { _, which, isChecked ->
+                when {
+                    isChecked -> selectedModes.add(modes[which])
+                    selectedModes.contains(modes[which]) -> selectedModes.remove(modes[which])
+                }
+            }
+            setPositiveButton(context.getString(android.R.string.ok)) { _, _ ->
+                viewModel.saveSelectedModes(selectedModes)
+            }
+            setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
         }
         dialogBuilder.create().show()
     }

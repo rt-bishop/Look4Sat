@@ -49,21 +49,19 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
-    private val viewModelSat: SatMapViewModel by viewModels()
+    private val viewModel: SatMapViewModel by viewModels()
     private val minLat = MapView.getTileSystem().minLatitude
     private val maxLat = MapView.getTileSystem().maxLatitude
-    private val trackPaint = Paint().apply {
+    private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         strokeWidth = 2f
         style = Paint.Style.STROKE
         color = Color.RED
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
-        isAntiAlias = true
     }
-    private val footprintPaint = Paint().apply {
+    private val footprintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.parseColor("#26FFE082")
-        isAntiAlias = true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,10 +71,9 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
             mapView.apply {
                 setMultiTouchControls(true)
                 setTileSource(TileSourceFactory.WIKIMEDIA)
-                val minZoom = getMinZoom(resources.displayMetrics.heightPixels)
-                minZoomLevel = minZoom
+                minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels)
                 maxZoomLevel = 6.0
-                controller.setZoom(minZoom + 0.5)
+                controller.setZoom(minZoomLevel + 0.5)
                 zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
                 overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
                 overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
@@ -86,17 +83,17 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
         }
-        binding.fabPrev.setOnClickListener { viewModelSat.scrollSelection(true) }
-        binding.fabNext.setOnClickListener { viewModelSat.scrollSelection(false) }
+        binding.fabPrev.setOnClickListener { viewModel.scrollSelection(true) }
+        binding.fabNext.setOnClickListener { viewModel.scrollSelection(false) }
         setupObservers(binding)
     }
 
     private fun setupObservers(binding: FragmentMapBinding) {
-        viewModelSat.stationPos.observe(viewLifecycleOwner, { renderStationPos(it, binding) })
-        viewModelSat.allSatPositions.observe(viewLifecycleOwner, { renderSatPositions(it, binding) })
-        viewModelSat.satTrack.observe(viewLifecycleOwner, { renderSatTrack(it, binding) })
-        viewModelSat.satFootprint.observe(viewLifecycleOwner, { renderSatFootprint(it, binding) })
-        viewModelSat.satData.observe(viewLifecycleOwner, { renderSatData(it, binding) })
+        viewModel.stationPos.observe(viewLifecycleOwner, { renderStationPos(it, binding) })
+        viewModel.satPositions.observe(viewLifecycleOwner, { renderSatPositions(it, binding) })
+        viewModel.satTrack.observe(viewLifecycleOwner, { renderSatTrack(it, binding) })
+        viewModel.satFootprint.observe(viewLifecycleOwner, { renderSatFootprint(it, binding) })
+        viewModel.satData.observe(viewLifecycleOwner, { renderSatData(it, binding) })
     }
 
     private fun renderStationPos(stationPos: Position, binding: FragmentMapBinding) {
@@ -116,7 +113,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
         binding.apply {
             val markers = FolderOverlay()
             posMap.entries.forEach {
-                if (viewModelSat.shouldUseTextLabels()) {
+                if (viewModel.shouldUseTextLabels()) {
                     Marker(mapView).apply {
                         setInfoWindow(null)
                         textLabelFontSize = 24
@@ -131,7 +128,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
                             Timber.d(exception)
                         }
                         setOnMarkerClickListener { _, _ ->
-                            viewModelSat.selectSatellite(it.key)
+                            viewModel.selectSatellite(it.key)
                             return@setOnMarkerClickListener true
                         }
                         markers.add(this)
@@ -147,7 +144,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
                             Timber.d(exception)
                         }
                         setOnMarkerClickListener { _, _ ->
-                            viewModelSat.selectSatellite(it.key)
+                            viewModel.selectSatellite(it.key)
                             return@setOnMarkerClickListener true
                         }
                         markers.add(this)

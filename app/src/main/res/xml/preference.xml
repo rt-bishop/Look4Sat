@@ -61,7 +61,7 @@
         android:title="@string/pref_map_labels_title"
         app:iconSpaceReserved="false">
         <SwitchPreferenceCompat
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="shouldUseTextLabels"
             android:title="@string/pref_map_labels"
             app:iconSpaceReserved="false" />
