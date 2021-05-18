@@ -21,6 +21,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.widget.SearchView
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatDataRepository
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.framework.model.Result
@@ -32,6 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SatItemViewModel @Inject constructor(
+    private val preferencesSource: PreferencesSource,
     private val resolver: ContentResolver,
     private val satDataRepository: SatDataRepository,
 ) : ViewModel(), SatItemAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
@@ -61,12 +63,12 @@ class SatItemViewModel @Inject constructor(
         }
     }
 
-    fun updateEntriesFromWeb(sources: List<String>?) {
+    fun updateEntriesFromWeb(sources: List<String>) {
         viewModelScope.launch {
             _satData.value = Result.InProgress
             runCatching {
-                if (sources == null) satDataRepository.updateEntriesFromWeb()
-                else satDataRepository.updateEntriesFromWeb(sources)
+                preferencesSource.saveTleSources(sources)
+                satDataRepository.updateEntriesFromWeb(sources)
             }.onFailure { _satData.value = Result.Error(it) }
         }
     }

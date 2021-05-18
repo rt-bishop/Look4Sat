@@ -27,9 +27,9 @@ import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.framework.api.SatDataRemote
 import com.rtbishop.look4sat.framework.api.SatDataService
 import com.rtbishop.look4sat.framework.db.RoomConverters
-import com.rtbishop.look4sat.framework.db.SatDataLocal
 import com.rtbishop.look4sat.framework.db.SatDataDao
 import com.rtbishop.look4sat.framework.db.SatDataDb
+import com.rtbishop.look4sat.framework.db.SatDataLocal
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -58,11 +58,12 @@ object SatDataModule {
     @Provides
     @Singleton
     fun providePreferenceSource(
+        moshi: Moshi,
         qthConverter: QthConverter,
         locationManager: LocationManager,
         preferences: SharedPreferences
     ): PreferencesSource {
-        return PreferencesProvider(qthConverter, locationManager, preferences)
+        return PreferencesProvider(moshi, qthConverter, locationManager, preferences)
     }
 
     @Provides

@@ -2,6 +2,8 @@
 <resources>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="btn_update">Обновить</string>
 
     <string name="menu_entries">Спутники</string>
     <string name="menu_passes">Пролеты</string>
@@ -9,8 +11,9 @@
     <string name="menu_prefs">Настройки</string>
     <string name="menu_about">Инфо</string>
 
-    <string name="sources_title">Введите HTTPS адрес источника</string>
+    <string name="sources_title">Управление TLE</string>
     <string name="sources_hint">URL источника</string>
+    <string name="sources_https">Только протокол HTTPS</string>
     <string name="sources_error">Пожалуйста, проверьте URL</string>
 
     <string name="entries_update">Обновить спутники:</string>

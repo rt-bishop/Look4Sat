@@ -25,15 +25,49 @@ import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
 import com.rtbishop.look4sat.utility.round
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import javax.inject.Inject
 
 class PreferencesProvider @Inject constructor(
+    moshi: Moshi,
     private val qthConverter: QthConverter,
     private val locationManager: LocationManager,
     private val preferences: SharedPreferences
 ) : PreferencesSource {
 
+    private val sourcesType = Types.newParameterizedType(List::class.java, String::class.java)
+    private val sourcesAdapter = moshi.adapter<List<String>>(sourcesType)
+
+    override fun loadTleSources(): List<String> {
+        return try {
+            val sourcesString = preferences.getString(keySources, String())
+            if (sourcesString.isNullOrEmpty()) {
+                loadDefaultSources()
+            } else {
+                sourcesAdapter.fromJson(sourcesString) ?: loadDefaultSources()
+            }
+        } catch (exception: ClassCastException) {
+            loadDefaultSources()
+        }
+    }
+
+    override fun saveTleSources(sources: List<String>) {
+        val sourcesJson = sourcesAdapter.toJson(sources)
+        preferences.edit { putString(keySources, sourcesJson) }
+    }
+
+    override fun loadDefaultSources(): List<String> {
+        return listOf(
+            "https://celestrak.com/NORAD/elements/active.txt",
+            "https://amsat.org/tle/current/nasabare.txt",
+            "https://www.prismnet.com/~mmccants/tles/classfd.zip",
+            "https://www.prismnet.com/~mmccants/tles/inttles.zip"
+        )
+    }
+
     companion object {
+        const val keySources = "sourcesListJson"
         const val keyModes = "satModes"
         const val keyCompass = "compass"
         const val keyTextLabels = "shouldUseTextLabels"

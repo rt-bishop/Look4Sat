@@ -65,8 +65,8 @@ class SatPassViewModel @Inject constructor(
         preferencesSource.updatePositionFromGPS()
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
-            satDataRepository.updateEntriesFromWeb()
             val defaultCatNums = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
+            satDataRepository.updateEntriesFromWeb(preferencesSource.loadDefaultSources())
             satDataRepository.updateEntriesSelection(defaultCatNums, true)
             satPassRepository.forceCalculation(satDataRepository.getSelectedSatellites())
             preferencesSource.setSetupDone()

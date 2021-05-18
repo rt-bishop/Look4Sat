@@ -52,4 +52,10 @@ interface PreferencesSource {
     fun loadModesSelection(): List<String>
 
     fun getRotatorServer(): Pair<String, Int>?
+
+    fun loadTleSources(): List<String>
+
+    fun saveTleSources(sources: List<String>)
+
+    fun loadDefaultSources(): List<String>
 }

@@ -35,12 +35,6 @@ class SatDataRepository(
     private val satRemoteSource: SatDataRemoteSource,
     private val ioDispatcher: CoroutineDispatcher
 ) {
-    private val defaultSources = listOf(
-        "https://celestrak.com/NORAD/elements/active.txt",
-        "https://amsat.org/tle/current/nasabare.txt",
-        "https://www.prismnet.com/~mmccants/tles/classfd.zip",
-        "https://www.prismnet.com/~mmccants/tles/inttles.zip"
-    )
 
     fun saveSelectedModes(modes: List<String>) {
         preferencesSource.saveModesSelection(modes)
@@ -66,7 +60,7 @@ class SatDataRepository(
         satLocalSource.updateEntries(importSatEntries(stream))
     }
 
-    suspend fun updateEntriesFromWeb(sources: List<String> = defaultSources) {
+    suspend fun updateEntriesFromWeb(sources: List<String>) {
         coroutineScope {
             launch(ioDispatcher) {
                 val streams = mutableListOf<InputStream>()

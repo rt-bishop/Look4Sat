@@ -30,19 +30,7 @@
         android:backgroundTint="@color/greyDark"
         android:contentDescription="@string/placeholder"
         android:elevation="4dp"
-        android:src="@drawable/ic_baseline_cached_24"
-        app:layout_constraintBottom_toBottomOf="@+id/import_file"
-        app:layout_constraintEnd_toStartOf="@+id/import_source"
-        app:layout_constraintTop_toTopOf="@+id/import_file" />
-
-    <ImageButton
-        android:id="@+id/import_source"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:backgroundTint="@color/greyDark"
-        android:contentDescription="@string/placeholder"
-        android:elevation="4dp"
-        android:src="@drawable/ic_baseline_link_24"
+        android:src="@drawable/ic_update_web"
         app:layout_constraintBottom_toBottomOf="@+id/import_file"
         app:layout_constraintEnd_toStartOf="@+id/import_file"
         app:layout_constraintTop_toTopOf="@+id/import_file" />

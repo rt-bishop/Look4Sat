@@ -5,6 +5,8 @@
 
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_update">Update</string>
 
     <string name="menu_entries">Satellites</string>
     <string name="menu_passes">Passes</string>
@@ -12,8 +14,9 @@
     <string name="menu_prefs">Settings</string>
     <string name="menu_about">Info</string>
 
-    <string name="sources_title">Enter HTTPS source address</string>
+    <string name="sources_title">Manage TLE sources</string>
     <string name="sources_hint">Source URL</string>
+    <string name="sources_https">Protocol HTTPS only</string>
     <string name="sources_error">Please check the entered URL</string>
 
     <string name="entries_update">TLE data update:</string>

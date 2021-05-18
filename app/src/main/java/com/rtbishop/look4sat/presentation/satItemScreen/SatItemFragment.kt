@@ -24,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -33,6 +34,8 @@ import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.utility.RecyclerDivider
+import com.rtbishop.look4sat.utility.getNavResult
+import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.showSnack
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -62,8 +65,11 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
-            importWeb.setOnClickListener { viewModel.updateEntriesFromWeb(null) }
-            importSource.setOnClickListener { showSourceDialog() }
+            importWeb.setOnClickListener {
+//                viewModel.updateEntriesFromWeb(null)
+                findNavController().navigateSafe(R.id.action_entries_to_sources)
+            }
+//            importSource.setOnClickListener { showSourceDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectMode.setOnClickListener { showModesDialog() }
             selectAll.setOnClickListener { viewModel.selectCurrentItems() }
@@ -72,6 +78,9 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
             handleSatData(satData, binding, entriesAdapter)
         })
+        getNavResult<List<String>>(R.id.nav_entries, "sources") { sources ->
+            viewModel.updateEntriesFromWeb(sources)
+        }
     }
 
     private fun handleSatData(
