@@ -47,7 +47,7 @@ class PreferencesProvider @Inject constructor(
             } else {
                 sourcesAdapter.fromJson(sourcesString) ?: loadDefaultSources()
             }
-        } catch (exception: ClassCastException) {
+        } catch (exception: Exception) {
             loadDefaultSources()
         }
     }
@@ -67,7 +67,7 @@ class PreferencesProvider @Inject constructor(
     }
 
     companion object {
-        const val keySources = "sourcesListJson"
+        const val keySources = "prefTleSourcesKey"
         const val keyModes = "satModes"
         const val keyCompass = "compass"
         const val keyTextLabels = "shouldUseTextLabels"
