@@ -22,12 +22,18 @@ import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.sin
 
+@AndroidEntryPoint
 class PassInfoView(context: Context) : View(context) {
+
+    @Inject lateinit var preferencesSource: PreferencesSource
 
     private lateinit var satPass: SatPass
     private val scale = resources.displayMetrics.density
@@ -93,7 +99,9 @@ class PassInfoView(context: Context) : View(context) {
             canvas.drawPath(satTrack, arrowPaint)
         }
         drawSatellite(canvas, satPass)
-        drawCrosshair(canvas, azimuth, pitch)
+        if (preferencesSource.shouldUseCompass()) {
+            drawCrosshair(canvas, azimuth, pitch)
+        }
     }
 
     private fun createPassTrajectory(satPass: SatPass) {

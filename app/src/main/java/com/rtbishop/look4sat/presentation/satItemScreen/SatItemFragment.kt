@@ -18,10 +18,8 @@
 package com.rtbishop.look4sat.presentation.satItemScreen
 
 import android.os.Bundle
-import android.util.Patterns
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -29,7 +27,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.DialogSourceBinding
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.framework.model.Result
@@ -66,10 +63,8 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
             importWeb.setOnClickListener {
-//                viewModel.updateEntriesFromWeb(null)
                 findNavController().navigateSafe(R.id.action_entries_to_sources)
             }
-//            importSource.setOnClickListener { showSourceDialog() }
             importFile.setOnClickListener { filePicker.launch("*/*") }
             selectMode.setOnClickListener { showModesDialog() }
             selectAll.setOnClickListener { viewModel.selectCurrentItems() }
@@ -93,7 +88,6 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
                 satItemAdapter.submitList(result.data)
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
-                binding.entriesRecycler.scrollToPosition(0)
             }
             is Result.InProgress -> {
                 binding.entriesProgress.visibility = View.VISIBLE
@@ -105,24 +99,6 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
                 requireView().showSnack(getString(R.string.entries_update_error))
             }
         }
-    }
-
-    private fun showSourceDialog() {
-        val dialogBinding = DialogSourceBinding.inflate(requireActivity().layoutInflater)
-        val dialogBuilder = AlertDialog.Builder(requireContext()).apply {
-            setMessage(getString(R.string.sources_title))
-            setView(dialogBinding.root)
-            setPositiveButton(android.R.string.ok) { _, _ ->
-                val editTextInput = dialogBinding.sourceUrl.text.toString()
-                if (Patterns.WEB_URL.matcher(editTextInput).matches()) {
-                    viewModel.updateEntriesFromWeb(listOf(editTextInput))
-                } else {
-                    requireView().showSnack(getString(R.string.sources_error))
-                }
-            }
-            setNeutralButton(android.R.string.cancel, null)
-        }
-        dialogBuilder.create().show()
     }
 
     private fun showModesDialog() {
