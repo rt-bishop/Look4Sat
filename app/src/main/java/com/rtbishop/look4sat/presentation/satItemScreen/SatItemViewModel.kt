@@ -66,10 +66,12 @@ class SatItemViewModel @Inject constructor(
     fun updateEntriesFromWeb(sources: List<String>) {
         viewModelScope.launch {
             _satData.value = Result.InProgress
-            runCatching {
+            try {
                 preferencesSource.saveTleSources(sources)
                 satDataRepository.updateEntriesFromWeb(sources)
-            }.onFailure { _satData.value = Result.Error(it) }
+            } catch (exception: Exception) {
+                _satData.value = Result.Error(exception)
+            }
         }
     }
 
