@@ -37,9 +37,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
+import javax.net.ssl.HostnameVerifier
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -109,8 +111,11 @@ object SatDataModule {
 
     @Provides
     fun provideSatDataService(): SatDataService {
+        val verifier = HostnameVerifier { _, _ -> true }
+        val httpClient = OkHttpClient.Builder().hostnameVerifier(verifier).build()
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
+            .client(httpClient)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
             .create(SatDataService::class.java)

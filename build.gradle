@@ -9,12 +9,12 @@ buildscript {
         navigation_version = '2.3.5'
         preference_version = '1.1.1'
         room_version = '2.3.0'
-        hilt_version = '2.36'
+        hilt_version = '2.37'
         retrofit_version = '2.9.0'
         osmdroid_version = '6.1.10'
         timber_version = '4.7.1'
         junit_version = '4.13.2'
-        mockito_version = '3.10.0'
+        mockito_version = '3.11.1'
         leak_canary_version = '2.7'
     }
     repositories {

@@ -11,10 +11,10 @@ android {
 
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 30
-        versionCode 252
-        versionName "2.5.2"
+        versionCode 253
+        versionName "2.5.3"
     }
 
     buildTypes {
