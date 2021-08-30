@@ -1,8 +1,8 @@
 buildscript {
     ext {
-        gradle_version = '7.0.1'
+        gradle_version = '7.0.2'
         kotlin_version = '1.5.30'
-        coroutines_version = '1.5.1-native-mt'
+        coroutines_version = '1.5.2-native-mt'
         material_version = '1.4.0'
         constraint_layout_version = '2.1.0'
         lifecycle_version = '2.3.1'

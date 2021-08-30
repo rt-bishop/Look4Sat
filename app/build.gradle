@@ -12,6 +12,7 @@ android {
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
         minSdkVersion 23
+        resConfigs "en,ru"
         targetSdkVersion 30
         versionCode 253
         versionName "2.5.3"
@@ -19,6 +20,9 @@ android {
 
     buildTypes {
         release {
+//            minifyEnabled true
+//            shrinkResources true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             postprocessing {
                 removeUnusedCode true
                 removeUnusedResources true
