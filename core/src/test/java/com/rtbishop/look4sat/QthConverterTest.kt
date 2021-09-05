@@ -53,7 +53,7 @@ class QthConverterTest {
     }
 
     @Test
-    fun `Given invalid location returns null`() {
+    fun `Given invalid POS returns null`() {
         assert(qthConverter.positionToQTH(91.0542, -170.1142) == null)
         assert(qthConverter.positionToQTH(89.0542, -240.1142) == null)
     }

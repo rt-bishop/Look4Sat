@@ -154,7 +154,7 @@ class SatMapViewModel @Inject constructor(
 
     private suspend fun setSelectedSatFootprint(sat: Satellite, gsp: StationPosition, date: Date) {
         withContext(defaultDispatcher) {
-            val satFootprint = sat.getPosition(gsp, date).getRangeCircle().map { rangePos ->
+            val satFootprint = sat.getPredictor(gsp).getRangeCircle(date).map { rangePos ->
                 val osmLat = clipLat(rangePos.latitude)
                 val osmLon = clipLon(rangePos.longitude)
                 Position(osmLat, osmLon)

@@ -18,11 +18,50 @@
 package com.rtbishop.look4sat.domain.predict4kotlin
 
 import java.util.*
+import kotlin.math.*
 
 class PassPredictor(private val satellite: Satellite, private val stationPos: StationPosition) {
 
     private val oneQuarterOrbitMin = (24.0 * 60.0 / satellite.tle.meanmo / 4.0).toInt()
     private val speedOfLight = 2.99792458E8
+    private val earthRadiusKm = 6378.16
+
+    fun getRangeCircle(date: Date): List<Position> {
+        val satPos = getSatPos(date)
+        val positions = mutableListOf<Position>()
+        val lat = satPos.latitude
+        val lon = satPos.longitude
+        // rangeCircleRadiusKm
+        // earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + satPos.altitude))
+        val beta = acos(earthRadiusKm / (earthRadiusKm + satPos.altitude))
+        var tempAzimuth = 0
+        while (tempAzimuth < 360) {
+            val azimuth = tempAzimuth / 360.0 * 2.0 * Math.PI
+            var rangelat = asin(sin(lat) * cos(beta) + cos(azimuth) * sin(beta) * cos(lat))
+            val num = (cos(beta) - (sin(lat) * sin(rangelat)))
+            val den = cos(lat) * cos(rangelat)
+            var rangelon = if (tempAzimuth == 0 && (beta > ((Math.PI / 2.0) - lat))) {
+                lon + Math.PI
+            } else if (tempAzimuth == 180 && (beta > ((Math.PI / 2.0) - lat))) {
+                lon + Math.PI
+            } else if (abs(num / den) > 1.0) {
+                lon
+            } else {
+                if ((180 - tempAzimuth) >= 0) {
+                    lon - acos(num / den)
+                } else {
+                    lon + acos(num / den)
+                }
+            }
+            while (rangelon < 0.0) rangelon += Math.PI * 2.0
+            while (rangelon > Math.PI * 2.0) rangelon -= Math.PI * 2.0
+            rangelat = Math.toDegrees(rangelat)
+            rangelon = Math.toDegrees(rangelon)
+            positions.add(Position(rangelat, rangelon))
+            tempAzimuth += 1
+        }
+        return positions
+    }
 
     fun getDownlinkFreq(freq: Long, date: Date): Long {
         val rangeRate = getSatPos(date).rangeRate
