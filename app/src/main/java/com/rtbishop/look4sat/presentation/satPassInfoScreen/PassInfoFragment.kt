@@ -25,17 +25,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
 import com.rtbishop.look4sat.utility.RecyclerDivider
-import com.rtbishop.look4sat.utility.toTimerString
 import com.rtbishop.look4sat.utility.navigateSafe
+import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PassInfoFragment : Fragment(R.layout.fragment_polar) {
 
+    @Inject
+    lateinit var preferencesSource: PreferencesSource
     private val viewModel: PassInfoViewModel by viewModels()
     private var passInfoView: PassInfoView? = null
 
@@ -69,7 +73,10 @@ class PassInfoFragment : Fragment(R.layout.fragment_polar) {
         val catNum = requireArguments().getInt("catNum")
         val aosTime = requireArguments().getLong("aosTime")
         viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
-            passInfoView = PassInfoView(requireContext()).apply { setPass(pass) }
+            passInfoView = PassInfoView(requireContext()).apply {
+                setShowAim(preferencesSource.shouldUseCompass())
+                setPass(pass)
+            }
             binding.frame.addView(passInfoView)
             observeTransmitters(pass, satTransAdapter, binding)
         }
