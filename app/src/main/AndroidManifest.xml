@@ -13,7 +13,8 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".presentation.Look4SatActivity"
-            android:theme="@style/AppTheme.Splash">
+            android:theme="@style/AppTheme.Splash"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
