@@ -17,7 +17,6 @@
  */
 package com.rtbishop.look4sat.domain.predict4kotlin
 
-import java.io.InputStream
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.*
@@ -345,53 +344,5 @@ abstract class Satellite(val tle: TLE) {
         var gmst = 24110.54841 + tu * (8640184.812866 + tu * (0.093104 - tu * 6.2E-6))
         gmst = modulus(gmst + secPerDay * earthRotPerSidDay * ut)
         return twoPi * gmst / secPerDay
-    }
-
-    companion object {
-
-        fun createSat(tle: TLE?): Satellite? {
-            return when {
-                tle == null -> null
-                tle.isDeepspace -> DeepSpaceSat(tle)
-                else -> NearEarthSat(tle)
-            }
-        }
-
-        fun importElements(tleStream: InputStream): List<TLE> {
-            val currentTLE = arrayOf(String(), String(), String())
-            val importedTles = mutableListOf<TLE>()
-            var line = 0
-            tleStream.bufferedReader().forEachLine {
-                if (line != 2) {
-                    currentTLE[line] = it
-                    line++
-                } else {
-                    currentTLE[line] = it
-                    parseElement(currentTLE)?.let { tle -> importedTles.add(tle) }
-                    line = 0
-                }
-            }
-            return importedTles
-        }
-
-        private fun parseElement(tle: Array<String>): TLE? {
-            if (tle.size != 3) return null
-            try {
-                val name: String = tle[0].trim()
-                val epoch: Double = tle[1].substring(18, 32).toDouble()
-                val meanmo: Double = tle[2].substring(52, 63).toDouble()
-                val eccn: Double = 1.0e-07 * tle[2].substring(26, 33).toDouble()
-                val incl: Double = tle[2].substring(8, 16).toDouble()
-                val raan: Double = tle[2].substring(17, 25).toDouble()
-                val argper: Double = tle[2].substring(34, 42).toDouble()
-                val meanan: Double = tle[2].substring(43, 51).toDouble()
-                val catnum: Int = tle[1].substring(2, 7).trim().toInt()
-                val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() /
-                        10.0.pow(tle[1].substring(60, 61).toDouble())
-                return TLE(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
-            } catch (exception: Exception) {
-                return null
-            }
-        }
     }
 }

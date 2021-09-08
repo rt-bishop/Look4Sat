@@ -20,6 +20,7 @@ package com.rtbishop.look4sat.framework.db
 import androidx.room.TypeConverter
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.domain.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.predict4kotlin.createSat
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
@@ -46,6 +47,6 @@ object RoomConverters {
     @JvmStatic
     @TypeConverter
     fun satFromString(string: String): Satellite? {
-        return Satellite.createSat(tleAdapter.fromJson(string))
+        return tleAdapter.fromJson(string)?.createSat()
     }
 }

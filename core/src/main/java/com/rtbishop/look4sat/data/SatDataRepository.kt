@@ -21,6 +21,7 @@ import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatTrans
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.TLE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -90,6 +91,6 @@ class SatDataRepository(
     }
 
     private fun importSatEntries(stream: InputStream): List<SatEntry> {
-        return Satellite.importElements(stream).map { tle -> SatEntry(tle) }
+        return TLE.importElements(stream).map { tle -> SatEntry(tle) }
     }
 }
