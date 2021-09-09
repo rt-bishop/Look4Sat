@@ -23,6 +23,7 @@ import com.rtbishop.look4sat.data.SatDataRepository
 import com.rtbishop.look4sat.domain.predict4kotlin.Position
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
+import com.rtbishop.look4sat.domain.predict4kotlin.getRangeCircle
 import com.rtbishop.look4sat.framework.model.SatData
 import com.rtbishop.look4sat.injection.DefaultDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -154,7 +155,7 @@ class SatMapViewModel @Inject constructor(
 
     private suspend fun setSelectedSatFootprint(sat: Satellite, gsp: StationPosition, date: Date) {
         withContext(defaultDispatcher) {
-            val satFootprint = sat.getPredictor(gsp).getRangeCircle(date).map { rangePos ->
+            val satFootprint = sat.getPosition(gsp, date).getRangeCircle().map { rangePos ->
                 val osmLat = clipLat(rangePos.latitude)
                 val osmLon = clipLon(rangePos.longitude)
                 Position(osmLat, osmLon)

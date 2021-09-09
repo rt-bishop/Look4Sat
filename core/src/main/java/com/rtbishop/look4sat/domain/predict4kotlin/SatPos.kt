@@ -18,6 +18,10 @@
 package com.rtbishop.look4sat.domain.predict4kotlin
 
 import java.util.*
+import kotlin.math.*
+
+const val earthRadiusKm = 6378.16
+const val speedOfLight = 2.99792458E8
 
 data class SatPos(
     var azimuth: Double = 0.0,
@@ -30,3 +34,47 @@ data class SatPos(
     var theta: Double = 0.0,
     var time: Date = Date()
 )
+
+fun SatPos.getDownlinkFreq(freq: Long): Long {
+    return (freq.toDouble() * (speedOfLight - this.rangeRate * 1000.0) / speedOfLight).toLong()
+}
+
+fun SatPos.getUplinkFreq(freq: Long): Long {
+    return (freq.toDouble() * (speedOfLight + this.rangeRate * 1000.0) / speedOfLight).toLong()
+}
+
+fun SatPos.getRangeCircle(): List<Position> {
+    val positions = mutableListOf<Position>()
+    val lat = this.latitude
+    val lon = this.longitude
+    // rangeCircleRadiusKm
+    // earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + satPos.altitude))
+    val beta = acos(earthRadiusKm / (earthRadiusKm + this.altitude))
+    var tempAzimuth = 0
+    while (tempAzimuth < 360) {
+        val azimuth = tempAzimuth / 360.0 * 2.0 * Math.PI
+        var rangelat = asin(sin(lat) * cos(beta) + cos(azimuth) * sin(beta) * cos(lat))
+        val num = (cos(beta) - (sin(lat) * sin(rangelat)))
+        val den = cos(lat) * cos(rangelat)
+        var rangelon = if (tempAzimuth == 0 && (beta > ((Math.PI / 2.0) - lat))) {
+            lon + Math.PI
+        } else if (tempAzimuth == 180 && (beta > ((Math.PI / 2.0) - lat))) {
+            lon + Math.PI
+        } else if (abs(num / den) > 1.0) {
+            lon
+        } else {
+            if ((180 - tempAzimuth) >= 0) {
+                lon - acos(num / den)
+            } else {
+                lon + acos(num / den)
+            }
+        }
+        while (rangelon < 0.0) rangelon += Math.PI * 2.0
+        while (rangelon > Math.PI * 2.0) rangelon -= Math.PI * 2.0
+        rangelat = Math.toDegrees(rangelat)
+        rangelon = Math.toDegrees(rangelon)
+        positions.add(Position(rangelat, rangelon))
+        tempAzimuth += 1
+    }
+    return positions
+}
