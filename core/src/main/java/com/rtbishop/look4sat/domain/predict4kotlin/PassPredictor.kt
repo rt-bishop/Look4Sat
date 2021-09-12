@@ -18,11 +18,10 @@
 package com.rtbishop.look4sat.domain.predict4kotlin
 
 import java.util.*
-import kotlin.math.*
 
-class PassPredictor(private val satellite: Satellite, private val stationPos: StationPosition) {
+class PassPredictor(private val satellite: Satellite, private val stationPos: StationPos) {
 
-    private val oneQuarterOrbitMin = (24.0 * 60.0 / satellite.tle.meanmo / 4.0).toInt()
+    private val oneQuarterOrbitMin = (24.0 * 60.0 / satellite.params.meanmo / 4.0).toInt()
     private val speedOfLight = 2.99792458E8
 
     fun getDownlinkFreq(freq: Long, date: Date): Long {
@@ -41,7 +40,7 @@ class PassPredictor(private val satellite: Satellite, private val stationPos: St
 
     fun getPositions(refDate: Date, stepSec: Int, minBefore: Int, orbits: Double): List<SatPos> {
         val positions = mutableListOf<SatPos>()
-        val orbitalPeriod = 24 * 60 / satellite.tle.meanmo
+        val orbitalPeriod = 24 * 60 / satellite.params.meanmo
         val endDate = Date(refDate.time + (orbitalPeriod * orbits * 60L * 1000L).toLong())
         val startDate = Date(refDate.time - minBefore * 60L * 1000L)
         var currentDate = startDate
@@ -60,16 +59,15 @@ class PassPredictor(private val satellite: Satellite, private val stationPos: St
         var lastAosDate: Date
         var count = 0
         if (satellite.willBeSeen(stationPos)) {
-            if (satellite.tle.isDeepspace) {
+            if (satellite.params.isDeepspace) {
                 passes.add(nextDeepSpacePass(refDate))
             } else {
                 do {
                     if (count > 0) shouldWindBack = false
                     val pass = nextNearEarthPass(startDate, shouldWindBack)
-                    lastAosDate = pass.aosDate
+                    lastAosDate = Date(pass.aosTime)
                     passes.add(pass)
-                    startDate =
-                        Date(pass.losDate.time + (oneQuarterOrbitMin * 3) * 60L * 1000L)
+                    startDate = Date(pass.losTime + (oneQuarterOrbitMin * 3) * 60L * 1000L)
                     count++
                 } while (lastAosDate < endDate)
             }
@@ -79,16 +77,13 @@ class PassPredictor(private val satellite: Satellite, private val stationPos: St
 
     private fun nextDeepSpacePass(refDate: Date): SatPass {
         val satPos = getSatPos(refDate)
-        val id = satellite.tle.catnum
-        val name = satellite.tle.name
-        val isDeep = satellite.tle.isDeepspace
         val aos = Date(refDate.time - 24 * 60L * 60L * 1000L).time
         val los = Date(refDate.time + 24 * 60L * 60L * 1000L).time
         val tca = Date((aos + los) / 2).time
         val az = Math.toDegrees(satPos.azimuth)
         val elev = Math.toDegrees(satPos.elevation)
         val alt = satPos.altitude
-        return SatPass(id, name, isDeep, aos, az, los, az, tca, az, alt, elev, this)
+        return SatPass(aos, az, los, az, tca, az, alt, elev, satellite, this)
     }
 
     private fun nextNearEarthPass(refDate: Date, windBack: Boolean = false): SatPass {
@@ -96,9 +91,6 @@ class PassPredictor(private val satellite: Satellite, private val stationPos: St
             clear()
             timeInMillis = refDate.time
         }
-        val id = satellite.tle.catnum
-        val name = satellite.tle.name
-        val isDeep = satellite.tle.isDeepspace
 
         var elevation: Double
         var maxElevation = 0.0
@@ -176,6 +168,6 @@ class PassPredictor(private val satellite: Satellite, private val stationPos: St
         val losAz = Math.toDegrees(satPos.azimuth)
         val tca = Date((aos + los) / 2).time
         val elev = Math.toDegrees(maxElevation)
-        return SatPass(id, name, isDeep, aos, aosAz, los, losAz, tca, tcaAz, alt, elev, this)
+        return SatPass(aos, aosAz, los, losAz, tca, tcaAz, alt, elev, satellite, this)
     }
 }

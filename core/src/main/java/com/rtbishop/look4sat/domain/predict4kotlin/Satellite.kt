@@ -21,7 +21,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.*
 
-abstract class Satellite(val tle: TLE) {
+abstract class Satellite(val params: TLE) {
 
     private val flatFactor = 3.35281066474748E-3
     private val deg2Rad = 1.745329251994330E-2
@@ -41,26 +41,26 @@ abstract class Satellite(val tle: TLE) {
     var s4 = 0.0
     val xke = 7.43669161E-2
 
-    fun willBeSeen(pos: StationPosition): Boolean {
-        return if (tle.meanmo < 1e-8) false else {
-            var lin = tle.incl
+    fun willBeSeen(pos: StationPos): Boolean {
+        return if (params.meanmo < 1e-8) false else {
+            var lin = params.incl
             if (lin >= 90.0) lin = 180.0 - lin
-            val sma = 331.25 * exp(ln(1440.0 / tle.meanmo) * (2.0 / 3.0))
-            val apogee = sma * (1.0 + tle.eccn) - earthRadius
+            val sma = 331.25 * exp(ln(1440.0 / params.meanmo) * (2.0 / 3.0))
+            val apogee = sma * (1.0 + params.eccn) - earthRadius
             acos(earthRadius / (apogee + earthRadius)) + lin * deg2Rad > abs(pos.latitude * deg2Rad)
         }
     }
 
-    fun getPredictor(pos: StationPosition): PassPredictor {
+    fun getPredictor(pos: StationPos): PassPredictor {
         return PassPredictor(this, pos)
     }
 
-    fun getPosition(pos: StationPosition, time: Date): SatPos {
+    fun getPosition(pos: StationPos, time: Date): SatPos {
         val satPos = SatPos()
         // Date/time at which the position and velocity were calculated
         val julUTC = calcCurrentDaynum(time) + 2444238.5
         // Convert satellite's epoch time to Julian and calculate time since epoch in minutes
-        val julEpoch = juliandDateOfEpoch(tle.epoch)
+        val julEpoch = juliandDateOfEpoch(params.epoch)
         val tsince = (julUTC - julEpoch) * minPerDay
         calculateSDP4orSGP4(tsince)
         // Scale position and velocity vectors to km and km/sec
@@ -105,7 +105,7 @@ abstract class Satellite(val tle: TLE) {
     }
 
     private fun calculateSDP4orSGP4(tsince: Double) {
-        if (tle.isDeepspace) (this as DeepSpaceSat).calculateSDP4(tsince)
+        if (params.isDeepspace) (this as DeepSpaceSat).calculateSDP4(tsince)
         else (this as NearEarthSat).calculateSGP4(tsince)
     }
 
@@ -120,7 +120,7 @@ abstract class Satellite(val tle: TLE) {
         julianUTC: Double,
         positionVector: Vector4,
         velocityVector: Vector4,
-        gsPos: StationPosition,
+        gsPos: StationPos,
         squintVector: Vector4,
         satPos: SatPos
     ) {
@@ -162,7 +162,7 @@ abstract class Satellite(val tle: TLE) {
     // Returns the ECI position and velocity of the observer
     private fun calculateUserPosVel(
         time: Double,
-        gsPos: StationPosition,
+        gsPos: StationPos,
         gsPosTheta: AtomicReference<Double>,
         obsPos: Vector4,
         obsVel: Vector4

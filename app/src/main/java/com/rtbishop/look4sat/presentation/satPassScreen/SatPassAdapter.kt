@@ -34,7 +34,7 @@ class SatPassAdapter(private val isUTC: Boolean, private val clickListener: Pass
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatPass>() {
         override fun areItemsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
-            return oldItem.catNum == newItem.catNum && oldItem.aosDate == newItem.aosDate
+            return oldItem.catNum == newItem.catNum && oldItem.aosTime == newItem.aosTime
         }
 
         override fun areContentsTheSame(oldItem: SatPass, newItem: SatPass): Boolean {
@@ -99,9 +99,9 @@ class SatPassAdapter(private val isUTC: Boolean, private val clickListener: Pass
                 passLeoAosAz.text = String.format(aosAzFormat, satPass.aosAzimuth)
                 passLeoMaxEl.text = String.format(maxElFormat, satPass.maxElevation)
                 passLeoLosAz.text = String.format(losAzFormat, satPass.losAzimuth)
-                passLeoStart.text = startFormat.format(satPass.aosDate)
+                passLeoStart.text = startFormat.format(Date(satPass.aosTime))
                 passLeoTcaAz.text = String.format(tcaAzFormat, satPass.tcaAzimuth)
-                passLeoEnd.text = endFormat.format(satPass.losDate)
+                passLeoEnd.text = endFormat.format(Date(satPass.losTime))
                 passLeoProgress.progress = satPass.progress
             }
 

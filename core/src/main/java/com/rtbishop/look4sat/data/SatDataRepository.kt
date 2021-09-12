@@ -91,6 +91,6 @@ class SatDataRepository(
     }
 
     private fun importSatEntries(stream: InputStream): List<SatEntry> {
-        return TLE.importElements(stream).map { tle -> SatEntry(tle) }
+        return TLE.parseStream(stream).map { tle -> SatEntry(tle) }
     }
 }

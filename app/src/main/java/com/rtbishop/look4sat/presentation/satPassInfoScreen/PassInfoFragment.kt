@@ -119,13 +119,13 @@ class PassInfoFragment : Fragment(R.layout.fragment_polar) {
         binding.satName.text = satPass.name
 
         if (!satPass.isDeepSpace) {
-            if (dateNow.before(satPass.aosDate)) {
-                val millisBeforeStart = satPass.aosDate.time.minus(timeNow)
+            if (dateNow.time < satPass.aosTime) {
+                val millisBeforeStart = satPass.aosTime.minus(timeNow)
                 binding.polarTimer.text = millisBeforeStart.toTimerString()
             } else {
-                val millisBeforeEnd = satPass.losDate.time.minus(timeNow)
+                val millisBeforeEnd = satPass.losTime.minus(timeNow)
                 binding.polarTimer.text = millisBeforeEnd.toTimerString()
-                if (dateNow.after(satPass.losDate)) {
+                if (dateNow.time > satPass.losTime) {
                     binding.polarTimer.text = 0L.toTimerString()
                     findNavController().navigateSafe(R.id.action_polar_to_passes)
                 }

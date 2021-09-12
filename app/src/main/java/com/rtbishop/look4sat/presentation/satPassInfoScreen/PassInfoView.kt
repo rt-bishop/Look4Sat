@@ -200,17 +200,17 @@ class PassInfoView(context: Context) : View(context) {
     }
 
     private fun createPassTrajectory(satPass: SatPass) {
-        val currentTime = satPass.aosDate
-        while (currentTime.before(satPass.losDate)) {
-            val satPos = satPass.predictor.getSatPos(currentTime)
+        var currentTime = satPass.aosTime
+        while (currentTime < satPass.losTime) {
+            val satPos = satPass.predictor.getSatPos(Date(currentTime))
             val passX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
             val passY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
-            if (currentTime.compareTo(satPass.aosDate) == 0) {
+            if (currentTime == satPass.aosTime) {
                 trackPath.moveTo(passX, -passY)
             } else {
                 trackPath.lineTo(passX, -passY)
             }
-            currentTime.time += 15000
+            currentTime += 15000
         }
     }
 

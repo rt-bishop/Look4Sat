@@ -92,10 +92,10 @@ class SatPassViewModel @Inject constructor(
             val timeNow = System.currentTimeMillis()
             currentPasses.forEach { pass ->
                 if (!pass.isDeepSpace) {
-                    val timeStart = pass.aosDate.time
+                    val timeStart = pass.aosTime
                     if (timeNow > timeStart) {
                         val deltaNow = timeNow.minus(timeStart).toFloat()
-                        val deltaTotal = pass.losDate.time.minus(timeStart).toFloat()
+                        val deltaTotal = pass.losTime.minus(timeStart).toFloat()
                         pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
                     }
                 }

@@ -39,13 +39,16 @@ data class TLE(
     val xno: Double = meanmo * Math.PI * 2.0 / 1440
     val isDeepspace: Boolean = meanmo < 6.4
 
+    fun createSat(): Satellite {
+        return when {
+            this.isDeepspace -> DeepSpaceSat(this)
+            else -> NearEarthSat(this)
+        }
+    }
+
     companion object {
 
-        fun createSat(array: Array<String>): Satellite? {
-            return importElement(array)?.createSat()
-        }
-
-        fun importElement(array: Array<String>): TLE? {
+        fun parseArray(array: Array<String>): TLE? {
             if (array.size != 3) return null
             try {
                 val name: String = array[0].trim()
@@ -65,7 +68,7 @@ data class TLE(
             }
         }
 
-        fun importElements(stream: InputStream): List<TLE> {
+        fun parseStream(stream: InputStream): List<TLE> {
             val elementArray = arrayOf(String(), String(), String())
             val importedElements = mutableListOf<TLE>()
             var line = 0
@@ -75,18 +78,11 @@ data class TLE(
                     line++
                 } else {
                     elementArray[line] = it
-                    importElement(elementArray)?.let { tle -> importedElements.add(tle) }
+                    parseArray(elementArray)?.let { tle -> importedElements.add(tle) }
                     line = 0
                 }
             }
             return importedElements
         }
-    }
-}
-
-fun TLE.createSat(): Satellite {
-    return when {
-        this.isDeepspace -> DeepSpaceSat(this)
-        else -> NearEarthSat(this)
     }
 }

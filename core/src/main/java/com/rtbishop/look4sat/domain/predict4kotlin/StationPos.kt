@@ -17,4 +17,9 @@
  */
 package com.rtbishop.look4sat.domain.predict4kotlin
 
-data class Position(val latitude: Double, val longitude: Double)
+data class StationPos(
+    val latitude: Double,
+    val longitude: Double,
+    val altitude: Double,
+    val name: String = "default"
+)

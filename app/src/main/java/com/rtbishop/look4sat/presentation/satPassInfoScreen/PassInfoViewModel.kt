@@ -50,7 +50,7 @@ class PassInfoViewModel @Inject constructor(
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
         satPassRepository.passes.collect { passes ->
-            val pass = passes.find { it.catNum == catNum && it.aosDate.time == aosTime }
+            val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
             pass?.let { satPass ->
                 processTransmitters(satPass)
                 initRotatorControl(satPass)

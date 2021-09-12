@@ -1,34 +1,17 @@
-/*
- * Look4Sat. Amateur radio satellite tracker and pass predictor.
- * Copyright (C) 2019-2021 Arty Bishop (bishop.arty@gmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
-import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict4kotlin.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class SatPassRepository(
+class SatPredictor(
     private val preferencesSource: PreferencesSource,
     private val defaultDispatcher: CoroutineDispatcher
 ) {
+    // Multi Sat passes
     private val _passes = MutableSharedFlow<List<SatPass>>(replay = 1)
     private var selectedSatellites = emptyList<Satellite>()
     val passes: SharedFlow<List<SatPass>> = _passes
@@ -68,4 +51,36 @@ class SatPassRepository(
             .filter { it.maxElevation > preferencesSource.getMinElevation() }
             .sortedBy { it.aosTime }
     }
+
+    // Single Sat radar
+
+    // Constant calculation of beacon Az/El point
+    private val _beaconPoint = MutableSharedFlow<SkyPos>(replay = 1)
+    val beaconPoint: SharedFlow<SkyPos> = _beaconPoint
+
+    suspend fun calculateSatBeacon(satPass: SatPass, stationPos: StationPos, date: Date) {
+        withContext(defaultDispatcher) {
+            val satPos = satPass.satellite.getPosition(stationPos, date)
+            _beaconPoint.emit(SkyPos(satPos.azimuth, satPos.elevation))
+        }
+    }
+
+    // Single calculation of beacon Az/El points list
+    private val _trajectoryPoints = MutableSharedFlow<List<SkyPos>>(replay = 1)
+    val trajectoryPoints: SharedFlow<List<SkyPos>> = _trajectoryPoints
+
+    suspend fun calculateSatTrajectory(satPass: SatPass, stationPos: StationPos) {
+        withContext(defaultDispatcher) {
+            val trajectoryPoints = mutableListOf<SkyPos>()
+            var currentTime = satPass.aosTime
+            while (currentTime < satPass.losTime) {
+                val satPos = satPass.satellite.getPosition(stationPos, Date(currentTime))
+                trajectoryPoints.add(SkyPos(satPos.azimuth, satPos.elevation))
+                currentTime += 15000
+            }
+            _trajectoryPoints.emit(trajectoryPoints)
+        }
+    }
+
+    // Multi Sat map
 }

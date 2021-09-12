@@ -21,7 +21,7 @@ import kotlin.math.round
 
 class QthConverter {
 
-    fun qthToPosition(qthString: String): Position? {
+    fun qthToPosition(qthString: String): GeoPos? {
         val trimmedQth = qthString.take(6)
         if (!isValidQTH(trimmedQth)) return null
         val lonFirst = (trimmedQth[0].uppercaseChar().code - 65) * 20
@@ -32,7 +32,7 @@ class QthConverter {
         val latThird = (((trimmedQth[5].lowercaseChar().code - 97) / 24.0) + (1.0 / 48.0)) - 90
         val longitude = (lonFirst + lonSecond + lonThird).roundToDecimals(4)
         val latitude = (latFirst + latSecond + latThird).roundToDecimals(4)
-        return Position(latitude, longitude)
+        return GeoPos(latitude, longitude)
     }
 
     fun positionToQTH(lat: Double, lon: Double): String? {

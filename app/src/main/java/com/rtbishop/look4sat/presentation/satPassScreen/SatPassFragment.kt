@@ -110,12 +110,12 @@ class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.Passe
         if (passes.isNotEmpty()) {
             val timeNow = System.currentTimeMillis()
             try {
-                val nextPass = passes.first { it.aosDate.time.minus(timeNow) > 0 }
-                val millisBeforeStart = nextPass.aosDate.time.minus(timeNow)
+                val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
+                val millisBeforeStart = nextPass.aosTime.minus(timeNow)
                 binding.passesTimer.text = millisBeforeStart.toTimerString()
             } catch (e: NoSuchElementException) {
                 val lastPass = passes.last()
-                val millisBeforeEnd = lastPass.losDate.time.minus(timeNow)
+                val millisBeforeEnd = lastPass.losTime.minus(timeNow)
                 binding.passesTimer.text = millisBeforeEnd.toTimerString()
             }
         } else {
@@ -125,7 +125,7 @@ class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.Passe
 
     override fun navigateToPass(satPass: SatPass) {
         if (satPass.progress < 100) {
-            val bundle = bundleOf("catNum" to satPass.catNum, "aosTime" to satPass.aosDate.time)
+            val bundle = bundleOf("catNum" to satPass.catNum, "aosTime" to satPass.aosTime)
             findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
         }
     }

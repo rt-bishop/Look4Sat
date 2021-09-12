@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.framework.model
 
-import com.rtbishop.look4sat.domain.predict4kotlin.Position
+import com.rtbishop.look4sat.domain.predict4kotlin.GeoPos
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 
 data class SatData(
@@ -28,5 +28,5 @@ data class SatData(
     val altitude: Double,
     val velocity: Double,
     val qthLoc: String,
-    val osmPos: Position
+    val osmPos: GeoPos
 )

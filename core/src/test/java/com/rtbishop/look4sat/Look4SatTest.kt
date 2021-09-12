@@ -7,20 +7,20 @@ class Look4SatTest {
 
     @Test
     fun `Given correct TLE array returns Satellite`() {
-        val elementArray = arrayOf(
+        val tleArray = arrayOf(
             "ISS (ZARYA)",
             "1 25544U 98067A   21242.56000419  .00070558  00000-0  12956-2 0  9996",
             "2 25544  51.6433 334.9559 0003020 334.9496 106.9882 15.48593918300128"
         )
-        assert(TLE.createSat(elementArray) != null)
+        assert(TLE.parseArray(tleArray)?.createSat() != null)
     }
 
     @Test
     fun `Given incorrect TLE array returns null`() {
-        val elementArray = arrayOf(
+        val tleArray = arrayOf(
             "1 25544U 98067A   21242.56000419  .00070558  00000-0  12956-2 0  9996",
             "2 25544  51.6433 334.9559 0003020 334.9496 106.9882 15.48593918300128"
         )
-        assert(TLE.createSat(elementArray) == null)
+        assert(TLE.parseArray(tleArray)?.createSat() == null)
     }
 }

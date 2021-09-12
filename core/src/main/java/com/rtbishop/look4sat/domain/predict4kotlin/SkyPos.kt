@@ -17,20 +17,4 @@
  */
 package com.rtbishop.look4sat.domain.predict4kotlin
 
-data class SatPass(
-    val aosTime: Long,
-    val aosAzimuth: Double,
-    val losTime: Long,
-    val losAzimuth: Double,
-    val tcaTime: Long,
-    val tcaAzimuth: Double,
-    val altitude: Double,
-    val maxElevation: Double,
-    val satellite: Satellite,
-    val predictor: PassPredictor,
-) {
-    val catNum: Int = satellite.params.catnum
-    val name: String = satellite.params.name
-    val isDeepSpace: Boolean = satellite.params.isDeepspace
-    var progress: Int = 0
-}
+data class SkyPos(val azimuth: Double, val elevation: Double)

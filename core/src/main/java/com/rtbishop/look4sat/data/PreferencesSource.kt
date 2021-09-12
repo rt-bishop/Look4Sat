@@ -17,15 +17,15 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
+import com.rtbishop.look4sat.domain.predict4kotlin.StationPos
 
 interface PreferencesSource {
 
     fun positionToQTH(lat: Double, lon: Double): String?
 
-    fun loadStationPosition(): StationPosition
+    fun loadStationPosition(): StationPos
 
-    fun saveStationPosition(position: StationPosition)
+    fun saveStationPosition(pos: StationPos)
 
     fun updatePositionFromGPS(): Boolean
 

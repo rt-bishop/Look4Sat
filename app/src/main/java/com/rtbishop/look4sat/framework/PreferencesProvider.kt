@@ -23,7 +23,7 @@ import android.location.LocationManager
 import androidx.core.content.edit
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
-import com.rtbishop.look4sat.domain.predict4kotlin.StationPosition
+import com.rtbishop.look4sat.domain.predict4kotlin.StationPos
 import com.rtbishop.look4sat.utility.round
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -89,19 +89,19 @@ class PreferencesProvider @Inject constructor(
         return qthConverter.positionToQTH(lat, lon)
     }
 
-    override fun loadStationPosition(): StationPosition {
+    override fun loadStationPosition(): StationPos {
         val defaultSP = "0.0"
         val latitude = preferences.getString(keyLatitude, null) ?: defaultSP
         val longitude = preferences.getString(keyLongitude, null) ?: defaultSP
         val altitude = preferences.getString(keyAltitude, null) ?: defaultSP
-        return StationPosition(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
+        return StationPos(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
     }
 
-    override fun saveStationPosition(position: StationPosition) {
+    override fun saveStationPosition(pos: StationPos) {
         preferences.edit {
-            putString(keyLatitude, position.latitude.toString())
-            putString(keyLongitude, position.longitude.toString())
-            putString(keyAltitude, position.altitude.toString())
+            putString(keyLatitude, pos.latitude.toString())
+            putString(keyLongitude, pos.longitude.toString())
+            putString(keyAltitude, pos.altitude.toString())
         }
     }
 
@@ -113,7 +113,7 @@ class PreferencesProvider @Inject constructor(
                 val latitude = location.latitude.round(4)
                 val longitude = location.longitude.round(4)
                 val altitude = location.altitude.round(1)
-                val stationPosition = StationPosition(latitude, longitude, altitude)
+                val stationPosition = StationPos(latitude, longitude, altitude)
                 saveStationPosition(stationPosition)
                 return true
             }
@@ -124,7 +124,7 @@ class PreferencesProvider @Inject constructor(
 
     override fun updatePositionFromQTH(qthString: String): Boolean {
         val position = qthConverter.qthToPosition(qthString) ?: return false
-        val stationPosition = StationPosition(position.latitude, position.longitude, 0.0)
+        val stationPosition = StationPos(position.latitude, position.longitude, 0.0)
         saveStationPosition(stationPosition)
         return true
     }

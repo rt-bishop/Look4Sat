@@ -29,7 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
-import com.rtbishop.look4sat.domain.predict4kotlin.Position
+import com.rtbishop.look4sat.domain.predict4kotlin.GeoPos
 import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
 import com.rtbishop.look4sat.framework.model.SatData
 import dagger.hilt.android.AndroidEntryPoint
@@ -96,7 +96,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
         viewModel.satData.observe(viewLifecycleOwner, { renderSatData(it, binding) })
     }
 
-    private fun renderStationPos(stationPos: Position, binding: FragmentMapBinding) {
+    private fun renderStationPos(stationPos: GeoPos, binding: FragmentMapBinding) {
         binding.apply {
             Marker(mapView).apply {
                 setInfoWindow(null)
@@ -109,7 +109,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun renderSatPositions(posMap: Map<Satellite, Position>, binding: FragmentMapBinding) {
+    private fun renderSatPositions(posMap: Map<Satellite, GeoPos>, binding: FragmentMapBinding) {
         binding.apply {
             val markers = FolderOverlay()
             posMap.entries.forEach {
@@ -120,7 +120,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
                         textLabelBackgroundColor = Color.TRANSPARENT
                         textLabelForegroundColor =
                             ContextCompat.getColor(requireContext(), R.color.themeLight)
-                        setTextIcon(it.key.tle.name)
+                        setTextIcon(it.key.params.name)
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         try {
                             position = GeoPoint(it.value.latitude, it.value.longitude)
@@ -156,7 +156,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun renderSatTrack(satTrack: List<List<Position>>, binding: FragmentMapBinding) {
+    private fun renderSatTrack(satTrack: List<List<GeoPos>>, binding: FragmentMapBinding) {
         val trackOverlay = FolderOverlay()
         satTrack.forEach { track ->
             val trackPoints = track.map { GeoPoint(it.latitude, it.longitude) }
@@ -169,7 +169,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
         binding.mapView.overlays[1] = trackOverlay
     }
 
-    private fun renderSatFootprint(satFootprint: List<Position>, binding: FragmentMapBinding) {
+    private fun renderSatFootprint(satFootprint: List<GeoPos>, binding: FragmentMapBinding) {
         val footprintPoints = satFootprint.map { GeoPoint(it.latitude, it.longitude) }
         val footprintOverlay = Polygon().apply {
             fillPaint.set(footprintPaint)
