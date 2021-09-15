@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
-import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import com.rtbishop.look4sat.domain.SatPass
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.toTimerString
@@ -39,7 +39,7 @@ import javax.inject.Inject
 class PassInfoFragment : Fragment(R.layout.fragment_polar) {
 
     @Inject
-    lateinit var preferencesSource: PreferencesSource
+    lateinit var preferences: PreferencesSource
     private val viewModel: PassInfoViewModel by viewModels()
     private var passInfoView: PassInfoView? = null
 
@@ -72,10 +72,12 @@ class PassInfoFragment : Fragment(R.layout.fragment_polar) {
     private fun setupObservers(satTransAdapter: SatTransAdapter, binding: FragmentPolarBinding) {
         val catNum = requireArguments().getInt("catNum")
         val aosTime = requireArguments().getLong("aosTime")
+        val stationPos = preferences.loadStationPosition()
         viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
             passInfoView = PassInfoView(requireContext()).apply {
-                setShowAim(preferencesSource.shouldUseCompass())
+                setShowAim(preferences.shouldUseCompass())
                 setPass(pass)
+                setStationPos(stationPos)
             }
             binding.frame.addView(passInfoView)
             observeTransmitters(pass, satTransAdapter, binding)
@@ -107,7 +109,8 @@ class PassInfoFragment : Fragment(R.layout.fragment_polar) {
     private fun setPassText(satPass: SatPass, binding: FragmentPolarBinding) {
         val dateNow = Date()
         val timeNow = System.currentTimeMillis()
-        val satPos = satPass.predictor.getSatPos(dateNow)
+        val stationPos = preferences.loadStationPosition()
+        val satPos = satPass.satellite.getPosition(stationPos, dateNow.time)
         val polarAz = getString(R.string.pat_azimuth)
         val polarEl = getString(R.string.pat_elevation)
         val polarRng = getString(R.string.pat_distance)

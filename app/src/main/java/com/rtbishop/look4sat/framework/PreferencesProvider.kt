@@ -22,8 +22,8 @@ import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
-import com.rtbishop.look4sat.domain.predict4kotlin.StationPos
+import com.rtbishop.look4sat.domain.QthConverter
+import com.rtbishop.look4sat.domain.StationPos
 import com.rtbishop.look4sat.utility.round
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -31,7 +31,6 @@ import javax.inject.Inject
 
 class PreferencesProvider @Inject constructor(
     moshi: Moshi,
-    private val qthConverter: QthConverter,
     private val locationManager: LocationManager,
     private val preferences: SharedPreferences
 ) : PreferencesSource {
@@ -86,7 +85,7 @@ class PreferencesProvider @Inject constructor(
     }
 
     override fun positionToQTH(lat: Double, lon: Double): String? {
-        return qthConverter.positionToQTH(lat, lon)
+        return QthConverter.positionToQTH(lat, lon)
     }
 
     override fun loadStationPosition(): StationPos {
@@ -123,7 +122,7 @@ class PreferencesProvider @Inject constructor(
     }
 
     override fun updatePositionFromQTH(qthString: String): Boolean {
-        val position = qthConverter.qthToPosition(qthString) ?: return false
+        val position = QthConverter.qthToPosition(qthString) ?: return false
         val stationPosition = StationPos(position.latitude, position.longitude, 0.0)
         saveStationPosition(stationPosition)
         return true

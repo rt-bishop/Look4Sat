@@ -17,11 +17,11 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.model.SatEntry
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.SatTrans
-import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import com.rtbishop.look4sat.domain.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.SatEntry
+import com.rtbishop.look4sat.domain.SatItem
+import com.rtbishop.look4sat.domain.SatTrans
+import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.domain.TLE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -30,10 +30,10 @@ import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 
-class SatDataRepository(
+class SatelliteRepo(
     private val preferencesSource: PreferencesSource,
-    private val satLocalSource: SatDataLocalSource,
-    private val satRemoteSource: SatDataRemoteSource,
+    private val localDataSource: LocalDataSource,
+    private val remoteDataSource: RemoteDataSource,
     private val ioDispatcher: CoroutineDispatcher
 ) {
 
@@ -46,19 +46,19 @@ class SatDataRepository(
     }
 
     fun getSatItems(): Flow<List<SatItem>> {
-        return satLocalSource.getSatItems()
+        return localDataSource.getSatItems()
     }
 
     fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>> {
-        return satLocalSource.getSatTransmitters(catNum)
+        return localDataSource.getSatTransmitters(catNum)
     }
 
     suspend fun getSelectedSatellites(): List<Satellite> {
-        return satLocalSource.getSelectedSatellites()
+        return localDataSource.getSelectedSatellites()
     }
 
     suspend fun updateEntriesFromFile(stream: InputStream) = withContext(ioDispatcher) {
-        satLocalSource.updateEntries(importSatEntries(stream))
+        localDataSource.updateEntries(importSatEntries(stream))
     }
 
     suspend fun updateEntriesFromWeb(sources: List<String>) {
@@ -67,7 +67,7 @@ class SatDataRepository(
                 val streams = mutableListOf<InputStream>()
                 val entries = mutableListOf<SatEntry>()
                 sources.forEach { source ->
-                    satRemoteSource.fetchDataStream(source)?.let { stream ->
+                    remoteDataSource.fetchDataStream(source)?.let { stream ->
                         if (source.contains(".zip", true)) {
                             val zipStream = ZipInputStream(stream).apply { nextEntry }
                             streams.add(zipStream)
@@ -77,17 +77,17 @@ class SatDataRepository(
                     }
                 }
                 streams.forEach { stream -> entries.addAll(importSatEntries(stream)) }
-                satLocalSource.updateEntries(entries)
+                localDataSource.updateEntries(entries)
             }
             launch(ioDispatcher) {
-                val transmitters = satRemoteSource.fetchTransmitters().filter { it.isAlive }
-                satLocalSource.updateTransmitters(transmitters)
+                val transmitters = remoteDataSource.fetchTransmitters().filter { it.isAlive }
+                localDataSource.updateTransmitters(transmitters)
             }
         }
     }
 
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        satLocalSource.updateEntriesSelection(catNums, isSelected)
+        localDataSource.updateEntriesSelection(catNums, isSelected)
     }
 
     private fun importSatEntries(stream: InputStream): List<SatEntry> {

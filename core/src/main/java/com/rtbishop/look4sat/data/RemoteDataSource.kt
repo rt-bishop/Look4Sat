@@ -15,21 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.api
+package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.framework.model.SatTrans
-import okhttp3.ResponseBody
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Streaming
-import retrofit2.http.Url
+import com.rtbishop.look4sat.domain.SatTrans
+import java.io.InputStream
 
-interface SatDataService {
+interface RemoteDataSource {
 
-    @Streaming
-    @GET
-    suspend fun fetchFileByUrl(@Url url: String): Response<ResponseBody>
+    suspend fun fetchDataStream(url: String): InputStream?
 
-    @GET("transmitters/")
     suspend fun fetchTransmitters(): List<SatTrans>
 }

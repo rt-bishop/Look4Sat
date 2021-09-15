@@ -18,12 +18,12 @@
 package com.rtbishop.look4sat.presentation.satPassInfoScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.SatPassRepository
+import com.rtbishop.look4sat.data.PassPredictor
 import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.data.SatDataRepository
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.injection.IoDispatcher
-import com.rtbishop.look4sat.domain.model.SatTrans
-import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import com.rtbishop.look4sat.domain.SatTrans
+import com.rtbishop.look4sat.domain.SatPass
 import com.rtbishop.look4sat.framework.OrientationProvider
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,19 +37,20 @@ import javax.inject.Inject
 @HiltViewModel
 class PassInfoViewModel @Inject constructor(
     private val orientationProvider: OrientationProvider,
-    private val preferencesSource: PreferencesSource,
-    private val satPassRepository: SatPassRepository,
-    private val satDataRepository: SatDataRepository,
+    private val preferences: PreferencesSource,
+    private val passPredictor: PassPredictor,
+    private val satelliteRepo: SatelliteRepo,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
+    private val stationPos = preferences.loadStationPosition()
     private val _transmitters = MutableLiveData<List<SatTrans>>()
     private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
     val transmitters: LiveData<List<SatTrans>> = _transmitters
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
-        satPassRepository.passes.collect { passes ->
+        passPredictor.passes.collect { passes ->
             val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
             pass?.let { satPass ->
                 processTransmitters(satPass)
@@ -60,27 +61,27 @@ class PassInfoViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (preferencesSource.shouldUseCompass()) orientationProvider.startListening(this)
+        if (preferences.shouldUseCompass()) orientationProvider.startListening(this)
     }
 
     fun disableSensor() {
-        if (preferencesSource.shouldUseCompass()) orientationProvider.stopListening()
+        if (preferences.shouldUseCompass()) orientationProvider.stopListening()
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
-        _orientation.value = Triple(azimuth + preferencesSource.getMagDeclination(), pitch, roll)
+        _orientation.value = Triple(azimuth + preferences.getMagDeclination(), pitch, roll)
     }
 
     private fun initRotatorControl(satPass: SatPass) {
         viewModelScope.launch {
-            val rotatorPrefs = preferencesSource.getRotatorServer()
+            val rotatorPrefs = preferences.getRotatorServer()
             if (rotatorPrefs != null) {
                 runCatching {
                     withContext(ioDispatcher) {
                         val socket = Socket(rotatorPrefs.first, rotatorPrefs.second)
                         val writer = socket.getOutputStream().bufferedWriter()
                         while (isActive) {
-                            val satPos = satPass.predictor.getSatPos(Date())
+                            val satPos = satPass.satellite.getPosition(stationPos, Date().time)
                             val azimuth = Math.toDegrees(satPos.azimuth).round(1)
                             val elevation = Math.toDegrees(satPos.elevation).round(1)
                             writer.write("\\set_pos $azimuth $elevation")
@@ -97,16 +98,16 @@ class PassInfoViewModel @Inject constructor(
 
     private fun processTransmitters(satPass: SatPass) {
         viewModelScope.launch {
-            satDataRepository.getSatTransmitters(satPass.catNum).collect { transList ->
+            satelliteRepo.getSatTransmitters(satPass.catNum).collect { transList ->
                 while (isActive) {
-                    val timeNow = Date()
+                    val satPos = satPass.satellite.getPosition(stationPos, Date().time)
                     val copiedList = transList.map { it.copy() }
                     copiedList.forEach { transmitter ->
                         transmitter.downlink?.let {
-                            transmitter.downlink = satPass.predictor.getDownlinkFreq(it, timeNow)
+                            transmitter.downlink = satPos.getDownlinkFreq(it)
                         }
                         transmitter.uplink?.let {
-                            transmitter.uplink = satPass.predictor.getUplinkFreq(it, timeNow)
+                            transmitter.uplink = satPos.getUplinkFreq(it)
                         }
                     }
                     _transmitters.postValue(copiedList.map { it.copy() })

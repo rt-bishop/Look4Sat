@@ -22,7 +22,8 @@ import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import com.rtbishop.look4sat.domain.SatPass
+import com.rtbishop.look4sat.domain.StationPos
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.min
@@ -37,6 +38,7 @@ class PassInfoView(context: Context) : View(context) {
     private val radarRadius = radarWidth * 0.48f
     private val piDiv2 = Math.PI / 2.0
     private val strokeSize = scale * 2f
+    private var stationPos: StationPos = StationPos(0.0, 0.0, 0.0)
 
     private var radarColor = ContextCompat.getColor(context, R.color.greyLight)
     private var radarCircleNum = 3
@@ -99,6 +101,10 @@ class PassInfoView(context: Context) : View(context) {
 
     fun setPass(satPass: SatPass) {
         this.satPass = satPass
+    }
+
+    fun setStationPos(stationPos: StationPos) {
+        this.stationPos = stationPos
     }
 
     fun setShowAim(showAim: Boolean) {
@@ -170,7 +176,7 @@ class PassInfoView(context: Context) : View(context) {
     }
 
     private fun drawSatellite(canvas: Canvas, satPass: SatPass) {
-        val satPos = satPass.predictor.getSatPos(Date())
+        val satPos = satPass.satellite.getPosition(stationPos, Date().time)
         if (satPos.elevation > 0) {
             val satX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
             val satY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
@@ -202,7 +208,7 @@ class PassInfoView(context: Context) : View(context) {
     private fun createPassTrajectory(satPass: SatPass) {
         var currentTime = satPass.aosTime
         while (currentTime < satPass.losTime) {
-            val satPos = satPass.predictor.getSatPos(Date(currentTime))
+            val satPos = satPass.satellite.getPosition(stationPos, currentTime)
             val passX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
             val passY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
             if (currentTime == satPass.aosTime) {

@@ -22,9 +22,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.data.SatDataRepository
-import com.rtbishop.look4sat.data.SatPassRepository
-import com.rtbishop.look4sat.domain.predict4kotlin.SatPass
+import com.rtbishop.look4sat.data.SatelliteRepo
+import com.rtbishop.look4sat.data.PassPredictor
+import com.rtbishop.look4sat.domain.SatPass
 import com.rtbishop.look4sat.framework.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -33,8 +33,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SatPassViewModel @Inject constructor(
-    private val satDataRepository: SatDataRepository,
-    private val satPassRepository: SatPassRepository,
+    private val satelliteRepo: SatelliteRepo,
+    private val passPredictor: PassPredictor,
     private val preferencesSource: PreferencesSource
 ) : ViewModel() {
 
@@ -48,13 +48,14 @@ class SatPassViewModel @Inject constructor(
         if (preferencesSource.isSetupDone()) {
             viewModelScope.launch {
                 _passes.postValue(Result.InProgress)
-                satPassRepository.triggerCalculation(satDataRepository.getSelectedSatellites())
+                val stationPos = preferencesSource.loadStationPosition()
+                passPredictor.triggerCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
             }
         } else {
             _isFirstLaunchDone.value = false
         }
         viewModelScope.launch {
-            satPassRepository.passes.collect { passes ->
+            passPredictor.passes.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch { tickPasses(passes) }
             }
@@ -66,9 +67,10 @@ class SatPassViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
             val defaultCatNums = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
-            satDataRepository.updateEntriesFromWeb(preferencesSource.loadDefaultSources())
-            satDataRepository.updateEntriesSelection(defaultCatNums, true)
-            satPassRepository.forceCalculation(satDataRepository.getSelectedSatellites())
+            val stationPos = preferencesSource.loadStationPosition()
+            satelliteRepo.updateEntriesFromWeb(preferencesSource.loadDefaultSources())
+            satelliteRepo.updateEntriesSelection(defaultCatNums, true)
+            passPredictor.forceCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
             preferencesSource.setSetupDone()
             _isFirstLaunchDone.value = true
         }
@@ -78,7 +80,8 @@ class SatPassViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
             passesProcessing?.cancelAndJoin()
-            satPassRepository.forceCalculation(satDataRepository.getSelectedSatellites())
+            val stationPos = preferencesSource.loadStationPosition()
+            passPredictor.forceCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
         }
     }
 

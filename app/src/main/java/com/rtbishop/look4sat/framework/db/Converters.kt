@@ -18,34 +18,34 @@
 package com.rtbishop.look4sat.framework.db
 
 import androidx.room.TypeConverter
-import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import com.rtbishop.look4sat.domain.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.domain.TLE
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
-object RoomConverters {
+object Converters {
 
-    private lateinit var tleAdapter: JsonAdapter<TLE>
+    private lateinit var paramsAdapter: JsonAdapter<TLE>
 
     fun initialize(moshi: Moshi) {
-        tleAdapter = moshi.adapter(TLE::class.java)
+        paramsAdapter = moshi.adapter(TLE::class.java)
     }
 
     @JvmStatic
     @TypeConverter
     fun tleToString(tle: TLE): String {
-        return tleAdapter.toJson(tle)
+        return paramsAdapter.toJson(tle)
     }
 
     @JvmStatic
     @TypeConverter
     fun tleFromString(string: String): TLE? {
-        return tleAdapter.fromJson(string)
+        return paramsAdapter.fromJson(string)
     }
 
     @JvmStatic
     @TypeConverter
     fun satFromString(string: String): Satellite? {
-        return tleAdapter.fromJson(string)?.createSat()
+        return paramsAdapter.fromJson(string)?.createSat()
     }
 }

@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
-import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.SatItem
 import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult

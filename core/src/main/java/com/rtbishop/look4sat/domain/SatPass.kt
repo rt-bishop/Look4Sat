@@ -15,11 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.model
+package com.rtbishop.look4sat.domain
 
-data class SatItem(
-    val catNum: Int,
-    val name: String,
-    var isSelected: Boolean,
-    val modes: List<String>
-)
+data class SatPass(
+    val aosTime: Long,
+    val aosAzimuth: Double,
+    val losTime: Long,
+    val losAzimuth: Double,
+    val tcaTime: Long,
+    val tcaAzimuth: Double,
+    val altitude: Double,
+    val maxElevation: Double,
+    val satellite: Satellite
+) {
+    val catNum: Int = satellite.params.catnum
+    val name: String = satellite.params.name
+    val isDeepSpace: Boolean = satellite.params.isDeepspace
+    var progress: Int = 0
+}

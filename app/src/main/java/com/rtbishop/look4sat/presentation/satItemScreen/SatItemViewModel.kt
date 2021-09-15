@@ -22,8 +22,8 @@ import android.net.Uri
 import android.widget.SearchView
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.data.SatDataRepository
-import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.data.SatelliteRepo
+import com.rtbishop.look4sat.domain.SatItem
 import com.rtbishop.look4sat.framework.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -35,13 +35,13 @@ import javax.inject.Inject
 class SatItemViewModel @Inject constructor(
     private val preferencesSource: PreferencesSource,
     private val resolver: ContentResolver,
-    private val satDataRepository: SatDataRepository,
+    private val satelliteRepo: SatelliteRepo,
 ) : ViewModel(), SatItemAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
 
-    private val transModes = MutableLiveData(satDataRepository.loadSelectedModes())
+    private val transModes = MutableLiveData(satelliteRepo.loadSelectedModes())
     private val currentQuery = MutableLiveData(String())
     private val itemsWithModes = transModes.switchMap { modes ->
-        liveData { satDataRepository.getSatItems().collect { emit(filterByModes(it, modes)) } }
+        liveData { satelliteRepo.getSatItems().collect { emit(filterByModes(it, modes)) } }
     }
     private val itemsWithQuery = currentQuery.switchMap { query ->
         itemsWithModes.map { items -> Result.Success(filterByQuery(items, query)) }
@@ -57,7 +57,7 @@ class SatItemViewModel @Inject constructor(
             _satData.value = Result.InProgress
             runCatching {
                 resolver.openInputStream(uri)?.use { stream ->
-                    satDataRepository.updateEntriesFromFile(stream)
+                    satelliteRepo.updateEntriesFromFile(stream)
                 }
             }.onFailure { _satData.value = Result.Error(it) }
         }
@@ -68,7 +68,7 @@ class SatItemViewModel @Inject constructor(
             _satData.value = Result.InProgress
             try {
                 preferencesSource.saveTleSources(sources)
-                satDataRepository.updateEntriesFromWeb(sources)
+                satelliteRepo.updateEntriesFromWeb(sources)
             } catch (exception: Exception) {
                 _satData.value = Result.Error(exception)
             }
@@ -84,12 +84,12 @@ class SatItemViewModel @Inject constructor(
     }
 
     fun loadSelectedModes(): List<String> {
-        return satDataRepository.loadSelectedModes()
+        return satelliteRepo.loadSelectedModes()
     }
 
     fun saveSelectedModes(modes: List<String>) {
         transModes.value = modes
-        satDataRepository.saveSelectedModes(modes)
+        satelliteRepo.saveSelectedModes(modes)
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -102,7 +102,7 @@ class SatItemViewModel @Inject constructor(
     }
 
     override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        viewModelScope.launch { satDataRepository.updateEntriesSelection(catNums, isSelected) }
+        viewModelScope.launch { satelliteRepo.updateEntriesSelection(catNums, isSelected) }
     }
 
     private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {

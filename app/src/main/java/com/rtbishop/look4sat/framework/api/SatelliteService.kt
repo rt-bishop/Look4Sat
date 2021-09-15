@@ -15,11 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.predict4kotlin
+package com.rtbishop.look4sat.framework.api
 
-data class StationPos(
-    val latitude: Double,
-    val longitude: Double,
-    val altitude: Double,
-    val name: String = "default"
-)
+import com.rtbishop.look4sat.framework.model.SatTrans
+import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Streaming
+import retrofit2.http.Url
+
+interface SatelliteService {
+
+    @Streaming
+    @GET
+    suspend fun fetchFileByUrl(@Url url: String): Response<ResponseBody>
+
+    @GET("transmitters/")
+    suspend fun fetchTransmitters(): List<SatTrans>
+}

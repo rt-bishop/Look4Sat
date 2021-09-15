@@ -29,9 +29,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
-import com.rtbishop.look4sat.domain.predict4kotlin.GeoPos
-import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import com.rtbishop.look4sat.framework.model.SatData
+import com.rtbishop.look4sat.domain.GeoPos
+import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.domain.SatData
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -89,7 +89,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun setupObservers(binding: FragmentMapBinding) {
-        viewModel.stationPos.observe(viewLifecycleOwner, { renderStationPos(it, binding) })
+        viewModel.stationPosLiveData.observe(viewLifecycleOwner, { renderStationPos(it, binding) })
         viewModel.satPositions.observe(viewLifecycleOwner, { renderSatPositions(it, binding) })
         viewModel.satTrack.observe(viewLifecycleOwner, { renderSatTrack(it, binding) })
         viewModel.satFootprint.observe(viewLifecycleOwner, { renderSatFootprint(it, binding) })

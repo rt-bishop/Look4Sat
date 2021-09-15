@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.predict4kotlin
+package com.rtbishop.look4sat.domain
 
-data class SkyPos(val azimuth: Double, val elevation: Double)
+data class SatItem(
+    val catNum: Int,
+    val name: String,
+    var isSelected: Boolean,
+    val modes: List<String>
+)

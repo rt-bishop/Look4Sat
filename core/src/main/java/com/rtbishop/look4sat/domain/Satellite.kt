@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.predict4kotlin
+package com.rtbishop.look4sat.domain
 
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
@@ -41,6 +41,10 @@ abstract class Satellite(val params: TLE) {
     var s4 = 0.0
     val xke = 7.43669161E-2
 
+    fun getQuarterOrbitMin(): Int {
+        return (24.0 * 60.0 / params.meanmo / 4.0).toInt()
+    }
+
     fun willBeSeen(pos: StationPos): Boolean {
         return if (params.meanmo < 1e-8) false else {
             var lin = params.incl
@@ -51,11 +55,7 @@ abstract class Satellite(val params: TLE) {
         }
     }
 
-    fun getPredictor(pos: StationPos): PassPredictor {
-        return PassPredictor(this, pos)
-    }
-
-    fun getPosition(pos: StationPos, time: Date): SatPos {
+    fun getPosition(pos: StationPos, time: Long): SatPos {
         val satPos = SatPos()
         // Date/time at which the position and velocity were calculated
         val julUTC = calcCurrentDaynum(time) + 2444238.5
@@ -76,8 +76,7 @@ abstract class Satellite(val params: TLE) {
     }
 
     // Read the system clock and return the number of days since 31Dec79 00:00:00 UTC (daynum 0)
-    private fun calcCurrentDaynum(date: Date): Double {
-        val now = date.time
+    private fun calcCurrentDaynum(now: Long): Double {
         val sgp4Epoch = Calendar.getInstance(TimeZone.getTimeZone("UTC:UTC"))
         sgp4Epoch.clear()
         sgp4Epoch[1979, 11, 31, 0, 0] = 0

@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.model
+package com.rtbishop.look4sat.domain
 
-data class SatTrans(
-    val uuid: String,
-    val info: String,
-    val isAlive: Boolean,
-    var downlink: Long?,
-    var uplink: Long?,
-    val mode: String?,
-    val isInverted: Boolean,
-    val catNum: Int
+data class SatData(
+    val pass: Satellite,
+    val catNum: Int,
+    val name: String,
+    val range: Double,
+    val altitude: Double,
+    val velocity: Double,
+    val qthLoc: String,
+    val osmPos: GeoPos
 )

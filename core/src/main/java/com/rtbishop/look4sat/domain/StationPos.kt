@@ -15,17 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.db
+package com.rtbishop.look4sat.domain
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.rtbishop.look4sat.framework.model.SatEntry
-import com.rtbishop.look4sat.framework.model.SatTrans
-
-@Database(entities = [SatEntry::class, SatTrans::class], version = 1, exportSchema = false)
-@TypeConverters(RoomConverters::class)
-abstract class SatDataDb : RoomDatabase() {
-
-    abstract fun satelliteDao(): SatDataDao
-}
+data class StationPos(
+    val latitude: Double,
+    val longitude: Double,
+    val altitude: Double,
+    val name: String = "default"
+)

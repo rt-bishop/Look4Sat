@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.predict4kotlin
+package com.rtbishop.look4sat.domain
 
-data class GeoPos(val latitude: Double, val longitude: Double)
+data class SatEntry(
+    val tle: TLE,
+    val catNum: Int = tle.catnum,
+    val name: String = tle.name,
+    var isSelected: Boolean = false
+)

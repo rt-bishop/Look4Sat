@@ -19,11 +19,12 @@ package com.rtbishop.look4sat.presentation.satMapScreen
 
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.data.SatDataRepository
-import com.rtbishop.look4sat.domain.predict4kotlin.GeoPos
-import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import com.rtbishop.look4sat.domain.predict4kotlin.StationPos
-import com.rtbishop.look4sat.framework.model.SatData
+import com.rtbishop.look4sat.data.SatelliteRepo
+import com.rtbishop.look4sat.data.PassPredictor
+import com.rtbishop.look4sat.domain.GeoPos
+import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.domain.StationPos
+import com.rtbishop.look4sat.domain.SatData
 import com.rtbishop.look4sat.injection.DefaultDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -35,19 +36,20 @@ import kotlin.math.sqrt
 
 @HiltViewModel
 class SatMapViewModel @Inject constructor(
-    private val satDataRepository: SatDataRepository,
-    private val preferencesSource: PreferencesSource,
+    private val satelliteRepo: SatelliteRepo,
+    private val passPredictor: PassPredictor,
+    private val preferences: PreferencesSource,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val gsp = preferencesSource.loadStationPosition()
+    private val stationPos = preferences.loadStationPosition()
     private var dataUpdateJob: Job? = null
     private var allSatList = listOf<Satellite>()
     private lateinit var selectedSat: Satellite
 
-    val stationPos = liveData {
-        val osmLat = clipLat(gsp.latitude)
-        val osmLon = clipLon(gsp.longitude)
+    val stationPosLiveData = liveData {
+        val osmLat = clipLat(stationPos.latitude)
+        val osmLon = clipLon(stationPos.longitude)
         emit(GeoPos(osmLat, osmLon))
     }
 
@@ -65,7 +67,7 @@ class SatMapViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            satDataRepository.getSelectedSatellites().also { selectedSatellites ->
+            satelliteRepo.getSelectedSatellites().also { selectedSatellites ->
                 if (selectedSatellites.isNotEmpty()) {
                     allSatList = selectedSatellites
                     selectSatellite(selectedSatellites.first())
@@ -75,7 +77,7 @@ class SatMapViewModel @Inject constructor(
     }
 
     fun shouldUseTextLabels(): Boolean {
-        return preferencesSource.shouldUseTextLabels()
+        return preferences.shouldUseTextLabels()
     }
 
     fun scrollSelection(decrement: Boolean) {
@@ -97,12 +99,12 @@ class SatMapViewModel @Inject constructor(
             dataUpdateJob?.cancelAndJoin()
             dataUpdateJob = launch {
                 val dateNow = Date()
-                setSelectedSatTrack(selectedSat, gsp, dateNow)
+                setSelectedSatTrack(selectedSat, stationPos, dateNow)
                 while (isActive) {
                     dateNow.time = System.currentTimeMillis()
-                    setSatPositions(allSatList, gsp, dateNow)
-                    setSelectedSatFootprint(selectedSat, gsp, dateNow)
-                    setSelectedSatData(selectedSat, gsp, dateNow)
+                    setSatPositions(allSatList, stationPos, dateNow)
+                    setSelectedSatFootprint(selectedSat, stationPos, dateNow)
+                    setSelectedSatData(selectedSat, stationPos, dateNow)
                     delay(updateFreq)
                 }
             }
@@ -113,7 +115,7 @@ class SatMapViewModel @Inject constructor(
         withContext(defaultDispatcher) {
             val satPositions = mutableMapOf<Satellite, GeoPos>()
             list.forEach { satellite ->
-                val satPos = satellite.getPredictor(gsp).getSatPos(date)
+                val satPos = satellite.getPosition(gsp, date.time)
                 val osmLat = clipLat(Math.toDegrees(satPos.latitude))
                 val osmLon = clipLon(Math.toDegrees(satPos.longitude))
                 satPositions[satellite] = GeoPos(osmLat, osmLon)
@@ -127,7 +129,7 @@ class SatMapViewModel @Inject constructor(
             val satTracks = mutableListOf<List<GeoPos>>()
             val currentTrack = mutableListOf<GeoPos>()
             var oldLongitude = 0.0
-            sat.getPredictor(gsp).getPositions(date, 15, 0, 2.4).forEach { satPos ->
+            passPredictor.getPositions(sat, gsp, date, 15, 0, 2.4).forEach { satPos ->
                 val osmLat = clipLat(Math.toDegrees(satPos.latitude))
                 val osmLon = clipLon(Math.toDegrees(satPos.longitude))
                 val currentPosition = GeoPos(osmLat, osmLon)
@@ -154,7 +156,7 @@ class SatMapViewModel @Inject constructor(
 
     private suspend fun setSelectedSatFootprint(sat: Satellite, gsp: StationPos, date: Date) {
         withContext(defaultDispatcher) {
-            val satFootprint = sat.getPosition(gsp, date).getRangeCircle().map { rangePos ->
+            val satFootprint = sat.getPosition(gsp, date.time).getRangeCircle().map { rangePos ->
                 val osmLat = clipLat(rangePos.latitude)
                 val osmLon = clipLon(rangePos.longitude)
                 GeoPos(osmLat, osmLon)
@@ -165,12 +167,11 @@ class SatMapViewModel @Inject constructor(
 
     private suspend fun setSelectedSatData(sat: Satellite, gsp: StationPos, date: Date) {
         withContext(defaultDispatcher) {
-            val satPos = sat.getPredictor(gsp).getSatPos(date)
+            val satPos = sat.getPosition(gsp, date.time)
             val osmLat = clipLat(Math.toDegrees(satPos.latitude))
             val osmLon = clipLon(Math.toDegrees(satPos.longitude))
             val osmPos = GeoPos(osmLat, osmLon)
-            val qthLoc =
-                preferencesSource.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
+            val qthLoc = preferences.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
             val velocity = getOrbitalVelocity(satPos.altitude)
             val satData = SatData(
                 sat, sat.params.catnum, sat.params.name, satPos.range,

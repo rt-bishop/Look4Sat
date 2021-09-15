@@ -22,14 +22,13 @@ import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.room.Room
 import com.rtbishop.look4sat.data.*
-import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
 import com.rtbishop.look4sat.framework.PreferencesProvider
-import com.rtbishop.look4sat.framework.api.SatDataRemote
-import com.rtbishop.look4sat.framework.api.SatDataService
-import com.rtbishop.look4sat.framework.db.RoomConverters
-import com.rtbishop.look4sat.framework.db.SatDataDao
-import com.rtbishop.look4sat.framework.db.SatDataDb
-import com.rtbishop.look4sat.framework.db.SatDataLocal
+import com.rtbishop.look4sat.framework.api.RemoteSource
+import com.rtbishop.look4sat.framework.api.SatelliteService
+import com.rtbishop.look4sat.framework.db.Converters
+import com.rtbishop.look4sat.framework.db.LocalSource
+import com.rtbishop.look4sat.framework.db.SatelliteDao
+import com.rtbishop.look4sat.framework.db.SatelliteDb
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -45,12 +44,7 @@ import javax.net.ssl.HostnameVerifier
 
 @Module
 @InstallIn(SingletonComponent::class)
-object SatDataModule {
-
-    @Provides
-    fun provideQthConverter(): QthConverter {
-        return QthConverter()
-    }
+object SatelliteDataModule {
 
     @Provides
     fun provideMoshi(): Moshi {
@@ -61,56 +55,52 @@ object SatDataModule {
     @Singleton
     fun providePreferenceSource(
         moshi: Moshi,
-        qthConverter: QthConverter,
         locationManager: LocationManager,
         preferences: SharedPreferences
     ): PreferencesSource {
-        return PreferencesProvider(moshi, qthConverter, locationManager, preferences)
+        return PreferencesProvider(moshi, locationManager, preferences)
     }
 
     @Provides
     @Singleton
-    fun providePassesRepo(
-        preferencesSource: PreferencesSource,
-        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
-    ): SatPassRepository {
-        return SatPassRepository(preferencesSource, defaultDispatcher)
+    fun providePassPredictor(@DefaultDispatcher dispatcher: CoroutineDispatcher): PassPredictor {
+        return PassPredictor(dispatcher)
     }
 
     @Provides
     @Singleton
     fun provideSatelliteRepo(
         preferencesSource: PreferencesSource,
-        satLocalSource: SatDataLocalSource,
-        satRemoteSource: SatDataRemoteSource,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
-    ): SatDataRepository {
-        return SatDataRepository(preferencesSource, satLocalSource, satRemoteSource, ioDispatcher)
+        localDataSource: LocalDataSource,
+        remoteDataSource: RemoteDataSource,
+        @IoDispatcher dispatcher: CoroutineDispatcher
+    ): SatelliteRepo {
+        return SatelliteRepo(preferencesSource, localDataSource, remoteDataSource, dispatcher)
     }
 
     @Provides
-    fun provideLocalDataSource(satDataDao: SatDataDao): SatDataLocalSource {
-        return SatDataLocal(satDataDao)
+    fun provideLocalDataSource(satelliteDao: SatelliteDao): LocalDataSource {
+        return LocalSource(satelliteDao)
     }
 
     @Provides
-    fun provideSatDataDao(db: SatDataDb): SatDataDao {
+    fun provideSatelliteDao(db: SatelliteDb): SatelliteDao {
         return db.satelliteDao()
     }
 
     @Provides
-    fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatDataDb {
-        RoomConverters.initialize(moshi)
-        return Room.databaseBuilder(context, SatDataDb::class.java, "SatelliteDb").build()
+    fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
+        Converters.initialize(moshi)
+        return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb").build()
     }
 
     @Provides
-    fun provideRemoteDataSource(satDataService: SatDataService): SatDataRemoteSource {
-        return SatDataRemote(satDataService)
+    fun provideRemoteDataSource(satelliteService: SatelliteService): RemoteDataSource {
+        return RemoteSource(satelliteService)
     }
 
     @Provides
-    fun provideSatDataService(): SatDataService {
+    fun provideSatelliteService(): SatelliteService {
         val verifier = HostnameVerifier { _, _ -> true }
         val httpClient = OkHttpClient.Builder().hostnameVerifier(verifier).build()
         return Retrofit.Builder()
@@ -118,6 +108,6 @@ object SatDataModule {
             .client(httpClient)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
-            .create(SatDataService::class.java)
+            .create(SatelliteService::class.java)
     }
 }

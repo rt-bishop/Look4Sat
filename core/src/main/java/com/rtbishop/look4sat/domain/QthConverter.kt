@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.predict4kotlin
+package com.rtbishop.look4sat.domain
 
 import kotlin.math.round
 
-class QthConverter {
+object QthConverter {
 
     fun qthToPosition(qthString: String): GeoPos? {
         val trimmedQth = qthString.take(6)

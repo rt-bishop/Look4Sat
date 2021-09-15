@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.predict4kotlin
+package com.rtbishop.look4sat.domain
 
-import java.util.*
 import kotlin.math.*
 
 data class SatPos(
@@ -29,7 +28,7 @@ data class SatPos(
     var range: Double = 0.0,
     var rangeRate: Double = 0.0,
     var theta: Double = 0.0,
-    var time: Date = Date()
+    var time: Long = 0L
 ) {
     private val earthRadiusKm = 6378.16
     private val speedOfLight = 2.99792458E8

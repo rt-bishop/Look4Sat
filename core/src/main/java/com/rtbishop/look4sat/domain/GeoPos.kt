@@ -15,25 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.domain.model.SatEntry
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.SatTrans
-import com.rtbishop.look4sat.domain.predict4kotlin.Satellite
-import kotlinx.coroutines.flow.Flow
-
-interface SatDataLocalSource {
-
-    fun getSatItems(): Flow<List<SatItem>>
-
-    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>>
-
-    suspend fun getSelectedSatellites(): List<Satellite>
-
-    suspend fun updateEntries(entries: List<SatEntry>)
-
-    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean)
-
-    suspend fun updateTransmitters(satelliteTrans: List<SatTrans>)
-}
+data class GeoPos(val latitude: Double, val longitude: Double)

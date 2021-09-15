@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ItemTransBinding
-import com.rtbishop.look4sat.domain.model.SatTrans
+import com.rtbishop.look4sat.domain.SatTrans
 import java.util.*
 
 class SatTransAdapter : RecyclerView.Adapter<SatTransAdapter.TransHolder>() {

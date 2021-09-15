@@ -17,44 +17,42 @@
  */
 package com.rtbishop.look4sat
 
-import com.rtbishop.look4sat.domain.predict4kotlin.QthConverter
+import com.rtbishop.look4sat.domain.QthConverter
 import org.junit.Test
 
 class QthConverterTest {
 
-    private val qthConverter = QthConverter()
-
     @Test
     fun `Given valid QTH returns correct POS`() {
-        var result = qthConverter.qthToPosition("io91VL39FX")
+        var result = QthConverter.qthToPosition("io91VL39FX")
         assert(result?.latitude == 51.4792 && result.longitude == -0.2083)
-        result = qthConverter.qthToPosition("JN58TD")
+        result = QthConverter.qthToPosition("JN58TD")
         assert(result?.latitude == 48.1458 && result.longitude == 11.6250)
-        result = qthConverter.qthToPosition("gf15vc")
+        result = QthConverter.qthToPosition("gf15vc")
         assert(result?.latitude == -34.8958 && result.longitude == -56.2083)
-        result = qthConverter.qthToPosition("fm18LW")
+        result = QthConverter.qthToPosition("fm18LW")
         assert(result?.latitude == 38.9375 && result.longitude == -77.0417)
     }
 
     @Test
     fun `Given invalid QTH returns null`() {
-        var result = qthConverter.qthToPosition("ZZ00zz")
+        var result = QthConverter.qthToPosition("ZZ00zz")
         assert(result == null)
-        result = qthConverter.qthToPosition("JN58tz")
+        result = QthConverter.qthToPosition("JN58tz")
         assert(result == null)
     }
 
     @Test
     fun `Given valid POS returns correct QTH`() {
-        assert(qthConverter.positionToQTH(51.4878, -0.2146) == "IO91vl")
-        assert(qthConverter.positionToQTH(48.1466, 11.6083) == "JN58td")
-        assert(qthConverter.positionToQTH(-34.91, -56.2116) == "GF15vc")
-        assert(qthConverter.positionToQTH(38.92, -77.065) == "FM18lw")
+        assert(QthConverter.positionToQTH(51.4878, -0.2146) == "IO91vl")
+        assert(QthConverter.positionToQTH(48.1466, 11.6083) == "JN58td")
+        assert(QthConverter.positionToQTH(-34.91, -56.2116) == "GF15vc")
+        assert(QthConverter.positionToQTH(38.92, -77.065) == "FM18lw")
     }
 
     @Test
     fun `Given invalid POS returns null`() {
-        assert(qthConverter.positionToQTH(91.0542, -170.1142) == null)
-        assert(qthConverter.positionToQTH(89.0542, -240.1142) == null)
+        assert(QthConverter.positionToQTH(91.0542, -170.1142) == null)
+        assert(QthConverter.positionToQTH(89.0542, -240.1142) == null)
     }
 }

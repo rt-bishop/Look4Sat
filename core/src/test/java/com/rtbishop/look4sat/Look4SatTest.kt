@@ -1,6 +1,6 @@
 package com.rtbishop.look4sat
 
-import com.rtbishop.look4sat.domain.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.TLE
 import org.junit.Test
 
 class Look4SatTest {

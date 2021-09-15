@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.predict4kotlin.StationPos
+import com.rtbishop.look4sat.domain.StationPos
 
 interface PreferencesSource {
 

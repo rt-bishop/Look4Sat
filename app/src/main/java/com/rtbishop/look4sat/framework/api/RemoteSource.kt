@@ -15,14 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.framework.api
 
-import com.rtbishop.look4sat.domain.model.SatTrans
+import com.rtbishop.look4sat.data.RemoteDataSource
+import com.rtbishop.look4sat.domain.SatTrans
+import com.rtbishop.look4sat.utility.DataMapper
 import java.io.InputStream
 
-interface SatDataRemoteSource {
+class RemoteSource(private val api: SatelliteService) : RemoteDataSource {
 
-    suspend fun fetchDataStream(url: String): InputStream?
+    override suspend fun fetchDataStream(url: String): InputStream? {
+        return api.fetchFileByUrl(url).body()?.byteStream()
+    }
 
-    suspend fun fetchTransmitters(): List<SatTrans>
+    override suspend fun fetchTransmitters(): List<SatTrans> {
+        return DataMapper.satTransListToDomainTransList(api.fetchTransmitters())
+    }
 }

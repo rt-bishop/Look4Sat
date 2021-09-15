@@ -15,22 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.predict4kotlin
+package com.rtbishop.look4sat.framework.db
 
-data class SatPass(
-    val aosTime: Long,
-    val aosAzimuth: Double,
-    val losTime: Long,
-    val losAzimuth: Double,
-    val tcaTime: Long,
-    val tcaAzimuth: Double,
-    val altitude: Double,
-    val maxElevation: Double,
-    val satellite: Satellite,
-    val predictor: PassPredictor,
-) {
-    val catNum: Int = satellite.params.catnum
-    val name: String = satellite.params.name
-    val isDeepSpace: Boolean = satellite.params.isDeepspace
-    var progress: Int = 0
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.rtbishop.look4sat.framework.model.SatEntry
+import com.rtbishop.look4sat.framework.model.SatTrans
+
+@Database(entities = [SatEntry::class, SatTrans::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
+abstract class SatelliteDb : RoomDatabase() {
+
+    abstract fun satelliteDao(): SatelliteDao
 }
