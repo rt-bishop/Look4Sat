@@ -42,7 +42,7 @@ abstract class Satellite(val params: TLE) {
     var qoms24 = 0.0
     var s4 = 0.0
 
-    fun willBeSeen(pos: StationPos): Boolean {
+    fun willBeSeen(pos: GeoPos): Boolean {
         return if (params.meanmo < 1e-8) false
         else {
             val sma = 331.25 * exp(ln(1440.0 / params.meanmo) * (2.0 / 3.0))
@@ -53,7 +53,7 @@ abstract class Satellite(val params: TLE) {
         }
     }
 
-    fun getPosition(pos: StationPos, time: Long): SatPos {
+    fun getPosition(pos: GeoPos, time: Long): SatPos {
         val satPos = SatPos()
         // Date/time at which the position and velocity were calculated
         val julUTC = calcCurrentDaynum(time) + 2444238.5
@@ -116,7 +116,7 @@ abstract class Satellite(val params: TLE) {
         julianUTC: Double,
         positionVector: Vector4,
         velocityVector: Vector4,
-        gsPos: StationPos,
+        gsPos: GeoPos,
         squintVector: Vector4,
         satPos: SatPos
     ) {
@@ -158,7 +158,7 @@ abstract class Satellite(val params: TLE) {
     // Returns the ECI position and velocity of the observer
     private fun calculateUserPosVel(
         time: Double,
-        gsPos: StationPos,
+        gsPos: GeoPos,
         gsPosTheta: AtomicReference<Double>,
         obsPos: Vector4,
         obsVel: Vector4

@@ -30,12 +30,12 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
     private var selectedSatIds = emptyList<Int>()
     val passes: SharedFlow<List<SatPass>> = _passes
 
-    suspend fun getSatPos(sat: Satellite, pos: StationPos, date: Date): SatPos =
+    suspend fun getSatPos(sat: Satellite, pos: GeoPos, date: Date): SatPos =
         withContext(predictorDispatcher) {
             return@withContext sat.getPosition(pos, date.time)
         }
 
-    suspend fun getSatTrack(sat: Satellite, pos: StationPos, start: Date, end: Date): List<SatPos> =
+    suspend fun getSatTrack(sat: Satellite, pos: GeoPos, start: Date, end: Date): List<SatPos> =
         withContext(predictorDispatcher) {
             val positions = mutableListOf<SatPos>()
             var currentTime = start.time
@@ -48,7 +48,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
 
     suspend fun triggerCalculation(
         satellites: List<Satellite>,
-        pos: StationPos,
+        pos: GeoPos,
         date: Date = Date(),
         hoursAhead: Int = 8,
         minElevation: Double = 16.0
@@ -65,7 +65,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
 
     suspend fun forceCalculation(
         satellites: List<Satellite>,
-        pos: StationPos,
+        pos: GeoPos,
         date: Date = Date(),
         hoursAhead: Int = 8,
         minElevation: Double = 16.0
@@ -84,7 +84,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         }
     }
 
-    private fun Satellite.getPasses(pos: StationPos, date: Date, hours: Int): List<SatPass> {
+    private fun Satellite.getPasses(pos: GeoPos, date: Date, hours: Int): List<SatPass> {
         val passes = mutableListOf<SatPass>()
         val endDate = Date(date.time + hours * 60L * 60L * 1000L)
         val quarterOrbitMin = (this.orbitalPeriod / 4.0).toInt()
@@ -117,7 +117,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
             .sortedBy { it.aosTime }
     }
 
-    private fun getGeoPass(sat: Satellite, pos: StationPos, date: Date): SatPass {
+    private fun getGeoPass(sat: Satellite, pos: GeoPos, date: Date): SatPass {
         val satPos = sat.getPosition(pos, date.time)
         val aos = Date(date.time - 24 * 60L * 60L * 1000L).time
         val los = Date(date.time + 24 * 60L * 60L * 1000L).time
@@ -128,7 +128,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         return SatPass(aos, az, los, az, tca, az, alt, elev, sat)
     }
 
-    private fun getLeoPass(sat: Satellite, pos: StationPos, date: Date, rewind: Boolean): SatPass {
+    private fun getLeoPass(sat: Satellite, pos: GeoPos, date: Date, rewind: Boolean): SatPass {
         val quarterOrbitMin = (sat.orbitalPeriod / 4.0).toInt()
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
             clear()

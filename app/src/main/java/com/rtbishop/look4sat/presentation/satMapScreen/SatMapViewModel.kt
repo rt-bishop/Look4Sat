@@ -105,7 +105,7 @@ class SatMapViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getSatTrack(satellite: Satellite, pos: StationPos, date: Date) {
+    private suspend fun getSatTrack(satellite: Satellite, pos: GeoPos, date: Date) {
         val satTracks = mutableListOf<List<GeoPos>>()
         val currentTrack = mutableListOf<GeoPos>()
         val endDate = Date(date.time + (satellite.orbitalPeriod * 2.4 * 60000L).toLong())
@@ -134,7 +134,7 @@ class SatMapViewModel @Inject constructor(
         _satTrack.postValue(satTracks)
     }
 
-    private suspend fun getPositions(satellites: List<Satellite>, pos: StationPos, date: Date) {
+    private suspend fun getPositions(satellites: List<Satellite>, pos: GeoPos, date: Date) {
         val positions = mutableMapOf<Satellite, GeoPos>()
         satellites.forEach { satellite ->
             val satPos = predictor.getSatPos(satellite, pos, date)
@@ -145,7 +145,7 @@ class SatMapViewModel @Inject constructor(
         _satPositions.postValue(positions)
     }
 
-    private suspend fun getSatFootprint(satellite: Satellite, pos: StationPos, date: Date) {
+    private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
         val satPos = predictor.getSatPos(satellite, pos, date)
         val satFootprint = satPos.getRangeCircle().map { rangePos ->
             val osmLat = clipLat(rangePos.latitude)
@@ -155,7 +155,7 @@ class SatMapViewModel @Inject constructor(
         _satFootprint.postValue(satFootprint)
     }
 
-    private suspend fun getSatData(satellite: Satellite, pos: StationPos, date: Date) {
+    private suspend fun getSatData(satellite: Satellite, pos: GeoPos, date: Date) {
         val satPos = predictor.getSatPos(satellite, pos, date)
         val osmLat = clipLat(Math.toDegrees(satPos.latitude))
         val osmLon = clipLon(Math.toDegrees(satPos.longitude))

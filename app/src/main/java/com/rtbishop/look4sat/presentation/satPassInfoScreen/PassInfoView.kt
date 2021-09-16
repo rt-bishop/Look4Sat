@@ -22,8 +22,8 @@ import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.domain.GeoPos
 import com.rtbishop.look4sat.domain.SatPass
-import com.rtbishop.look4sat.domain.StationPos
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.min
@@ -38,7 +38,7 @@ class PassInfoView(context: Context) : View(context) {
     private val radarRadius = radarWidth * 0.48f
     private val piDiv2 = Math.PI / 2.0
     private val strokeSize = scale * 2f
-    private var stationPos: StationPos = StationPos(0.0, 0.0, 0.0)
+    private var stationPos: GeoPos = GeoPos(0.0, 0.0, 0.0)
 
     private var radarColor = ContextCompat.getColor(context, R.color.greyLight)
     private var radarCircleNum = 3
@@ -103,7 +103,7 @@ class PassInfoView(context: Context) : View(context) {
         this.satPass = satPass
     }
 
-    fun setStationPos(stationPos: StationPos) {
+    fun setStationPos(stationPos: GeoPos) {
         this.stationPos = stationPos
     }
 

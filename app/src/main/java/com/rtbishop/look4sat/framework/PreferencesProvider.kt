@@ -22,8 +22,8 @@ import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.domain.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
-import com.rtbishop.look4sat.domain.StationPos
 import com.rtbishop.look4sat.utility.round
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -88,15 +88,15 @@ class PreferencesProvider @Inject constructor(
         return QthConverter.positionToQTH(lat, lon)
     }
 
-    override fun loadStationPosition(): StationPos {
+    override fun loadStationPosition(): GeoPos {
         val defaultSP = "0.0"
         val latitude = preferences.getString(keyLatitude, null) ?: defaultSP
         val longitude = preferences.getString(keyLongitude, null) ?: defaultSP
         val altitude = preferences.getString(keyAltitude, null) ?: defaultSP
-        return StationPos(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
+        return GeoPos(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
     }
 
-    override fun saveStationPosition(pos: StationPos) {
+    override fun saveStationPosition(pos: GeoPos) {
         preferences.edit {
             putString(keyLatitude, pos.latitude.toString())
             putString(keyLongitude, pos.longitude.toString())
@@ -112,7 +112,7 @@ class PreferencesProvider @Inject constructor(
                 val latitude = location.latitude.round(4)
                 val longitude = location.longitude.round(4)
                 val altitude = location.altitude.round(1)
-                val stationPosition = StationPos(latitude, longitude, altitude)
+                val stationPosition = GeoPos(latitude, longitude, altitude)
                 saveStationPosition(stationPosition)
                 return true
             }
@@ -123,7 +123,7 @@ class PreferencesProvider @Inject constructor(
 
     override fun updatePositionFromQTH(qthString: String): Boolean {
         val position = QthConverter.qthToPosition(qthString) ?: return false
-        val stationPosition = StationPos(position.latitude, position.longitude, 0.0)
+        val stationPosition = GeoPos(position.latitude, position.longitude, 0.0)
         saveStationPosition(stationPosition)
         return true
     }

@@ -17,15 +17,15 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.StationPos
+import com.rtbishop.look4sat.domain.GeoPos
 
 interface PreferencesSource {
 
     fun positionToQTH(lat: Double, lon: Double): String?
 
-    fun loadStationPosition(): StationPos
+    fun loadStationPosition(): GeoPos
 
-    fun saveStationPosition(pos: StationPos)
+    fun saveStationPosition(pos: GeoPos)
 
     fun updatePositionFromGPS(): Boolean
 

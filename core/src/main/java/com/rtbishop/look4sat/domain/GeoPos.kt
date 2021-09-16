@@ -17,4 +17,4 @@
  */
 package com.rtbishop.look4sat.domain
 
-data class GeoPos(val latitude: Double, val longitude: Double)
+data class GeoPos(val latitude: Double, val longitude: Double, val altitude: Double = 0.0)
