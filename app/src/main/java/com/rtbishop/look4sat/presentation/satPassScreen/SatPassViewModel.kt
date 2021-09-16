@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
-import com.rtbishop.look4sat.data.PassPredictor
+import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.domain.SatPass
 import com.rtbishop.look4sat.framework.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SatPassViewModel @Inject constructor(
     private val satelliteRepo: SatelliteRepo,
-    private val passPredictor: PassPredictor,
+    private val predictor: Predictor,
     private val preferencesSource: PreferencesSource
 ) : ViewModel() {
 
@@ -49,13 +49,13 @@ class SatPassViewModel @Inject constructor(
             viewModelScope.launch {
                 _passes.postValue(Result.InProgress)
                 val stationPos = preferencesSource.loadStationPosition()
-                passPredictor.triggerCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
+                predictor.triggerCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
             }
         } else {
             _isFirstLaunchDone.value = false
         }
         viewModelScope.launch {
-            passPredictor.passes.collect { passes ->
+            predictor.passes.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch { tickPasses(passes) }
             }
@@ -70,7 +70,7 @@ class SatPassViewModel @Inject constructor(
             val stationPos = preferencesSource.loadStationPosition()
             satelliteRepo.updateEntriesFromWeb(preferencesSource.loadDefaultSources())
             satelliteRepo.updateEntriesSelection(defaultCatNums, true)
-            passPredictor.forceCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
+            predictor.forceCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
             preferencesSource.setSetupDone()
             _isFirstLaunchDone.value = true
         }
@@ -81,7 +81,7 @@ class SatPassViewModel @Inject constructor(
             _passes.postValue(Result.InProgress)
             passesProcessing?.cancelAndJoin()
             val stationPos = preferencesSource.loadStationPosition()
-            passPredictor.forceCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
+            predictor.forceCalculation(satelliteRepo.getSelectedSatellites(), stationPos)
         }
     }
 

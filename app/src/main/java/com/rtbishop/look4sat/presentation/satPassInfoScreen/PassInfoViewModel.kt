@@ -18,7 +18,7 @@
 package com.rtbishop.look4sat.presentation.satPassInfoScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.PassPredictor
+import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.injection.IoDispatcher
@@ -38,7 +38,7 @@ import javax.inject.Inject
 class PassInfoViewModel @Inject constructor(
     private val orientationProvider: OrientationProvider,
     private val preferences: PreferencesSource,
-    private val passPredictor: PassPredictor,
+    private val predictor: Predictor,
     private val satelliteRepo: SatelliteRepo,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel(), OrientationProvider.OrientationListener {
@@ -50,7 +50,7 @@ class PassInfoViewModel @Inject constructor(
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
-        passPredictor.passes.collect { passes ->
+        predictor.passes.collect { passes ->
             val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
             pass?.let { satPass ->
                 processTransmitters(satPass)

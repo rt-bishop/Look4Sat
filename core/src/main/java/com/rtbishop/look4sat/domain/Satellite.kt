@@ -31,26 +31,24 @@ abstract class Satellite(val params: TLE) {
     private val position = Vector4()
     private val velocity = Vector4()
     private var perigee = 0.0
+    val orbitalPeriod = 24 * 60 / params.meanmo
     val earthRadius = 6378.137
     val j3Harmonic = -2.53881E-6
     val twoPi = Math.PI * 2.0
     val twoThirds = 2.0 / 3.0
+    val xke = 7.43669161E-2
     val ck2 = 5.413079E-4
     val ck4 = 6.209887E-7
     var qoms24 = 0.0
     var s4 = 0.0
-    val xke = 7.43669161E-2
-
-    fun getQuarterOrbitMin(): Int {
-        return (24.0 * 60.0 / params.meanmo / 4.0).toInt()
-    }
 
     fun willBeSeen(pos: StationPos): Boolean {
-        return if (params.meanmo < 1e-8) false else {
-            var lin = params.incl
-            if (lin >= 90.0) lin = 180.0 - lin
+        return if (params.meanmo < 1e-8) false
+        else {
             val sma = 331.25 * exp(ln(1440.0 / params.meanmo) * (2.0 / 3.0))
             val apogee = sma * (1.0 + params.eccn) - earthRadius
+            var lin = params.incl
+            if (lin >= 90.0) lin = 180.0 - lin
             acos(earthRadius / (apogee + earthRadius)) + lin * deg2Rad > abs(pos.latitude * deg2Rad)
         }
     }
@@ -71,8 +69,7 @@ abstract class Satellite(val params: TLE) {
         // Angles in rads, dist in km, vel in km/S. Calculate sat Az, El, Range and Range-rate.
         calculateObs(julUTC, position, velocity, pos, squintVector, satPos)
         calculateLatLonAlt(julUTC, satPos, position)
-        satPos.time = time
-        return satPos
+        return satPos.apply { this.time = time }
     }
 
     // Read the system clock and return the number of days since 31Dec79 00:00:00 UTC (daynum 0)

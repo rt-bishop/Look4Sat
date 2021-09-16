@@ -41,6 +41,13 @@ data class SatPos(
         return (freq.toDouble() * (speedOfLight + this.rangeRate * 1000.0) / speedOfLight).toLong()
     }
 
+    fun getOrbitalVelocity(): Double {
+        val earthG = 6.674 * 10.0.pow(-11)
+        val earthM = 5.98 * 10.0.pow(24)
+        val radius = 6.37 * 10.0.pow(6) + altitude * 10.0.pow(3)
+        return sqrt(earthG * earthM / radius) / 1000
+    }
+
     fun getRangeCircle(): List<GeoPos> {
         val positions = mutableListOf<GeoPos>()
         val lat = this.latitude
