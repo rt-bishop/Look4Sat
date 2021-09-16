@@ -20,7 +20,7 @@ package com.rtbishop.look4sat.framework.db
 import androidx.room.*
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatItem
-import com.rtbishop.look4sat.framework.model.SatTrans
+import com.rtbishop.look4sat.framework.model.Transmitter
 import com.rtbishop.look4sat.domain.Satellite
 import kotlinx.coroutines.flow.Flow
 
@@ -32,7 +32,7 @@ interface SatelliteDao {
     fun getSatItems(): Flow<List<SatItem>>
 
     @Query("SELECT * FROM transmitters WHERE catNum = :catNum")
-    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>>
+    fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>>
 
     @Query("SELECT tle FROM entries WHERE isSelected = 1")
     suspend fun getSelectedSatellites(): List<Satellite>
@@ -68,7 +68,7 @@ interface SatelliteDao {
     }
 
     @Transaction
-    suspend fun updateTransmitters(transmitters: List<SatTrans>) {
+    suspend fun updateTransmitters(transmitters: List<Transmitter>) {
         deleteTransmitters()
         insertTransmitters(transmitters)
     }
@@ -77,5 +77,5 @@ interface SatelliteDao {
     suspend fun deleteTransmitters()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTransmitters(transmitters: List<SatTrans>)
+    suspend fun insertTransmitters(transmitters: List<Transmitter>)
 }

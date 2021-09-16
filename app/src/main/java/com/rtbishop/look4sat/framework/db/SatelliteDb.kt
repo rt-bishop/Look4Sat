@@ -21,9 +21,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.rtbishop.look4sat.framework.model.SatEntry
-import com.rtbishop.look4sat.framework.model.SatTrans
+import com.rtbishop.look4sat.framework.model.Transmitter
 
-@Database(entities = [SatEntry::class, SatTrans::class], version = 1, exportSchema = false)
+@Database(entities = [SatEntry::class, Transmitter::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class SatelliteDb : RoomDatabase() {
 

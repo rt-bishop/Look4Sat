@@ -18,13 +18,13 @@
 package com.rtbishop.look4sat.presentation.satPassInfoScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
-import com.rtbishop.look4sat.injection.IoDispatcher
-import com.rtbishop.look4sat.domain.SatTrans
+import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.domain.SatPass
+import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.framework.OrientationProvider
+import com.rtbishop.look4sat.injection.IoDispatcher
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -44,9 +44,9 @@ class PassInfoViewModel @Inject constructor(
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
-    private val _transmitters = MutableLiveData<List<SatTrans>>()
+    private val _transmitters = MutableLiveData<List<Transmitter>>()
     private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
-    val transmitters: LiveData<List<SatTrans>> = _transmitters
+    val transmitters: LiveData<List<Transmitter>> = _transmitters
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
@@ -81,7 +81,7 @@ class PassInfoViewModel @Inject constructor(
                         val socket = Socket(rotatorPrefs.first, rotatorPrefs.second)
                         val writer = socket.getOutputStream().bufferedWriter()
                         while (isActive) {
-                            val satPos = satPass.satellite.getPosition(stationPos, Date().time)
+                            val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
                             val azimuth = Math.toDegrees(satPos.azimuth).round(1)
                             val elevation = Math.toDegrees(satPos.elevation).round(1)
                             writer.write("\\set_pos $azimuth $elevation")
@@ -100,7 +100,7 @@ class PassInfoViewModel @Inject constructor(
         viewModelScope.launch {
             satelliteRepo.getSatTransmitters(satPass.catNum).collect { transList ->
                 while (isActive) {
-                    val satPos = satPass.satellite.getPosition(stationPos, Date().time)
+                    val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
                     val copiedList = transList.map { it.copy() }
                     copiedList.forEach { transmitter ->
                         transmitter.downlink?.let {

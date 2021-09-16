@@ -25,7 +25,7 @@ data class SatItem(
     var isSelected: Boolean,
     @Relation(
         parentColumn = "catNum",
-        entity = SatTrans::class,
+        entity = Transmitter::class,
         entityColumn = "catNum",
         projection = ["mode"]
     )

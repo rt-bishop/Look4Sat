@@ -17,9 +17,7 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.SatEntry
-import com.rtbishop.look4sat.domain.SatItem
-import com.rtbishop.look4sat.domain.SatTrans
+import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.domain.Satellite
 import kotlinx.coroutines.flow.Flow
 
@@ -27,7 +25,7 @@ interface LocalDataSource {
 
     fun getSatItems(): Flow<List<SatItem>>
 
-    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>>
+    fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>>
 
     suspend fun getSelectedSatellites(): List<Satellite>
 
@@ -35,5 +33,5 @@ interface LocalDataSource {
 
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean)
 
-    suspend fun updateTransmitters(satelliteTrans: List<SatTrans>)
+    suspend fun updateTransmitters(satelliteTrans: List<Transmitter>)
 }

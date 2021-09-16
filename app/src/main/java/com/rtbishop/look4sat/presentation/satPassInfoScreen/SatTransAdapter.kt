@@ -24,23 +24,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ItemTransBinding
-import com.rtbishop.look4sat.domain.SatTrans
+import com.rtbishop.look4sat.domain.Transmitter
 import java.util.*
 
 class SatTransAdapter : RecyclerView.Adapter<SatTransAdapter.TransHolder>() {
 
-    private val diffCallback = object : DiffUtil.ItemCallback<SatTrans>() {
-        override fun areItemsTheSame(oldItem: SatTrans, newItem: SatTrans): Boolean {
+    private val diffCallback = object : DiffUtil.ItemCallback<Transmitter>() {
+        override fun areItemsTheSame(oldItem: Transmitter, newItem: Transmitter): Boolean {
             return oldItem.uuid == newItem.uuid
         }
 
-        override fun areContentsTheSame(oldItem: SatTrans, newItem: SatTrans): Boolean {
+        override fun areContentsTheSame(oldItem: Transmitter, newItem: Transmitter): Boolean {
             return oldItem.downlink == newItem.downlink
         }
     }
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitList(transmitters: List<SatTrans>) {
+    fun submitList(transmitters: List<Transmitter>) {
         differ.submitList(transmitters)
     }
 
@@ -65,27 +65,27 @@ class SatTransAdapter : RecyclerView.Adapter<SatTransAdapter.TransHolder>() {
         private val formatLinkNull = itemView.context.getString(R.string.trans_no_link)
         private val isInverted = itemView.context.getString(R.string.trans_inverted)
 
-        fun bind(satTrans: SatTrans) {
-            binding.description.text = satTrans.info
+        fun bind(transmitter: Transmitter) {
+            binding.description.text = transmitter.info
 
-            satTrans.downlink.let { downlink ->
+            transmitter.downlink.let { downlink ->
                 if (downlink != null) {
                     val downlinkFreq = downlink / divider
                     binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downlinkFreq)
                 } else binding.downlink.text = formatLinkNull
             }
 
-            satTrans.uplink.let { uplink ->
+            transmitter.uplink.let { uplink ->
                 if (uplink != null) {
                     val uplinkFreq = uplink / divider
                     binding.uplink.text = String.format(Locale.ENGLISH, formatLink, uplinkFreq)
                 } else binding.uplink.text = formatLinkNull
             }
 
-            if (satTrans.mode != null) binding.mode.text = String.format(mode, satTrans.mode)
+            if (transmitter.mode != null) binding.mode.text = String.format(mode, transmitter.mode)
             else binding.mode.text = String.format(mode, strNo)
 
-            if (satTrans.isInverted) binding.isInverted.text = String.format(isInverted, strYes)
+            if (transmitter.isInverted) binding.isInverted.text = String.format(isInverted, strYes)
             else binding.isInverted.text = String.format(isInverted, strNo)
         }
 

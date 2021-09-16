@@ -15,11 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain
+package com.rtbishop.look4sat.data
 
-data class SatEntry(
-    val tle: TLE,
-    val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
+import com.rtbishop.look4sat.domain.GeoPos
+import com.rtbishop.look4sat.domain.Satellite
+
+data class SatData(
+    val pass: Satellite,
+    val catNum: Int,
+    val name: String,
+    val range: Double,
+    val altitude: Double,
+    val velocity: Double,
+    val qthLoc: String,
+    val osmPos: GeoPos
 )

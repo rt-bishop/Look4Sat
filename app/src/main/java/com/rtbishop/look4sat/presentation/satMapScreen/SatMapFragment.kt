@@ -31,7 +31,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.domain.GeoPos
 import com.rtbishop.look4sat.domain.Satellite
-import com.rtbishop.look4sat.domain.SatData
+import com.rtbishop.look4sat.data.SatData
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory

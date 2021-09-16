@@ -23,7 +23,7 @@ import android.widget.SearchView
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
-import com.rtbishop.look4sat.domain.SatItem
+import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.framework.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect

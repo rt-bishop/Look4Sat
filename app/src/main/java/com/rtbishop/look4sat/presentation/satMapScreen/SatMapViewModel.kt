@@ -20,6 +20,7 @@ package com.rtbishop.look4sat.presentation.satMapScreen
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.data.SatData
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.*
 import dagger.hilt.android.lifecycle.HiltViewModel

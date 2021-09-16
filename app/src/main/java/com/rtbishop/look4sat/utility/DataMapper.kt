@@ -19,10 +19,10 @@ package com.rtbishop.look4sat.utility
 
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatItem
-import com.rtbishop.look4sat.framework.model.SatTrans
-import com.rtbishop.look4sat.domain.SatEntry as DomainEntry
-import com.rtbishop.look4sat.domain.SatItem as DomainItem
-import com.rtbishop.look4sat.domain.SatTrans as DomainTrans
+import com.rtbishop.look4sat.framework.model.Transmitter
+import com.rtbishop.look4sat.data.SatEntry as DomainEntry
+import com.rtbishop.look4sat.data.SatItem as DomainItem
+import com.rtbishop.look4sat.domain.Transmitter as DomainTrans
 
 object DataMapper {
 
@@ -44,14 +44,14 @@ object DataMapper {
         return items.map { item -> satItemToDomainItem(item) }
     }
 
-    fun satTransToDomainTrans(transmitter: SatTrans): DomainTrans {
+    fun satTransToDomainTrans(transmitter: Transmitter): DomainTrans {
         return DomainTrans(
             transmitter.uuid, transmitter.info, transmitter.isAlive, transmitter.downlink,
             transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catNum
         )
     }
 
-    fun satTransListToDomainTransList(transmitters: List<SatTrans>): List<DomainTrans> {
+    fun satTransListToDomainTransList(transmitters: List<Transmitter>): List<DomainTrans> {
         return transmitters.map { transmitter -> satTransToDomainTrans(transmitter) }
     }
 
@@ -73,14 +73,14 @@ object DataMapper {
         return items.map { item -> domainItemToSatItem(item) }
     }
 
-    fun domainTransToSatTrans(transmitter: DomainTrans): SatTrans {
-        return SatTrans(
+    fun domainTransToSatTrans(transmitter: DomainTrans): Transmitter {
+        return Transmitter(
             transmitter.uuid, transmitter.info, transmitter.isAlive, transmitter.downlink,
             transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catNum
         )
     }
 
-    fun domainTransListToSatTransList(transmitters: List<DomainTrans>): List<SatTrans> {
+    fun domainTransListToSatTransList(transmitters: List<DomainTrans>): List<Transmitter> {
         return transmitters.map { transmitter -> domainTransToSatTrans(transmitter) }
     }
 }

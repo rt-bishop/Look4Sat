@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.framework.api
 
-import com.rtbishop.look4sat.framework.model.SatTrans
+import com.rtbishop.look4sat.framework.model.Transmitter
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -31,5 +31,5 @@ interface SatelliteService {
     suspend fun fetchFileByUrl(@Url url: String): Response<ResponseBody>
 
     @GET("transmitters/")
-    suspend fun fetchTransmitters(): List<SatTrans>
+    suspend fun fetchTransmitters(): List<Transmitter>
 }

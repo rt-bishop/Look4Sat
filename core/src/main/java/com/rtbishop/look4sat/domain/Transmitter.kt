@@ -15,20 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.domain
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.squareup.moshi.Json
-
-@Entity(tableName = "transmitters")
-data class SatTrans(
-    @PrimaryKey @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "description") val info: String,
-    @field:Json(name = "alive") val isAlive: Boolean,
-    @field:Json(name = "downlink_low") var downlink: Long?,
-    @field:Json(name = "uplink_low") var uplink: Long?,
-    @field:Json(name = "mode") val mode: String?,
-    @field:Json(name = "invert") val isInverted: Boolean,
-    @field:Json(name = "norad_cat_id") val catNum: Int
+data class Transmitter(
+    val uuid: String,
+    val info: String,
+    val isAlive: Boolean,
+    var downlink: Long?,
+    var uplink: Long?,
+    val mode: String?,
+    val isInverted: Boolean,
+    val catNum: Int
 )

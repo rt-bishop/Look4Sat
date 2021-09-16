@@ -17,9 +17,7 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.SatEntry
-import com.rtbishop.look4sat.domain.SatItem
-import com.rtbishop.look4sat.domain.SatTrans
+import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.domain.TLE
 import kotlinx.coroutines.CoroutineDispatcher
@@ -49,7 +47,7 @@ class SatelliteRepo(
         return localDataSource.getSatItems()
     }
 
-    fun getSatTransmitters(catNum: Int): Flow<List<SatTrans>> {
+    fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>> {
         return localDataSource.getSatTransmitters(catNum)
     }
 
