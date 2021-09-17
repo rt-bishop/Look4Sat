@@ -43,6 +43,8 @@ interface PreferencesSource {
 
     fun shouldUseCompass(): Boolean
 
+    fun shouldShowSweep(): Boolean
+
     fun isSetupDone(): Boolean
 
     fun setSetupDone()

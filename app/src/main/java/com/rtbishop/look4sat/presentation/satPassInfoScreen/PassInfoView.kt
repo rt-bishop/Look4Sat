@@ -99,6 +99,10 @@ class PassInfoView(context: Context) : View(context) {
     private var pitch: Float = 0f
     private var roll: Float = 0f
 
+    fun setScanning(isScanning: Boolean) {
+        shouldShowSweep = isScanning
+    }
+
     fun setPass(satPass: SatPass) {
         this.satPass = satPass
     }

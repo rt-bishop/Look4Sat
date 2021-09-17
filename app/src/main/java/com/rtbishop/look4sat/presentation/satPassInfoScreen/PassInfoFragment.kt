@@ -78,6 +78,7 @@ class PassInfoFragment : Fragment(R.layout.fragment_polar) {
                 setShowAim(preferences.shouldUseCompass())
                 setPass(pass)
                 setStationPos(stationPos)
+                setScanning(preferences.shouldShowSweep())
             }
             binding.frame.addView(passInfoView)
             observeTransmitters(pass, satTransAdapter, binding)

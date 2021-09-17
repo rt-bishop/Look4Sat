@@ -14,7 +14,7 @@ jobs:
 
       - name: Setup java environment
         uses: actions/setup-java@v1
-        with: {java-version: 1.8}
+        with: {java-version: 11}
 
       - name: Assemble APK and Bundle
         run: |
@@ -32,7 +32,7 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "30.0.3"
+          BUILD_TOOLS_VERSION: "31.0.0"
 
       - name: Sign Bundle
         uses: r0adkll/sign-android-release@v1
@@ -44,7 +44,7 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "30.0.3"
+          BUILD_TOOLS_VERSION: "31.0.0"
 
       - name: Deploy Bundle to Play Store
         uses: r0adkll/upload-google-play@v1

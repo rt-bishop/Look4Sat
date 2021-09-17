@@ -75,6 +75,7 @@
     <string name="pref_map_labels">Use text labels instead of icons</string>
     <string name="pref_other_title">Other</string>
     <string name="pref_time_utc_title">Show pass time in UTC</string>
+    <string name="pref_radar_sweep">Enable radar sweep animation</string>
     <string name="pref_compass_title">Use sensors to rotate radar view</string>
 
     <string name="tracking_title">Tracking preferences</string>

@@ -76,6 +76,11 @@
             app:iconSpaceReserved="false" />
         <SwitchPreferenceCompat
             android:defaultValue="true"
+            android:key="radarSweep"
+            android:title="@string/pref_radar_sweep"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:key="compass"
             android:title="@string/pref_compass_title"
             app:iconSpaceReserved="false" />

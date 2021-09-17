@@ -59,6 +59,7 @@
     <string name="pref_map_labels">Использовать текстовые метки</string>
     <string name="pref_other_title">Другие настройки</string>
     <string name="pref_compass_title">Использовать компас</string>
+    <string name="pref_radar_sweep">Показывать анимацию радара</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
     <string name="tracking_title">Настройки слежения</string>

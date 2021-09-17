@@ -69,6 +69,7 @@ class PreferencesProvider @Inject constructor(
         const val keySources = "prefTleSourcesKey"
         const val keyModes = "satModes"
         const val keyCompass = "compass"
+        const val keyRadarSweep = "radarSweep"
         const val keyTextLabels = "shouldUseTextLabels"
         const val keyTimeUTC = "timeUTC"
         const val keyHoursAhead = "hoursAhead"
@@ -154,6 +155,10 @@ class PreferencesProvider @Inject constructor(
 
     override fun shouldUseCompass(): Boolean {
         return preferences.getBoolean(keyCompass, true)
+    }
+
+    override fun shouldShowSweep(): Boolean {
+        return preferences.getBoolean(keyRadarSweep, true)
     }
 
     override fun isSetupDone(): Boolean {
