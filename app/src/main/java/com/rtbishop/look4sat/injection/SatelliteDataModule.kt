@@ -26,10 +26,7 @@ import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.framework.api.RemoteSource
 import com.rtbishop.look4sat.framework.api.SatelliteService
-import com.rtbishop.look4sat.framework.db.Converters
-import com.rtbishop.look4sat.framework.db.LocalSource
-import com.rtbishop.look4sat.framework.db.SatelliteDao
-import com.rtbishop.look4sat.framework.db.SatelliteDb
+import com.rtbishop.look4sat.framework.db.*
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -92,7 +89,8 @@ object SatelliteDataModule {
     @Provides
     fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
         Converters.initialize(moshi)
-        return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb").build()
+        return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
+            .addMigrations(MIGRATION_1_2).build()
     }
 
     @Provides

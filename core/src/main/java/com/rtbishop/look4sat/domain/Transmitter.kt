@@ -25,5 +25,5 @@ data class Transmitter(
     var uplink: Long?,
     val mode: String?,
     val isInverted: Boolean,
-    val catNum: Int
+    val catNum: Int?
 )

@@ -16,6 +16,12 @@ android {
         targetSdkVersion 31
         versionCode 253
         versionName "2.5.3"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
