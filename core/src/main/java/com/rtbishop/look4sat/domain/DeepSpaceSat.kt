@@ -90,7 +90,7 @@ class DeepSpaceSat(params: TLE) : Satellite(params) {
         deep = DeepSpaceCalculator(dsv)
     }
 
-    fun calculateSDP4(tSince: Double) {
+    internal fun calculateSDP4(tSince: Double) {
         synchronized(this) {
             val temp = DoubleArray(12)
             val xmdf = params.xmo + dsv.xmdot * tSince

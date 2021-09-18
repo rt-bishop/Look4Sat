@@ -18,14 +18,19 @@
 package com.rtbishop.look4sat.presentation.satPassInfoScreen
 
 import androidx.lifecycle.*
+import androidx.navigation.fragment.findNavController
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.domain.SatPass
+import com.rtbishop.look4sat.domain.SatPos
 import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.framework.OrientationProvider
 import com.rtbishop.look4sat.injection.IoDispatcher
+import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.round
+import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -44,8 +49,10 @@ class PassInfoViewModel @Inject constructor(
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
+    private val _passData = MutableLiveData<PassData>()
     private val _transmitters = MutableLiveData<List<Transmitter>>()
     private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
+    val passData: LiveData<PassData> = _passData
     val transmitters: LiveData<List<Transmitter>> = _transmitters
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
@@ -53,9 +60,10 @@ class PassInfoViewModel @Inject constructor(
         predictor.passes.collect { passes ->
             val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
             pass?.let { satPass ->
+                emit(satPass)
+                sendPassData(satPass)
                 processTransmitters(satPass)
                 initRotatorControl(satPass)
-                emit(satPass)
             }
         }
     }
@@ -70,6 +78,22 @@ class PassInfoViewModel @Inject constructor(
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
         _orientation.value = Triple(azimuth + preferences.getMagDeclination(), pitch, roll)
+    }
+
+    private fun sendPassData(satPass: SatPass) {
+        viewModelScope.launch {
+            var track: List<SatPos> = emptyList()
+            if (!satPass.isDeepSpace) {
+                val startDate = Date(satPass.aosTime)
+                val endDate = Date(satPass.losTime)
+                track = predictor.getSatTrack(satPass.satellite, stationPos, startDate, endDate)
+            }
+            while (isActive) {
+                val pos = predictor.getSatPos(satPass.satellite, stationPos, Date())
+                _passData.postValue(PassData(pos, track))
+                delay(1000)
+            }
+        }
     }
 
     private fun initRotatorControl(satPass: SatPass) {

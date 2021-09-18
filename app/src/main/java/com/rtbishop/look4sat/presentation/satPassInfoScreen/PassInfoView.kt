@@ -22,23 +22,21 @@ import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.GeoPos
-import com.rtbishop.look4sat.domain.SatPass
-import java.util.*
+import com.rtbishop.look4sat.domain.SatPos
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
 class PassInfoView(context: Context) : View(context) {
 
-    private lateinit var satPass: SatPass
     private val defaultColor = ContextCompat.getColor(context, R.color.themeLight)
     private val scale = resources.displayMetrics.density
     private val radarWidth = resources.displayMetrics.widthPixels
     private val radarRadius = radarWidth * 0.48f
     private val piDiv2 = Math.PI / 2.0
     private val strokeSize = scale * 2f
-    private var stationPos: GeoPos = GeoPos(0.0, 0.0, 0.0)
+    private var position: SatPos? = null
+    private var positions: List<SatPos> = emptyList()
 
     private var radarColor = ContextCompat.getColor(context, R.color.greyLight)
     private var radarCircleNum = 3
@@ -103,12 +101,12 @@ class PassInfoView(context: Context) : View(context) {
         shouldShowSweep = isScanning
     }
 
-    fun setPass(satPass: SatPass) {
-        this.satPass = satPass
+    fun setPosition(position: SatPos) {
+        this.position = position
     }
 
-    fun setStationPos(stationPos: GeoPos) {
-        this.stationPos = stationPos
+    fun setPositions(positions: List<SatPos>) {
+        this.positions = positions
     }
 
     fun setShowAim(showAim: Boolean) {
@@ -131,8 +129,8 @@ class PassInfoView(context: Context) : View(context) {
         val cx = paddingLeft + radarWidth / 2f
         val cy = paddingTop + radarHeight / 2f
 
-        if (!satPass.isDeepSpace && !isTrackCreated) {
-            createPassTrajectory(satPass)
+        if (positions.isNotEmpty() && !isTrackCreated) {
+            createPassTrajectory()
             createPassTrajectoryArrow()
             isTrackCreated = true
         }
@@ -143,12 +141,12 @@ class PassInfoView(context: Context) : View(context) {
         drawRadarText(canvas, cx, radarRadius)
 
         canvas.translate(cx, cy)
-        if (!satPass.isDeepSpace) {
+        if (positions.isNotEmpty()) {
             canvas.drawPath(trackPath, trackPaint)
             canvas.drawPath(trackPath, arrowPaint)
         }
         if (shouldShowBeacons) {
-            drawSatellite(canvas, satPass)
+            drawSatellite(canvas)
         }
         if (shouldShowAim) {
             drawCrosshair(canvas, azimuth, pitch)
@@ -179,12 +177,13 @@ class PassInfoView(context: Context) : View(context) {
         }
     }
 
-    private fun drawSatellite(canvas: Canvas, satPass: SatPass) {
-        val satPos = satPass.satellite.getPosition(stationPos, Date().time)
-        if (satPos.elevation > 0) {
-            val satX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
-            val satY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
-            canvas.drawCircle(satX, -satY, beaconSize, beaconPaint)
+    private fun drawSatellite(canvas: Canvas) {
+        position?.let { satPos ->
+            if (satPos.elevation > 0) {
+                val satX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
+                val satY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
+                canvas.drawCircle(satX, -satY, beaconSize, beaconPaint)
+            }
         }
     }
 
@@ -209,18 +208,15 @@ class PassInfoView(context: Context) : View(context) {
         return (radius * sin(piDiv2 - azimuth)).toFloat()
     }
 
-    private fun createPassTrajectory(satPass: SatPass) {
-        var currentTime = satPass.aosTime
-        while (currentTime < satPass.losTime) {
-            val satPos = satPass.satellite.getPosition(stationPos, currentTime)
+    private fun createPassTrajectory() {
+        positions.forEachIndexed { index, satPos ->
             val passX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
             val passY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
-            if (currentTime == satPass.aosTime) {
+            if (index == 0) {
                 trackPath.moveTo(passX, -passY)
             } else {
                 trackPath.lineTo(passX, -passY)
             }
-            currentTime += 15000
         }
     }
 

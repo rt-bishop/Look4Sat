@@ -28,11 +28,11 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.databinding.FragmentPolarBinding
 import com.rtbishop.look4sat.domain.SatPass
+import com.rtbishop.look4sat.domain.SatPos
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,49 +69,43 @@ class PassInfoFragment : Fragment(R.layout.fragment_polar) {
         viewModel.disableSensor()
     }
 
-    private fun setupObservers(satTransAdapter: SatTransAdapter, binding: FragmentPolarBinding) {
+    private fun setupObservers(transAdapter: SatTransAdapter, binding: FragmentPolarBinding) {
         val catNum = requireArguments().getInt("catNum")
         val aosTime = requireArguments().getLong("aosTime")
-        val stationPos = preferences.loadStationPosition()
         viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
             passInfoView = PassInfoView(requireContext()).apply {
                 setShowAim(preferences.shouldUseCompass())
-                setPass(pass)
-                setStationPos(stationPos)
                 setScanning(preferences.shouldShowSweep())
             }
             binding.frame.addView(passInfoView)
-            observeTransmitters(pass, satTransAdapter, binding)
+            viewModel.passData.observe(viewLifecycleOwner, { passData ->
+                passInfoView?.setPosition(passData.position)
+                passInfoView?.setPositions(passData.positions)
+                setPassText(pass, passData.position, binding)
+            })
+            viewModel.transmitters.observe(viewLifecycleOwner, { list ->
+                if (list.isNotEmpty()) {
+                    transAdapter.submitList(list)
+                    binding.recycler.visibility = View.VISIBLE
+                    binding.noTransMsg.visibility = View.INVISIBLE
+                } else {
+                    binding.recycler.visibility = View.INVISIBLE
+                    binding.noTransMsg.visibility = View.VISIBLE
+                }
+                passInfoView?.invalidate()
+            })
+            viewModel.orientation.observe(viewLifecycleOwner, { orientation ->
+                passInfoView?.setOrientation(
+                    orientation.first,
+                    orientation.second,
+                    orientation.third
+                )
+            })
         }
-        viewModel.orientation.observe(viewLifecycleOwner, { orientation ->
-            passInfoView?.setOrientation(orientation.first, orientation.second, orientation.third)
-        })
     }
 
-    private fun observeTransmitters(
-        satPass: SatPass,
-        satTransAdapter: SatTransAdapter,
-        binding: FragmentPolarBinding
-    ) {
-        viewModel.transmitters.observe(viewLifecycleOwner, { list ->
-            if (list.isNotEmpty()) {
-                satTransAdapter.submitList(list)
-                binding.recycler.visibility = View.VISIBLE
-                binding.noTransMsg.visibility = View.INVISIBLE
-            } else {
-                binding.recycler.visibility = View.INVISIBLE
-                binding.noTransMsg.visibility = View.VISIBLE
-            }
-            setPassText(satPass, binding)
-            passInfoView?.invalidate()
-        })
-    }
-
-    private fun setPassText(satPass: SatPass, binding: FragmentPolarBinding) {
-        val dateNow = Date()
+    private fun setPassText(satPass: SatPass, satPos: SatPos, binding: FragmentPolarBinding) {
         val timeNow = System.currentTimeMillis()
-        val stationPos = preferences.loadStationPosition()
-        val satPos = satPass.satellite.getPosition(stationPos, dateNow.time)
         val polarAz = getString(R.string.pat_azimuth)
         val polarEl = getString(R.string.pat_elevation)
         val polarRng = getString(R.string.pat_distance)
@@ -123,13 +117,13 @@ class PassInfoFragment : Fragment(R.layout.fragment_polar) {
         binding.satName.text = satPass.name
 
         if (!satPass.isDeepSpace) {
-            if (dateNow.time < satPass.aosTime) {
+            if (timeNow < satPass.aosTime) {
                 val millisBeforeStart = satPass.aosTime.minus(timeNow)
                 binding.polarTimer.text = millisBeforeStart.toTimerString()
             } else {
                 val millisBeforeEnd = satPass.losTime.minus(timeNow)
                 binding.polarTimer.text = millisBeforeEnd.toTimerString()
-                if (dateNow.time > satPass.losTime) {
+                if (timeNow > satPass.losTime) {
                     binding.polarTimer.text = 0L.toTimerString()
                     findNavController().navigateSafe(R.id.action_polar_to_passes)
                 }

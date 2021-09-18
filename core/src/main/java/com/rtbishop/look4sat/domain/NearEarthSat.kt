@@ -135,7 +135,7 @@ class NearEarthSat(params: TLE) : Satellite(params) {
         }
     }
 
-    fun calculateSGP4(tSince: Double) {
+    internal fun calculateSGP4(tSince: Double) {
         synchronized(this) {
             val temp = DoubleArray(9)
             val xmdf = params.xmo + xmdot * tSince

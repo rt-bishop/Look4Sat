@@ -42,7 +42,7 @@ abstract class Satellite(val params: TLE) {
     var qoms24 = 0.0
     var s4 = 0.0
 
-    fun willBeSeen(pos: GeoPos): Boolean {
+    internal fun willBeSeen(pos: GeoPos): Boolean {
         return if (params.meanmo < 1e-8) false
         else {
             val sma = 331.25 * exp(ln(1440.0 / params.meanmo) * (2.0 / 3.0))
@@ -53,7 +53,7 @@ abstract class Satellite(val params: TLE) {
         }
     }
 
-    fun getPosition(pos: GeoPos, time: Long): SatPos {
+    internal fun getPosition(pos: GeoPos, time: Long): SatPos {
         val satPos = SatPos()
         // Date/time at which the position and velocity were calculated
         val julUTC = calcCurrentDaynum(time) + 2444238.5
@@ -89,7 +89,7 @@ abstract class Satellite(val params: TLE) {
         return julianDateOfYear(year) + day
     }
 
-    fun julianDateOfYear(theYear: Double): Double {
+    internal fun julianDateOfYear(theYear: Double): Double {
         val aYear = theYear - 1
         var i = floor(aYear / 100).toLong()
         val a = i
@@ -207,7 +207,7 @@ abstract class Satellite(val params: TLE) {
         }
     }
 
-    fun calculatePosAndVel(
+    internal fun calculatePosAndVel(
         rk: Double, uk: Double, xnodek: Double,
         xinck: Double, rdotk: Double, rfdotk: Double
     ) {
@@ -234,7 +234,7 @@ abstract class Satellite(val params: TLE) {
         velocity.z = rdotk * uz + rfdotk * vz
     }
 
-    class Vector4 {
+    internal class Vector4 {
         var w = 0.0
         var x = 0.0
         var y = 0.0
@@ -253,16 +253,16 @@ abstract class Satellite(val params: TLE) {
         }
     }
 
-    fun sqr(arg: Double): Double {
+    internal fun sqr(arg: Double): Double {
         return arg * arg
     }
 
-    fun invert(value: Double): Double {
+    internal fun invert(value: Double): Double {
         return 1.0 / value
     }
 
     // Calculates the modulus of 2 * PI
-    fun mod2PI(value: Double): Double {
+    internal fun mod2PI(value: Double): Double {
         var retVal = value
         val i = (retVal / twoPi).toInt()
         retVal -= i * twoPi
@@ -271,7 +271,7 @@ abstract class Satellite(val params: TLE) {
     }
 
     // Solves Keplers' Equation
-    fun converge(temp: DoubleArray, axn: Double, ayn: Double, capu: Double) {
+    internal fun converge(temp: DoubleArray, axn: Double, ayn: Double, capu: Double) {
         var converged = false
         var i = 0
         do {
@@ -287,7 +287,7 @@ abstract class Satellite(val params: TLE) {
     }
 
     // Sets perigee and checks and adjusts the calculation if the perigee is less tan 156KM
-    fun setPerigee(perigee: Double) {
+    internal fun setPerigee(perigee: Double) {
         this.perigee = perigee
         checkPerigee()
     }
