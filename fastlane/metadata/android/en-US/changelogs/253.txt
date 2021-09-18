@@ -1,2 +1,0 @@
-Bumped minSdk to 23 (Android 6.0), fixed AMSat SSL issue
-Dependencies update, fixed issue #58

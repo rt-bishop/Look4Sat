@@ -1,6 +1,0 @@
-Added simple custom source TLE update dialog
-Added immediate initial setup
-Added pass direction arrow to radar view #52
-Added orientation pointer to radar view
-Fixed radar view update bug #51
-Switched to modular architecture
