@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satPassInfoScreen
+package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.content.Context
 import android.graphics.*
@@ -27,7 +27,7 @@ import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
-class PassInfoView(context: Context) : View(context) {
+class RadarView(context: Context) : View(context) {
 
     private val defaultColor = ContextCompat.getColor(context, R.color.themeLight)
     private val scale = resources.displayMetrics.density

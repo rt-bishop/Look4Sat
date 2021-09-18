@@ -1,91 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/radar_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/polar_bar"
+        android:id="@+id/radar_bar"
         style="@style/TopBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/polar_timer"
+        android:id="@+id/radar_timer"
         style="@style/TimerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="4dp"
         android:text="@string/timer_zero"
         android:textSize="40sp"
-        app:layout_constraintBottom_toBottomOf="@+id/polar_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/polar_bar"
+        app:layout_constraintStart_toStartOf="@id/radar_bar"
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
-        android:id="@+id/frame"
+        android:id="@+id/radar_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/polar_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/radar_bar" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/azimuth"
+        android:id="@+id/radar_az"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="@string/pat_azimuth"
         android:textSize="15sp"
-        app:layout_constraintStart_toStartOf="@+id/frame"
-        app:layout_constraintTop_toTopOf="@+id/frame" />
+        app:layout_constraintStart_toStartOf="@+id/radar_frame"
+        app:layout_constraintTop_toTopOf="@+id/radar_frame" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/elevation"
+        android:id="@+id/radar_el"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:text="@string/pat_elevation"
         android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="@+id/frame"
-        app:layout_constraintTop_toTopOf="@+id/frame" />
+        app:layout_constraintEnd_toEndOf="@+id/radar_frame"
+        app:layout_constraintTop_toTopOf="@+id/radar_frame" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/altitude"
+        android:id="@+id/radar_alt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="@string/pat_altitude"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/frame"
-        app:layout_constraintStart_toStartOf="@+id/frame" />
+        app:layout_constraintBottom_toBottomOf="@+id/radar_frame"
+        app:layout_constraintStart_toStartOf="@+id/radar_frame" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/distance"
+        android:id="@+id/radar_dst"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:text="@string/pat_distance"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/frame"
-        app:layout_constraintEnd_toEndOf="@+id/frame" />
+        app:layout_constraintBottom_toBottomOf="@+id/radar_frame"
+        app:layout_constraintEnd_toEndOf="@+id/radar_frame" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler"
+        android:id="@+id/radar_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sat_name" />
+        app:layout_constraintTop_toBottomOf="@+id/radar_name" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/no_trans_msg"
+        android:id="@+id/radar_recycler_msg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -94,10 +95,10 @@
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/recycler" />
+        app:layout_constraintTop_toTopOf="@+id/radar_recycler" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/sat_name"
+        android:id="@+id/radar_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
@@ -107,5 +108,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frame" />
+        app:layout_constraintTop_toBottomOf="@+id/radar_frame" />
 </androidx.constraintlayout.widget.ConstraintLayout>

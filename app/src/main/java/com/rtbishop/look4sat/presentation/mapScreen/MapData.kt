@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.presentation.mapScreen
 
 import com.rtbishop.look4sat.domain.GeoPos
 import com.rtbishop.look4sat.domain.Satellite
 
-data class SatData(
+data class MapData(
     val pass: Satellite,
     val catNum: Int,
     val name: String,

@@ -15,33 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satSourcesScreen
+package com.rtbishop.look4sat.presentation.sourcesScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.databinding.ItemTleSourceBinding
+import com.rtbishop.look4sat.databinding.ItemSourceBinding
 
-class SourcesAdapter(private val sources: MutableList<TleSource> = mutableListOf()) :
+class SourcesAdapter(private val sources: MutableList<DataSource> = mutableListOf()) :
     RecyclerView.Adapter<SourcesAdapter.TleSourceHolder>() {
 
-    fun getSources(): List<TleSource> {
+    fun getSources(): List<DataSource> {
         return sources.filter { it.url.contains("https://") }
     }
 
-    fun setSources(list: List<TleSource>) {
+    fun setSources(list: List<DataSource>) {
         sources.clear()
         sources.addAll(list)
     }
 
     fun addSource() {
-        sources.add(TleSource())
+        sources.add(DataSource())
         notifyItemInserted(itemCount - 1)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TleSourceHolder {
-        val binding = ItemTleSourceBinding
+        val binding = ItemSourceBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
         return TleSourceHolder(binding)
     }
@@ -54,13 +54,13 @@ class SourcesAdapter(private val sources: MutableList<TleSource> = mutableListOf
         return sources.size
     }
 
-    inner class TleSourceHolder(private val binding: ItemTleSourceBinding) :
+    inner class TleSourceHolder(private val binding: ItemSourceBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(source: TleSource) {
-            binding.tleSourceUrl.setText(source.url)
-            binding.tleSourceUrl.doOnTextChanged { text, _, _, _ -> source.url = text.toString() }
-            binding.tleSourceInputLayout.setEndIconOnClickListener {
+        fun bind(source: DataSource) {
+            binding.sourceUrl.setText(source.url)
+            binding.sourceUrl.doOnTextChanged { text, _, _, _ -> source.url = text.toString() }
+            binding.sourceInput.setEndIconOnClickListener {
                 sources.remove(source)
                 notifyItemRemoved(adapterPosition)
             }

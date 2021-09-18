@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satMapScreen
+package com.rtbishop.look4sat.presentation.mapScreen
 
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -31,7 +31,6 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.domain.GeoPos
 import com.rtbishop.look4sat.domain.Satellite
-import com.rtbishop.look4sat.data.SatData
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -44,12 +43,12 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SatMapFragment : Fragment(R.layout.fragment_map) {
+class MapFragment : Fragment(R.layout.fragment_map) {
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
-    private val viewModel: SatMapViewModel by viewModels()
+    private val viewModel: MapViewModel by viewModels()
     private val minLat = MapView.getTileSystem().minLatitude
     private val maxLat = MapView.getTileSystem().maxLatitude
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -83,8 +82,8 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
         }
-        binding.fabPrev.setOnClickListener { viewModel.scrollSelection(true) }
-        binding.fabNext.setOnClickListener { viewModel.scrollSelection(false) }
+        binding.mapBtnPrev.setOnClickListener { viewModel.scrollSelection(true) }
+        binding.mapBtnNext.setOnClickListener { viewModel.scrollSelection(false) }
         setupObservers(binding)
     }
 
@@ -93,7 +92,7 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
         viewModel.satPositions.observe(viewLifecycleOwner, { renderSatPositions(it, binding) })
         viewModel.satTrack.observe(viewLifecycleOwner, { renderSatTrack(it, binding) })
         viewModel.satFootprint.observe(viewLifecycleOwner, { renderSatFootprint(it, binding) })
-        viewModel.satData.observe(viewLifecycleOwner, { renderSatData(it, binding) })
+        viewModel.mapData.observe(viewLifecycleOwner, { renderSatData(it, binding) })
     }
 
     private fun renderStationPos(stationPos: GeoPos, binding: FragmentMapBinding) {
@@ -183,16 +182,18 @@ class SatMapFragment : Fragment(R.layout.fragment_map) {
         binding.mapView.overlays[2] = footprintOverlay
     }
 
-    private fun renderSatData(satData: SatData, binding: FragmentMapBinding) {
+    private fun renderSatData(mapData: MapData, binding: FragmentMapBinding) {
         binding.apply {
-            idName.text =
-                String.format(getString(R.string.pat_osm_idName), satData.catNum, satData.name)
-            qthLocator.text = String.format(getString(R.string.map_qth), satData.qthLoc)
-            altitude.text = String.format(getString(R.string.pat_altitude), satData.altitude)
-            distance.text = String.format(getString(R.string.pat_distance), satData.range)
-            velocity.text = String.format(getString(R.string.pat_osm_vel), satData.velocity)
-            mapLat.text = String.format(getString(R.string.pat_osm_lat), satData.osmPos.latitude)
-            mapLon.text = String.format(getString(R.string.pat_osm_lon), satData.osmPos.longitude)
+            mapDataName.text =
+                String.format(getString(R.string.pat_osm_idName), mapData.catNum, mapData.name)
+            mapDataQth.text = String.format(getString(R.string.map_qth), mapData.qthLoc)
+            mapDataAlt.text = String.format(getString(R.string.pat_altitude), mapData.altitude)
+            mapDataDst.text = String.format(getString(R.string.pat_distance), mapData.range)
+            mapDataVel.text = String.format(getString(R.string.pat_osm_vel), mapData.velocity)
+            mapDataLat.text =
+                String.format(getString(R.string.pat_osm_lat), mapData.osmPos.latitude)
+            mapDataLon.text =
+                String.format(getString(R.string.pat_osm_lon), mapData.osmPos.longitude)
         }
         binding.mapView.invalidate()
     }

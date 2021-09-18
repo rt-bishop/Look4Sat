@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satItemScreen
+package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.os.Bundle
 import android.view.View
@@ -27,8 +27,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.data.SatItem
+import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.framework.model.Result
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
@@ -37,9 +37,9 @@ import com.rtbishop.look4sat.utility.showSnack
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SatItemFragment : Fragment(R.layout.fragment_entries) {
+class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
-    private val viewModel: SatItemViewModel by viewModels()
+    private val viewModel: EntriesViewModel by viewModels()
     private val contentContract = ActivityResultContracts.GetContent()
     private val filePicker = registerForActivityResult(contentContract) { uri ->
         uri?.let { viewModel.updateEntriesFromFile(uri) }
@@ -51,7 +51,7 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupComponents(view: View) {
-        val entriesAdapter = SatItemAdapter().apply {
+        val entriesAdapter = EntriesAdapter().apply {
             setEntriesClickListener(viewModel)
         }
         val binding = FragmentEntriesBinding.bind(view).apply {
@@ -62,13 +62,13 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
             }
-            importWeb.setOnClickListener {
+            entriesImportWeb.setOnClickListener {
                 findNavController().navigateSafe(R.id.action_entries_to_sources)
             }
-            importFile.setOnClickListener { filePicker.launch("*/*") }
-            selectMode.setOnClickListener { showModesDialog() }
-            selectAll.setOnClickListener { viewModel.selectCurrentItems() }
-            searchBar.setOnQueryTextListener(viewModel)
+            entriesImportFile.setOnClickListener { filePicker.launch("*/*") }
+            entriesSelectMode.setOnClickListener { showModesDialog() }
+            entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
+            entriesSearchBar.setOnQueryTextListener(viewModel)
         }
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
             handleSatData(satData, binding, entriesAdapter)
@@ -81,11 +81,11 @@ class SatItemFragment : Fragment(R.layout.fragment_entries) {
     private fun handleSatData(
         result: Result<List<SatItem>>,
         binding: FragmentEntriesBinding,
-        satItemAdapter: SatItemAdapter
+        entriesAdapter: EntriesAdapter
     ) {
         when (result) {
             is Result.Success -> {
-                satItemAdapter.submitList(result.data)
+                entriesAdapter.submitList(result.data)
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
             }

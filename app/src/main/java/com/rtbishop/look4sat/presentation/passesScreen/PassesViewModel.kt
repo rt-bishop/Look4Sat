@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satPassScreen
+package com.rtbishop.look4sat.presentation.passesScreen
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @HiltViewModel
-class SatPassViewModel @Inject constructor(
+class PassesViewModel @Inject constructor(
     private val satelliteRepo: SatelliteRepo,
     private val predictor: Predictor,
     private val preferencesSource: PreferencesSource

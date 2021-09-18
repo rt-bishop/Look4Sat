@@ -15,6 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satSourcesScreen
+package com.rtbishop.look4sat.presentation.sourcesScreen
 
-class TleSource(var url: String = String())
+class DataSource(var url: String = String())

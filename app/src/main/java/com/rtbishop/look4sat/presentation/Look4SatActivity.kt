@@ -37,7 +37,7 @@ class Look4SatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
-        binding.navBottom.setupWithNavController(navHost.navController)
+        val navHost = supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
+        binding.mainNavBottom.setupWithNavController(navHost.navController)
     }
 }

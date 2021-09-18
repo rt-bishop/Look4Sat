@@ -15,11 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satPassInfoScreen
+package com.rtbishop.look4sat.presentation.radarScreen
 
 import androidx.lifecycle.*
-import androidx.navigation.fragment.findNavController
-import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
@@ -28,9 +26,7 @@ import com.rtbishop.look4sat.domain.SatPos
 import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.framework.OrientationProvider
 import com.rtbishop.look4sat.injection.IoDispatcher
-import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.round
-import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -40,7 +36,7 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class PassInfoViewModel @Inject constructor(
+class RadarViewModel @Inject constructor(
     private val orientationProvider: OrientationProvider,
     private val preferences: PreferencesSource,
     private val predictor: Predictor,
@@ -49,10 +45,10 @@ class PassInfoViewModel @Inject constructor(
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
-    private val _passData = MutableLiveData<PassData>()
+    private val _passData = MutableLiveData<RadarData>()
     private val _transmitters = MutableLiveData<List<Transmitter>>()
     private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
-    val passData: LiveData<PassData> = _passData
+    val radarData: LiveData<RadarData> = _passData
     val transmitters: LiveData<List<Transmitter>> = _transmitters
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
@@ -90,7 +86,7 @@ class PassInfoViewModel @Inject constructor(
             }
             while (isActive) {
                 val pos = predictor.getSatPos(satPass.satellite, stationPos, Date())
-                _passData.postValue(PassData(pos, track))
+                _passData.postValue(RadarData(pos, track))
                 delay(1000)
             }
         }

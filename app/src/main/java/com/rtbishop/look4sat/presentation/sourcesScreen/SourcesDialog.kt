@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satSourcesScreen
+package com.rtbishop.look4sat.presentation.sourcesScreen
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -43,7 +43,7 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        val sources = prefsManager.loadTleSources().map { TleSource(it) }
+        val sources = prefsManager.loadTleSources().map { DataSource(it) }
         val sourcesAdapter = SourcesAdapter().apply { setSources(sources) }
         DialogSourcesBinding.bind(view).apply {
             dialog?.window?.setLayout(
@@ -54,7 +54,7 @@ class SourcesDialog : AppCompatDialogFragment() {
                 adapter = sourcesAdapter
                 layoutManager = LinearLayoutManager(requireContext())
             }
-            sourceBtnAdd.setOnClickListener {
+            sourcesBtnAdd.setOnClickListener {
                 sourcesAdapter.addSource()
             }
             sourcesBtnPos.setOnClickListener {

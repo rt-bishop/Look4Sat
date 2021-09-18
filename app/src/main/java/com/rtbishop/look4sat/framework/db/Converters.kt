@@ -33,19 +33,19 @@ object Converters {
 
     @JvmStatic
     @TypeConverter
-    fun tleToString(tle: TLE): String {
+    fun paramsToString(tle: TLE): String {
         return paramsAdapter.toJson(tle)
     }
 
     @JvmStatic
     @TypeConverter
-    fun tleFromString(string: String): TLE? {
+    fun paramsFromString(string: String): TLE? {
         return paramsAdapter.fromJson(string)
     }
 
     @JvmStatic
     @TypeConverter
-    fun satFromString(string: String): Satellite? {
+    fun satelliteFromString(string: String): Satellite? {
         return paramsAdapter.fromJson(string)?.createSat()
     }
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satItemScreen
+package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.content.ContentResolver
 import android.net.Uri
@@ -32,11 +32,11 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class SatItemViewModel @Inject constructor(
+class EntriesViewModel @Inject constructor(
     private val preferencesSource: PreferencesSource,
     private val resolver: ContentResolver,
     private val satelliteRepo: SatelliteRepo,
-) : ViewModel(), SatItemAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
+) : ViewModel(), EntriesAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
 
     private val transModes = MutableLiveData(satelliteRepo.loadSelectedModes())
     private val currentQuery = MutableLiveData(String())

@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/trans_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/trans_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/trans_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/description"
+            android:id="@+id/trans_desc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
@@ -21,35 +30,59 @@
             android:maxLines="1"
             android:text="@string/trans_description"
             android:textSize="15sp"
-            app:layout_constraintEnd_toStartOf="@+id/img_uplink"
+            app:layout_constraintEnd_toStartOf="@+id/trans_uplink_img"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toEndOf="@+id/img_downlink"
+            app:layout_constraintStart_toEndOf="@+id/trans_downlink_img"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/downlink"
-            style="@style/TimerText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/trans_link_low"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
+        <ImageView
+            android:id="@+id/trans_downlink_img"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="4dp"
+            android:contentDescription="@string/placeholder"
+            android:rotation="90"
+            app:layout_constraintBottom_toBottomOf="@+id/trans_desc"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/description" />
+            app:layout_constraintTop_toTopOf="@+id/trans_desc"
+            app:srcCompat="@drawable/ic_arrow" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/uplink"
+            android:id="@+id/trans_downlink"
             style="@style/TimerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trans_link_low"
             android:textSize="24sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/downlink"
+            app:layout_constraintEnd_toStartOf="@+id/trans_guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/trans_desc" />
+
+        <ImageView
+            android:id="@+id/trans_uplink_img"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginEnd="4dp"
+            android:contentDescription="@string/placeholder"
+            android:rotation="270"
+            app:layout_constraintBottom_toBottomOf="@+id/trans_desc"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline" />
+            app:layout_constraintTop_toTopOf="@+id/trans_desc"
+            app:srcCompat="@drawable/ic_arrow" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mode"
+            android:id="@+id/trans_uplink"
+            style="@style/TimerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trans_link_low"
+            android:textSize="24sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/trans_downlink"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/trans_guideline" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/trans_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
@@ -57,52 +90,21 @@
             android:text="@string/trans_mode"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/isInverted"
+            app:layout_constraintEnd_toStartOf="@+id/trans_inverted"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/downlink" />
+            app:layout_constraintTop_toBottomOf="@+id/trans_downlink" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/isInverted"
+            android:id="@+id/trans_inverted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/trans_inverted"
             android:textSize="15sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/mode"
+            app:layout_constraintBaseline_toBaselineOf="@+id/trans_mode"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/mode" />
-
-        <ImageView
-            android:id="@+id/img_downlink"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="4dp"
-            android:contentDescription="@string/placeholder"
-            android:rotation="90"
-            app:layout_constraintBottom_toBottomOf="@+id/description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/description"
-            app:srcCompat="@drawable/ic_arrow" />
-
-        <ImageView
-            android:id="@+id/img_uplink"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginEnd="4dp"
-            android:contentDescription="@string/placeholder"
-            android:rotation="270"
-            app:layout_constraintBottom_toBottomOf="@+id/description"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/description"
-            app:srcCompat="@drawable/ic_arrow" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
+            app:layout_constraintStart_toEndOf="@+id/trans_mode" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

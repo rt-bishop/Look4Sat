@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satItemScreen
+package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.databinding.SatItemBinding
 import com.rtbishop.look4sat.data.SatItem
+import com.rtbishop.look4sat.databinding.ItemEntryBinding
 
-class SatItemAdapter : RecyclerView.Adapter<SatItemAdapter.SatItemHolder>() {
+class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatItem>() {
         override fun areItemsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
@@ -61,12 +61,12 @@ class SatItemAdapter : RecyclerView.Adapter<SatItemAdapter.SatItemHolder>() {
         holder.bind(differ.currentList[position], clickListener)
     }
 
-    class SatItemHolder private constructor(private val binding: SatItemBinding) :
+    class SatItemHolder private constructor(private val binding: ItemEntryBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: SatItem, listener: EntriesClickListener) {
-            binding.satItemCheckbox.text = item.name
-            binding.satItemCheckbox.isChecked = item.isSelected
+            binding.entryCheckbox.text = item.name
+            binding.entryCheckbox.isChecked = item.isSelected
             itemView.setOnClickListener {
                 listener.updateSelection(listOf(item.catNum), item.isSelected.not())
             }
@@ -75,7 +75,7 @@ class SatItemAdapter : RecyclerView.Adapter<SatItemAdapter.SatItemHolder>() {
         companion object {
             fun from(parent: ViewGroup): SatItemHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                return SatItemHolder(SatItemBinding.inflate(inflater, parent, false))
+                return SatItemHolder(ItemEntryBinding.inflate(inflater, parent, false))
             }
         }
     }

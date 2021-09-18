@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
     <org.osmdroid.views.MapView
-        android:id="@+id/mapView"
+        android:id="@+id/map_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -17,6 +19,7 @@
     </org.osmdroid.views.MapView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_data_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -28,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mapLat"
+            android:id="@+id/map_data_lat"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,94 +42,95 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/mapLon"
+            android:id="@+id/map_data_lon"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="@string/pat_osm_lon"
-            app:layout_constraintStart_toStartOf="@+id/mapLat"
-            app:layout_constraintTop_toBottomOf="@+id/mapLat" />
+            app:layout_constraintStart_toStartOf="@+id/map_data_lat"
+            app:layout_constraintTop_toBottomOf="@+id/map_data_lat" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/qthLocator"
+            android:id="@+id/map_data_qth"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="@string/map_qth"
-            app:layout_constraintStart_toStartOf="@+id/mapLon"
-            app:layout_constraintTop_toBottomOf="@+id/mapLon" />
+            app:layout_constraintStart_toStartOf="@+id/map_data_lon"
+            app:layout_constraintTop_toBottomOf="@+id/map_data_lon" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/altitude"
+            android:id="@+id/map_data_alt"
+            style="@style/MapInfoText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/MapInfoText"
-            android:text="@string/pat_altitude"
             android:layout_marginEnd="8dp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/mapLat"
+            android:text="@string/pat_altitude"
+            app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lat"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/velocity"
-            style="@style/MapInfoText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pat_osm_vel"
-            app:layout_constraintBaseline_toBaselineOf="@+id/qthLocator"
-            app:layout_constraintEnd_toEndOf="@+id/distance" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/distance"
+            android:id="@+id/map_data_dst"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pat_distance"
-            app:layout_constraintBaseline_toBaselineOf="@+id/mapLon"
-            app:layout_constraintEnd_toEndOf="@+id/altitude" />
+            app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lon"
+            app:layout_constraintEnd_toEndOf="@+id/map_data_alt" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/idName"
+            android:id="@+id/map_data_vel"
+            style="@style/MapInfoText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/pat_osm_vel"
+            app:layout_constraintBaseline_toBaselineOf="@+id/map_data_qth"
+            app:layout_constraintEnd_toEndOf="@+id/map_data_dst" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/map_data_name"
             style="@style/MapInfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:text="@string/pat_osm_idName"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/qthLocator" />
+            app:layout_constraintTop_toBottomOf="@+id/map_data_qth" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageButton
-        android:id="@+id/fabPrev"
+        android:id="@+id/map_btn_prev"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_marginStart="@dimen/fab_padding"
         android:layout_marginBottom="@dimen/fab_padding"
+        android:backgroundTint="@color/greySurface"
         android:contentDescription="@string/placeholder"
         android:rotation="180"
-        android:backgroundTint="@color/greySurface"
+        android:src="@drawable/ic_next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/ic_next" />
+        tools:ignore="DuplicateSpeakableTextCheck" />
 
     <ImageButton
-        android:id="@+id/fabNext"
+        android:id="@+id/map_btn_next"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:layout_marginEnd="@dimen/fab_padding"
         android:layout_marginBottom="@dimen/fab_padding"
         android:backgroundTint="@color/greySurface"
         android:contentDescription="@string/placeholder"
+        android:src="@drawable/ic_next"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_next" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/copyright"
+        android:id="@+id/map_copyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"

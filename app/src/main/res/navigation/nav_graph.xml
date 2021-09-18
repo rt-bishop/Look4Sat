@@ -2,12 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
+    android:id="@+id/nav_root"
     app:startDestination="@id/nav_passes">
-
     <fragment
         android:id="@+id/nav_entries"
-        android:name="com.rtbishop.look4sat.presentation.satItemScreen.SatItemFragment"
+        android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
         tools:layout="@layout/fragment_entries">
         <action
             android:id="@+id/action_entries_to_passes"
@@ -18,32 +17,30 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/action_entries_to_sources"
-            app:destination="@id/nav_dialog_sources"
+            app:destination="@id/nav_sources"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
-
     <fragment
         android:id="@+id/nav_passes"
-        android:name="com.rtbishop.look4sat.presentation.satPassScreen.SatPassFragment"
+        android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
         tools:layout="@layout/fragment_passes">
         <action
-            android:id="@+id/action_passes_to_polar"
-            app:destination="@id/nav_polar"
+            android:id="@+id/action_passes_to_radar"
+            app:destination="@id/nav_radar"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
-
     <fragment
-        android:id="@+id/nav_polar"
-        android:name="com.rtbishop.look4sat.presentation.satPassInfoScreen.PassInfoFragment"
-        tools:layout="@layout/fragment_polar">
+        android:id="@+id/nav_radar"
+        android:name="com.rtbishop.look4sat.presentation.radarScreen.RadarFragment"
+        tools:layout="@layout/fragment_radar">
         <action
-            android:id="@+id/action_polar_to_passes"
+            android:id="@+id/action_radar_to_passes"
             app:destination="@id/nav_passes"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -52,23 +49,19 @@
             app:popUpTo="@id/nav_passes"
             app:popUpToInclusive="true" />
     </fragment>
-
     <fragment
         android:id="@+id/nav_map"
-        android:name="com.rtbishop.look4sat.presentation.satMapScreen.SatMapFragment"
+        android:name="com.rtbishop.look4sat.presentation.mapScreen.MapFragment"
         tools:layout="@layout/fragment_map" />
-
     <fragment
-        android:id="@+id/nav_prefs"
-        android:name="com.rtbishop.look4sat.presentation.appSettingsScreen.AppSettingsFragment" />
-
+        android:id="@+id/nav_settings"
+        android:name="com.rtbishop.look4sat.presentation.settingsScreen.SettingsFragment" />
     <fragment
         android:id="@+id/nav_info"
-        android:name="com.rtbishop.look4sat.presentation.appInfoScreen.AppInfoFragment"
+        android:name="com.rtbishop.look4sat.presentation.infoScreen.InfoFragment"
         tools:layout="@layout/fragment_info" />
     <dialog
-        android:id="@+id/nav_dialog_sources"
-        android:name="com.rtbishop.look4sat.presentation.satSourcesScreen.SourcesDialog"
+        android:id="@+id/nav_sources"
+        android:name="com.rtbishop.look4sat.presentation.sourcesScreen.SourcesDialog"
         tools:layout="@layout/dialog_sources" />
-
 </navigation>

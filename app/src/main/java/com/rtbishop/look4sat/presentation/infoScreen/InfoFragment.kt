@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.appInfoScreen
+package com.rtbishop.look4sat.presentation.infoScreen
 
 import android.content.Intent
 import android.net.Uri
@@ -27,20 +27,20 @@ import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentInfoBinding
 
-class AppInfoFragment : Fragment(R.layout.fragment_info) {
+class InfoFragment : Fragment(R.layout.fragment_info) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         FragmentInfoBinding.bind(view).apply {
             infoVersion.text =
                 String.format(getString(R.string.info_version), BuildConfig.VERSION_NAME)
-            infoGithub.setOnClickListener {
+            infoBtnGithub.setOnClickListener {
                 gotoUrl("https://github.com/rt-bishop/Look4Sat/")
             }
-            infoFdroid.setOnClickListener {
+            infoBtnFdroid.setOnClickListener {
                 gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
             }
-            infoBmc.setOnClickListener {
+            infoBtnDonate.setOnClickListener {
                 gotoUrl("https://www.buymeacoffee.com/rtbishop")
             }
             val moveMethod = LinkMovementMethod.getInstance()

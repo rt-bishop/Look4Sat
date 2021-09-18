@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/tleSourcesDialog"
+    android:id="@+id/sources_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/greyDark"
     android:padding="4dp">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/sourcesTitle"
+        android:id="@+id/sources_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:text="@string/sources_title"
         android:textSize="16sp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="@+id/sourcesRecycler"
+        app:layout_constraintStart_toStartOf="@+id/sources_recycler"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/sourcesWarning"
+        android:id="@+id/sources_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="@string/sources_https"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@+id/sourcesRecycler"
-        app:layout_constraintTop_toBottomOf="@+id/sourcesTitle" />
+        app:layout_constraintStart_toStartOf="@+id/sources_recycler"
+        app:layout_constraintTop_toBottomOf="@+id/sources_title" />
 
     <ImageButton
-        android:id="@+id/sourceBtnAdd"
+        android:id="@+id/sources_btn_add"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:backgroundTint="@color/greySurface"
         android:contentDescription="@string/placeholder"
         android:src="@drawable/ic_add"
-        app:layout_constraintBottom_toBottomOf="@+id/sourcesWarning"
+        app:layout_constraintBottom_toBottomOf="@+id/sources_warning"
         app:layout_constraintDimensionRatio="h,1:1"
-        app:layout_constraintEnd_toEndOf="@+id/sourcesRecycler"
-        app:layout_constraintTop_toTopOf="@+id/sourcesTitle" />
+        app:layout_constraintEnd_toEndOf="@+id/sources_recycler"
+        app:layout_constraintTop_toTopOf="@+id/sources_title" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/sourcesRecycler"
+        android:id="@+id/sources_recycler"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -50,24 +50,24 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sourcesWarning">
+        app:layout_constraintTop_toBottomOf="@+id/sources_warning">
 
     </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/sourcesBtnNeg"
+        android:id="@+id/sources_btn_neg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/greySurface"
         android:text="@string/btn_cancel"
         android:textAllCaps="false"
         android:textColor="@color/themeLight"
-        app:layout_constraintBaseline_toBaselineOf="@+id/sourcesBtnPos"
+        app:layout_constraintBaseline_toBaselineOf="@+id/sources_btn_pos"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="@+id/sourcesRecycler" />
+        app:layout_constraintStart_toStartOf="@+id/sources_recycler" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/sourcesBtnPos"
+        android:id="@+id/sources_btn_pos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -77,7 +77,7 @@
         android:textAllCaps="false"
         android:textColor="@color/themeLight"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/sourcesRecycler"
-        app:layout_constraintTop_toBottomOf="@+id/sourcesRecycler" />
+        app:layout_constraintEnd_toEndOf="@+id/sources_recycler"
+        app:layout_constraintTop_toBottomOf="@+id/sources_recycler" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

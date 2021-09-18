@@ -43,7 +43,7 @@ import java.util.regex.Pattern
 
 fun View.showSnack(message: String, isAnchored: Boolean = true) {
     Snackbar.make(this, message, Snackbar.LENGTH_SHORT).apply {
-        if (isAnchored) setAnchorView(R.id.nav_bottom)
+        if (isAnchored) setAnchorView(R.id.main_nav_bottom)
     }.show()
 }
 

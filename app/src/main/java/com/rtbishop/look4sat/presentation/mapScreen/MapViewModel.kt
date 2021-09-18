@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satMapScreen
+package com.rtbishop.look4sat.presentation.mapScreen
 
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.data.SatData
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +30,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @HiltViewModel
-class SatMapViewModel @Inject constructor(
+class MapViewModel @Inject constructor(
     private val satelliteRepo: SatelliteRepo,
     private val predictor: Predictor,
     private val preferences: PreferencesSource,
@@ -54,8 +53,8 @@ class SatMapViewModel @Inject constructor(
     private val _satFootprint = MutableLiveData<List<GeoPos>>()
     val satFootprint: LiveData<List<GeoPos>> = _satFootprint
 
-    private val _satData = MutableLiveData<SatData>()
-    val satData: LiveData<SatData> = this._satData
+    private val _satData = MutableLiveData<MapData>()
+    val mapData: LiveData<MapData> = this._satData
 
     private val _satPositions = MutableLiveData<Map<Satellite, GeoPos>>()
     val satPositions: LiveData<Map<Satellite, GeoPos>> = _satPositions
@@ -162,7 +161,7 @@ class SatMapViewModel @Inject constructor(
         val osmLon = clipLon(Math.toDegrees(satPos.longitude))
         val osmPos = GeoPos(osmLat, osmLon)
         val qthLoc = QthConverter.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
-        val satData = SatData(
+        val satData = MapData(
             satellite, satellite.params.catnum, satellite.params.name, satPos.range,
             satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos
         )

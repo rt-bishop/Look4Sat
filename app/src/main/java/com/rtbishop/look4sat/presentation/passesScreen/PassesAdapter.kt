@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satPassScreen
+package com.rtbishop.look4sat.presentation.passesScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -29,7 +29,7 @@ import com.rtbishop.look4sat.domain.SatPass
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SatPassAdapter(private val isUTC: Boolean, private val clickListener: PassesClickListener) :
+class PassesAdapter(private val isUTC: Boolean, private val clickListener: PassesClickListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatPass>() {
@@ -94,13 +94,13 @@ class SatPassAdapter(private val isUTC: Boolean, private val clickListener: Pass
                     startFormat.timeZone = timeZoneUTC
                     endFormat.timeZone = timeZoneUTC
                 }
-                passLeoSatName.text = satPass.name
-                passLeoSatId.text = String.format(satIdFormat, satPass.catNum)
-                passLeoAosAz.text = String.format(aosAzFormat, satPass.aosAzimuth)
-                passLeoMaxEl.text = String.format(maxElFormat, satPass.maxElevation)
-                passLeoLosAz.text = String.format(losAzFormat, satPass.losAzimuth)
+                passLeoName.text = satPass.name
+                passLeoId.text = String.format(satIdFormat, satPass.catNum)
+                passLeoAos.text = String.format(aosAzFormat, satPass.aosAzimuth)
+                passLeoElev.text = String.format(maxElFormat, satPass.maxElevation)
+                passLeoLos.text = String.format(losAzFormat, satPass.losAzimuth)
                 passLeoStart.text = startFormat.format(Date(satPass.aosTime))
-                passLeoTcaAz.text = String.format(tcaAzFormat, satPass.tcaAzimuth)
+                passLeoTca.text = String.format(tcaAzFormat, satPass.tcaAzimuth)
                 passLeoEnd.text = endFormat.format(Date(satPass.losTime))
                 passLeoProgress.progress = satPass.progress
             }
@@ -128,8 +128,8 @@ class SatPassAdapter(private val isUTC: Boolean, private val clickListener: Pass
 
         fun bind(satPass: SatPass, listener: PassesClickListener) {
             binding.apply {
-                passGeoSatName.text = satPass.name
-                passGeoSatId.text = String.format(satIdFormat, satPass.catNum)
+                passGeoName.text = satPass.name
+                passGeoId.text = String.format(satIdFormat, satPass.catNum)
                 passGeoAz.text = String.format(azFormat, satPass.tcaAzimuth)
                 passGeoAlt.text = String.format(altFormat, satPass.altitude)
                 passGeoEl.text = String.format(elevFormat, satPass.maxElevation)

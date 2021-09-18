@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.appSettingsScreen
+package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.InputType
-import android.util.Patterns
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -36,7 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AppSettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment : PreferenceFragmentCompat() {
 
     @Inject
     lateinit var preferencesSource: PreferencesSource
@@ -72,7 +71,8 @@ class AppSettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<EditTextPreference>(PreferencesProvider.keyRotatorAddress)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
-                if (Patterns.IP_ADDRESS.matcher(newValue.toString()).matches()) {
+                val ip4 = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!\$)|\$)){4}\$"
+                if (newValue.toString().matches(ip4.toRegex())) {
                     return@setOnPreferenceChangeListener true
                 } else {
                     showSnack(getString(R.string.tracking_rotator_address_invalid))
@@ -119,7 +119,7 @@ class AppSettingsFragment : PreferenceFragmentCompat() {
 
     private fun showSnack(message: String) {
         Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
-            setAnchorView(R.id.nav_bottom)
+            setAnchorView(R.id.main_nav_bottom)
         }.show()
     }
 }

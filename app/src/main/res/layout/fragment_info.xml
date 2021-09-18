@@ -2,29 +2,31 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/info_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.appInfoScreen.AppInfoFragment">
+    tools:context=".presentation.infoScreen.InfoFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/info_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/infoTitleImg"
+            android:id="@+id/info_title_img"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:contentDescription="@string/placeholder"
-            android:src="@drawable/ic_menu_entries"
-            app:layout_constraintBottom_toBottomOf="@+id/infoTitle"
-            app:layout_constraintEnd_toStartOf="@+id/infoTitle"
+            android:src="@drawable/ic_nav_entries"
+            app:layout_constraintBottom_toBottomOf="@+id/info_title"
+            app:layout_constraintEnd_toStartOf="@+id/info_title"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/infoTitle" />
+            app:layout_constraintTop_toTopOf="@+id/info_title" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/infoTitle"
+            android:id="@+id/info_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -32,11 +34,11 @@
             android:textColor="@color/themeLight"
             android:textSize="48sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/infoTitleImg"
+            app:layout_constraintStart_toEndOf="@+id/info_title_img"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/infoVersion"
+            android:id="@+id/info_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -45,10 +47,10 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/infoTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/info_title" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/infoSubtitle"
+            android:id="@+id/info_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -56,39 +58,39 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/infoVersion" />
+            app:layout_constraintTop_toBottomOf="@+id/info_version" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/infoGithub"
+            android:id="@+id/info_btn_github"
             style="@style/InfoButton"
             android:layout_marginTop="8dp"
             android:text="@string/info_github"
             app:icon="@drawable/ic_github"
-            app:layout_constraintEnd_toStartOf="@+id/infoFdroid"
+            app:layout_constraintEnd_toStartOf="@+id/info_btn_fdroid"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/infoSubtitle" />
+            app:layout_constraintTop_toBottomOf="@+id/info_subtitle" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/infoFdroid"
+            android:id="@+id/info_btn_fdroid"
             style="@style/InfoButton"
             android:text="@string/info_fdroid"
             app:icon="@drawable/ic_fdroid"
-            app:layout_constraintBaseline_toBaselineOf="@+id/infoGithub"
+            app:layout_constraintBaseline_toBaselineOf="@+id/info_btn_github"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/infoGithub" />
+            app:layout_constraintStart_toEndOf="@+id/info_btn_github" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/infoBmc"
+            android:id="@+id/info_btn_donate"
             style="@style/InfoButton"
             android:layout_marginTop="8dp"
             android:text="@string/info_bmc"
             app:icon="@drawable/ic_bmc"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/infoGithub" />
+            app:layout_constraintTop_toBottomOf="@+id/info_btn_github" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/infoThanks"
+            android:id="@+id/info_thanks"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -99,10 +101,10 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/infoBmc" />
+            app:layout_constraintTop_toBottomOf="@+id/info_btn_donate" />
 
         <TextView
-            android:id="@+id/infoWarranty"
+            android:id="@+id/info_warranty"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -111,9 +113,9 @@
             android:text="@string/info_warranty"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/infoThanks"
-            app:layout_constraintStart_toStartOf="@+id/infoThanks"
-            app:layout_constraintTop_toBottomOf="@+id/infoThanks" />
+            app:layout_constraintEnd_toEndOf="@+id/info_thanks"
+            app:layout_constraintStart_toStartOf="@+id/info_thanks"
+            app:layout_constraintTop_toBottomOf="@+id/info_thanks" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

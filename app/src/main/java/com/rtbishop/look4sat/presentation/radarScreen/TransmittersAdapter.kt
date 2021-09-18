@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satPassInfoScreen
+package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -27,7 +27,7 @@ import com.rtbishop.look4sat.databinding.ItemTransBinding
 import com.rtbishop.look4sat.domain.Transmitter
 import java.util.*
 
-class SatTransAdapter : RecyclerView.Adapter<SatTransAdapter.TransHolder>() {
+class TransmittersAdapter : RecyclerView.Adapter<TransmittersAdapter.TransHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<Transmitter>() {
         override fun areItemsTheSame(oldItem: Transmitter, newItem: Transmitter): Boolean {
@@ -66,27 +66,38 @@ class SatTransAdapter : RecyclerView.Adapter<SatTransAdapter.TransHolder>() {
         private val isInverted = itemView.context.getString(R.string.trans_inverted)
 
         fun bind(transmitter: Transmitter) {
-            binding.description.text = transmitter.info
+            binding.transDesc.text = transmitter.info
 
             transmitter.downlink.let { downlink ->
                 if (downlink != null) {
                     val downlinkFreq = downlink / divider
-                    binding.downlink.text = String.format(Locale.ENGLISH, formatLink, downlinkFreq)
-                } else binding.downlink.text = formatLinkNull
+                    binding.transDownlink.text =
+                        String.format(Locale.ENGLISH, formatLink, downlinkFreq)
+                } else {
+                    binding.transDownlink.text = formatLinkNull
+                }
             }
 
             transmitter.uplink.let { uplink ->
                 if (uplink != null) {
                     val uplinkFreq = uplink / divider
-                    binding.uplink.text = String.format(Locale.ENGLISH, formatLink, uplinkFreq)
-                } else binding.uplink.text = formatLinkNull
+                    binding.transUplink.text = String.format(Locale.ENGLISH, formatLink, uplinkFreq)
+                } else {
+                    binding.transUplink.text = formatLinkNull
+                }
             }
 
-            if (transmitter.mode != null) binding.mode.text = String.format(mode, transmitter.mode)
-            else binding.mode.text = String.format(mode, strNo)
+            if (transmitter.mode != null) {
+                binding.transMode.text = String.format(mode, transmitter.mode)
+            } else {
+                binding.transMode.text = String.format(mode, strNo)
+            }
 
-            if (transmitter.isInverted) binding.isInverted.text = String.format(isInverted, strYes)
-            else binding.isInverted.text = String.format(isInverted, strNo)
+            if (transmitter.isInverted) {
+                binding.transInverted.text = String.format(isInverted, strYes)
+            } else {
+                binding.transInverted.text = String.format(isInverted, strNo)
+            }
         }
 
         companion object {

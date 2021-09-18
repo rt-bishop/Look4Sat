@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.satPassScreen
+package com.rtbishop.look4sat.presentation.passesScreen
 
 import android.Manifest
 import android.os.Bundle
@@ -38,12 +38,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 @AndroidEntryPoint
-class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.PassesClickListener {
+class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
-    private val viewModel: SatPassViewModel by viewModels()
+    private val passesViewModel: PassesViewModel by viewModels()
     private val permRequest = ActivityResultContracts.RequestPermission()
     private val permRequestLauncher = registerForActivityResult(permRequest) {
-        viewModel.triggerInitialSetup()
+        passesViewModel.triggerInitialSetup()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,7 +52,7 @@ class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.Passe
     }
 
     private fun setupComponents(view: View) {
-        val passesAdapter = SatPassAdapter(viewModel.shouldUseUTC(), this)
+        val passesAdapter = PassesAdapter(passesViewModel.shouldUseUTC(), this)
         val binding = FragmentPassesBinding.bind(view).apply {
             passesRecycler.apply {
                 setHasFixedSize(true)
@@ -62,24 +62,24 @@ class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.Passe
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
             }
-            passesRefresh.setOnClickListener { viewModel.forceCalculation() }
+            passesRefresh.setOnClickListener { passesViewModel.forceCalculation() }
         }
-        viewModel.passes.observe(viewLifecycleOwner, { passesResult ->
+        passesViewModel.passes.observe(viewLifecycleOwner, { passesResult ->
             handleNewPasses(passesResult, passesAdapter, binding)
         })
-        viewModel.isFirstLaunchDone.observe(viewLifecycleOwner, { setupDone ->
+        passesViewModel.isFirstLaunchDone.observe(viewLifecycleOwner, { setupDone ->
             if (!setupDone) permRequestLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         })
     }
 
     private fun handleNewPasses(
         result: Result<List<SatPass>>,
-        satPassAdapter: SatPassAdapter,
+        passesAdapter: PassesAdapter,
         binding: FragmentPassesBinding
     ) {
         when (result) {
             is Result.Success -> {
-                satPassAdapter.submitList(result.data)
+                passesAdapter.submitList(result.data)
                 binding.apply {
                     passesError.visibility = View.INVISIBLE
                     passesProgress.visibility = View.INVISIBLE
@@ -126,7 +126,7 @@ class SatPassFragment : Fragment(R.layout.fragment_passes), SatPassAdapter.Passe
     override fun navigateToPass(satPass: SatPass) {
         if (satPass.progress < 100) {
             val bundle = bundleOf("catNum" to satPass.catNum, "aosTime" to satPass.aosTime)
-            findNavController().navigateSafe(R.id.action_passes_to_polar, bundle)
+            findNavController().navigateSafe(R.id.action_passes_to_radar, bundle)
         }
     }
 }
