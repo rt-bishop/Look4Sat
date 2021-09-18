@@ -26,10 +26,10 @@ data class SatPass(
     val tcaAzimuth: Double,
     val altitude: Double,
     val maxElevation: Double,
-    val satellite: Satellite
+    val satellite: Satellite,
+    var progress: Int = 0
 ) {
     val catNum: Int = satellite.params.catnum
     val name: String = satellite.params.name
     val isDeepSpace: Boolean = satellite.params.isDeepspace
-    var progress: Int = 0
 }
