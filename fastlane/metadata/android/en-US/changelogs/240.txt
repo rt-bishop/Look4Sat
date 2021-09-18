@@ -1,5 +1,0 @@
-Removed hardcoded screen orientation
-Removed redundant permission from manifest
-Added antenna rotator control via socket
-Showing azimuth for respective maxElevation
-Showing satellite name on the polar screen
