@@ -1,10 +1,12 @@
 <resources>
 
-    <style name="AppTheme.Splash" parent="AppTheme">
-        <item name="android:windowBackground">@drawable/splash_drawable</item>
+    <style name="Theme.Look4Sat.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/greyDark</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_drawable</item>
+        <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.Look4Sat.Main" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/themeLight</item>
         <item name="colorSecondary">@color/themeLight</item>
         <item name="colorPrimaryVariant">@color/themeDark</item>
