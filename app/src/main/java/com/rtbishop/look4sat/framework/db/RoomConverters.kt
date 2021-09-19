@@ -23,7 +23,7 @@ import com.rtbishop.look4sat.domain.TLE
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
-object Converters {
+object RoomConverters {
 
     private lateinit var paramsAdapter: JsonAdapter<TLE>
 

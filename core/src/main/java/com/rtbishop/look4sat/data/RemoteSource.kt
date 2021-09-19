@@ -20,9 +20,9 @@ package com.rtbishop.look4sat.data
 import com.rtbishop.look4sat.domain.Transmitter
 import java.io.InputStream
 
-interface RemoteDataSource {
+interface RemoteSource {
 
-    suspend fun fetchDataStream(url: String): InputStream?
+    suspend fun fetchFileStream(url: String): InputStream?
 
     suspend fun fetchTransmitters(): List<Transmitter>
 }

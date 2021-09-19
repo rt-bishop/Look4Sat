@@ -19,13 +19,13 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.PassReporter
-import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.domain.SatPass
 import com.rtbishop.look4sat.domain.SatPos
 import com.rtbishop.look4sat.domain.Transmitter
-import com.rtbishop.look4sat.framework.OrientationProvider
+import com.rtbishop.look4sat.framework.OrientationSource
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -37,12 +37,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RadarViewModel @Inject constructor(
-    private val orientationProvider: OrientationProvider,
-    private val preferences: PreferencesSource,
+    private val orientationSource: OrientationSource,
+    private val preferences: Preferences,
     private val predictor: Predictor,
     private val satelliteRepo: SatelliteRepo,
     private val passReporter: PassReporter
-) : ViewModel(), OrientationProvider.OrientationListener {
+) : ViewModel(), OrientationSource.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
     private val _passData = MutableLiveData<RadarData>()
@@ -64,11 +64,11 @@ class RadarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (preferences.shouldUseCompass()) orientationProvider.startListening(this)
+        if (preferences.shouldUseCompass()) orientationSource.startListening(this)
     }
 
     fun disableSensor() {
-        if (preferences.shouldUseCompass()) orientationProvider.stopListening()
+        if (preferences.shouldUseCompass()) orientationSource.stopListening()
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {

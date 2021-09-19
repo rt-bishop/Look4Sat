@@ -26,7 +26,7 @@ import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.Transmitter
 
 @Database(entities = [SatEntry::class, Transmitter::class], version = 2, exportSchema = true)
-@TypeConverters(Converters::class)
+@TypeConverters(RoomConverters::class)
 abstract class SatelliteDb : RoomDatabase() {
 
     abstract fun satelliteDao(): SatelliteDao

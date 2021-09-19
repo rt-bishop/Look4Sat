@@ -24,7 +24,7 @@ import android.hardware.SensorManager
 import javax.inject.Inject
 import kotlin.math.round
 
-class OrientationProvider @Inject constructor(private val sensorManager: SensorManager) :
+class OrientationSource @Inject constructor(private val sensorManager: SensorManager) :
     SensorEventListener {
 
     interface OrientationListener {

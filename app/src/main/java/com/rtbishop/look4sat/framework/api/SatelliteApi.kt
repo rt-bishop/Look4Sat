@@ -24,11 +24,11 @@ import retrofit2.http.GET
 import retrofit2.http.Streaming
 import retrofit2.http.Url
 
-interface SatelliteService {
+interface SatelliteApi {
 
     @Streaming
     @GET
-    suspend fun fetchFileByUrl(@Url url: String): Response<ResponseBody>
+    suspend fun fetchFileStream(@Url url: String): Response<ResponseBody>
 
     @GET("transmitters/")
     suspend fun fetchTransmitters(): List<Transmitter>
