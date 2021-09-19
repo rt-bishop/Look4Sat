@@ -21,7 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.domain.SatPass
@@ -36,7 +36,7 @@ import javax.inject.Inject
 class PassesViewModel @Inject constructor(
     private val satelliteRepo: SatelliteRepo,
     private val predictor: Predictor,
-    private val preferencesSource: PreferencesSource
+    private val preferences: Preferences
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<Result<List<SatPass>>>(Result.InProgress)
@@ -46,14 +46,14 @@ class PassesViewModel @Inject constructor(
     val isFirstLaunchDone: LiveData<Boolean> = _isFirstLaunchDone
 
     init {
-        if (preferencesSource.isSetupDone()) {
+        if (preferences.isSetupDone()) {
             viewModelScope.launch {
                 _passes.postValue(Result.InProgress)
                 val dateNow = Date()
                 val satellites = satelliteRepo.getSelectedSatellites()
-                val stationPos = preferencesSource.loadStationPosition()
-                val hoursAhead = preferencesSource.getHoursAhead()
-                val minElev = preferencesSource.getMinElevation()
+                val stationPos = preferences.loadStationPosition()
+                val hoursAhead = preferences.getHoursAhead()
+                val minElev = preferences.getMinElevation()
                 predictor.triggerCalculation(satellites, stationPos, dateNow, hoursAhead, minElev)
             }
         } else {
@@ -68,19 +68,19 @@ class PassesViewModel @Inject constructor(
     }
 
     fun triggerInitialSetup() {
-        preferencesSource.updatePositionFromGPS()
+        preferences.updatePositionFromGPS()
         viewModelScope.launch {
             _passes.postValue(Result.InProgress)
             val defaultCatNums = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
             val dateNow = Date()
             val satellites = satelliteRepo.getSelectedSatellites()
-            val stationPos = preferencesSource.loadStationPosition()
-            val hoursAhead = preferencesSource.getHoursAhead()
-            val minElev = preferencesSource.getMinElevation()
-            satelliteRepo.updateEntriesFromWeb(preferencesSource.loadDefaultSources())
+            val stationPos = preferences.loadStationPosition()
+            val hoursAhead = preferences.getHoursAhead()
+            val minElev = preferences.getMinElevation()
+            satelliteRepo.updateEntriesFromWeb(preferences.loadDefaultSources())
             satelliteRepo.updateEntriesSelection(defaultCatNums, true)
             predictor.forceCalculation(satellites, stationPos, dateNow, hoursAhead, minElev)
-            preferencesSource.setSetupDone()
+            preferences.setSetupDone()
             _isFirstLaunchDone.value = true
         }
     }
@@ -91,15 +91,15 @@ class PassesViewModel @Inject constructor(
             passesProcessing?.cancelAndJoin()
             val dateNow = Date()
             val satellites = satelliteRepo.getSelectedSatellites()
-            val stationPos = preferencesSource.loadStationPosition()
-            val hoursAhead = preferencesSource.getHoursAhead()
-            val minElev = preferencesSource.getMinElevation()
+            val stationPos = preferences.loadStationPosition()
+            val hoursAhead = preferences.getHoursAhead()
+            val minElev = preferences.getMinElevation()
             predictor.forceCalculation(satellites, stationPos, dateNow, hoursAhead, minElev)
         }
     }
 
     fun shouldUseUTC(): Boolean {
-        return preferencesSource.shouldUseUTC()
+        return preferences.shouldUseUTC()
     }
 
     private suspend fun tickPasses(passes: List<SatPass>) = withContext(Dispatchers.Default) {

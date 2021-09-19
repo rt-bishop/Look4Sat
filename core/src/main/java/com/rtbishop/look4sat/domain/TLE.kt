@@ -48,39 +48,41 @@ data class TLE(
 
     companion object {
 
-        fun parseStream(stream: InputStream): List<TLE> {
-            val itemParams = mutableListOf(String(), String(), String())
-            val importedItems = mutableListOf<TLE>()
+        fun parseTleStream(stream: InputStream): List<TLE> {
+            val tleStrings = mutableListOf(String(), String(), String())
+            val parsedItems = mutableListOf<TLE>()
             var lineIndex = 0
             stream.bufferedReader().forEachLine { line ->
-                itemParams[lineIndex] = line
+                tleStrings[lineIndex] = line
                 if (lineIndex < 2) {
                     lineIndex++
                 } else {
-                    val isLineOneValid = itemParams[1].substring(0, 1) == "1"
-                    val isLineTwoValid = itemParams[2].substring(0, 1) == "2"
+                    val isLineOneValid = tleStrings[1].substring(0, 1) == "1"
+                    val isLineTwoValid = tleStrings[2].substring(0, 1) == "2"
                     if (!isLineOneValid && !isLineTwoValid) return@forEachLine
-                    parseParams(itemParams)?.let { tle -> importedItems.add(tle) }
+                    parseTleStrings(tleStrings)?.let { tle -> parsedItems.add(tle) }
                     lineIndex = 0
                 }
             }
-            return importedItems
+            return parsedItems
         }
 
-        private fun parseParams(params: List<String>): TLE? {
-            if (params[1].substring(0, 1) != "1" && params[2].substring(0, 1) != "2") return null
+        private fun parseTleStrings(tleStrings: List<String>): TLE? {
+            if (tleStrings[1].substring(0, 1) != "1" && tleStrings[2].substring(0, 1) != "2") {
+                return null
+            }
             try {
-                val name: String = params[0].trim()
-                val epoch: Double = params[1].substring(18, 32).toDouble()
-                val meanmo: Double = params[2].substring(52, 63).toDouble()
-                val eccn: Double = 1.0e-07 * params[2].substring(26, 33).toDouble()
-                val incl: Double = params[2].substring(8, 16).toDouble()
-                val raan: Double = params[2].substring(17, 25).toDouble()
-                val argper: Double = params[2].substring(34, 42).toDouble()
-                val meanan: Double = params[2].substring(43, 51).toDouble()
-                val catnum: Int = params[1].substring(2, 7).trim().toInt()
-                val bstar: Double = 1.0e-5 * params[1].substring(53, 59).toDouble() /
-                        10.0.pow(params[1].substring(60, 61).toDouble())
+                val name: String = tleStrings[0].trim()
+                val epoch: Double = tleStrings[1].substring(18, 32).toDouble()
+                val meanmo: Double = tleStrings[2].substring(52, 63).toDouble()
+                val eccn: Double = 1.0e-07 * tleStrings[2].substring(26, 33).toDouble()
+                val incl: Double = tleStrings[2].substring(8, 16).toDouble()
+                val raan: Double = tleStrings[2].substring(17, 25).toDouble()
+                val argper: Double = tleStrings[2].substring(34, 42).toDouble()
+                val meanan: Double = tleStrings[2].substring(43, 51).toDouble()
+                val catnum: Int = tleStrings[1].substring(2, 7).trim().toInt()
+                val bstar: Double = 1.0e-5 * tleStrings[1].substring(53, 59).toDouble() /
+                        10.0.pow(tleStrings[1].substring(60, 61).toDouble())
                 return TLE(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
             } catch (exception: Exception) {
                 return null

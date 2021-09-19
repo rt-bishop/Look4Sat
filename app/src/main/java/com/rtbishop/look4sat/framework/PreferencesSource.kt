@@ -21,7 +21,7 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
-import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.domain.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.utility.round
@@ -29,11 +29,11 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import javax.inject.Inject
 
-class PreferencesProvider @Inject constructor(
+class PreferencesSource @Inject constructor(
     moshi: Moshi,
     private val locationManager: LocationManager,
     private val preferences: SharedPreferences
-) : PreferencesSource {
+) : Preferences {
 
     private val sourcesType = Types.newParameterizedType(List::class.java, String::class.java)
     private val sourcesAdapter = moshi.adapter<List<String>>(sourcesType)

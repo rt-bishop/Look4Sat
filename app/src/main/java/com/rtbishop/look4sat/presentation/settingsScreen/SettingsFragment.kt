@@ -29,8 +29,8 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.framework.PreferencesProvider
+import com.rtbishop.look4sat.data.Preferences
+import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ import javax.inject.Inject
 class SettingsFragment : PreferenceFragmentCompat() {
 
     @Inject
-    lateinit var preferencesSource: PreferencesSource
+    lateinit var preferences: Preferences
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -56,20 +56,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        findPreference<Preference>(PreferencesProvider.keyPositionGPS)?.apply {
+        findPreference<Preference>(PreferencesSource.keyPositionGPS)?.apply {
             setOnPreferenceClickListener {
                 updatePositionFromGPS()
                 return@setOnPreferenceClickListener true
             }
         }
 
-        findPreference<Preference>(PreferencesProvider.keyPositionQTH)?.apply {
+        findPreference<Preference>(PreferencesSource.keyPositionQTH)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 updatePositionFromQth(newValue.toString())
             }
         }
 
-        findPreference<EditTextPreference>(PreferencesProvider.keyRotatorAddress)?.apply {
+        findPreference<EditTextPreference>(PreferencesSource.keyRotatorAddress)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 val ip4 = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!\$)|\$)){4}\$"
                 if (newValue.toString().matches(ip4.toRegex())) {
@@ -81,7 +81,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
-        findPreference<EditTextPreference>(PreferencesProvider.keyRotatorPort)?.apply {
+        findPreference<EditTextPreference>(PreferencesSource.keyRotatorPort)?.apply {
             setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
             setOnPreferenceChangeListener { _, newValue ->
                 val portValue = newValue.toString()
@@ -96,7 +96,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun updatePositionFromQth(qthString: String): Boolean {
-        return if (preferencesSource.updatePositionFromQTH(qthString)) {
+        return if (preferences.updatePositionFromQTH(qthString)) {
             showSnack(getString(R.string.pref_pos_success))
             true
         } else {
@@ -109,7 +109,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val locPermString = Manifest.permission.ACCESS_FINE_LOCATION
         val locPermResult = ContextCompat.checkSelfPermission(requireContext(), locPermString)
         if (locPermResult == PackageManager.PERMISSION_GRANTED) {
-            if (preferencesSource.updatePositionFromGPS()) {
+            if (preferences.updatePositionFromGPS()) {
                 showSnack(getString(R.string.pref_pos_success))
             } else {
                 showSnack(getString(R.string.pref_pos_gps_null))

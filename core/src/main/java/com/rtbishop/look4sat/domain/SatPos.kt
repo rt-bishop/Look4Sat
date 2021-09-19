@@ -50,35 +50,32 @@ data class SatPos(
 
     fun getRangeCircle(): List<GeoPos> {
         val positions = mutableListOf<GeoPos>()
-        val lat = this.latitude
-        val lon = this.longitude
-        // rangeCircleRadiusKm
-        // earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + satPos.altitude))
         val beta = acos(earthRadiusKm / (earthRadiusKm + this.altitude))
+//        val radiusKm = earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + altitude))
         var tempAzimuth = 0
         while (tempAzimuth < 360) {
             val azimuth = tempAzimuth / 360.0 * 2.0 * Math.PI
-            var rangelat = asin(sin(lat) * cos(beta) + cos(azimuth) * sin(beta) * cos(lat))
-            val num = (cos(beta) - (sin(lat) * sin(rangelat)))
-            val den = cos(lat) * cos(rangelat)
-            var rangelon = if (tempAzimuth == 0 && (beta > ((Math.PI / 2.0) - lat))) {
-                lon + Math.PI
-            } else if (tempAzimuth == 180 && (beta > ((Math.PI / 2.0) - lat))) {
-                lon + Math.PI
+            var lat = asin(sin(latitude) * cos(beta) + cos(azimuth) * sin(beta) * cos(latitude))
+            val num = (cos(beta) - (sin(latitude) * sin(lat)))
+            val den = cos(latitude) * cos(lat)
+            var lon = if (tempAzimuth == 0 && (beta > ((Math.PI / 2.0) - latitude))) {
+                longitude + Math.PI
+            } else if (tempAzimuth == 180 && (beta > ((Math.PI / 2.0) - latitude))) {
+                longitude + Math.PI
             } else if (abs(num / den) > 1.0) {
-                lon
+                longitude
             } else {
                 if ((180 - tempAzimuth) >= 0) {
-                    lon - acos(num / den)
+                    longitude - acos(num / den)
                 } else {
-                    lon + acos(num / den)
+                    longitude + acos(num / den)
                 }
             }
-            while (rangelon < 0.0) rangelon += Math.PI * 2.0
-            while (rangelon > Math.PI * 2.0) rangelon -= Math.PI * 2.0
-            rangelat = Math.toDegrees(rangelat)
-            rangelon = Math.toDegrees(rangelon)
-            positions.add(GeoPos(rangelat, rangelon))
+            while (lon < 0.0) lon += Math.PI * 2.0
+            while (lon > Math.PI * 2.0) lon -= Math.PI * 2.0
+            lat = Math.toDegrees(lat)
+            lon = Math.toDegrees(lon)
+            positions.add(GeoPos(lat, lon))
             tempAzimuth += 1
         }
         return positions

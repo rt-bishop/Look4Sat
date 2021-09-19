@@ -25,7 +25,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.SatPass
 import com.rtbishop.look4sat.domain.SatPos
@@ -39,7 +39,7 @@ import javax.inject.Inject
 class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     @Inject
-    lateinit var preferences: PreferencesSource
+    lateinit var preferences: Preferences
     private val viewModel: RadarViewModel by viewModels()
     private var radarView: RadarView? = null
 

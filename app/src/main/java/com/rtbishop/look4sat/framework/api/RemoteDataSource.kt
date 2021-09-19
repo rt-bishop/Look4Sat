@@ -15,23 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.framework.api
 
+import com.rtbishop.look4sat.data.RemoteSource
 import com.rtbishop.look4sat.domain.Transmitter
-import com.rtbishop.look4sat.domain.Satellite
-import kotlinx.coroutines.flow.Flow
+import com.rtbishop.look4sat.utility.DataMapper
+import java.io.InputStream
 
-interface LocalDataSource {
+class RemoteDataSource(private val satelliteApi: SatelliteApi) : RemoteSource {
 
-    fun getSatItems(): Flow<List<SatItem>>
+    override suspend fun fetchFileStream(url: String): InputStream? {
+        return satelliteApi.fetchFileStream(url).body()?.byteStream()
+    }
 
-    fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>>
-
-    suspend fun getSelectedSatellites(): List<Satellite>
-
-    suspend fun updateEntries(entries: List<SatEntry>)
-
-    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean)
-
-    suspend fun updateTransmitters(satelliteTrans: List<Transmitter>)
+    override suspend fun fetchTransmitters(): List<Transmitter> {
+        return DataMapper.satTransListToDomainTransList(satelliteApi.fetchTransmitters())
+    }
 }

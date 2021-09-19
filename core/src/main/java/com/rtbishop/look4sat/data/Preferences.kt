@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.data
 
 import com.rtbishop.look4sat.domain.GeoPos
 
-interface PreferencesSource {
+interface Preferences {
 
     fun positionToQTH(lat: Double, lon: Double): String?
 

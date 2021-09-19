@@ -17,18 +17,18 @@
  */
 package com.rtbishop.look4sat.framework.db
 
-import com.rtbishop.look4sat.data.LocalDataSource
+import com.rtbishop.look4sat.data.LocalSource
 import com.rtbishop.look4sat.data.SatEntry
 import com.rtbishop.look4sat.data.SatItem
-import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.utility.DataMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class LocalSource(private val satelliteDao: SatelliteDao) : LocalDataSource {
+class LocalDataSource(private val satelliteDao: SatelliteDao) : LocalSource {
 
-    override fun getSatItems(): Flow<List<SatItem>> {
+    override fun getEntriesWithModes(): Flow<List<SatItem>> {
         return satelliteDao.getSatItems()
             .map { satItems -> DataMapper.satItemsToDomainItems(satItems) }
     }
@@ -46,13 +46,13 @@ class LocalSource(private val satelliteDao: SatelliteDao) : LocalDataSource {
         satelliteDao.updateEntriesSelection(catNums, isSelected)
     }
 
-    override fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>> {
+    override fun getTransmitters(catNum: Int): Flow<List<Transmitter>> {
         return satelliteDao.getSatTransmitters(catNum)
             .map { satTransList -> DataMapper.satTransListToDomainTransList(satTransList) }
     }
 
-    override suspend fun updateTransmitters(satelliteTrans: List<Transmitter>) {
-        val satTransList = DataMapper.domainTransListToSatTransList(satelliteTrans)
+    override suspend fun updateTransmitters(transmitters: List<Transmitter>) {
+        val satTransList = DataMapper.domainTransListToSatTransList(transmitters)
         satelliteDao.updateTransmitters(satTransList)
     }
 }
