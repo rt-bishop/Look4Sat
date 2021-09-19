@@ -21,7 +21,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.room.Room
-import com.rtbishop.look4sat.data.*
+import com.rtbishop.look4sat.data.LocalDataSource
+import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.data.RemoteDataSource
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.framework.api.RemoteSource
@@ -34,11 +37,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
-import javax.net.ssl.HostnameVerifier
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -100,13 +101,9 @@ object SatelliteDataModule {
 
     @Provides
     fun provideSatelliteService(): SatelliteService {
-        val verifier = HostnameVerifier { _, _ -> true }
-        val httpClient = OkHttpClient.Builder().hostnameVerifier(verifier).build()
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
-            .client(httpClient)
             .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(SatelliteService::class.java)
+            .build().create(SatelliteService::class.java)
     }
 }

@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
-        minSdkVersion 23
+        minSdkVersion 21
         resConfigs "en,ru"
         targetSdkVersion 31
         versionCode 255
@@ -36,13 +36,6 @@ android {
                 optimizeCode true
             }
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
     }
     buildFeatures {
         viewBinding true

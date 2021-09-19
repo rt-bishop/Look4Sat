@@ -10,12 +10,11 @@
         android:name=".presentation.Look4SatApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:usesCleartextTraffic="true">
+        android:label="@string/app_name">
         <activity
             android:name=".presentation.Look4SatActivity"
-            android:theme="@style/AppTheme.Splash"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
