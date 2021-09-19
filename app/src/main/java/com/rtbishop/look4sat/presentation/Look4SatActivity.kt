@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.rtbishop.look4sat.R
@@ -33,8 +34,8 @@ class Look4SatActivity : AppCompatActivity() {
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val navHost = supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
