@@ -22,8 +22,8 @@ import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.room.Room
 import com.rtbishop.look4sat.data.*
+import com.rtbishop.look4sat.domain.PassReporter
 import com.rtbishop.look4sat.domain.Predictor
-import com.rtbishop.look4sat.framework.NetDataReporter
 import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.framework.api.RemoteSource
 import com.rtbishop.look4sat.framework.api.SatelliteService
@@ -112,7 +112,7 @@ object SatelliteDataModule {
 
     @Provides
     @Singleton
-    fun provideDataReporter(@IoDispatcher dispatcher: CoroutineDispatcher): DataReporter {
-        return NetDataReporter(dispatcher)
+    fun provideDataReporter(@IoDispatcher dispatcher: CoroutineDispatcher): PassReporter {
+        return PassReporter(dispatcher)
     }
 }
