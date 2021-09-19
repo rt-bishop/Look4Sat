@@ -18,7 +18,7 @@
 package com.rtbishop.look4sat.presentation.radarScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.DataReporter
+import com.rtbishop.look4sat.domain.PassReporter
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
@@ -41,7 +41,7 @@ class RadarViewModel @Inject constructor(
     private val preferences: PreferencesSource,
     private val predictor: Predictor,
     private val satelliteRepo: SatelliteRepo,
-    private val dataReporter: DataReporter
+    private val passReporter: PassReporter
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
@@ -80,7 +80,7 @@ class RadarViewModel @Inject constructor(
             var satTrack: List<SatPos> = emptyList()
             val rotatorPrefs = preferences.getRotatorServer()
             if (rotatorPrefs != null) {
-                dataReporter.setRotatorSocket(rotatorPrefs.first, rotatorPrefs.second)
+                passReporter.setupRotatorSocket(rotatorPrefs.first, rotatorPrefs.second)
             }
             if (!satPass.isDeepSpace) {
                 val startDate = Date(satPass.aosTime)
@@ -91,7 +91,7 @@ class RadarViewModel @Inject constructor(
                 val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
                 val azimuth = Math.toDegrees(satPos.azimuth).round(1)
                 val elevation = Math.toDegrees(satPos.elevation).round(1)
-                dataReporter.reportRotation(azimuth, elevation)
+                passReporter.reportRotation(azimuth, elevation)
                 _passData.postValue(RadarData(satPos, satTrack))
                 delay(1000)
             }
