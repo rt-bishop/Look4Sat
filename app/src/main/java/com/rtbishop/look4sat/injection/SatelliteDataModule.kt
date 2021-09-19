@@ -21,11 +21,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.room.Room
-import com.rtbishop.look4sat.data.LocalDataSource
-import com.rtbishop.look4sat.data.PreferencesSource
-import com.rtbishop.look4sat.data.RemoteDataSource
-import com.rtbishop.look4sat.data.SatelliteRepo
+import com.rtbishop.look4sat.data.*
 import com.rtbishop.look4sat.domain.Predictor
+import com.rtbishop.look4sat.framework.NetDataReporter
 import com.rtbishop.look4sat.framework.PreferencesProvider
 import com.rtbishop.look4sat.framework.api.RemoteSource
 import com.rtbishop.look4sat.framework.api.SatelliteService
@@ -46,6 +44,7 @@ import javax.inject.Singleton
 object SatelliteDataModule {
 
     @Provides
+    @Singleton
     fun provideMoshi(): Moshi {
         return Moshi.Builder().build()
     }
@@ -83,11 +82,13 @@ object SatelliteDataModule {
     }
 
     @Provides
+    @Singleton
     fun provideSatelliteDao(db: SatelliteDb): SatelliteDao {
         return db.satelliteDao()
     }
 
     @Provides
+    @Singleton
     fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
         Converters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
@@ -95,15 +96,23 @@ object SatelliteDataModule {
     }
 
     @Provides
+    @Singleton
     fun provideRemoteDataSource(satelliteService: SatelliteService): RemoteDataSource {
         return RemoteSource(satelliteService)
     }
 
     @Provides
+    @Singleton
     fun provideSatelliteService(): SatelliteService {
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
             .addConverterFactory(MoshiConverterFactory.create())
             .build().create(SatelliteService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataReporter(@IoDispatcher dispatcher: CoroutineDispatcher): DataReporter {
+        return NetDataReporter(dispatcher)
     }
 }

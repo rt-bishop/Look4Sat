@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.presentation.radarScreen
 
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.DataReporter
 import com.rtbishop.look4sat.data.PreferencesSource
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
@@ -25,13 +26,12 @@ import com.rtbishop.look4sat.domain.SatPass
 import com.rtbishop.look4sat.domain.SatPos
 import com.rtbishop.look4sat.domain.Transmitter
 import com.rtbishop.look4sat.framework.OrientationProvider
-import com.rtbishop.look4sat.injection.IoDispatcher
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import timber.log.Timber
-import java.net.Socket
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -41,7 +41,7 @@ class RadarViewModel @Inject constructor(
     private val preferences: PreferencesSource,
     private val predictor: Predictor,
     private val satelliteRepo: SatelliteRepo,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    private val dataReporter: DataReporter
 ) : ViewModel(), OrientationProvider.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
@@ -59,7 +59,6 @@ class RadarViewModel @Inject constructor(
                 emit(satPass)
                 sendPassData(satPass)
                 processTransmitters(satPass)
-                initRotatorControl(satPass)
             }
         }
     }
@@ -78,40 +77,23 @@ class RadarViewModel @Inject constructor(
 
     private fun sendPassData(satPass: SatPass) {
         viewModelScope.launch {
-            var track: List<SatPos> = emptyList()
+            var satTrack: List<SatPos> = emptyList()
+            val rotatorPrefs = preferences.getRotatorServer()
+            if (rotatorPrefs != null) {
+                dataReporter.setRotatorSocket(rotatorPrefs.first, rotatorPrefs.second)
+            }
             if (!satPass.isDeepSpace) {
                 val startDate = Date(satPass.aosTime)
                 val endDate = Date(satPass.losTime)
-                track = predictor.getSatTrack(satPass.satellite, stationPos, startDate, endDate)
+                satTrack = predictor.getSatTrack(satPass.satellite, stationPos, startDate, endDate)
             }
             while (isActive) {
-                val pos = predictor.getSatPos(satPass.satellite, stationPos, Date())
-                _passData.postValue(RadarData(pos, track))
+                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
+                val azimuth = Math.toDegrees(satPos.azimuth).round(1)
+                val elevation = Math.toDegrees(satPos.elevation).round(1)
+                dataReporter.reportRotation(azimuth, elevation)
+                _passData.postValue(RadarData(satPos, satTrack))
                 delay(1000)
-            }
-        }
-    }
-
-    private fun initRotatorControl(satPass: SatPass) {
-        viewModelScope.launch {
-            val rotatorPrefs = preferences.getRotatorServer()
-            if (rotatorPrefs != null) {
-                runCatching {
-                    withContext(ioDispatcher) {
-                        val socket = Socket(rotatorPrefs.first, rotatorPrefs.second)
-                        val writer = socket.getOutputStream().bufferedWriter()
-                        while (isActive) {
-                            val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
-                            val azimuth = Math.toDegrees(satPos.azimuth).round(1)
-                            val elevation = Math.toDegrees(satPos.elevation).round(1)
-                            writer.write("\\set_pos $azimuth $elevation")
-                            writer.newLine()
-                            writer.flush()
-                            delay(1000)
-                        }
-                        writer.close()
-                    }
-                }.onFailure { Timber.d(it) }
             }
         }
     }
