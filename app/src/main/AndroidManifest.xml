@@ -14,7 +14,7 @@
         <activity
             android:name=".presentation.Look4SatActivity"
             android:exported="true"
-            android:theme="@style/AppTheme.Splash">
+            android:theme="@style/Theme.Look4Sat.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

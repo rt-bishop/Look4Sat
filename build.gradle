@@ -4,6 +4,7 @@ buildscript {
         kotlin_version = '1.5.30'
         coroutines_version = '1.5.2-native-mt'
         material_version = '1.4.0'
+        splash_screen_version = '1.0.0-alpha01'
         constraint_layout_version = '2.1.0'
         lifecycle_version = '2.3.1'
         navigation_version = '2.3.5'
