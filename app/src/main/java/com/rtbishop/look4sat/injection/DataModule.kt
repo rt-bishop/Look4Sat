@@ -21,12 +21,15 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.room.Room
-import com.rtbishop.look4sat.data.*
+import com.rtbishop.look4sat.data.LocalSource
+import com.rtbishop.look4sat.data.Preferences
+import com.rtbishop.look4sat.data.RemoteSource
+import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.PassReporter
 import com.rtbishop.look4sat.domain.Predictor
-import com.rtbishop.look4sat.framework.PreferencesProvider
-import com.rtbishop.look4sat.framework.api.RemoteSource
-import com.rtbishop.look4sat.framework.api.SatelliteService
+import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.api.RemoteDataSource
+import com.rtbishop.look4sat.framework.api.SatelliteApi
 import com.rtbishop.look4sat.framework.db.*
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -41,7 +44,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object SatelliteDataModule {
+object DataModule {
 
     @Provides
     @Singleton
@@ -55,8 +58,8 @@ object SatelliteDataModule {
         moshi: Moshi,
         locationManager: LocationManager,
         preferences: SharedPreferences
-    ): PreferencesSource {
-        return PreferencesProvider(moshi, locationManager, preferences)
+    ): Preferences {
+        return PreferencesSource(moshi, locationManager, preferences)
     }
 
     @Provides
@@ -68,17 +71,17 @@ object SatelliteDataModule {
     @Provides
     @Singleton
     fun provideSatelliteRepo(
-        preferencesSource: PreferencesSource,
-        localDataSource: LocalDataSource,
-        remoteDataSource: RemoteDataSource,
+        preferences: Preferences,
+        localSource: LocalSource,
+        remoteSource: RemoteSource,
         @IoDispatcher dispatcher: CoroutineDispatcher
     ): SatelliteRepo {
-        return SatelliteRepo(preferencesSource, localDataSource, remoteDataSource, dispatcher)
+        return SatelliteRepo(preferences, localSource, remoteSource, dispatcher)
     }
 
     @Provides
-    fun provideLocalDataSource(satelliteDao: SatelliteDao): LocalDataSource {
-        return LocalSource(satelliteDao)
+    fun provideLocalDataSource(satelliteDao: SatelliteDao): LocalSource {
+        return LocalDataSource(satelliteDao)
     }
 
     @Provides
@@ -90,24 +93,24 @@ object SatelliteDataModule {
     @Provides
     @Singleton
     fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
-        Converters.initialize(moshi)
+        RoomConverters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
             .addMigrations(MIGRATION_1_2).build()
     }
 
     @Provides
     @Singleton
-    fun provideRemoteDataSource(satelliteService: SatelliteService): RemoteDataSource {
-        return RemoteSource(satelliteService)
+    fun provideRemoteDataSource(satelliteApi: SatelliteApi): RemoteSource {
+        return RemoteDataSource(satelliteApi)
     }
 
     @Provides
     @Singleton
-    fun provideSatelliteService(): SatelliteService {
+    fun provideSatelliteService(): SatelliteApi {
         return Retrofit.Builder()
             .baseUrl("https://db.satnogs.org/api/")
             .addConverterFactory(MoshiConverterFactory.create())
-            .build().create(SatelliteService::class.java)
+            .build().create(SatelliteApi::class.java)
     }
 
     @Provides

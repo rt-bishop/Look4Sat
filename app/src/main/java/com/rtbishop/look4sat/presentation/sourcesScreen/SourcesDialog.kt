@@ -25,7 +25,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.PreferencesSource
+import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
 import com.rtbishop.look4sat.utility.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +35,7 @@ import javax.inject.Inject
 class SourcesDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var prefsManager: PreferencesSource
+    lateinit var prefsManager: Preferences
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_sources, group, false)

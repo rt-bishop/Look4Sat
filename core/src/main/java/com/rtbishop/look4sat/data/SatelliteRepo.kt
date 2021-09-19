@@ -29,43 +29,43 @@ import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 class SatelliteRepo(
-    private val preferencesSource: PreferencesSource,
-    private val localDataSource: LocalDataSource,
-    private val remoteDataSource: RemoteDataSource,
-    private val ioDispatcher: CoroutineDispatcher
+    private val preferences: Preferences,
+    private val localSource: LocalSource,
+    private val remoteSource: RemoteSource,
+    private val repoDispatcher: CoroutineDispatcher
 ) {
 
     fun saveSelectedModes(modes: List<String>) {
-        preferencesSource.saveModesSelection(modes)
+        preferences.saveModesSelection(modes)
     }
 
     fun loadSelectedModes(): List<String> {
-        return preferencesSource.loadModesSelection()
+        return preferences.loadModesSelection()
     }
 
     fun getSatItems(): Flow<List<SatItem>> {
-        return localDataSource.getSatItems()
+        return localSource.getEntriesWithModes()
     }
 
     fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>> {
-        return localDataSource.getSatTransmitters(catNum)
+        return localSource.getTransmitters(catNum)
     }
 
     suspend fun getSelectedSatellites(): List<Satellite> {
-        return localDataSource.getSelectedSatellites()
+        return localSource.getSelectedSatellites()
     }
 
-    suspend fun updateEntriesFromFile(stream: InputStream) = withContext(ioDispatcher) {
-        localDataSource.updateEntries(importSatEntries(stream))
+    suspend fun updateEntriesFromFile(stream: InputStream) = withContext(repoDispatcher) {
+        localSource.updateEntries(importSatEntries(stream))
     }
 
     suspend fun updateEntriesFromWeb(sources: List<String>) {
         coroutineScope {
-            launch(ioDispatcher) {
+            launch(repoDispatcher) {
                 val streams = mutableListOf<InputStream>()
                 val entries = mutableListOf<SatEntry>()
                 sources.forEach { source ->
-                    remoteDataSource.fetchDataStream(source)?.let { stream ->
+                    remoteSource.fetchFileStream(source)?.let { stream ->
                         if (source.contains(".zip", true)) {
                             val zipStream = ZipInputStream(stream).apply { nextEntry }
                             streams.add(zipStream)
@@ -75,20 +75,20 @@ class SatelliteRepo(
                     }
                 }
                 streams.forEach { stream -> entries.addAll(importSatEntries(stream)) }
-                localDataSource.updateEntries(entries)
+                localSource.updateEntries(entries)
             }
-            launch(ioDispatcher) {
-                val transmitters = remoteDataSource.fetchTransmitters().filter { it.isAlive }
-                localDataSource.updateTransmitters(transmitters)
+            launch(repoDispatcher) {
+                val transmitters = remoteSource.fetchTransmitters().filter { it.isAlive }
+                localSource.updateTransmitters(transmitters)
             }
         }
     }
 
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        localDataSource.updateEntriesSelection(catNums, isSelected)
+        localSource.updateEntriesSelection(catNums, isSelected)
     }
 
     private fun importSatEntries(stream: InputStream): List<SatEntry> {
-        return TLE.parseStream(stream).map { tle -> SatEntry(tle) }
+        return TLE.parseTleStream(stream).map { tle -> SatEntry(tle) }
     }
 }

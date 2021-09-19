@@ -31,7 +31,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ApplicationModule {
+object AndroidModule {
 
     @Provides
     fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
