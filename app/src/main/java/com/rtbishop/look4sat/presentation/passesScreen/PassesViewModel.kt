@@ -25,7 +25,7 @@ import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.domain.Predictor
 import com.rtbishop.look4sat.domain.SatPass
-import com.rtbishop.look4sat.framework.model.Result
+import com.rtbishop.look4sat.framework.model.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -39,16 +39,16 @@ class PassesViewModel @Inject constructor(
     private val preferences: Preferences
 ) : ViewModel() {
 
-    private val _passes = MutableLiveData<Result<List<SatPass>>>(Result.InProgress)
+    private val _passes = MutableLiveData<DataState<List<SatPass>>>(DataState.Loading)
     private val _isFirstLaunchDone = MutableLiveData<Boolean>()
     private var passesProcessing: Job? = null
-    val passes: LiveData<Result<List<SatPass>>> = _passes
+    val passes: LiveData<DataState<List<SatPass>>> = _passes
     val isFirstLaunchDone: LiveData<Boolean> = _isFirstLaunchDone
 
     init {
         if (preferences.isSetupDone()) {
             viewModelScope.launch {
-                _passes.postValue(Result.InProgress)
+                _passes.postValue(DataState.Loading)
                 val dateNow = Date()
                 val satellites = satelliteRepo.getSelectedSatellites()
                 val stationPos = preferences.loadStationPosition()
@@ -70,7 +70,7 @@ class PassesViewModel @Inject constructor(
     fun triggerInitialSetup() {
         preferences.updatePositionFromGPS()
         viewModelScope.launch {
-            _passes.postValue(Result.InProgress)
+            _passes.postValue(DataState.Loading)
             val defaultCatNums = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
             val dateNow = Date()
             val satellites = satelliteRepo.getSelectedSatellites()
@@ -87,7 +87,7 @@ class PassesViewModel @Inject constructor(
 
     fun forceCalculation() {
         viewModelScope.launch {
-            _passes.postValue(Result.InProgress)
+            _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
             val dateNow = Date()
             val satellites = satelliteRepo.getSelectedSatellites()
@@ -117,7 +117,7 @@ class PassesViewModel @Inject constructor(
                 }
             }
             currentPasses = currentPasses.filter { it.progress < 100 }
-            _passes.postValue(Result.Success(currentPasses.map { it.copy() }))
+            _passes.postValue(DataState.Success(currentPasses.map { it.copy() }))
             delay(1000)
         }
     }

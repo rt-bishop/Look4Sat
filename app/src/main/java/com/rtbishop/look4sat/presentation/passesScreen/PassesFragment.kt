@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.SatPass
-import com.rtbishop.look4sat.framework.model.Result
+import com.rtbishop.look4sat.framework.model.DataState
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.toTimerString
@@ -73,21 +73,21 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     }
 
     private fun handleNewPasses(
-        result: Result<List<SatPass>>,
+        dataState: DataState<List<SatPass>>,
         passesAdapter: PassesAdapter,
         binding: FragmentPassesBinding
     ) {
-        when (result) {
-            is Result.Success -> {
-                passesAdapter.submitList(result.data)
+        when (dataState) {
+            is DataState.Success -> {
+                passesAdapter.submitList(dataState.data)
                 binding.apply {
                     passesError.visibility = View.INVISIBLE
                     passesProgress.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.VISIBLE
                 }
-                tickMainTimer(result.data, binding)
+                tickMainTimer(dataState.data, binding)
             }
-            is Result.InProgress -> {
+            is DataState.Loading -> {
                 binding.apply {
                     passesTimer.text = 0L.toTimerString()
                     passesError.visibility = View.INVISIBLE
@@ -95,7 +95,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     passesProgress.visibility = View.VISIBLE
                 }
             }
-            is Result.Error -> {
+            is DataState.Error -> {
                 binding.apply {
                     passesTimer.text = 0L.toTimerString()
                     passesProgress.visibility = View.INVISIBLE
