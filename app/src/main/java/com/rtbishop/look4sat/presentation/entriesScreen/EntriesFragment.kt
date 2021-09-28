@@ -29,7 +29,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.SatItem
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
-import com.rtbishop.look4sat.framework.model.Result
+import com.rtbishop.look4sat.framework.model.DataState
 import com.rtbishop.look4sat.utility.RecyclerDivider
 import com.rtbishop.look4sat.utility.getNavResult
 import com.rtbishop.look4sat.utility.navigateSafe
@@ -79,21 +79,21 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun handleSatData(
-        result: Result<List<SatItem>>,
+        dataState: DataState<List<SatItem>>,
         binding: FragmentEntriesBinding,
         entriesAdapter: EntriesAdapter
     ) {
-        when (result) {
-            is Result.Success -> {
-                entriesAdapter.submitList(result.data)
+        when (dataState) {
+            is DataState.Success -> {
+                entriesAdapter.submitList(dataState.data)
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
             }
-            is Result.InProgress -> {
+            is DataState.Loading -> {
                 binding.entriesProgress.visibility = View.VISIBLE
                 binding.entriesRecycler.visibility = View.INVISIBLE
             }
-            is Result.Error -> {
+            is DataState.Error -> {
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
                 requireView().showSnack(getString(R.string.entries_update_error))

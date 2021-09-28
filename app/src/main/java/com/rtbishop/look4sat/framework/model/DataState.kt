@@ -17,8 +17,9 @@
  */
 package com.rtbishop.look4sat.framework.model
 
-sealed class Result<out T : Any> {
-    data class Success<out T : Any>(val data: T) : Result<T>()
-    data class Error(val exception: Throwable) : Result<Nothing>()
-    object InProgress : Result<Nothing>()
+sealed class DataState<out T> {
+    data class Success<out T>(val data: T) : DataState<T>()
+    data class Error(val error: Throwable) : DataState<Nothing>()
+    object Empty : DataState<Nothing>()
+    object Loading : DataState<Nothing>()
 }
