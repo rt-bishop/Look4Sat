@@ -78,10 +78,6 @@ class RadarViewModel @Inject constructor(
     private fun sendPassData(satPass: SatPass) {
         viewModelScope.launch {
             var satTrack: List<SatPos> = emptyList()
-            val rotatorPrefs = preferences.getRotatorServer()
-            if (rotatorPrefs != null) {
-                dataReporter.setupRotatorSocket(rotatorPrefs.first, rotatorPrefs.second)
-            }
             if (!satPass.isDeepSpace) {
                 val startDate = Date(satPass.aosTime)
                 val endDate = Date(satPass.losTime)
@@ -89,9 +85,13 @@ class RadarViewModel @Inject constructor(
             }
             while (isActive) {
                 val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
-                val azimuth = Math.toDegrees(satPos.azimuth).round(1)
-                val elevation = Math.toDegrees(satPos.elevation).round(1)
-                dataReporter.reportRotation(azimuth, elevation)
+                if (preferences.isRotatorEnabled()) {
+                    val server = preferences.getRotatorServer().first
+                    val port = preferences.getRotatorServer().second
+                    val azimuth = Math.toDegrees(satPos.azimuth).round(1)
+                    val elevation = Math.toDegrees(satPos.elevation).round(1)
+                    dataReporter.reportRotation(server, port, azimuth, elevation)
+                }
                 _passData.postValue(RadarData(satPos, satTrack))
                 delay(1000)
             }
