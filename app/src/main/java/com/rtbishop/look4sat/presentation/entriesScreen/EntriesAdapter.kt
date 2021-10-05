@@ -22,10 +22,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.data.SatItem
+import com.rtbishop.look4sat.model.SatItem
 import com.rtbishop.look4sat.databinding.ItemEntryBinding
 
-class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
+class EntriesAdapter(private val clickListener: EntriesClickListener) :
+    RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatItem>() {
         override fun areItemsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
@@ -37,15 +38,6 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
         }
     }
     private val differ = AsyncListDiffer(this, diffCallback)
-    private lateinit var clickListener: EntriesClickListener
-
-    interface EntriesClickListener {
-        fun updateSelection(catNums: List<Int>, isSelected: Boolean)
-    }
-
-    fun setEntriesClickListener(listener: EntriesClickListener) {
-        clickListener = listener
-    }
 
     fun submitList(items: List<SatItem>) {
         differ.submitList(items)
@@ -78,5 +70,9 @@ class EntriesAdapter : RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
                 return SatItemHolder(ItemEntryBinding.inflate(inflater, parent, false))
             }
         }
+    }
+
+    interface EntriesClickListener {
+        fun updateSelection(catNums: List<Int>, isSelected: Boolean)
     }
 }

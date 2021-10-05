@@ -29,8 +29,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
-import com.rtbishop.look4sat.domain.GeoPos
-import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.predict4kotlin.GeoPos
+import com.rtbishop.look4sat.predict4kotlin.Satellite
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory

@@ -15,16 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.data
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.rtbishop.look4sat.predict4kotlin.TLE
+import com.rtbishop.look4sat.model.SatEntry
+import com.rtbishop.look4sat.model.SatItem
+import com.rtbishop.look4sat.model.Transmitter
+import com.rtbishop.look4sat.predict4kotlin.Satellite
+import kotlinx.coroutines.flow.Flow
 
-@Entity(tableName = "entries")
-data class SatEntry(
-    val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
-)
+interface LocalDataSource {
+
+    fun getEntriesWithModes(): Flow<List<SatItem>>
+
+    fun getTransmitters(catNum: Int): Flow<List<Transmitter>>
+
+    suspend fun getSelectedSatellites(): List<Satellite>
+
+    suspend fun updateEntries(entries: List<SatEntry>)
+
+    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean)
+
+    suspend fun updateTransmitters(transmitters: List<Transmitter>)
+}

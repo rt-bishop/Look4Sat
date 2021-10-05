@@ -27,10 +27,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.SatItem
+import com.rtbishop.look4sat.model.SatItem
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
-import com.rtbishop.look4sat.framework.model.DataState
-import com.rtbishop.look4sat.utility.RecyclerDivider
+import com.rtbishop.look4sat.common.DataState
+import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.utility.getNavResult
 import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.showSnack
@@ -51,16 +51,18 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupComponents(view: View) {
-        val entriesAdapter = EntriesAdapter().apply {
-            setEntriesClickListener(viewModel)
-        }
+        val entriesAdapter = EntriesAdapter(object: EntriesAdapter.EntriesClickListener {
+            override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
+                viewModel.updateSelection(catNums, isSelected)
+            }
+        })
         val binding = FragmentEntriesBinding.bind(view).apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = entriesAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(RecyclerDivider(R.drawable.rec_divider_light))
+                addItemDecoration(ItemDivider(R.drawable.rec_divider_light))
             }
             entriesImportWeb.setOnClickListener {
                 findNavController().navigateSafe(R.id.action_entries_to_sources)
@@ -97,6 +99,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
                 requireView().showSnack(getString(R.string.entries_update_error))
+            }
+            else -> {
             }
         }
     }
