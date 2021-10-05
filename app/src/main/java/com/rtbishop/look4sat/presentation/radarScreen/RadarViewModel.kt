@@ -18,14 +18,14 @@
 package com.rtbishop.look4sat.presentation.radarScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.PassReporter
-import com.rtbishop.look4sat.data.Preferences
-import com.rtbishop.look4sat.data.SatelliteRepo
-import com.rtbishop.look4sat.domain.Predictor
-import com.rtbishop.look4sat.domain.SatPass
-import com.rtbishop.look4sat.domain.SatPos
-import com.rtbishop.look4sat.domain.Transmitter
+import com.rtbishop.look4sat.domain.DataReporter
+import com.rtbishop.look4sat.domain.Repository
+import com.rtbishop.look4sat.predict4kotlin.Predictor
+import com.rtbishop.look4sat.predict4kotlin.SatPass
+import com.rtbishop.look4sat.predict4kotlin.SatPos
+import com.rtbishop.look4sat.model.Transmitter
 import com.rtbishop.look4sat.framework.OrientationSource
+import com.rtbishop.look4sat.framework.PreferencesSource
 import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -38,10 +38,10 @@ import javax.inject.Inject
 @HiltViewModel
 class RadarViewModel @Inject constructor(
     private val orientationSource: OrientationSource,
-    private val preferences: Preferences,
+    private val preferences: PreferencesSource,
     private val predictor: Predictor,
-    private val satelliteRepo: SatelliteRepo,
-    private val passReporter: PassReporter
+    private val satelliteRepo: Repository,
+    private val dataReporter: DataReporter
 ) : ViewModel(), OrientationSource.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
@@ -80,7 +80,7 @@ class RadarViewModel @Inject constructor(
             var satTrack: List<SatPos> = emptyList()
             val rotatorPrefs = preferences.getRotatorServer()
             if (rotatorPrefs != null) {
-                passReporter.setupRotatorSocket(rotatorPrefs.first, rotatorPrefs.second)
+                dataReporter.setupRotatorSocket(rotatorPrefs.first, rotatorPrefs.second)
             }
             if (!satPass.isDeepSpace) {
                 val startDate = Date(satPass.aosTime)
@@ -91,7 +91,7 @@ class RadarViewModel @Inject constructor(
                 val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
                 val azimuth = Math.toDegrees(satPos.azimuth).round(1)
                 val elevation = Math.toDegrees(satPos.elevation).round(1)
-                passReporter.reportRotation(azimuth, elevation)
+                dataReporter.reportRotation(azimuth, elevation)
                 _passData.postValue(RadarData(satPos, satTrack))
                 delay(1000)
             }

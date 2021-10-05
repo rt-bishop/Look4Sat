@@ -15,16 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.common
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.rtbishop.look4sat.predict4kotlin.TLE
+object Constants {
 
-@Entity(tableName = "entries")
-data class SatEntry(
-    val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
-)
+    const val URL_BASE = "https://db.satnogs.org/api/"
+    const val URL_CELESTRAK = "https://celestrak.com/NORAD/elements/active.txt"
+    const val URL_AMSAT = "https://amsat.org/tle/current/nasabare.txt"
+    const val URL_PRISM_CLASSFD = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
+    const val URL_PRISM_INTEL = "https://www.prismnet.com/~mmccants/tles/inttles.zip"
+
+}

@@ -21,8 +21,8 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
-import com.rtbishop.look4sat.data.Preferences
-import com.rtbishop.look4sat.domain.GeoPos
+import com.rtbishop.look4sat.common.Constants
+import com.rtbishop.look4sat.predict4kotlin.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.utility.round
 import com.squareup.moshi.Moshi
@@ -33,12 +33,12 @@ class PreferencesSource @Inject constructor(
     moshi: Moshi,
     private val locationManager: LocationManager,
     private val preferences: SharedPreferences
-) : Preferences {
+) {
 
     private val sourcesType = Types.newParameterizedType(List::class.java, String::class.java)
     private val sourcesAdapter = moshi.adapter<List<String>>(sourcesType)
 
-    override fun loadTleSources(): List<String> {
+    fun loadTleSources(): List<String> {
         return try {
             val sourcesString = preferences.getString(keySources, String())
             if (sourcesString.isNullOrEmpty()) {
@@ -51,17 +51,15 @@ class PreferencesSource @Inject constructor(
         }
     }
 
-    override fun saveTleSources(sources: List<String>) {
+    fun saveTleSources(sources: List<String>) {
         val sourcesJson = sourcesAdapter.toJson(sources)
         preferences.edit { putString(keySources, sourcesJson) }
     }
 
-    override fun loadDefaultSources(): List<String> {
+    fun loadDefaultSources(): List<String> {
         return listOf(
-            "https://celestrak.com/NORAD/elements/active.txt",
-            "https://amsat.org/tle/current/nasabare.txt",
-            "https://www.prismnet.com/~mmccants/tles/classfd.zip",
-            "https://www.prismnet.com/~mmccants/tles/inttles.zip"
+            Constants.URL_CELESTRAK, Constants.URL_AMSAT,
+            Constants.URL_PRISM_CLASSFD, Constants.URL_PRISM_INTEL
         )
     }
 
@@ -85,11 +83,11 @@ class PreferencesSource @Inject constructor(
         const val keyPositionQTH = "setPositionQTH"
     }
 
-    override fun positionToQTH(lat: Double, lon: Double): String? {
+    fun positionToQTH(lat: Double, lon: Double): String? {
         return QthConverter.positionToQTH(lat, lon)
     }
 
-    override fun loadStationPosition(): GeoPos {
+    fun loadStationPosition(): GeoPos {
         val defaultSP = "0.0"
         val latitude = preferences.getString(keyLatitude, null) ?: defaultSP
         val longitude = preferences.getString(keyLongitude, null) ?: defaultSP
@@ -97,7 +95,7 @@ class PreferencesSource @Inject constructor(
         return GeoPos(latitude.toDouble(), longitude.toDouble(), altitude.toDouble())
     }
 
-    override fun saveStationPosition(pos: GeoPos) {
+    fun saveStationPosition(pos: GeoPos) {
         preferences.edit {
             putString(keyLatitude, pos.latitude.toString())
             putString(keyLongitude, pos.longitude.toString())
@@ -105,7 +103,7 @@ class PreferencesSource @Inject constructor(
         }
     }
 
-    override fun updatePositionFromGPS(): Boolean {
+    fun updatePositionFromGPS(): Boolean {
         return try {
             val location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
             if (location == null) false
@@ -122,14 +120,14 @@ class PreferencesSource @Inject constructor(
         }
     }
 
-    override fun updatePositionFromQTH(qthString: String): Boolean {
+    fun updatePositionFromQTH(qthString: String): Boolean {
         val position = QthConverter.qthToPosition(qthString) ?: return false
         val stationPosition = GeoPos(position.latitude, position.longitude, 0.0)
         saveStationPosition(stationPosition)
         return true
     }
 
-    override fun getMagDeclination(): Float {
+    fun getMagDeclination(): Float {
         val stationPosition = loadStationPosition()
         val lat = stationPosition.latitude.toFloat()
         val lon = stationPosition.longitude.toFloat()
@@ -137,56 +135,60 @@ class PreferencesSource @Inject constructor(
         return GeomagneticField(lat, lon, alt, System.currentTimeMillis()).declination
     }
 
-    override fun getHoursAhead(): Int {
+    fun getHoursAhead(): Int {
         return preferences.getInt(keyHoursAhead, 8)
     }
 
-    override fun getMinElevation(): Double {
+    fun getMinElevation(): Double {
         return preferences.getInt(keyMinElevation, 16).toDouble()
     }
 
-    override fun shouldUseTextLabels(): Boolean {
+    fun shouldUseTextLabels(): Boolean {
         return preferences.getBoolean(keyTextLabels, false)
     }
 
-    override fun shouldUseUTC(): Boolean {
+    fun shouldUseUTC(): Boolean {
         return preferences.getBoolean(keyTimeUTC, false)
     }
 
-    override fun shouldUseCompass(): Boolean {
+    fun shouldUseCompass(): Boolean {
         return preferences.getBoolean(keyCompass, true)
     }
 
-    override fun shouldShowSweep(): Boolean {
+    fun shouldShowSweep(): Boolean {
         return preferences.getBoolean(keyRadarSweep, true)
     }
 
-    override fun isSetupDone(): Boolean {
+    fun isSetupDone(): Boolean {
         return preferences.getBoolean(keyInitialSetup, false)
     }
 
-    override fun setSetupDone() {
+    fun setSetupDone() {
         preferences.edit { putBoolean(keyInitialSetup, true) }
     }
 
-    override fun saveModesSelection(modes: List<String>) {
+    fun saveModesSelection(modes: List<String>) {
         val modesSet = modes.toSet()
         preferences.edit {
             putStringSet(keyModes, modesSet)
         }
     }
 
-    override fun loadModesSelection(): List<String> {
+    fun loadModesSelection(): List<String> {
         preferences.getStringSet(keyModes, setOf())?.let { modesSet ->
             return modesSet.toList().sorted()
         }
         return emptyList()
     }
 
-    override fun getRotatorServer(): Pair<String, Int>? {
-        return if (preferences.getBoolean(keyRotator, false)) {
+    fun isRotatorEnabled(): Boolean {
+        return preferences.getBoolean(keyRotator, false)
+    }
+
+    fun getRotatorServer(): Pair<String, Int>? {
+        return if (isRotatorEnabled()) {
             val address = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
-            val port = preferences.getString(keyRotatorPort, null) ?: "4096"
+            val port = preferences.getString(keyRotatorPort, null) ?: "4533"
             Pair(address, port.toInt())
         } else null
     }

@@ -1,7 +1,7 @@
 buildscript {
     ext {
         gradle_version = '7.0.2'
-        kotlin_version = '1.5.30'
+        kotlin_version = '1.5.31'
         coroutines_version = '1.5.2-native-mt'
         material_version = '1.4.0'
         splash_screen_version = '1.0.0-alpha01'
@@ -10,7 +10,7 @@ buildscript {
         navigation_version = '2.3.5'
         preference_version = '1.1.1'
         room_version = '2.3.0'
-        hilt_version = '2.39'
+        hilt_version = '2.39.1'
         retrofit_version = '2.9.0'
         osmdroid_version = '6.1.11'
         timber_version = '5.0.1'

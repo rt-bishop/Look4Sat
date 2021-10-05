@@ -29,7 +29,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -38,7 +37,7 @@ import javax.inject.Inject
 class SettingsFragment : PreferenceFragmentCompat() {
 
     @Inject
-    lateinit var preferences: Preferences
+    lateinit var preferences: PreferencesSource
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

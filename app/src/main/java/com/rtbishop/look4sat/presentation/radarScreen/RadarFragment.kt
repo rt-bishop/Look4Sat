@@ -25,11 +25,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.Preferences
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
-import com.rtbishop.look4sat.domain.SatPass
-import com.rtbishop.look4sat.domain.SatPos
-import com.rtbishop.look4sat.utility.RecyclerDivider
+import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.predict4kotlin.SatPass
+import com.rtbishop.look4sat.predict4kotlin.SatPos
+import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +39,7 @@ import javax.inject.Inject
 class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     @Inject
-    lateinit var preferences: Preferences
+    lateinit var preferences: PreferencesSource
     private val viewModel: RadarViewModel by viewModels()
     private var radarView: RadarView? = null
 
@@ -53,7 +53,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 isVerticalScrollBarEnabled = false
                 layoutManager = LinearLayoutManager(context)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
+                addItemDecoration(ItemDivider(R.drawable.rec_divider_dark))
             }
             setupObservers(transAdapter, this)
         }

@@ -15,16 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.framework.remote
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.rtbishop.look4sat.predict4kotlin.TLE
+import com.rtbishop.look4sat.framework.model.Transmitter
+import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Streaming
+import retrofit2.http.Url
 
-@Entity(tableName = "entries")
-data class SatEntry(
-    val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
-)
+interface SatelliteApi {
+
+    @Streaming
+    @GET
+    suspend fun fetchFileStream(@Url url: String): Response<ResponseBody>
+
+    @GET("transmitters/")
+    suspend fun fetchTransmitters(): List<Transmitter>
+}
