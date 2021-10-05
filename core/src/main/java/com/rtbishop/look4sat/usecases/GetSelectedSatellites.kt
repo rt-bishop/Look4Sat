@@ -15,16 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.usecases
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.rtbishop.look4sat.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.Repository
 
-@Entity(tableName = "entries")
-data class SatEntry(
-    val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
-)
+class GetSelectedSatellites(private val dataRepository: Repository) {
+    suspend operator fun invoke() = dataRepository.getSelectedSatellites()
+}

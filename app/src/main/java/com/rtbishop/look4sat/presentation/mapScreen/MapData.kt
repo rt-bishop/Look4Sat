@@ -17,8 +17,8 @@
  */
 package com.rtbishop.look4sat.presentation.mapScreen
 
-import com.rtbishop.look4sat.domain.GeoPos
-import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.predict4kotlin.GeoPos
+import com.rtbishop.look4sat.predict4kotlin.Satellite
 
 data class MapData(
     val pass: Satellite,

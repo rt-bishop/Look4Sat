@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.domain
 
+import com.rtbishop.look4sat.predict4kotlin.GeoPos
 import kotlin.math.round
 
 object QthConverter {

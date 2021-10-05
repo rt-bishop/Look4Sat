@@ -15,16 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.rtbishop.look4sat.predict4kotlin.TLE
-
-@Entity(tableName = "entries")
-data class SatEntry(
-    val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
+data class SatItem(
+    val catNum: Int,
+    val name: String,
+    var isSelected: Boolean,
+    val modes: List<String>
 )

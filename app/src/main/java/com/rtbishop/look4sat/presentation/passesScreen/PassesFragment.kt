@@ -29,9 +29,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
-import com.rtbishop.look4sat.domain.SatPass
-import com.rtbishop.look4sat.framework.model.DataState
-import com.rtbishop.look4sat.utility.RecyclerDivider
+import com.rtbishop.look4sat.predict4kotlin.SatPass
+import com.rtbishop.look4sat.common.DataState
+import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,7 +60,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 isVerticalScrollBarEnabled = false
                 layoutManager = LinearLayoutManager(context)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(RecyclerDivider(R.drawable.rec_divider_dark))
+                addItemDecoration(ItemDivider(R.drawable.rec_divider_dark))
             }
             passesRefresh.setOnClickListener { passesViewModel.forceCalculation() }
         }

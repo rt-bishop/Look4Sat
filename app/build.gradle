@@ -24,8 +24,12 @@ android {
         }
     }
 
+//    def props = new Properties()
+//    file("../securityKeys.properties").withInputStream { props.load(it) }
+
     buildTypes {
         release {
+//            buildConfigField "String", "ApiKey", props.getProperty("apiKey")
 //            minifyEnabled true
 //            shrinkResources true
 //            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

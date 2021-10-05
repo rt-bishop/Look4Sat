@@ -50,7 +50,7 @@
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
-            android:defaultValue="4096"
+            android:defaultValue="4533"
             android:dependency="isRotatorEnabled"
             android:key="rotatorPort"
             android:title="@string/tracking_rotator_port"

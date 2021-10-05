@@ -21,10 +21,10 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.widget.SearchView
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.Preferences
-import com.rtbishop.look4sat.data.SatelliteRepo
-import com.rtbishop.look4sat.data.SatItem
-import com.rtbishop.look4sat.framework.model.DataState
+import com.rtbishop.look4sat.model.SatItem
+import com.rtbishop.look4sat.common.DataState
+import com.rtbishop.look4sat.domain.Repository
+import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.collect
@@ -35,16 +35,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val preferences: Preferences,
+    private val preferences: PreferencesSource,
     private val resolver: ContentResolver,
-    private val satelliteRepo: SatelliteRepo,
-) : ViewModel(), EntriesAdapter.EntriesClickListener, SearchView.OnQueryTextListener {
+    private val satelliteRepo: Repository,
+) : ViewModel(), SearchView.OnQueryTextListener {
 
     private val coroutineHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.d(throwable)
         _satData.value = DataState.Error(throwable)
     }
-    private val transModes = MutableLiveData(satelliteRepo.loadSelectedModes())
+    private val transModes = MutableLiveData(preferences.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsWithModes = transModes.switchMap { modes ->
         liveData { satelliteRepo.getSatItems().collect { emit(filterByModes(it, modes)) } }
@@ -86,12 +86,12 @@ class EntriesViewModel @Inject constructor(
     }
 
     fun loadSelectedModes(): List<String> {
-        return satelliteRepo.loadSelectedModes()
+        return preferences.loadModesSelection()
     }
 
     fun saveSelectedModes(modes: List<String>) {
         transModes.value = modes
-        satelliteRepo.saveSelectedModes(modes)
+        preferences.saveModesSelection(modes)
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -103,7 +103,7 @@ class EntriesViewModel @Inject constructor(
         return true
     }
 
-    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
+    fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
         viewModelScope.launch { satelliteRepo.updateEntriesSelection(catNums, isSelected) }
     }
 

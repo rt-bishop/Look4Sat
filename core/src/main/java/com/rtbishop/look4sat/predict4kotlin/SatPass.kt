@@ -15,16 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.predict4kotlin
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.rtbishop.look4sat.predict4kotlin.TLE
-
-@Entity(tableName = "entries")
-data class SatEntry(
-    val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
-)
+data class SatPass(
+    val aosTime: Long,
+    val aosAzimuth: Double,
+    val losTime: Long,
+    val losAzimuth: Double,
+    val tcaTime: Long,
+    val tcaAzimuth: Double,
+    val altitude: Double,
+    val maxElevation: Double,
+    val satellite: Satellite,
+    var progress: Int = 0
+) {
+    val catNum: Int = satellite.params.catnum
+    val name: String = satellite.params.name
+    val isDeepSpace: Boolean = satellite.params.isDeepspace
+}

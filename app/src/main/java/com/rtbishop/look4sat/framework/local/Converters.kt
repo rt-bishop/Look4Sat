@@ -15,16 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.framework.local
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import com.rtbishop.look4sat.predict4kotlin.Satellite
 import com.rtbishop.look4sat.predict4kotlin.TLE
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 
-@Entity(tableName = "entries")
-data class SatEntry(
-    val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
-    var isSelected: Boolean = false
-)
+object Converters {
+
+    private lateinit var paramsAdapter: JsonAdapter<TLE>
+
+    fun initialize(moshi: Moshi) {
+        paramsAdapter = moshi.adapter(TLE::class.java)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun paramsToString(tle: TLE): String {
+        return paramsAdapter.toJson(tle)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun paramsFromString(string: String): TLE? {
+        return paramsAdapter.fromJson(string)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun satelliteFromString(string: String): Satellite? {
+        return paramsAdapter.fromJson(string)?.createSat()
+    }
+}
