@@ -17,57 +17,50 @@
  */
 package com.rtbishop.look4sat.domain
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import java.io.BufferedWriter
-import java.net.Socket
+import kotlinx.coroutines.*
+import java.net.InetSocketAddress
+import java.nio.ByteBuffer
+import java.nio.channels.SocketChannel
 
-class DataReporter(private val reporterDispatcher: CoroutineDispatcher) {
+class DataReporter(reporterDispatcher: CoroutineDispatcher) {
 
-    private var radioSocket: Socket? = null
-    private var radioWriter: BufferedWriter? = null
-    private var rotatorSocket: Socket? = null
-    private var rotatorWriter: BufferedWriter? = null
+    private val reporterScope = CoroutineScope(reporterDispatcher)
+    private var frequencySocketChannel: SocketChannel? = null
+    private var rotationSocketChannel: SocketChannel? = null
+    private var frequencyReporting: Job? = null
+    private var rotationReporting: Job? = null
 
-    suspend fun setupRadioSocket(server: String, port: Int) {
-        withContext(reporterDispatcher) {
+    fun reportFrequency(server: String, port: Int, frequency: Long) {
+        frequencyReporting = reporterScope.launch {
             runCatching {
-                radioSocket = Socket(server, port)
-                radioWriter = rotatorSocket?.getOutputStream()?.bufferedWriter()
-            }.onFailure { println(it.localizedMessage) }
-        }
-    }
-
-    suspend fun reportFrequency(freq: Long) {
-        withContext(reporterDispatcher) {
-            runCatching {
-                rotatorWriter?.let { writer ->
-                    writer.write("\\set_freq $freq")
-                    writer.newLine()
-                    writer.flush()
+                if (frequencySocketChannel == null) {
+                    frequencySocketChannel = SocketChannel.open(InetSocketAddress(server, port))
+                } else {
+                    val buffer = ByteBuffer.wrap("\\set_freq $frequency\n".toByteArray())
+                    frequencySocketChannel?.write(buffer)
                 }
-            }.onFailure { println(it.localizedMessage) }
+            }.onFailure { error ->
+                println(error.localizedMessage)
+                frequencySocketChannel = null
+                frequencyReporting?.cancelAndJoin()
+            }
         }
     }
 
-    suspend fun setupRotatorSocket(server: String, port: Int) {
-        withContext(reporterDispatcher) {
+    fun reportRotation(server: String, port: Int, azimuth: Double, elevation: Double) {
+        rotationReporting = reporterScope.launch {
             runCatching {
-                rotatorSocket = Socket(server, port)
-                rotatorWriter = rotatorSocket?.getOutputStream()?.bufferedWriter()
-            }.onFailure { println(it.localizedMessage) }
-        }
-    }
-
-    suspend fun reportRotation(azim: Double, elev: Double) {
-        withContext(reporterDispatcher) {
-            runCatching {
-                rotatorWriter?.let { writer ->
-                    writer.write("\\set_pos $azim $elev")
-                    writer.newLine()
-                    writer.flush()
+                if (rotationSocketChannel == null) {
+                    rotationSocketChannel = SocketChannel.open(InetSocketAddress(server, port))
+                } else {
+                    val buffer = ByteBuffer.wrap("\\set_pos $azimuth $elevation\n".toByteArray())
+                    rotationSocketChannel?.write(buffer)
                 }
-            }.onFailure { println(it.localizedMessage) }
+            }.onFailure { error ->
+                println(error.localizedMessage)
+                rotationSocketChannel = null
+                rotationReporting?.cancelAndJoin()
+            }
         }
     }
 }
