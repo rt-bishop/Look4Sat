@@ -83,10 +83,6 @@ class PreferencesSource @Inject constructor(
         const val keyPositionQTH = "setPositionQTH"
     }
 
-    fun positionToQTH(lat: Double, lon: Double): String? {
-        return QthConverter.positionToQTH(lat, lon)
-    }
-
     fun loadStationPosition(): GeoPos {
         val defaultSP = "0.0"
         val latitude = preferences.getString(keyLatitude, null) ?: defaultSP
@@ -185,11 +181,9 @@ class PreferencesSource @Inject constructor(
         return preferences.getBoolean(keyRotator, false)
     }
 
-    fun getRotatorServer(): Pair<String, Int>? {
-        return if (isRotatorEnabled()) {
-            val address = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
-            val port = preferences.getString(keyRotatorPort, null) ?: "4533"
-            Pair(address, port.toInt())
-        } else null
+    fun getRotatorServer(): Pair<String, Int> {
+        val address = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
+        val port = preferences.getString(keyRotatorPort, null) ?: "4533"
+        return Pair(address, port.toInt())
     }
 }
