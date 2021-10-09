@@ -17,35 +17,53 @@
  */
 package com.rtbishop.look4sat.injection
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
+import android.hardware.SensorManager
 import android.location.LocationManager
+import androidx.preference.PreferenceManager
 import androidx.room.Room
-import com.rtbishop.look4sat.data.LocalDataSource
-import com.rtbishop.look4sat.data.RemoteDataSource
-import com.rtbishop.look4sat.data.DataRepository
-import com.rtbishop.look4sat.framework.remote.SatelliteApi
-import com.rtbishop.look4sat.common.Constants
-import com.rtbishop.look4sat.domain.Repository
+import com.rtbishop.look4sat.domain.Constants
 import com.rtbishop.look4sat.framework.PreferencesSource
-import com.rtbishop.look4sat.domain.DataReporter
-import com.rtbishop.look4sat.predict4kotlin.Predictor
-import com.rtbishop.look4sat.framework.remote.RemoteSource
-import com.rtbishop.look4sat.framework.local.*
+import com.rtbishop.look4sat.framework.local.Converters
+import com.rtbishop.look4sat.framework.local.MIGRATION_1_2
+import com.rtbishop.look4sat.framework.local.SatelliteDao
+import com.rtbishop.look4sat.framework.local.SatelliteDb
+import com.rtbishop.look4sat.framework.remote.SatelliteApi
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object Look4SatModule {
+object AppModule {
+
+    @Provides
+    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
+        return context.contentResolver
+    }
+
+    @Provides
+    fun provideLocationManager(@ApplicationContext context: Context): LocationManager {
+        return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    }
+
+    @Provides
+    fun provideSensorManager(@ApplicationContext context: Context): SensorManager {
+        return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+
+    @Provides
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+    }
 
     @Provides
     @Singleton
@@ -65,23 +83,11 @@ object Look4SatModule {
 
     @Provides
     @Singleton
-    fun providePredictor(@DefaultDispatcher dispatcher: CoroutineDispatcher): Predictor {
-        return Predictor(dispatcher)
-    }
-
-    @Provides
-    @Singleton
-    fun provideSatelliteRepo(
-        localSource: LocalDataSource,
-        remoteSource: RemoteDataSource,
-        @IoDispatcher dispatcher: CoroutineDispatcher
-    ): Repository {
-        return DataRepository(localSource, remoteSource, dispatcher)
-    }
-
-    @Provides
-    fun provideLocalDataSource(satelliteDao: SatelliteDao): LocalDataSource {
-        return LocalSource(satelliteDao)
+    fun provideSatelliteApi(): SatelliteApi {
+        return Retrofit.Builder()
+            .baseUrl(Constants.URL_BASE)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build().create(SatelliteApi::class.java)
     }
 
     @Provides
@@ -96,26 +102,5 @@ object Look4SatModule {
         Converters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
             .addMigrations(MIGRATION_1_2).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRemoteDataSource(satelliteApi: SatelliteApi): RemoteDataSource {
-        return RemoteSource(satelliteApi)
-    }
-
-    @Provides
-    @Singleton
-    fun provideSatelliteService(): SatelliteApi {
-        return Retrofit.Builder()
-            .baseUrl(Constants.URL_BASE)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build().create(SatelliteApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideDataReporter(@IoDispatcher dispatcher: CoroutineDispatcher): DataReporter {
-        return DataReporter(dispatcher)
     }
 }

@@ -15,14 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.common
+package com.rtbishop.look4sat.domain.model
 
-object Constants {
-
-    const val URL_BASE = "https://db.satnogs.org/api/"
-    const val URL_CELESTRAK = "https://celestrak.com/NORAD/elements/active.txt"
-    const val URL_AMSAT = "https://amsat.org/tle/current/nasabare.txt"
-    const val URL_PRISM_CLASSFD = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
-    const val URL_PRISM_INTEL = "https://www.prismnet.com/~mmccants/tles/inttles.zip"
-
-}
+data class OMM(
+    val name: String,
+    val epochString: String,
+    val meanmo: Double,
+    val eccn: Double,
+    val incl: Double,
+    val raan: Double,
+    val argper: Double,
+    val meanan: Double,
+    val catnum: Int,
+    val bstar: Double,
+)

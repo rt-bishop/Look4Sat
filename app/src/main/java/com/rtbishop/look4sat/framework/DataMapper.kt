@@ -20,9 +20,9 @@ package com.rtbishop.look4sat.framework
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatItem
 import com.rtbishop.look4sat.framework.model.Transmitter
-import com.rtbishop.look4sat.model.SatEntry as DomainEntry
-import com.rtbishop.look4sat.model.SatItem as DomainItem
-import com.rtbishop.look4sat.model.Transmitter as DomainTrans
+import com.rtbishop.look4sat.domain.model.SatEntry as DomainEntry
+import com.rtbishop.look4sat.domain.model.SatItem as DomainItem
+import com.rtbishop.look4sat.domain.model.Transmitter as DomainTrans
 
 object DataMapper {
 

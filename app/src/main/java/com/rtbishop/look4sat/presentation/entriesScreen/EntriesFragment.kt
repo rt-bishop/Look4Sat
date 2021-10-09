@@ -23,13 +23,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.model.SatItem
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
-import com.rtbishop.look4sat.common.DataState
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.DataState
 import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.utility.getNavResult
 import com.rtbishop.look4sat.utility.navigateSafe
@@ -51,7 +51,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupComponents(view: View) {
-        val entriesAdapter = EntriesAdapter(object: EntriesAdapter.EntriesClickListener {
+        val entriesAdapter = EntriesAdapter(object : EntriesAdapter.EntriesClickListener {
             override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
                 viewModel.updateSelection(catNums, isSelected)
             }
@@ -60,7 +60,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             entriesRecycler.apply {
                 setHasFixedSize(true)
                 adapter = entriesAdapter
-                layoutManager = LinearLayoutManager(requireContext())
+                layoutManager = GridLayoutManager(requireContext(), 2)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(ItemDivider(R.drawable.rec_divider_light))
             }

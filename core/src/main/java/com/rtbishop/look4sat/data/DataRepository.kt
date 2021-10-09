@@ -17,12 +17,12 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.Repository
-import com.rtbishop.look4sat.model.SatEntry
-import com.rtbishop.look4sat.model.SatItem
-import com.rtbishop.look4sat.model.Transmitter
-import com.rtbishop.look4sat.predict4kotlin.Satellite
-import com.rtbishop.look4sat.predict4kotlin.TLE
+import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.model.SatEntry
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.predict.TLE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +35,7 @@ class DataRepository(
     private val localSource: LocalDataSource,
     private val remoteSource: RemoteDataSource,
     private val repoDispatcher: CoroutineDispatcher
-) : Repository {
+) : SatelliteRepo {
 
     override fun getSatItems(): Flow<List<SatItem>> {
         return localSource.getEntriesWithModes()

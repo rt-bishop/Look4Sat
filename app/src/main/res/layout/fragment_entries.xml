@@ -17,7 +17,7 @@
         android:id="@+id/entries_import_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="18dp"
         android:elevation="4dp"
         android:text="@string/entries_update"
         android:textSize="18sp"
@@ -53,13 +53,15 @@
     <SearchView
         android:id="@+id/entries_search_bar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="2dp"
         android:iconifiedByDefault="false"
         android:queryHint="@string/entries_search_hint"
+        android:searchIcon="@null"
+        app:layout_constraintBottom_toBottomOf="@+id/entries_select_mode"
         app:layout_constraintEnd_toStartOf="@+id/entries_select_mode"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/entries_import_web" />
 
     <ImageButton
         android:id="@+id/entries_select_mode"
@@ -86,6 +88,7 @@
         android:id="@+id/entries_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

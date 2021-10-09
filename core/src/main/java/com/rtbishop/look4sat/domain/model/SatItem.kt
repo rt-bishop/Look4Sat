@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.usecases
+package com.rtbishop.look4sat.domain.model
 
-import com.rtbishop.look4sat.domain.Repository
-
-class GetSelectedSatellites(private val dataRepository: Repository) {
-    suspend operator fun invoke() = dataRepository.getSelectedSatellites()
-}
+data class SatItem(
+    val catNum: Int,
+    val name: String,
+    var isSelected: Boolean,
+    val modes: List<String>
+)

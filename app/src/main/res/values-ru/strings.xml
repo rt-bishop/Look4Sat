@@ -17,7 +17,7 @@
     <string name="sources_error">Пожалуйста, проверьте URL</string>
 
     <string name="entries_update">Обновить спутники:</string>
-    <string name="entries_search_hint">Имя / Номер</string>
+    <string name="entries_search_hint">Поиск по Имени / Id</string>
     <string name="entries_update_error">Ошибка обновления спутников</string>
 
     <string name="modes_title">Выберите модуляцию трансивера</string>

@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.model
+package com.rtbishop.look4sat.domain.model
 
-data class SatItem(
-    val catNum: Int,
-    val name: String,
-    var isSelected: Boolean,
-    val modes: List<String>
+import com.rtbishop.look4sat.domain.predict.TLE
+
+data class SatEntry(
+    val tle: TLE,
+    val catNum: Int = tle.catnum,
+    val name: String = tle.name,
+    var isSelected: Boolean = false
 )
