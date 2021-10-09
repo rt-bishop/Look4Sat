@@ -19,11 +19,11 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.DataReporter
-import com.rtbishop.look4sat.domain.Repository
-import com.rtbishop.look4sat.predict4kotlin.Predictor
-import com.rtbishop.look4sat.predict4kotlin.SatPass
-import com.rtbishop.look4sat.predict4kotlin.SatPos
-import com.rtbishop.look4sat.model.Transmitter
+import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.predict.Predictor
+import com.rtbishop.look4sat.domain.predict.SatPass
+import com.rtbishop.look4sat.domain.predict.SatPos
+import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.framework.OrientationSource
 import com.rtbishop.look4sat.framework.PreferencesSource
 import com.rtbishop.look4sat.utility.round
@@ -40,7 +40,7 @@ class RadarViewModel @Inject constructor(
     private val orientationSource: OrientationSource,
     private val preferences: PreferencesSource,
     private val predictor: Predictor,
-    private val satelliteRepo: Repository,
+    private val satelliteRepo: SatelliteRepo,
     private val dataReporter: DataReporter
 ) : ViewModel(), OrientationSource.OrientationListener {
 

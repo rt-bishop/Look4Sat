@@ -18,12 +18,12 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.predict4kotlin.Predictor
-import com.rtbishop.look4sat.domain.Repository
+import com.rtbishop.look4sat.domain.predict.Predictor
+import com.rtbishop.look4sat.domain.SatelliteRepo
 import com.rtbishop.look4sat.framework.PreferencesSource
-import com.rtbishop.look4sat.predict4kotlin.GeoPos
+import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
-import com.rtbishop.look4sat.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.predict.Satellite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -33,7 +33,7 @@ import kotlin.math.min
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val satelliteRepo: Repository,
+    private val satelliteRepo: SatelliteRepo,
     private val predictor: Predictor,
     private val preferences: PreferencesSource,
 ) : ViewModel() {
@@ -162,7 +162,7 @@ class MapViewModel @Inject constructor(
         val osmLat = clipLat(Math.toDegrees(satPos.latitude))
         val osmLon = clipLon(Math.toDegrees(satPos.longitude))
         val osmPos = GeoPos(osmLat, osmLon)
-        val qthLoc = QthConverter.positionToQTH(osmPos.latitude, osmPos.longitude) ?: "-- --"
+        val qthLoc = QthConverter.positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
         val satData = MapData(
             satellite, satellite.params.catnum, satellite.params.name, satPos.range,
             satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos

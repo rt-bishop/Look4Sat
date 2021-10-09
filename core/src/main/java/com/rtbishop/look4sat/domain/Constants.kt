@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.common
+package com.rtbishop.look4sat.domain
 
-sealed class DataState<out T> {
-    data class Success<out T>(val data: T) : DataState<T>()
-    data class Error(val error: Throwable) : DataState<Nothing>()
-    object Empty : DataState<Nothing>()
-    object Loading : DataState<Nothing>()
+object Constants {
+
+    const val URL_BASE = "https://db.satnogs.org/api/"
+    const val URL_CELESTRAK = "https://celestrak.com/NORAD/elements/active.txt"
+    const val URL_AMSAT = "https://amsat.org/tle/current/nasabare.txt"
+    const val URL_PRISM_CLASSFD = "https://www.prismnet.com/~mmccants/tles/classfd.zip"
+    const val URL_PRISM_INTEL = "https://www.prismnet.com/~mmccants/tles/inttles.zip"
 }

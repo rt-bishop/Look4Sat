@@ -27,8 +27,8 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.framework.PreferencesSource
-import com.rtbishop.look4sat.predict4kotlin.SatPass
-import com.rtbishop.look4sat.predict4kotlin.SatPos
+import com.rtbishop.look4sat.domain.predict.SatPass
+import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.utility.navigateSafe
 import com.rtbishop.look4sat.utility.toTimerString

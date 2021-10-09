@@ -21,9 +21,9 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.widget.SearchView
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.model.SatItem
-import com.rtbishop.look4sat.common.DataState
-import com.rtbishop.look4sat.domain.Repository
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.DataState
+import com.rtbishop.look4sat.domain.SatelliteRepo
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -37,7 +37,7 @@ import javax.inject.Inject
 class EntriesViewModel @Inject constructor(
     private val preferences: PreferencesSource,
     private val resolver: ContentResolver,
-    private val satelliteRepo: Repository,
+    private val satelliteRepo: SatelliteRepo,
 ) : ViewModel(), SearchView.OnQueryTextListener {
 
     private val coroutineHandler = CoroutineExceptionHandler { _, throwable ->

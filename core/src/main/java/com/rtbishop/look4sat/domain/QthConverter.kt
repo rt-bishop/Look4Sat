@@ -17,14 +17,14 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.predict4kotlin.GeoPos
+import com.rtbishop.look4sat.domain.predict.GeoPos
 import kotlin.math.round
 
 object QthConverter {
 
     fun qthToPosition(qthString: String): GeoPos? {
         val trimmedQth = qthString.take(6)
-        if (!isValidQTH(trimmedQth)) return null
+        if (!isValidQth(trimmedQth)) return null
         val lonFirst = (trimmedQth[0].uppercaseChar().code - 65) * 20
         val latFirst = (trimmedQth[1].uppercaseChar().code - 65) * 10
         val lonSecond = trimmedQth[2].toString().toInt() * 2
@@ -36,7 +36,7 @@ object QthConverter {
         return GeoPos(latitude, longitude)
     }
 
-    fun positionToQTH(lat: Double, lon: Double): String? {
+    fun positionToQth(lat: Double, lon: Double): String? {
         if (!isValidPosition(lat, lon)) return null
         val tempLon = if (lon > 180.0) lon - 360 else lon
         val upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
@@ -52,7 +52,7 @@ object QthConverter {
         return "$lonFirst$latFirst$lonSecond$latSecond$lonThird$latThird"
     }
 
-    private fun isValidQTH(qthString: String): Boolean {
+    private fun isValidQth(qthString: String): Boolean {
         val qthPattern = "[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex()
         return qthString.matches(qthPattern)
     }

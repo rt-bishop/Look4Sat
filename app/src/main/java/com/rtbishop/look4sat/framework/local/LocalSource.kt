@@ -18,10 +18,10 @@
 package com.rtbishop.look4sat.framework.local
 
 import com.rtbishop.look4sat.data.LocalDataSource
-import com.rtbishop.look4sat.model.SatEntry
-import com.rtbishop.look4sat.model.SatItem
-import com.rtbishop.look4sat.predict4kotlin.Satellite
-import com.rtbishop.look4sat.model.Transmitter
+import com.rtbishop.look4sat.domain.model.SatEntry
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.framework.DataMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

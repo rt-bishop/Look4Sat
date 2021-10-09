@@ -17,13 +17,13 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.model.SatItem
-import com.rtbishop.look4sat.model.Transmitter
-import com.rtbishop.look4sat.predict4kotlin.Satellite
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.flow.Flow
 import java.io.InputStream
 
-interface Repository {
+interface SatelliteRepo {
 
     fun getSatItems(): Flow<List<SatItem>>
 

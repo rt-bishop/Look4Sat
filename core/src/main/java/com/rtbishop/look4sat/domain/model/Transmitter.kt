@@ -15,17 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.model
+package com.rtbishop.look4sat.domain.model
 
-data class OMM(
-    val name: String,
-    val epochString: String,
-    val meanmo: Double,
-    val eccn: Double,
-    val incl: Double,
-    val raan: Double,
-    val argper: Double,
-    val meanan: Double,
-    val catnum: Int,
-    val bstar: Double,
+data class Transmitter(
+    val uuid: String,
+    val info: String,
+    val isAlive: Boolean,
+    var downlink: Long?,
+    var uplink: Long?,
+    val mode: String?,
+    val isInverted: Boolean,
+    val catNum: Int?
 )
