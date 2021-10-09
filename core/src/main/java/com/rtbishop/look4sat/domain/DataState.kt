@@ -15,21 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.predict4kotlin
+package com.rtbishop.look4sat.domain
 
-data class SatPass(
-    val aosTime: Long,
-    val aosAzimuth: Double,
-    val losTime: Long,
-    val losAzimuth: Double,
-    val tcaTime: Long,
-    val tcaAzimuth: Double,
-    val altitude: Double,
-    val maxElevation: Double,
-    val satellite: Satellite,
-    var progress: Int = 0
-) {
-    val catNum: Int = satellite.params.catnum
-    val name: String = satellite.params.name
-    val isDeepSpace: Boolean = satellite.params.isDeepspace
+sealed class DataState<out T> {
+    data class Success<out T>(val data: T) : DataState<T>()
+    data class Error(val error: Throwable) : DataState<Nothing>()
+    object Empty : DataState<Nothing>()
+    object Loading : DataState<Nothing>()
 }

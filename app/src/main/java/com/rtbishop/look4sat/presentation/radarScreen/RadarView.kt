@@ -22,7 +22,7 @@ import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.predict4kotlin.SatPos
+import com.rtbishop.look4sat.domain.predict.SatPos
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin

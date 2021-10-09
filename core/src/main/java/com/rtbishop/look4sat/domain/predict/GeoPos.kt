@@ -15,6 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.predict4kotlin
+package com.rtbishop.look4sat.domain.predict
 
 data class GeoPos(val latitude: Double, val longitude: Double, val altitude: Double = 0.0)

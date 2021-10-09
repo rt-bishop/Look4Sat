@@ -21,8 +21,8 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
-import com.rtbishop.look4sat.common.Constants
-import com.rtbishop.look4sat.predict4kotlin.GeoPos
+import com.rtbishop.look4sat.domain.Constants
+import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.utility.round
 import com.squareup.moshi.Moshi

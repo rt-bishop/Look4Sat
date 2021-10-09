@@ -18,7 +18,7 @@
 package com.rtbishop.look4sat.framework.remote
 
 import com.rtbishop.look4sat.data.RemoteDataSource
-import com.rtbishop.look4sat.model.Transmitter
+import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.framework.DataMapper
 import java.io.InputStream
 
