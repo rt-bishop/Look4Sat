@@ -39,14 +39,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
     @Inject
     lateinit var preferences: PreferencesSource
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                updatePositionFromGPS()
-            } else {
-                showSnack(getString(R.string.pref_pos_gps_error))
-            }
+    private val permReqContract = ActivityResultContracts.RequestMultiplePermissions()
+    private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
+    private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
+    private val locPermReq = registerForActivityResult(permReqContract) { permissions ->
+        when {
+            permissions[locPermFine] == true -> updatePositionFromGPS()
+            permissions[locPermCoarse] == true -> updatePositionFromGPS()
+            else -> showSnack(getString(R.string.pref_pos_gps_error))
         }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
@@ -113,7 +115,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             } else {
                 showSnack(getString(R.string.pref_pos_gps_null))
             }
-        } else requestPermissionLauncher.launch(locPermString)
+        } else locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
     }
 
     private fun showSnack(message: String) {

@@ -23,14 +23,22 @@ import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.framework.DataMapper
+import com.rtbishop.look4sat.framework.model.DataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class LocalSource(private val satelliteDao: SatelliteDao) : LocalDataSource {
+class LocalSource(
+    private val satelliteDao: SatelliteDao,
+    private val sourcesDao: SourcesDao
+) : LocalDataSource {
 
     override fun getEntriesWithModes(): Flow<List<SatItem>> {
         return satelliteDao.getSatItems()
             .map { satItems -> DataMapper.satItemsToDomainItems(satItems) }
+    }
+
+    override suspend fun getSources(): List<String> {
+        return sourcesDao.getSources()
     }
 
     override suspend fun getSelectedSatellites(): List<Satellite> {
@@ -44,6 +52,11 @@ class LocalSource(private val satelliteDao: SatelliteDao) : LocalDataSource {
 
     override suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
         satelliteDao.updateEntriesSelection(catNums, isSelected)
+    }
+
+    override suspend fun updateSources(sources: List<String>) {
+        sourcesDao.deleteSources()
+        sourcesDao.setSources(sources.map { DataSource(it) })
     }
 
     override fun getTransmitters(catNum: Int): Flow<List<Transmitter>> {

@@ -23,19 +23,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
-import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.model.DataSource
 import com.rtbishop.look4sat.utility.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SourcesDialog : AppCompatDialogFragment() {
 
-    @Inject
-    lateinit var prefsManager: PreferencesSource
+    private val viewModel: SourcesViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_sources, group, false)
@@ -43,25 +42,26 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        val sources = prefsManager.loadTleSources().map { DataSource(it) }
-        val sourcesAdapter = SourcesAdapter().apply { setSources(sources) }
-        DialogSourcesBinding.bind(view).apply {
-            dialog?.window?.setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-            sourcesRecycler.apply {
-                adapter = sourcesAdapter
-                layoutManager = LinearLayoutManager(requireContext())
+        viewModel.sources.observe(viewLifecycleOwner, { sources ->
+            val adapter = SourcesAdapter().apply { setSources(sources.map { DataSource(it) }) }
+            DialogSourcesBinding.bind(view).apply {
+                dialog?.window?.setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+                sourcesRecycler.apply {
+                    this.adapter = adapter
+                    layoutManager = LinearLayoutManager(requireContext())
+                }
+                sourcesBtnAdd.setOnClickListener {
+                    adapter.addSource()
+                }
+                sourcesBtnPos.setOnClickListener {
+                    setNavResult("sources", adapter.getSources().map { it.sourceUrl })
+                    dismiss()
+                }
+                sourcesBtnNeg.setOnClickListener { dismiss() }
             }
-            sourcesBtnAdd.setOnClickListener {
-                sourcesAdapter.addSource()
-            }
-            sourcesBtnPos.setOnClickListener {
-                setNavResult("sources", sourcesAdapter.getSources().map { it.url })
-                dismiss()
-            }
-            sourcesBtnNeg.setOnClickListener { dismiss() }
-        }
+        })
     }
 }

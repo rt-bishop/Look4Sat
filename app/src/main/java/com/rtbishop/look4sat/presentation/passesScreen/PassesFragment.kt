@@ -41,9 +41,14 @@ import java.util.*
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
     private val passesViewModel: PassesViewModel by viewModels()
-    private val permRequest = ActivityResultContracts.RequestPermission()
-    private val permRequestLauncher = registerForActivityResult(permRequest) {
-        passesViewModel.triggerInitialSetup()
+    private val permReqContract = ActivityResultContracts.RequestMultiplePermissions()
+    private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
+    private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
+    private val locPermReq = registerForActivityResult(permReqContract) { permissions ->
+        when {
+            permissions[locPermFine] == true -> passesViewModel.triggerInitialSetup()
+            permissions[locPermCoarse] == true -> passesViewModel.triggerInitialSetup()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +73,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             handleNewPasses(passesResult, passesAdapter, binding)
         })
         passesViewModel.isFirstLaunchDone.observe(viewLifecycleOwner, { setupDone ->
-            if (!setupDone) permRequestLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            if (!setupDone) locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
         })
     }
 
@@ -95,7 +100,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     passesProgress.visibility = View.VISIBLE
                 }
             }
-            is DataState.Error -> {
+            else -> {
                 binding.apply {
                     passesTimer.text = 0L.toTimerString()
                     passesProgress.visibility = View.INVISIBLE

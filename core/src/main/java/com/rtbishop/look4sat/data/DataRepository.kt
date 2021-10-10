@@ -45,6 +45,22 @@ class DataRepository(
         return localSource.getTransmitters(catNum)
     }
 
+    override fun getDefaultSources(): List<String> {
+        return listOf(
+            "https://celestrak.com/NORAD/elements/active.txt",
+            "https://amsat.org/tle/current/nasabare.txt",
+            "https://www.prismnet.com/~mmccants/tles/classfd.zip",
+            "https://www.prismnet.com/~mmccants/tles/inttles.zip"
+        )
+    }
+
+    override suspend fun getSavedSources(): List<String> {
+        val savedSources = localSource.getSources()
+        return if (savedSources.isEmpty()) {
+            getDefaultSources()
+        } else savedSources
+    }
+
     override suspend fun getSelectedSatellites(): List<Satellite> {
         return localSource.getSelectedSatellites()
     }
@@ -55,6 +71,9 @@ class DataRepository(
 
     override suspend fun updateEntriesFromWeb(sources: List<String>) {
         coroutineScope {
+            launch(repoDispatcher) {
+                localSource.updateSources(sources)
+            }
             launch(repoDispatcher) {
                 val streams = mutableListOf<InputStream>()
                 val entries = mutableListOf<SatEntry>()
