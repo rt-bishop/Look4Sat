@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.sourcesScreen
+package com.rtbishop.look4sat.framework.model
 
-class DataSource(var url: String = String())
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "sources")
+data class DataSource(@PrimaryKey var sourceUrl: String = String())

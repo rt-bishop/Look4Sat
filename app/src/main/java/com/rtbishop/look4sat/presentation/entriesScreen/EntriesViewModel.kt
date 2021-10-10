@@ -37,7 +37,7 @@ import javax.inject.Inject
 class EntriesViewModel @Inject constructor(
     private val preferences: PreferencesSource,
     private val resolver: ContentResolver,
-    private val satelliteRepo: SatelliteRepo,
+    private val satelliteRepo: SatelliteRepo
 ) : ViewModel(), SearchView.OnQueryTextListener {
 
     private val coroutineHandler = CoroutineExceptionHandler { _, throwable ->
@@ -72,7 +72,6 @@ class EntriesViewModel @Inject constructor(
     fun updateEntriesFromWeb(sources: List<String>) {
         viewModelScope.launch(coroutineHandler) {
             _satData.value = DataState.Loading
-            preferences.saveTleSources(sources)
             satelliteRepo.updateEntriesFromWeb(sources)
         }
     }

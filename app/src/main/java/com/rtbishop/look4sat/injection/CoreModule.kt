@@ -38,8 +38,11 @@ import javax.inject.Singleton
 object CoreModule {
 
     @Provides
-    fun provideLocalDataSource(satelliteDao: SatelliteDao): LocalDataSource {
-        return LocalSource(satelliteDao)
+    fun provideLocalDataSource(
+        satelliteDao: SatelliteDao,
+        sourcesDao: SourcesDao
+    ): LocalDataSource {
+        return LocalSource(satelliteDao, sourcesDao)
     }
 
     @Provides

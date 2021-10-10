@@ -29,11 +29,15 @@ interface LocalDataSource {
 
     fun getTransmitters(catNum: Int): Flow<List<Transmitter>>
 
+    suspend fun getSources(): List<String>
+
     suspend fun getSelectedSatellites(): List<Satellite>
 
     suspend fun updateEntries(entries: List<SatEntry>)
 
     suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean)
+
+    suspend fun updateSources(sources: List<String>)
 
     suspend fun updateTransmitters(transmitters: List<Transmitter>)
 }

@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        gradle_version = '7.0.2'
+        gradle_version = '7.0.3'
         kotlin_version = '1.5.31'
         coroutines_version = '1.5.2-native-mt'
         material_version = '1.4.0'
@@ -15,7 +15,7 @@ buildscript {
         osmdroid_version = '6.1.11'
         timber_version = '5.0.1'
         junit_version = '4.13.2'
-        mockito_version = '3.12.4'
+        mockito_version = '4.0.0'
         leak_canary_version = '2.7'
     }
     repositories {

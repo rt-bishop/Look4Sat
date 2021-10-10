@@ -29,6 +29,10 @@ interface SatelliteRepo {
 
     fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>>
 
+    fun getDefaultSources(): List<String>
+
+    suspend fun getSavedSources(): List<String>
+
     suspend fun getSelectedSatellites(): List<Satellite>
 
     suspend fun updateEntriesFromFile(stream: InputStream)

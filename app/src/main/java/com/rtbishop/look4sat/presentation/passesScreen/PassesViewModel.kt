@@ -77,7 +77,7 @@ class PassesViewModel @Inject constructor(
             val stationPos = preferences.loadStationPosition()
             val hoursAhead = preferences.getHoursAhead()
             val minElev = preferences.getMinElevation()
-            satelliteRepo.updateEntriesFromWeb(preferences.loadDefaultSources())
+            satelliteRepo.updateEntriesFromWeb(satelliteRepo.getDefaultSources())
             satelliteRepo.updateEntriesSelection(defaultCatNums, true)
             predictor.forceCalculation(satellites, stationPos, dateNow, hoursAhead, minElev)
             preferences.setSetupDone()

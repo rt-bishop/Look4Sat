@@ -24,12 +24,8 @@ import android.hardware.SensorManager
 import android.location.LocationManager
 import androidx.preference.PreferenceManager
 import androidx.room.Room
-import com.rtbishop.look4sat.domain.Constants
 import com.rtbishop.look4sat.framework.PreferencesSource
-import com.rtbishop.look4sat.framework.local.Converters
-import com.rtbishop.look4sat.framework.local.MIGRATION_1_2
-import com.rtbishop.look4sat.framework.local.SatelliteDao
-import com.rtbishop.look4sat.framework.local.SatelliteDb
+import com.rtbishop.look4sat.framework.local.*
 import com.rtbishop.look4sat.framework.remote.SatelliteApi
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -74,18 +70,17 @@ object AppModule {
     @Provides
     @Singleton
     fun providePreferenceSource(
-        moshi: Moshi,
         locationManager: LocationManager,
         preferences: SharedPreferences
     ): PreferencesSource {
-        return PreferencesSource(moshi, locationManager, preferences)
+        return PreferencesSource(locationManager, preferences)
     }
 
     @Provides
     @Singleton
     fun provideSatelliteApi(): SatelliteApi {
         return Retrofit.Builder()
-            .baseUrl(Constants.URL_BASE)
+            .baseUrl("https://db.satnogs.org/api/")
             .addConverterFactory(MoshiConverterFactory.create())
             .build().create(SatelliteApi::class.java)
     }
@@ -98,9 +93,15 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSourcesDao(db: SatelliteDb): SourcesDao {
+        return db.sourcesDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideSatelliteDb(@ApplicationContext context: Context, moshi: Moshi): SatelliteDb {
         Converters.initialize(moshi)
         return Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
-            .addMigrations(MIGRATION_1_2).build()
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
     }
 }
