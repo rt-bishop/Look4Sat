@@ -22,12 +22,13 @@ import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.databinding.ItemSourceBinding
+import com.rtbishop.look4sat.framework.model.DataSource
 
 class SourcesAdapter(private val sources: MutableList<DataSource> = mutableListOf()) :
     RecyclerView.Adapter<SourcesAdapter.TleSourceHolder>() {
 
     fun getSources(): List<DataSource> {
-        return sources.filter { it.url.contains("https://") }
+        return sources.filter { it.sourceUrl.contains("https://") }
     }
 
     fun setSources(list: List<DataSource>) {
@@ -58,8 +59,8 @@ class SourcesAdapter(private val sources: MutableList<DataSource> = mutableListO
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(source: DataSource) {
-            binding.sourceUrl.setText(source.url)
-            binding.sourceUrl.doOnTextChanged { text, _, _, _ -> source.url = text.toString() }
+            binding.sourceUrl.setText(source.sourceUrl)
+            binding.sourceUrl.doOnTextChanged { text, _, _, _ -> source.sourceUrl = text.toString() }
             binding.sourceInput.setEndIconOnClickListener {
                 sources.remove(source)
                 notifyItemRemoved(adapterPosition)

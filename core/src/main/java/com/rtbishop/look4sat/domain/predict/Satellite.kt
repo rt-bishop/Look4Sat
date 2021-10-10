@@ -168,10 +168,10 @@ abstract class Satellite(val params: TLE) {
         val c =
             invert(sqrt(1.0 + flatFactor * (flatFactor - 2) * sqr(sin(deg2Rad * gsPos.latitude))))
         val sq = sqr(1.0 - flatFactor) * c
-        val achcp = (earthRadius * c + gsPos.altitude / 1000.0) * cos(deg2Rad * gsPos.latitude)
+        val achcp = (earthRadius * c) * cos(deg2Rad * gsPos.latitude)
         obsPos.setXYZ(
             achcp * cos(gsPosTheta.get()), achcp * sin(gsPosTheta.get()),
-            (earthRadius * sq + gsPos.altitude / 1000.0) * sin(deg2Rad * gsPos.latitude)
+            (earthRadius * sq) * sin(deg2Rad * gsPos.latitude)
         )
         obsVel.setXYZ(-mFactor * obsPos.y, mFactor * obsPos.x, 0.0)
         magnitude(obsPos)

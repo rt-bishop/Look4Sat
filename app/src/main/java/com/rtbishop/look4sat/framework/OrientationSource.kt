@@ -22,8 +22,10 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.round
 
+@Singleton
 class OrientationSource @Inject constructor(private val sensorManager: SensorManager) :
     SensorEventListener {
 

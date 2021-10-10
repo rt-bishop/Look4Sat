@@ -52,13 +52,13 @@ object QthConverter {
         return "$lonFirst$latFirst$lonSecond$latSecond$lonThird$latThird"
     }
 
+    fun isValidPosition(lat: Double, lon: Double): Boolean {
+        return (lat > -90.0 && lat < 90.0) && (lon > -180.0 && lon < 360.0)
+    }
+
     private fun isValidQth(qthString: String): Boolean {
         val qthPattern = "[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex()
         return qthString.matches(qthPattern)
-    }
-
-    private fun isValidPosition(lat: Double, lon: Double): Boolean {
-        return (lat > -90.0 && lat < 90.0) && (lon > -180.0 && lon < 360.0)
     }
 
     private fun Double.roundToDecimals(decimals: Int): Double {
