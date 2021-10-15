@@ -75,6 +75,18 @@
         app:layout_constraintBottom_toBottomOf="@+id/radar_frame"
         app:layout_constraintEnd_toEndOf="@+id/radar_frame" />
 
+    <ImageButton
+        android:id="@+id/add_notification_buttton"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="@color/greyDark"
+        android:contentDescription="@string/placeholder"
+        android:elevation="4dp"
+        android:src="@drawable/ic_notification"
+        app:layout_constraintEnd_toEndOf="@+id/radar_bar"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radar_recycler"
         android:layout_width="0dp"
