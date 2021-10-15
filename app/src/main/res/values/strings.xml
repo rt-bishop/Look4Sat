@@ -14,6 +14,12 @@
     <string name="menu_prefs">Settings</string>
     <string name="menu_about">Info</string>
 
+    <string name="notification_title">Set notification to incoming pass</string>
+    <string name="notification_on_start_pass">on start pass</string>
+    <string name="notification_5_min_before">5 minutes before pass</string>
+    <string name="notification_10_min_before">10 minutes before pass</string>
+    <string name="notification_15_min_before">15 minutes before pass</string>
+
     <string name="sources_title">Manage TLE sources</string>
     <string name="sources_hint">Source URL</string>
     <string name="sources_https">Protocol HTTPS only</string>
