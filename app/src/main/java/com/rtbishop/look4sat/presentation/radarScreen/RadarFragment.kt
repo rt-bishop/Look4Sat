@@ -19,11 +19,13 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.framework.PreferencesSource
@@ -104,6 +106,30 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     orientation.third
                 )
             })
+        }
+
+        binding.addNotificationButtton.setOnClickListener {
+            this.context?.let { context ->
+
+                val choicesList = arrayOf(
+                    getString(R.string.notification_on_start_pass),
+                    getString(R.string.notification_5_min_before),
+                    getString(R.string.notification_10_min_before),
+                    getString(R.string.notification_15_min_before),
+                )
+
+                MaterialAlertDialogBuilder(context)
+                    .setTitle(getString(R.string.notification_title))
+                    .setSingleChoiceItems(choicesList, -1) { dialog, which ->
+                        // TODO in this place should set a notification by NotificationBuilder
+                        Toast.makeText(context, "Reminder was saved", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { _, _ ->
+                        // noop
+                    }
+                    .show()
+            }
         }
     }
 
