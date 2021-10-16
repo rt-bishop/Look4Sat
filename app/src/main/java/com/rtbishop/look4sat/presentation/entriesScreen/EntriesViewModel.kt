@@ -79,7 +79,7 @@ class EntriesViewModel @Inject constructor(
     fun selectCurrentItems() {
         val currentValue = _satData.value
         if (currentValue is DataState.Success) {
-            updateSelection(currentValue.data.map { it.catNum }, shouldSelectAll)
+            updateSelection(currentValue.data.map { it.catnum }, shouldSelectAll)
             shouldSelectAll = shouldSelectAll.not()
         }
     }
@@ -114,7 +114,7 @@ class EntriesViewModel @Inject constructor(
     private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
         if (query.isBlank()) return items
         return try {
-            items.filter { it.catNum == query.toInt() }
+            items.filter { it.catnum == query.toInt() }
         } catch (e: Exception) {
             items.filter { item ->
                 val itemName = item.name.lowercase(Locale.getDefault())

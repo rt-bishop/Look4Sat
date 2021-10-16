@@ -26,7 +26,7 @@ import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.framework.OrientationSource
 import com.rtbishop.look4sat.framework.PreferencesSource
-import com.rtbishop.look4sat.utility.round
+import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -100,7 +100,7 @@ class RadarViewModel @Inject constructor(
 
     private fun processTransmitters(satPass: SatPass) {
         viewModelScope.launch {
-            satelliteRepo.getSatTransmitters(satPass.catNum).collect { transList ->
+            satelliteRepo.getTransmitters(satPass.catNum).collect { transList ->
                 while (isActive) {
                     val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
                     val copiedList = transList.map { it.copy() }

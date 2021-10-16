@@ -27,7 +27,7 @@ import javax.inject.Qualifier
 
 @Module
 @InstallIn(SingletonComponent::class)
-object CoroutinesModule {
+object KotlinModule {
 
     @Provides
     @DefaultDispatcher

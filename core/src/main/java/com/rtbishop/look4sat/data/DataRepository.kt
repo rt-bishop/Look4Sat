@@ -41,8 +41,8 @@ class DataRepository(
         return localSource.getEntriesWithModes()
     }
 
-    override fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>> {
-        return localSource.getTransmitters(catNum)
+    override fun getTransmitters(catnum: Int): Flow<List<Transmitter>> {
+        return localSource.getTransmitters(catnum)
     }
 
     override fun getDefaultSources(): List<String> {
@@ -97,8 +97,8 @@ class DataRepository(
         }
     }
 
-    override suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        localSource.updateEntriesSelection(catNums, isSelected)
+    override suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
+        localSource.updateEntriesSelection(catnums, isSelected)
     }
 
     private fun importSatEntries(stream: InputStream): List<SatEntry> {

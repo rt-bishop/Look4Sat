@@ -27,7 +27,7 @@ interface SatelliteRepo {
 
     fun getSatItems(): Flow<List<SatItem>>
 
-    fun getSatTransmitters(catNum: Int): Flow<List<Transmitter>>
+    fun getTransmitters(catnum: Int): Flow<List<Transmitter>>
 
     fun getDefaultSources(): List<String>
 
@@ -39,5 +39,5 @@ interface SatelliteRepo {
 
     suspend fun updateEntriesFromWeb(sources: List<String>)
 
-    suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean)
+    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean)
 }
