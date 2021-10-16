@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat.injection
 
+import android.content.Context
+import androidx.room.Room
 import com.rtbishop.look4sat.data.LocalDataSource
 import com.rtbishop.look4sat.data.RemoteDataSource
 import com.rtbishop.look4sat.data.DataRepository
@@ -29,8 +31,11 @@ import com.rtbishop.look4sat.framework.local.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -38,16 +43,19 @@ import javax.inject.Singleton
 object CoreModule {
 
     @Provides
-    fun provideLocalDataSource(
-        satelliteDao: SatelliteDao,
-        sourcesDao: SourcesDao
-    ): LocalDataSource {
-        return LocalSource(satelliteDao, sourcesDao)
+    @Singleton
+    fun provideLocalDataSource(@ApplicationContext context: Context): LocalDataSource {
+        val database = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
+        return LocalSource(database.entriesDao(), database.sourcesDao(), database.transmittersDao())
     }
 
     @Provides
     @Singleton
-    fun provideRemoteDataSource(satelliteApi: SatelliteApi): RemoteDataSource {
+    fun provideRemoteDataSource(): RemoteDataSource {
+        val satelliteApi = Retrofit.Builder().baseUrl("https://localhost")
+            .addConverterFactory(MoshiConverterFactory.create()).build()
+            .create(SatelliteApi::class.java)
         return RemoteSource(satelliteApi)
     }
 

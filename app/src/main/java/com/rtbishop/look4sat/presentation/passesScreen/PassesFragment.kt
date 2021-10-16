@@ -32,8 +32,8 @@ import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.DataState
 import com.rtbishop.look4sat.presentation.ItemDivider
-import com.rtbishop.look4sat.utility.navigateSafe
-import com.rtbishop.look4sat.utility.toTimerString
+import com.rtbishop.look4sat.presentation.navigateSafe
+import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 

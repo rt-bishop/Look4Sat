@@ -30,7 +30,7 @@ class EntriesAdapter(private val clickListener: EntriesClickListener) :
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatItem>() {
         override fun areItemsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
-            return oldItem.catNum == newItem.catNum
+            return oldItem.catnum == newItem.catnum
         }
 
         override fun areContentsTheSame(oldItem: SatItem, newItem: SatItem): Boolean {
@@ -60,7 +60,7 @@ class EntriesAdapter(private val clickListener: EntriesClickListener) :
             binding.entryName.text = item.name
             binding.entryCheckbox.isChecked = item.isSelected
             itemView.setOnClickListener {
-                listener.updateSelection(listOf(item.catNum), item.isSelected.not())
+                listener.updateSelection(listOf(item.catnum), item.isSelected.not())
             }
         }
 

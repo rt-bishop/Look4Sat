@@ -31,9 +31,9 @@ import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.DataState
 import com.rtbishop.look4sat.presentation.ItemDivider
-import com.rtbishop.look4sat.utility.getNavResult
-import com.rtbishop.look4sat.utility.navigateSafe
-import com.rtbishop.look4sat.utility.showSnack
+import com.rtbishop.look4sat.presentation.getNavResult
+import com.rtbishop.look4sat.presentation.navigateSafe
+import com.rtbishop.look4sat.presentation.showSnack
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

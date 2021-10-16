@@ -17,14 +17,13 @@
  */
 package com.rtbishop.look4sat.framework.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.rtbishop.look4sat.domain.predict.TLE
 
-@Entity(tableName = "entries")
+@Entity(tableName = "entries", primaryKeys = ["catnum"])
 data class SatEntry(
+    @Embedded
     val tle: TLE,
-    @PrimaryKey val catNum: Int = tle.catnum,
-    val name: String = tle.name,
     var isSelected: Boolean = false
 )
