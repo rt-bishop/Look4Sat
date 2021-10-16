@@ -23,7 +23,7 @@ import android.location.LocationManager
 import androidx.core.content.edit
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
-import com.rtbishop.look4sat.utility.round
+import com.rtbishop.look4sat.presentation.round
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.domain.LocationProvider
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.utility.round
+import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

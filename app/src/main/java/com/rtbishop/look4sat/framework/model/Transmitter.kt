@@ -30,5 +30,5 @@ data class Transmitter(
     @field:Json(name = "uplink_low") var uplink: Long?,
     @field:Json(name = "mode") val mode: String?,
     @field:Json(name = "invert") val isInverted: Boolean,
-    @field:Json(name = "norad_cat_id") val catNum: Int?
+    @field:Json(name = "norad_cat_id") val catnum: Int?
 )

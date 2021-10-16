@@ -30,14 +30,14 @@ data class TLE(
     val argper: Double,
     val meanan: Double,
     val catnum: Int,
-    val bstar: Double
-) {
-    val xincl: Double = Math.toRadians(incl)
-    val xnodeo: Double = Math.toRadians(raan)
-    val omegao: Double = Math.toRadians(argper)
-    val xmo: Double = Math.toRadians(meanan)
-    val xno: Double = meanmo * Math.PI * 2.0 / 1440
+    val bstar: Double,
+    val xincl: Double = Math.toRadians(incl),
+    val xnodeo: Double = Math.toRadians(raan),
+    val omegao: Double = Math.toRadians(argper),
+    val xmo: Double = Math.toRadians(meanan),
+    val xno: Double = meanmo * Math.PI * 2.0 / 1440,
     val isDeepspace: Boolean = meanmo < 6.4
+) {
 
     fun createSat(): Satellite {
         return when {

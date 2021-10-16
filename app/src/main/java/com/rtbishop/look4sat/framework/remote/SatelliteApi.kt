@@ -30,6 +30,6 @@ interface SatelliteApi {
     @GET
     suspend fun fetchFileStream(@Url url: String): Response<ResponseBody>
 
-    @GET("transmitters/")
+    @GET("https://db.satnogs.org/api/transmitters/")
     suspend fun fetchTransmitters(): List<Transmitter>
 }

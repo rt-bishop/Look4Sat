@@ -20,13 +20,13 @@ package com.rtbishop.look4sat.framework.model
 import androidx.room.Relation
 
 data class SatItem(
-    val catNum: Int,
+    val catnum: Int,
     val name: String,
     var isSelected: Boolean,
     @Relation(
-        parentColumn = "catNum",
+        parentColumn = "catnum",
         entity = Transmitter::class,
-        entityColumn = "catNum",
+        entityColumn = "catnum",
         projection = ["mode"]
     )
     val modes: List<String>

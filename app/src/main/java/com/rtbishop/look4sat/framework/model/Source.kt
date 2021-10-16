@@ -21,4 +21,4 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "sources")
-data class DataSource(@PrimaryKey var sourceUrl: String = String())
+data class Source(@PrimaryKey var sourceUrl: String = String())

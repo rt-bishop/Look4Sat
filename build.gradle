@@ -17,6 +17,7 @@ buildscript {
         junit_version = '4.13.2'
         mockito_version = '4.0.0'
         leak_canary_version = '2.7'
+        jvm_version = '11'
     }
     repositories {
         google()

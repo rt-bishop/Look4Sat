@@ -29,7 +29,7 @@ object DataMapper {
     // Presentation to Domain
 
     fun satEntryToDomainEntry(entry: SatEntry): DomainEntry {
-        return DomainEntry(entry.tle, entry.catNum, entry.name, entry.isSelected)
+        return DomainEntry(entry.tle, entry.isSelected)
     }
 
     fun satEntriesToDomainEntries(entries: List<SatEntry>): List<DomainEntry> {
@@ -37,7 +37,7 @@ object DataMapper {
     }
 
     fun satItemToDomainItem(item: SatItem): DomainItem {
-        return DomainItem(item.catNum, item.name, item.isSelected, item.modes)
+        return DomainItem(item.catnum, item.name, item.isSelected, item.modes)
     }
 
     fun satItemsToDomainItems(items: List<SatItem>): List<DomainItem> {
@@ -47,7 +47,7 @@ object DataMapper {
     fun satTransToDomainTrans(transmitter: Transmitter): DomainTrans {
         return DomainTrans(
             transmitter.uuid, transmitter.info, transmitter.isAlive, transmitter.downlink,
-            transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catNum
+            transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catnum
         )
     }
 
@@ -58,7 +58,7 @@ object DataMapper {
     // Domain to Presentation
 
     fun domainEntryToSatEntry(entry: DomainEntry): SatEntry {
-        return SatEntry(entry.tle, entry.catNum, entry.name, entry.isSelected)
+        return SatEntry(entry.tle, entry.isSelected)
     }
 
     fun domainEntriesToSatEntries(entries: List<DomainEntry>): List<SatEntry> {
@@ -66,7 +66,7 @@ object DataMapper {
     }
 
     fun domainItemToSatItem(item: DomainItem): SatItem {
-        return SatItem(item.catNum, item.name, item.isSelected, item.modes)
+        return SatItem(item.catnum, item.name, item.isSelected, item.modes)
     }
 
     fun domainItemsToSatItems(items: List<DomainItem>): List<SatItem> {
@@ -76,7 +76,7 @@ object DataMapper {
     fun domainTransToSatTrans(transmitter: DomainTrans): Transmitter {
         return Transmitter(
             transmitter.uuid, transmitter.info, transmitter.isAlive, transmitter.downlink,
-            transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catNum
+            transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catnum
         )
     }
 
