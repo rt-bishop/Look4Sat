@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.domain.DataState
+import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString

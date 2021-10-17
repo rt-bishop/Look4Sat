@@ -15,29 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain
+package com.rtbishop.look4sat.domain.model
 
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.Transmitter
-import com.rtbishop.look4sat.domain.predict.Satellite
-import kotlinx.coroutines.flow.Flow
-import java.io.InputStream
-
-interface SatelliteRepo {
-
-    fun getSatItems(): Flow<List<SatItem>>
-
-    fun getTransmitters(catnum: Int): Flow<List<Transmitter>>
-
-    fun getDefaultSources(): List<String>
-
-    suspend fun getSavedSources(): List<String>
-
-    suspend fun getSelectedSatellites(): List<Satellite>
-
-    suspend fun updateEntriesFromFile(stream: InputStream)
-
-    suspend fun updateEntriesFromWeb(sources: List<String>)
-
-    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean)
+sealed class DataState<out T> {
+    data class Success<out T>(val data: T) : DataState<T>()
+    data class Error(val error: Throwable) : DataState<Nothing>()
+    object Empty : DataState<Nothing>()
+    object Loading : DataState<Nothing>()
 }

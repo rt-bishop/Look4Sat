@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.presentation.mapScreen
 
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.predict.Predictor
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.framework.PreferencesSource
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
@@ -33,7 +33,7 @@ import kotlin.math.min
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val satelliteRepo: SatelliteRepo,
+    private val dataRepository: DataRepository,
     private val predictor: Predictor,
     private val preferences: PreferencesSource,
 ) : ViewModel() {
@@ -63,7 +63,7 @@ class MapViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            satelliteRepo.getSelectedSatellites().also { selectedSatellites ->
+            dataRepository.getSelectedSatellites().also { selectedSatellites ->
                 if (selectedSatellites.isNotEmpty()) {
                     allSatList = selectedSatellites
                     selectSatellite(selectedSatellites.first())
