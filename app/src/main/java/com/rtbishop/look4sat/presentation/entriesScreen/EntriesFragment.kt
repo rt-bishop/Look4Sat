@@ -29,7 +29,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.DataState
+import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.navigateSafe
@@ -42,7 +42,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     private val viewModel: EntriesViewModel by viewModels()
     private val contentContract = ActivityResultContracts.GetContent()
     private val filePicker = registerForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.updateEntriesFromFile(uri) }
+        uri?.let { viewModel.updateDataFromFile(uri) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,11 +51,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupComponents(view: View) {
-        val entriesAdapter = EntriesAdapter(object : EntriesAdapter.EntriesClickListener {
-            override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-                viewModel.updateSelection(catNums, isSelected)
-            }
-        })
+        val entriesAdapter = EntriesAdapter(viewModel)
         val binding = FragmentEntriesBinding.bind(view).apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
@@ -76,7 +72,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             handleSatData(satData, binding, entriesAdapter)
         })
         getNavResult<List<String>>(R.id.nav_entries, "sources") { sources ->
-            viewModel.updateEntriesFromWeb(sources)
+            viewModel.updateDataFromWeb(sources)
         }
     }
 

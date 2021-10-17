@@ -25,22 +25,19 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {
 
-    // Entries
-    fun getEntriesWithModes(): Flow<List<SatItem>>
+    fun getSatelliteItems(): Flow<List<SatItem>>
 
     suspend fun getSelectedSatellites(): List<Satellite>
 
+    suspend fun getTransmitters(catnum: Int): List<Transmitter>
+
+    suspend fun getWebSources(): List<String>
+
     suspend fun updateEntries(entries: List<SatEntry>)
 
-    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean)
-
-    // Sources
-    suspend fun getSources(): List<String>
-
-    suspend fun updateSources(sources: List<String>)
-
-    // Transmitters
-    fun getTransmitters(catnum: Int): Flow<List<Transmitter>>
+    suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean)
 
     suspend fun updateTransmitters(transmitters: List<Transmitter>)
+
+    suspend fun updateWebSources(sources: List<String>)
 }

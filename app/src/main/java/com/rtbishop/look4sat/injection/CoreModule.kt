@@ -21,9 +21,9 @@ import android.content.Context
 import androidx.room.Room
 import com.rtbishop.look4sat.data.LocalDataSource
 import com.rtbishop.look4sat.data.RemoteDataSource
-import com.rtbishop.look4sat.data.DataRepository
+import com.rtbishop.look4sat.data.DefaultRepository
 import com.rtbishop.look4sat.framework.remote.SatelliteApi
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.DataReporter
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.framework.remote.RemoteSource
@@ -65,8 +65,8 @@ object CoreModule {
         localSource: LocalDataSource,
         remoteSource: RemoteDataSource,
         @IoDispatcher dispatcher: CoroutineDispatcher
-    ): SatelliteRepo {
-        return DataRepository(localSource, remoteSource, dispatcher)
+    ): DataRepository {
+        return DefaultRepository(localSource, remoteSource, dispatcher)
     }
 
     @Provides

@@ -19,12 +19,9 @@ package com.rtbishop.look4sat.framework.local
 
 import com.rtbishop.look4sat.data.LocalDataSource
 import com.rtbishop.look4sat.domain.model.SatEntry
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.domain.model.Transmitter
-import com.rtbishop.look4sat.framework.DataMapper
+import com.rtbishop.look4sat.framework.*
 import com.rtbishop.look4sat.framework.model.Source
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LocalSource(
@@ -33,45 +30,31 @@ class LocalSource(
     private val transmittersDao: TransmittersDao
 ) : LocalDataSource {
 
-    // Entries
-    override fun getEntriesWithModes(): Flow<List<SatItem>> {
-        return entriesDao.getSatItems().map { satItems ->
-            DataMapper.satItemsToDomainItems(satItems)
-        }
+    override fun getSatelliteItems() = entriesDao.getSatelliteItems().map { it.toDomainItems() }
+
+    override suspend fun getSelectedSatellites() = entriesDao.getSelectedSatellites().map { entry ->
+        entry.tle.createSat()
     }
 
-    override suspend fun getSelectedSatellites(): List<Satellite> {
-        return entriesDao.getSelectedSatellites().map { it.tle.createSat() }
+    override suspend fun getTransmitters(catnum: Int): List<Transmitter> {
+        return transmittersDao.getTransmitters(catnum).toDomain()
     }
+
+    override suspend fun getWebSources() = sourcesDao.getSources()
 
     override suspend fun updateEntries(entries: List<SatEntry>) {
-        val satEntries = entries.map { entry -> DataMapper.domainEntryToSatEntry(entry) }
-        entriesDao.updateEntries(satEntries)
+        entriesDao.updateEntries(entries.toFrameworkEntries())
     }
 
-    override suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
-        entriesDao.updateEntriesSelection(catnums, isSelected)
-    }
-
-    // Sources
-    override suspend fun getSources(): List<String> {
-        return sourcesDao.getSources()
-    }
-
-    override suspend fun updateSources(sources: List<String>) {
-        sourcesDao.deleteSources()
-        sourcesDao.updateSources(sources.map { Source(it) })
-    }
-
-    // Transmitters
-    override fun getTransmitters(catnum: Int): Flow<List<Transmitter>> {
-        return transmittersDao.getTransmitters(catnum).map { satTransList ->
-            DataMapper.satTransListToDomainTransList(satTransList)
-        }
+    override suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean) {
+        entriesDao.updateSelection(catnums, isSelected)
     }
 
     override suspend fun updateTransmitters(transmitters: List<Transmitter>) {
-        val transList = DataMapper.domainTransListToSatTransList(transmitters)
-        transmittersDao.updateTransmitters(transList)
+        transmittersDao.updateTransmitters(transmitters.toFramework())
+    }
+
+    override suspend fun updateWebSources(sources: List<String>) {
+        sourcesDao.updateSources(sources.map { Source(it) })
     }
 }

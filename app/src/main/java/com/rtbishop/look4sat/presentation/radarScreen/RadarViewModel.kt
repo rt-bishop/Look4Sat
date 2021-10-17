@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.DataReporter
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
@@ -40,7 +40,7 @@ class RadarViewModel @Inject constructor(
     private val orientationSource: OrientationSource,
     private val preferences: PreferencesSource,
     private val predictor: Predictor,
-    private val satelliteRepo: SatelliteRepo,
+    private val dataRepository: DataRepository,
     private val dataReporter: DataReporter
 ) : ViewModel(), OrientationSource.OrientationListener {
 
@@ -100,21 +100,20 @@ class RadarViewModel @Inject constructor(
 
     private fun processTransmitters(satPass: SatPass) {
         viewModelScope.launch {
-            satelliteRepo.getTransmitters(satPass.catNum).collect { transList ->
-                while (isActive) {
-                    val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
-                    val copiedList = transList.map { it.copy() }
-                    copiedList.forEach { transmitter ->
-                        transmitter.downlink?.let {
-                            transmitter.downlink = satPos.getDownlinkFreq(it)
-                        }
-                        transmitter.uplink?.let {
-                            transmitter.uplink = satPos.getUplinkFreq(it)
-                        }
+            val transmitters = dataRepository.getTransmitters(satPass.catNum)
+            while (isActive) {
+                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
+                val copiedList = transmitters.map { it.copy() }
+                copiedList.forEach { transmitter ->
+                    transmitter.downlink?.let {
+                        transmitter.downlink = satPos.getDownlinkFreq(it)
                     }
-                    _transmitters.postValue(copiedList.map { it.copy() })
-                    delay(1000)
+                    transmitter.uplink?.let {
+                        transmitter.uplink = satPos.getUplinkFreq(it)
+                    }
                 }
+                _transmitters.postValue(copiedList.map { it.copy() })
+                delay(1000)
             }
         }
     }

@@ -17,9 +17,28 @@
  */
 package com.rtbishop.look4sat.domain
 
-sealed class DataState<out T> {
-    data class Success<out T>(val data: T) : DataState<T>()
-    data class Error(val error: Throwable) : DataState<Nothing>()
-    object Empty : DataState<Nothing>()
-    object Loading : DataState<Nothing>()
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.predict.Satellite
+import kotlinx.coroutines.flow.Flow
+import java.io.InputStream
+
+interface DataRepository {
+
+    val defaultSelection: List<Int>
+    val defaultSources: List<String>
+
+    fun getSatelliteItems(): Flow<List<SatItem>>
+
+    suspend fun getSelectedSatellites(): List<Satellite>
+
+    suspend fun getTransmitters(catnum: Int): List<Transmitter>
+
+    suspend fun getWebSources(): List<String>
+
+    suspend fun updateDataFromFile(stream: InputStream)
+
+    suspend fun updateDataFromWeb(sources: List<String> = defaultSources)
+
+    suspend fun updateSelection(catnums: List<Int> = defaultSelection, isSelected: Boolean = true)
 }

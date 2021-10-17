@@ -17,62 +17,49 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.model.SatEntry
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.Transmitter
-import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.domain.predict.TLE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 
-class DataRepository(
+class DefaultRepository(
     private val localSource: LocalDataSource,
     private val remoteSource: RemoteDataSource,
     private val repoDispatcher: CoroutineDispatcher
-) : SatelliteRepo {
+) : DataRepository {
 
-    override fun getSatItems(): Flow<List<SatItem>> {
-        return localSource.getEntriesWithModes()
+    override val defaultSelection = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
+    override val defaultSources = listOf(
+        "https://celestrak.com/NORAD/elements/active.txt",
+        "https://amsat.org/tle/current/nasabare.txt",
+        "https://www.prismnet.com/~mmccants/tles/classfd.zip",
+        "https://www.prismnet.com/~mmccants/tles/inttles.zip"
+    )
+
+    override fun getSatelliteItems() = localSource.getSatelliteItems()
+
+    override suspend fun getSelectedSatellites() = localSource.getSelectedSatellites()
+
+    override suspend fun getTransmitters(catnum: Int) = localSource.getTransmitters(catnum)
+
+    override suspend fun getWebSources() = localSource.getWebSources().also { sources ->
+        return if (sources.isNotEmpty()) sources
+        else defaultSources
     }
 
-    override fun getTransmitters(catnum: Int): Flow<List<Transmitter>> {
-        return localSource.getTransmitters(catnum)
+    override suspend fun updateDataFromFile(stream: InputStream) = withContext(repoDispatcher) {
+        localSource.updateEntries(importSatellites(stream))
     }
 
-    override fun getDefaultSources(): List<String> {
-        return listOf(
-            "https://celestrak.com/NORAD/elements/active.txt",
-            "https://amsat.org/tle/current/nasabare.txt",
-            "https://www.prismnet.com/~mmccants/tles/classfd.zip",
-            "https://www.prismnet.com/~mmccants/tles/inttles.zip"
-        )
-    }
-
-    override suspend fun getSavedSources(): List<String> {
-        val savedSources = localSource.getSources()
-        return if (savedSources.isEmpty()) {
-            getDefaultSources()
-        } else savedSources
-    }
-
-    override suspend fun getSelectedSatellites(): List<Satellite> {
-        return localSource.getSelectedSatellites()
-    }
-
-    override suspend fun updateEntriesFromFile(stream: InputStream) = withContext(repoDispatcher) {
-        localSource.updateEntries(importSatEntries(stream))
-    }
-
-    override suspend fun updateEntriesFromWeb(sources: List<String>) {
+    override suspend fun updateDataFromWeb(sources: List<String>) {
         coroutineScope {
             launch(repoDispatcher) {
-                localSource.updateSources(sources)
+                localSource.updateWebSources(sources)
             }
             launch(repoDispatcher) {
                 val streams = mutableListOf<InputStream>()
@@ -87,7 +74,7 @@ class DataRepository(
                         }
                     }
                 }
-                streams.forEach { stream -> entries.addAll(importSatEntries(stream)) }
+                streams.forEach { stream -> entries.addAll(importSatellites(stream)) }
                 localSource.updateEntries(entries)
             }
             launch(repoDispatcher) {
@@ -97,11 +84,11 @@ class DataRepository(
         }
     }
 
-    override suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
-        localSource.updateEntriesSelection(catnums, isSelected)
+    override suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean) {
+        localSource.updateSelection(catnums, isSelected)
     }
 
-    private fun importSatEntries(stream: InputStream): List<SatEntry> {
+    private fun importSatellites(stream: InputStream): List<SatEntry> {
         return TLE.parseTleStream(stream).map { tle -> SatEntry(tle) }
     }
 }
