@@ -17,70 +17,39 @@
  */
 package com.rtbishop.look4sat.framework
 
-import com.rtbishop.look4sat.framework.model.SatEntry
-import com.rtbishop.look4sat.framework.model.SatItem
-import com.rtbishop.look4sat.framework.model.Transmitter
 import com.rtbishop.look4sat.domain.model.SatEntry as DomainEntry
 import com.rtbishop.look4sat.domain.model.SatItem as DomainItem
-import com.rtbishop.look4sat.domain.model.Transmitter as DomainTrans
+import com.rtbishop.look4sat.domain.model.Transmitter as DomainTransmitter
+import com.rtbishop.look4sat.framework.model.SatEntry as FrameworkEntry
+import com.rtbishop.look4sat.framework.model.SatItem as FrameworkItem
+import com.rtbishop.look4sat.framework.model.Transmitter as FrameworkTransmitter
 
-object DataMapper {
+fun DomainEntry.toFramework() = FrameworkEntry(this.tle, this.isSelected)
 
-    // Presentation to Domain
+fun DomainItem.toFramework() = FrameworkItem(this.catnum, this.name, this.isSelected, this.modes)
 
-    fun satEntryToDomainEntry(entry: SatEntry): DomainEntry {
-        return DomainEntry(entry.tle, entry.isSelected)
-    }
+fun DomainTransmitter.toFramework() = FrameworkTransmitter(
+    this.uuid, this.info, this.isAlive, this.downlink,
+    this.uplink, this.mode, this.isInverted, this.catnum
+)
 
-    fun satEntriesToDomainEntries(entries: List<SatEntry>): List<DomainEntry> {
-        return entries.map { entry -> satEntryToDomainEntry(entry) }
-    }
+fun FrameworkEntry.toDomain() = DomainEntry(this.tle, this.isSelected)
 
-    fun satItemToDomainItem(item: SatItem): DomainItem {
-        return DomainItem(item.catnum, item.name, item.isSelected, item.modes)
-    }
+fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, this.isSelected, this.modes)
 
-    fun satItemsToDomainItems(items: List<SatItem>): List<DomainItem> {
-        return items.map { item -> satItemToDomainItem(item) }
-    }
+fun FrameworkTransmitter.toDomain() = DomainTransmitter(
+    this.uuid, this.info, this.isAlive, this.downlink,
+    this.uplink, this.mode, this.isInverted, this.catnum
+)
 
-    fun satTransToDomainTrans(transmitter: Transmitter): DomainTrans {
-        return DomainTrans(
-            transmitter.uuid, transmitter.info, transmitter.isAlive, transmitter.downlink,
-            transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catnum
-        )
-    }
+fun List<DomainEntry>.toFrameworkEntries() = this.map { it.toFramework() }
 
-    fun satTransListToDomainTransList(transmitters: List<Transmitter>): List<DomainTrans> {
-        return transmitters.map { transmitter -> satTransToDomainTrans(transmitter) }
-    }
+fun List<DomainItem>.toFrameworkItems() = this.map { it.toFramework() }
 
-    // Domain to Presentation
+fun List<DomainTransmitter>.toFramework() = this.map { it.toFramework() }
 
-    fun domainEntryToSatEntry(entry: DomainEntry): SatEntry {
-        return SatEntry(entry.tle, entry.isSelected)
-    }
+fun List<FrameworkEntry>.toDomainEntries() = this.map { it.toDomain() }
 
-    fun domainEntriesToSatEntries(entries: List<DomainEntry>): List<SatEntry> {
-        return entries.map { entry -> domainEntryToSatEntry(entry) }
-    }
+fun List<FrameworkItem>.toDomainItems() = this.map { it.toDomain() }
 
-    fun domainItemToSatItem(item: DomainItem): SatItem {
-        return SatItem(item.catnum, item.name, item.isSelected, item.modes)
-    }
-
-    fun domainItemsToSatItems(items: List<DomainItem>): List<SatItem> {
-        return items.map { item -> domainItemToSatItem(item) }
-    }
-
-    fun domainTransToSatTrans(transmitter: DomainTrans): Transmitter {
-        return Transmitter(
-            transmitter.uuid, transmitter.info, transmitter.isAlive, transmitter.downlink,
-            transmitter.uplink, transmitter.mode, transmitter.isInverted, transmitter.catnum
-        )
-    }
-
-    fun domainTransListToSatTransList(transmitters: List<DomainTrans>): List<Transmitter> {
-        return transmitters.map { transmitter -> domainTransToSatTrans(transmitter) }
-    }
-}
+fun List<FrameworkTransmitter>.toDomain() = this.map { it.toDomain() }

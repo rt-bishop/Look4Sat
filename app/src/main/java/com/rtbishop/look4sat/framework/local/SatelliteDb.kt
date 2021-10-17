@@ -26,7 +26,7 @@ import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.Transmitter
 
 @Database(
-    entities = [SatEntry::class, Transmitter::class, Source::class],
+    entities = [SatEntry::class, Source::class, Transmitter::class],
     version = 4,
     exportSchema = true
 )

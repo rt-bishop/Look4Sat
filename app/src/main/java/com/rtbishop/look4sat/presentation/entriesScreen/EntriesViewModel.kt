@@ -22,8 +22,8 @@ import android.net.Uri
 import android.widget.SearchView
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.DataState
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -37,8 +37,8 @@ import javax.inject.Inject
 class EntriesViewModel @Inject constructor(
     private val preferences: PreferencesSource,
     private val resolver: ContentResolver,
-    private val satelliteRepo: SatelliteRepo
-) : ViewModel(), SearchView.OnQueryTextListener {
+    private val dataRepository: DataRepository
+) : ViewModel(), SearchView.OnQueryTextListener, EntriesAdapter.EntriesClickListener {
 
     private val coroutineHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.d(throwable)
@@ -47,7 +47,7 @@ class EntriesViewModel @Inject constructor(
     private val transModes = MutableLiveData(preferences.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsWithModes = transModes.switchMap { modes ->
-        liveData { satelliteRepo.getSatItems().collect { emit(filterByModes(it, modes)) } }
+        liveData { dataRepository.getSatelliteItems().collect { emit(filterByModes(it, modes)) } }
     }
     private val itemsWithQuery = currentQuery.switchMap { query ->
         itemsWithModes.map { items -> DataState.Success(filterByQuery(items, query)) }
@@ -58,21 +58,21 @@ class EntriesViewModel @Inject constructor(
     private var shouldSelectAll = true
     val satData: LiveData<DataState<List<SatItem>>> = _satData
 
-    fun updateEntriesFromFile(uri: Uri) {
+    fun updateDataFromFile(uri: Uri) {
         viewModelScope.launch(coroutineHandler) {
             _satData.value = DataState.Loading
             runCatching {
                 resolver.openInputStream(uri)?.use { stream ->
-                    satelliteRepo.updateEntriesFromFile(stream)
+                    dataRepository.updateDataFromFile(stream)
                 }
             }.onFailure { _satData.value = DataState.Error(it) }
         }
     }
 
-    fun updateEntriesFromWeb(sources: List<String>) {
+    fun updateDataFromWeb(sources: List<String>) {
         viewModelScope.launch(coroutineHandler) {
             _satData.value = DataState.Loading
-            satelliteRepo.updateEntriesFromWeb(sources)
+            dataRepository.updateDataFromWeb(sources)
         }
     }
 
@@ -102,8 +102,8 @@ class EntriesViewModel @Inject constructor(
         return true
     }
 
-    fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        viewModelScope.launch { satelliteRepo.updateEntriesSelection(catNums, isSelected) }
+    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
+        viewModelScope.launch { dataRepository.updateSelection(catNums, isSelected) }
     }
 
     private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {

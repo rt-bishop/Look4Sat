@@ -23,8 +23,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.domain.DataState
-import com.rtbishop.look4sat.domain.SatelliteRepo
+import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val satelliteRepo: SatelliteRepo,
+    private val dataRepository: DataRepository,
     private val predictor: Predictor,
     private val preferences: PreferencesSource
 ) : ViewModel() {
@@ -50,7 +50,7 @@ class PassesViewModel @Inject constructor(
             viewModelScope.launch {
                 _passes.postValue(DataState.Loading)
                 val dateNow = Date()
-                val satellites = satelliteRepo.getSelectedSatellites()
+                val satellites = dataRepository.getSelectedSatellites()
                 val stationPos = preferences.loadStationPosition()
                 val hoursAhead = preferences.getHoursAhead()
                 val minElev = preferences.getMinElevation()
@@ -71,15 +71,13 @@ class PassesViewModel @Inject constructor(
         preferences.updatePositionFromGPS()
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
-            val defaultCatNums = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
-            val dateNow = Date()
-            val satellites = satelliteRepo.getSelectedSatellites()
+            val satellites = dataRepository.getSelectedSatellites()
             val stationPos = preferences.loadStationPosition()
             val hoursAhead = preferences.getHoursAhead()
             val minElev = preferences.getMinElevation()
-            satelliteRepo.updateEntriesFromWeb(satelliteRepo.getDefaultSources())
-            satelliteRepo.updateEntriesSelection(defaultCatNums, true)
-            predictor.forceCalculation(satellites, stationPos, dateNow, hoursAhead, minElev)
+            dataRepository.updateDataFromWeb()
+            dataRepository.updateSelection(isSelected = true)
+            predictor.forceCalculation(satellites, stationPos, Date(), hoursAhead, minElev)
             preferences.setSetupDone()
             _isFirstLaunchDone.value = true
         }
@@ -90,7 +88,7 @@ class PassesViewModel @Inject constructor(
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
             val dateNow = Date()
-            val satellites = satelliteRepo.getSelectedSatellites()
+            val satellites = dataRepository.getSelectedSatellites()
             val stationPos = preferences.loadStationPosition()
             val hoursAhead = preferences.getHoursAhead()
             val minElev = preferences.getMinElevation()

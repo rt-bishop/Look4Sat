@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.framework.remote
 
 import com.rtbishop.look4sat.data.RemoteDataSource
 import com.rtbishop.look4sat.domain.model.Transmitter
-import com.rtbishop.look4sat.framework.DataMapper
+import com.rtbishop.look4sat.framework.toDomain
 import java.io.InputStream
 
 class RemoteSource(private val satelliteApi: SatelliteApi) : RemoteDataSource {
@@ -29,6 +29,6 @@ class RemoteSource(private val satelliteApi: SatelliteApi) : RemoteDataSource {
     }
 
     override suspend fun fetchTransmitters(): List<Transmitter> {
-        return DataMapper.satTransListToDomainTransList(satelliteApi.fetchTransmitters())
+        return satelliteApi.fetchTransmitters().toDomain()
     }
 }
