@@ -22,13 +22,13 @@ import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.framework.toDomain
 import java.io.InputStream
 
-class RemoteSource(private val satelliteApi: SatelliteApi) : RemoteDataSource {
+class RetrofitRemoteSource(private val satelliteApi: SatelliteApi) : RemoteDataSource {
 
     override suspend fun fetchFileStream(url: String): InputStream? {
         return satelliteApi.fetchFileStream(url).body()?.byteStream()
     }
 
-    override suspend fun fetchTransmitters(): List<Transmitter> {
-        return satelliteApi.fetchTransmitters().toDomain()
+    override suspend fun fetchTransmitters(url: String): List<Transmitter> {
+        return satelliteApi.fetchTransmitters(url).toDomain()
     }
 }
