@@ -40,6 +40,7 @@ class DefaultRepository(
         "https://www.prismnet.com/~mmccants/tles/classfd.zip",
         "https://www.prismnet.com/~mmccants/tles/inttles.zip"
     )
+    override val transmittersSource = "https://db.satnogs.org/api/transmitters/"
 
     override fun getSatelliteItems() = localSource.getSatelliteItems()
 
@@ -78,7 +79,7 @@ class DefaultRepository(
                 localSource.updateEntries(entries)
             }
             launch(repoDispatcher) {
-                val transmitters = remoteSource.fetchTransmitters().filter { it.isAlive }
+                val transmitters = remoteSource.fetchTransmitters(transmittersSource)
                 localSource.updateTransmitters(transmitters)
             }
         }

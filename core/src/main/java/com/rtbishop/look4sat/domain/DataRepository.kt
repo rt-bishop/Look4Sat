@@ -27,6 +27,7 @@ interface DataRepository {
 
     val defaultSelection: List<Int>
     val defaultSources: List<String>
+    val transmittersSource: String
 
     fun getSatelliteItems(): Flow<List<SatItem>>
 
