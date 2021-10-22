@@ -7,7 +7,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     targetCompatibility = JavaVersion.VERSION_11
 
     kotlinOptions {
-        jvmTarget = "$jvm_version"
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
 

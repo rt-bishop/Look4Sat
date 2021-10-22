@@ -24,5 +24,5 @@ interface RemoteDataSource {
 
     suspend fun fetchFileStream(url: String): InputStream?
 
-    suspend fun fetchTransmitters(): List<Transmitter>
+    suspend fun fetchTransmitters(url: String): List<Transmitter>
 }

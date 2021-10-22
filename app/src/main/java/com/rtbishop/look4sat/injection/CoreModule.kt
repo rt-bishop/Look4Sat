@@ -19,23 +19,18 @@ package com.rtbishop.look4sat.injection
 
 import android.content.Context
 import androidx.room.Room
-import com.rtbishop.look4sat.data.LocalDataSource
-import com.rtbishop.look4sat.data.RemoteDataSource
 import com.rtbishop.look4sat.data.DefaultRepository
-import com.rtbishop.look4sat.framework.remote.SatelliteApi
 import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.DataReporter
 import com.rtbishop.look4sat.domain.predict.Predictor
-import com.rtbishop.look4sat.framework.remote.RemoteSource
 import com.rtbishop.look4sat.framework.local.*
+import com.rtbishop.look4sat.framework.remote.DefaultRemoteSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -44,29 +39,19 @@ object CoreModule {
 
     @Provides
     @Singleton
-    fun provideLocalDataSource(@ApplicationContext context: Context): LocalDataSource {
-        val database = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
-        return LocalSource(database.entriesDao(), database.sourcesDao(), database.transmittersDao())
-    }
-
-    @Provides
-    @Singleton
-    fun provideRemoteDataSource(): RemoteDataSource {
-        val satelliteApi = Retrofit.Builder().baseUrl("https://localhost")
-            .addConverterFactory(MoshiConverterFactory.create()).build()
-            .create(SatelliteApi::class.java)
-        return RemoteSource(satelliteApi)
-    }
-
-    @Provides
-    @Singleton
     fun provideSatelliteRepo(
-        localSource: LocalDataSource,
-        remoteSource: RemoteDataSource,
+        @ApplicationContext context: Context,
         @IoDispatcher dispatcher: CoroutineDispatcher
     ): DataRepository {
-        return DefaultRepository(localSource, remoteSource, dispatcher)
+        val db = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
+        val roomLocalSource = LocalSource(db.entriesDao(), db.sourcesDao(), db.transmittersDao())
+//        val satelliteApi = Retrofit.Builder().baseUrl("https://localhost")
+//            .addConverterFactory(MoshiConverterFactory.create()).build()
+//            .create(SatelliteApi::class.java)
+//        val retrofitRemoteSource = RetrofitRemoteSource(satelliteApi)
+        val defaultRemoteSource = DefaultRemoteSource(dispatcher)
+        return DefaultRepository(roomLocalSource, defaultRemoteSource, dispatcher)
     }
 
     @Provides
