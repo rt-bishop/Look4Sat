@@ -26,14 +26,10 @@ import com.rtbishop.look4sat.framework.model.Transmitter as FrameworkTransmitter
 
 fun DomainEntry.toFramework() = FrameworkEntry(this.tle, this.isSelected)
 
-fun DomainItem.toFramework() = FrameworkItem(this.catnum, this.name, this.isSelected, this.modes)
-
 fun DomainTransmitter.toFramework() = FrameworkTransmitter(
     this.uuid, this.info, this.isAlive, this.downlink,
     this.uplink, this.mode, this.isInverted, this.catnum
 )
-
-fun FrameworkEntry.toDomain() = DomainEntry(this.tle, this.isSelected)
 
 fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, this.isSelected, this.modes)
 
@@ -44,11 +40,7 @@ fun FrameworkTransmitter.toDomain() = DomainTransmitter(
 
 fun List<DomainEntry>.toFrameworkEntries() = this.map { it.toFramework() }
 
-fun List<DomainItem>.toFrameworkItems() = this.map { it.toFramework() }
-
 fun List<DomainTransmitter>.toFramework() = this.map { it.toFramework() }
-
-fun List<FrameworkEntry>.toDomainEntries() = this.map { it.toDomain() }
 
 fun List<FrameworkItem>.toDomainItems() = this.map { it.toDomain() }
 

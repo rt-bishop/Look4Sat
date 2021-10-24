@@ -20,11 +20,12 @@ package com.rtbishop.look4sat.injection
 import android.content.Context
 import androidx.room.Room
 import com.rtbishop.look4sat.data.DefaultRepository
+import com.rtbishop.look4sat.domain.DataParser
 import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.DataReporter
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.framework.local.*
-import com.rtbishop.look4sat.framework.remote.DefaultRemoteSource
+import com.rtbishop.look4sat.framework.remote.RemoteSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,17 +42,15 @@ object CoreModule {
     @Singleton
     fun provideSatelliteRepo(
         @ApplicationContext context: Context,
-        @IoDispatcher dispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): DataRepository {
+        val dataParser = DataParser(defaultDispatcher)
         val db = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
-        val roomLocalSource = LocalSource(db.entriesDao(), db.sourcesDao(), db.transmittersDao())
-//        val satelliteApi = Retrofit.Builder().baseUrl("https://localhost")
-//            .addConverterFactory(MoshiConverterFactory.create()).build()
-//            .create(SatelliteApi::class.java)
-//        val retrofitRemoteSource = RetrofitRemoteSource(satelliteApi)
-        val defaultRemoteSource = DefaultRemoteSource(dispatcher)
-        return DefaultRepository(roomLocalSource, defaultRemoteSource, dispatcher)
+        val localSource = LocalSource(db.entriesDao(), db.sourcesDao(), db.transmittersDao())
+        val remoteSource = RemoteSource(ioDispatcher)
+        return DefaultRepository(dataParser, localSource, remoteSource, ioDispatcher)
     }
 
     @Provides

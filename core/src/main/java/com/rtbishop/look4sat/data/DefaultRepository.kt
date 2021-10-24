@@ -17,9 +17,9 @@
  */
 package com.rtbishop.look4sat.data
 
+import com.rtbishop.look4sat.domain.DataParser
 import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.model.SatEntry
-import com.rtbishop.look4sat.domain.predict.TLE
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -28,6 +28,7 @@ import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 class DefaultRepository(
+    private val dataParser: DataParser,
     private val localSource: LocalDataSource,
     private val remoteSource: RemoteDataSource,
     private val repoDispatcher: CoroutineDispatcher
@@ -66,20 +67,20 @@ class DefaultRepository(
                 val streams = mutableListOf<InputStream>()
                 val entries = mutableListOf<SatEntry>()
                 sources.forEach { source ->
-                    remoteSource.fetchFileStream(source)?.let { stream ->
-                        if (source.contains(".zip", true)) {
-                            val zipStream = ZipInputStream(stream).apply { nextEntry }
-                            streams.add(zipStream)
-                        } else {
-                            streams.add(stream)
-                        }
+                    val fileStream = remoteSource.fetchFileStream(source)
+                    if (source.contains(".zip", true)) {
+                        val zipStream = ZipInputStream(fileStream).apply { nextEntry }
+                        streams.add(zipStream)
+                    } else {
+                        streams.add(fileStream)
                     }
                 }
                 streams.forEach { stream -> entries.addAll(importSatellites(stream)) }
                 localSource.updateEntries(entries)
             }
             launch(repoDispatcher) {
-                val transmitters = remoteSource.fetchTransmitters(transmittersSource)
+                val jsonStream = remoteSource.fetchFileStream(transmittersSource)
+                val transmitters = dataParser.parseJSONStream(jsonStream)
                 localSource.updateTransmitters(transmitters)
             }
         }
@@ -89,7 +90,7 @@ class DefaultRepository(
         localSource.updateSelection(catnums, isSelected)
     }
 
-    private fun importSatellites(stream: InputStream): List<SatEntry> {
-        return TLE.parseTleStream(stream).map { tle -> SatEntry(tle) }
+    private suspend fun importSatellites(stream: InputStream): List<SatEntry> {
+        return dataParser.parseTLEStream(stream).map { tle -> SatEntry(tle) }
     }
 }
