@@ -34,28 +34,24 @@ interface EntriesDao {
 
     @Transaction
     suspend fun updateEntries(entries: List<SatEntry>) {
-        val savedSelection = getSelection()
+        val entriesSelection = getEntriesSelection()
         insertEntries(entries)
-        restoreSelection(savedSelection, true)
+        restoreSelection(entriesSelection, true)
     }
 
     @Query("SELECT catnum FROM entries WHERE isSelected = 1")
-    suspend fun getSelection(): List<Int>
+    suspend fun getEntriesSelection(): List<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
 
     @Transaction
     suspend fun restoreSelection(catnums: List<Int>, isSelected: Boolean) {
-        clearEntriesSelection()
-        updateSelection(catnums, isSelected)
+        updateEntriesSelection(catnums, isSelected)
     }
 
-    @Query("UPDATE entries SET isSelected = 0")
-    suspend fun clearEntriesSelection()
-
     @Transaction
-    suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean) {
+    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
         catnums.forEach { catnum -> updateEntrySelection(catnum, isSelected) }
     }
 

@@ -50,7 +50,7 @@ object CoreModule {
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
         val localSource = LocalSource(db.entriesDao(), db.sourcesDao(), db.transmittersDao())
         val remoteSource = RemoteSource(ioDispatcher)
-        return DefaultRepository(dataParser, localSource, remoteSource, ioDispatcher)
+        return DefaultRepository(dataParser, localSource, remoteSource)
     }
 
     @Provides
