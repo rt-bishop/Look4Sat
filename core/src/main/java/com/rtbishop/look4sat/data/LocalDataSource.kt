@@ -29,15 +29,15 @@ interface LocalDataSource {
 
     suspend fun getSelectedSatellites(): List<Satellite>
 
-    suspend fun getTransmitters(catnum: Int): List<Transmitter>
+    suspend fun getSources(): List<String>
 
-    suspend fun getWebSources(): List<String>
+    suspend fun getTransmitters(catnum: Int): List<Transmitter>
 
     suspend fun updateEntries(entries: List<SatEntry>)
 
-    suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean)
+    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean)
+
+    suspend fun updateSources(sources: List<String>)
 
     suspend fun updateTransmitters(transmitters: List<Transmitter>)
-
-    suspend fun updateWebSources(sources: List<String>)
 }

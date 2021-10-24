@@ -17,10 +17,8 @@
  */
 package com.rtbishop.look4sat.presentation
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.webkit.URLUtil
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -31,9 +29,6 @@ import androidx.navigation.Navigator
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.security.MessageDigest
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -104,21 +99,9 @@ fun Date.toString(format: String): String {
 }
 
 fun String.toDate(format: String): Date? {
-    val dateFormatter = SimpleDateFormat(format, Locale.US)
     return try {
-        dateFormatter.parse(this)
+        return SimpleDateFormat(format, Locale.US).parse(this)
     } catch (e: ParseException) {
-        null
-    }
-}
-
-fun String.toUri(): Uri? {
-    return try {
-        if (URLUtil.isValidUrl(this))
-            Uri.parse(this)
-        else
-            null
-    } catch (e: Exception) {
         null
     }
 }
@@ -139,76 +122,3 @@ fun String.isEmailValid(): Boolean {
     val matcher = pattern.matcher(this)
     return matcher.matches()
 }
-
-fun String.getJsonObjectOrNull(): JSONObject? {
-    return try {
-        JSONObject(this)
-    } catch (e: JSONException) {
-        null
-    }
-}
-
-fun String.getJsonArrayOrNull(): JSONArray? {
-    return try {
-        JSONArray(this)
-    } catch (e: JSONException) {
-        null
-    }
-}
-
-fun JSONObject.getIntOrNull(name: String): Int? =
-    try {
-        getInt(name)
-    } catch (e: JSONException) {
-        val strValue = getStringOrNull(name)
-        strValue?.toIntOrNull()
-    }
-
-fun JSONObject.getDoubleOrNull(name: String): Double? =
-    try {
-        getDouble(name)
-    } catch (e: JSONException) {
-        null
-    }
-
-fun JSONObject.getLongOrNull(name: String): Long? =
-    try {
-        getLong(name)
-    } catch (e: JSONException) {
-        null
-    }
-
-fun JSONObject.getStringOrNull(name: String): String? =
-    try {
-        getString(name).trim()
-    } catch (e: JSONException) {
-        null
-    }
-
-fun JSONObject.getBooleanOrNull(name: String): Boolean? =
-    try {
-        getBoolean(name)
-    } catch (e: JSONException) {
-        null
-    }
-
-fun JSONObject.getObjectOrNull(name: String): JSONObject? =
-    try {
-        getJSONObject(name)
-    } catch (e: JSONException) {
-        null
-    }
-
-fun JSONObject.getArrayOrNull(name: String): JSONArray? =
-    try {
-        getJSONArray(name)
-    } catch (e: JSONException) {
-        null
-    }
-
-fun JSONObject.getArrayOrEmpty(name: String): JSONArray =
-    try {
-        getJSONArray(name)
-    } catch (e: JSONException) {
-        JSONArray()
-    }
