@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_name"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_aos"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             app:layout_constraintStart_toStartOf="@+id/pass_leo_name"
             app:layout_constraintTop_toBottomOf="@+id/pass_leo_name" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_elev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_end"
             app:layout_constraintStart_toStartOf="@+id/pass_leo_start" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_los"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_id"
             app:layout_constraintStart_toEndOf="@+id/pass_leo_aos" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
             app:layout_constraintStart_toStartOf="@+id/pass_leo_aos"
             app:layout_constraintTop_toBottomOf="@+id/pass_leo_aos" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_tca"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_los"
             app:layout_constraintStart_toStartOf="@+id/pass_leo_aos" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_leo_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

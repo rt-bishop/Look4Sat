@@ -1,9 +1,10 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Look4Sat.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/greyDark</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_drawable</item>
         <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Theme.Look4Sat.Main" parent="Theme.MaterialComponents.NoActionBar">
@@ -14,6 +15,7 @@
 
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarTextViewStyle">@style/Snackbar.Text</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Snackbar" parent="@style/Widget.MaterialComponents.Snackbar">

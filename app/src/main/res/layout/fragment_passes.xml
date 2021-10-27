@@ -12,7 +12,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/passes_timer"
         style="@style/TimerText"
         android:layout_width="wrap_content"
@@ -60,7 +60,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passes_bar" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/passes_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

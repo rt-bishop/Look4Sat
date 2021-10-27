@@ -30,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/map_data_lat"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/map_data_lon"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
@@ -51,7 +51,7 @@
             app:layout_constraintStart_toStartOf="@+id/map_data_lat"
             app:layout_constraintTop_toBottomOf="@+id/map_data_lat" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/map_data_qth"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
@@ -61,7 +61,7 @@
             app:layout_constraintStart_toStartOf="@+id/map_data_lon"
             app:layout_constraintTop_toBottomOf="@+id/map_data_lon" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/map_data_alt"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
@@ -71,7 +71,7 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lat"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/map_data_dst"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
@@ -80,7 +80,7 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lon"
             app:layout_constraintEnd_toEndOf="@+id/map_data_alt" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/map_data_vel"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
@@ -89,7 +89,7 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/map_data_qth"
             app:layout_constraintEnd_toEndOf="@+id/map_data_dst" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/map_data_name"
             style="@style/MapInfoText"
             android:layout_width="wrap_content"
@@ -129,7 +129,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/map_copyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_geo_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_geo_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/pass_geo_name" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_geo_az"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
             app:layout_constraintStart_toStartOf="@+id/pass_geo_name"
             app:layout_constraintTop_toBottomOf="@+id/pass_geo_name" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_geo_alt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
             app:layout_constraintEnd_toEndOf="@+id/pass_geo_el"
             app:layout_constraintStart_toStartOf="@+id/pass_geo_az" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/pass_geo_el"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
