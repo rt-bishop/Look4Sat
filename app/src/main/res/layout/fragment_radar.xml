@@ -77,7 +77,7 @@
         app:layout_constraintEnd_toEndOf="@+id/radar_frame" />
 
     <ImageButton
-        android:id="@+id/add_notification_button"
+        android:id="@+id/radar_notify_button"
         android:layout_width="64dp"
         android:layout_height="48dp"
         android:layout_marginStart="4dp"
@@ -86,10 +86,24 @@
         android:contentDescription="@string/placeholder"
         android:elevation="4dp"
         android:src="@drawable/ic_notification"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
         app:layout_constraintStart_toStartOf="@+id/radar_bar"
         app:layout_constraintTop_toTopOf="@+id/radar_bar"
-        app:tint="@color/greyLight"
+        tools:ignore="DuplicateSpeakableTextCheck" />
+
+    <ImageButton
+        android:id="@+id/radar_to_map_button"
+        android:layout_width="64dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="@color/greyDark"
+        android:contentDescription="@string/placeholder"
+        android:elevation="4dp"
+        android:src="@drawable/ic_nav_map"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
+        app:layout_constraintEnd_toEndOf="@+id/radar_bar"
+        app:layout_constraintTop_toTopOf="@+id/radar_bar"
         tools:ignore="DuplicateSpeakableTextCheck" />
 
     <androidx.recyclerview.widget.RecyclerView

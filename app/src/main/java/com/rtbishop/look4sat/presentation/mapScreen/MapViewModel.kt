@@ -61,17 +61,6 @@ class MapViewModel @Inject constructor(
     private val _satPositions = MutableLiveData<Map<Satellite, GeoPos>>()
     val satPositions: LiveData<Map<Satellite, GeoPos>> = _satPositions
 
-    init {
-        viewModelScope.launch {
-            dataRepository.getSelectedSatellites().also { selectedSatellites ->
-                if (selectedSatellites.isNotEmpty()) {
-                    allSatList = selectedSatellites
-                    selectSatellite(selectedSatellites.first())
-                }
-            }
-        }
-    }
-
     fun shouldUseTextLabels(): Boolean {
         return preferences.shouldUseTextLabels()
     }
@@ -85,6 +74,21 @@ class MapViewModel @Inject constructor(
             } else {
                 if (index < allSatList.size - 1) selectSatellite(allSatList[index + 1])
                 else selectSatellite(allSatList[0])
+            }
+        }
+    }
+
+    fun selectDefaultSatellite(catnum: Int?) {
+        viewModelScope.launch {
+            dataRepository.getSelectedSatellites().also { satellites ->
+                if (satellites.isNotEmpty()) {
+                    allSatList = satellites
+                    if (catnum == null) {
+                        selectSatellite(satellites.first())
+                    } else {
+                        satellites.find { it.params.catnum == catnum }?.let { selectSatellite(it) }
+                    }
+                }
             }
         }
     }
