@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/radar_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/radar_timer"
         style="@style/TimerText"
         android:layout_width="wrap_content"
@@ -35,7 +36,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_bar" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/radar_az"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,7 +46,7 @@
         app:layout_constraintStart_toStartOf="@+id/radar_frame"
         app:layout_constraintTop_toTopOf="@+id/radar_frame" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/radar_el"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,7 +56,7 @@
         app:layout_constraintEnd_toEndOf="@+id/radar_frame"
         app:layout_constraintTop_toTopOf="@+id/radar_frame" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/radar_alt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -65,7 +66,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/radar_frame"
         app:layout_constraintStart_toStartOf="@+id/radar_frame" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/radar_dst"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -76,16 +77,20 @@
         app:layout_constraintEnd_toEndOf="@+id/radar_frame" />
 
     <ImageButton
-        android:id="@+id/add_notification_buttton"
+        android:id="@+id/add_notification_button"
         android:layout_width="64dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
         android:backgroundTint="@color/greyDark"
+        android:clickable="false"
         android:contentDescription="@string/placeholder"
         android:elevation="4dp"
         android:src="@drawable/ic_notification"
-        app:layout_constraintEnd_toEndOf="@+id/radar_bar"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
+        app:layout_constraintStart_toStartOf="@+id/radar_bar"
+        app:layout_constraintTop_toTopOf="@+id/radar_bar"
+        app:tint="@color/greyLight"
+        tools:ignore="DuplicateSpeakableTextCheck" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radar_recycler"
@@ -97,7 +102,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_name" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/radar_recycler_msg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -109,7 +114,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/radar_recycler" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/radar_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

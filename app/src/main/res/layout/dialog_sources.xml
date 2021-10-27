@@ -7,7 +7,7 @@
     android:background="@color/greyDark"
     android:padding="4dp">
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/sources_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="@+id/sources_recycler"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:id="@+id/sources_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/sources_btn_neg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="@+id/sources_recycler" />
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/sources_btn_pos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -18,7 +18,7 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/trans_desc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
             app:layout_constraintTop_toTopOf="@+id/trans_desc"
             app:srcCompat="@drawable/ic_arrow" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/trans_downlink"
             style="@style/TimerText"
             android:layout_width="wrap_content"
@@ -70,7 +70,7 @@
             app:layout_constraintTop_toTopOf="@+id/trans_desc"
             app:srcCompat="@drawable/ic_arrow" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/trans_uplink"
             style="@style/TimerText"
             android:layout_width="wrap_content"
@@ -81,7 +81,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/trans_guideline" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/trans_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trans_downlink" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/trans_inverted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

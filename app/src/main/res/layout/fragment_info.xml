@@ -25,7 +25,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/info_title" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/info_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             app:layout_constraintStart_toEndOf="@+id/info_title_img"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/info_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_title" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/info_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_version" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/info_btn_github"
             style="@style/InfoButton"
             android:layout_marginTop="8dp"
@@ -70,7 +70,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_subtitle" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/info_btn_fdroid"
             style="@style/InfoButton"
             android:text="@string/info_fdroid"
@@ -79,7 +79,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/info_btn_github" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/info_btn_donate"
             style="@style/InfoButton"
             android:layout_marginTop="8dp"
@@ -89,7 +89,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_btn_github" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/info_thanks"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
