@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -104,9 +105,13 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     orientation.third
                 )
             })
+            binding.radarToMapButton.setOnClickListener {
+                val bundle = bundleOf("catNum" to pass.catNum)
+                findNavController().navigateSafe(R.id.action_radar_to_map, bundle)
+            }
         }
 
-//        binding.addNotificationButton.setOnClickListener {
+//        binding.radarNotifyButton.setOnClickListener {
 //            this.context?.let { context ->
 //
 //                val choicesList = arrayOf(

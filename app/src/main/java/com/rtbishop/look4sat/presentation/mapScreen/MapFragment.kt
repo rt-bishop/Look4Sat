@@ -88,6 +88,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun setupObservers(binding: FragmentMapBinding) {
+        viewModel.selectDefaultSatellite(arguments?.getInt("catNum"))
         viewModel.stationPosLiveData.observe(viewLifecycleOwner, { renderStationPos(it, binding) })
         viewModel.satPositions.observe(viewLifecycleOwner, { renderSatPositions(it, binding) })
         viewModel.satTrack.observe(viewLifecycleOwner, { renderSatTrack(it, binding) })
