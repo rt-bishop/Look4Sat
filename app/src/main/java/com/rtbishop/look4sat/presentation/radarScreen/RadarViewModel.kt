@@ -79,12 +79,12 @@ class RadarViewModel @Inject constructor(
         viewModelScope.launch {
             var satTrack: List<SatPos> = emptyList()
             if (!satPass.isDeepSpace) {
-                val startDate = Date(satPass.aosTime)
-                val endDate = Date(satPass.losTime)
+                val startDate = satPass.aosTime
+                val endDate = satPass.losTime
                 satTrack = predictor.getSatTrack(satPass.satellite, stationPos, startDate, endDate)
             }
             while (isActive) {
-                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
+                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date().time)
                 if (preferences.isRotatorEnabled()) {
                     val server = preferences.getRotatorServer().first
                     val port = preferences.getRotatorServer().second
@@ -102,7 +102,7 @@ class RadarViewModel @Inject constructor(
         viewModelScope.launch {
             val transmitters = dataRepository.getTransmitters(satPass.catNum)
             while (isActive) {
-                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date())
+                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date().time)
                 val copiedList = transmitters.map { it.copy() }
                 copiedList.forEach { transmitter ->
                     transmitter.downlink?.let {

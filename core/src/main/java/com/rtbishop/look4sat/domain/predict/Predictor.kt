@@ -21,7 +21,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
-import java.util.*
 
 class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
 
@@ -29,26 +28,26 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
     private var selectedSatIds = emptyList<Int>()
     val passes: SharedFlow<List<SatPass>> = _passes
 
-    suspend fun getSatPos(sat: Satellite, pos: GeoPos, date: Date): SatPos =
-        withContext(predictorDispatcher) {
-            return@withContext sat.getPosition(pos, date.time)
-        }
+    suspend fun getSatPos(sat: Satellite, pos: GeoPos, time: Long): SatPos {
+        return withContext(predictorDispatcher) { sat.getPosition(pos, time) }
+    }
 
-    suspend fun getSatTrack(sat: Satellite, pos: GeoPos, start: Date, end: Date): List<SatPos> =
-        withContext(predictorDispatcher) {
+    suspend fun getSatTrack(sat: Satellite, pos: GeoPos, start: Long, end: Long): List<SatPos> {
+        return withContext(predictorDispatcher) {
             val positions = mutableListOf<SatPos>()
-            var currentTime = start.time
-            while (currentTime < end.time) {
+            var currentTime = start
+            while (currentTime < end) {
                 positions.add(sat.getPosition(pos, currentTime))
                 currentTime += 15000
             }
-            return@withContext positions
+            positions
         }
+    }
 
     suspend fun triggerCalculation(
         satellites: List<Satellite>,
         pos: GeoPos,
-        date: Date = Date(),
+        time: Long,
         hoursAhead: Int = 8,
         minElevation: Double = 16.0
     ) {
@@ -57,7 +56,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         } else {
             val newCatNums = satellites.map { it.params.catnum }
             if (selectedSatIds != newCatNums) {
-                forceCalculation(satellites, pos, date, hoursAhead, minElevation)
+                forceCalculation(satellites, pos, time, hoursAhead, minElevation)
             }
         }
     }
@@ -65,7 +64,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
     suspend fun forceCalculation(
         satellites: List<Satellite>,
         pos: GeoPos,
-        date: Date = Date(),
+        time: Long,
         hoursAhead: Int = 8,
         minElevation: Double = 16.0
     ) {
@@ -76,31 +75,31 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
                 val allPasses = mutableListOf<SatPass>()
                 selectedSatIds = satellites.map { it.params.catnum }
                 satellites.forEach { satellite ->
-                    allPasses.addAll(satellite.getPasses(pos, date, hoursAhead))
+                    allPasses.addAll(satellite.getPasses(pos, time, hoursAhead))
                 }
-                _passes.emit(allPasses.filter(date, hoursAhead, minElevation))
+                _passes.emit(allPasses.filter(time, hoursAhead, minElevation))
             }
         }
     }
 
-    private fun Satellite.getPasses(pos: GeoPos, date: Date, hours: Int): List<SatPass> {
+    private fun Satellite.getPasses(pos: GeoPos, time: Long, hours: Int): List<SatPass> {
         val passes = mutableListOf<SatPass>()
-        val endDate = Date(date.time + hours * 60L * 60L * 1000L)
+        val endDate = time + hours * 60L * 60L * 1000L
         val quarterOrbitMin = (this.orbitalPeriod / 4.0).toInt()
-        var startDate = date
+        var startDate = time
         var shouldRewind = true
-        var lastAosDate: Date
+        var lastAosDate: Long
         var count = 0
         if (this.willBeSeen(pos)) {
             if (this.params.isDeepspace) {
-                passes.add(getGeoPass(this, pos, date))
+                passes.add(getGeoPass(this, pos, time))
             } else {
                 do {
                     if (count > 0) shouldRewind = false
                     val pass = getLeoPass(this, pos, startDate, shouldRewind)
-                    lastAosDate = Date(pass.aosTime)
+                    lastAosDate = pass.aosTime
                     passes.add(pass)
-                    startDate = Date(pass.losTime + (quarterOrbitMin * 3) * 60L * 1000L)
+                    startDate = pass.losTime + (quarterOrbitMin * 3) * 60L * 1000L
                     count++
                 } while (lastAosDate < endDate)
             }
@@ -108,53 +107,50 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         return passes
     }
 
-    private fun List<SatPass>.filter(date: Date, hoursAhead: Int, minElev: Double): List<SatPass> {
-        val timeFuture = date.time + (hoursAhead * 60L * 60L * 1000L)
-        return this.filter { it.losTime > date.time }
+    private fun List<SatPass>.filter(time: Long, hoursAhead: Int, minElev: Double): List<SatPass> {
+        val timeFuture = time + (hoursAhead * 60L * 60L * 1000L)
+        return this.filter { it.losTime > time }
             .filter { it.aosTime < timeFuture }
             .filter { it.maxElevation > minElev }
             .sortedBy { it.aosTime }
     }
 
-    private fun getGeoPass(sat: Satellite, pos: GeoPos, date: Date): SatPass {
-        val satPos = sat.getPosition(pos, date.time)
-        val aos = Date(date.time - 24 * 60L * 60L * 1000L).time
-        val los = Date(date.time + 24 * 60L * 60L * 1000L).time
-        val tca = Date((aos + los) / 2).time
+    private fun getGeoPass(sat: Satellite, pos: GeoPos, time: Long): SatPass {
+        val satPos = sat.getPosition(pos, time)
+        val aos = time - 24 * 60L * 60L * 1000L
+        val los = time + 24 * 60L * 60L * 1000L
+        val tca = (aos + los) / 2
         val az = Math.toDegrees(satPos.azimuth)
         val elev = Math.toDegrees(satPos.elevation)
         val alt = satPos.altitude
         return SatPass(aos, az, los, az, tca, az, alt, elev, sat)
     }
 
-    private fun getLeoPass(sat: Satellite, pos: GeoPos, date: Date, rewind: Boolean): SatPass {
+    private fun getLeoPass(sat: Satellite, pos: GeoPos, time: Long, rewind: Boolean): SatPass {
         val quarterOrbitMin = (sat.orbitalPeriod / 4.0).toInt()
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
-            clear()
-            timeInMillis = date.time
-        }
+        var calendarTimeMillis = time
         var elevation: Double
         var maxElevation = 0.0
         var alt = 0.0
         var tcaAz = 0.0
         // rewind 1/4 of an orbit
-        if (rewind) calendar.add(Calendar.MINUTE, -quarterOrbitMin)
+        if (rewind) calendarTimeMillis += -quarterOrbitMin * 60L * 1000L
 
-        var satPos = sat.getPosition(pos, calendar.time.time)
+        var satPos = sat.getPosition(pos, calendarTimeMillis)
         if (satPos.elevation > 0.0) {
             // move forward in 30 second intervals until the sat goes below the horizon
             do {
-                calendar.add(Calendar.SECOND, 30)
-                satPos = sat.getPosition(pos, calendar.time.time)
+                calendarTimeMillis += 30 * 1000L
+                satPos = sat.getPosition(pos, calendarTimeMillis)
             } while (satPos.elevation > 0.0)
             // move forward 3/4 of an orbit
-            calendar.add(Calendar.MINUTE, quarterOrbitMin * 3)
+            calendarTimeMillis += quarterOrbitMin * 3 * 60L * 1000L
         }
 
         // find the next time sat comes above the horizon
         do {
-            calendar.add(Calendar.SECOND, 60)
-            satPos = sat.getPosition(pos, calendar.time.time)
+            calendarTimeMillis += 60L * 1000L
+            satPos = sat.getPosition(pos, calendarTimeMillis)
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
@@ -164,10 +160,10 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         } while (satPos.elevation < 0.0)
 
         // refine to 3 seconds
-        calendar.add(Calendar.SECOND, -60)
+        calendarTimeMillis += -60L * 1000L
         do {
-            calendar.add(Calendar.SECOND, 3)
-            satPos = sat.getPosition(pos, calendar.time.time)
+            calendarTimeMillis += 3L * 1000L
+            satPos = sat.getPosition(pos, calendarTimeMillis)
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
@@ -181,8 +177,8 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
 
         // find when sat goes below
         do {
-            calendar.add(Calendar.SECOND, 30)
-            satPos = sat.getPosition(pos, calendar.time.time)
+            calendarTimeMillis += 30L * 1000L
+            satPos = sat.getPosition(pos, calendarTimeMillis)
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
@@ -192,10 +188,10 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         } while (satPos.elevation > 0.0)
 
         // refine to 3 seconds
-        calendar.add(Calendar.SECOND, -30)
+        calendarTimeMillis += -30L * 1000L
         do {
-            calendar.add(Calendar.SECOND, 3)
-            satPos = sat.getPosition(pos, calendar.time.time)
+            calendarTimeMillis += 3L * 1000L
+            satPos = sat.getPosition(pos, calendarTimeMillis)
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
@@ -206,7 +202,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
 
         val los = satPos.time
         val losAz = Math.toDegrees(satPos.azimuth)
-        val tca = Date((aos + los) / 2).time
+        val tca = (aos + los) / 2
         val elev = Math.toDegrees(maxElevation)
         return SatPass(aos, aosAz, los, losAz, tca, tcaAz, alt, elev, sat)
     }

@@ -116,7 +116,7 @@ class MapViewModel @Inject constructor(
         val currentTrack = mutableListOf<GeoPos>()
         val endDate = Date(date.time + (satellite.orbitalPeriod * 2.4 * 60000L).toLong())
         var oldLongitude = 0.0
-        predictor.getSatTrack(satellite, pos, date, endDate).forEach { satPos ->
+        predictor.getSatTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
             val osmLat = clipLat(Math.toDegrees(satPos.latitude))
             val osmLon = clipLon(Math.toDegrees(satPos.longitude))
             val currentPosition = GeoPos(osmLat, osmLon)
@@ -143,7 +143,7 @@ class MapViewModel @Inject constructor(
     private suspend fun getPositions(satellites: List<Satellite>, pos: GeoPos, date: Date) {
         val positions = mutableMapOf<Satellite, GeoPos>()
         satellites.forEach { satellite ->
-            val satPos = predictor.getSatPos(satellite, pos, date)
+            val satPos = predictor.getSatPos(satellite, pos, date.time)
             val osmLat = clipLat(Math.toDegrees(satPos.latitude))
             val osmLon = clipLon(Math.toDegrees(satPos.longitude))
             positions[satellite] = GeoPos(osmLat, osmLon)
@@ -152,7 +152,7 @@ class MapViewModel @Inject constructor(
     }
 
     private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
-        val satPos = predictor.getSatPos(satellite, pos, date)
+        val satPos = predictor.getSatPos(satellite, pos, date.time)
         val satFootprint = satPos.getRangeCircle().map { rangePos ->
             val osmLat = clipLat(rangePos.latitude)
             val osmLon = clipLon(rangePos.longitude)
@@ -162,7 +162,7 @@ class MapViewModel @Inject constructor(
     }
 
     private suspend fun getSatData(satellite: Satellite, pos: GeoPos, date: Date) {
-        val satPos = predictor.getSatPos(satellite, pos, date)
+        val satPos = predictor.getSatPos(satellite, pos, date.time)
         val osmLat = clipLat(Math.toDegrees(satPos.latitude))
         val osmLon = clipLon(Math.toDegrees(satPos.longitude))
         val osmPos = GeoPos(osmLat, osmLon)

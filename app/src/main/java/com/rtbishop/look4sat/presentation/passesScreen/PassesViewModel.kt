@@ -49,12 +49,12 @@ class PassesViewModel @Inject constructor(
         if (preferences.isSetupDone()) {
             viewModelScope.launch {
                 _passes.postValue(DataState.Loading)
-                val dateNow = Date()
+                val timeNow = System.currentTimeMillis()
                 val satellites = dataRepository.getSelectedSatellites()
                 val stationPos = preferences.loadStationPosition()
                 val hoursAhead = preferences.getHoursAhead()
                 val minElev = preferences.getMinElevation()
-                predictor.triggerCalculation(satellites, stationPos, dateNow, hoursAhead, minElev)
+                predictor.triggerCalculation(satellites, stationPos, timeNow, hoursAhead, minElev)
             }
         } else {
             _isFirstLaunchDone.value = false
@@ -77,7 +77,7 @@ class PassesViewModel @Inject constructor(
             val minElev = preferences.getMinElevation()
             dataRepository.updateDataFromWeb()
             dataRepository.updateSelection(isSelected = true)
-            predictor.forceCalculation(satellites, stationPos, Date(), hoursAhead, minElev)
+            predictor.forceCalculation(satellites, stationPos, Date().time, hoursAhead, minElev)
             preferences.setSetupDone()
             _isFirstLaunchDone.value = true
         }
@@ -87,12 +87,12 @@ class PassesViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
-            val dateNow = Date()
+            val timeNow = System.currentTimeMillis()
             val satellites = dataRepository.getSelectedSatellites()
             val stationPos = preferences.loadStationPosition()
             val hoursAhead = preferences.getHoursAhead()
             val minElev = preferences.getMinElevation()
-            predictor.forceCalculation(satellites, stationPos, dateNow, hoursAhead, minElev)
+            predictor.forceCalculation(satellites, stationPos, timeNow, hoursAhead, minElev)
         }
     }
 

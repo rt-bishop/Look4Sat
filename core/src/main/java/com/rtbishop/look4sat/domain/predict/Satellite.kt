@@ -17,8 +17,6 @@
  */
 package com.rtbishop.look4sat.domain.predict
 
-import java.util.*
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.*
 
 abstract class Satellite(val params: TLE) {
@@ -30,6 +28,7 @@ abstract class Satellite(val params: TLE) {
     private val epsilon = 1.0E-12
     private val position = Vector4()
     private val velocity = Vector4()
+    private var gsPosTheta = 0.0
     private var perigee = 0.0
     val orbitalPeriod = 24 * 60 / params.meanmo
     val earthRadius = 6378.137
@@ -74,10 +73,7 @@ abstract class Satellite(val params: TLE) {
 
     // Read the system clock and return the number of days since 31Dec79 00:00:00 UTC (daynum 0)
     private fun calcCurrentDaynum(now: Long): Double {
-        val sgp4Epoch = Calendar.getInstance(TimeZone.getTimeZone("UTC:UTC"))
-        sgp4Epoch.clear()
-        sgp4Epoch[1979, 11, 31, 0, 0] = 0
-        val then = sgp4Epoch.timeInMillis
+        val then = 315446400000 // time in millis on 31Dec79 00:00:00 UTC (daynum 0)
         val millis = now - then
         return millis / 1000.0 / 60.0 / 60.0 / 24.0
     }
@@ -124,8 +120,7 @@ abstract class Satellite(val params: TLE) {
         val obsVel = Vector4()
         val range = Vector4()
         val rgvel = Vector4()
-        val gsPosTheta = AtomicReference<Double>()
-        calculateUserPosVel(julianUTC, gsPos, gsPosTheta, obsPos, obsVel)
+        calculateUserPosVel(julianUTC, gsPos, obsPos, obsVel)
         range.setXYZ(
             positionVector.x - obsPos.x,
             positionVector.y - obsPos.y,
@@ -141,8 +136,8 @@ abstract class Satellite(val params: TLE) {
         magnitude(range)
         val sinLat = sin(deg2Rad * gsPos.latitude)
         val cosLat = cos(deg2Rad * gsPos.latitude)
-        val sinTheta = sin(gsPosTheta.get())
-        val cosTheta = cos(gsPosTheta.get())
+        val sinTheta = sin(gsPosTheta)
+        val cosTheta = cos(gsPosTheta)
         val topS = sinLat * cosTheta * range.x + sinLat * sinTheta * range.y - cosLat * range.z
         val topE = -sinTheta * range.x + cosTheta * range.y
         val topZ = cosLat * cosTheta * range.x + cosLat * sinTheta * range.y + sinLat * range.z
@@ -159,18 +154,17 @@ abstract class Satellite(val params: TLE) {
     private fun calculateUserPosVel(
         time: Double,
         gsPos: GeoPos,
-        gsPosTheta: AtomicReference<Double>,
         obsPos: Vector4,
         obsVel: Vector4
     ) {
         val mFactor = 7.292115E-5
-        gsPosTheta.set(mod2PI(thetaGJD(time) + deg2Rad * gsPos.longitude))
+        gsPosTheta = mod2PI(thetaGJD(time) + deg2Rad * gsPos.longitude)
         val c =
             invert(sqrt(1.0 + flatFactor * (flatFactor - 2) * sqr(sin(deg2Rad * gsPos.latitude))))
         val sq = sqr(1.0 - flatFactor) * c
         val achcp = (earthRadius * c) * cos(deg2Rad * gsPos.latitude)
         obsPos.setXYZ(
-            achcp * cos(gsPosTheta.get()), achcp * sin(gsPosTheta.get()),
+            achcp * cos(gsPosTheta), achcp * sin(gsPosTheta),
             (earthRadius * sq) * sin(deg2Rad * gsPos.latitude)
         )
         obsVel.setXYZ(-mFactor * obsPos.y, mFactor * obsPos.x, 0.0)
