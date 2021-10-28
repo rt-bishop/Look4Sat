@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
+import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.presentation.round
@@ -33,6 +34,8 @@ class PreferencesSource @Inject constructor(
     private val preferences: SharedPreferences
 ) {
 
+    private val keyInitialSetup = "${BuildConfig.VERSION_NAME}update"
+
     companion object {
         const val keyModes = "satModes"
         const val keyCompass = "compass"
@@ -41,7 +44,6 @@ class PreferencesSource @Inject constructor(
         const val keyTimeUTC = "timeUTC"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
-        const val keyInitialSetup = "initialSetupDone"
         const val keyRotator = "isRotatorEnabled"
         const val keyRotatorAddress = "rotatorAddress"
         const val keyRotatorPort = "rotatorPort"
@@ -58,7 +60,7 @@ class PreferencesSource @Inject constructor(
         return GeoPos(latitude.toDouble(), longitude.toDouble())
     }
 
-    fun saveStationPosition(pos: GeoPos) {
+    private fun saveStationPosition(pos: GeoPos) {
         preferences.edit {
             putString(keyLatitude, pos.latitude.toString())
             putString(keyLongitude, pos.longitude.toString())

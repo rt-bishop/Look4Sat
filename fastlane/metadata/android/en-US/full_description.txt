@@ -1,16 +1,10 @@
-Let this app look for satellites for you!
+Track satellite passes with ease!
 
-Thanks to the huge database provided by Celestrak and SatNOGS you have access to more than 3000
-active satellites orbiting Earth at this very moment. You can search the entire DB by satellite
-name or by NORAD catalog number. Track them with ease!
+Thanks to the huge database provided by Celestrak and SatNOGS you have access to more than 3000 active satellites orbiting Earth. You can search the entire DB by satellite name or by NORAD catnum.
 
-Satellite positions and passes are calculated relative to your location. In order to get reliable
-predictions set the observation position using GPS or QTH Locator in the Settings menu.
+Satellite positions and passes are calculated relative to your location. To get reliable info make sure to set the observation position using GPS or QTH Locator in the Settings menu.
 
-The application is built using predict4java library, Kotlin, Coroutines, Dagger2, Retrofit2, Moshi,
-Architecture Components and Jetpack Navigation. It is now and always will be completely ad-free
-and open-source. Make sure you check the app developer's
-<a href="https://github.com/rt-bishop/Look4Sat">GitHub repository</a>.
+The application is built using Kotlin, Coroutines, Architecture Components and Jetpack Navigation. It is now and always will be completely ad-free and open-source.
 
 <b>Main features:</b><ul>
 <li>Predicting satellite positions and passes for up to 4 days (96 hours)</li>

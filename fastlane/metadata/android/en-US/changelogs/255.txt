@@ -1,4 +1,0 @@
-Now correctly using the hours ahead setting #66
-Fixed broken pass progress indicator #67
-Fixed satellite data update crash
-Lots of refactoring, getting codebase ready for new features

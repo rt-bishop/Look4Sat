@@ -95,21 +95,19 @@
     <string name="info_subtitle">Satellite tracker and pass predictor</string>
     <string name="info_github" translatable="false">GitHub</string>
     <string name="info_fdroid" translatable="false">F-Droid</string>
-    <string name="info_bmc">Buy me a coffee</string>
+    <string name="info_bmc">Support the developer</string>
     <string name="info_thanks">Huge thanks to:
-        \n— You for downloading and using Look4Sat! \nMay your sky always be clear!
-        \n— <a href="https://github.com/g4dpz">David A. B. Johnson</a>
-        and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java library and making it
-        available under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license.
-        \n— <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
-        sat tracker that inspired the creation of Look4Sat.
-        \n— <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
+        \n\nYou for downloading and using Look4Sat! \nMay your sky always be clear!
+        \n\n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
+        and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
+        under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license.
+        \n\n<a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
+        satellite tracker that inspired the creation of Look4Sat.
+        \n\n<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
         <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
-        \n— <a href="https://libre.space/">Libre Space Foundation</a> for their <a href="https://db.satnogs.org/">SatNOGS</a>
-        API and database providing a huge amount of satellite data used by Look4Sat.
-        \n— <a href="https://square.github.io/">Square</a> for epic OkHttp, Retrofit and Moshi libs
-        available under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a> license.
+        \n\n<a href="https://libre.space/">Libre Space Foundation</a> for their <a href="https://db.satnogs.org/">SatNOGS</a>
+        API and DB providing a huge amount of satellite data.
     </string>
-    <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy</a>
-        \nThis app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.</string>
+    <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy.</a>
+        The app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.</string>
 </resources>
