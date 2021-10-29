@@ -14,7 +14,7 @@ jobs:
 
       - name: Setup java environment
         uses: actions/setup-java@v1
-        with: {java-version: 11}
+        with: { java-version: 11 }
 
       - name: Assemble APK and Bundle
         run: |
@@ -46,18 +46,22 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "31.0.0"
 
-#      - name: Deploy Bundle to Play Store
-#        uses: r0adkll/upload-google-play@v1
-#        with:
-#          serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
-#          packageName: com.rtbishop.look4sat
-#          track: production
-#          whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
-#          releaseFiles: ${{steps.sign_bundle.outputs.signedReleaseFile}}
+      - name: Rename APK
+        run: |
+          mv ${{steps.sign_apk.outputs.signedReleaseFile}} app/build/outputs/apk/release/look4sat.apk
+
+      - name: Deploy Bundle to Play Store
+        uses: r0adkll/upload-google-play@v1.0.15
+        with:
+          serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
+          packageName: com.rtbishop.look4sat
+          track: production
+          whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
+          releaseFiles: ${{steps.sign_bundle.outputs.signedReleaseFile}}
 
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          artifacts: app/build/outputs/apk/release/look4sat.apk
           bodyFile: fastlane/metadata/android/en-US/whatsnew/whatsnew-en-US
           token: ${{ secrets.RELEASE_TOKEN }}

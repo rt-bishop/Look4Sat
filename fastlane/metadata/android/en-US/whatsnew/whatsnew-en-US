@@ -1,6 +1,7 @@
 Reverted API version to v21, Android 5.0
 Fixed antenna rotator control issue #69
 Fixed Redmi dark theme colors bug
+Fixed satellite selection checkbox click bug
 Switched to grid layout in entries list
 Fetching satellite data asynchronously
 Added toggle from pass view to map view #68
