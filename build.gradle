@@ -3,7 +3,6 @@ buildscript {
         gradle_version = '7.0.3'
         kotlin_version = '1.5.31'
         coroutines_version = '1.5.2-native-mt'
-        material_version = '1.4.0'
         splash_screen_version = '1.0.0-alpha01'
         constraint_layout_version = '2.1.1'
         lifecycle_version = '2.4.0'

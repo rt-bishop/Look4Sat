@@ -19,13 +19,15 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.SatItem
@@ -33,7 +35,6 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.navigateSafe
-import com.rtbishop.look4sat.presentation.showSnack
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -67,6 +68,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             entriesSelectMode.setOnClickListener { showModesDialog() }
             entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
             entriesSearchBar.setOnQueryTextListener(viewModel)
+            entriesSearchBar.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI
         }
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
             handleSatData(satData, binding, entriesAdapter)
@@ -94,7 +96,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             is DataState.Error -> {
                 binding.entriesProgress.visibility = View.INVISIBLE
                 binding.entriesRecycler.visibility = View.VISIBLE
-                requireView().showSnack(getString(R.string.entries_update_error))
+                val message = getString(R.string.entries_update_error)
+                Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
             }
             else -> {
             }
@@ -112,7 +115,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         val savedModes = BooleanArray(modes.size)
         val selectedModes = viewModel.loadSelectedModes().toMutableList()
         selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
-        val dialogBuilder = MaterialAlertDialogBuilder(requireContext()).apply {
+        AlertDialog.Builder(requireContext()).apply {
             setTitle(context.getString(R.string.modes_title))
             setMultiChoiceItems(modes, savedModes) { _, which, isChecked ->
                 when {
@@ -126,7 +129,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
+            create().show()
         }
-        dialogBuilder.create().show()
     }
 }

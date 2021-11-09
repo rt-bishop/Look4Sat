@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <com.google.android.material.card.MaterialCardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/radar_bar"
         style="@style/TopBar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -110,6 +110,7 @@
         android:id="@+id/radar_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:overScrollMode="never"
         android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

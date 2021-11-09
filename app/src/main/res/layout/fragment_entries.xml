@@ -17,7 +17,7 @@
         android:id="@+id/entries_import_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
+        android:layout_marginStart="12dp"
         android:elevation="4dp"
         android:text="@string/entries_update"
         android:textSize="18sp"

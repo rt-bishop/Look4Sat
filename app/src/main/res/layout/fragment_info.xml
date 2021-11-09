@@ -63,9 +63,11 @@
         <Button
             android:id="@+id/info_btn_github"
             style="@style/InfoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:drawableStart="@drawable/ic_github"
             android:text="@string/info_github"
-            app:icon="@drawable/ic_github"
             app:layout_constraintEnd_toStartOf="@+id/info_btn_fdroid"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_subtitle" />
@@ -73,8 +75,10 @@
         <Button
             android:id="@+id/info_btn_fdroid"
             style="@style/InfoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_fdroid"
             android:text="@string/info_fdroid"
-            app:icon="@drawable/ic_fdroid"
             app:layout_constraintBaseline_toBaselineOf="@+id/info_btn_github"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/info_btn_github" />
@@ -82,9 +86,11 @@
         <Button
             android:id="@+id/info_btn_donate"
             style="@style/InfoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:drawableStart="@drawable/ic_bmc"
             android:text="@string/info_bmc"
-            app:icon="@drawable/ic_bmc"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_btn_github" />

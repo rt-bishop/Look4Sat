@@ -60,8 +60,8 @@ class SourcesAdapter(private val sources: MutableList<Source> = mutableListOf())
 
         fun bind(source: Source) {
             binding.sourceUrl.setText(source.sourceUrl)
-            binding.sourceUrl.doOnTextChanged { text, _, _, _ -> source.sourceUrl = text.toString() }
-            binding.sourceInput.setEndIconOnClickListener {
+            binding.sourceUrl.doOnTextChanged { txt, _, _, _ -> source.sourceUrl = txt.toString() }
+            binding.sourceBtn.setOnClickListener {
                 sources.remove(source)
                 notifyItemRemoved(adapterPosition)
             }

@@ -36,12 +36,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-fun View.showSnack(message: String, isAnchored: Boolean = true) {
-    Snackbar.make(this, message, Snackbar.LENGTH_SHORT).apply {
-        if (isAnchored) setAnchorView(R.id.main_nav_bottom)
-    }.show()
-}
-
 fun NavController.navigateSafe(
     @IdRes resId: Int,
     args: Bundle? = null,

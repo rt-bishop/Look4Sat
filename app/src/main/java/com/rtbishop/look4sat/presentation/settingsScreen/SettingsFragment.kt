@@ -119,8 +119,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun showSnack(message: String) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
-            setAnchorView(R.id.main_nav_bottom)
-        }.show()
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
     }
 }
