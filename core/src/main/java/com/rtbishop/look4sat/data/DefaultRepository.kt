@@ -65,22 +65,24 @@ class DefaultRepository(
             }
             launch {
                 val updateTimeMillis = measureTimeMillis {
-                    val fetchesMap = mutableMapOf<String, Deferred<InputStream>>()
-                    val streamsMap = mutableMapOf<String, InputStream>()
+                    val jobsMap = mutableMapOf<String, Deferred<InputStream?>>()
+                    val streamsMap = mutableMapOf<String, InputStream?>()
                     val streams = mutableListOf<InputStream>()
                     val entries = mutableListOf<SatEntry>()
-                    sources.forEach { fetchesMap[it] = async { remoteSource.fetchFileStream(it) } }
-                    fetchesMap.forEach { streamsMap[it.key] = it.value.await() }
+                    sources.forEach { jobsMap[it] = async { remoteSource.fetchFileStream(it) } }
+                    jobsMap.forEach { streamsMap[it.key] = it.value.await() }
                     streamsMap.forEach { stream ->
-                        when {
-                            stream.key.contains("=csv", true) -> {
-                                val tles = dataParser.parseCSVStream(stream.value)
-                                entries.addAll(tles.map { tle -> SatEntry(tle) })
+                        stream.value?.let { inputStream ->
+                            when {
+                                stream.key.contains("=csv", true) -> {
+                                    val tles = dataParser.parseCSVStream(inputStream)
+                                    entries.addAll(tles.map { tle -> SatEntry(tle) })
+                                }
+                                stream.key.contains(".zip", true) -> {
+                                    streams.add(ZipInputStream(inputStream).apply { nextEntry })
+                                }
+                                else -> streams.add(inputStream)
                             }
-                            stream.key.contains(".zip", true) -> {
-                                streams.add(ZipInputStream(stream.value).apply { nextEntry })
-                            }
-                            else -> streams.add(stream.value)
                         }
                     }
                     streams.forEach { stream -> entries.addAll(importSatellites(stream)) }
@@ -89,9 +91,10 @@ class DefaultRepository(
                 println("Update from web took $updateTimeMillis ms")
             }
             launch {
-                val jsonStream = remoteSource.fetchFileStream(transmittersSource)
-                val transmitters = dataParser.parseJSONStream(jsonStream)
-                localSource.updateTransmitters(transmitters)
+                remoteSource.fetchFileStream(transmittersSource)?.let { inputStream ->
+                    val transmitters = dataParser.parseJSONStream(inputStream)
+                    localSource.updateTransmitters(transmitters)
+                }
             }
         }
     }

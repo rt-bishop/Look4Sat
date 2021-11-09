@@ -21,5 +21,5 @@ import java.io.InputStream
 
 interface RemoteDataSource {
 
-    suspend fun fetchFileStream(fileUrl: String): InputStream
+    suspend fun fetchFileStream(url: String): InputStream?
 }

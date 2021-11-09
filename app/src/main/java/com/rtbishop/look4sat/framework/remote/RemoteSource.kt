@@ -9,7 +9,11 @@ import java.net.URL
 class RemoteSource(private val ioDispatcher: CoroutineDispatcher) : RemoteDataSource {
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun fetchFileStream(fileUrl: String): InputStream {
-        return withContext(ioDispatcher) { URL(fileUrl).openStream() }
+    override suspend fun fetchFileStream(url: String): InputStream? {
+        return try {
+            withContext(ioDispatcher) { URL(url).openStream() }
+        } catch (e: Exception) {
+            null
+        }
     }
 }
