@@ -29,20 +29,20 @@ class DataParserTest {
     private val dataParser = DataParser(TestCoroutineDispatcher())
     private val validCSVStream = """
         OBJECT_NAME,OBJECT_ID,EPOCH,MEAN_MOTION,ECCENTRICITY,INCLINATION,RA_OF_ASC_NODE,ARG_OF_PERICENTER,MEAN_ANOMALY,EPHEMERIS_TYPE,CLASSIFICATION_TYPE,NORAD_CAT_ID,ELEMENT_SET_NO,REV_AT_EPOCH,BSTAR,MEAN_MOTION_DOT,MEAN_MOTION_DDOT
-        CALSPHERE 1,1964-063C,2021-10-23T03:34:39.713664,13.73605115,.0026891,90.1713,36.6548,20.0176,64.9795,0,U,900,999,83808,.30972E-3,.299E-5,0
+        ISS (ZARYA),1998-067A,2021-11-16T12:28:09.322176,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876,0,U,25544,999,31220,.31985E-4,.1288E-4,0
     """.trimIndent().byteInputStream()
     private val invalidCSVStream = """
-        CALSPHERE 1,1964-063C,2021-10-23T03:34:39.713664,13.73605115,.0026891,90.1713,36.6548,20.0176,64.9795,0,U,900,999,83808,.30972E-3,.299E-5,0
+        ISS (ZARYA),1998-067A,2021-11-16T12:28:09.322176,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876,0,U,25544,999,31220,.31985E-4,.1288E-4,0
         OBJECT_NAME,OBJECT_ID,EPOCH,MEAN_MOTION,ECCENTRICITY,INCLINATION,RA_OF_ASC_NODE,ARG_OF_PERICENTER,MEAN_ANOMALY,EPHEMERIS_TYPE,CLASSIFICATION_TYPE,NORAD_CAT_ID,ELEMENT_SET_NO,REV_AT_EPOCH,BSTAR,MEAN_MOTION_DOT,MEAN_MOTION_DDOT
     """.trimIndent().byteInputStream()
     private val validTLEStream = """
         ISS (ZARYA)
-        1 25544U 98067A   21255.21005818 -.00120443  00000-0 -22592-2 0  9998
-        2 25544  51.6451 272.4173 0002526  27.1693  64.4213 15.48396490302085
+        1 25544U 98067A   21320.51955234  .00001288  00000+0  31985-4 0  9990
+        2 25544  51.6447 309.4881 0004694 203.6966 299.8876 15.48582035312205
     """.trimIndent().byteInputStream()
     private val invalidTLEStream = """
-        1 25544U 98067A   21255.21005818 -.00120443  00000-0 -22592-2 0  9998
-        2 25544  51.6451 272.4173 0002526  27.1693  64.4213 15.48396490302085
+        1 25544U 98067A   21320.51955234  .00001288  00000+0  31985-4 0  9990
+        2 25544  51.6447 309.4881 0004694 203.6966 299.8876 15.48582035312205
     """.trimIndent().byteInputStream()
     private val validJSONStream = """
         [{"uuid":"UzPz4gcsNBPKPKAFPmer7g","description":"Upper side band (drifting)","alive":true,"type":"Transmitter","uplink_low":null,"uplink_high":null,"uplink_drift":null,"downlink_low":136658500,"downlink_high":null,"downlink_drift":null,"mode":"USB","mode_id":9,"uplink_mode":null,"invert":false,"baud":null,"sat_id":"SCHX-0895-2361-9925-0309","norad_cat_id":965,"status":"active","updated":"2019-04-18T05:39:53.343316Z","citation":"CITATION NEEDED - https://xkcd.com/285/","service":"Unknown","coordination":"","coordination_url":""}]
@@ -54,7 +54,7 @@ class DataParserTest {
     @Test
     fun `Given valid CSV stream returns valid data`() = runBlockingTest {
         val parsedList = dataParser.parseCSVStream(validCSVStream)
-        assert(parsedList[0].catnum == 900)
+        assert(parsedList[0].epoch == 21320.51955234)
     }
 
     @Test
@@ -66,7 +66,7 @@ class DataParserTest {
     @Test
     fun `Given valid TLE stream returns valid data`() = runBlockingTest {
         val parsedList = dataParser.parseTLEStream(validTLEStream)
-        assert(parsedList[0].catnum == 25544)
+        assert(parsedList[0].epoch == 21320.51955234)
     }
 
     @Test
@@ -76,9 +76,16 @@ class DataParserTest {
     }
 
     @Test
+    fun `Given valid data streams parsed results match`() = runBlockingTest {
+        val csvResult = dataParser.parseCSVStream(validCSVStream)
+        val tleResult = dataParser.parseTLEStream(validTLEStream)
+        assert(csvResult == tleResult)
+    }
+
+    @Test
     fun `Given valid JSON stream returns valid data`() = runBlockingTest {
         val parsedList = dataParser.parseJSONStream(validJSONStream)
-        assert(parsedList[0].catnum == 965)
+        assert(parsedList[0].downlink == 136658500L)
     }
 
     @Test

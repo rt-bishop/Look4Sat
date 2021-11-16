@@ -24,14 +24,9 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.InputStream
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.math.pow
 
 class DataParser(private val parserDispatcher: CoroutineDispatcher) {
-
-    private val calendar = Calendar.getInstance()
-    private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
 
     suspend fun parseCSVStream(csvStream: InputStream): List<TLE> = withContext(parserDispatcher) {
         val parsedItems = mutableListOf<TLE>()
@@ -84,14 +79,16 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
     private fun parseCSV(values: List<String>): TLE? {
         try {
             val name = values[0]
-            calendar.time = simpleDateFormat.parse(values[2]) ?: Date()
-            val year = calendar.get(Calendar.YEAR).toString().substring(2, 4)
-            val day = calendar.get(Calendar.DAY_OF_YEAR)
-            val hours = calendar.get(Calendar.HOUR_OF_DAY)
-            val minutes = calendar.get(Calendar.MINUTE)
-            val seconds = calendar.get(Calendar.SECOND)
-            val fraction = ((hours * 60 * 60 + minutes * 60 + seconds) / 86400.0).toString()
-            val epoch = "$year$day${fraction.substring(1, fraction.length)}".toDouble()
+            val year = values[2].substring(0, 4)
+            val month = values[2].substring(5, 7)
+            val dayOfMonth = values[2].substring(8, 10)
+            val day = getDayOfYear(year.toInt(), month.toInt(), dayOfMonth.toInt())
+            val hour = values[2].substring(11, 13).toInt() * 3600000000 // microseconds in one hour
+            val min = values[2].substring(14, 16).toInt() * 60000000 // microseconds in one minute
+            val sec = values[2].substring(17, 19).toInt() * 1000000 // microseconds in one second
+            val microsec = values[2].substring(20, 26).toInt()
+            val frac = ((hour + min + sec + microsec) / 86400000000.0).toString()
+            val epoch = "${year.substring(2)}$day${frac.substring(1)}".toDouble()
             val meanmo = values[3].toDouble()
             val eccn = values[4].toDouble()
             val incl = values[5].toDouble()
@@ -114,7 +111,7 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
             val name: String = tle[0].trim()
             val epoch: Double = tle[1].substring(18, 32).toDouble()
             val meanmo: Double = tle[2].substring(52, 63).toDouble()
-            val eccn: Double = 1.0e-07 * tle[2].substring(26, 33).toDouble()
+            val eccn: Double = tle[2].substring(26, 33).toDouble() / 10000000.0
             val incl: Double = tle[2].substring(8, 16).toDouble()
             val raan: Double = tle[2].substring(17, 25).toDouble()
             val argper: Double = tle[2].substring(34, 42).toDouble()
@@ -146,5 +143,17 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
         } catch (exception: Exception) {
             return null
         }
+    }
+
+    private fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
+        if (month == 1) return dayOfMonth
+        val daysArray = arrayOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        var dayOfYear = dayOfMonth
+        // If leap year increment Feb days
+        if (((year / 4 == 0) && (year / 100 != 0)) || (year / 400 == 0)) daysArray[1]++
+        for (i in 0 until month - 1) {
+            dayOfYear += daysArray[i]
+        }
+        return dayOfYear
     }
 }

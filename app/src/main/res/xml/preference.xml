@@ -18,7 +18,7 @@
         app:iconSpaceReserved="false">
         <SeekBarPreference
             android:key="hoursAhead"
-            android:max="96"
+            android:max="168"
             android:title="@string/pref_hours_title"
             app:defaultValue="8"
             app:iconSpaceReserved="false"
