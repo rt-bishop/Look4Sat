@@ -57,7 +57,7 @@ class EntriesAdapter(private val clickListener: EntriesClickListener) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: SatItem, listener: EntriesClickListener) {
-            binding.entryName.text = item.name
+            binding.entryCheckbox.text = item.name
             binding.entryCheckbox.isChecked = item.isSelected
             itemView.setOnClickListener {
                 listener.updateSelection(listOf(item.catnum), item.isSelected.not())
