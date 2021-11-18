@@ -71,8 +71,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 setMultiTouchControls(true)
                 setTileSource(TileSourceFactory.WIKIMEDIA)
                 minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels)
-                maxZoomLevel = 6.0
-                controller.setZoom(minZoomLevel + 0.5)
+                maxZoomLevel = 5.75
+                controller.setZoom(minZoomLevel + 0.25)
                 zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
                 overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
                 overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT

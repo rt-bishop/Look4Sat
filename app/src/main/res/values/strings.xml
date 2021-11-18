@@ -10,7 +10,7 @@
 
     <string name="menu_entries">Satellites</string>
     <string name="menu_passes">Passes</string>
-    <string name="menu_map">Map</string>
+    <string name="menu_map">World Map</string>
     <string name="menu_prefs">Settings</string>
     <string name="menu_about">Info</string>
 

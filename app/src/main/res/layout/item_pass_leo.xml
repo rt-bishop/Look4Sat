@@ -4,17 +4,20 @@
     android:id="@+id/pass_leo_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:backgroundTint="@color/greyDark"
     app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/pass_leo_root"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="?android:selectableItemBackground">
 
         <ImageView
             android:id="@+id/pass_leo_bg"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:alpha="0.64"
             android:contentDescription="@string/placeholder"
             android:scaleType="centerCrop"
             android:src="@drawable/card_pass_bg"
@@ -110,7 +113,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            app:layout_constraintBottom_toBottomOf="@+id/pass_leo_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/pass_leo_end"
             app:layout_constraintStart_toStartOf="@+id/pass_leo_start"
             app:layout_constraintTop_toBottomOf="@+id/pass_leo_elev" />
