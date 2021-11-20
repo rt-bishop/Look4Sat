@@ -71,7 +71,7 @@
 
     <string name="info_version">Версия: %s</string>
     <string name="info_subtitle">Трекер спутников для Android</string>
-    <string name="info_bmc">Поддержать разработчика</string>
+    <string name="info_support">Поддержать</string>
     <string name="info_thanks">Огромное спасибо:
         \n\nВам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
         \n\n<a href="https://github.com/g4dpz">David A. B. Johnson</a> и

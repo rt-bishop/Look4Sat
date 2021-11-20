@@ -14,12 +14,13 @@
 
         <ImageView
             android:id="@+id/info_title_img"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             android:contentDescription="@string/placeholder"
             android:src="@drawable/ic_nav_entries"
-            app:layout_constraintBottom_toBottomOf="@+id/info_title"
+            app:layout_constraintBottom_toBottomOf="@+id/info_version"
+            app:layout_constraintDimensionRatio="h,1:1"
             app:layout_constraintEnd_toStartOf="@+id/info_title"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +30,8 @@
             android:id="@+id/info_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
             android:text="@string/app_name"
             android:textColor="@color/themeLight"
             android:textSize="48sp"
@@ -41,12 +43,10 @@
             android:id="@+id/info_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:text="@string/info_version"
-            android:textColor="@color/themeLight"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@color/greyLight"
+            android:textSize="22sp"
+            app:layout_constraintStart_toStartOf="@+id/info_title"
             app:layout_constraintTop_toBottomOf="@+id/info_title" />
 
         <TextView
@@ -55,9 +55,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/info_subtitle"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/info_title"
+            app:layout_constraintStart_toStartOf="@+id/info_title_img"
             app:layout_constraintTop_toBottomOf="@+id/info_version" />
 
         <Button
@@ -65,10 +65,13 @@
             style="@style/InfoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:drawableStart="@drawable/ic_github"
             android:text="@string/info_github"
-            app:layout_constraintEnd_toStartOf="@+id/info_btn_fdroid"
+            app:layout_constraintEnd_toStartOf="@+id/info_btn_donate"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_subtitle" />
 
@@ -77,31 +80,33 @@
             style="@style/InfoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:drawableStart="@drawable/ic_fdroid"
             android:text="@string/info_fdroid"
-            app:layout_constraintBaseline_toBaselineOf="@+id/info_btn_github"
+            app:layout_constraintBaseline_toBaselineOf="@+id/info_btn_donate"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/info_btn_github" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/info_btn_donate" />
 
         <Button
             android:id="@+id/info_btn_donate"
             style="@style/InfoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:drawableStart="@drawable/ic_bmc"
-            android:text="@string/info_bmc"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/info_btn_github" />
+            android:text="@string/info_support"
+            app:layout_constraintBaseline_toBaselineOf="@+id/info_btn_github"
+            app:layout_constraintEnd_toStartOf="@+id/info_btn_fdroid"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/info_btn_github" />
 
         <TextView
             android:id="@+id/info_thanks"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:gravity="center"
             android:text="@string/info_thanks"
             android:textSize="16sp"

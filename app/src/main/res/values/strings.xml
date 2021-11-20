@@ -95,7 +95,7 @@
     <string name="info_subtitle">Satellite tracker and pass predictor</string>
     <string name="info_github" translatable="false">GitHub</string>
     <string name="info_fdroid" translatable="false">F-Droid</string>
-    <string name="info_bmc">Support the developer</string>
+    <string name="info_support">Support</string>
     <string name="info_thanks">Huge thanks to:
         \n\nYou for downloading and using Look4Sat! \nMay your sky always be clear!
         \n\n<a href="https://github.com/g4dpz">David A. B. Johnson</a>

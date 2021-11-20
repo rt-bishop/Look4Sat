@@ -7,4 +7,5 @@
     <color name="greyDivider">#808080</color>
     <color name="greySurface">#1e1e1e</color>
     <color name="mapInfoLayout">#99000000</color>
+    <color name="mtrl_textinput_default_box_stroke_color">@color/greyLight</color>
 </resources>
