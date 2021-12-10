@@ -1,1 +1,1 @@
-Look4Sat: Radio satellite tracker
+Look4Sat: Satellite tracker

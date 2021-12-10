@@ -1,4 +1,4 @@
-# Look4Sat: Radio satellite tracker
+# Look4Sat: Satellite tracker
 
 [![Look4Sat CI](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml/badge.svg)](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml)
 

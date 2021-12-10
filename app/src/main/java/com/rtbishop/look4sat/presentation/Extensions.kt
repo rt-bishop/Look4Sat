@@ -17,7 +17,10 @@
  */
 package com.rtbishop.look4sat.presentation
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -29,6 +32,18 @@ import androidx.navigation.fragment.findNavController
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
+
+fun Context.toast(text: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, text, duration).apply { show() }
+}
+
+fun SharedPreferences.getDouble(key: String, default: Double): Double {
+    return Double.fromBits(getLong(key, default.toRawBits()))
+}
+
+fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
+    putLong(key, double.toRawBits())
+}
 
 fun NavController.navigateSafe(
     @IdRes resId: Int,
