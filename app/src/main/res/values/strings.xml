@@ -3,8 +3,8 @@
     <string name="app_name" translatable="false">Look4Sat</string>
     <string name="placeholder" translatable="false">dummy</string>
 
-    <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_update">Update</string>
 
@@ -84,30 +84,50 @@
     <string name="pref_radar_sweep">Enable radar sweep animation</string>
     <string name="pref_compass_title">Use sensors to rotate radar view</string>
 
-    <string name="tracking_title">Tracking preferences</string>
-    <string name="tracking_rotator_switch">Antenna rotator control</string>
-    <string name="tracking_rotator_address">Rotator IP address</string>
-    <string name="tracking_rotator_address_invalid">Please enter a valid IP address</string>
-    <string name="tracking_rotator_port">Rotator port</string>
-    <string name="tracking_rotator_port_invalid">Please enter a port between 1024 to 65535</string>
+    <string name="about_version">Version: %s</string>
+    <string name="about_subtitle">Satellite tracker and pass predictor</string>
+    <string name="about_github" translatable="false">GitHub</string>
+    <string name="about_support">Support</string>
+    <string name="about_fdroid" translatable="false">F-Droid</string>
 
-    <string name="info_version">Version: %s</string>
-    <string name="info_subtitle">Satellite tracker and pass predictor</string>
-    <string name="info_github" translatable="false">GitHub</string>
-    <string name="info_fdroid" translatable="false">F-Droid</string>
-    <string name="info_support">Support</string>
-    <string name="info_thanks">Huge thanks to:
-        \n\nYou for downloading and using Look4Sat! \nMay your sky always be clear!
-        \n\n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
+    <string name="location_title">Station position update</string>
+    <string name="location_gps">From GPS</string>
+    <string name="location_gps_null">No geolocation data</string>
+    <string name="location_gps_error">Check your location permissions</string>
+    <string name="location_qth">From QTH</string>
+    <string name="location_qth_error">Invalid QTH locator</string>
+    <string name="location_success">Position updated successfully</string>
+
+    <string name="other_title">Other preferences</string>
+    <string name="other_switch_utc">Show pass time in UTC</string>
+    <string name="other_switch_sweep">Enable radar sweep animation</string>
+    <string name="other_switch_sensors">Use sensors to rotate radar view</string>
+
+    <string name="tracking_title">Tracking preferences</string>
+    <string name="tracking_switch">Antenna rotator control</string>
+    <string name="tracking_ip_hint">IP address</string>
+    <string name="tracking_ip_invalid">Please enter a valid IP address</string>
+    <string name="tracking_port_hint">Port</string>
+    <string name="tracking_port_invalid">Please enter a port between 1024 to 65535</string>
+
+    <string name="update_title">Satellite data update</string>
+    <string name="update_web">From Web</string>
+    <string name="update_file">From File</string>
+    <string name="update_error">Update completed with errors</string>
+
+    <string name="warranty_title">I would like to say thank you:</string>
+    <string name="warranty_thanks"> • To You for downloading and using Look4Sat! \nMay your sky always be clear!
+        \n • To <a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
         under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license.
-        \n\n<a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
+        \n • To <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
         satellite tracker that inspired the creation of Look4Sat.
-        \n\n<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
+        \n • To <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
         <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
-        \n\n<a href="https://libre.space/">Libre Space Foundation</a> for their <a href="https://db.satnogs.org/">SatNOGS</a>
-        API and DB providing a huge amount of satellite data.
+        \n • To <a href="https://libre.space/">Libre Space Foundation</a> for their
+        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data.
     </string>
-    <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy.</a>
-        The app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.</string>
+    <string name="warranty_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy.</a>
+        The app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.
+    </string>
 </resources>

@@ -62,27 +62,48 @@
     <string name="pref_radar_sweep">Показывать анимацию радара</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
-    <string name="tracking_title">Настройки слежения</string>
-    <string name="tracking_rotator_switch">Управление поворотным устройством</string>
-    <string name="tracking_rotator_address">IP адрес поворотного устройства</string>
-    <string name="tracking_rotator_address_invalid">Введён неправильный IP адрес</string>
-    <string name="tracking_rotator_port">Порт поворотного устройства</string>
-    <string name="tracking_rotator_port_invalid">Введите порт в диапазоне от 1024 до 65535</string>
+    <string name="about_version">Версия: %s</string>
+    <string name="about_subtitle">Трекер спутников для Android</string>
+    <string name="about_support">Поддержать</string>
 
-    <string name="info_version">Версия: %s</string>
-    <string name="info_subtitle">Трекер спутников для Android</string>
-    <string name="info_support">Поддержать</string>
-    <string name="info_thanks">Огромное спасибо:
-        \n\nВам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
-        \n\n<a href="https://github.com/g4dpz">David A. B. Johnson</a> и
+    <string name="location_title">Местоположение наземной станции</string>
+    <string name="location_gps">Данные GPS</string>
+    <string name="location_gps_null">Нет данных геолокации</string>
+    <string name="location_gps_error">Нет разрешения использовать геоданные</string>
+    <string name="location_qth">Локатор QTH</string>
+    <string name="location_qth_error">Неправильный локатор QTH</string>
+    <string name="location_success">Позиция успешно обновлена</string>
+
+    <string name="other_title">Другие настройки</string>
+    <string name="other_switch_utc">Показывать время пролета по UTC</string>
+    <string name="other_switch_sweep">Показывать анимацию радара</string>
+    <string name="other_switch_sensors">Использовать компас</string>
+
+    <string name="tracking_title">Настройки слежения</string>
+    <string name="tracking_switch">Управление поворотным устройством</string>
+    <string name="tracking_ip_hint">IP адрес</string>
+    <string name="tracking_ip_invalid">Введён неправильный IP адрес</string>
+    <string name="tracking_port_hint">Порт</string>
+    <string name="tracking_port_invalid">Введите порт в диапазоне от 1024 до 65535</string>
+
+    <string name="update_title">Обновление данных спутников</string>
+    <string name="update_web">Из Вэб</string>
+    <string name="update_file">Из Файла</string>
+    <string name="update_error">При обновлении возникли ошибки</string>
+
+    <string name="warranty_title">Я хотел бы сказать спасибо:</string>
+    <string name="warranty_thanks"> • Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
+        \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a> и
         <a href="https://github.com/davidmoten">Dave Moten</a> за работу над predict4java и
         доступ к ней по <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
-        \n\n<a href="https://github.com/csete">Alexandru Csete</a> за его программу
+        \n • <a href="https://github.com/csete">Alexandru Csete</a> за его программу
         Gpredict, которая послужила для меня вдохновением.
-        \n\n<a href="https://celestrak.com/webmaster.php">Доктору T.S. Kelso</a> за его сайт
+        \n • <a href="https://celestrak.com/webmaster.php">Доктору T.S. Kelso</a> за его сайт
         <a href="https://celestrak.com/">Celestrak</a> и доступ к файлам орбит Two-Line Element.
-        \n\n<a href="https://libre.space/">Libre Space Foundation</a> за проект
-        <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с информацией о спутниках.</string>
-    <string name="info_warranty"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Политика конфиденциальности.</a>
-        \nЭто ПО поставляется без гарантий. \nПодробности в лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.</string>
+        \n • <a href="https://libre.space/">Libre Space Foundation</a> за проект
+        <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с информацией о спутниках.
+    </string>
+    <string name="warranty_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Политика конфиденциальности.</a>
+        \nЭто ПО поставляется без гарантий. \nПодробности в лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.
+    </string>
 </resources>

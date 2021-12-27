@@ -61,12 +61,17 @@
         android:name="com.rtbishop.look4sat.presentation.mapScreen.MapFragment"
         tools:layout="@layout/fragment_map" />
     <fragment
-        android:id="@+id/nav_settings"
-        android:name="com.rtbishop.look4sat.presentation.settingsScreen.SettingsFragment" />
-    <fragment
-        android:id="@+id/nav_info"
-        android:name="com.rtbishop.look4sat.presentation.infoScreen.InfoFragment"
-        tools:layout="@layout/fragment_info" />
+        android:id="@+id/nav_prefs"
+        android:name="com.rtbishop.look4sat.presentation.prefsScreen.PrefsFragment"
+        tools:layout="@layout/fragment_prefs">
+        <action
+            android:id="@+id/action_prefs_to_sources"
+            app:destination="@id/nav_sources"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
     <dialog
         android:id="@+id/nav_sources"
         android:name="com.rtbishop.look4sat.presentation.sourcesScreen.SourcesDialog"

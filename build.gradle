@@ -1,20 +1,20 @@
 buildscript {
     ext {
         gradle_version = '7.0.4'
-        kotlin_version = '1.6.0'
-        coroutines_version = '1.5.2-native-mt'
+        kotlin_version = '1.6.10'
+        coroutines_version = '1.6.0-native-mt'
         splash_screen_version = '1.0.0-alpha01'
         constraint_layout_version = '2.1.2'
         lifecycle_version = '2.4.0'
         navigation_version = '2.3.5'
         preference_version = '1.1.1'
-        room_version = '2.3.0'
+        room_version = '2.4.0'
         hilt_version = '2.40.5'
         json_version = '20211205'
         osmdroid_version = '6.1.11'
         timber_version = '5.0.1'
         junit_version = '4.13.2'
-        mockito_version = '4.1.0'
+        mockito_version = '4.2.0'
         leak_canary_version = '2.7'
     }
     repositories {

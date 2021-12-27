@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.hardware.SensorManager
 import android.location.LocationManager
-import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -55,6 +54,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context)
+        return context.getSharedPreferences("default", Context.MODE_PRIVATE)
     }
 }
