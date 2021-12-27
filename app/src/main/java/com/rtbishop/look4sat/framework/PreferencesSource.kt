@@ -22,8 +22,8 @@ import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.rtbishop.look4sat.BuildConfig
-import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
+import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.round
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -109,19 +109,31 @@ class PreferencesSource @Inject constructor(
         return preferences.getBoolean(keyTextLabels, false)
     }
 
-    fun shouldUseUTC(): Boolean {
+    fun getUseUTC(): Boolean {
         return preferences.getBoolean(keyTimeUTC, false)
     }
 
-    fun shouldUseCompass(): Boolean {
+    fun setUseUTC(value: Boolean) {
+        preferences.edit { putBoolean(keyTimeUTC, value) }
+    }
+
+    fun getUseCompass(): Boolean {
         return preferences.getBoolean(keyCompass, true)
     }
 
-    fun shouldShowSweep(): Boolean {
+    fun setUseCompass(value: Boolean) {
+        preferences.edit { putBoolean(keyCompass, value) }
+    }
+
+    fun getShowSweep(): Boolean {
         return preferences.getBoolean(keyRadarSweep, true)
     }
 
-    fun isSetupDone(): Boolean {
+    fun setShowSweep(value: Boolean) {
+        preferences.edit { putBoolean(keyRadarSweep, value) }
+    }
+
+    fun getSetupDone(): Boolean {
         return preferences.getBoolean(keyInitialSetup, false)
     }
 
@@ -143,13 +155,33 @@ class PreferencesSource @Inject constructor(
         return emptyList()
     }
 
-    fun isRotatorEnabled(): Boolean {
+    fun getRotatorEnabled(): Boolean {
         return preferences.getBoolean(keyRotator, false)
+    }
+
+    fun setRotatorEnabled(value: Boolean) {
+        preferences.edit { putBoolean(keyRotator, value) }
     }
 
     fun getRotatorServer(): Pair<String, Int> {
         val address = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
         val port = preferences.getString(keyRotatorPort, null) ?: "4533"
         return Pair(address, port.toInt())
+    }
+
+    fun getRotatorIp(): String {
+        return preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
+    }
+
+    fun setRotatorIp(value: String) {
+        preferences.edit { putString(keyRotatorAddress, value) }
+    }
+
+    fun getRotatorPort(): String {
+        return preferences.getString(keyRotatorPort, null) ?: "4533"
+    }
+
+    fun setRotatorPort(value: String) {
+        preferences.edit { putString(keyRotatorPort, value) }
     }
 }

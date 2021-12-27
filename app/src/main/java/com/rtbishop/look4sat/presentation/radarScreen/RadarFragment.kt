@@ -78,8 +78,8 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
         val aosTime = requireArguments().getLong("aosTime")
         viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
             radarView = RadarView(requireContext()).apply {
-                setShowAim(preferences.shouldUseCompass())
-                setScanning(preferences.shouldShowSweep())
+                setShowAim(preferences.getUseCompass())
+                setScanning(preferences.getShowSweep())
             }
             binding.radarFrame.addView(radarView)
             viewModel.radarData.observe(viewLifecycleOwner, { passData ->

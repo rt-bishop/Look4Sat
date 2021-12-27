@@ -28,7 +28,6 @@ import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import java.util.*
 import javax.inject.Inject
 
@@ -46,7 +45,7 @@ class PassesViewModel @Inject constructor(
     val isFirstLaunchDone: LiveData<Boolean> = _isFirstLaunchDone
 
     init {
-        if (preferences.isSetupDone()) {
+        if (preferences.getSetupDone()) {
             viewModelScope.launch {
                 _passes.postValue(DataState.Loading)
                 val timeNow = System.currentTimeMillis()
@@ -97,7 +96,7 @@ class PassesViewModel @Inject constructor(
     }
 
     fun shouldUseUTC(): Boolean {
-        return preferences.shouldUseUTC()
+        return preferences.getUseUTC()
     }
 
     private suspend fun tickPasses(passes: List<SatPass>) = withContext(Dispatchers.Default) {

@@ -19,9 +19,13 @@ package com.rtbishop.look4sat.presentation
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.os.Bundle
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -101,8 +105,38 @@ fun String.getHash(type: String = "SHA-256"): String {
     return result.toString()
 }
 
-fun String.isEmailValid(): Boolean {
+fun String.isValidEmail(): Boolean {
     val expression = "^[\\w.-]+@([\\w\\-]+\\.)+[A-Z]{2,8}$"
     val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
     return pattern.matcher(this).matches()
+}
+
+fun String.isValidIPv4(): Boolean {
+    val ip4 = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!\$)|\$)){4}\$"
+    return this.matches(ip4.toRegex())
+}
+
+fun String.isValidPort(): Boolean {
+    return this.isNotEmpty() && this.toInt() in 1024..65535
+}
+
+fun Float.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+fun AlertDialog.Builder.setEditText(editText: EditText): AlertDialog.Builder {
+    val container = FrameLayout(context)
+    container.addView(editText)
+    val containerParams = FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.WRAP_CONTENT
+    )
+    val marginHorizontal = 32F
+    val marginTop = 24F
+    containerParams.topMargin = (marginTop / 2).toPx()
+    containerParams.leftMargin = marginHorizontal.toInt()
+    containerParams.rightMargin = marginHorizontal.toInt()
+    container.layoutParams = containerParams
+    val superContainer = FrameLayout(context)
+    superContainer.addView(container)
+    setView(superContainer)
+    return this
 }

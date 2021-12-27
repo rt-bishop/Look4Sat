@@ -24,8 +24,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
+import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -34,8 +37,7 @@ import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPrefsBinding
 import com.rtbishop.look4sat.framework.PreferencesSource
-import com.rtbishop.look4sat.presentation.getNavResult
-import com.rtbishop.look4sat.presentation.navigateSafe
+import com.rtbishop.look4sat.presentation.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -44,6 +46,7 @@ class PrefsFragment : Fragment(R.layout.fragment_prefs) {
 
     @Inject
     lateinit var preferences: PreferencesSource
+
     private val viewModel: PrefsViewModel by viewModels()
     private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
@@ -64,13 +67,15 @@ class PrefsFragment : Fragment(R.layout.fragment_prefs) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPrefsBinding.bind(view)
-        setupInfoCard()
+        setupAboutCard()
         setupDataCard()
         setupLocationCard()
         setupWarrantyCard()
+        setupOtherCard()
+        setupTrackingCard()
     }
 
-    private fun setupInfoCard() {
+    private fun setupAboutCard() {
         _binding?.prefsInfo?.let { binding ->
             binding.aboutVersion.text =
                 String.format(getString(R.string.about_version), BuildConfig.VERSION_NAME)
@@ -92,21 +97,77 @@ class PrefsFragment : Fragment(R.layout.fragment_prefs) {
                 findNavController().navigateSafe(R.id.action_prefs_to_sources)
             }
             binding.updateBtnFile.setOnClickListener { filePicker.launch("*/*") }
-        }
-        getNavResult<List<String>>(R.id.nav_passes, "sources") { sources ->
-            viewModel.updateDataFromWeb(sources)
+            getNavResult<List<String>>(R.id.nav_prefs, "sources") { sources ->
+                viewModel.updateDataFromWeb(sources)
+            }
         }
     }
 
     private fun setupLocationCard() {
+        _binding?.prefsLocation?.let { binding ->
+            binding.locationBtnGps.setOnClickListener {
+                updatePositionFromGPS()
+            }
+            binding.locationBtnQth.setOnClickListener {
+                val editText = EditText(requireActivity())
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Title")
+                    .setEditText(editText)
+                    .setPositiveButton("OK") { _, _ ->
+                        val editTextInput = editText.text.toString()
+                        updatePositionFromQth(editTextInput)
+                    }
+                    .setNeutralButton("Cancel", null)
+                    .create()
+                    .show()
+            }
+        }
+    }
 
+    private fun setupTrackingCard() {
+        _binding?.prefsTracking?.let { binding ->
+            binding.trackingSwitch.apply {
+                isChecked = preferences.getRotatorEnabled()
+                binding.trackingIp.isEnabled = isChecked
+                binding.trackingIpEdit.setText(preferences.getRotatorIp())
+                binding.trackingPort.isEnabled = isChecked
+                binding.trackingPortEdit.setText(preferences.getRotatorPort())
+                setOnCheckedChangeListener { _, isChecked ->
+                    preferences.setRotatorEnabled(isChecked)
+                    binding.trackingIp.isEnabled = isChecked
+                    binding.trackingPort.isEnabled = isChecked
+                }
+            }
+            binding.trackingIpEdit.doOnTextChanged { text, _, _, _ ->
+                if (text.toString().isValidIPv4()) preferences.setRotatorIp(text.toString())
+            }
+            binding.trackingPortEdit.doOnTextChanged { text, _, _, _ ->
+                if (text.toString().isValidPort()) preferences.setRotatorPort(text.toString())
+            }
+        }
+    }
+
+    private fun setupOtherCard() {
+        _binding?.prefsOther?.let { binding ->
+            binding.otherSwitchUtc.apply {
+                isChecked = preferences.getUseUTC()
+                setOnCheckedChangeListener { _, isChecked -> preferences.setUseUTC(isChecked) }
+            }
+            binding.otherSwitchSweep.apply {
+                isChecked = preferences.getShowSweep()
+                setOnCheckedChangeListener { _, isChecked -> preferences.setShowSweep(isChecked) }
+            }
+            binding.otherSwitchSensors.apply {
+                isChecked = preferences.getUseCompass()
+                setOnCheckedChangeListener { _, isChecked -> preferences.setUseCompass(isChecked) }
+            }
+        }
     }
 
     private fun setupWarrantyCard() {
         _binding?.prefsWarranty?.let { binding ->
-            val moveMethod = LinkMovementMethod.getInstance()
-            binding.warrantyThanks.movementMethod = moveMethod
-            binding.warrantyLicense.movementMethod = moveMethod
+            binding.warrantyThanks.movementMethod = LinkMovementMethod.getInstance()
+            binding.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
@@ -122,54 +183,12 @@ class PrefsFragment : Fragment(R.layout.fragment_prefs) {
         } else locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
     }
 
-    private fun updatePositionFromQth(qthString: String): Boolean {
-        return if (preferences.updatePositionFromQTH(qthString)) {
+    private fun updatePositionFromQth(qthString: String) {
+        if (preferences.updatePositionFromQTH(qthString)) {
             showSnack(getString(R.string.pref_pos_success))
-            true
         } else {
             showSnack(getString(R.string.pref_pos_qth_error))
-            false
         }
-    }
-
-    private fun setupLater() {
-//        findPreference<Preference>(PreferencesSource.keyPositionGPS)?.apply {
-//            setOnPreferenceClickListener {
-//                updatePositionFromGPS()
-//                return@setOnPreferenceClickListener true
-//            }
-//        }
-//
-//        findPreference<Preference>(PreferencesSource.keyPositionQTH)?.apply {
-//            setOnPreferenceChangeListener { _, newValue ->
-//                updatePositionFromQth(newValue.toString())
-//            }
-//        }
-//
-//        findPreference<EditTextPreference>(PreferencesSource.keyRotatorAddress)?.apply {
-//            setOnPreferenceChangeListener { _, newValue ->
-//                val ip4 = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!\$)|\$)){4}\$"
-//                if (newValue.toString().matches(ip4.toRegex())) {
-//                    return@setOnPreferenceChangeListener true
-//                } else {
-//                    showSnack(getString(R.string.tracking_ip_invalid))
-//                    return@setOnPreferenceChangeListener false
-//                }
-//            }
-//        }
-//
-//        findPreference<EditTextPreference>(PreferencesSource.keyRotatorPort)?.apply {
-//            setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
-//            setOnPreferenceChangeListener { _, newValue ->
-//                val portValue = newValue.toString()
-//                if (portValue.isNotEmpty() && portValue.toInt() in 1024..65535) {
-//                    return@setOnPreferenceChangeListener true
-//                } else {
-//                    showSnack(getString(R.string.tracking_port_invalid))
-//                    return@setOnPreferenceChangeListener false
-//                }
-//            }
-//        }
     }
 
     private fun showSnack(message: String) {

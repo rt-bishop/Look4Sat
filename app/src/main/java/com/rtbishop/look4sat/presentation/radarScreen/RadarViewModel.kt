@@ -29,7 +29,6 @@ import com.rtbishop.look4sat.framework.PreferencesSource
 import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.*
@@ -64,11 +63,11 @@ class RadarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (preferences.shouldUseCompass()) orientationSource.startListening(this)
+        if (preferences.getUseCompass()) orientationSource.startListening(this)
     }
 
     fun disableSensor() {
-        if (preferences.shouldUseCompass()) orientationSource.stopListening()
+        if (preferences.getUseCompass()) orientationSource.stopListening()
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
@@ -85,7 +84,7 @@ class RadarViewModel @Inject constructor(
             }
             while (isActive) {
                 val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date().time)
-                if (preferences.isRotatorEnabled()) {
+                if (preferences.getRotatorEnabled()) {
                     val server = preferences.getRotatorServer().first
                     val port = preferences.getRotatorServer().second
                     val azimuth = Math.toDegrees(satPos.azimuth).round(1)

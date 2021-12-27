@@ -11,4 +11,5 @@
     <color name="greySurface">#1e1e1e</color>
     <color name="mapInfoLayout">#99000000</color>
     <color name="mtrl_textinput_default_box_stroke_color">@color/greyLight</color>
+    <color name="mtrl_textinput_disabled_color">@color/bgDark</color>
 </resources>
