@@ -4,7 +4,7 @@
     android:id="@+id/pass_geo_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@color/greyDark"
+    android:backgroundTint="@color/greyCard"
     app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -12,19 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?android:selectableItemBackground">
-
-        <ImageView
-            android:id="@+id/pass_geo_bg"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:alpha="0.64"
-            android:contentDescription="@string/placeholder"
-            android:scaleType="centerCrop"
-            android:src="@drawable/card_pass_bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/pass_geo_name"

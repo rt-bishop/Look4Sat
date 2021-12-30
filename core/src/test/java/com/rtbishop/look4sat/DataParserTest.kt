@@ -19,14 +19,15 @@ package com.rtbishop.look4sat
 
 import com.rtbishop.look4sat.domain.DataParser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class DataParserTest {
 
-    private val dataParser = DataParser(TestCoroutineDispatcher())
+    private val testDispatcher = StandardTestDispatcher()
+    private val dataParser = DataParser(testDispatcher)
     private val validCSVStream = """
         OBJECT_NAME,OBJECT_ID,EPOCH,MEAN_MOTION,ECCENTRICITY,INCLINATION,RA_OF_ASC_NODE,ARG_OF_PERICENTER,MEAN_ANOMALY,EPHEMERIS_TYPE,CLASSIFICATION_TYPE,NORAD_CAT_ID,ELEMENT_SET_NO,REV_AT_EPOCH,BSTAR,MEAN_MOTION_DOT,MEAN_MOTION_DDOT
         ISS (ZARYA),1998-067A,2021-11-16T12:28:09.322176,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876,0,U,25544,999,31220,.31985E-4,.1288E-4,0
@@ -56,31 +57,31 @@ class DataParserTest {
     """.trimIndent().byteInputStream()
 
     @Test
-    fun `Given valid CSV stream returns valid data`() = runBlockingTest {
+    fun `Given valid CSV stream returns valid data`() = runTest(testDispatcher) {
         val parsedList = dataParser.parseCSVStream(validCSVStream)
         assert(parsedList[0].epoch == 21320.51955234)
     }
 
     @Test
-    fun `Given invalid CSV stream returns empty list`() = runBlockingTest {
+    fun `Given invalid CSV stream returns empty list`() = runTest(testDispatcher) {
         val parsedList = dataParser.parseCSVStream(invalidCSVStream)
         assert(parsedList.isEmpty())
     }
 
     @Test
-    fun `Given valid TLE stream returns valid data`() = runBlockingTest {
+    fun `Given valid TLE stream returns valid data`() = runTest(testDispatcher) {
         val parsedList = dataParser.parseTLEStream(validTLEStream)
         assert(parsedList[0].epoch == 21320.51955234)
     }
 
     @Test
-    fun `Given invalid TLE stream returns empty list`() = runBlockingTest {
+    fun `Given invalid TLE stream returns empty list`() = runTest(testDispatcher) {
         val parsedList = dataParser.parseTLEStream(invalidTLEStream)
         assert(parsedList.isEmpty())
     }
 
     @Test
-    fun `Given valid data streams parsed results match`() = runBlockingTest {
+    fun `Given valid data streams parsed results match`() = runTest(testDispatcher) {
         val csvResult = dataParser.parseCSVStream(validCSVStream)
         val tleResult = dataParser.parseTLEStream(validTLEStream)
         println(csvResult)
@@ -89,13 +90,13 @@ class DataParserTest {
     }
 
     @Test
-    fun `Given valid JSON stream returns valid data`() = runBlockingTest {
+    fun `Given valid JSON stream returns valid data`() = runTest(testDispatcher) {
         val parsedList = dataParser.parseJSONStream(validJSONStream)
         assert(parsedList[0].downlink == 136658500L)
     }
 
     @Test
-    fun `Given invalid JSON stream returns empty list`() = runBlockingTest {
+    fun `Given invalid JSON stream returns empty list`() = runTest(testDispatcher) {
         val parsedList = dataParser.parseJSONStream(invalidJSONStream)
         assert(parsedList.isEmpty())
     }

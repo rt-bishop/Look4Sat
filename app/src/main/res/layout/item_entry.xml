@@ -3,7 +3,7 @@
     android:id="@+id/entry_checkbox"
     android:layout_width="match_parent"
     android:layout_height="36dp"
-    android:background="@null"
+    android:background="@color/greyCard"
     android:ellipsize="end"
     android:lines="1"
     android:text="@string/placeholder"

@@ -12,17 +12,16 @@
         <item name="colorSecondary">@color/themeLight</item>
         <item name="colorAccent">@color/themeLight</item>
         <item name="android:textColorPrimary">@color/greyLight</item>
-        <item name="android:statusBarColor">@color/greyDark</item>
+        <item name="android:statusBarColor">@color/greyCard</item>
         <item name="android:windowBackground">@color/greyDark</item>
-        <item name="android:navigationBarColor">@color/greyDark</item>
+        <item name="android:navigationBarColor">@color/greySurface</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
-    <style name="TopBar">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="cardBackgroundColor">@color/greySurface</item>
-        <item name="cardCornerRadius">0dp</item>
+    <style name="Toolbar">
+        <item name="android:layout_height">?android:attr/actionBarSize</item>
+        <item name="android:background">@color/greySurface</item>
+        <item name="android:elevation">8dp</item>
     </style>
 
     <style name="DialogText">
@@ -33,7 +32,7 @@
     </style>
 
     <style name="InfoButton">
-        <item name="android:backgroundTint">@color/bgDark</item>
+        <item name="android:backgroundTint">@color/greyButton</item>
         <item name="android:textColor">@color/themeLight</item>
         <item name="android:textSize">15sp</item>
         <item name="android:drawablePadding">4dp</item>
@@ -47,8 +46,8 @@
         <item name="android:layout_marginStart">8dp</item>
         <item name="android:layout_marginTop">8dp</item>
         <item name="android:layout_marginEnd">8dp</item>
-        <item name="cardBackgroundColor">@color/bgDarker</item>
-        <item name="cardCornerRadius">4dp</item>
+        <item name="cardBackgroundColor">@color/greyCard</item>
+        <item name="cardCornerRadius">8dp</item>
     </style>
 
     <style name="TimerText">

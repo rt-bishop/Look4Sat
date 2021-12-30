@@ -1,76 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/entries_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/greyCard">
 
-    <androidx.cardview.widget.CardView
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/entries_bar"
-        style="@style/TopBar"
+        style="@style/Toolbar"
+        android:layout_width="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/entries_import_msg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:elevation="4dp"
-        android:text="@string/entries_update"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@+id/entries_import_web"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/entries_import_web" />
-
-    <ImageButton
-        android:id="@+id/entries_import_web"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:backgroundTint="@color/greyDark"
-        android:contentDescription="@string/placeholder"
-        android:elevation="4dp"
-        android:src="@drawable/ic_update_web"
-        app:layout_constraintBottom_toBottomOf="@+id/entries_import_file"
-        app:layout_constraintEnd_toStartOf="@+id/entries_import_file"
-        app:layout_constraintTop_toTopOf="@+id/entries_import_file"
-        tools:ignore="DuplicateSpeakableTextCheck" />
-
-    <ImageButton
-        android:id="@+id/entries_import_file"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="4dp"
-        android:backgroundTint="@color/greyDark"
-        android:contentDescription="@string/placeholder"
-        android:elevation="4dp"
-        android:src="@drawable/ic_update_file"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <SearchView
         android:id="@+id/entries_search_bar"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="16dp"
         android:iconifiedByDefault="false"
         android:queryHint="@string/entries_search_hint"
-        app:layout_constraintBottom_toBottomOf="@+id/entries_select_mode"
+        app:layout_constraintBottom_toBottomOf="@+id/entries_bar"
         app:layout_constraintEnd_toStartOf="@+id/entries_select_mode"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entries_import_web" />
+        app:layout_constraintTop_toTopOf="@+id/entries_bar" />
 
     <ImageButton
         android:id="@+id/entries_select_mode"
         android:layout_width="64dp"
         android:layout_height="48dp"
+        android:elevation="16dp"
         android:backgroundTint="@color/greySurface"
         android:contentDescription="@string/placeholder"
         android:src="@drawable/ic_satellite"
-        app:layout_constraintBottom_toBottomOf="@+id/entries_select_all"
+        app:layout_constraintBottom_toBottomOf="@+id/entries_bar"
         app:layout_constraintEnd_toStartOf="@+id/entries_select_all"
-        app:layout_constraintTop_toTopOf="@+id/entries_select_all" />
+        app:layout_constraintTop_toTopOf="@+id/entries_bar" />
 
     <ImageButton
         android:id="@+id/entries_select_all"
@@ -78,19 +44,20 @@
         android:layout_height="48dp"
         android:backgroundTint="@color/greySurface"
         android:contentDescription="@string/placeholder"
+        android:elevation="16dp"
         android:src="@drawable/ic_select_all"
-        app:layout_constraintEnd_toEndOf="@+id/entries_import_file"
-        app:layout_constraintTop_toBottomOf="@+id/entries_import_file" />
+        app:layout_constraintBottom_toBottomOf="@+id/entries_select_mode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entries_select_mode" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/entries_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entries_search_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
 
     <ProgressBar
         android:id="@+id/entries_progress"

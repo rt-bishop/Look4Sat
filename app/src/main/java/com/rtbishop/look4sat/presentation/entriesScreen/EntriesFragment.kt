@@ -24,17 +24,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
-import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.presentation.getNavResult
-import com.rtbishop.look4sat.presentation.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,12 +57,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 adapter = entriesAdapter
                 layoutManager = GridLayoutManager(requireContext(), 2)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(ItemDivider(R.drawable.rec_divider_light))
+                addItemDecoration(ItemDivider(R.drawable.rec_divider_dark))
             }
-            entriesImportWeb.setOnClickListener {
-                findNavController().navigateSafe(R.id.action_entries_to_sources)
-            }
-            entriesImportFile.setOnClickListener { filePicker.launch("*/*") }
+//            entriesImportWeb.setOnClickListener {
+//                findNavController().navigateSafe(R.id.action_entries_to_sources)
+//            }
+//            entriesImportFile.setOnClickListener { filePicker.launch("*/*") }
             entriesSelectMode.setOnClickListener { showModesDialog() }
             entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
             entriesSearchBar.setOnQueryTextListener(viewModel)

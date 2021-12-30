@@ -7,9 +7,10 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <androidx.cardview.widget.CardView
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/radar_bar"
-        style="@style/TopBar"
+        style="@style/Toolbar"
+        android:layout_width="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -19,7 +20,7 @@
         style="@style/TimerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
+        android:elevation="16dp"
         android:text="@string/timer_zero"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
@@ -99,7 +100,7 @@
         android:layout_marginEnd="4dp"
         android:backgroundTint="@color/greyDark"
         android:contentDescription="@string/placeholder"
-        android:elevation="4dp"
+        android:elevation="16dp"
         android:src="@drawable/ic_nav_map"
         app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
         app:layout_constraintEnd_toEndOf="@+id/radar_bar"
@@ -111,7 +112,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:overScrollMode="never"
-        android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
