@@ -29,9 +29,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
-import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.presentation.ItemDivider
+import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,15 +67,37 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 layoutManager = LinearLayoutManager(context)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(ItemDivider(R.drawable.rec_divider_dark))
+//                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+//                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+//                        if (dy > 0 && passesFab.visibility == View.VISIBLE) passesFab.hide()
+//                        else if (dy < 0 && passesFab.visibility != View.VISIBLE) passesFab.show()
+//                    }
+//                })
             }
-            passesRefresh.setOnClickListener { passesViewModel.forceCalculation() }
+            passesRefresh.setOnClickListener { findNavController().navigate(R.id.nav_pass_prefs) }
+//            passesSwipe.apply {
+//                setColorSchemeResources(R.color.greySurface)
+//                setProgressBackgroundColorSchemeResource(R.color.themeLight)
+//                setOnRefreshListener { passesViewModel.forceCalculation() }
+//            }
         }
+//        val appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_passes))
+//        binding.passesToolbar.setupWithNavController(findNavController(), appBarConfiguration)
+//        binding.passesToolbar.navigationIcon =
+//            ResourcesCompat.getDrawable(resources, R.drawable.ic_add, requireActivity().theme)
+//        binding.passesToolbar.inflateMenu(R.menu.passes_menu)
+//        binding.passesFab.setOnClickListener {
+//            findNavController().navigate(R.id.nav_entries)
+//        }
         passesViewModel.passes.observe(viewLifecycleOwner, { passesResult ->
             handleNewPasses(passesResult, passesAdapter, binding)
         })
         passesViewModel.isFirstLaunchDone.observe(viewLifecycleOwner, { setupDone ->
             if (!setupDone) locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
         })
+        getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
+            passesViewModel.forceCalculation(prefs.first, prefs.second)
+        }
     }
 
     private fun handleNewPasses(
@@ -86,6 +109,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             is DataState.Success -> {
                 passesAdapter.submitList(dataState.data)
                 binding.apply {
+//                    passesSwipe.isRefreshing = false
                     passesError.visibility = View.INVISIBLE
                     passesProgress.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.VISIBLE
@@ -94,6 +118,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             }
             is DataState.Loading -> {
                 binding.apply {
+//                    passesSwipe.isRefreshing = true
                     passesTimer.text = 0L.toTimerString()
                     passesError.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.INVISIBLE
@@ -102,6 +127,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             }
             else -> {
                 binding.apply {
+//                    passesSwipe.isRefreshing = false
                     passesTimer.text = 0L.toTimerString()
                     passesProgress.visibility = View.INVISIBLE
                     passesRecycler.visibility = View.INVISIBLE

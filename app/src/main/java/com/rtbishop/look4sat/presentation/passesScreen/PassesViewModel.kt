@@ -21,10 +21,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.domain.model.DataState
-import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -82,16 +82,17 @@ class PassesViewModel @Inject constructor(
         }
     }
 
-    fun forceCalculation() {
+    fun forceCalculation(
+        hoursAhead: Int = preferences.getHoursAhead(),
+        minElevation: Double = preferences.getMinElevation(),
+        timeRef: Long = System.currentTimeMillis()
+    ) {
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
-            val timeNow = System.currentTimeMillis()
             val satellites = dataRepository.getSelectedSatellites()
             val stationPos = preferences.loadStationPosition()
-            val hoursAhead = preferences.getHoursAhead()
-            val minElev = preferences.getMinElevation()
-            predictor.forceCalculation(satellites, stationPos, timeNow, hoursAhead, minElev)
+            predictor.forceCalculation(satellites, stationPos, timeRef, hoursAhead, minElevation)
         }
     }
 
@@ -114,7 +115,9 @@ class PassesViewModel @Inject constructor(
                 }
             }
             currentPasses = currentPasses.filter { it.progress < 100 }
-            _passes.postValue(DataState.Success(currentPasses.map { it.copy() }))
+            val passesCopy = currentPasses.map { it.copy() }
+            if (passesCopy.isEmpty()) _passes.postValue(DataState.Empty)
+            else _passes.postValue(DataState.Success(passesCopy))
             delay(1000)
         }
     }

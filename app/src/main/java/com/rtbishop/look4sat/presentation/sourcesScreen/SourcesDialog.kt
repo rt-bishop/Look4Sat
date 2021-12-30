@@ -23,18 +23,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.framework.model.Source
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SourcesDialog : AppCompatDialogFragment() {
 
-    private val viewModel: SourcesViewModel by viewModels()
+    @Inject
+    lateinit var dataRepository: DataRepository
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_sources, group, false)
@@ -42,26 +46,50 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        viewModel.sources.observe(viewLifecycleOwner, { sources ->
-            val adapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
+//        liveData { emit(dataRepository.getWebSources()) }.observe(viewLifecycleOwner, { sources ->
+//            val sourcesAdapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
+//            DialogSourcesBinding.bind(view).apply {
+//                dialog?.window?.setLayout(
+//                    WindowManager.LayoutParams.MATCH_PARENT,
+//                    WindowManager.LayoutParams.WRAP_CONTENT
+//                )
+//                sourcesRecycler.apply {
+//                    adapter = sourcesAdapter
+//                    layoutManager = LinearLayoutManager(requireContext())
+//                }
+//                sourcesBtnAdd.setOnClickListener {
+//                    sourcesAdapter.addSource()
+//                }
+//                sourcesBtnPos.setOnClickListener {
+//                    setNavResult("sources", sourcesAdapter.getSources().map { it.sourceUrl })
+//                    dismiss()
+//                }
+//                sourcesBtnNeg.setOnClickListener { dismiss() }
+//            }
+//        })
+        lifecycleScope.launch {
+            val sources = dataRepository.getWebSources()
+            val sourcesAdapter = SourcesAdapter()
             DialogSourcesBinding.bind(view).apply {
                 dialog?.window?.setLayout(
                     WindowManager.LayoutParams.MATCH_PARENT,
                     WindowManager.LayoutParams.WRAP_CONTENT
                 )
                 sourcesRecycler.apply {
-                    this.adapter = adapter
+                    sourcesAdapter.apply { setSources(sources.map { Source(it) }) }
+                    adapter = sourcesAdapter
                     layoutManager = LinearLayoutManager(requireContext())
                 }
                 sourcesBtnAdd.setOnClickListener {
-                    adapter.addSource()
+                    sourcesAdapter.addSource()
                 }
                 sourcesBtnPos.setOnClickListener {
-                    setNavResult("sources", adapter.getSources().map { it.sourceUrl })
+                    setNavResult("sources", sourcesAdapter.getSources().map { it.sourceUrl })
                     dismiss()
                 }
                 sourcesBtnNeg.setOnClickListener { dismiss() }
             }
-        })
+        }
+
     }
 }

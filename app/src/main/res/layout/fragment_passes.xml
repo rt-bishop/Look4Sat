@@ -28,13 +28,14 @@
     <ImageButton
         android:id="@+id/passes_refresh"
         android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="4dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="4dp"
         android:backgroundTint="@color/greyDark"
         android:contentDescription="@string/placeholder"
         android:elevation="4dp"
-        android:src="@drawable/ic_refresh"
-        app:layout_constraintEnd_toEndOf="@+id/passes_bar"
+        android:src="@drawable/ic_filter"
+        app:layout_constraintBottom_toBottomOf="@+id/passes_bar"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/passes_bar" />
 
     <androidx.recyclerview.widget.RecyclerView

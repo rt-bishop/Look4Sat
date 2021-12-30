@@ -62,6 +62,15 @@
     <string name="pref_radar_sweep">Показывать анимацию радара</string>
     <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
 
+    <string name="dialog_filter_passes">Фильтровать пролеты</string>
+
+    <string name="pref_hours_ahead_hint">Количество часов</string>
+    <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
+    <string name="pref_hours_ahead_input_error">Введите значение между 1ч и 168ч</string>
+    <string name="pref_min_el_hint">Минимальная элевация</string>
+    <string name="pref_min_el_summary">Показать пролеты с элевацией более</string>
+    <string name="pref_min_el_input_error">Введите значение между 0° и 90°</string>
+
     <string name="about_version">Версия: %s</string>
     <string name="about_subtitle">Трекер спутников для Android</string>
     <string name="about_support">Поддержать</string>
