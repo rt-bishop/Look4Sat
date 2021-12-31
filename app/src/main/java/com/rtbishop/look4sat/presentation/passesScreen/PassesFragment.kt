@@ -84,14 +84,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             passesSettings.setOnClickListener { findNavController().navigate(R.id.nav_prefs) }
             passesFab.setOnClickListener { findNavController().navigate(R.id.nav_entries) }
         }
-//        val appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_passes))
-//        binding.passesToolbar.setupWithNavController(findNavController(), appBarConfiguration)
-//        binding.passesToolbar.navigationIcon =
-//            ResourcesCompat.getDrawable(resources, R.drawable.ic_add, requireActivity().theme)
-//        binding.passesToolbar.inflateMenu(R.menu.passes_menu)
-//        binding.passesFab.setOnClickListener {
-//            findNavController().navigate(R.id.nav_entries)
-//        }
         passesViewModel.passes.observe(viewLifecycleOwner, { passesResult ->
             handleNewPasses(passesResult, passesAdapter, binding)
         })

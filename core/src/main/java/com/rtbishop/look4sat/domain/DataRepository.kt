@@ -25,21 +25,15 @@ import java.io.InputStream
 
 interface DataRepository {
 
-    val defaultSelection: List<Int>
-    val defaultSources: List<String>
-    val transmittersSource: String
-
     fun getSatelliteItems(): Flow<List<SatItem>>
 
     suspend fun getSelectedSatellites(): List<Satellite>
 
     suspend fun getTransmitters(catnum: Int): List<Transmitter>
 
-    suspend fun getWebSources(): List<String>
-
     suspend fun updateDataFromFile(stream: InputStream)
 
-    suspend fun updateDataFromWeb(sources: List<String> = defaultSources)
+    suspend fun updateDataFromWeb(sources: List<String>)
 
-    suspend fun updateSelection(catnums: List<Int> = defaultSelection, isSelected: Boolean = true)
+    suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean = true)
 }

@@ -28,7 +28,6 @@ import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +37,7 @@ class PassesViewModel @Inject constructor(
     private val preferences: PreferencesSource
 ) : ViewModel() {
 
-    private val _passes = MutableLiveData<DataState<List<SatPass>>>(DataState.Loading)
+    private val _passes = MutableLiveData<DataState<List<SatPass>>>()
     private val _isFirstLaunchDone = MutableLiveData<Boolean>()
     private var passesProcessing: Job? = null
     val passes: LiveData<DataState<List<SatPass>>> = _passes
@@ -69,15 +68,15 @@ class PassesViewModel @Inject constructor(
     fun triggerInitialSetup() {
         preferences.updatePositionFromGPS()
         viewModelScope.launch {
-            _passes.postValue(DataState.Loading)
-            val satellites = dataRepository.getSelectedSatellites()
-            val stationPos = preferences.loadStationPosition()
-            val hoursAhead = preferences.getHoursAhead()
-            val minElev = preferences.getMinElevation()
-            dataRepository.updateDataFromWeb()
-            dataRepository.updateSelection(isSelected = true)
-            predictor.forceCalculation(satellites, stationPos, Date().time, hoursAhead, minElev)
-            preferences.setSetupDone()
+//            _passes.postValue(DataState.Loading)
+//            val satellites = dataRepository.getSelectedSatellites()
+//            val stationPos = preferences.loadStationPosition()
+//            val hoursAhead = preferences.getHoursAhead()
+//            val minElev = preferences.getMinElevation()
+//            dataRepository.updateDataFromWeb()
+//            dataRepository.updateSelection(isSelected = true)
+//            predictor.forceCalculation(satellites, stationPos, Date().time, hoursAhead, minElev)
+//            preferences.setSetupDone()
             _isFirstLaunchDone.value = true
         }
     }

@@ -18,13 +18,18 @@
 package com.rtbishop.look4sat.injection
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.location.LocationManager
 import androidx.room.Room
 import com.rtbishop.look4sat.data.DefaultRepository
+import com.rtbishop.look4sat.data.PreferencesHandler
 import com.rtbishop.look4sat.domain.DataParser
-import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.DataReporter
+import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.predict.Predictor
-import com.rtbishop.look4sat.framework.local.*
+import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.local.LocalSource
+import com.rtbishop.look4sat.framework.local.SatelliteDb
 import com.rtbishop.look4sat.framework.remote.RemoteSource
 import dagger.Module
 import dagger.Provides
@@ -41,16 +46,26 @@ object CoreModule {
     @Provides
     @Singleton
     fun provideSatelliteRepo(
+        preferencesHandler: PreferencesHandler,
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): DataRepository {
         val dataParser = DataParser(defaultDispatcher)
         val db = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
-        val localSource = LocalSource(db.entriesDao(), db.sourcesDao(), db.transmittersDao())
+            .fallbackToDestructiveMigration().build()
+        val localSource = LocalSource(db.entriesDao(), db.transmittersDao())
         val remoteSource = RemoteSource(ioDispatcher)
-        return DefaultRepository(dataParser, localSource, remoteSource)
+        return DefaultRepository(dataParser, localSource, remoteSource, preferencesHandler)
+    }
+
+    @Provides
+    @Singleton
+    fun providePreferencesHandler(
+        locationManager: LocationManager,
+        sharedPreferences: SharedPreferences
+    ): PreferencesHandler {
+        return PreferencesSource(locationManager, sharedPreferences)
     }
 
     @Provides

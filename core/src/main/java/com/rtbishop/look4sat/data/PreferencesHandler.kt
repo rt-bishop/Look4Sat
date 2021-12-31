@@ -15,17 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.local
+package com.rtbishop.look4sat.data
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.rtbishop.look4sat.framework.model.SatEntry
-import com.rtbishop.look4sat.framework.model.Transmitter
+interface PreferencesHandler {
 
-@Database(entities = [SatEntry::class, Transmitter::class], version = 1)
-abstract class SatelliteDb : RoomDatabase() {
+    val defaultSources: List<String>
+        get() = listOf(
+            "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
+            "https://amsat.org/tle/current/nasabare.txt",
+            "https://prismnet.com/~mmccants/tles/classfd.zip",
+            "https://prismnet.com/~mmccants/tles/inttles.zip"
+        )
+    val transmittersSource: String
+        get() = "https://db.satnogs.org/api/transmitters/?format=json"
 
-    abstract fun entriesDao(): EntriesDao
+    fun loadDataSources(): List<String>
 
-    abstract fun transmittersDao(): TransmittersDao
+    fun saveDataSources(sources: List<String>)
 }

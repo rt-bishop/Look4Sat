@@ -22,6 +22,7 @@ import android.hardware.GeomagneticField
 import android.location.LocationManager
 import androidx.core.content.edit
 import com.rtbishop.look4sat.BuildConfig
+import com.rtbishop.look4sat.data.PreferencesHandler
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.round
@@ -32,11 +33,12 @@ import javax.inject.Singleton
 class PreferencesSource @Inject constructor(
     private val locationManager: LocationManager,
     private val preferences: SharedPreferences
-) {
+) : PreferencesHandler {
 
     private val keyInitialSetup = "${BuildConfig.VERSION_NAME}update"
 
     companion object {
+        const val keyDataSources = "dataSources"
         const val keyModes = "satModes"
         const val keyCompass = "compass"
         const val keyRadarSweep = "radarSweep"
@@ -183,5 +185,14 @@ class PreferencesSource @Inject constructor(
 
     fun setRotatorPort(value: String) {
         preferences.edit { putString(keyRotatorPort, value) }
+    }
+
+    override fun loadDataSources(): List<String> {
+        val sourcesList = preferences.getStringSet(keyDataSources, null)?.toList()
+        return if (sourcesList.isNullOrEmpty()) defaultSources else sourcesList
+    }
+
+    override fun saveDataSources(sources: List<String>) {
+        if (sources.isNotEmpty()) preferences.edit { putStringSet(keyDataSources, sources.toSet()) }
     }
 }

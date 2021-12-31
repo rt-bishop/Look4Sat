@@ -23,22 +23,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.PreferencesHandler
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
-import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.framework.model.Source
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SourcesDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var dataRepository: DataRepository
+    lateinit var preferences: PreferencesHandler
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_sources, group, false)
@@ -46,50 +44,25 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-//        liveData { emit(dataRepository.getWebSources()) }.observe(viewLifecycleOwner, { sources ->
-//            val sourcesAdapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
-//            DialogSourcesBinding.bind(view).apply {
-//                dialog?.window?.setLayout(
-//                    WindowManager.LayoutParams.MATCH_PARENT,
-//                    WindowManager.LayoutParams.WRAP_CONTENT
-//                )
-//                sourcesRecycler.apply {
-//                    adapter = sourcesAdapter
-//                    layoutManager = LinearLayoutManager(requireContext())
-//                }
-//                sourcesBtnAdd.setOnClickListener {
-//                    sourcesAdapter.addSource()
-//                }
-//                sourcesBtnPos.setOnClickListener {
-//                    setNavResult("sources", sourcesAdapter.getSources().map { it.sourceUrl })
-//                    dismiss()
-//                }
-//                sourcesBtnNeg.setOnClickListener { dismiss() }
-//            }
-//        })
-        lifecycleScope.launch {
-            val sources = dataRepository.getWebSources()
-            val sourcesAdapter = SourcesAdapter()
-            DialogSourcesBinding.bind(view).apply {
-                dialog?.window?.setLayout(
-                    WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT
-                )
-                sourcesRecycler.apply {
-                    sourcesAdapter.apply { setSources(sources.map { Source(it) }) }
-                    adapter = sourcesAdapter
-                    layoutManager = LinearLayoutManager(requireContext())
-                }
-                sourcesBtnAdd.setOnClickListener {
-                    sourcesAdapter.addSource()
-                }
-                sourcesBtnPos.setOnClickListener {
-                    setNavResult("sources", sourcesAdapter.getSources().map { it.sourceUrl })
-                    dismiss()
-                }
-                sourcesBtnNeg.setOnClickListener { dismiss() }
+        val sources = preferences.loadDataSources()
+        val sourcesAdapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
+        DialogSourcesBinding.bind(view).apply {
+            dialog?.window?.setLayout(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT
+            )
+            sourcesRecycler.apply {
+                adapter = sourcesAdapter
+                layoutManager = LinearLayoutManager(requireContext())
             }
+            sourcesBtnAdd.setOnClickListener {
+                sourcesAdapter.addSource()
+            }
+            sourcesBtnPos.setOnClickListener {
+                setNavResult("sources", sourcesAdapter.getSources().map { it.sourceUrl })
+                dismiss()
+            }
+            sourcesBtnNeg.setOnClickListener { dismiss() }
         }
-
     }
 }

@@ -22,14 +22,15 @@ import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.domain.predict.Satellite
-import com.rtbishop.look4sat.framework.*
-import com.rtbishop.look4sat.framework.model.Source
+import com.rtbishop.look4sat.framework.toDomain
+import com.rtbishop.look4sat.framework.toDomainItems
+import com.rtbishop.look4sat.framework.toFramework
+import com.rtbishop.look4sat.framework.toFrameworkEntries
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LocalSource(
     private val entriesDao: EntriesDao,
-    private val sourcesDao: SourcesDao,
     private val transmittersDao: TransmittersDao
 ) : LocalDataSource {
 
@@ -41,8 +42,6 @@ class LocalSource(
         return entriesDao.getSelectedSatellites().map { entry -> entry.tle.createSat() }
     }
 
-    override suspend fun getSources() = sourcesDao.getSources()
-
     override suspend fun getTransmitters(catnum: Int): List<Transmitter> {
         return transmittersDao.getTransmitters(catnum).toDomain()
     }
@@ -53,10 +52,6 @@ class LocalSource(
 
     override suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
         entriesDao.updateEntriesSelection(catnums, isSelected)
-    }
-
-    override suspend fun updateSources(sources: List<String>) {
-        sourcesDao.updateSources(sources.map { sourceUrl -> Source(sourceUrl) })
     }
 
     override suspend fun updateTransmitters(transmitters: List<Transmitter>) {

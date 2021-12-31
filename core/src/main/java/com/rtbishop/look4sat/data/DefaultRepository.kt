@@ -31,28 +31,15 @@ import kotlin.system.measureTimeMillis
 class DefaultRepository(
     private val dataParser: DataParser,
     private val localSource: LocalDataSource,
-    private val remoteSource: RemoteDataSource
+    private val remoteSource: RemoteDataSource,
+    private val preferences: PreferencesHandler
 ) : DataRepository {
-
-    override val defaultSelection = listOf(43700, 25544, 25338, 28654, 33591, 40069, 27607, 24278)
-    override val defaultSources = listOf(
-        "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-        "https://amsat.org/tle/current/nasabare.txt",
-        "https://www.prismnet.com/~mmccants/tles/classfd.zip",
-        "https://www.prismnet.com/~mmccants/tles/inttles.zip"
-    )
-    override val transmittersSource = "https://db.satnogs.org/api/transmitters/?format=json"
 
     override fun getSatelliteItems() = localSource.getSatelliteItems()
 
     override suspend fun getSelectedSatellites() = localSource.getSelectedSatellites()
 
     override suspend fun getTransmitters(catnum: Int) = localSource.getTransmitters(catnum)
-
-    override suspend fun getWebSources() = localSource.getSources().also { sources ->
-        return if (sources.isNotEmpty()) sources
-        else defaultSources
-    }
 
     override suspend fun updateDataFromFile(stream: InputStream) {
         localSource.updateEntries(importSatellites(stream))
@@ -61,7 +48,7 @@ class DefaultRepository(
     override suspend fun updateDataFromWeb(sources: List<String>) {
         coroutineScope {
             launch {
-                localSource.updateSources(sources)
+                preferences.saveDataSources(sources)
             }
             launch {
                 val updateTimeMillis = measureTimeMillis {
@@ -91,7 +78,7 @@ class DefaultRepository(
                 println("Update from web took $updateTimeMillis ms")
             }
             launch {
-                remoteSource.fetchFileStream(transmittersSource)?.let { inputStream ->
+                remoteSource.fetchFileStream(preferences.transmittersSource)?.let { inputStream ->
                     val transmitters = dataParser.parseJSONStream(inputStream)
                     localSource.updateTransmitters(transmitters)
                 }
