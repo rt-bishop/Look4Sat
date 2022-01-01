@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/greyDark">
+    android:background="@color/surfaceBg">
 
     <TextView
         android:id="@+id/pass_pref_title"
@@ -69,10 +69,10 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/greySurface"
+        android:backgroundTint="@color/surfaceToolbar"
         android:text="@string/btn_cancel"
         android:textAllCaps="false"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/pass_pref_btn_pos"
         app:layout_constraintHorizontal_bias="0.5"
@@ -85,10 +85,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:backgroundTint="@color/greySurface"
+        android:backgroundTint="@color/surfaceToolbar"
         android:text="@string/btn_update"
         android:textAllCaps="false"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         app:layout_constraintBaseline_toBaselineOf="@+id/pass_pref_btn_neg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

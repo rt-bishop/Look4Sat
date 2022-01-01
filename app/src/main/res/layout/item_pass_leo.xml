@@ -4,7 +4,7 @@
     android:id="@+id/pass_leo_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@color/greyCard"
+    android:backgroundTint="@color/surfaceCard"
     app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +20,7 @@
             android:layout_marginStart="6dp"
             android:layout_marginTop="6dp"
             android:text="@string/pass_satName"
-            android:textColor="@color/themeLight"
+            android:textColor="@color/themeAccent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/pass_satId"
-            android:textColor="@color/themeLight"
+            android:textColor="@color/themeAccent"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_leo_name"
             app:layout_constraintEnd_toEndOf="parent" />
 

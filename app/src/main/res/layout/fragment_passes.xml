@@ -5,52 +5,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/passes_bar"
-        android:layout_width="0dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/passes_toolbar"
         style="@style/Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/passes_timer"
-        style="@style/TimerText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="16dp"
-        android:text="@string/timer_zero"
-        android:textSize="40sp"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/passes_bar"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageButton
         android:id="@+id/passes_filter"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        style="@style/ToolbarButton"
         android:layout_marginStart="4dp"
-        android:background="?android:attr/actionBarItemBackground"
-        android:contentDescription="@string/placeholder"
-        android:elevation="16dp"
         android:src="@drawable/ic_filter"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_bar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/passes_bar" />
+        app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/passes_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
+
+    <TextView
+        android:id="@+id/passes_timer"
+        style="@style/ToolbarTimer"
+        app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/passes_toolbar"
+        app:layout_constraintStart_toStartOf="@id/passes_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
 
     <ImageButton
         android:id="@+id/passes_settings"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        style="@style/ToolbarButton"
         android:layout_marginEnd="4dp"
-        android:background="?android:attr/actionBarItemBackground"
-        android:contentDescription="@string/placeholder"
-        android:elevation="16dp"
-        android:src="@drawable/ic_nav_prefs"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/passes_bar" />
+        android:src="@drawable/ic_prefs"
+        app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/passes_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/passes_swipe"
@@ -59,7 +45,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passes_bar">
+        app:layout_constraintTop_toBottomOf="@+id/passes_toolbar">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/passes_recycler"
@@ -77,7 +63,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/passes_swipe"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passes_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/passes_toolbar" />
 
     <TextView
         android:id="@+id/passes_error"
@@ -89,7 +75,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passes_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/passes_toolbar" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/passes_fab"
@@ -98,7 +84,6 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:contentDescription="@string/placeholder"
         android:src="@drawable/ic_sputnik_dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

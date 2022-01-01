@@ -11,7 +11,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
         android:text="@string/location_title"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +23,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
-        android:drawableStart="@drawable/ic_gps"
+        android:drawableStart="@drawable/ic_pos"
         android:text="@string/location_gps"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/location_btn_qth"

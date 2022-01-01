@@ -11,7 +11,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
         android:text="@string/other_title"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,7 +24,7 @@
         android:layout_marginEnd="4dp"
         android:minHeight="48dp"
         android:text="@string/other_switch_utc"
-        android:textColor="@color/greyLight"
+        android:textColor="@color/themeLight"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/other_title" />
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:minHeight="48dp"
         android:text="@string/other_switch_sweep"
-        android:textColor="@color/greyLight"
+        android:textColor="@color/themeLight"
         app:layout_constraintEnd_toEndOf="@+id/other_switch_utc"
         app:layout_constraintStart_toStartOf="@+id/other_switch_utc"
         app:layout_constraintTop_toBottomOf="@+id/other_switch_utc" />
@@ -47,7 +47,7 @@
         android:layout_marginBottom="8dp"
         android:minHeight="48dp"
         android:text="@string/other_switch_sensors"
-        android:textColor="@color/greyLight"
+        android:textColor="@color/themeLight"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/other_switch_utc"
         app:layout_constraintStart_toStartOf="@+id/other_switch_sweep"

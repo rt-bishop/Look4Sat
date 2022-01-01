@@ -3,9 +3,9 @@
     android:id="@+id/entry_checkbox"
     android:layout_width="match_parent"
     android:layout_height="36dp"
-    android:background="@color/greyCard"
+    android:background="@color/surfaceCard"
     android:ellipsize="end"
     android:lines="1"
     android:text="@string/placeholder"
-    android:textColor="@color/greyLight"
+    android:textColor="@color/themeLight"
     android:textSize="16sp" />

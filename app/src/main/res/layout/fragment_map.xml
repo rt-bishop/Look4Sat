@@ -7,16 +7,40 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/map_toolbar"
+        style="@style/Toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/map_back"
+        style="@style/ToolbarButton"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toBottomOf="@+id/map_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/map_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/map_toolbar" />
+
+    <TextView
+        android:id="@+id/map_title"
+        style="@style/ToolbarText"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/map_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/map_toolbar"
+        app:layout_constraintHorizontal_bias="0.32"
+        app:layout_constraintStart_toStartOf="@+id/map_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/map_toolbar" />
+
     <org.osmdroid.views.MapView
         android:id="@+id/map_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </org.osmdroid.views.MapView>
+        app:layout_constraintTop_toBottomOf="@+id/map_toolbar" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/map_data_root"
@@ -28,7 +52,7 @@
         android:background="@drawable/map_info_rounded"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/map_toolbar">
 
         <TextView
             android:id="@+id/map_data_lat"
@@ -109,10 +133,9 @@
         android:layout_height="52dp"
         android:layout_marginStart="48dp"
         android:layout_marginBottom="48dp"
-        android:backgroundTint="@color/greySurface"
-        android:contentDescription="@string/placeholder"
+        android:backgroundTint="@color/surfaceToolbar"
         android:rotation="180"
-        android:src="@drawable/ic_next"
+        android:src="@drawable/ic_arrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="DuplicateSpeakableTextCheck" />
@@ -123,9 +146,8 @@
         android:layout_height="52dp"
         android:layout_marginEnd="48dp"
         android:layout_marginBottom="48dp"
-        android:backgroundTint="@color/greySurface"
-        android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_next"
+        android:backgroundTint="@color/surfaceToolbar"
+        android:src="@drawable/ic_arrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -135,7 +157,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/map_copyright"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

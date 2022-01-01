@@ -42,7 +42,6 @@ class PreferencesSource @Inject constructor(
         const val keyModes = "satModes"
         const val keyCompass = "compass"
         const val keyRadarSweep = "radarSweep"
-        const val keyTextLabels = "shouldUseTextLabels"
         const val keyTimeUTC = "timeUTC"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
@@ -105,10 +104,6 @@ class PreferencesSource @Inject constructor(
 
     fun getMinElevation(): Double {
         return preferences.getInt(keyMinElevation, 16).toDouble()
-    }
-
-    fun shouldUseTextLabels(): Boolean {
-        return preferences.getBoolean(keyTextLabels, false)
     }
 
     fun getUseUTC(): Boolean {
@@ -189,7 +184,7 @@ class PreferencesSource @Inject constructor(
 
     override fun loadDataSources(): List<String> {
         val sourcesList = preferences.getStringSet(keyDataSources, null)?.toList()
-        return if (sourcesList.isNullOrEmpty()) defaultSources else sourcesList
+        return if (sourcesList.isNullOrEmpty()) defaultSources else sourcesList.sortedDescending()
     }
 
     override fun saveDataSources(sources: List<String>) {

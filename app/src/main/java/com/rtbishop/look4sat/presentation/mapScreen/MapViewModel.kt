@@ -18,12 +18,12 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.DataRepository
-import com.rtbishop.look4sat.framework.PreferencesSource
-import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.QthConverter
+import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -35,7 +35,7 @@ import kotlin.math.min
 class MapViewModel @Inject constructor(
     private val dataRepository: DataRepository,
     private val predictor: Predictor,
-    private val preferences: PreferencesSource,
+    preferences: PreferencesSource,
 ) : ViewModel() {
 
     private val stationPos = preferences.loadStationPosition()
@@ -60,10 +60,6 @@ class MapViewModel @Inject constructor(
 
     private val _satPositions = MutableLiveData<Map<Satellite, GeoPos>>()
     val satPositions: LiveData<Map<Satellite, GeoPos>> = _satPositions
-
-    fun shouldUseTextLabels(): Boolean {
-        return preferences.shouldUseTextLabels()
-    }
 
     fun scrollSelection(decrement: Boolean) {
         if (allSatList.isNotEmpty()) {

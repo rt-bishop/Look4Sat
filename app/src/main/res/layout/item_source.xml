@@ -28,11 +28,9 @@
 
     <ImageButton
         android:id="@+id/source_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:backgroundTint="@color/greyDark"
-        android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_map_sat"
+        style="@style/ToolbarButton"
+        android:rotation="45"
+        android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="@+id/source_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/source_input" />

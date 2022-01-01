@@ -101,7 +101,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             Marker(mapView).apply {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pos)
+                icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_pos)
                 position = GeoPoint(stationPos.latitude, stationPos.longitude)
                 mapView.overlays[0] = this
                 mapView.invalidate()

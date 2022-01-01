@@ -21,10 +21,10 @@ interface PreferencesHandler {
 
     val defaultSources: List<String>
         get() = listOf(
-            "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-            "https://amsat.org/tle/current/nasabare.txt",
+            "https://prismnet.com/~mmccants/tles/inttles.zip",
             "https://prismnet.com/~mmccants/tles/classfd.zip",
-            "https://prismnet.com/~mmccants/tles/inttles.zip"
+            "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
+            "https://amsat.org/tle/current/nasabare.txt"
         )
     val transmittersSource: String
         get() = "https://db.satnogs.org/api/transmitters/?format=json"

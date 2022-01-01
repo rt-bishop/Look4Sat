@@ -29,7 +29,7 @@ import kotlin.math.sin
 
 class RadarView(context: Context) : View(context) {
 
-    private val defaultColor = ContextCompat.getColor(context, R.color.themeLight)
+    private val defaultColor = ContextCompat.getColor(context, R.color.themeAccent)
     private val scale = resources.displayMetrics.density
     private val radarWidth = resources.displayMetrics.widthPixels
     private val radarRadius = radarWidth * 0.48f
@@ -38,7 +38,7 @@ class RadarView(context: Context) : View(context) {
     private var position: SatPos? = null
     private var positions: List<SatPos> = emptyList()
 
-    private var radarColor = ContextCompat.getColor(context, R.color.greyLight)
+    private var radarColor = ContextCompat.getColor(context, R.color.themeLight)
     private var radarCircleNum = 3
     private var radarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = radarColor
@@ -79,7 +79,7 @@ class RadarView(context: Context) : View(context) {
 
     private val arrowPath = Path()
     private var arrowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.themeLight)
+        color = ContextCompat.getColor(context, R.color.themeAccent)
         style = Paint.Style.FILL
         strokeWidth = strokeSize
     }
@@ -135,7 +135,7 @@ class RadarView(context: Context) : View(context) {
             isTrackCreated = true
         }
 
-        canvas.drawColor(ContextCompat.getColor(context, R.color.greyDark))
+        canvas.drawColor(ContextCompat.getColor(context, R.color.surfaceBg))
         drawRadarCircle(canvas, cx, cy, radarRadius)
         drawRadarCross(canvas, cx, cy, radarRadius)
         drawRadarText(canvas, cx, radarRadius)

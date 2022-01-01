@@ -4,45 +4,54 @@
     android:id="@+id/entries_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/greyCard">
+    android:background="@color/surfaceCard">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/entries_bar"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/entries_toolbar"
         style="@style/Toolbar"
-        android:layout_width="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/entries_back"
+        style="@style/ToolbarButton"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toBottomOf="@+id/entries_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/entries_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/entries_toolbar" />
 
     <SearchView
         android:id="@+id/entries_search_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:elevation="16dp"
         android:iconifiedByDefault="false"
         android:queryHint="@string/entries_search_hint"
-        app:layout_constraintBottom_toBottomOf="@+id/entries_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/entries_toolbar"
         app:layout_constraintEnd_toStartOf="@+id/entries_select_mode"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/entries_bar" />
+        app:layout_constraintTop_toTopOf="@+id/entries_toolbar" />
 
     <ImageButton
         android:id="@+id/entries_select_mode"
         android:layout_width="64dp"
         android:layout_height="48dp"
         android:elevation="16dp"
-        android:backgroundTint="@color/greySurface"
+        android:backgroundTint="@color/surfaceToolbar"
         android:contentDescription="@string/placeholder"
         android:src="@drawable/ic_satellite"
-        app:layout_constraintBottom_toBottomOf="@+id/entries_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/entries_toolbar"
         app:layout_constraintEnd_toStartOf="@+id/entries_select_all"
-        app:layout_constraintTop_toTopOf="@+id/entries_bar" />
+        app:layout_constraintTop_toTopOf="@+id/entries_toolbar" />
 
     <ImageButton
         android:id="@+id/entries_select_all"
         android:layout_width="64dp"
         android:layout_height="48dp"
-        android:backgroundTint="@color/greySurface"
+        android:backgroundTint="@color/surfaceToolbar"
         android:contentDescription="@string/placeholder"
         android:elevation="16dp"
         android:src="@drawable/ic_select_all"
@@ -57,7 +66,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/entries_toolbar" />
 
     <ProgressBar
         android:id="@+id/entries_progress"
@@ -67,6 +76,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entries_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/entries_toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

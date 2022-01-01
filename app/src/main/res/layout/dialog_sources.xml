@@ -4,7 +4,7 @@
     android:id="@+id/sources_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/greyDark"
+    android:background="@color/surfaceBg"
     android:padding="4dp">
 
     <TextView
@@ -34,7 +34,7 @@
         android:id="@+id/sources_btn_add"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:backgroundTint="@color/greySurface"
+        android:backgroundTint="@color/surfaceToolbar"
         android:contentDescription="@string/placeholder"
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="@+id/sources_warning"
@@ -60,10 +60,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:backgroundTint="@color/greySurface"
+        android:backgroundTint="@color/surfaceToolbar"
         android:text="@string/btn_cancel"
         android:textAllCaps="false"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         app:layout_constraintBaseline_toBaselineOf="@+id/sources_btn_pos"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent" />
@@ -75,10 +75,10 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
-        android:backgroundTint="@color/greySurface"
+        android:backgroundTint="@color/surfaceToolbar"
         android:text="@string/btn_update"
         android:textAllCaps="false"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sources_recycler" />

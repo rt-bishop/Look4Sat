@@ -76,8 +76,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 })
             }
             passesSwipe.apply {
-                setColorSchemeResources(R.color.greySurface)
-                setProgressBackgroundColorSchemeResource(R.color.themeLight)
+                setColorSchemeResources(R.color.surfaceToolbar)
+                setProgressBackgroundColorSchemeResource(R.color.themeAccent)
                 setOnRefreshListener { passesViewModel.forceCalculation() }
             }
             passesFilter.setOnClickListener { findNavController().navigate(R.id.nav_pass_prefs) }

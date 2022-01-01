@@ -4,7 +4,7 @@
     android:id="@+id/trans_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/greySurface"
+    app:cardBackgroundColor="@color/surfaceToolbar"
     app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,7 +50,7 @@
 
         <TextView
             android:id="@+id/trans_downlink"
-            style="@style/TimerText"
+            style="@style/ToolbarTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trans_link_low"
@@ -73,7 +73,7 @@
 
         <TextView
             android:id="@+id/trans_uplink"
-            style="@style/TimerText"
+            style="@style/ToolbarTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trans_link_low"

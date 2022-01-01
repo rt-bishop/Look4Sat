@@ -9,8 +9,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:contentDescription="@string/placeholder"
-        android:src="@drawable/ic_nav_entries"
+        android:src="@drawable/ic_sputnik"
         app:layout_constraintBottom_toBottomOf="@+id/about_version"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toStartOf="@+id/about_title"
@@ -26,7 +25,7 @@
         android:layout_marginTop="8dp"
         android:includeFontPadding="false"
         android:text="@string/app_name"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/themeAccent"
         android:textSize="48sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/about_img"
@@ -37,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/about_version"
-        android:textColor="@color/greyLight"
+        android:textColor="@color/themeLight"
         android:textSize="22sp"
         app:layout_constraintStart_toStartOf="@+id/about_title"
         app:layout_constraintTop_toBottomOf="@+id/about_title" />
@@ -48,6 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/about_subtitle"
+        android:textColor="@color/themeLight"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +65,6 @@
         android:text="@string/about_github"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/about_btn_donate"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/about_subtitle" />
@@ -79,7 +78,6 @@
         android:text="@string/about_support"
         app:layout_constraintBaseline_toBaselineOf="@+id/about_btn_github"
         app:layout_constraintEnd_toStartOf="@+id/about_btn_fdroid"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/about_btn_github" />
 
     <Button
@@ -92,7 +90,6 @@
         android:text="@string/about_fdroid"
         app:layout_constraintBaseline_toBaselineOf="@+id/about_btn_github"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/about_btn_donate" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

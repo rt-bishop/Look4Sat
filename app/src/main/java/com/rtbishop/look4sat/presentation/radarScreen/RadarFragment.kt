@@ -27,9 +27,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
-import com.rtbishop.look4sat.framework.PreferencesSource
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
+import com.rtbishop.look4sat.framework.PreferencesSource
 import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
@@ -105,35 +105,11 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     orientation.third
                 )
             })
-            binding.radarToMapButton.setOnClickListener {
+            binding.radarMap.setOnClickListener {
                 val bundle = bundleOf("catNum" to pass.catNum)
                 findNavController().navigateSafe(R.id.action_radar_to_map, bundle)
             }
         }
-
-//        binding.radarNotifyButton.setOnClickListener {
-//            this.context?.let { context ->
-//
-//                val choicesList = arrayOf(
-//                    getString(R.string.notification_on_start_pass),
-//                    getString(R.string.notification_5_min_before),
-//                    getString(R.string.notification_10_min_before),
-//                    getString(R.string.notification_15_min_before),
-//                )
-//
-//                MaterialAlertDialogBuilder(context)
-//                    .setTitle(getString(R.string.notification_title))
-//                    .setSingleChoiceItems(choicesList, -1) { dialog, which ->
-//                        // TODO in this place should set a notification by NotificationBuilder
-//                        Toast.makeText(context, "Reminder was saved", Toast.LENGTH_SHORT).show()
-//                        dialog.dismiss()
-//                    }
-//                    .setNegativeButton(getString(R.string.btn_cancel)) { _, _ ->
-//                        // noop
-//                    }
-//                    .show()
-//            }
-//        }
     }
 
     private fun setPassText(satPass: SatPass, satPos: SatPos, binding: FragmentRadarBinding) {
@@ -157,7 +133,9 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 binding.radarTimer.text = millisBeforeEnd.toTimerString()
                 if (timeNow > satPass.losTime) {
                     binding.radarTimer.text = 0L.toTimerString()
-                    findNavController().navigateSafe(R.id.action_radar_to_passes)
+//                    findNavController().navigateSafe(R.id.action_radar_to_passes)
+                    findNavController().popBackStack(R.id.nav_passes, true)
+//                    requireActivity().onNavigateUp()
                 }
             }
         } else {

@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="themeLight">#FFE082</color>
-    <color name="themeDark">#FFCA28</color>
-
-    <color name="greyLight">#D0D0D0</color>
-    <color name="greyDivider">#808080</color>
-    <color name="greyButton">#242424</color>
-    <color name="greySurface">#1E1E1E</color>
-    <color name="greyCard">#181818</color>
-    <color name="greyDark">#121212</color>
+    <color name="themeAccent">#FFE082</color>
+    <color name="themeIcon">#FFFFFF</color>
+    <color name="themeLight">#D0D0D0</color>
+    <color name="surfaceButton">#242424</color>
+    <color name="surfaceStatusbar">#1A1A1A</color>
+    <color name="surfaceToolbar">#202020</color>
+    <color name="surfaceCard">#181818</color>
+    <color name="surfaceBg">#121212</color>
     <color name="mapInfoLayout">#99000000</color>
-
-    <color name="mtrl_textinput_disabled_color">@color/greyButton</color>
-    <color name="mtrl_textinput_default_box_stroke_color">@color/greyLight</color>
+    <color name="mtrl_textinput_disabled_color">@color/surfaceButton</color>
+    <color name="mtrl_textinput_default_box_stroke_color">@color/themeLight</color>
 </resources>

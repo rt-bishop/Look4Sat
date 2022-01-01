@@ -8,17 +8,20 @@
         android:id="@+id/nav_entries"
         android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
         tools:layout="@layout/fragment_entries">
-        <action
-            android:id="@+id/action_entries_to_passes"
-            app:destination="@id/nav_passes" />
-        <action
-            android:id="@+id/action_entries_to_sources"
-            app:destination="@id/nav_sources" />
     </fragment>
     <fragment
         android:id="@+id/nav_passes"
         android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
         tools:layout="@layout/fragment_passes">
+        <action
+            android:id="@+id/action_passes_to_entries"
+            app:destination="@id/nav_entries" />
+        <action
+            android:id="@+id/action_passes_to_pass_prefs"
+            app:destination="@id/nav_pass_prefs" />
+        <action
+            android:id="@+id/action_passes_to_prefs"
+            app:destination="@id/nav_prefs" />
         <action
             android:id="@+id/action_passes_to_radar"
             app:destination="@id/nav_radar" />
@@ -27,11 +30,11 @@
         android:id="@+id/nav_radar"
         android:name="com.rtbishop.look4sat.presentation.radarScreen.RadarFragment"
         tools:layout="@layout/fragment_radar">
-        <action
-            android:id="@+id/action_radar_to_passes"
-            app:destination="@id/nav_passes"
-            app:popUpTo="@id/nav_passes"
-            app:popUpToInclusive="true" />
+<!--        <action-->
+<!--            android:id="@+id/action_radar_to_passes"-->
+<!--            app:destination="@id/nav_passes"-->
+<!--            app:popUpTo="@id/nav_passes"-->
+<!--            app:popUpToInclusive="true" />-->
         <action
             android:id="@+id/action_radar_to_map"
             app:destination="@id/nav_map" />

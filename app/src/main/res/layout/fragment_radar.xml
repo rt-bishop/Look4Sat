@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/radar_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/radar_bar"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/radar_toolbar"
         style="@style/Toolbar"
-        android:layout_width="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/radar_back"
+        style="@style/ToolbarButton"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/radar_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/radar_toolbar" />
+
     <TextView
         android:id="@+id/radar_timer"
-        style="@style/TimerText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="16dp"
-        android:text="@string/timer_zero"
-        android:textSize="40sp"
-        app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/radar_bar"
-        app:layout_constraintTop_toTopOf="parent" />
+        style="@style/ToolbarTimer"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/radar_toolbar"
+        app:layout_constraintStart_toStartOf="@+id/radar_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/radar_toolbar" />
+
+    <ImageButton
+        android:id="@+id/radar_map"
+        style="@style/ToolbarButton"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/ic_map"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/radar_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/radar_toolbar" />
 
     <FrameLayout
         android:id="@+id/radar_frame"
@@ -35,7 +46,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/radar_toolbar" />
 
     <TextView
         android:id="@+id/radar_az"
@@ -76,36 +87,6 @@
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/radar_frame"
         app:layout_constraintEnd_toEndOf="@+id/radar_frame" />
-
-    <ImageButton
-        android:id="@+id/radar_notify_button"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="4dp"
-        android:backgroundTint="@color/greyDark"
-        android:clickable="false"
-        android:contentDescription="@string/placeholder"
-        android:elevation="4dp"
-        android:src="@drawable/ic_notification"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
-        app:layout_constraintStart_toStartOf="@+id/radar_bar"
-        app:layout_constraintTop_toTopOf="@+id/radar_bar"
-        tools:ignore="DuplicateSpeakableTextCheck" />
-
-    <ImageButton
-        android:id="@+id/radar_to_map_button"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="4dp"
-        android:backgroundTint="@color/greyDark"
-        android:contentDescription="@string/placeholder"
-        android:elevation="16dp"
-        android:src="@drawable/ic_nav_map"
-        app:layout_constraintBottom_toBottomOf="@+id/radar_bar"
-        app:layout_constraintEnd_toEndOf="@+id/radar_bar"
-        app:layout_constraintTop_toTopOf="@+id/radar_bar"
-        tools:ignore="DuplicateSpeakableTextCheck" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radar_recycler"
