@@ -29,32 +29,36 @@ interface EntriesDao {
     @Query("SELECT catnum, name, isSelected FROM entries ORDER BY name ASC")
     fun getSatelliteItems(): Flow<List<SatItem>>
 
-    @Query("SELECT * FROM entries WHERE isSelected = 1")
-    suspend fun getSelectedSatellites(): List<SatEntry>
-
-    @Transaction
-    suspend fun updateEntries(entries: List<SatEntry>) {
-        val entriesSelection = getEntriesSelection()
-        insertEntries(entries)
-        restoreSelection(entriesSelection, true)
-    }
-
     @Query("SELECT catnum FROM entries WHERE isSelected = 1")
     suspend fun getEntriesSelection(): List<Int>
+
+    @Query("SELECT * FROM entries WHERE isSelected = 1")
+    suspend fun getSelectedSatellites(): List<SatEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
 
     @Transaction
-    suspend fun restoreSelection(catnums: List<Int>, isSelected: Boolean) {
-        updateEntriesSelection(catnums, isSelected)
+    suspend fun updateEntries(entries: List<SatEntry>) {
+        val entriesSelection = getEntriesSelection()
+        deleteEntries()
+        insertEntries(entries)
+        restoreSelection(entriesSelection, true)
     }
+
+    @Query("UPDATE entries SET isSelected = :isSelected WHERE catnum = :catnum")
+    suspend fun updateEntrySelection(catnum: Int, isSelected: Boolean)
 
     @Transaction
     suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
         catnums.forEach { catnum -> updateEntrySelection(catnum, isSelected) }
     }
 
-    @Query("UPDATE entries SET isSelected = :isSelected WHERE catnum = :catnum")
-    suspend fun updateEntrySelection(catnum: Int, isSelected: Boolean)
+    @Transaction
+    suspend fun restoreSelection(catnums: List<Int>, isSelected: Boolean) {
+        updateEntriesSelection(catnums, isSelected)
+    }
+
+    @Query("DELETE FROM entries")
+    suspend fun deleteEntries()
 }

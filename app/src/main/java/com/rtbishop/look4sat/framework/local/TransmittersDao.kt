@@ -23,9 +23,18 @@ import com.rtbishop.look4sat.framework.model.Transmitter
 @Dao
 interface TransmittersDao {
 
-    @Query("SELECT * FROM transmitters WHERE catnum = :catnum")
+    @Query("SELECT * FROM transmitters WHERE catnum = :catnum AND isAlive = 1")
     suspend fun getTransmitters(catnum: Int): List<Transmitter>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateTransmitters(transmitters: List<Transmitter>)
+    suspend fun insertTransmitters(transmitters: List<Transmitter>)
+
+    @Transaction
+    suspend fun updateTransmitters(transmitters: List<Transmitter>) {
+        deleteTransmitters()
+        insertTransmitters(transmitters)
+    }
+
+    @Query("DELETE FROM transmitters")
+    suspend fun deleteTransmitters()
 }
