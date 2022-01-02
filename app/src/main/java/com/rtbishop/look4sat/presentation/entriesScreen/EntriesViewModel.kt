@@ -21,13 +21,12 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.widget.SearchView
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.framework.PreferencesSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
@@ -91,6 +90,10 @@ class EntriesViewModel @Inject constructor(
     fun saveSelectedModes(modes: List<String>) {
         transModes.value = modes
         preferences.saveModesSelection(modes)
+    }
+
+    fun setQuery(query: String) {
+        currentQuery.value = query
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {

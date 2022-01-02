@@ -1,32 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Look4Sat</string>
-    <string name="placeholder" translatable="false">dummy</string>
 
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="btn_update">Update</string>
-
-    <string name="menu_entries">Satellites</string>
-    <string name="menu_passes">Passes</string>
-    <string name="menu_map">World Map</string>
-    <string name="menu_prefs">Settings</string>
-    <string name="menu_about">Info</string>
-
-    <string name="notification_title" translatable="false">Set notification</string>
-    <string name="notification_on_start_pass" translatable="false">On pass start</string>
-    <string name="notification_5_min_before" translatable="false">5 minutes before pass</string>
-    <string name="notification_10_min_before" translatable="false">10 minutes before pass</string>
-    <string name="notification_15_min_before" translatable="false">15 minutes before pass</string>
+    <string name="btn_accept">Accept</string>
 
     <string name="sources_title">Manage TLE sources</string>
     <string name="sources_hint">Source URL</string>
     <string name="sources_https">Protocol HTTPS only</string>
     <string name="sources_error">Please check the entered URL</string>
 
+    <string name="entries_title">Satellites</string>
     <string name="entries_update">TLE data update:</string>
     <string name="entries_search_hint">Search by Name / Id</string>
+    <string name="entries_select_all">Select All/None</string>
     <string name="entries_update_error">Error importing satellite data</string>
 
     <string name="modes_title">Choose transceiver mode</string>
@@ -54,6 +43,7 @@
     <string name="trans_link_lowHigh" translatable="false">%.4f - %.4f</string>
     <string name="trans_no_data">No transceivers found for this satellite</string>
 
+    <string name="map_title">World Map</string>
     <string name="map_qth">QTH Locator: %s</string>
     <string name="map_coverage">Coverage: %.0f km</string>
     <string name="map_copyright" translatable="false">Wikimedia maps | Map data © OpenStreetMap contributors</string>
@@ -62,7 +52,7 @@
     <string name="pat_elevation">Elevation: %.1f°</string>
     <string name="pat_distance">Range: %.0f km</string>
     <string name="pat_altitude">Altitude: %.0f km</string>
-    <string name="pat_osm_idName" translatable="false">Id:%s / %s</string>
+    <string name="pat_osm_idName" translatable="false">%s : %s</string>
     <string name="pat_osm_lat">Latitude: %.1f°</string>
     <string name="pat_osm_lon">Longitude: %.1f°</string>
     <string name="pat_osm_vel">Velocity: %.2f km/s</string>
@@ -95,6 +85,8 @@
     <string name="pref_min_el_summary">Show passes with max elevation above</string>
     <string name="pref_min_el_input_error">Set the value between 0° and 90°</string>
 
+    <string name="settings_title">Settings</string>
+
     <string name="about_version">Version: %s</string>
     <string name="about_subtitle">Satellite tracker and pass predictor</string>
     <string name="about_github" translatable="false">GitHub</string>
@@ -126,17 +118,17 @@
     <string name="update_file">From File</string>
     <string name="update_error">Update completed with errors</string>
 
-    <string name="warranty_title">I would like to say thank you:</string>
-    <string name="warranty_thanks"> • To You for downloading and using Look4Sat! \nMay your sky always be clear!
-        \n • To <a href="https://github.com/g4dpz">David A. B. Johnson</a>
+    <string name="warranty_title">I would like to say thanks to:</string>
+    <string name="warranty_thanks"> • You for downloading and using Look4Sat! \nMay your sky always be clear!
+        \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
-        under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a> license.
-        \n • To <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
-        satellite tracker that inspired the creation of Look4Sat.
-        \n • To <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
-        <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
-        \n • To <a href="https://libre.space/">Libre Space Foundation</a> for their
-        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data.
+        under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
+        \n • <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
+        satellite tracker that inspired the creation of Look4Sat
+        \n • <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
+        <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data
+        \n • <a href="https://libre.space/">Libre Space Foundation</a> for their
+        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data
     </string>
     <string name="warranty_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy.</a>
         The app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.

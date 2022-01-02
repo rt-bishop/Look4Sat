@@ -3,21 +3,17 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="btn_cancel">Отмена</string>
-    <string name="btn_update">Обновить</string>
-
-    <string name="menu_entries">Спутники</string>
-    <string name="menu_passes">Пролеты</string>
-    <string name="menu_map">Карта</string>
-    <string name="menu_prefs">Настройки</string>
-    <string name="menu_about">Инфо</string>
+    <string name="btn_accept">Принять</string>
 
     <string name="sources_title">Управление TLE</string>
     <string name="sources_hint">URL источника</string>
     <string name="sources_https">Только протокол HTTPS</string>
     <string name="sources_error">Пожалуйста, проверьте URL</string>
 
+    <string name="entries_title">Спутники</string>
     <string name="entries_update">Обновить спутники:</string>
     <string name="entries_search_hint">Поиск по Имени / Id</string>
+    <string name="entries_select_all">Выбрать Все/Нет</string>
     <string name="entries_update_error">Ошибка обновления спутников</string>
 
     <string name="modes_title">Выберите модуляцию трансивера</string>
@@ -34,6 +30,7 @@
     <string name="trans_inverted">Инверсия: %s</string>
     <string name="trans_no_data">Не найдены трансиверы для этого спутника</string>
 
+    <string name="map_title">Карта Мира</string>
     <string name="map_qth">QTH Локатор: %s</string>
     <string name="map_coverage">Покрытие: %.0fкм</string>
 
@@ -70,6 +67,8 @@
     <string name="pref_min_el_hint">Минимальная элевация</string>
     <string name="pref_min_el_summary">Показать пролеты с элевацией более</string>
     <string name="pref_min_el_input_error">Введите значение между 0° и 90°</string>
+
+    <string name="settings_title">Настройки</string>
 
     <string name="about_version">Версия: %s</string>
     <string name="about_subtitle">Трекер спутников для Android</string>

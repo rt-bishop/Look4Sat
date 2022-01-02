@@ -54,7 +54,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 isVerticalScrollBarEnabled = false
                 layoutManager = LinearLayoutManager(context)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(ItemDivider(R.drawable.rec_divider_dark))
+                addItemDecoration(ItemDivider(R.drawable.divider_dark))
             }
             setupObservers(transAdapter, this)
         }
@@ -135,7 +135,6 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     binding.radarTimer.text = 0L.toTimerString()
 //                    findNavController().navigateSafe(R.id.action_radar_to_passes)
                     findNavController().popBackStack(R.id.nav_passes, true)
-//                    requireActivity().onNavigateUp()
                 }
             }
         } else {

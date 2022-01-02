@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
+        android:textSize="16sp"
         android:text="@string/update_title"
         android:textColor="@color/themeAccent"
         app:layout_constraintStart_toStartOf="parent"
@@ -17,7 +18,7 @@
 
     <Button
         android:id="@+id/update_btn_web"
-        style="@style/InfoButton"
+        style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
@@ -31,7 +32,7 @@
 
     <Button
         android:id="@+id/update_btn_file"
-        style="@style/InfoButton"
+        style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"

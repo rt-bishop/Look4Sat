@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.prefsScreen
+package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.content.ContentResolver
 import android.net.Uri
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PrefsViewModel @Inject constructor(
+class SettingsViewModel @Inject constructor(
     private val preferences: PreferencesSource,
     private val resolver: ContentResolver,
     private val dataRepository: DataRepository

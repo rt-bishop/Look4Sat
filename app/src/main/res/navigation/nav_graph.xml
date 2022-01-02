@@ -45,8 +45,8 @@
         tools:layout="@layout/fragment_map" />
     <fragment
         android:id="@+id/nav_prefs"
-        android:name="com.rtbishop.look4sat.presentation.prefsScreen.PrefsFragment"
-        tools:layout="@layout/fragment_prefs">
+        android:name="com.rtbishop.look4sat.presentation.settingsScreen.SettingsFragment"
+        tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_prefs_to_sources"
             app:destination="@id/nav_sources" />

@@ -55,7 +55,7 @@
 
     <Button
         android:id="@+id/about_btn_github"
-        style="@style/InfoButton"
+        style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -71,7 +71,7 @@
 
     <Button
         android:id="@+id/about_btn_donate"
-        style="@style/InfoButton"
+        style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_bmc"
@@ -82,7 +82,7 @@
 
     <Button
         android:id="@+id/about_btn_fdroid"
-        style="@style/InfoButton"
+        style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"

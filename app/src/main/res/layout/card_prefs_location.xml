@@ -17,7 +17,7 @@
 
     <Button
         android:id="@+id/location_btn_gps"
-        style="@style/InfoButton"
+        style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -34,7 +34,7 @@
 
     <Button
         android:id="@+id/location_btn_qth"
-        style="@style/InfoButton"
+        style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"

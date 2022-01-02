@@ -19,11 +19,11 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
@@ -39,10 +39,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     private val viewModel: EntriesViewModel by viewModels()
-    private val contentContract = ActivityResultContracts.GetContent()
-    private val filePicker = registerForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.updateDataFromFile(uri) }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,16 +53,12 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 adapter = entriesAdapter
                 layoutManager = GridLayoutManager(requireContext(), 2)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(ItemDivider(R.drawable.rec_divider_dark))
+                addItemDecoration(ItemDivider(R.drawable.divider_dark))
             }
-//            entriesImportWeb.setOnClickListener {
-//                findNavController().navigateSafe(R.id.action_entries_to_sources)
-//            }
-//            entriesImportFile.setOnClickListener { filePicker.launch("*/*") }
-            entriesSelectMode.setOnClickListener { showModesDialog() }
+            entriesBack.setOnClickListener { findNavController().navigateUp() }
+            entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
+            entriesMode.setOnClickListener { showModesDialog() }
             entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
-            entriesSearchBar.setOnQueryTextListener(viewModel)
-            entriesSearchBar.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI
         }
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
             handleSatData(satData, binding, entriesAdapter)

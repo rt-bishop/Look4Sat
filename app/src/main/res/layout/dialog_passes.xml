@@ -86,7 +86,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:backgroundTint="@color/surfaceToolbar"
-        android:text="@string/btn_update"
+        android:text="@string/btn_accept"
         android:textAllCaps="false"
         android:textColor="@color/themeAccent"
         app:layout_constraintBaseline_toBaselineOf="@+id/pass_pref_btn_neg"

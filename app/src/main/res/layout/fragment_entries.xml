@@ -22,48 +22,43 @@
         app:layout_constraintStart_toStartOf="@+id/entries_toolbar"
         app:layout_constraintTop_toTopOf="@+id/entries_toolbar" />
 
-    <SearchView
-        android:id="@+id/entries_search_bar"
+    <EditText
+        android:id="@+id/entries_search"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:elevation="16dp"
-        android:iconifiedByDefault="false"
-        android:queryHint="@string/entries_search_hint"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="4dp"
+        android:background="@android:color/transparent"
+        android:elevation="8dp"
+        android:hint="@string/entries_search_hint"
+        android:importantForAutofill="no"
+        android:includeFontPadding="false"
+        android:inputType="text"
+        android:textColor="@color/themeAccent"
+        android:textColorHint="@color/themeAccent"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/entries_toolbar"
-        app:layout_constraintEnd_toStartOf="@+id/entries_select_mode"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/entries_mode"
+        app:layout_constraintStart_toEndOf="@+id/entries_back"
         app:layout_constraintTop_toTopOf="@+id/entries_toolbar" />
 
     <ImageButton
-        android:id="@+id/entries_select_mode"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:elevation="16dp"
-        android:backgroundTint="@color/surfaceToolbar"
-        android:contentDescription="@string/placeholder"
+        android:id="@+id/entries_mode"
+        style="@style/ToolbarButton"
+        android:layout_marginEnd="4dp"
         android:src="@drawable/ic_satellite"
         app:layout_constraintBottom_toBottomOf="@+id/entries_toolbar"
-        app:layout_constraintEnd_toStartOf="@+id/entries_select_all"
+        app:layout_constraintEnd_toEndOf="@+id/entries_toolbar"
         app:layout_constraintTop_toTopOf="@+id/entries_toolbar" />
-
-    <ImageButton
-        android:id="@+id/entries_select_all"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:backgroundTint="@color/surfaceToolbar"
-        android:contentDescription="@string/placeholder"
-        android:elevation="16dp"
-        android:src="@drawable/ic_select_all"
-        app:layout_constraintBottom_toBottomOf="@+id/entries_select_mode"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/entries_select_mode" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/entries_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/entries_cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entries_toolbar" />
@@ -73,9 +68,46 @@
         style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/entries_recycler"
+        app:layout_constraintEnd_toEndOf="@+id/entries_recycler"
+        app:layout_constraintStart_toStartOf="@+id/entries_recycler"
         app:layout_constraintTop_toBottomOf="@+id/entries_toolbar" />
+
+    <Button
+        android:id="@+id/entries_cancel"
+        style="@style/AppButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="2dp"
+        android:text="@string/btn_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/entries_select_all"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/entries_select_all"
+        style="@style/AppButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/entries_select_all"
+        app:layout_constraintBaseline_toBaselineOf="@+id/entries_cancel"
+        app:layout_constraintEnd_toStartOf="@+id/entries_accept"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/entries_cancel" />
+
+    <Button
+        android:id="@+id/entries_accept"
+        style="@style/AppButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="@string/btn_accept"
+        app:layout_constraintBaseline_toBaselineOf="@+id/entries_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/entries_select_all" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

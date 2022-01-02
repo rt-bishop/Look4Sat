@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.prefsScreen
+package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.Manifest
 import android.content.Intent
@@ -35,19 +35,19 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.FragmentPrefsBinding
+import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
 import com.rtbishop.look4sat.framework.PreferencesSource
 import com.rtbishop.look4sat.presentation.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PrefsFragment : Fragment(R.layout.fragment_prefs) {
+class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     @Inject
     lateinit var preferences: PreferencesSource
 
-    private val viewModel: PrefsViewModel by viewModels()
+    private val viewModel: SettingsViewModel by viewModels()
     private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     private val contentContract = ActivityResultContracts.GetContent()
@@ -62,17 +62,18 @@ class PrefsFragment : Fragment(R.layout.fragment_prefs) {
             else -> showSnack(getString(R.string.pref_pos_gps_error))
         }
     }
-    private var _binding: FragmentPrefsBinding? = null
+    private var _binding: FragmentSettingsBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentPrefsBinding.bind(view)
+        _binding = FragmentSettingsBinding.bind(view)
+        _binding?.prefsBack?.setOnClickListener { findNavController().navigateUp() }
         setupAboutCard()
         setupDataCard()
         setupLocationCard()
-        setupWarrantyCard()
-        setupOtherCard()
         setupTrackingCard()
+        setupOtherCard()
+        setupWarrantyCard()
     }
 
     private fun setupAboutCard() {
