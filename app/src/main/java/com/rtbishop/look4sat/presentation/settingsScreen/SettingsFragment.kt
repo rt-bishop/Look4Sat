@@ -18,8 +18,12 @@
 package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -42,7 +46,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsFragment : Fragment(R.layout.fragment_settings) {
+class SettingsFragment : Fragment(R.layout.fragment_settings), LocationListener {
 
     @Inject
     lateinit var preferences: PreferencesSource
@@ -173,11 +177,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun updatePositionFromGPS() {
-        val locPermString = Manifest.permission.ACCESS_FINE_LOCATION
-        val locPermResult = ContextCompat.checkSelfPermission(requireContext(), locPermString)
-        if (locPermResult == PackageManager.PERMISSION_GRANTED) {
-            if (preferences.updatePositionFromGPS()) {
-                showSnack(getString(R.string.pref_pos_success))
+        val manager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val provider = LocationManager.NETWORK_PROVIDER
+        val permission = Manifest.permission.ACCESS_COARSE_LOCATION
+        val result = ContextCompat.checkSelfPermission(requireContext(), permission)
+        if (result == PackageManager.PERMISSION_GRANTED) {
+            if (manager.isProviderEnabled(provider)) {
+                manager.requestLocationUpdates(provider, 0L, 0f, this)
             } else {
                 showSnack(getString(R.string.pref_pos_gps_null))
             }
@@ -203,5 +209,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onLocationChanged(location: Location) {
+        val manager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        manager.removeUpdates(this)
+        val latitude = location.latitude.round(4)
+        val longitude = location.longitude.round(4)
+        preferences.updatePosition(latitude, longitude)
+        showSnack(getString(R.string.pref_pos_success))
     }
 }

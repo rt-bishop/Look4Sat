@@ -68,6 +68,11 @@ class PreferencesSource @Inject constructor(
         }
     }
 
+    fun updatePosition(latitude: Double, longitude: Double) {
+        val stationPosition = GeoPos(latitude, longitude)
+        saveStationPosition(stationPosition)
+    }
+
     fun updatePositionFromGPS(): Boolean {
         return try {
             val location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
