@@ -17,15 +17,17 @@
  */
 package com.rtbishop.look4sat.presentation.radarScreen
 
+import android.hardware.GeomagneticField
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.DataReporter
 import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.framework.OrientationSource
-import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.SettingsProvider
 import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -37,7 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RadarViewModel @Inject constructor(
     private val orientationSource: OrientationSource,
-    private val preferences: PreferencesSource,
+    private val preferences: SettingsProvider,
     private val predictor: Predictor,
     private val dataRepository: DataRepository,
     private val dataReporter: DataReporter
@@ -71,7 +73,13 @@ class RadarViewModel @Inject constructor(
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
-        _orientation.value = Triple(azimuth + preferences.getMagDeclination(), pitch, roll)
+        _orientation.value = Triple(azimuth + getMagDeclination(stationPos), pitch, roll)
+    }
+
+    private fun getMagDeclination(geoPos: GeoPos, time: Long = System.currentTimeMillis()): Float {
+        val latitude = geoPos.latitude.toFloat()
+        val longitude = geoPos.longitude.toFloat()
+        return GeomagneticField(latitude, longitude, 0f, time).declination
     }
 
     private fun sendPassData(satPass: SatPass) {

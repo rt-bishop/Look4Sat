@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.data
 
-interface PreferencesHandler {
+interface SettingsHandler {
 
     val defaultSources: List<String>
         get() = listOf(

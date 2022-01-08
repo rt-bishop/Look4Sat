@@ -19,15 +19,16 @@ package com.rtbishop.look4sat.injection
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.location.LocationManager
 import androidx.room.Room
 import com.rtbishop.look4sat.data.DefaultRepository
-import com.rtbishop.look4sat.data.PreferencesHandler
+import com.rtbishop.look4sat.data.SettingsHandler
 import com.rtbishop.look4sat.domain.DataParser
 import com.rtbishop.look4sat.domain.DataReporter
 import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.LocationHandler
 import com.rtbishop.look4sat.domain.predict.Predictor
-import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.LocationProvider
+import com.rtbishop.look4sat.framework.SettingsProvider
 import com.rtbishop.look4sat.framework.local.LocalSource
 import com.rtbishop.look4sat.framework.local.SatelliteDb
 import com.rtbishop.look4sat.framework.remote.RemoteSource
@@ -46,7 +47,7 @@ object CoreModule {
     @Provides
     @Singleton
     fun provideSatelliteRepo(
-        preferencesHandler: PreferencesHandler,
+        settingsHandler: SettingsHandler,
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
@@ -56,16 +57,22 @@ object CoreModule {
             .fallbackToDestructiveMigration().build()
         val localSource = LocalSource(db.entriesDao(), db.transmittersDao())
         val remoteSource = RemoteSource(ioDispatcher)
-        return DefaultRepository(dataParser, localSource, remoteSource, preferencesHandler)
+        return DefaultRepository(dataParser, localSource, remoteSource, settingsHandler)
     }
 
     @Provides
     @Singleton
-    fun providePreferencesHandler(
-        locationManager: LocationManager,
-        sharedPreferences: SharedPreferences
-    ): PreferencesHandler {
-        return PreferencesSource(locationManager, sharedPreferences)
+    fun provideSettingsHandler(sharedPreferences: SharedPreferences): SettingsHandler {
+        return SettingsProvider(sharedPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationHandler(
+        @ApplicationContext context: Context,
+        settingsProvider: SettingsProvider
+    ): LocationHandler {
+        return LocationProvider(context, settingsProvider)
     }
 
     @Provides

@@ -25,7 +25,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.PreferencesHandler
+import com.rtbishop.look4sat.data.SettingsHandler
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
 import com.rtbishop.look4sat.framework.model.Source
 import com.rtbishop.look4sat.presentation.setNavResult
@@ -36,7 +36,7 @@ import javax.inject.Inject
 class SourcesDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var preferences: PreferencesHandler
+    lateinit var settings: SettingsHandler
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_sources, group, false)
@@ -44,7 +44,7 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        val sources = preferences.loadDataSources()
+        val sources = settings.loadDataSources()
         val sourcesAdapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
         DialogSourcesBinding.bind(view).apply {
             dialog?.window?.setLayout(

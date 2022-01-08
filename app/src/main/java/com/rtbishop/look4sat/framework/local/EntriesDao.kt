@@ -39,9 +39,9 @@ interface EntriesDao {
     suspend fun insertEntries(entries: List<SatEntry>)
 
     @Transaction
-    suspend fun updateEntries(entries: List<SatEntry>) {
+    suspend fun updateEntries(entries: List<SatEntry>, cleanup: Boolean = false) {
         val entriesSelection = getEntriesSelection()
-        deleteEntries()
+        if (cleanup) deleteEntries()
         insertEntries(entries)
         restoreSelection(entriesSelection, true)
     }

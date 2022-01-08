@@ -32,7 +32,7 @@ class DefaultRepository(
     private val dataParser: DataParser,
     private val localSource: LocalDataSource,
     private val remoteSource: RemoteDataSource,
-    private val preferences: PreferencesHandler
+    private val settings: SettingsHandler
 ) : DataRepository {
 
     override fun getSatelliteItems() = localSource.getSatelliteItems()
@@ -48,7 +48,7 @@ class DefaultRepository(
     override suspend fun updateDataFromWeb(sources: List<String>) {
         coroutineScope {
             launch {
-                preferences.saveDataSources(sources)
+                settings.saveDataSources(sources)
             }
             launch {
                 val updateTimeMillis = measureTimeMillis {
@@ -78,7 +78,7 @@ class DefaultRepository(
                 println("Update from web took $updateTimeMillis ms")
             }
             launch {
-                remoteSource.fetchFileStream(preferences.transmittersSource)?.let { inputStream ->
+                remoteSource.fetchFileStream(settings.transmittersSource)?.let { inputStream ->
                     val transmitters = dataParser.parseJSONStream(inputStream)
                     localSource.updateTransmitters(transmitters)
                 }

@@ -23,7 +23,7 @@ import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.Satellite
-import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.SettingsProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -35,7 +35,7 @@ import kotlin.math.min
 class MapViewModel @Inject constructor(
     private val dataRepository: DataRepository,
     private val predictor: Predictor,
-    preferences: PreferencesSource,
+    preferences: SettingsProvider,
 ) : ViewModel() {
 
     private val stationPos = preferences.loadStationPosition()

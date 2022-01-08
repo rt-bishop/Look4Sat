@@ -24,7 +24,7 @@ import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.SettingsProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -34,14 +34,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val preferences: PreferencesSource,
+    private val preferences: SettingsProvider,
     private val resolver: ContentResolver,
     private val dataRepository: DataRepository
 ) : ViewModel(), SearchView.OnQueryTextListener, EntriesAdapter.EntriesClickListener {
 
     private val coroutineHandler = CoroutineExceptionHandler { _, throwable ->
         Timber.d(throwable)
-        _satData.value = DataState.Error(throwable)
+        _satData.value = DataState.Error(null)
     }
     private val transModes = MutableLiveData(preferences.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
@@ -64,7 +64,7 @@ class EntriesViewModel @Inject constructor(
                 resolver.openInputStream(uri)?.use { stream ->
                     dataRepository.updateDataFromFile(stream)
                 }
-            }.onFailure { _satData.value = DataState.Error(it) }
+            }.onFailure { _satData.value = DataState.Error(null) }
         }
     }
 

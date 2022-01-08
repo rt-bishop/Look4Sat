@@ -18,12 +18,8 @@
 package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.Manifest
-import android.content.Context
+import android.content.ContentResolver
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -31,170 +27,161 @@ import android.view.View
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
-import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.LocationHandler
+import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.framework.SettingsProvider
 import com.rtbishop.look4sat.presentation.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsFragment : Fragment(R.layout.fragment_settings), LocationListener {
+class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     @Inject
-    lateinit var preferences: PreferencesSource
+    lateinit var preferences: SettingsProvider
 
-    private val viewModel: SettingsViewModel by viewModels()
-    private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
-    private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
-    private val contentContract = ActivityResultContracts.GetContent()
-    private val filePicker = registerForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.updateDataFromFile(uri) }
-    }
-    private val permReqContract = ActivityResultContracts.RequestMultiplePermissions()
-    private val locPermReq = registerForActivityResult(permReqContract) { permissions ->
+    @Inject
+    lateinit var locationHandler: LocationHandler
+
+    @Inject
+    lateinit var resolver: ContentResolver
+
+    @Inject
+    lateinit var dataRepository: DataRepository
+
+    private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
+    private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
+    private val locationContract = ActivityResultContracts.RequestMultiplePermissions()
+    private val locationRequest = registerForActivityResult(locationContract) { permissions ->
         when {
-            permissions[locPermFine] == true -> updatePositionFromGPS()
-            permissions[locPermCoarse] == true -> updatePositionFromGPS()
+            permissions[locationFine] == true -> locationHandler.setPositionFromLocation()
+            permissions[locationCoarse] == true -> locationHandler.setPositionFromNet()
             else -> showSnack(getString(R.string.pref_pos_gps_error))
         }
     }
-    private var _binding: FragmentSettingsBinding? = null
+    private val contentContract = ActivityResultContracts.GetContent()
+    private val contentRequest = registerForActivityResult(contentContract) { uri ->
+        lifecycleScope.launchWhenResumed {
+            @Suppress("BlockingMethodInNonBlockingContext")
+            resolver.openInputStream(uri)?.use { dataRepository.updateDataFromFile(it) }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentSettingsBinding.bind(view)
-        _binding?.prefsBack?.setOnClickListener { findNavController().navigateUp() }
-        setupAboutCard()
-        setupDataCard()
-        setupLocationCard()
-        setupTrackingCard()
-        setupOtherCard()
-        setupWarrantyCard()
-    }
-
-    private fun setupAboutCard() {
-        _binding?.prefsInfo?.let { binding ->
-            binding.aboutVersion.text =
-                String.format(getString(R.string.about_version), BuildConfig.VERSION_NAME)
-            binding.aboutBtnGithub.setOnClickListener {
-                gotoUrl("https://github.com/rt-bishop/Look4Sat/")
-            }
-            binding.aboutBtnDonate.setOnClickListener {
-                gotoUrl("https://www.buymeacoffee.com/rtbishop")
-            }
-            binding.aboutBtnFdroid.setOnClickListener {
-                gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
-            }
+        val settingsBinding = FragmentSettingsBinding.bind(view)
+        settingsBinding.prefsBack.setOnClickListener { findNavController().navigateUp() }
+        setupAboutCard(settingsBinding)
+        setupDataCard(settingsBinding)
+        setupLocationCard(settingsBinding)
+        setupTrackingCard(settingsBinding)
+        setupOtherCard(settingsBinding)
+        setupWarrantyCard(settingsBinding)
+        locationHandler.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
+            stationPos?.let { handleStationPosition(it) }
         }
     }
 
-    private fun setupDataCard() {
-        _binding?.prefsData?.let { binding ->
-            binding.updateBtnWeb.setOnClickListener {
-                findNavController().navigateSafe(R.id.action_prefs_to_sources)
-            }
-            binding.updateBtnFile.setOnClickListener { filePicker.launch("*/*") }
-            getNavResult<List<String>>(R.id.nav_prefs, "sources") { sources ->
-                viewModel.updateDataFromWeb(sources)
-            }
+    private fun setupAboutCard(binding: FragmentSettingsBinding) {
+        binding.prefsInfo.aboutVersion.text =
+            String.format(getString(R.string.about_version), BuildConfig.VERSION_NAME)
+        binding.prefsInfo.aboutBtnGithub.setOnClickListener {
+            gotoUrl("https://github.com/rt-bishop/Look4Sat/")
+        }
+        binding.prefsInfo.aboutBtnDonate.setOnClickListener {
+            gotoUrl("https://www.buymeacoffee.com/rtbishop")
+        }
+        binding.prefsInfo.aboutBtnFdroid.setOnClickListener {
+            gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
         }
     }
 
-    private fun setupLocationCard() {
-        _binding?.prefsLocation?.let { binding ->
-            binding.locationBtnGps.setOnClickListener {
-                updatePositionFromGPS()
-            }
-            binding.locationBtnQth.setOnClickListener {
-                val editText = EditText(requireActivity())
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Title")
-                    .setEditText(editText)
-                    .setPositiveButton("OK") { _, _ ->
-                        val editTextInput = editText.text.toString()
-                        updatePositionFromQth(editTextInput)
-                    }
-                    .setNeutralButton("Cancel", null)
-                    .create()
-                    .show()
-            }
+    private fun setupDataCard(binding: FragmentSettingsBinding) {
+        binding.prefsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
+        binding.prefsData.updateBtnWeb.setOnClickListener {
+            findNavController().navigateSafe(R.id.action_prefs_to_sources)
+        }
+        getNavResult<List<String>>(R.id.nav_prefs, "sources") { sources ->
+            lifecycleScope.launchWhenResumed { dataRepository.updateDataFromWeb(sources) }
         }
     }
 
-    private fun setupTrackingCard() {
-        _binding?.prefsTracking?.let { binding ->
-            binding.trackingSwitch.apply {
-                isChecked = preferences.getRotatorEnabled()
-                binding.trackingIp.isEnabled = isChecked
-                binding.trackingIpEdit.setText(preferences.getRotatorIp())
-                binding.trackingPort.isEnabled = isChecked
-                binding.trackingPortEdit.setText(preferences.getRotatorPort())
-                setOnCheckedChangeListener { _, isChecked ->
-                    preferences.setRotatorEnabled(isChecked)
-                    binding.trackingIp.isEnabled = isChecked
-                    binding.trackingPort.isEnabled = isChecked
+    private fun setupLocationCard(binding: FragmentSettingsBinding) {
+        binding.prefsLocation.locationBtnGps.setOnClickListener {
+            locationRequest.launch(arrayOf(locationFine, locationCoarse))
+        }
+        binding.prefsLocation.locationBtnQth.setOnClickListener {
+            val editText = EditText(requireActivity())
+            AlertDialog.Builder(requireContext())
+                .setTitle("Title")
+                .setEditText(editText)
+                .setPositiveButton("OK") { _, _ ->
+                    val editTextInput = editText.text.toString()
+                    locationHandler.setPositionFromQth(editTextInput)
                 }
-            }
-            binding.trackingIpEdit.doOnTextChanged { text, _, _, _ ->
-                if (text.toString().isValidIPv4()) preferences.setRotatorIp(text.toString())
-            }
-            binding.trackingPortEdit.doOnTextChanged { text, _, _, _ ->
-                if (text.toString().isValidPort()) preferences.setRotatorPort(text.toString())
-            }
+                .setNeutralButton("Cancel", null)
+                .create()
+                .show()
         }
     }
 
-    private fun setupOtherCard() {
-        _binding?.prefsOther?.let { binding ->
-            binding.otherSwitchUtc.apply {
-                isChecked = preferences.getUseUTC()
-                setOnCheckedChangeListener { _, isChecked -> preferences.setUseUTC(isChecked) }
+    private fun setupTrackingCard(binding: FragmentSettingsBinding) {
+        binding.prefsTracking.trackingSwitch.apply {
+            isChecked = preferences.getRotatorEnabled()
+            binding.prefsTracking.trackingIp.isEnabled = isChecked
+            binding.prefsTracking.trackingIpEdit.setText(preferences.getRotatorIp())
+            binding.prefsTracking.trackingPort.isEnabled = isChecked
+            binding.prefsTracking.trackingPortEdit.setText(preferences.getRotatorPort())
+            setOnCheckedChangeListener { _, isChecked ->
+                preferences.setRotatorEnabled(isChecked)
+                binding.prefsTracking.trackingIp.isEnabled = isChecked
+                binding.prefsTracking.trackingPort.isEnabled = isChecked
             }
-            binding.otherSwitchSweep.apply {
-                isChecked = preferences.getShowSweep()
-                setOnCheckedChangeListener { _, isChecked -> preferences.setShowSweep(isChecked) }
-            }
-            binding.otherSwitchSensors.apply {
-                isChecked = preferences.getUseCompass()
-                setOnCheckedChangeListener { _, isChecked -> preferences.setUseCompass(isChecked) }
-            }
+        }
+        binding.prefsTracking.trackingIpEdit.doOnTextChanged { text, _, _, _ ->
+            if (text.toString().isValidIPv4()) preferences.setRotatorIp(text.toString())
+        }
+        binding.prefsTracking.trackingPortEdit.doOnTextChanged { text, _, _, _ ->
+            if (text.toString().isValidPort()) preferences.setRotatorPort(text.toString())
         }
     }
 
-    private fun setupWarrantyCard() {
-        _binding?.prefsWarranty?.let { binding ->
-            binding.warrantyThanks.movementMethod = LinkMovementMethod.getInstance()
-            binding.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
+    private fun setupOtherCard(binding: FragmentSettingsBinding) {
+        binding.prefsOther.otherSwitchUtc.apply {
+            isChecked = preferences.getUseUTC()
+            setOnCheckedChangeListener { _, isChecked -> preferences.setUseUTC(isChecked) }
+        }
+        binding.prefsOther.otherSwitchSweep.apply {
+            isChecked = preferences.getShowSweep()
+            setOnCheckedChangeListener { _, isChecked -> preferences.setShowSweep(isChecked) }
+        }
+        binding.prefsOther.otherSwitchSensors.apply {
+            isChecked = preferences.getUseCompass()
+            setOnCheckedChangeListener { _, isChecked -> preferences.setUseCompass(isChecked) }
         }
     }
 
-    private fun updatePositionFromGPS() {
-        val manager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val provider = LocationManager.NETWORK_PROVIDER
-        val permission = Manifest.permission.ACCESS_COARSE_LOCATION
-        val result = ContextCompat.checkSelfPermission(requireContext(), permission)
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            if (manager.isProviderEnabled(provider)) {
-                manager.requestLocationUpdates(provider, 0L, 0f, this)
-            } else {
-                showSnack(getString(R.string.pref_pos_gps_null))
-            }
-        } else locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
+    private fun setupWarrantyCard(binding: FragmentSettingsBinding) {
+        binding.prefsWarranty.warrantyThanks.movementMethod = LinkMovementMethod.getInstance()
+        binding.prefsWarranty.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
     }
 
-    private fun updatePositionFromQth(qthString: String) {
-        if (preferences.updatePositionFromQTH(qthString)) {
-            showSnack(getString(R.string.pref_pos_success))
-        } else {
-            showSnack(getString(R.string.pref_pos_qth_error))
+    private fun handleStationPosition(position: DataState<GeoPos>) {
+        when (position) {
+            is DataState.Success -> showSnack(getString(R.string.pref_pos_success))
+            is DataState.Error -> showSnack(position.message.toString())
+            DataState.Loading -> showSnack("Fetching position")
         }
     }
 
@@ -204,19 +191,5 @@ class SettingsFragment : Fragment(R.layout.fragment_settings), LocationListener 
 
     private fun gotoUrl(url: String) {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
-    }
-
-    override fun onLocationChanged(location: Location) {
-        val manager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        manager.removeUpdates(this)
-        val latitude = location.latitude.round(4)
-        val longitude = location.longitude.round(4)
-        preferences.updatePosition(latitude, longitude)
-        showSnack(getString(R.string.pref_pos_success))
     }
 }

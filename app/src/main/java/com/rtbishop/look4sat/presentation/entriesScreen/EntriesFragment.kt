@@ -89,8 +89,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 val message = getString(R.string.entries_update_error)
                 Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
             }
-            else -> {
-            }
         }
     }
 

@@ -25,7 +25,7 @@ import com.rtbishop.look4sat.domain.DataRepository
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.framework.PreferencesSource
+import com.rtbishop.look4sat.framework.SettingsProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -34,7 +34,7 @@ import javax.inject.Inject
 class PassesViewModel @Inject constructor(
     private val dataRepository: DataRepository,
     private val predictor: Predictor,
-    private val preferences: PreferencesSource
+    private val preferences: SettingsProvider
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<DataState<List<SatPass>>>()
@@ -66,7 +66,7 @@ class PassesViewModel @Inject constructor(
     }
 
     fun triggerInitialSetup() {
-        preferences.updatePositionFromGPS()
+//        preferences.updatePositionFromGPS()
         viewModelScope.launch {
 //            _passes.postValue(DataState.Loading)
 //            val satellites = dataRepository.getSelectedSatellites()
@@ -115,8 +115,7 @@ class PassesViewModel @Inject constructor(
             }
             currentPasses = currentPasses.filter { it.progress < 100 }
             val passesCopy = currentPasses.map { it.copy() }
-            if (passesCopy.isEmpty()) _passes.postValue(DataState.Empty)
-            else _passes.postValue(DataState.Success(passesCopy))
+            _passes.postValue(DataState.Success(passesCopy))
             delay(1000)
         }
     }

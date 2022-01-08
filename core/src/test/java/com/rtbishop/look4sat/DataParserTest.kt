@@ -84,8 +84,6 @@ class DataParserTest {
     fun `Given valid data streams parsed results match`() = runTest(testDispatcher) {
         val csvResult = dataParser.parseCSVStream(validCSVStream)
         val tleResult = dataParser.parseTLEStream(validTLEStream)
-        println(csvResult)
-        println(tleResult)
         assert(csvResult == tleResult)
     }
 

@@ -17,10 +17,8 @@
  */
 package com.rtbishop.look4sat.presentation.passesScreen
 
-import android.Manifest
 import android.os.Bundle
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,15 +41,15 @@ import java.util.*
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
     private val passesViewModel: PassesViewModel by viewModels()
-    private val permReqContract = ActivityResultContracts.RequestMultiplePermissions()
-    private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
-    private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
-    private val locPermReq = registerForActivityResult(permReqContract) { permissions ->
-        when {
-            permissions[locPermFine] == true -> passesViewModel.triggerInitialSetup()
-            permissions[locPermCoarse] == true -> passesViewModel.triggerInitialSetup()
-        }
-    }
+//    private val permReqContract = ActivityResultContracts.RequestMultiplePermissions()
+//    private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
+//    private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
+//    private val locPermReq = registerForActivityResult(permReqContract) { permissions ->
+//        when {
+//            permissions[locPermFine] == true -> passesViewModel.triggerInitialSetup()
+//            permissions[locPermCoarse] == true -> passesViewModel.triggerInitialSetup()
+//        }
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -88,7 +86,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             handleNewPasses(passesResult, passesAdapter, binding)
         })
         passesViewModel.isFirstLaunchDone.observe(viewLifecycleOwner, { setupDone ->
-            if (!setupDone) locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
+//            if (!setupDone) locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
         })
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.forceCalculation(prefs.first, prefs.second)
