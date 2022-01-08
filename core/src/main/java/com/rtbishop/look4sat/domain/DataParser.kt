@@ -82,12 +82,13 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
             val year = values[2].substring(0, 4)
             val month = values[2].substring(5, 7)
             val dayOfMonth = values[2].substring(8, 10)
-            val day = getDayOfYear(year.toInt(), month.toInt(), dayOfMonth.toInt())
-            val hour = values[2].substring(11, 13).toInt() * 3600000000 // microseconds in one hour
-            val min = values[2].substring(14, 16).toInt() * 60000000 // microseconds in one minute
-            val sec = values[2].substring(17, 19).toInt() * 1000000 // microseconds in one second
-            val microsec = values[2].substring(20, 26).toInt()
-            val frac = ((hour + min + sec + microsec) / 86400000000.0).toString()
+            val dayInt = getDayOfYear(year.toInt(), month.toInt(), dayOfMonth.toInt())
+            val day = if (dayInt < 10) "00$dayInt" else if (dayInt < 100) "0$dayInt" else "$dayInt"
+            val hour = values[2].substring(11, 13).toInt() * 3600000 // ms in one hour
+            val min = values[2].substring(14, 16).toInt() * 60000 // ms in one minute
+            val sec = values[2].substring(17, 19).toInt() * 1000 // ms in one second
+            val ms = values[2].substring(20, 26).toInt() / 1000.0 // microseconds to ms
+            val frac = ((hour + min + sec + ms) / 86400000.0).toString()
             val epoch = "${year.substring(2)}$day${frac.substring(1)}".toDouble()
             val meanmo = values[3].toDouble()
             val eccn = values[4].toDouble()
@@ -151,9 +152,7 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
         var dayOfYear = dayOfMonth
         // If leap year increment Feb days
         if (((year / 4 == 0) && (year / 100 != 0)) || (year / 400 == 0)) daysArray[1]++
-        for (i in 0 until month - 1) {
-            dayOfYear += daysArray[i]
-        }
+        for (i in 0 until month - 1) { dayOfYear += daysArray[i] }
         return dayOfYear
     }
 }
