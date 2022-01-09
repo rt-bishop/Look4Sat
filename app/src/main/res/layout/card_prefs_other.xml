@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/other_title"
-        style="@style/SettingsCategory"
+        style="@style/SettingsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

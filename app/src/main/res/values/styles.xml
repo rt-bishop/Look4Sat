@@ -28,11 +28,27 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="DialogButton">
+        <item name="android:backgroundTint">@color/surfaceButton</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="DialogText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="DialogTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:textSize">17sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="Toolbar">
@@ -91,7 +107,7 @@
         <item name="android:textColor">@color/themeLight</item>
     </style>
 
-    <style name="SettingsCategory">
+    <style name="SettingsTitle">
         <item name="android:includeFontPadding">false</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/themeAccent</item>

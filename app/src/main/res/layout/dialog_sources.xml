@@ -4,29 +4,28 @@
     android:id="@+id/sources_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/surfaceBg"
-    android:padding="4dp">
+    android:background="@color/surfaceCard">
 
     <TextView
         android:id="@+id/sources_title"
+        style="@style/DialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:text="@string/sources_title"
-        android:textSize="16sp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/sources_warning"
+        style="@style/DialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="@string/sources_https"
-        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/sources_title"
         app:layout_constraintTop_toBottomOf="@+id/sources_title" />
 
@@ -34,8 +33,9 @@
         android:id="@+id/sources_btn_add"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:backgroundTint="@color/surfaceToolbar"
+        android:backgroundTint="@color/surfaceButton"
         android:src="@drawable/ic_add"
+        android:tint="@color/themeAccent"
         app:layout_constraintBottom_toBottomOf="@+id/sources_warning"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toEndOf="@+id/sources_recycler"
@@ -44,10 +44,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/sources_recycler"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="280dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sources_warning">
@@ -56,28 +56,24 @@
 
     <Button
         android:id="@+id/sources_btn_neg"
+        style="@style/DialogButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:backgroundTint="@color/surfaceToolbar"
+        android:layout_marginStart="12dp"
         android:text="@string/btn_cancel"
-        android:textAllCaps="false"
-        android:textColor="@color/themeAccent"
         app:layout_constraintBaseline_toBaselineOf="@+id/sources_btn_pos"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/sources_btn_pos"
+        style="@style/DialogButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="4dp"
-        android:backgroundTint="@color/surfaceToolbar"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
         android:text="@string/btn_accept"
-        android:textAllCaps="false"
-        android:textColor="@color/themeAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sources_recycler" />
