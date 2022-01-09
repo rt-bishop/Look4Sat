@@ -12,11 +12,9 @@ interface LocationHandler {
 
     fun setStationPosition(latitude: Double, longitude: Double)
 
-    fun setPositionFromLocation()
+    fun setPositionFromGps()
 
     fun setPositionFromNet()
-
-    fun setPositionFromGps()
 
     fun setPositionFromQth(qthString: String)
 }

@@ -6,44 +6,54 @@
 
     <TextView
         android:id="@+id/update_title"
+        style="@style/SettingsCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:textSize="16sp"
         android:text="@string/update_title"
-        android:textColor="@color/themeAccent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/update_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/update_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/update_title"
+        app:layout_constraintTop_toTopOf="@+id/update_title" />
 
     <Button
         android:id="@+id/update_btn_web"
         style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:drawableStart="@drawable/ic_update_web"
         android:text="@string/update_web"
-        app:layout_constraintBaseline_toBaselineOf="@+id/update_btn_file"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/update_btn_file"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@+id/update_btn_file" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/update_title" />
 
     <Button
         android:id="@+id/update_btn_file"
         style="@style/AppButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="4dp"
         android:drawableStart="@drawable/ic_update_file"
         android:text="@string/update_file"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/update_btn_web"
+        app:layout_constraintBaseline_toBaselineOf="@+id/update_btn_web"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/update_title" />
+        app:layout_constraintStart_toEndOf="@+id/update_btn_web" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

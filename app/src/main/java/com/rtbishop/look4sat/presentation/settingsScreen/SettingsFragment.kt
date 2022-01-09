@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
@@ -32,7 +33,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
@@ -65,9 +65,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private val locationContract = ActivityResultContracts.RequestMultiplePermissions()
     private val locationRequest = registerForActivityResult(locationContract) { permissions ->
         when {
-            permissions[locationFine] == true -> locationHandler.setPositionFromLocation()
+            permissions[locationFine] == true -> locationHandler.setPositionFromGps()
             permissions[locationCoarse] == true -> locationHandler.setPositionFromNet()
-            else -> showSnack(getString(R.string.pref_pos_gps_error))
+            else -> showToast(getString(R.string.pref_pos_gps_error))
         }
     }
     private val contentContract = ActivityResultContracts.GetContent()
@@ -89,7 +89,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         setupOtherCard(settingsBinding)
         setupWarrantyCard(settingsBinding)
         locationHandler.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
-            stationPos?.let { handleStationPosition(it) }
+            stationPos?.let { handleStationPosition(it, settingsBinding) }
         }
     }
 
@@ -107,17 +107,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupDataCard(binding: FragmentSettingsBinding) {
-        binding.prefsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
-        binding.prefsData.updateBtnWeb.setOnClickListener {
-            findNavController().navigateSafe(R.id.action_prefs_to_sources)
-        }
-        getNavResult<List<String>>(R.id.nav_prefs, "sources") { sources ->
-            lifecycleScope.launchWhenResumed { dataRepository.updateDataFromWeb(sources) }
-        }
-    }
-
     private fun setupLocationCard(binding: FragmentSettingsBinding) {
+        setPositionText(locationHandler.getStationPosition(), binding)
         binding.prefsLocation.locationBtnGps.setOnClickListener {
             locationRequest.launch(arrayOf(locationFine, locationCoarse))
         }
@@ -133,6 +124,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 .setNeutralButton("Cancel", null)
                 .create()
                 .show()
+        }
+    }
+
+    private fun setupDataCard(binding: FragmentSettingsBinding) {
+        binding.prefsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
+        binding.prefsData.updateBtnWeb.setOnClickListener {
+            findNavController().navigateSafe(R.id.action_prefs_to_sources)
+        }
+        getNavResult<List<String>>(R.id.nav_prefs, "sources") { sources ->
+            lifecycleScope.launchWhenResumed { dataRepository.updateDataFromWeb(sources) }
         }
     }
 
@@ -177,16 +178,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.prefsWarranty.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
     }
 
-    private fun handleStationPosition(position: DataState<GeoPos>) {
-        when (position) {
-            is DataState.Success -> showSnack(getString(R.string.pref_pos_success))
-            is DataState.Error -> showSnack(position.message.toString())
-            DataState.Loading -> showSnack("Fetching position")
+    private fun setPositionText(geoPos: GeoPos, binding: FragmentSettingsBinding) {
+        val latFormat = getString(R.string.location_lat)
+        val lonFormat = getString(R.string.location_lon)
+        binding.prefsLocation.locationLat.text = String.format(latFormat, geoPos.latitude)
+        binding.prefsLocation.locationLon.text = String.format(lonFormat, geoPos.longitude)
+    }
+
+    private fun handleStationPosition(pos: DataState<GeoPos>, binding: FragmentSettingsBinding) {
+        when (pos) {
+            is DataState.Success -> {
+                setPositionText(pos.data, binding)
+                binding.prefsLocation.locationProgress.isIndeterminate = false
+                showToast(getString(R.string.pref_pos_success))
+            }
+            is DataState.Error -> {
+                binding.prefsLocation.locationProgress.isIndeterminate = false
+                showToast(pos.message.toString())
+            }
+            DataState.Loading -> {
+                binding.prefsLocation.locationProgress.isIndeterminate = true
+            }
         }
     }
 
-    private fun showSnack(message: String) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun gotoUrl(url: String) {

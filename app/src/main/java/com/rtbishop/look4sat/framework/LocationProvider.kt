@@ -68,29 +68,29 @@ class LocationProvider @Inject constructor(
         } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_gps_null)))
     }
 
-    override fun setPositionFromLocation() {
+    override fun setPositionFromGps() {
         val result = ContextCompat.checkSelfPermission(context, locationFine)
-        if (manager.isProviderEnabled(providerDef) && result == PackageManager.PERMISSION_GRANTED) {
+        if (manager.isProviderEnabled(providerGps) && result == PackageManager.PERMISSION_GRANTED) {
             val location = manager.getLastKnownLocation(providerDef)
             if (location != null) {
                 setStationPosition(location.latitude, location.longitude)
-            } else setPositionFromGps()
+            } else {
+                _stationPosition.tryEmit(DataState.Loading)
+                manager.requestLocationUpdates(providerGps, 0L, 0f, this)
+            }
         } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_gps_null)))
     }
 
     override fun setPositionFromNet() {
         val result = ContextCompat.checkSelfPermission(context, locationCoarse)
         if (manager.isProviderEnabled(providerNet) && result == PackageManager.PERMISSION_GRANTED) {
-            _stationPosition.tryEmit(DataState.Loading)
-            manager.requestLocationUpdates(providerNet, 0L, 0f, this)
-        } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_gps_null)))
-    }
-
-    override fun setPositionFromGps() {
-        val result = ContextCompat.checkSelfPermission(context, locationFine)
-        if (manager.isProviderEnabled(providerGps) && result == PackageManager.PERMISSION_GRANTED) {
-            _stationPosition.tryEmit(DataState.Loading)
-            manager.requestLocationUpdates(providerGps, 0L, 0f, this)
+            val location = manager.getLastKnownLocation(providerDef)
+            if (location != null) {
+                setStationPosition(location.latitude, location.longitude)
+            } else {
+                _stationPosition.tryEmit(DataState.Loading)
+                manager.requestLocationUpdates(providerNet, 0L, 0f, this)
+            }
         } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_gps_null)))
     }
 

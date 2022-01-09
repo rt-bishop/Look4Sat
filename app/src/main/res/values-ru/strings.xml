@@ -75,6 +75,8 @@
     <string name="about_support">Поддержать</string>
 
     <string name="location_title">Местоположение наземной станции</string>
+    <string name="location_lat">Широта: %.4f°</string>
+    <string name="location_lon">Долгота: %.4f°</string>
     <string name="location_gps">Данные GPS</string>
     <string name="location_gps_null">Нет данных геолокации</string>
     <string name="location_gps_error">Нет разрешения использовать геоданные</string>

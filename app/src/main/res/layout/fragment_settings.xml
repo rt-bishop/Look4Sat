@@ -50,24 +50,11 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/card_prefs_data"
-            style="@style/SettingsCard"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card_prefs_info">
-
-            <include
-                android:id="@+id/prefs_data"
-                layout="@layout/card_prefs_update" />
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
             android:id="@+id/card_prefs_location"
             style="@style/SettingsCard"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card_prefs_data">
+            app:layout_constraintTop_toBottomOf="@+id/card_prefs_info">
 
             <include
                 android:id="@+id/prefs_location"
@@ -76,11 +63,24 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/card_prefs_tracking"
+            android:id="@+id/card_prefs_data"
             style="@style/SettingsCard"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/card_prefs_location">
+
+            <include
+                android:id="@+id/prefs_data"
+                layout="@layout/card_prefs_update" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_prefs_tracking"
+            style="@style/SettingsCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card_prefs_data">
 
             <include
                 android:id="@+id/prefs_tracking"

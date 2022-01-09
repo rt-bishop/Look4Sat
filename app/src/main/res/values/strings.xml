@@ -94,6 +94,8 @@
     <string name="about_fdroid" translatable="false">F-Droid</string>
 
     <string name="location_title">Station position update</string>
+    <string name="location_lat">Latitude: %.4f°</string>
+    <string name="location_lon">Longitude: %.4f°</string>
     <string name="location_gps">From GPS</string>
     <string name="location_gps_null">No geolocation data</string>
     <string name="location_gps_error">Check your location permissions</string>

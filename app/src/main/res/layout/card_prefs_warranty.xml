@@ -6,39 +6,35 @@
 
     <TextView
         android:id="@+id/warranty_title"
+        style="@style/SettingsCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/warranty_title"
-        android:textColor="@color/themeAccent"
-        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/warranty_thanks"
+        style="@style/SettingsText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:text="@string/warranty_thanks"
-        android:textColor="@color/themeLight"
-        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/warranty_title"
         app:layout_constraintTop_toBottomOf="@+id/warranty_title" />
 
     <TextView
         android:id="@+id/warranty_license"
+        style="@style/SettingsText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="8dp"
         android:text="@string/warranty_license"
-        android:textColor="@color/themeLight"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/warranty_thanks"
         app:layout_constraintStart_toStartOf="@+id/warranty_thanks"
