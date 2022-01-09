@@ -14,8 +14,8 @@ android {
         minSdkVersion 21
         resConfigs "en,ru"
         targetSdkVersion 31
-        versionCode 259
-        versionName "2.5.9"
+        versionCode 260
+        versionName "2.6.0"
 
         kapt {
             arguments {

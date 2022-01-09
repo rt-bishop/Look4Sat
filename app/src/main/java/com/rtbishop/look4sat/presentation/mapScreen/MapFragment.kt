@@ -70,7 +70,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             mapView.apply {
                 setMultiTouchControls(true)
                 setTileSource(TileSourceFactory.WIKIMEDIA)
-                minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels)
+                minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels) + 0.25
                 maxZoomLevel = 5.75
                 controller.setZoom(minZoomLevel + 0.25)
                 zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
@@ -113,42 +113,24 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         binding.apply {
             val markers = FolderOverlay()
             posMap.entries.forEach {
-                if (viewModel.shouldUseTextLabels()) {
-                    Marker(mapView).apply {
-                        setInfoWindow(null)
-                        textLabelFontSize = 24
-                        textLabelBackgroundColor = Color.TRANSPARENT
-                        textLabelForegroundColor =
-                            ContextCompat.getColor(requireContext(), R.color.themeLight)
-                        setTextIcon(it.key.params.name)
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                        try {
-                            position = GeoPoint(it.value.latitude, it.value.longitude)
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.d(exception)
-                        }
-                        setOnMarkerClickListener { _, _ ->
-                            viewModel.selectSatellite(it.key)
-                            return@setOnMarkerClickListener true
-                        }
-                        markers.add(this)
+                Marker(mapView).apply {
+                    setInfoWindow(null)
+                    textLabelFontSize = 24
+                    textLabelBackgroundColor = Color.TRANSPARENT
+                    textLabelForegroundColor =
+                        ContextCompat.getColor(requireContext(), R.color.themeLight)
+                    setTextIcon(it.key.params.name)
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    try {
+                        position = GeoPoint(it.value.latitude, it.value.longitude)
+                    } catch (exception: IllegalArgumentException) {
+                        Timber.d(exception)
                     }
-                } else {
-                    Marker(mapView).apply {
-                        setInfoWindow(null)
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                        icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_sat)
-                        try {
-                            position = GeoPoint(it.value.latitude, it.value.longitude)
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.d(exception)
-                        }
-                        setOnMarkerClickListener { _, _ ->
-                            viewModel.selectSatellite(it.key)
-                            return@setOnMarkerClickListener true
-                        }
-                        markers.add(this)
+                    setOnMarkerClickListener { _, _ ->
+                        viewModel.selectSatellite(it.key)
+                        return@setOnMarkerClickListener true
                     }
+                    markers.add(this)
                 }
             }
             mapView.overlays[3] = markers
@@ -161,9 +143,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         satTrack.forEach { track ->
             val trackPoints = track.map { GeoPoint(it.latitude, it.longitude) }
             Polyline().apply {
-                outlinePaint.set(trackPaint)
-                setPoints(trackPoints)
-                trackOverlay.add(this)
+                try {
+                    setPoints(trackPoints)
+                    outlinePaint.set(trackPaint)
+                    trackOverlay.add(this)
+                } catch (exception: IllegalArgumentException) {
+                    Timber.d(exception)
+                }
             }
         }
         binding.mapView.overlays[1] = trackOverlay
