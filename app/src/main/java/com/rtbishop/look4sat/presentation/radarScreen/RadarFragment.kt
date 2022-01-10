@@ -133,8 +133,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 binding.radarTimer.text = millisBeforeEnd.toTimerString()
                 if (timeNow > satPass.losTime) {
                     binding.radarTimer.text = 0L.toTimerString()
-//                    findNavController().navigateSafe(R.id.action_radar_to_passes)
-                    findNavController().popBackStack(R.id.nav_passes, true)
+                    findNavController().navigateUp()
                 }
             }
         } else {

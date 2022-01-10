@@ -7,6 +7,12 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_accept">Accept</string>
 
+    <string name="menu_satellites">Satellites</string>
+    <string name="menu_passes">Passes</string>
+    <string name="menu_radar">Radar</string>
+    <string name="menu_map">World Map</string>
+    <string name="menu_settings">Settings</string>
+
     <string name="sources_title">Manage TLE sources</string>
     <string name="sources_hint">Source URL</string>
     <string name="sources_https">Protocol HTTPS only</string>

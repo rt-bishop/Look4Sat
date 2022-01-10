@@ -132,7 +132,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.prefsData.updateBtnWeb.setOnClickListener {
             findNavController().navigateSafe(R.id.action_prefs_to_sources)
         }
-        getNavResult<List<String>>(R.id.nav_prefs, "sources") { sources ->
+        getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
             lifecycleScope.launchWhenResumed { dataRepository.updateDataFromWeb(sources) }
         }
     }

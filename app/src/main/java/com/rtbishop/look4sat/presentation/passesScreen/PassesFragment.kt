@@ -79,8 +79,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 setOnRefreshListener { passesViewModel.forceCalculation() }
             }
             passesFilter.setOnClickListener { findNavController().navigate(R.id.nav_pass_prefs) }
-            passesSettings.setOnClickListener { findNavController().navigate(R.id.nav_prefs) }
-            passesFab.setOnClickListener { findNavController().navigate(R.id.nav_entries) }
+            passesSettings.setOnClickListener { findNavController().navigate(R.id.nav_settings) }
+            passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
         }
         passesViewModel.passes.observe(viewLifecycleOwner, { passesResult ->
             handleNewPasses(passesResult, passesAdapter, binding)

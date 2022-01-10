@@ -63,7 +63,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
             handleSatData(satData, binding, entriesAdapter)
         })
-        getNavResult<List<String>>(R.id.nav_entries, "sources") { sources ->
+        getNavResult<List<String>>(R.id.nav_satellites, "sources") { sources ->
             viewModel.updateDataFromWeb(sources)
         }
     }

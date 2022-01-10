@@ -22,6 +22,9 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,6 +36,9 @@ class Look4SatActivity : AppCompatActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         super.onCreate(savedInstanceState)
         installSplashScreen()
-        setContentView(ActivityMainBinding.inflate(layoutInflater).root)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val navHost = supportFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
+        binding.mainNavBottom.setupWithNavController(navHost.navController)
     }
 }

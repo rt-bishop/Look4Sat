@@ -5,7 +5,7 @@
     android:id="@+id/nav_root"
     app:startDestination="@id/nav_passes">
     <fragment
-        android:id="@+id/nav_entries"
+        android:id="@+id/nav_satellites"
         android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
         tools:layout="@layout/fragment_entries">
     </fragment>
@@ -15,13 +15,13 @@
         tools:layout="@layout/fragment_passes">
         <action
             android:id="@+id/action_passes_to_entries"
-            app:destination="@id/nav_entries" />
+            app:destination="@id/nav_satellites" />
         <action
             android:id="@+id/action_passes_to_pass_prefs"
             app:destination="@id/nav_pass_prefs" />
         <action
             android:id="@+id/action_passes_to_prefs"
-            app:destination="@id/nav_prefs" />
+            app:destination="@id/nav_settings" />
         <action
             android:id="@+id/action_passes_to_radar"
             app:destination="@id/nav_radar" />
@@ -44,7 +44,7 @@
         android:name="com.rtbishop.look4sat.presentation.mapScreen.MapFragment"
         tools:layout="@layout/fragment_map" />
     <fragment
-        android:id="@+id/nav_prefs"
+        android:id="@+id/nav_settings"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.SettingsFragment"
         tools:layout="@layout/fragment_settings">
         <action
