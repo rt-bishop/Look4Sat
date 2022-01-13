@@ -27,6 +27,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.domain.predict.GeoPos
@@ -82,6 +83,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
         }
+        binding.mapBack.setOnClickListener { findNavController().navigateUp() }
         binding.mapBtnPrev.setOnClickListener { viewModel.scrollSelection(true) }
         binding.mapBtnNext.setOnClickListener { viewModel.scrollSelection(false) }
         setupObservers(binding)

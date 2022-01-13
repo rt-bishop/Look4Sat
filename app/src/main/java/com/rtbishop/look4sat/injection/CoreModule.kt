@@ -53,7 +53,7 @@ object CoreModule {
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): DataRepository {
         val dataParser = DataParser(defaultDispatcher)
-        val db = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
+        val db = Room.databaseBuilder(context, SatelliteDb::class.java, "Look4SatDB")
             .fallbackToDestructiveMigration().build()
         val localSource = LocalSource(db.entriesDao(), db.transmittersDao())
         val remoteSource = RemoteSource(ioDispatcher)

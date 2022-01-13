@@ -23,6 +23,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.LocationHandler
@@ -105,4 +106,10 @@ class LocationProvider @Inject constructor(
         manager.removeUpdates(this)
         setStationPosition(location.latitude, location.longitude)
     }
+
+    override fun onProviderEnabled(provider: String) {}
+
+    override fun onProviderDisabled(provider: String) {}
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
 }

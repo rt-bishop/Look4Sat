@@ -41,15 +41,6 @@ import java.util.*
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
     private val passesViewModel: PassesViewModel by viewModels()
-//    private val permReqContract = ActivityResultContracts.RequestMultiplePermissions()
-//    private val locPermFine = Manifest.permission.ACCESS_FINE_LOCATION
-//    private val locPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
-//    private val locPermReq = registerForActivityResult(permReqContract) { permissions ->
-//        when {
-//            permissions[locPermFine] == true -> passesViewModel.triggerInitialSetup()
-//            permissions[locPermCoarse] == true -> passesViewModel.triggerInitialSetup()
-//        }
-//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -84,9 +75,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         }
         passesViewModel.passes.observe(viewLifecycleOwner, { passesResult ->
             handleNewPasses(passesResult, passesAdapter, binding)
-        })
-        passesViewModel.isFirstLaunchDone.observe(viewLifecycleOwner, { setupDone ->
-//            if (!setupDone) locPermReq.launch(arrayOf(locPermFine, locPermCoarse))
         })
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.forceCalculation(prefs.first, prefs.second)

@@ -38,10 +38,8 @@ class PassesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<DataState<List<SatPass>>>()
-    private val _isFirstLaunchDone = MutableLiveData<Boolean>()
     private var passesProcessing: Job? = null
     val passes: LiveData<DataState<List<SatPass>>> = _passes
-    val isFirstLaunchDone: LiveData<Boolean> = _isFirstLaunchDone
 
     init {
         if (preferences.getSetupDone()) {
@@ -54,30 +52,12 @@ class PassesViewModel @Inject constructor(
                 val minElev = preferences.getMinElevation()
                 predictor.triggerCalculation(satellites, stationPos, timeNow, hoursAhead, minElev)
             }
-        } else {
-            _isFirstLaunchDone.value = false
         }
         viewModelScope.launch {
             predictor.passes.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch { tickPasses(passes) }
             }
-        }
-    }
-
-    fun triggerInitialSetup() {
-//        preferences.updatePositionFromGPS()
-        viewModelScope.launch {
-//            _passes.postValue(DataState.Loading)
-//            val satellites = dataRepository.getSelectedSatellites()
-//            val stationPos = preferences.loadStationPosition()
-//            val hoursAhead = preferences.getHoursAhead()
-//            val minElev = preferences.getMinElevation()
-//            dataRepository.updateDataFromWeb()
-//            dataRepository.updateSelection(isSelected = true)
-//            predictor.forceCalculation(satellites, stationPos, Date().time, hoursAhead, minElev)
-//            preferences.setSetupDone()
-            _isFirstLaunchDone.value = true
         }
     }
 

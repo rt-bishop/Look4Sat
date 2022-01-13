@@ -32,7 +32,6 @@ import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.ItemDivider
-import com.rtbishop.look4sat.presentation.getNavResult
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -63,9 +62,6 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
             handleSatData(satData, binding, entriesAdapter)
         })
-        getNavResult<List<String>>(R.id.nav_satellites, "sources") { sources ->
-            viewModel.updateDataFromWeb(sources)
-        }
     }
 
     private fun handleSatData(

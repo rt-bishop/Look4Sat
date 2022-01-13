@@ -14,7 +14,7 @@
         <item name="android:textColorPrimary">@color/themeLight</item>
         <item name="android:statusBarColor">@color/surfaceStatusbar</item>
         <item name="android:windowBackground">@color/surfaceBg</item>
-        <item name="android:navigationBarColor">@color/surfaceToolbar</item>
+        <item name="android:navigationBarColor">@color/surfaceStatusbar</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 

@@ -17,8 +17,6 @@
  */
 package com.rtbishop.look4sat.presentation.entriesScreen
 
-import android.content.ContentResolver
-import android.net.Uri
 import android.widget.SearchView
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.DataRepository
@@ -26,23 +24,16 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.framework.SettingsProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
     private val preferences: SettingsProvider,
-    private val resolver: ContentResolver,
     private val dataRepository: DataRepository
 ) : ViewModel(), SearchView.OnQueryTextListener, EntriesAdapter.EntriesClickListener {
 
-    private val coroutineHandler = CoroutineExceptionHandler { _, throwable ->
-        Timber.d(throwable)
-        _satData.value = DataState.Error(null)
-    }
     private val transModes = MutableLiveData(preferences.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsWithModes = transModes.switchMap { modes ->
@@ -56,24 +47,6 @@ class EntriesViewModel @Inject constructor(
     }
     private var shouldSelectAll = true
     val satData: LiveData<DataState<List<SatItem>>> = _satData
-
-    fun updateDataFromFile(uri: Uri) {
-        viewModelScope.launch(coroutineHandler) {
-            _satData.value = DataState.Loading
-            runCatching {
-                resolver.openInputStream(uri)?.use { stream ->
-                    dataRepository.updateDataFromFile(stream)
-                }
-            }.onFailure { _satData.value = DataState.Error(null) }
-        }
-    }
-
-    fun updateDataFromWeb(sources: List<String>) {
-        viewModelScope.launch(coroutineHandler) {
-            _satData.value = DataState.Loading
-            dataRepository.updateDataFromWeb(sources)
-        }
-    }
 
     fun selectCurrentItems() {
         val currentValue = _satData.value
@@ -93,6 +66,7 @@ class EntriesViewModel @Inject constructor(
     }
 
     fun setQuery(query: String) {
+        shouldSelectAll = true
         currentQuery.value = query
     }
 
