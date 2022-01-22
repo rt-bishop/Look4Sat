@@ -29,8 +29,7 @@ import com.rtbishop.look4sat.domain.LocationHandler
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.framework.LocationProvider
 import com.rtbishop.look4sat.framework.SettingsProvider
-import com.rtbishop.look4sat.framework.local.LocalSource
-import com.rtbishop.look4sat.framework.local.SatelliteDb
+import com.rtbishop.look4sat.framework.local.*
 import com.rtbishop.look4sat.framework.remote.RemoteSource
 import dagger.Module
 import dagger.Provides
@@ -53,7 +52,8 @@ object CoreModule {
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): DataRepository {
         val dataParser = DataParser(defaultDispatcher)
-        val db = Room.databaseBuilder(context, SatelliteDb::class.java, "Look4SatDB")
+        val db = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .fallbackToDestructiveMigration().build()
         val localSource = LocalSource(db.entriesDao(), db.transmittersDao())
         val remoteSource = RemoteSource(ioDispatcher)

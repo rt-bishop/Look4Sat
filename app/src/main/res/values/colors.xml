@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="themeAccent">#FFE082</color>
-    <color name="themeLight">#D0D0D0</color>
+    <color name="themeLight">#D6FFFFFF</color>
+    <color name="themeGrey">#99FFFFFF</color>
+    <color name="themeDisabled">#5CFFFFFF</color>
+    <color name="themeDark">#121212</color>
+    <color name="surfaceIcon">#404040</color>
+    <color name="surfaceTop">#383838</color>
+    <color name="surfaceChip">#303030</color>
     <color name="surfaceButton">#242424</color>
-    <color name="surfaceStatusbar">#1A1A1A</color>
     <color name="surfaceToolbar">#202020</color>
-    <color name="surfaceCard">#181818</color>
+    <color name="surfaceSystem">#1A1A1A</color>
+    <color name="surfaceCard">#1A1A1A</color>
     <color name="surfaceBg">#121212</color>
     <color name="mapInfoLayout">#B3181818</color>
     <color name="mtrl_textinput_disabled_color">@color/surfaceButton</color>

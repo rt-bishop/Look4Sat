@@ -11,10 +11,11 @@
         <item name="colorPrimary">@color/themeAccent</item>
         <item name="colorSecondary">@color/themeAccent</item>
         <item name="colorAccent">@color/themeAccent</item>
+        <item name="colorControlNormal">@color/themeLight</item>
         <item name="android:textColorPrimary">@color/themeLight</item>
-        <item name="android:statusBarColor">@color/surfaceStatusbar</item>
+        <item name="android:statusBarColor">@color/surfaceSystem</item>
         <item name="android:windowBackground">@color/surfaceBg</item>
-        <item name="android:navigationBarColor">@color/surfaceStatusbar</item>
+        <item name="android:navigationBarColor">@color/surfaceSystem</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 

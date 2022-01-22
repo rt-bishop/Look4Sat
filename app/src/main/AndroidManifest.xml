@@ -10,6 +10,7 @@
         android:name=".presentation.Look4SatApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:theme="@style/Theme.Look4Sat.Main">
         <activity
