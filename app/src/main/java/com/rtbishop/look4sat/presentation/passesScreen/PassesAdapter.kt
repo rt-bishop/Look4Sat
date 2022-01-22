@@ -23,8 +23,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.ItemPassGeoBinding
-import com.rtbishop.look4sat.databinding.ItemPassLeoBinding
+import com.rtbishop.look4sat.databinding.ItemPassBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,56 +52,57 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
 
     override fun getItemCount() = differ.currentList.size
 
-    override fun getItemViewType(position: Int): Int {
-        return if (differ.currentList[position].isDeepSpace) 1
-        else 0
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == 0) {
-            SatPassLeoHolder.from(parent)
-        } else {
-            SatPassGeoHolder.from(parent)
-        }
+        return PassHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder.itemViewType == 0) {
-            (holder as SatPassLeoHolder).bind(differ.currentList[position], clickListener, isUTC)
-        } else {
-            (holder as SatPassGeoHolder).bind(differ.currentList[position], clickListener)
-        }
+        (holder as PassHolder).bind(differ.currentList[position], clickListener, isUTC)
     }
 
-    class SatPassLeoHolder private constructor(private val binding: ItemPassLeoBinding) :
+    class PassHolder private constructor(private val binding: ItemPassBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         private val satIdFormat = itemView.context.getString(R.string.pass_satId)
-        private val tcaAzFormat = itemView.context.getString(R.string.pass_tcaAz)
         private val aosAzFormat = itemView.context.getString(R.string.pass_aosAz)
-        private val maxElFormat = itemView.context.getString(R.string.pass_maxEl)
-        private val losAzFormat = itemView.context.getString(R.string.pass_losAz)
+        private val altFormat = itemView.context.getString(R.string.pass_altitude)
+        private val losAzFormat = itemView.context.getString(R.string.pass_los)
         private val startTimeFormat = itemView.context.getString(R.string.pass_startTime)
+        private val elevFormat = itemView.context.getString(R.string.pat_elevation)
+        private val maxElFormat = itemView.context.getString(R.string.pass_elevation)
         private val endTimeFormat = itemView.context.getString(R.string.pass_endTime)
+        private val placeholder = itemView.context.getString(R.string.pass_placeholder)
         private val timeZoneUTC = TimeZone.getTimeZone("UTC")
         private val startFormat = SimpleDateFormat(startTimeFormat, Locale.getDefault())
         private val endFormat = SimpleDateFormat(endTimeFormat, Locale.getDefault())
 
         fun bind(satPass: SatPass, listener: PassesClickListener, shouldUseUTC: Boolean) {
             binding.apply {
-                if (shouldUseUTC) {
-                    startFormat.timeZone = timeZoneUTC
-                    endFormat.timeZone = timeZoneUTC
+                if (satPass.isDeepSpace) {
+                    passName.text = satPass.name
+                    passId.text = String.format(satIdFormat, satPass.catNum)
+                    passAos.text = String.format(aosAzFormat, satPass.aosAzimuth)
+                    passAltitude.text = String.format(altFormat, satPass.altitude)
+                    passLos.text = String.format(losAzFormat, satPass.losAzimuth)
+                    passStart.text = placeholder
+                    passElev.text = String.format(elevFormat, satPass.maxElevation)
+                    passEnd.text = placeholder
+                    passProgress.progress = 100
+                } else {
+                    if (shouldUseUTC) {
+                        startFormat.timeZone = timeZoneUTC
+                        endFormat.timeZone = timeZoneUTC
+                    }
+                    passName.text = satPass.name
+                    passId.text = String.format(satIdFormat, satPass.catNum)
+                    passAos.text = String.format(aosAzFormat, satPass.aosAzimuth)
+                    passAltitude.text = String.format(altFormat, satPass.altitude)
+                    passLos.text = String.format(losAzFormat, satPass.losAzimuth)
+                    passStart.text = startFormat.format(Date(satPass.aosTime))
+                    passElev.text = String.format(maxElFormat, satPass.maxElevation)
+                    passEnd.text = endFormat.format(Date(satPass.losTime))
+                    passProgress.progress = satPass.progress
                 }
-                passLeoName.text = satPass.name
-                passLeoId.text = String.format(satIdFormat, satPass.catNum)
-                passLeoAos.text = String.format(aosAzFormat, satPass.aosAzimuth)
-                passLeoElev.text = String.format(maxElFormat, satPass.maxElevation)
-                passLeoLos.text = String.format(losAzFormat, satPass.losAzimuth)
-                passLeoStart.text = startFormat.format(Date(satPass.aosTime))
-                passLeoTca.text = String.format(tcaAzFormat, satPass.tcaAzimuth)
-                passLeoEnd.text = endFormat.format(Date(satPass.losTime))
-                passLeoProgress.progress = satPass.progress
             }
 
             itemView.setOnClickListener {
@@ -111,39 +111,9 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
         }
 
         companion object {
-            fun from(parent: ViewGroup): SatPassLeoHolder {
+            fun from(parent: ViewGroup): PassHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                return SatPassLeoHolder(ItemPassLeoBinding.inflate(inflater, parent, false))
-            }
-        }
-    }
-
-    class SatPassGeoHolder private constructor(private val binding: ItemPassGeoBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        private val satIdFormat = itemView.context.getString(R.string.pass_satId)
-        private val azFormat = itemView.context.getString(R.string.pat_azimuth)
-        private val altFormat = itemView.context.getString(R.string.pat_altitude)
-        private val elevFormat = itemView.context.getString(R.string.pat_elevation)
-
-        fun bind(satPass: SatPass, listener: PassesClickListener) {
-            binding.apply {
-                passGeoName.text = satPass.name
-                passGeoId.text = String.format(satIdFormat, satPass.catNum)
-                passGeoAz.text = String.format(azFormat, satPass.tcaAzimuth)
-                passGeoAlt.text = String.format(altFormat, satPass.altitude)
-                passGeoEl.text = String.format(elevFormat, satPass.maxElevation)
-            }
-
-            itemView.setOnClickListener {
-                listener.navigateToPass(satPass)
-            }
-        }
-
-        companion object {
-            fun from(parent: ViewGroup): SatPassGeoHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                return SatPassGeoHolder(ItemPassGeoBinding.inflate(inflater, parent, false))
+                return PassHolder(ItemPassBinding.inflate(inflater, parent, false))
             }
         }
     }

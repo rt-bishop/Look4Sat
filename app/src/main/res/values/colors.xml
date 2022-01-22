@@ -11,9 +11,10 @@
     <color name="surfaceButton">#242424</color>
     <color name="surfaceToolbar">#202020</color>
     <color name="surfaceSystem">#1A1A1A</color>
-    <color name="surfaceCard">#1A1A1A</color>
+    <color name="surfaceCard">#181818</color>
     <color name="surfaceBg">#121212</color>
     <color name="mapInfoLayout">#B3181818</color>
+    <color name="transparent">@android:color/transparent</color>
     <color name="mtrl_textinput_disabled_color">@color/surfaceButton</color>
     <color name="mtrl_textinput_default_box_stroke_color">@color/themeLight</color>
 </resources>

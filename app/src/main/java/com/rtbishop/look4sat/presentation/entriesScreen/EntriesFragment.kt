@@ -31,7 +31,6 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.presentation.ItemDivider
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -52,7 +51,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 adapter = entriesAdapter
                 layoutManager = GridLayoutManager(requireContext(), 2)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(ItemDivider(R.drawable.divider_dark))
+//                addItemDecoration(ItemDivider(R.drawable.divider_dark))
             }
             entriesBack.setOnClickListener { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }

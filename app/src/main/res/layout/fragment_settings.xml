@@ -6,7 +6,10 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/prefs_toolbar"
-        style="@style/Toolbar"
+        style="@style/ToolbarCard"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -14,25 +17,27 @@
     <ImageButton
         android:id="@+id/prefs_back"
         style="@style/ToolbarButton"
-        android:layout_marginStart="4dp"
         android:src="@drawable/ic_back"
         app:layout_constraintBottom_toBottomOf="@+id/prefs_toolbar"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/prefs_toolbar"
         app:layout_constraintTop_toTopOf="@+id/prefs_toolbar" />
 
     <TextView
         android:id="@+id/prefs_title"
         style="@style/ToolbarText"
+        android:layout_marginStart="20dp"
         android:text="@string/settings_title"
         app:layout_constraintBottom_toBottomOf="@+id/prefs_toolbar"
-        app:layout_constraintEnd_toEndOf="@+id/prefs_toolbar"
-        app:layout_constraintHorizontal_bias="0.25"
-        app:layout_constraintStart_toStartOf="@+id/prefs_toolbar"
+        app:layout_constraintStart_toEndOf="@+id/prefs_back"
         app:layout_constraintTop_toTopOf="@+id/prefs_toolbar" />
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:clipChildren="true"
         android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -59,6 +64,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_prefs_location"
                 style="@style/SettingsCard"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/card_prefs_info">
@@ -72,6 +78,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_prefs_data"
                 style="@style/SettingsCard"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/card_prefs_location">
@@ -85,6 +92,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_prefs_tracking"
                 style="@style/SettingsCard"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/card_prefs_data">
@@ -98,6 +106,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_prefs_other"
                 style="@style/SettingsCard"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/card_prefs_tracking">
@@ -111,6 +120,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_prefs_warranty"
                 style="@style/SettingsCard"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

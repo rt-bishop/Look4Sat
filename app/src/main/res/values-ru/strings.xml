@@ -28,8 +28,9 @@
 
     <string name="pass_aosAz">НПС - %.1f°</string>
     <string name="pass_tcaAz">Азимут: %.1f°</string>
-    <string name="pass_maxEl">МаксЭлев: %.1f°</string>
-    <string name="pass_losAz">%.1f° - КПС</string>
+    <string name="pass_elevation">МаксЭлев: %.1f°</string>
+    <string name="pass_los">%.1f° - КПС</string>
+    <string name="pass_altitude">Высота: %.0fкм</string>
 
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_no_mode">Модуляция: нет</string>

@@ -35,8 +35,10 @@
     <string name="pass_satId" translatable="false">Id:%d</string>
     <string name="pass_aosAz">AOS - %.1f°</string>
     <string name="pass_tcaAz">Azimuth: %.1f°</string>
-    <string name="pass_maxEl">MaxElev: %.1f°</string>
-    <string name="pass_losAz">%.1f° - LOS</string>
+    <string name="pass_elevation">MaxElev: %.1f°</string>
+    <string name="pass_los">%.1f° - LOS</string>
+    <string name="pass_altitude">Altitude: %.0f km</string>
+    <string name="pass_placeholder" translatable="false"> - - : - - </string>
     <string name="pass_startTime" translatable="false">HH:mm:ss - EEE</string>
     <string name="pass_endTime" translatable="false">EEE - HH:mm:ss</string>
 

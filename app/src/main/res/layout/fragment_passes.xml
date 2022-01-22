@@ -7,7 +7,10 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/passes_toolbar"
-        style="@style/Toolbar"
+        style="@style/ToolbarCard"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -15,7 +18,6 @@
     <ImageButton
         android:id="@+id/passes_filter"
         style="@style/ToolbarButton"
-        android:layout_marginStart="4dp"
         android:src="@drawable/ic_filter"
         app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
         app:layout_constraintStart_toStartOf="@+id/passes_toolbar"
@@ -25,45 +27,47 @@
         android:id="@+id/passes_timer"
         style="@style/ToolbarTimer"
         app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
-        app:layout_constraintEnd_toEndOf="@+id/passes_toolbar"
-        app:layout_constraintStart_toStartOf="@id/passes_toolbar"
+        app:layout_constraintEnd_toStartOf="@+id/passes_settings"
+        app:layout_constraintStart_toEndOf="@+id/passes_filter"
         app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
 
     <ImageButton
         android:id="@+id/passes_settings"
         style="@style/ToolbarButton"
-        android:layout_marginEnd="4dp"
         android:src="@drawable/ic_prefs"
         app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
         app:layout_constraintEnd_toEndOf="@+id/passes_toolbar"
         app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/passes_swipe"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/passes_list_card"
+        style="@style/ToolbarCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/surfaceBg"
+        android:clipChildren="true"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passes_toolbar">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/passes_recycler"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/passes_swipe"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/passes_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-    <ProgressBar
-        android:id="@+id/passes_progress"
-        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_swipe"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passes_toolbar" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/passes_error"
@@ -72,18 +76,19 @@
         android:text="@string/passes_error"
         android:textSize="20sp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passes_toolbar" />
+        app:layout_constraintBottom_toBottomOf="@+id/passes_list_card"
+        app:layout_constraintEnd_toEndOf="@+id/passes_list_card"
+        app:layout_constraintStart_toStartOf="@+id/passes_list_card"
+        app:layout_constraintTop_toTopOf="@+id/passes_list_card" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/passes_fab"
         style="@style/Widget.MaterialComponents.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:elevation="16dp"
         android:src="@drawable/ic_satellite"
         android:tint="@color/surfaceBg"
         app:layout_constraintBottom_toBottomOf="parent"

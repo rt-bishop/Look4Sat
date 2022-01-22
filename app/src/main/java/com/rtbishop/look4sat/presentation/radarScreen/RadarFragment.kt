@@ -30,7 +30,6 @@ import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.framework.SettingsProvider
-import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,7 +53,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 isVerticalScrollBarEnabled = false
                 layoutManager = LinearLayoutManager(context)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(ItemDivider(R.drawable.divider_dark))
+//                addItemDecoration(ItemDivider(R.drawable.divider_dark))
             }
             setupObservers(transAdapter, this)
         }

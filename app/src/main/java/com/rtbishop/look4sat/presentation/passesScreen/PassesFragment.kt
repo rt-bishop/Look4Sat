@@ -30,7 +30,6 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.presentation.ItemDivider
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
@@ -50,13 +49,12 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     private fun setupComponents(view: View) {
         val passesAdapter = PassesAdapter(passesViewModel.shouldUseUTC(), this)
         val binding = FragmentPassesBinding.bind(view).apply {
-            passesRecycler.apply {
+            passesList.apply {
                 setHasFixedSize(true)
                 adapter = passesAdapter
                 isVerticalScrollBarEnabled = false
                 layoutManager = LinearLayoutManager(context)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addItemDecoration(ItemDivider(R.drawable.divider_dark))
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         if (dy > 0 && passesFab.visibility == View.VISIBLE) passesFab.hide()
@@ -91,27 +89,24 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 passesAdapter.submitList(dataState.data)
                 binding.apply {
                     passesSwipe.isRefreshing = false
+                    passesList.visibility = View.VISIBLE
                     passesError.visibility = View.INVISIBLE
-                    passesProgress.visibility = View.INVISIBLE
-                    passesRecycler.visibility = View.VISIBLE
                 }
                 tickMainTimer(dataState.data, binding)
             }
             is DataState.Loading -> {
                 binding.apply {
-                    passesSwipe.isRefreshing = true
                     passesTimer.text = 0L.toTimerString()
+                    passesSwipe.isRefreshing = true
+                    passesList.visibility = View.INVISIBLE
                     passesError.visibility = View.INVISIBLE
-                    passesRecycler.visibility = View.INVISIBLE
-                    passesProgress.visibility = View.VISIBLE
                 }
             }
             else -> {
                 binding.apply {
-                    passesSwipe.isRefreshing = false
                     passesTimer.text = 0L.toTimerString()
-                    passesProgress.visibility = View.INVISIBLE
-                    passesRecycler.visibility = View.INVISIBLE
+                    passesSwipe.isRefreshing = false
+                    passesList.visibility = View.INVISIBLE
                     passesError.visibility = View.VISIBLE
                 }
             }

@@ -135,7 +135,7 @@ class RadarView(context: Context) : View(context) {
             isTrackCreated = true
         }
 
-        canvas.drawColor(ContextCompat.getColor(context, R.color.surfaceBg))
+        canvas.drawColor(ContextCompat.getColor(context, R.color.surfaceCard))
         drawRadarCircle(canvas, cx, cy, radarRadius)
         drawRadarCross(canvas, cx, cy, radarRadius)
         drawRadarText(canvas, cx, radarRadius)
