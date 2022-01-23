@@ -15,25 +15,21 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageButton
-        android:id="@+id/map_back"
-        style="@style/ToolbarButton"
-        android:src="@drawable/ic_back"
-        app:layout_constraintBottom_toBottomOf="@+id/map_toolbar"
-        app:layout_constraintStart_toStartOf="@+id/map_toolbar"
-        app:layout_constraintTop_toTopOf="@+id/map_toolbar" />
+        <ImageButton
+            android:id="@+id/map_back"
+            style="@style/ToolbarButton"
+            android:layout_gravity="start|center_vertical"
+            android:src="@drawable/ic_back" />
 
-    <TextView
-        android:id="@+id/map_title"
-        style="@style/ToolbarText"
-        android:text="@string/map_title"
-        app:layout_constraintBottom_toBottomOf="@+id/map_toolbar"
-        app:layout_constraintEnd_toEndOf="@+id/map_toolbar"
-        app:layout_constraintHorizontal_bias="0.32"
-        app:layout_constraintStart_toStartOf="@+id/map_toolbar"
-        app:layout_constraintTop_toTopOf="@+id/map_toolbar" />
+        <TextView
+            android:id="@+id/map_title"
+            style="@style/ToolbarTitle"
+            android:layout_gravity="center"
+            android:text="@string/map_title" />
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/map_card"
@@ -53,14 +49,13 @@
         <org.osmdroid.views.MapView
             android:id="@+id/map_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:elevation="16dp" />
+            android:layout_height="match_parent" />
 
     </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/map_data_name"
-        style="@style/MapInfoText"
+        style="@style/WorldMapText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -89,15 +84,11 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/map_data_root"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/mapInfoLayout"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/map_data_lat"
-                style="@style/MapInfoText"
+                style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -108,7 +99,7 @@
 
             <TextView
                 android:id="@+id/map_data_lon"
-                style="@style/MapInfoText"
+                style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
@@ -118,7 +109,7 @@
 
             <TextView
                 android:id="@+id/map_data_qth"
-                style="@style/MapInfoText"
+                style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
@@ -130,7 +121,7 @@
 
             <TextView
                 android:id="@+id/map_data_alt"
-                style="@style/MapInfoText"
+                style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -140,7 +131,7 @@
 
             <TextView
                 android:id="@+id/map_data_dst"
-                style="@style/MapInfoText"
+                style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pat_distance"
@@ -149,7 +140,7 @@
 
             <TextView
                 android:id="@+id/map_data_vel"
-                style="@style/MapInfoText"
+                style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pat_osm_vel"
@@ -159,7 +150,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
-
 
     <ImageButton
         android:id="@+id/map_btn_prev"

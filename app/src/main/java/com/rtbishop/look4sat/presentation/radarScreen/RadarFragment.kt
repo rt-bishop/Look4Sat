@@ -23,8 +23,8 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
@@ -45,28 +45,23 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupComponents(view)
+    }
+
+    private fun setupComponents(view: View) {
+        val context = requireContext()
+        val adapter = TransmittersAdapter()
+        val layoutManager = LinearLayoutManager(context)
+        val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
         FragmentRadarBinding.bind(view).apply {
-            val transAdapter = TransmittersAdapter()
             radarRecycler.apply {
                 setHasFixedSize(true)
-                adapter = transAdapter
-                isVerticalScrollBarEnabled = false
-                layoutManager = LinearLayoutManager(context)
-                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-//                addItemDecoration(ItemDivider(R.drawable.divider_dark))
+                this.adapter = adapter
+                this.layoutManager = LinearLayoutManager(context)
+                addItemDecoration(itemDecoration)
             }
-            setupObservers(transAdapter, this)
+            setupObservers(adapter, this)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.enableSensor()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.disableSensor()
     }
 
     private fun setupObservers(
@@ -80,7 +75,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 setShowAim(preferences.getUseCompass())
                 setScanning(preferences.getShowSweep())
             }
-            binding.radarFrame.addView(radarView)
+            binding.radarCard.addView(radarView)
             viewModel.radarData.observe(viewLifecycleOwner, { passData ->
                 radarView?.setPosition(passData.satPos)
                 radarView?.setPositions(passData.satTrack)
@@ -138,5 +133,15 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
         } else {
             binding.radarTimer.text = 0L.toTimerString()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.enableSensor()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.disableSensor()
     }
 }

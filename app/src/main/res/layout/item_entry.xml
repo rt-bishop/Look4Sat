@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/entry_root"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="1dp"
-    android:layout_marginEnd="1dp"
-    android:layout_marginBottom="1dp"
-    app:cardBackgroundColor="@color/surfaceCard"
-    app:cardCornerRadius="@dimen/card_corner"
-    app:cardElevation="0dp">
+    android:id="@+id/entry_card"
+    style="@style/ListItemCard">
 
     <CheckBox
         android:id="@+id/entry_checkbox"

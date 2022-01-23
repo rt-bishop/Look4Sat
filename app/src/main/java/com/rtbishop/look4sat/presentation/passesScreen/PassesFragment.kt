@@ -23,9 +23,9 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.model.DataState
@@ -47,14 +47,16 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     }
 
     private fun setupComponents(view: View) {
-        val passesAdapter = PassesAdapter(passesViewModel.shouldUseUTC(), this)
+        val context = requireContext()
+        val adapter = PassesAdapter(passesViewModel.shouldUseUTC(), this)
+        val layoutManager = LinearLayoutManager(context)
+        val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
         val binding = FragmentPassesBinding.bind(view).apply {
             passesList.apply {
                 setHasFixedSize(true)
-                adapter = passesAdapter
-                isVerticalScrollBarEnabled = false
-                layoutManager = LinearLayoutManager(context)
-                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                this.adapter = adapter
+                this.layoutManager = layoutManager
+                addItemDecoration(itemDecoration)
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         if (dy > 0 && passesFab.visibility == View.VISIBLE) passesFab.hide()
@@ -72,7 +74,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
         }
         passesViewModel.passes.observe(viewLifecycleOwner, { passesResult ->
-            handleNewPasses(passesResult, passesAdapter, binding)
+            handleNewPasses(passesResult, adapter, binding)
         })
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.forceCalculation(prefs.first, prefs.second)

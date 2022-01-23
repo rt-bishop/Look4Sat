@@ -2,12 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pass_card"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="1dp"
-    android:backgroundTint="@color/surfaceCard"
-    app:cardCornerRadius="@dimen/card_corner"
-    app:cardElevation="0dp">
+    style="@style/ListItemCard">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/pass_root"
@@ -108,4 +103,5 @@
             app:layout_constraintTop_toBottomOf="@+id/pass_elev" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.cardview.widget.CardView>

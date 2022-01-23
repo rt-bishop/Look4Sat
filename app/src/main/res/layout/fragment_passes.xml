@@ -13,31 +13,26 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageButton
-        android:id="@+id/passes_filter"
-        style="@style/ToolbarButton"
-        android:src="@drawable/ic_filter"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
-        app:layout_constraintStart_toStartOf="@+id/passes_toolbar"
-        app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
+        <ImageButton
+            android:id="@+id/passes_filter"
+            style="@style/ToolbarButton"
+            android:layout_gravity="start|center_vertical"
+            android:src="@drawable/ic_filter" />
 
-    <TextView
-        android:id="@+id/passes_timer"
-        style="@style/ToolbarTimer"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
-        app:layout_constraintEnd_toStartOf="@+id/passes_settings"
-        app:layout_constraintStart_toEndOf="@+id/passes_filter"
-        app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
+        <TextView
+            android:id="@+id/passes_timer"
+            style="@style/ToolbarTimer"
+            android:layout_gravity="center" />
 
-    <ImageButton
-        android:id="@+id/passes_settings"
-        style="@style/ToolbarButton"
-        android:src="@drawable/ic_prefs"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_toolbar"
-        app:layout_constraintEnd_toEndOf="@+id/passes_toolbar"
-        app:layout_constraintTop_toTopOf="@+id/passes_toolbar" />
+        <ImageButton
+            android:id="@+id/passes_settings"
+            style="@style/ToolbarButton"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/ic_prefs" />
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/passes_list_card"
@@ -48,7 +43,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/surfaceBg"
         android:clipChildren="true"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -63,23 +57,22 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/passes_list"
+                style="@style/ListRecycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-    </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/passes_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/passes_error"
-        android:textSize="20sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/passes_list_card"
-        app:layout_constraintEnd_toEndOf="@+id/passes_list_card"
-        app:layout_constraintStart_toStartOf="@+id/passes_list_card"
-        app:layout_constraintTop_toTopOf="@+id/passes_list_card" />
+        <TextView
+            android:id="@+id/passes_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/passes_error"
+            android:textSize="20sp"
+            android:visibility="invisible" />
+
+    </androidx.cardview.widget.CardView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/passes_fab"

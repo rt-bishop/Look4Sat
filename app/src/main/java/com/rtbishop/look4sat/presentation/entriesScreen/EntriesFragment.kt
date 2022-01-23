@@ -24,8 +24,8 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
@@ -44,14 +44,16 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
     }
 
     private fun setupComponents(view: View) {
-        val entriesAdapter = EntriesAdapter(viewModel)
+        val context = requireContext()
+        val adapter = EntriesAdapter(viewModel)
+        val layoutManager = GridLayoutManager(context, 2)
+        val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
         val binding = FragmentEntriesBinding.bind(view).apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
-                adapter = entriesAdapter
-                layoutManager = GridLayoutManager(requireContext(), 2)
-                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-//                addItemDecoration(ItemDivider(R.drawable.divider_dark))
+                this.adapter = adapter
+                this.layoutManager = layoutManager
+                addItemDecoration(itemDecoration)
             }
             entriesBack.setOnClickListener { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
@@ -59,7 +61,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
         }
         viewModel.satData.observe(viewLifecycleOwner, { satData ->
-            handleSatData(satData, binding, entriesAdapter)
+            handleSatData(satData, binding, adapter)
         })
     }
 
