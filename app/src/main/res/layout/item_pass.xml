@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pass_card"
-    style="@style/ListItemCard">
+    style="@style/RecyclerItemCard">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/pass_root"
@@ -17,6 +17,7 @@
             android:layout_marginStart="6dp"
             android:layout_marginTop="4dp"
             android:text="@string/pass_satName"
+            android:textSize="@dimen/text_size_small"
             android:textColor="@color/themeAccent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -27,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/pass_satId"
+            android:textSize="@dimen/text_size_small"
             android:textColor="@color/themeAccent"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_name"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -37,6 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="@string/pass_aosAz"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintEnd_toStartOf="@+id/pass_los"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="@+id/pass_name"
@@ -47,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_altitude"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_aos"
             app:layout_constraintEnd_toEndOf="@+id/pass_los"
             app:layout_constraintStart_toStartOf="@+id/pass_aos" />
@@ -56,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_los"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_aos"
             app:layout_constraintEnd_toEndOf="@+id/pass_id"
             app:layout_constraintStart_toEndOf="@+id/pass_aos" />
@@ -66,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="@string/pass_startTime"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintEnd_toStartOf="@+id/pass_end"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -77,6 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_elevation"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_start"
             app:layout_constraintEnd_toEndOf="@+id/pass_end"
             app:layout_constraintStart_toStartOf="@+id/pass_start" />
@@ -86,6 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pass_endTime"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_start"
             app:layout_constraintEnd_toEndOf="@+id/pass_los"
             app:layout_constraintHorizontal_bias="0.5"

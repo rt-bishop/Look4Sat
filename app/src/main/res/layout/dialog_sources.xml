@@ -43,6 +43,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/sources_recycler"
+        style="@style/AppRecycler"
         android:layout_width="0dp"
         android:layout_height="280dp"
         android:layout_marginStart="16dp"

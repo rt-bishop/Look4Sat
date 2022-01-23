@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/entry_card"
-    style="@style/ListItemCard">
+    style="@style/RecyclerItemCard">
 
     <CheckBox
         android:id="@+id/entry_checkbox"
@@ -13,6 +13,6 @@
         android:lines="1"
         android:padding="1dp"
         android:textColor="@color/themeLight"
-        android:textSize="16sp" />
+        android:textSize="@dimen/text_size_medium" />
 
 </androidx.cardview.widget.CardView>

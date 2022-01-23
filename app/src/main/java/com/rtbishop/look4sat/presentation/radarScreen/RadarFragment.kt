@@ -25,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
@@ -59,6 +60,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 this.adapter = adapter
                 this.layoutManager = LinearLayoutManager(context)
                 addItemDecoration(itemDecoration)
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
             setupObservers(adapter, this)
         }
@@ -84,11 +86,9 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
             viewModel.transmitters.observe(viewLifecycleOwner, { list ->
                 if (list.isNotEmpty()) {
                     transmittersAdapter.submitList(list)
-                    binding.radarRecycler.visibility = View.VISIBLE
-                    binding.radarRecyclerMsg.visibility = View.INVISIBLE
+                    binding.radarRecyclerMsg.text = getString(R.string.trans_data)
                 } else {
-                    binding.radarRecycler.visibility = View.INVISIBLE
-                    binding.radarRecyclerMsg.visibility = View.VISIBLE
+                    binding.radarRecyclerMsg.text = getString(R.string.trans_no_data)
                 }
                 radarView?.invalidate()
             })

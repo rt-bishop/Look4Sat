@@ -9,9 +9,9 @@
     <color name="surfaceTop">#383838</color>
     <color name="surfaceChip">#303030</color>
     <color name="surfaceButton">#242424</color>
-    <color name="surfaceToolbar">#202020</color>
+    <color name="surfaceToolbar">#1A1A1A</color>
     <color name="surfaceSystem">#1A1A1A</color>
-    <color name="surfaceCard">#181818</color>
+    <color name="surfaceCard">#1A1A1A</color>
     <color name="surfaceBg">#121212</color>
     <color name="mapInfoLayout">#B3181818</color>
     <color name="transparent">@android:color/transparent</color>

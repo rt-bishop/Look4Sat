@@ -26,6 +26,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
@@ -54,6 +55,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 this.adapter = adapter
                 this.layoutManager = layoutManager
                 addItemDecoration(itemDecoration)
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
             entriesBack.setOnClickListener { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }

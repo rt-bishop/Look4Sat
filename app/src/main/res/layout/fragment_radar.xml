@@ -39,21 +39,23 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
         android:gravity="center"
-        android:textSize="16sp"
+        android:includeFontPadding="false"
+        android:textSize="@dimen/text_size_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_toolbar" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/radar_card"
-        style="@style/SettingsCard"
+        style="@style/SurfaceCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
-        android:elevation="0dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,9 +67,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
-        android:elevation="8dp"
         android:text="@string/pat_azimuth"
-        android:textSize="15sp"
+        android:textSize="@dimen/text_size_small"
         app:layout_constraintStart_toStartOf="@+id/radar_card"
         app:layout_constraintTop_toTopOf="@+id/radar_card" />
 
@@ -77,9 +78,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:elevation="8dp"
         android:text="@string/pat_elevation"
-        android:textSize="15sp"
+        android:textSize="@dimen/text_size_small"
         app:layout_constraintEnd_toEndOf="@+id/radar_card"
         app:layout_constraintTop_toTopOf="@+id/radar_card" />
 
@@ -89,9 +89,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"
-        android:elevation="8dp"
         android:text="@string/pat_altitude"
-        android:textSize="15sp"
+        android:textSize="@dimen/text_size_small"
         app:layout_constraintBottom_toBottomOf="@+id/radar_card"
         app:layout_constraintStart_toStartOf="@+id/radar_card" />
 
@@ -101,22 +100,20 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
-        android:elevation="8dp"
         android:text="@string/pat_distance"
-        android:textSize="15sp"
+        android:textSize="@dimen/text_size_small"
         app:layout_constraintBottom_toBottomOf="@+id/radar_card"
         app:layout_constraintEnd_toEndOf="@+id/radar_card" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/radar_list_card"
-        style="@style/ToolbarCard"
+        style="@style/SurfaceCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:clipChildren="true"
-        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -124,7 +121,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/radar_recycler"
-            style="@style/ListRecycler"
+            style="@style/AppRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -135,10 +132,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
         android:gravity="center"
+        android:includeFontPadding="false"
         android:text="@string/trans_no_data"
-        android:textSize="16sp"
+        android:textSize="@dimen/text_size_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_card" />

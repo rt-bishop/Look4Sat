@@ -1,36 +1,40 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Look4Sat.SplashScreen" parent="Theme.SplashScreen">
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
         <item name="windowSplashScreenBackground">@color/surfaceBg</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_drawable</item>
-        <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Theme.Look4Sat.Main" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/themeAccent</item>
-        <item name="colorSecondary">@color/themeAccent</item>
         <item name="colorAccent">@color/themeAccent</item>
         <item name="colorControlNormal">@color/themeLight</item>
+        <item name="colorPrimary">@color/themeAccent</item>
+        <item name="colorSecondary">@color/themeAccent</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:listDivider">@drawable/item_divider</item>
+        <item name="android:navigationBarColor">@color/surfaceBg</item>
         <item name="android:textColorPrimary">@color/themeLight</item>
         <item name="android:statusBarColor">@color/surfaceBg</item>
         <item name="android:windowBackground">@color/surfaceBg</item>
-        <item name="android:navigationBarColor">@color/surfaceBg</item>
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <item name="android:listDivider">@drawable/item_divider</item>
     </style>
 
     <style name="AppButton">
         <item name="android:backgroundTint">@color/surfaceButton</item>
-        <item name="android:drawablePadding">4dp</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/themeLight</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
     </style>
 
-    <style name="ListItemCard">
+    <style name="AppRecycler">
+        <item name="android:overScrollMode">never</item>
+        <item name="android:scrollbars">none</item>
+    </style>
+
+    <style name="RecyclerItemCard">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardBackgroundColor">@color/surfaceCard</item>
@@ -38,73 +42,67 @@
         <item name="cardElevation">@dimen/card_elev_low</item>
     </style>
 
-    <style name="ListRecycler">
-        <item name="android:animateLayoutChanges">false</item>
-        <item name="android:overScrollMode">never</item>
-        <item name="android:scrollbars">none</item>
+    <style name="SurfaceCard">
+        <item name="android:clipChildren">true</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cardBackgroundColor">@color/surfaceCard</item>
+        <item name="cardCornerRadius">@dimen/card_corner_high</item>
+        <item name="cardElevation">@dimen/card_elev_low</item>
     </style>
 
     <style name="ToolbarCard">
+        <item name="android:clipChildren">true</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="cardElevation">@dimen/card_elev_low</item>
-        <item name="cardBackgroundColor">@color/surfaceCard</item>
+        <item name="cardBackgroundColor">@color/surfaceToolbar</item>
         <item name="cardCornerRadius">@dimen/card_corner_high</item>
+        <item name="cardElevation">@dimen/card_elev_low</item>
     </style>
 
     <style name="ToolbarButton">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:background">?actionBarItemBackground</item>
-        <item name="android:elevation">8dp</item>
         <item name="android:tint">@color/themeLight</item>
     </style>
 
     <style name="ToolbarTimer">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:elevation">8dp</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:text">@string/timer_zero</item>
         <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:textSize">38sp</item>
+        <item name="android:textSize">@dimen/text_size_app_timer</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="ToolbarTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:elevation">8dp</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">@color/themeLight</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">@dimen/text_size_large</item>
     </style>
 
     <style name="WorldMapText">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textColor">@color/themeLight</item>
     </style>
 
     <style name="WorldMapTitle">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textColor">@color/themeLight</item>
     </style>
 
-    <style name="SettingsCard">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="cardBackgroundColor">@color/surfaceCard</item>
-        <item name="cardCornerRadius">@dimen/card_corner_high</item>
-    </style>
-
     <style name="SettingsText">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textColor">@color/themeLight</item>
     </style>
 
     <style name="SettingsTitle">
         <item name="android:includeFontPadding">false</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textColor">@color/themeAccent</item>
     </style>
 
@@ -114,21 +112,21 @@
         <item name="android:maxLines">1</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
     </style>
 
     <style name="DialogText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/themeLight</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
     </style>
 
     <style name="DialogTitle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
     </style>
 
 </resources>

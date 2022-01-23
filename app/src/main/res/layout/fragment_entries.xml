@@ -37,7 +37,7 @@
             android:inputType="text"
             android:textColor="@color/themeAccent"
             android:textColorHint="@color/themeAccent"
-            android:textSize="20sp" />
+            android:textSize="@dimen/text_size_large" />
 
         <ImageButton
             android:id="@+id/entries_mode"
@@ -49,15 +49,13 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/entries_list_card"
-        style="@style/ToolbarCard"
+        style="@style/SurfaceCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="3dp"
-        android:clipChildren="true"
-        app:cardElevation="0dp"
+        android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toTopOf="@+id/entries_select_all"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +63,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/entries_recycler"
-            style="@style/ListRecycler"
+            style="@style/AppRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -85,11 +83,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="4dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginBottom="4dp"
         android:backgroundTint="@color/surfaceCard"
         android:text="@string/entries_select_all"
         android:textAllCaps="false"
-        android:textSize="16sp"
+        android:textSize="@dimen/text_size_medium"
         app:cornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/entries_accept"
@@ -106,7 +104,7 @@
         android:backgroundTint="@color/surfaceCard"
         android:text="@string/btn_accept"
         android:textAllCaps="false"
-        android:textSize="16sp"
+        android:textSize="@dimen/text_size_medium"
         app:cornerRadius="8dp"
         app:layout_constraintBaseline_toBaselineOf="@+id/entries_select_all"
         app:layout_constraintEnd_toEndOf="parent"

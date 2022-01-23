@@ -4,4 +4,11 @@
     <dimen name="card_elev_high">8dp</dimen>
     <dimen name="card_corner_low">0dp</dimen>
     <dimen name="card_corner_high">8dp</dimen>
+    <dimen name="text_size_copyright">13sp</dimen>
+    <dimen name="text_size_small">15sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_frequency">24sp</dimen>
+    <dimen name="text_size_app_timer">42sp</dimen>
+    <dimen name="text_size_app_title">48sp</dimen>
 </resources>

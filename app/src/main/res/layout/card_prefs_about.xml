@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/SettingsCard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    style="@style/SurfaceCard">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -31,7 +29,7 @@
             android:includeFontPadding="false"
             android:text="@string/app_name"
             android:textColor="@color/themeAccent"
-            android:textSize="48sp"
+            android:textSize="@dimen/text_size_app_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/about_img"
             app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +40,7 @@
             android:layout_height="wrap_content"
             android:text="@string/about_version"
             android:textColor="@color/themeLight"
-            android:textSize="22sp"
+            android:textSize="@dimen/text_size_large"
             app:layout_constraintStart_toStartOf="@+id/about_title"
             app:layout_constraintTop_toBottomOf="@+id/about_title" />
 
@@ -53,7 +51,7 @@
             android:layout_marginTop="4dp"
             android:text="@string/about_subtitle"
             android:textColor="@color/themeLight"
-            android:textSize="20sp"
+            android:textSize="@dimen/text_size_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/about_version" />

@@ -45,21 +45,23 @@ class SourcesDialog : AppCompatDialogFragment() {
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
         val sources = settings.loadDataSources()
-        val sourcesAdapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
+        val adapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
+        val layoutManager = LinearLayoutManager(requireContext())
         DialogSourcesBinding.bind(view).apply {
             dialog?.window?.setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
             sourcesRecycler.apply {
-                adapter = sourcesAdapter
-                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true)
+                this.adapter = adapter
+                this.layoutManager = layoutManager
             }
             sourcesBtnAdd.setOnClickListener {
-                sourcesAdapter.addSource()
+                adapter.addSource()
             }
             sourcesBtnPos.setOnClickListener {
-                setNavResult("sources", sourcesAdapter.getSources().map { it.sourceUrl })
+                setNavResult("sources", adapter.getSources().map { it.sourceUrl })
                 dismiss()
             }
             sourcesBtnNeg.setOnClickListener { dismiss() }

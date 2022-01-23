@@ -35,6 +35,7 @@
     <string name="trans_mode">Модуляция: %s</string>
     <string name="trans_no_mode">Модуляция: нет</string>
     <string name="trans_inverted">Инверсия: %s</string>
+    <string name="trans_data">Трансиверы спутника:</string>
     <string name="trans_no_data">Не найдены трансиверы для этого спутника</string>
 
     <string name="map_title">Карта Мира</string>

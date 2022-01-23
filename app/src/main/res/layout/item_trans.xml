@@ -2,8 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/trans_card"
-    style="@style/ListItemCard"
-    android:layout_marginBottom="1dp">
+    style="@style/RecyclerItemCard">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/trans_root"
@@ -28,7 +27,7 @@
             android:gravity="center"
             android:maxLines="1"
             android:text="@string/trans_description"
-            android:textSize="15sp"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintEnd_toStartOf="@+id/trans_uplink_img"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toEndOf="@+id/trans_downlink_img"
@@ -51,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trans_link_low"
-            android:textSize="24sp"
+            android:textSize="@dimen/text_size_frequency"
             app:layout_constraintEnd_toStartOf="@+id/trans_guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trans_desc" />
@@ -73,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trans_link_low"
-            android:textSize="24sp"
+            android:textSize="@dimen/text_size_frequency"
             app:layout_constraintBaseline_toBaselineOf="@+id/trans_downlink"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/trans_guideline" />
@@ -85,7 +84,7 @@
             android:layout_marginStart="6dp"
             android:layout_marginBottom="4dp"
             android:text="@string/trans_mode"
-            android:textSize="15sp"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/trans_inverted"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -98,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/trans_inverted"
-            android:textSize="15sp"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/trans_mode"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/trans_mode" />
