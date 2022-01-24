@@ -32,9 +32,8 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,12 +49,10 @@ class LocationProvider @Inject constructor(
     private val providerGps = LocationManager.GPS_PROVIDER
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
-    private val _stationPosition = MutableSharedFlow<DataState<GeoPos>>(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _stationPosition = MutableStateFlow<DataState<GeoPos>>(DataState.Handled)
     private var currentPosition = settingsProvider.loadStationPosition()
-    override val stationPosition: SharedFlow<DataState<GeoPos>> = _stationPosition
+
+    override val stationPosition: StateFlow<DataState<GeoPos>> = _stationPosition
 
     override fun getStationPosition(): GeoPos = currentPosition
 
@@ -65,8 +62,9 @@ class LocationProvider @Inject constructor(
             val newLon = longitude.round(4)
             currentPosition = GeoPos(newLat, newLon)
             settingsProvider.saveStationPosition(newLat, newLon)
-            _stationPosition.tryEmit(DataState.Success(currentPosition))
-        } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_gps_null)))
+            _stationPosition.value = DataState.Success(currentPosition)
+        } else _stationPosition.value =
+            DataState.Error(context.getString(R.string.pref_pos_gps_null))
     }
 
     override fun setPositionFromGps() {
@@ -76,10 +74,11 @@ class LocationProvider @Inject constructor(
             if (location != null) {
                 setStationPosition(location.latitude, location.longitude)
             } else {
-                _stationPosition.tryEmit(DataState.Loading)
+                _stationPosition.value = DataState.Loading
                 manager.requestLocationUpdates(providerGps, 0L, 0f, this)
             }
-        } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_gps_null)))
+        } else _stationPosition.value =
+            DataState.Error(context.getString(R.string.pref_pos_gps_null))
     }
 
     override fun setPositionFromNet() {
@@ -89,17 +88,23 @@ class LocationProvider @Inject constructor(
             if (location != null) {
                 setStationPosition(location.latitude, location.longitude)
             } else {
-                _stationPosition.tryEmit(DataState.Loading)
+                _stationPosition.value = DataState.Loading
                 manager.requestLocationUpdates(providerNet, 0L, 0f, this)
             }
-        } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_gps_null)))
+        } else _stationPosition.value =
+            DataState.Error(context.getString(R.string.pref_pos_gps_null))
     }
 
     override fun setPositionFromQth(qthString: String) {
         val position = QthConverter.qthToPosition(qthString)
         if (position != null) {
             setStationPosition(position.latitude, position.longitude)
-        } else _stationPosition.tryEmit(DataState.Error(context.getString(R.string.pref_pos_qth_error)))
+        } else _stationPosition.value =
+            DataState.Error(context.getString(R.string.pref_pos_qth_error))
+    }
+
+    override fun setPositionHandled() {
+        _stationPosition.value = DataState.Handled
     }
 
     override fun onLocationChanged(location: Location) {

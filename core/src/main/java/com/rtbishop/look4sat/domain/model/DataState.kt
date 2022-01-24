@@ -20,5 +20,6 @@ package com.rtbishop.look4sat.domain.model
 sealed class DataState<out T> {
     data class Success<out T>(val data: T) : DataState<T>()
     data class Error(val message: String?) : DataState<Nothing>()
+    object Handled : DataState<Nothing>()
     object Loading : DataState<Nothing>()
 }

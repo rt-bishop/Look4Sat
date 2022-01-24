@@ -191,14 +191,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setPositionText(pos.data, binding)
                 binding.prefsLocation.locationProgress.isIndeterminate = false
                 showToast(getString(R.string.pref_pos_success))
+                locationHandler.setPositionHandled()
             }
             is DataState.Error -> {
                 binding.prefsLocation.locationProgress.isIndeterminate = false
                 showToast(pos.message.toString())
+                locationHandler.setPositionHandled()
             }
             DataState.Loading -> {
                 binding.prefsLocation.locationProgress.isIndeterminate = true
             }
+            DataState.Handled -> {}
         }
     }
 

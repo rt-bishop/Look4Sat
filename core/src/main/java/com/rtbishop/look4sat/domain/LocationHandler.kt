@@ -17,4 +17,6 @@ interface LocationHandler {
     fun setPositionFromNet()
 
     fun setPositionFromQth(qthString: String)
+
+    fun setPositionHandled()
 }
