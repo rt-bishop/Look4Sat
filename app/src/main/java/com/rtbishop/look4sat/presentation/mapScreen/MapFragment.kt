@@ -38,9 +38,11 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.*
+import org.osmdroid.views.overlay.FolderOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.Polyline
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -91,11 +93,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun setupObservers(binding: FragmentMapBinding) {
         viewModel.selectDefaultSatellite(arguments?.getInt("catNum"))
-        viewModel.stationPosLiveData.observe(viewLifecycleOwner, { renderStationPos(it, binding) })
-        viewModel.satPositions.observe(viewLifecycleOwner, { renderSatPositions(it, binding) })
-        viewModel.satTrack.observe(viewLifecycleOwner, { renderSatTrack(it, binding) })
-        viewModel.satFootprint.observe(viewLifecycleOwner, { renderSatFootprint(it, binding) })
-        viewModel.mapData.observe(viewLifecycleOwner, { renderSatData(it, binding) })
+        viewModel.stationPosLiveData.observe(viewLifecycleOwner) { renderStationPos(it, binding) }
+        viewModel.satPositions.observe(viewLifecycleOwner) { renderSatPositions(it, binding) }
+        viewModel.satTrack.observe(viewLifecycleOwner) { renderSatTrack(it, binding) }
+        viewModel.satFootprint.observe(viewLifecycleOwner) { renderSatFootprint(it, binding) }
+        viewModel.mapData.observe(viewLifecycleOwner) { renderSatData(it, binding) }
     }
 
     private fun renderStationPos(stationPos: GeoPos, binding: FragmentMapBinding) {

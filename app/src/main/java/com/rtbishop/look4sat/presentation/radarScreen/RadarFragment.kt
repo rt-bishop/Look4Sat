@@ -78,12 +78,12 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 setScanning(preferences.getShowSweep())
             }
             binding.radarCard.addView(radarView)
-            viewModel.radarData.observe(viewLifecycleOwner, { passData ->
+            viewModel.radarData.observe(viewLifecycleOwner) { passData ->
                 radarView?.setPosition(passData.satPos)
                 radarView?.setPositions(passData.satTrack)
                 setPassText(pass, passData.satPos, binding)
-            })
-            viewModel.transmitters.observe(viewLifecycleOwner, { list ->
+            }
+            viewModel.transmitters.observe(viewLifecycleOwner) { list ->
                 if (list.isNotEmpty()) {
                     transmittersAdapter.submitList(list)
                     binding.radarRecyclerMsg.text = getString(R.string.trans_data)
@@ -91,14 +91,14 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     binding.radarRecyclerMsg.text = getString(R.string.trans_no_data)
                 }
                 radarView?.invalidate()
-            })
-            viewModel.orientation.observe(viewLifecycleOwner, { orientation ->
+            }
+            viewModel.orientation.observe(viewLifecycleOwner) { orientation ->
                 radarView?.setOrientation(
                     orientation.first,
                     orientation.second,
                     orientation.third
                 )
-            })
+            }
             binding.radarMap.setOnClickListener {
                 val bundle = bundleOf("catNum" to pass.catNum)
                 findNavController().navigateSafe(R.id.action_radar_to_map, bundle)

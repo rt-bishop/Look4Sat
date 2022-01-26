@@ -62,9 +62,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             entriesMode.setOnClickListener { showModesDialog() }
             entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
         }
-        viewModel.satData.observe(viewLifecycleOwner, { satData ->
+        viewModel.satData.observe(viewLifecycleOwner) { satData ->
             handleSatData(satData, binding, adapter)
-        })
+        }
     }
 
     private fun handleSatData(
@@ -88,6 +88,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 val message = getString(R.string.entries_update_error)
                 Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
             }
+            DataState.Handled -> {}
         }
     }
 

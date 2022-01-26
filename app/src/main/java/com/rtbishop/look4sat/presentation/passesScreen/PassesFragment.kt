@@ -35,7 +35,6 @@ import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 @AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
@@ -75,9 +74,9 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             passesSettings.setOnClickListener { findNavController().navigate(R.id.nav_settings) }
             passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
         }
-        passesViewModel.passes.observe(viewLifecycleOwner, { passesResult ->
+        passesViewModel.passes.observe(viewLifecycleOwner) { passesResult ->
             handleNewPasses(passesResult, adapter, binding)
-        })
+        }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.forceCalculation(prefs.first, prefs.second)
         }
