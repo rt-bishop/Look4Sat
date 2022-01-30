@@ -17,19 +17,23 @@
  */
 package com.rtbishop.look4sat.data
 
-interface SettingsHandler {
+import com.rtbishop.look4sat.domain.model.SatEntry
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.predict.Satellite
+import kotlinx.coroutines.flow.Flow
 
-    val defaultSources: List<String>
-        get() = listOf(
-            "https://prismnet.com/~mmccants/tles/inttles.zip",
-            "https://prismnet.com/~mmccants/tles/classfd.zip",
-            "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-            "https://amsat.org/tle/current/nasabare.txt"
-        )
-    val transmittersSource: String
-        get() = "https://db.satnogs.org/api/transmitters/?format=json"
+interface ILocalSource {
 
-    fun loadDataSources(): List<String>
+    fun getSatelliteItems(): Flow<List<SatItem>>
 
-    fun saveDataSources(sources: List<String>)
+    suspend fun getSelectedSatellites(): List<Satellite>
+
+    suspend fun getTransmitters(catnum: Int): List<Transmitter>
+
+    suspend fun updateEntries(entries: List<SatEntry>)
+
+    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean)
+
+    suspend fun updateTransmitters(transmitters: List<Transmitter>)
 }

@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.Manifest
-import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -30,17 +29,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
-import com.rtbishop.look4sat.domain.DataRepository
-import com.rtbishop.look4sat.domain.LocationHandler
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.framework.SettingsProvider
+import com.rtbishop.look4sat.framework.SettingsHandler
 import com.rtbishop.look4sat.presentation.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -49,33 +46,22 @@ import javax.inject.Inject
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     @Inject
-    lateinit var preferences: SettingsProvider
+    lateinit var preferences: SettingsHandler
 
-    @Inject
-    lateinit var locationHandler: LocationHandler
-
-    @Inject
-    lateinit var resolver: ContentResolver
-
-    @Inject
-    lateinit var dataRepository: DataRepository
-
+    private val viewModel: SettingsViewModel by viewModels()
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     private val locationContract = ActivityResultContracts.RequestMultiplePermissions()
     private val locationRequest = registerForActivityResult(locationContract) { permissions ->
         when {
-            permissions[locationFine] == true -> locationHandler.setPositionFromGps()
-            permissions[locationCoarse] == true -> locationHandler.setPositionFromNet()
+            permissions[locationFine] == true -> viewModel.setPositionFromGps()
+            permissions[locationCoarse] == true -> viewModel.setPositionFromNet()
             else -> showToast(getString(R.string.pref_pos_gps_error))
         }
     }
     private val contentContract = ActivityResultContracts.GetContent()
     private val contentRequest = registerForActivityResult(contentContract) { uri ->
-        lifecycleScope.launchWhenResumed {
-            @Suppress("BlockingMethodInNonBlockingContext")
-            resolver.openInputStream(uri)?.use { dataRepository.updateDataFromFile(it) }
-        }
+        viewModel.updateDataFromFile(uri)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -88,7 +74,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         setupTrackingCard(settingsBinding)
         setupOtherCard(settingsBinding)
         setupWarrantyCard(settingsBinding)
-        locationHandler.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
+        viewModel.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
             stationPos?.let { handleStationPosition(it, settingsBinding) }
         }
     }
@@ -108,7 +94,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupLocationCard(binding: FragmentSettingsBinding) {
-        setPositionText(locationHandler.getStationPosition(), binding)
+        setPositionText(viewModel.getStationPosition(), binding)
         binding.prefsLocation.locationBtnGps.setOnClickListener {
             locationRequest.launch(arrayOf(locationFine, locationCoarse))
         }
@@ -119,7 +105,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 .setEditText(editText)
                 .setPositiveButton("OK") { _, _ ->
                     val editTextInput = editText.text.toString()
-                    locationHandler.setPositionFromQth(editTextInput)
+                    viewModel.setPositionFromQth(editTextInput)
                 }
                 .setNeutralButton("Cancel", null)
                 .create()
@@ -133,7 +119,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             findNavController().navigateSafe(R.id.action_prefs_to_sources)
         }
         getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
-            lifecycleScope.launchWhenResumed { dataRepository.updateDataFromWeb(sources) }
+            viewModel.updateDataFromWeb(sources)
         }
     }
 
@@ -191,12 +177,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setPositionText(pos.data, binding)
                 binding.prefsLocation.locationProgress.isIndeterminate = false
                 showToast(getString(R.string.pref_pos_success))
-                locationHandler.setPositionHandled()
+                viewModel.setPositionHandled()
             }
             is DataState.Error -> {
                 binding.prefsLocation.locationProgress.isIndeterminate = false
                 showToast(pos.message.toString())
-                locationHandler.setPositionHandled()
+                viewModel.setPositionHandled()
             }
             DataState.Loading -> {
                 binding.prefsLocation.locationProgress.isIndeterminate = true

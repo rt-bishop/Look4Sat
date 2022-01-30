@@ -17,23 +17,9 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.model.SatEntry
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.Transmitter
-import com.rtbishop.look4sat.domain.predict.Satellite
-import kotlinx.coroutines.flow.Flow
+import java.io.InputStream
 
-interface LocalDataSource {
+interface IRemoteSource {
 
-    fun getSatelliteItems(): Flow<List<SatItem>>
-
-    suspend fun getSelectedSatellites(): List<Satellite>
-
-    suspend fun getTransmitters(catnum: Int): List<Transmitter>
-
-    suspend fun updateEntries(entries: List<SatEntry>)
-
-    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean)
-
-    suspend fun updateTransmitters(transmitters: List<Transmitter>)
+    suspend fun fetchFileStream(url: String): InputStream?
 }

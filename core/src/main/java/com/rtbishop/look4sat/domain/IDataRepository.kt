@@ -23,7 +23,7 @@ import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.flow.Flow
 import java.io.InputStream
 
-interface DataRepository {
+interface IDataRepository {
 
     fun getSatelliteItems(): Flow<List<SatItem>>
 

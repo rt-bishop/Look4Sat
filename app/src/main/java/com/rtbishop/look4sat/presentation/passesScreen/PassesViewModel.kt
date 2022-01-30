@@ -21,20 +21,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.framework.SettingsProvider
+import com.rtbishop.look4sat.framework.SettingsHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val dataRepository: DataRepository,
+    private val dataRepository: IDataRepository,
     private val predictor: Predictor,
-    private val preferences: SettingsProvider
+    private val preferences: SettingsHandler
 ) : ViewModel() {
 
     private val _passes = MutableLiveData<DataState<List<SatPass>>>()

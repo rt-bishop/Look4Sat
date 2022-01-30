@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.framework.local
 
-import com.rtbishop.look4sat.data.LocalDataSource
+import com.rtbishop.look4sat.data.ILocalSource
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.Transmitter
@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.map
 class LocalSource(
     private val entriesDao: EntriesDao,
     private val transmittersDao: TransmittersDao
-) : LocalDataSource {
+) : ILocalSource {
 
     override fun getSatelliteItems(): Flow<List<SatItem>> {
         return entriesDao.getSatelliteItems().map { items -> items.toDomainItems() }

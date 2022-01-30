@@ -18,7 +18,7 @@
 package com.rtbishop.look4sat.data
 
 import com.rtbishop.look4sat.domain.DataParser
-import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.SatEntry
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -28,12 +28,12 @@ import java.io.InputStream
 import java.util.zip.ZipInputStream
 import kotlin.system.measureTimeMillis
 
-class DefaultRepository(
+class DataRepository(
     private val dataParser: DataParser,
-    private val localSource: LocalDataSource,
-    private val remoteSource: RemoteDataSource,
-    private val settings: SettingsHandler
-) : DataRepository {
+    private val localSource: ILocalSource,
+    private val remoteSource: IRemoteSource,
+    private val settingsHandler: ISettingsHandler
+) : IDataRepository {
 
     override fun getSatelliteItems() = localSource.getSatelliteItems()
 
@@ -48,7 +48,7 @@ class DefaultRepository(
     override suspend fun updateDataFromWeb(sources: List<String>) {
         coroutineScope {
             launch {
-                settings.saveDataSources(sources)
+                settingsHandler.saveDataSources(sources)
             }
             launch {
                 val updateTimeMillis = measureTimeMillis {
@@ -78,8 +78,8 @@ class DefaultRepository(
                 println("Update from web took $updateTimeMillis ms")
             }
             launch {
-                remoteSource.fetchFileStream(settings.transmittersSource)?.let { inputStream ->
-                    val transmitters = dataParser.parseJSONStream(inputStream)
+                remoteSource.fetchFileStream(settingsHandler.transmittersSource)?.let { stream ->
+                    val transmitters = dataParser.parseJSONStream(stream)
                     localSource.updateTransmitters(transmitters)
                 }
             }

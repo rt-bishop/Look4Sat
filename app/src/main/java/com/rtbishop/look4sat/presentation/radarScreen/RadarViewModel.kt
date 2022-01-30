@@ -20,14 +20,14 @@ package com.rtbishop.look4sat.presentation.radarScreen
 import android.hardware.GeomagneticField
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.DataReporter
-import com.rtbishop.look4sat.domain.DataRepository
+import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.framework.OrientationSource
-import com.rtbishop.look4sat.framework.SettingsProvider
+import com.rtbishop.look4sat.framework.OrientationHandler
+import com.rtbishop.look4sat.framework.SettingsHandler
 import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -38,12 +38,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RadarViewModel @Inject constructor(
-    private val orientationSource: OrientationSource,
-    private val preferences: SettingsProvider,
+    private val orientationHandler: OrientationHandler,
+    private val preferences: SettingsHandler,
     private val predictor: Predictor,
-    private val dataRepository: DataRepository,
+    private val dataRepository: IDataRepository,
     private val dataReporter: DataReporter
-) : ViewModel(), OrientationSource.OrientationListener {
+) : ViewModel(), OrientationHandler.OrientationListener {
 
     private val stationPos = preferences.loadStationPosition()
     private val _passData = MutableLiveData<RadarData>()
@@ -65,11 +65,11 @@ class RadarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (preferences.getUseCompass()) orientationSource.startListening(this)
+        if (preferences.getUseCompass()) orientationHandler.startListening(this)
     }
 
     fun disableSensor() {
-        if (preferences.getUseCompass()) orientationSource.stopListening()
+        if (preferences.getUseCompass()) orientationHandler.stopListening()
     }
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {

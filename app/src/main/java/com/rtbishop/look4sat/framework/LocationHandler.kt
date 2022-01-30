@@ -26,7 +26,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.LocationHandler
+import com.rtbishop.look4sat.domain.ILocationHandler
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
@@ -38,10 +38,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LocationProvider @Inject constructor(
+class LocationHandler @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val settingsProvider: SettingsProvider,
-) : LocationListener, LocationHandler {
+    private val settingsHandler: SettingsHandler,
+) : LocationListener, ILocationHandler {
 
     private val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private val providerDef = LocationManager.PASSIVE_PROVIDER
@@ -50,7 +50,7 @@ class LocationProvider @Inject constructor(
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val _stationPosition = MutableStateFlow<DataState<GeoPos>>(DataState.Handled)
-    private var currentPosition = settingsProvider.loadStationPosition()
+    private var currentPosition = settingsHandler.loadStationPosition()
 
     override val stationPosition: StateFlow<DataState<GeoPos>> = _stationPosition
 
@@ -61,7 +61,7 @@ class LocationProvider @Inject constructor(
             val newLat = latitude.round(4)
             val newLon = longitude.round(4)
             currentPosition = GeoPos(newLat, newLon)
-            settingsProvider.saveStationPosition(newLat, newLon)
+            settingsHandler.saveStationPosition(newLat, newLon)
             _stationPosition.value = DataState.Success(currentPosition)
         } else _stationPosition.value =
             DataState.Error(context.getString(R.string.pref_pos_gps_null))

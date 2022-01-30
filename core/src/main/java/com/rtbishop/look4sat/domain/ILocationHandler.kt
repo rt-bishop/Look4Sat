@@ -4,7 +4,7 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import kotlinx.coroutines.flow.SharedFlow
 
-interface LocationHandler {
+interface ILocationHandler {
 
     val stationPosition: SharedFlow<DataState<GeoPos>>
 

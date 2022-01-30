@@ -30,7 +30,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.framework.SettingsProvider
+import com.rtbishop.look4sat.framework.SettingsHandler
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     @Inject
-    lateinit var preferences: SettingsProvider
+    lateinit var preferences: SettingsHandler
     private val viewModel: RadarViewModel by viewModels()
     private var radarView: RadarView? = null
 

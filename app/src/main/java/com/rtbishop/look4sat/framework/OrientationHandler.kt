@@ -26,7 +26,7 @@ import javax.inject.Singleton
 import kotlin.math.round
 
 @Singleton
-class OrientationSource @Inject constructor(private val sensorManager: SensorManager) :
+class OrientationHandler @Inject constructor(private val sensorManager: SensorManager) :
     SensorEventListener {
 
     interface OrientationListener {

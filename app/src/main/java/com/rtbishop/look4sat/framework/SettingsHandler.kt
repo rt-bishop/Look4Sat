@@ -20,13 +20,13 @@ package com.rtbishop.look4sat.framework
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.rtbishop.look4sat.BuildConfig
-import com.rtbishop.look4sat.data.SettingsHandler
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SettingsProvider @Inject constructor(private val prefs: SharedPreferences) : SettingsHandler {
+class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) : ISettingsHandler {
 
     private val keyInitialSetup = "${BuildConfig.VERSION_NAME}update"
 
