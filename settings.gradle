@@ -1,3 +1,17 @@
-include ':app'
-include ':core'
-rootProject.name='Look4Sat'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "Look4Sat"
+include ":app"
+include ":core"

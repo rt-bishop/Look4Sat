@@ -42,7 +42,6 @@ import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -128,7 +127,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     try {
                         position = GeoPoint(it.value.latitude, it.value.longitude)
                     } catch (exception: IllegalArgumentException) {
-                        Timber.d(exception)
+                        println(exception.stackTraceToString())
                     }
                     setOnMarkerClickListener { _, _ ->
                         viewModel.selectSatellite(it.key)
@@ -152,7 +151,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     outlinePaint.set(trackPaint)
                     trackOverlay.add(this)
                 } catch (exception: IllegalArgumentException) {
-                    Timber.d(exception)
+                    println(exception.stackTraceToString())
                 }
             }
         }
@@ -167,7 +166,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             try {
                 this.points = footprintPoints
             } catch (exception: IllegalArgumentException) {
-                Timber.d(exception)
+                println(exception.stackTraceToString())
             }
         }
         binding.mapView.overlays[2] = footprintOverlay

@@ -18,15 +18,7 @@
 package com.rtbishop.look4sat.presentation
 
 import android.app.Application
-import com.rtbishop.look4sat.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
-import timber.log.Timber
 
 @HiltAndroidApp
-class Look4SatApplication : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
-    }
-}
+class Look4SatApplication : Application()

@@ -4,10 +4,10 @@
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
         <item name="windowSplashScreenBackground">@color/surfaceBg</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_drawable</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
     </style>
 
-    <style name="Theme.Look4Sat.Main" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.Look4Sat.Main" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorAccent">@color/themeAccent</item>
         <item name="colorControlNormal">@color/themeLight</item>
         <item name="colorPrimary">@color/themeAccent</item>

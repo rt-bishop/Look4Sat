@@ -33,6 +33,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.findNavController
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
@@ -139,4 +141,18 @@ fun AlertDialog.Builder.setEditText(editText: EditText): AlertDialog.Builder {
     superContainer.addView(container)
     setView(superContainer)
     return this
+}
+
+fun ping(hostname: String, port: Int): Int {
+    val start = System.currentTimeMillis()
+    val socket = Socket()
+    try {
+        socket.connect(InetSocketAddress(hostname, port), 6000)
+        socket.close()
+    } catch (exception: Exception) {
+        exception.printStackTrace()
+        println("Failed to ping: $hostname")
+        return Int.MAX_VALUE
+    }
+    return (System.currentTimeMillis() - start).toInt()
 }
