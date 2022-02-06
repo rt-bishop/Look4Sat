@@ -35,11 +35,11 @@
         android:layout_height="48dp"
         android:backgroundTint="@color/surfaceButton"
         android:src="@drawable/ic_add"
-        android:tint="@color/themeAccent"
         app:layout_constraintBottom_toBottomOf="@+id/sources_warning"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toEndOf="@+id/sources_recycler"
-        app:layout_constraintTop_toTopOf="@+id/sources_title" />
+        app:layout_constraintTop_toTopOf="@+id/sources_title"
+        app:tint="@color/themeAccent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/sources_recycler"

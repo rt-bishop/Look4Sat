@@ -78,6 +78,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             handleNewPasses(passesResult, adapter, binding)
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
+            passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)
             passesViewModel.forceCalculation(prefs.first, prefs.second)
         }
     }

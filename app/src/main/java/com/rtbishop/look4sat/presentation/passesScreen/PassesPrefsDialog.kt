@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.databinding.DialogPassesBinding
-import com.rtbishop.look4sat.framework.SettingsHandler
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class PassesPrefsDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var preferences: SettingsHandler
+    lateinit var preferences: ISettingsHandler
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_passes, group, false)

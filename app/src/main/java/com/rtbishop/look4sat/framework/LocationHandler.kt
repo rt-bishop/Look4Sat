@@ -26,6 +26,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.ILocationHandler
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.model.DataState
@@ -40,7 +41,7 @@ import javax.inject.Singleton
 @Singleton
 class LocationHandler @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val settingsHandler: SettingsHandler,
+    private val settingsHandler: ISettingsHandler,
 ) : LocationListener, ILocationHandler {
 
     private val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager

@@ -78,7 +78,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/entries_select_all"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -87,6 +87,7 @@
         android:backgroundTint="@color/surfaceCard"
         android:text="@string/entries_select_all"
         android:textAllCaps="false"
+        android:textColor="@color/themeAccent"
         android:textSize="@dimen/text_size_medium"
         app:cornerRadius="@dimen/card_corner_high"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -96,13 +97,14 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/entries_accept"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="8dp"
-        android:backgroundTint="@color/surfaceCard"
+        android:backgroundTint="@color/themeAccent"
         android:text="@string/btn_accept"
+        android:textColor="@color/surfaceBg"
         android:textAllCaps="false"
         android:textSize="@dimen/text_size_medium"
         app:cornerRadius="@dimen/card_corner_high"

@@ -19,10 +19,10 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.widget.SearchView
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.framework.SettingsHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val preferences: SettingsHandler,
+    private val preferences: ISettingsHandler,
     private val dataRepository: IDataRepository
 ) : ViewModel(), SearchView.OnQueryTextListener, EntriesAdapter.EntriesClickListener {
 

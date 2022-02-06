@@ -70,7 +70,7 @@ object CoreModule {
     @Singleton
     fun provideLocationHandler(
         @ApplicationContext context: Context,
-        settingsHandler: SettingsHandler
+        settingsHandler: ISettingsHandler
     ): ILocationHandler {
         return LocationHandler(context, settingsHandler)
     }

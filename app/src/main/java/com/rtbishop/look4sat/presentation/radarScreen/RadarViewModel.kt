@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.hardware.GeomagneticField
 import androidx.lifecycle.*
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.DataReporter
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.Transmitter
@@ -27,7 +28,6 @@ import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.framework.OrientationHandler
-import com.rtbishop.look4sat.framework.SettingsHandler
 import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -39,7 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RadarViewModel @Inject constructor(
     private val orientationHandler: OrientationHandler,
-    private val preferences: SettingsHandler,
+    private val preferences: ISettingsHandler,
     private val predictor: Predictor,
     private val dataRepository: IDataRepository,
     private val dataReporter: DataReporter
@@ -93,8 +93,8 @@ class RadarViewModel @Inject constructor(
             while (isActive) {
                 val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date().time)
                 if (preferences.getRotatorEnabled()) {
-                    val server = preferences.getRotatorServer().first
-                    val port = preferences.getRotatorServer().second
+                    val server = preferences.getRotatorServer()
+                    val port = preferences.getRotatorPort().toInt()
                     val azimuth = Math.toDegrees(satPos.azimuth).round(1)
                     val elevation = Math.toDegrees(satPos.elevation).round(1)
                     dataReporter.reportRotation(server, port, azimuth, elevation)

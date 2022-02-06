@@ -37,16 +37,11 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.framework.SettingsHandler
 import com.rtbishop.look4sat.presentation.*
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
-
-    @Inject
-    lateinit var preferences: SettingsHandler
 
     private val viewModel: SettingsViewModel by viewModels()
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
@@ -125,37 +120,37 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private fun setupTrackingCard(binding: FragmentSettingsBinding) {
         binding.prefsTracking.trackingSwitch.apply {
-            isChecked = preferences.getRotatorEnabled()
+            isChecked = viewModel.getRotatorEnabled()
             binding.prefsTracking.trackingIp.isEnabled = isChecked
-            binding.prefsTracking.trackingIpEdit.setText(preferences.getRotatorIp())
+            binding.prefsTracking.trackingIpEdit.setText(viewModel.getRotatorServer())
             binding.prefsTracking.trackingPort.isEnabled = isChecked
-            binding.prefsTracking.trackingPortEdit.setText(preferences.getRotatorPort())
+            binding.prefsTracking.trackingPortEdit.setText(viewModel.getRotatorPort())
             setOnCheckedChangeListener { _, isChecked ->
-                preferences.setRotatorEnabled(isChecked)
+                viewModel.setRotatorEnabled(isChecked)
                 binding.prefsTracking.trackingIp.isEnabled = isChecked
                 binding.prefsTracking.trackingPort.isEnabled = isChecked
             }
         }
         binding.prefsTracking.trackingIpEdit.doOnTextChanged { text, _, _, _ ->
-            if (text.toString().isValidIPv4()) preferences.setRotatorIp(text.toString())
+            if (text.toString().isValidIPv4()) viewModel.setRotatorServer(text.toString())
         }
         binding.prefsTracking.trackingPortEdit.doOnTextChanged { text, _, _, _ ->
-            if (text.toString().isValidPort()) preferences.setRotatorPort(text.toString())
+            if (text.toString().isValidPort()) viewModel.setRotatorPort(text.toString())
         }
     }
 
     private fun setupOtherCard(binding: FragmentSettingsBinding) {
         binding.prefsOther.otherSwitchUtc.apply {
-            isChecked = preferences.getUseUTC()
-            setOnCheckedChangeListener { _, isChecked -> preferences.setUseUTC(isChecked) }
+            isChecked = viewModel.getUseUTC()
+            setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
         }
         binding.prefsOther.otherSwitchSweep.apply {
-            isChecked = preferences.getShowSweep()
-            setOnCheckedChangeListener { _, isChecked -> preferences.setShowSweep(isChecked) }
+            isChecked = viewModel.getShowSweep()
+            setOnCheckedChangeListener { _, isChecked -> viewModel.setShowSweep(isChecked) }
         }
         binding.prefsOther.otherSwitchSensors.apply {
-            isChecked = preferences.getUseCompass()
-            setOnCheckedChangeListener { _, isChecked -> preferences.setUseCompass(isChecked) }
+            isChecked = viewModel.getUseCompass()
+            setOnCheckedChangeListener { _, isChecked -> viewModel.setUseCompass(isChecked) }
         }
     }
 

@@ -19,16 +19,14 @@ package com.rtbishop.look4sat.framework
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.presentation.putDouble
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) : ISettingsHandler {
-
-    private val keyInitialSetup = "${BuildConfig.VERSION_NAME}update"
 
     companion object {
         const val keyDataSources = "dataSources"
@@ -43,105 +41,93 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
         const val keyRotatorPort = "rotatorPort"
         const val keyLatitude = "stationLat"
         const val keyLongitude = "stationLon"
-        const val keyPositionGPS = "setPositionGPS"
-        const val keyPositionQTH = "setPositionQTH"
+//        const val keyPositionGPS = "setPositionGPS"
+//        const val keyPositionQTH = "setPositionQTH"
     }
 
-    fun loadStationPosition(): GeoPos {
+    override fun loadStationPosition(): GeoPos {
         val defaultSP = "0.0"
         val latitude = prefs.getString(keyLatitude, null) ?: defaultSP
         val longitude = prefs.getString(keyLongitude, null) ?: defaultSP
         return GeoPos(latitude.toDouble(), longitude.toDouble())
     }
 
-    fun saveStationPosition(latitude: Double, longitude: Double) {
+    override fun saveStationPosition(latitude: Double, longitude: Double) {
         prefs.edit {
             putString(keyLatitude, latitude.toString())
             putString(keyLongitude, longitude.toString())
         }
     }
 
-    fun getHoursAhead(): Int {
+    override fun getHoursAhead(): Int {
         return prefs.getInt(keyHoursAhead, 8)
     }
 
-    fun getMinElevation(): Double {
+    override fun setHoursAhead(hoursAhead: Int) {
+        prefs.edit { putInt(keyHoursAhead, hoursAhead) }
+    }
+
+    override fun getMinElevation(): Double {
         return prefs.getInt(keyMinElevation, 16).toDouble()
     }
 
-    fun getUseUTC(): Boolean {
+    override fun setMinElevation(minElevation: Double) {
+        prefs.edit { putDouble(keyMinElevation, minElevation) }
+    }
+
+    override fun getUseUTC(): Boolean {
         return prefs.getBoolean(keyTimeUTC, false)
     }
 
-    fun setUseUTC(value: Boolean) {
+    override fun setUseUTC(value: Boolean) {
         prefs.edit { putBoolean(keyTimeUTC, value) }
     }
 
-    fun getUseCompass(): Boolean {
+    override fun getUseCompass(): Boolean {
         return prefs.getBoolean(keyCompass, true)
     }
 
-    fun setUseCompass(value: Boolean) {
+    override fun setUseCompass(value: Boolean) {
         prefs.edit { putBoolean(keyCompass, value) }
     }
 
-    fun getShowSweep(): Boolean {
+    override fun getShowSweep(): Boolean {
         return prefs.getBoolean(keyRadarSweep, true)
     }
 
-    fun setShowSweep(value: Boolean) {
+    override fun setShowSweep(value: Boolean) {
         prefs.edit { putBoolean(keyRadarSweep, value) }
     }
 
-    fun getSetupDone(): Boolean {
-        return prefs.getBoolean(keyInitialSetup, false)
+    override fun saveModesSelection(modes: List<String>) {
+        prefs.edit { putStringSet(keyModes, modes.toSet()) }
     }
 
-    fun setSetupDone() {
-        prefs.edit { putBoolean(keyInitialSetup, true) }
+    override fun loadModesSelection(): List<String> {
+        return prefs.getStringSet(keyModes, null)?.toList()?.sorted() ?: emptyList()
     }
 
-    fun saveModesSelection(modes: List<String>) {
-        val modesSet = modes.toSet()
-        prefs.edit {
-            putStringSet(keyModes, modesSet)
-        }
-    }
-
-    fun loadModesSelection(): List<String> {
-        prefs.getStringSet(keyModes, setOf())?.let { modesSet ->
-            return modesSet.toList().sorted()
-        }
-        return emptyList()
-    }
-
-    fun getRotatorEnabled(): Boolean {
+    override fun getRotatorEnabled(): Boolean {
         return prefs.getBoolean(keyRotator, false)
     }
 
-    fun setRotatorEnabled(value: Boolean) {
+    override fun setRotatorEnabled(value: Boolean) {
         prefs.edit { putBoolean(keyRotator, value) }
     }
 
-    fun getRotatorServer(): Pair<String, Int> {
-        val address = prefs.getString(keyRotatorAddress, null) ?: "127.0.0.1"
-        val port = prefs.getString(keyRotatorPort, null) ?: "4533"
-        return Pair(address, port.toInt())
-    }
-
-    fun getRotatorIp(): String {
+    override fun getRotatorServer(): String {
         return prefs.getString(keyRotatorAddress, null) ?: "127.0.0.1"
     }
 
-    fun setRotatorIp(value: String) {
+    override fun setRotatorServer(value: String) {
         prefs.edit { putString(keyRotatorAddress, value) }
     }
 
-    fun getRotatorPort(): String {
+    override fun getRotatorPort(): String {
         return prefs.getString(keyRotatorPort, null) ?: "4533"
     }
 
-    fun setRotatorPort(value: String) {
+    override fun setRotatorPort(value: String) {
         prefs.edit { putString(keyRotatorPort, value) }
     }
 

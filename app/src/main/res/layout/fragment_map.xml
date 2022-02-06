@@ -156,9 +156,9 @@
         android:backgroundTint="@color/surfaceToolbar"
         android:rotation="180"
         android:src="@drawable/ic_arrow"
-        android:tint="@color/themeLight"
         app:layout_constraintBottom_toTopOf="@+id/map_card_info"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/themeLight" />
 
     <ImageButton
         android:id="@+id/map_btn_next"
@@ -167,10 +167,10 @@
         android:layout_marginEnd="12dp"
         android:backgroundTint="@color/surfaceToolbar"
         android:src="@drawable/ic_arrow"
-        android:tint="@color/themeLight"
         app:layout_constraintBottom_toBottomOf="@+id/map_btn_prev"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/map_btn_prev" />
+        app:layout_constraintTop_toTopOf="@+id/map_btn_prev"
+        app:tint="@color/themeLight" />
 
     <TextView
         android:id="@+id/map_copyright"

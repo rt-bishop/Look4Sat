@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat.data
 
+import com.rtbishop.look4sat.domain.predict.GeoPos
+
 interface ISettingsHandler {
 
     val defaultSources: List<String>
@@ -28,6 +30,46 @@ interface ISettingsHandler {
         )
     val transmittersSource: String
         get() = "https://db.satnogs.org/api/transmitters/?format=json"
+
+    fun loadStationPosition(): GeoPos
+
+    fun saveStationPosition(latitude: Double, longitude: Double)
+
+    fun getHoursAhead(): Int
+
+    fun setHoursAhead(hoursAhead: Int)
+
+    fun getMinElevation(): Double
+
+    fun setMinElevation(minElevation: Double)
+
+    fun getUseUTC(): Boolean
+
+    fun setUseUTC(value: Boolean)
+
+    fun getUseCompass(): Boolean
+
+    fun setUseCompass(value: Boolean)
+
+    fun getShowSweep(): Boolean
+
+    fun setShowSweep(value: Boolean)
+
+    fun saveModesSelection(modes: List<String>)
+
+    fun loadModesSelection(): List<String>
+
+    fun getRotatorEnabled(): Boolean
+
+    fun setRotatorEnabled(value: Boolean)
+
+    fun getRotatorServer(): String
+
+    fun setRotatorServer(value: String)
+
+    fun getRotatorPort(): String
+
+    fun setRotatorPort(value: String)
 
     fun loadDataSources(): List<String>
 

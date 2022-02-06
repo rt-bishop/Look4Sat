@@ -27,10 +27,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.framework.SettingsHandler
 import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     @Inject
-    lateinit var preferences: SettingsHandler
+    lateinit var preferences: ISettingsHandler
     private val viewModel: RadarViewModel by viewModels()
     private var radarView: RadarView? = null
 
