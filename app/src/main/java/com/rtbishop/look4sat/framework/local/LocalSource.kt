@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat.framework.local
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.rtbishop.look4sat.data.ILocalSource
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
@@ -26,16 +28,26 @@ import com.rtbishop.look4sat.framework.toDomain
 import com.rtbishop.look4sat.framework.toDomainItems
 import com.rtbishop.look4sat.framework.toFramework
 import com.rtbishop.look4sat.framework.toFrameworkEntries
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import java.io.InputStream
 
 class LocalSource(
+    private val resolver: ContentResolver,
+    private val ioDispatcher: CoroutineDispatcher,
     private val entriesDao: EntriesDao,
-    private val transmittersDao: TransmittersDao
+    private val transmittersDao: TransmittersDao,
 ) : ILocalSource {
 
     override fun getSatelliteItems(): Flow<List<SatItem>> {
         return entriesDao.getSatelliteItems().map { items -> items.toDomainItems() }
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun getFileStream(uri: String): InputStream? {
+        return withContext(ioDispatcher) { resolver.openInputStream(Uri.parse(uri)) }
     }
 
     override suspend fun getSelectedSatellites(): List<Satellite> {

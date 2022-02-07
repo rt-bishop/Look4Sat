@@ -56,7 +56,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
     private val contentContract = ActivityResultContracts.GetContent()
     private val contentRequest = registerForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.updateDataFromFile(uri) }
+        uri?.let { viewModel.updateDataFromFile(uri.toString()) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

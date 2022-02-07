@@ -49,12 +49,15 @@ class DataRepository(
         _updateState.value = DataState.Handled
     }
 
-    override fun updateDataFromFile(stream: InputStream) {
+    override fun updateDataFromFile(uri: String) {
         repositoryScope.launch(exceptionHandler) {
             _updateState.value = DataState.Loading
-            val importedSatellites = importSatellites(stream)
-            localSource.updateEntries(importedSatellites)
-            _updateState.value = DataState.Success(0L)
+            val updateTimeMillis = measureTimeMillis {
+                localSource.getFileStream(uri)?.let { fileStream ->
+                    localSource.updateEntries(importSatellites(fileStream))
+                }
+            }
+            _updateState.value = DataState.Success(updateTimeMillis)
         }
     }
 

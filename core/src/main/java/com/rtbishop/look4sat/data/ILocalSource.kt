@@ -22,10 +22,13 @@ import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.flow.Flow
+import java.io.InputStream
 
 interface ILocalSource {
 
     fun getSatelliteItems(): Flow<List<SatItem>>
+
+    suspend fun getFileStream(uri: String): InputStream?
 
     suspend fun getSelectedSatellites(): List<Satellite>
 

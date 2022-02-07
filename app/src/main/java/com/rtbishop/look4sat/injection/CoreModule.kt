@@ -53,11 +53,12 @@ object CoreModule {
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): IDataRepository {
-        val dataParser = DataParser(defaultDispatcher)
         val db = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .fallbackToDestructiveMigration().build()
-        val localSource = LocalSource(db.entriesDao(), db.transmittersDao())
+        val dataParser = DataParser(defaultDispatcher)
+        val resolver = context.contentResolver
+        val localSource = LocalSource(resolver, ioDispatcher, db.entriesDao(), db.transmittersDao())
         val remoteSource = RemoteSource(ioDispatcher)
         val repositoryScope = CoroutineScope(SupervisorJob())
         return DataRepository(dataParser, settings, localSource, remoteSource, repositoryScope)

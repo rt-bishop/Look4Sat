@@ -23,7 +23,6 @@ import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import java.io.InputStream
 
 interface IDataRepository {
 
@@ -31,7 +30,7 @@ interface IDataRepository {
 
     fun setDataUpdateHandled()
 
-    fun updateDataFromFile(stream: InputStream)
+    fun updateDataFromFile(uri: String)
 
     fun updateDataFromWeb(sources: List<String>)
 

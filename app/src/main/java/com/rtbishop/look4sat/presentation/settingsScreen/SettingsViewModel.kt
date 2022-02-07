@@ -1,9 +1,6 @@
 package com.rtbishop.look4sat.presentation.settingsScreen
 
-import android.content.ContentResolver
-import android.net.Uri
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ILocationHandler
@@ -11,24 +8,17 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val resolver: ContentResolver,
     private val settings: ISettingsHandler,
     private val repository: IDataRepository,
     private val locationHandler: ILocationHandler
 ) : ViewModel() {
 
-    fun updateDataFromFile(uri: Uri) {
-        viewModelScope.launch {
-            @Suppress("BlockingMethodInNonBlockingContext")
-            resolver.openInputStream(uri)?.use { fileUri ->
-                repository.updateDataFromFile(fileUri)
-            }
-        }
+    fun updateDataFromFile(uri: String) {
+        repository.updateDataFromFile(uri)
     }
 
     fun updateDataFromWeb(sources: List<String>) {
