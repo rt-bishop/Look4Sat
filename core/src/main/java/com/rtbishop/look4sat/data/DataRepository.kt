@@ -102,6 +102,14 @@ class DataRepository(
         }
     }
 
+    override fun clearData() {
+        repositoryScope.launch {
+            _updateState.value = DataState.Loading
+            localSource.clearData()
+            _updateState.value = DataState.Success(0L)
+        }
+    }
+
     override fun getSatelliteItems(): Flow<List<SatItem>> = localSource.getSatelliteItems()
 
     override suspend fun getSelectedSatellites() = localSource.getSelectedSatellites()

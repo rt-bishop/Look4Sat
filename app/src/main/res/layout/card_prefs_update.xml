@@ -35,11 +35,11 @@
             style="@style/AppButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:drawableStart="@drawable/ic_update_web"
-            android:text="@string/update_web"
+            android:text="Web"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/update_btn_file"
             app:layout_constraintHorizontal_bias="0.5"
@@ -51,13 +51,27 @@
             style="@style/AppButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:drawableStart="@drawable/ic_update_file"
-            android:text="@string/update_file"
+            android:text="File"
+            app:layout_constraintBaseline_toBaselineOf="@+id/update_btn_web"
+            app:layout_constraintEnd_toStartOf="@+id/update_btn_clear"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/update_btn_web" />
+
+        <Button
+            android:id="@+id/update_btn_clear"
+            style="@style/AppButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:drawableStart="@drawable/ic_update_file"
+            android:text="Clear"
             app:layout_constraintBaseline_toBaselineOf="@+id/update_btn_web"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/update_btn_web" />
+            app:layout_constraintStart_toEndOf="@+id/update_btn_file" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

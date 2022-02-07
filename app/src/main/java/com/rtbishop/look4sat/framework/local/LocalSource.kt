@@ -69,4 +69,9 @@ class LocalSource(
     override suspend fun updateTransmitters(transmitters: List<Transmitter>) {
         transmittersDao.updateTransmitters(transmitters.toFramework())
     }
+
+    override suspend fun clearData() {
+        entriesDao.deleteEntries()
+        transmittersDao.deleteTransmitters()
+    }
 }

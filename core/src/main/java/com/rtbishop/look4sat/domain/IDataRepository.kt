@@ -34,6 +34,8 @@ interface IDataRepository {
 
     fun updateDataFromWeb(sources: List<String>)
 
+    fun clearData()
+
     fun getSatelliteItems(): Flow<List<SatItem>>
 
     suspend fun getSelectedSatellites(): List<Satellite>

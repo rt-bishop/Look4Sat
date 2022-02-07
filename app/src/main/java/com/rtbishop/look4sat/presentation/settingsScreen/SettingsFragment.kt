@@ -116,6 +116,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.prefsData.updateBtnWeb.setOnClickListener {
             findNavController().navigateSafe(R.id.action_prefs_to_sources)
         }
+        binding.prefsData.updateBtnClear.setOnClickListener { viewModel.clearData() }
         getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
             viewModel.updateDataFromWeb(sources)
         }

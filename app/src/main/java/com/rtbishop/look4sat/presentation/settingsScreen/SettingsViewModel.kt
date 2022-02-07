@@ -25,6 +25,10 @@ class SettingsViewModel @Inject constructor(
         repository.updateDataFromWeb(sources)
     }
 
+    fun clearData() {
+        repository.clearData()
+    }
+
     fun getUseUTC(): Boolean = settings.getUseUTC()
 
     fun setUseUTC(value: Boolean) = settings.setUseUTC(value)
