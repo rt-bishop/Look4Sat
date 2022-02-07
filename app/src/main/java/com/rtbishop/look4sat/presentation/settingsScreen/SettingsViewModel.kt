@@ -10,7 +10,6 @@ import com.rtbishop.look4sat.domain.ILocationHandler
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,14 +20,10 @@ class SettingsViewModel @Inject constructor(
     private val settings: ISettingsHandler,
     private val repository: IDataRepository,
     private val locationHandler: ILocationHandler
-) : ViewModel(), ILocationHandler {
-
-    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        println("Handled $exception in CoroutineExceptionHandler")
-    }
+) : ViewModel() {
 
     fun updateDataFromFile(uri: Uri) {
-        viewModelScope.launch(exceptionHandler) {
+        viewModelScope.launch {
             @Suppress("BlockingMethodInNonBlockingContext")
             resolver.openInputStream(uri)?.use { fileUri ->
                 repository.updateDataFromFile(fileUri)
@@ -37,9 +32,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateDataFromWeb(sources: List<String>) {
-        viewModelScope.launch(exceptionHandler) {
-            repository.updateDataFromWeb(sources)
-        }
+        repository.updateDataFromWeb(sources)
     }
 
     fun getUseUTC(): Boolean = settings.getUseUTC()
@@ -66,21 +59,19 @@ class SettingsViewModel @Inject constructor(
 
     fun setRotatorPort(value: String) = settings.setRotatorPort(value)
 
-    override val stationPosition: SharedFlow<DataState<GeoPos>> = locationHandler.stationPosition
+    fun getUpdateState() = repository.dataUpdateState
 
-    override fun getStationPosition(): GeoPos = locationHandler.getStationPosition()
+    fun setUpdateHandled() = repository.setDataUpdateHandled()
 
-    override fun setStationPosition(latitude: Double, longitude: Double) {
-        locationHandler.setStationPosition(latitude, longitude)
-    }
+    val stationPosition: SharedFlow<DataState<GeoPos>> = locationHandler.stationPosition
 
-    override fun setPositionFromGps() = locationHandler.setPositionFromGps()
+    fun getStationPosition(): GeoPos = locationHandler.getStationPosition()
 
-    override fun setPositionFromNet() = locationHandler.setPositionFromNet()
+    fun setPositionFromGps() = locationHandler.setPositionFromGps()
 
-    override fun setPositionFromQth(qthString: String) {
-        locationHandler.setPositionFromQth(qthString)
-    }
+    fun setPositionFromNet() = locationHandler.setPositionFromNet()
 
-    override fun setPositionHandled() = locationHandler.setPositionHandled()
+    fun setPositionFromQth(qthString: String) = locationHandler.setPositionFromQth(qthString)
+
+    fun setPositionHandled() = locationHandler.setPositionHandled()
 }

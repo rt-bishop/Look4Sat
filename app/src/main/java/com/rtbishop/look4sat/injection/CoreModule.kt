@@ -37,6 +37,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 @Module
@@ -46,7 +48,7 @@ object CoreModule {
     @Provides
     @Singleton
     fun provideSatelliteRepo(
-        settingsHandler: ISettingsHandler,
+        settings: ISettingsHandler,
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
@@ -57,7 +59,8 @@ object CoreModule {
             .fallbackToDestructiveMigration().build()
         val localSource = LocalSource(db.entriesDao(), db.transmittersDao())
         val remoteSource = RemoteSource(ioDispatcher)
-        return DataRepository(dataParser, localSource, remoteSource, settingsHandler)
+        val repositoryScope = CoroutineScope(SupervisorJob())
+        return DataRepository(dataParser, settings, localSource, remoteSource, repositoryScope)
     }
 
     @Provides

@@ -56,7 +56,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
     private val contentContract = ActivityResultContracts.GetContent()
     private val contentRequest = registerForActivityResult(contentContract) { uri ->
-        viewModel.updateDataFromFile(uri)
+        uri?.let { viewModel.updateDataFromFile(uri) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,7 +70,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         setupOtherCard(settingsBinding)
         setupWarrantyCard(settingsBinding)
         viewModel.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
-            stationPos?.let { handleStationPosition(it, settingsBinding) }
+            stationPos?.let { handleStationPosition(stationPos, settingsBinding) }
+        }
+        viewModel.getUpdateState().asLiveData().observe(viewLifecycleOwner) { updateState ->
+            updateState?.let { handleSatState(updateState, settingsBinding) }
         }
     }
 
@@ -171,18 +174,37 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             is DataState.Success -> {
                 setPositionText(pos.data, binding)
                 binding.prefsLocation.locationProgress.isIndeterminate = false
-                showToast(getString(R.string.pref_pos_success))
                 viewModel.setPositionHandled()
+                showToast(getString(R.string.pref_pos_success))
             }
             is DataState.Error -> {
                 binding.prefsLocation.locationProgress.isIndeterminate = false
-                showToast(pos.message.toString())
                 viewModel.setPositionHandled()
+                showToast(pos.message.toString())
             }
             DataState.Loading -> {
                 binding.prefsLocation.locationProgress.isIndeterminate = true
             }
             DataState.Handled -> {}
+        }
+    }
+
+    private fun handleSatState(state: DataState<Long>, binding: FragmentSettingsBinding) {
+        when (state) {
+            is DataState.Success -> {
+                binding.prefsData.updateProgress.isIndeterminate = false
+                viewModel.setUpdateHandled()
+                showToast("Data updated successfully")
+            }
+            is DataState.Error -> {
+                binding.prefsData.updateProgress.isIndeterminate = false
+                viewModel.setUpdateHandled()
+                showToast(state.message.toString())
+            }
+            is DataState.Loading -> {
+                binding.prefsData.updateProgress.isIndeterminate = true
+            }
+            is DataState.Handled -> {}
         }
     }
 

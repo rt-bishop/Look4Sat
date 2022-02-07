@@ -17,23 +17,29 @@
  */
 package com.rtbishop.look4sat.domain
 
+import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.InputStream
 
 interface IDataRepository {
+
+    val dataUpdateState: StateFlow<DataState<Long>>
+
+    fun setDataUpdateHandled()
+
+    fun updateDataFromFile(stream: InputStream)
+
+    fun updateDataFromWeb(sources: List<String>)
 
     fun getSatelliteItems(): Flow<List<SatItem>>
 
     suspend fun getSelectedSatellites(): List<Satellite>
 
     suspend fun getTransmitters(catnum: Int): List<Transmitter>
-
-    suspend fun updateDataFromFile(stream: InputStream)
-
-    suspend fun updateDataFromWeb(sources: List<String>)
 
     suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean = true)
 }
