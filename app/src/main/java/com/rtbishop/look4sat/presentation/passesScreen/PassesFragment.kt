@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.presentation.passesScreen
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -72,10 +73,21 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             }
             passesFilter.setOnClickListener { findNavController().navigate(R.id.nav_pass_prefs) }
             passesSettings.setOnClickListener { findNavController().navigate(R.id.nav_settings) }
-            passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
+//            passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
         }
         passesViewModel.passes.observe(viewLifecycleOwner) { passesResult ->
             handleNewPasses(passesResult, adapter, binding)
+        }
+        passesViewModel.satellites.observe(viewLifecycleOwner) { satellites ->
+            satellites?.let {
+                if (satellites.isEmpty()) {
+                    binding.passesFab.setOnClickListener {
+                        Toast.makeText(requireContext(), "Nothing to show", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    binding.passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
+                }
+            }
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)

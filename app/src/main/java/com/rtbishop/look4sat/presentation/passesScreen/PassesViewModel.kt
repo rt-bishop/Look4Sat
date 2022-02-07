@@ -17,10 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.passesScreen
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.DataState
@@ -32,14 +29,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val dataRepository: IDataRepository,
     private val predictor: Predictor,
-    private val preferences: ISettingsHandler
+    private val settings: ISettingsHandler,
+    private val repository: IDataRepository
 ) : ViewModel() {
 
-    private val _passes = MutableLiveData<DataState<List<SatPass>>>()
     private var passesProcessing: Job? = null
+    private val _passes = MutableLiveData<DataState<List<SatPass>>>()
     val passes: LiveData<DataState<List<SatPass>>> = _passes
+    val satellites = repository.getSatelliteItems().asLiveData()
 
     init {
         viewModelScope.launch {
@@ -51,26 +49,26 @@ class PassesViewModel @Inject constructor(
     }
 
     fun forceCalculation(
-        hoursAhead: Int = preferences.getHoursAhead(),
-        minElevation: Double = preferences.getMinElevation(),
+        hoursAhead: Int = settings.getHoursAhead(),
+        minElevation: Double = settings.getMinElevation(),
         timeRef: Long = System.currentTimeMillis()
     ) {
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
-            val satellites = dataRepository.getSelectedSatellites()
-            val stationPos = preferences.loadStationPosition()
+            val satellites = repository.getSelectedSatellites()
+            val stationPos = settings.loadStationPosition()
             predictor.forceCalculation(satellites, stationPos, timeRef, hoursAhead, minElevation)
         }
     }
 
     fun shouldUseUTC(): Boolean {
-        return preferences.getUseUTC()
+        return settings.getUseUTC()
     }
 
     fun saveCalculationPrefs(hoursAhead: Int, minElevation: Double) {
-        preferences.setHoursAhead(hoursAhead)
-        preferences.setMinElevation(minElevation)
+        settings.setHoursAhead(hoursAhead)
+        settings.setMinElevation(minElevation)
     }
 
     private suspend fun tickPasses(passes: List<SatPass>) = withContext(Dispatchers.Default) {
