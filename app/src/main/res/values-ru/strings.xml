@@ -105,8 +105,9 @@
     <string name="tracking_port_invalid">Введите порт в диапазоне от 1024 до 65535</string>
 
     <string name="update_title">Обновление данных спутников</string>
-    <string name="update_web">Из Вэб</string>
-    <string name="update_file">Из Файла</string>
+    <string name="update_web">Вэб</string>
+    <string name="update_file">Файл</string>
+    <string name="update_clear">Удалить</string>
     <string name="update_error">При обновлении возникли ошибки</string>
 
     <string name="warranty_title">Я хотел бы сказать спасибо:</string>

@@ -30,7 +30,7 @@
             android:id="@+id/radar_map"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
-            android:src="@drawable/ic_map" />
+            android:src="@drawable/ic_world" />
 
     </androidx.cardview.widget.CardView>
 

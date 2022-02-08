@@ -125,8 +125,9 @@
     <string name="tracking_port_invalid">Please enter a port between 1024 to 65535</string>
 
     <string name="update_title">Satellite data update</string>
-    <string name="update_web">From Web</string>
-    <string name="update_file">From File</string>
+    <string name="update_web">Web</string>
+    <string name="update_file">File</string>
+    <string name="update_clear">Clear</string>
     <string name="update_error">Update completed with errors</string>
 
     <string name="warranty_title">I would like to say thanks to:</string>

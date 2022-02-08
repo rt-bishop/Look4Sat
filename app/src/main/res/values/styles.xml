@@ -20,10 +20,10 @@
         <item name="android:windowBackground">@color/surfaceBg</item>
     </style>
 
-    <style name="AppButton" parent="Widget.Material3.Button">
+    <style name="AppButton" parent="Widget.Material3.Button.IconButton">
         <item name="android:backgroundTint">@color/surfaceButton</item>
         <item name="android:ellipsize">end</item>
-        <item name="cornerRadius">@dimen/card_corner_high</item>
+        <item name="cornerRadius">@dimen/btn_corner_high</item>
         <item name="rippleColor">@color/themeLight</item>
         <item name="android:maxLines">1</item>
         <item name="android:textAllCaps">false</item>

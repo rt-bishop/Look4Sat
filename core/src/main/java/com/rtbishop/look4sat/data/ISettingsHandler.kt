@@ -23,8 +23,8 @@ interface ISettingsHandler {
 
     val defaultSources: List<String>
         get() = listOf(
-            "https://prismnet.com/~mmccants/tles/inttles.zip",
-            "https://prismnet.com/~mmccants/tles/classfd.zip",
+            "https://www.prismnet.com/~mmccants/tles/inttles.zip",
+            "https://www.prismnet.com/~mmccants/tles/classfd.zip",
             "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
             "https://amsat.org/tle/current/nasabare.txt"
         )

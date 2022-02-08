@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="btn_corner_low">0dp</dimen>
+    <dimen name="btn_corner_high">8dp</dimen>
     <dimen name="card_elev_low">0dp</dimen>
     <dimen name="card_elev_high">8dp</dimen>
     <dimen name="card_corner_low">0dp</dimen>
