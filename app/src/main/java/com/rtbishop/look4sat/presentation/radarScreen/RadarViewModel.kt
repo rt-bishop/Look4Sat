@@ -54,7 +54,7 @@ class RadarViewModel @Inject constructor(
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
-        predictor.passes.collect { passes ->
+        predictor.calculatedPasses.collect { passes ->
             val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
             pass?.let { satPass ->
                 emit(satPass)
@@ -105,21 +105,13 @@ class RadarViewModel @Inject constructor(
         }
     }
 
-    private fun processTransmitters(satPass: SatPass) {
+    private fun processTransmitters(pass: SatPass) {
         viewModelScope.launch {
-            val transmitters = dataRepository.getTransmitters(satPass.catNum)
+            val transmitters = dataRepository.getTransmitters(pass.catNum)
             while (isActive) {
-                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date().time)
-                val copiedList = transmitters.map { it.copy() }
-                copiedList.forEach { transmitter ->
-                    transmitter.downlink?.let {
-                        transmitter.downlink = satPos.getDownlinkFreq(it)
-                    }
-                    transmitter.uplink?.let {
-                        transmitter.uplink = satPos.getUplinkFreq(it)
-                    }
-                }
-                _transmitters.postValue(copiedList.map { it.copy() })
+                val time = System.currentTimeMillis()
+                val list = predictor.processRadios(pass.satellite, stationPos, transmitters, time)
+                _transmitters.postValue(list)
                 delay(1000)
             }
         }

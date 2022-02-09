@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.domain.predict
 
+import com.rtbishop.look4sat.domain.model.Transmitter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,9 +25,8 @@ import kotlinx.coroutines.withContext
 
 class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
 
-    private val _passes = MutableSharedFlow<List<SatPass>>(replay = 1)
-    private var selectedSatIds = emptyList<Int>()
-    val passes: SharedFlow<List<SatPass>> = _passes
+    private val _calculatedPasses = MutableSharedFlow<List<SatPass>>(replay = 1)
+    val calculatedPasses: SharedFlow<List<SatPass>> = _calculatedPasses
 
     suspend fun getSatPos(sat: Satellite, pos: GeoPos, time: Long): SatPos {
         return withContext(predictorDispatcher) { sat.getPosition(pos, time) }
@@ -44,40 +44,55 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         }
     }
 
-    suspend fun triggerCalculation(
-        satellites: List<Satellite>,
-        pos: GeoPos,
-        time: Long,
-        hoursAhead: Int = 8,
-        minElevation: Double = 16.0
-    ) {
-        if (satellites.isEmpty()) {
-            _passes.emit(emptyList())
-        } else {
-            val newCatNums = satellites.map { it.params.catnum }
-            if (selectedSatIds != newCatNums) {
-                forceCalculation(satellites, pos, time, hoursAhead, minElevation)
+    suspend fun processRadios(sat: Satellite, pos: GeoPos, radios: List<Transmitter>, time: Long): List<Transmitter> {
+        return withContext(predictorDispatcher) {
+            val satPos = sat.getPosition(pos, time)
+            val copiedList = radios.map { it.copy() }
+            copiedList.forEach { transmitter ->
+                transmitter.downlink?.let {
+                    transmitter.downlink = satPos.getDownlinkFreq(it)
+                }
+                transmitter.uplink?.let {
+                    transmitter.uplink = satPos.getUplinkFreq(it)
+                }
             }
+            copiedList.map { it.copy() }
+        }
+    }
+
+    suspend fun processPasses(passList: List<SatPass>, time: Long): List<SatPass> {
+        return withContext(predictorDispatcher) {
+            val copiedList = passList.map { it.copy() }
+            copiedList.forEach { pass ->
+                if (!pass.isDeepSpace) {
+                    val timeStart = pass.aosTime
+                    if (time > timeStart) {
+                        val deltaNow = time.minus(timeStart).toFloat()
+                        val deltaTotal = pass.losTime.minus(timeStart).toFloat()
+                        pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
+                    }
+                }
+            }
+            copiedList.filter { it.progress < 100 }.map { it.copy() }
         }
     }
 
     suspend fun forceCalculation(
-        satellites: List<Satellite>,
+        satList: List<Satellite>,
         pos: GeoPos,
         time: Long,
         hoursAhead: Int = 8,
         minElevation: Double = 16.0
     ) {
-        if (satellites.isEmpty()) {
-            _passes.emit(emptyList())
+        if (satList.isEmpty()) {
+            _calculatedPasses.emit(emptyList())
         } else {
             withContext(predictorDispatcher) {
                 val allPasses = mutableListOf<SatPass>()
-                selectedSatIds = satellites.map { it.params.catnum }
-                satellites.forEach { satellite ->
+                satList.forEach { satellite ->
                     allPasses.addAll(satellite.getPasses(pos, time, hoursAhead))
                 }
-                _passes.emit(allPasses.filter(time, hoursAhead, minElevation))
+                _calculatedPasses.emit(allPasses.filter(time, hoursAhead, minElevation))
             }
         }
     }

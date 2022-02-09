@@ -41,9 +41,16 @@ class PassesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            predictor.passes.collect { passes ->
+            predictor.calculatedPasses.collect { passes ->
                 passesProcessing?.cancelAndJoin()
-                passesProcessing = viewModelScope.launch { tickPasses(passes) }
+                passesProcessing = viewModelScope.launch {
+                    while (isActive) {
+                        val time = System.currentTimeMillis()
+                        val newPasses = predictor.processPasses(passes, time)
+                        _passes.postValue(DataState.Success(newPasses))
+                        delay(1000)
+                    }
+                }
             }
         }
     }
@@ -69,26 +76,5 @@ class PassesViewModel @Inject constructor(
     fun saveCalculationPrefs(hoursAhead: Int, minElevation: Double) {
         settings.setHoursAhead(hoursAhead)
         settings.setMinElevation(minElevation)
-    }
-
-    private suspend fun tickPasses(passes: List<SatPass>) = withContext(Dispatchers.Default) {
-        var currentPasses = passes
-        while (isActive) {
-            val timeNow = System.currentTimeMillis()
-            currentPasses.forEach { pass ->
-                if (!pass.isDeepSpace) {
-                    val timeStart = pass.aosTime
-                    if (timeNow > timeStart) {
-                        val deltaNow = timeNow.minus(timeStart).toFloat()
-                        val deltaTotal = pass.losTime.minus(timeStart).toFloat()
-                        pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
-                    }
-                }
-            }
-            currentPasses = currentPasses.filter { it.progress < 100 }
-            val passesCopy = currentPasses.map { it.copy() }
-            _passes.postValue(DataState.Success(passesCopy))
-            delay(1000)
-        }
     }
 }
