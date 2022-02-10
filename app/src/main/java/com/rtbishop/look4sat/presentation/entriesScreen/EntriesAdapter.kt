@@ -22,8 +22,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.databinding.ItemEntryBinding
+import com.rtbishop.look4sat.domain.model.SatItem
 
 class EntriesAdapter(private val clickListener: EntriesClickListener) :
     RecyclerView.Adapter<EntriesAdapter.SatItemHolder>() {
@@ -59,7 +59,7 @@ class EntriesAdapter(private val clickListener: EntriesClickListener) :
         fun bind(item: SatItem, listener: EntriesClickListener) {
             binding.entryCheckbox.text = item.name
             binding.entryCheckbox.isChecked = item.isSelected
-            itemView.setOnClickListener {
+            binding.entryCheckbox.setOnClickListener {
                 listener.updateSelection(listOf(item.catnum), item.isSelected.not())
             }
         }

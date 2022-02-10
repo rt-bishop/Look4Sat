@@ -17,41 +17,38 @@
  */
 package com.rtbishop.look4sat.presentation.entriesScreen
 
-import android.widget.SearchView
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
     private val preferences: ISettingsHandler,
-    private val dataRepository: IDataRepository
-) : ViewModel(), SearchView.OnQueryTextListener, EntriesAdapter.EntriesClickListener {
+    private val repository: IDataRepository
+) : ViewModel(), EntriesAdapter.EntriesClickListener {
 
     private val transModes = MutableLiveData(preferences.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
+    private val itemsFromRepo = liveData {
+        repository.getSatelliteItems().collect { itemsAll -> emit(itemsAll) }
+    } as MutableLiveData
     private val itemsWithModes = transModes.switchMap { modes ->
-        liveData { dataRepository.getSatelliteItems().collect { emit(filterByModes(it, modes)) } }
+        itemsFromRepo.map { items -> filterByModes(items, modes) }
     }
     private val itemsWithQuery = currentQuery.switchMap { query ->
-        itemsWithModes.map { items -> DataState.Success(filterByQuery(items, query)) }
-    }
-    private val _satData = MediatorLiveData<DataState<List<SatItem>>>().apply {
-        addSource(itemsWithQuery) { value -> this.value = value }
+        itemsWithModes.map { items -> filterByQuery(items, query) }
     }
     private var shouldSelectAll = true
-    val satData: LiveData<DataState<List<SatItem>>> = _satData
+    val satData = itemsWithQuery.map { items -> DataState.Success(items) }
 
     fun selectCurrentItems() {
-        val currentValue = _satData.value
-        if (currentValue is DataState.Success) {
-            updateSelection(currentValue.data.map { it.catnum }, shouldSelectAll)
+        itemsWithQuery.value?.let { itemsWithQuery ->
+            updateSelection(itemsWithQuery.map { item -> item.catnum }, shouldSelectAll)
             shouldSelectAll = shouldSelectAll.not()
         }
     }
@@ -70,17 +67,14 @@ class EntriesViewModel @Inject constructor(
         currentQuery.value = query
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        return true
-    }
-
-    override fun onQueryTextChange(newText: String): Boolean {
-        currentQuery.value = newText
-        return true
-    }
-
     override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        viewModelScope.launch { dataRepository.updateSelection(catNums, isSelected) }
+        itemsFromRepo.value?.let { itemsAll ->
+            val copiedList = itemsAll.map { item -> item.copy() }
+            catNums.forEach { catnum ->
+                copiedList.find { item -> item.catnum == catnum }?.isSelected = isSelected
+            }
+            itemsFromRepo.value = copiedList
+        }
     }
 
     private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {
