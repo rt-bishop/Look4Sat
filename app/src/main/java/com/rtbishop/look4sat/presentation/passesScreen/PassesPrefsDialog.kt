@@ -33,11 +33,17 @@ class PassesPrefsDialog : AppCompatDialogFragment() {
             hoursAheadEdit.setText(preferences.getHoursAhead().toString())
             minElevEdit.setText(preferences.getMinElevation().toString())
             passPrefBtnPos.setOnClickListener {
-                val hoursAheadText = hoursAheadEdit.text.toString()
-                val hoursAhead = if (hoursAheadText.isNotEmpty()) hoursAheadText.toInt() else 8
-                val minElevText = minElevEdit.text.toString()
-                val minElev = if (minElevText.isNotEmpty()) minElevText.toDouble() else 16.0
-                setNavResult("prefs", Pair(hoursAhead, minElev))
+                val hoursAhead = try {
+                    hoursAheadEdit.text.toString().toInt()
+                } catch (exception: Exception) {
+                    8
+                }
+                val minElevation = try {
+                    minElevEdit.text.toString().toDouble()
+                } catch (exception: Exception) {
+                    16.0
+                }
+                setNavResult("prefs", Pair(hoursAhead, minElevation))
                 dismiss()
             }
             passPrefBtnNeg.setOnClickListener { dismiss() }

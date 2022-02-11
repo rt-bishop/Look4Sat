@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.presentation.getDouble
 import com.rtbishop.look4sat.presentation.putDouble
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -68,7 +69,7 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
     }
 
     override fun getMinElevation(): Double {
-        return prefs.getInt(keyMinElevation, 16).toDouble()
+        return prefs.getDouble(keyMinElevation, 16.0)
     }
 
     override fun setMinElevation(minElevation: Double) {
