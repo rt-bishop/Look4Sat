@@ -20,7 +20,6 @@ package com.rtbishop.look4sat.presentation.passesScreen
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -33,7 +32,6 @@ import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.presentation.getNavResult
-import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -71,9 +69,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 setProgressBackgroundColorSchemeResource(R.color.themeAccent)
                 setOnRefreshListener { passesViewModel.forceCalculation() }
             }
-            passesFilter.setOnClickListener { findNavController().navigate(R.id.nav_pass_prefs) }
-            passesSettings.setOnClickListener { findNavController().navigate(R.id.nav_settings) }
-//            passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
+            passesFilter.setOnClickListener { navigateToPassPrefs() }
+            passesSettings.setOnClickListener { navigateToSettings() }
         }
         passesViewModel.passes.observe(viewLifecycleOwner) { passesResult ->
             handleNewPasses(passesResult, adapter, binding)
@@ -85,7 +82,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                         Toast.makeText(requireContext(), "Nothing to show", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    binding.passesFab.setOnClickListener { findNavController().navigate(R.id.nav_satellites) }
+                    binding.passesFab.setOnClickListener { findNavController().navigate(R.id.nav_entries) }
                 }
             }
         }
@@ -93,6 +90,16 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)
             passesViewModel.forceCalculation(prefs.first, prefs.second)
         }
+    }
+
+    private fun navigateToPassPrefs() {
+        val direction = PassesFragmentDirections.actionPassesToPassPrefs()
+        findNavController().navigate(direction)
+    }
+
+    private fun navigateToSettings() {
+        val direction = PassesFragmentDirections.actionGlobalSettingsFragment()
+        findNavController().navigate(direction)
     }
 
     private fun handleNewPasses(
@@ -148,8 +155,10 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
 
     override fun navigateToPass(satPass: SatPass) {
         if (satPass.progress < 100) {
-            val bundle = bundleOf("catNum" to satPass.catNum, "aosTime" to satPass.aosTime)
-            findNavController().navigateSafe(R.id.action_passes_to_radar, bundle)
+            val catNum = satPass.catNum
+            val aosTime = satPass.aosTime
+            val action = PassesFragmentDirections.actionGlobalRadarFragment(catNum, aosTime)
+            findNavController().navigate(action)
         }
     }
 }

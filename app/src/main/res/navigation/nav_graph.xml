@@ -5,39 +5,43 @@
     android:id="@+id/nav_root"
     app:startDestination="@id/nav_passes">
     <fragment
-        android:id="@+id/nav_satellites"
+        android:id="@+id/nav_entries"
         android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
-        tools:layout="@layout/fragment_entries">
-    </fragment>
+        tools:layout="@layout/fragment_entries" />
     <fragment
         android:id="@+id/nav_passes"
         android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
         tools:layout="@layout/fragment_passes">
         <action
-            android:id="@+id/action_passes_to_entries"
-            app:destination="@id/nav_satellites" />
-        <action
             android:id="@+id/action_passes_to_pass_prefs"
             app:destination="@id/nav_pass_prefs" />
-        <action
-            android:id="@+id/action_passes_to_prefs"
-            app:destination="@id/nav_settings" />
-        <action
-            android:id="@+id/action_passes_to_radar"
-            app:destination="@id/nav_radar" />
     </fragment>
+    <dialog
+        android:id="@+id/nav_pass_prefs"
+        android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesPrefsDialog"
+        tools:layout="@layout/dialog_passes" />
     <fragment
         android:id="@+id/nav_radar"
         android:name="com.rtbishop.look4sat.presentation.radarScreen.RadarFragment"
         tools:layout="@layout/fragment_radar">
-        <action
-            android:id="@+id/action_radar_to_map"
-            app:destination="@id/nav_map" />
+        <argument
+            android:name="catNum"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="aosTime"
+            android:defaultValue="0L"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/nav_map"
         android:name="com.rtbishop.look4sat.presentation.mapScreen.MapFragment"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map">
+        <argument
+            android:name="catNum"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.SettingsFragment"
@@ -47,11 +51,22 @@
             app:destination="@id/nav_sources" />
     </fragment>
     <dialog
-        android:id="@+id/nav_pass_prefs"
-        android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesPrefsDialog"
-        tools:layout="@layout/dialog_passes" />
-    <dialog
         android:id="@+id/nav_sources"
         android:name="com.rtbishop.look4sat.presentation.sourcesScreen.SourcesDialog"
         tools:layout="@layout/dialog_sources" />
+    <action
+        android:id="@+id/action_global_entriesFragment"
+        app:destination="@id/nav_entries" />
+    <action
+        android:id="@+id/action_global_passesFragment"
+        app:destination="@id/nav_passes" />
+    <action
+        android:id="@+id/action_global_radarFragment"
+        app:destination="@id/nav_radar" />
+    <action
+        android:id="@+id/action_global_mapFragment"
+        app:destination="@id/nav_map" />
+    <action
+        android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/nav_settings" />
 </navigation>

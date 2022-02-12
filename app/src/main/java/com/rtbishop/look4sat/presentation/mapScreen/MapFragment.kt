@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.domain.predict.GeoPos
@@ -50,6 +51,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
+    private val args: MapFragmentArgs by navArgs()
     private val viewModel: MapViewModel by viewModels()
     private val minLat = MapView.getTileSystem().minLatitude
     private val maxLat = MapView.getTileSystem().maxLatitude
@@ -91,7 +93,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun setupObservers(binding: FragmentMapBinding) {
-        viewModel.selectDefaultSatellite(arguments?.getInt("catNum"))
+        viewModel.selectDefaultSatellite(args.catNum)
         viewModel.stationPosLiveData.observe(viewLifecycleOwner) { renderStationPos(it, binding) }
         viewModel.satPositions.observe(viewLifecycleOwner) { renderSatPositions(it, binding) }
         viewModel.satTrack.observe(viewLifecycleOwner) { renderSatTrack(it, binding) }

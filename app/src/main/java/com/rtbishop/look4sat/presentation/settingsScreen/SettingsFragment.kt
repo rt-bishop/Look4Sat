@@ -37,7 +37,10 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.presentation.*
+import com.rtbishop.look4sat.presentation.getNavResult
+import com.rtbishop.look4sat.presentation.isValidIPv4
+import com.rtbishop.look4sat.presentation.isValidPort
+import com.rtbishop.look4sat.presentation.setEditText
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -114,7 +117,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun setupDataCard(binding: FragmentSettingsBinding) {
         binding.prefsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
         binding.prefsData.updateBtnWeb.setOnClickListener {
-            findNavController().navigateSafe(R.id.action_prefs_to_sources)
+            val action = SettingsFragmentDirections.actionPrefsToSources()
+            findNavController().navigate(action)
         }
         binding.prefsData.updateBtnClear.setOnClickListener { viewModel.clearData() }
         getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->

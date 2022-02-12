@@ -20,7 +20,6 @@ package com.rtbishop.look4sat.presentation
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
-import android.os.Bundle
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -29,9 +28,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigator
 import androidx.navigation.fragment.findNavController
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -49,18 +45,6 @@ fun SharedPreferences.getDouble(key: String, default: Double): Double {
 
 fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
     putLong(key, double.toRawBits())
-}
-
-fun NavController.navigateSafe(
-    @IdRes resId: Int,
-    args: Bundle? = null,
-    options: NavOptions? = null,
-    extras: Navigator.Extras? = null
-) {
-    val action = currentDestination?.getAction(resId) ?: graph.getAction(resId)
-    if (action != null && currentDestination?.id != action.destinationId) {
-        navigate(resId, args, options, extras)
-    }
 }
 
 fun <T> Fragment.getNavResult(@IdRes id: Int, key: String, onResult: (result: T) -> Unit) {

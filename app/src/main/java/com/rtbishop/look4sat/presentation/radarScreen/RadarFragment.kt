@@ -19,10 +19,10 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -31,7 +31,6 @@ import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.presentation.navigateSafe
 import com.rtbishop.look4sat.presentation.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -41,6 +40,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     @Inject
     lateinit var preferences: ISettingsHandler
+    private val args: RadarFragmentArgs by navArgs()
     private val viewModel: RadarViewModel by viewModels()
     private var radarView: RadarView? = null
 
@@ -70,9 +70,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
         transmittersAdapter: TransmittersAdapter,
         binding: FragmentRadarBinding
     ) {
-        val catNum = requireArguments().getInt("catNum")
-        val aosTime = requireArguments().getLong("aosTime")
-        viewModel.getPass(catNum, aosTime).observe(viewLifecycleOwner) { pass ->
+        viewModel.getPass(args.catNum, args.aosTime).observe(viewLifecycleOwner) { pass ->
             radarView = RadarView(requireContext()).apply {
                 setShowAim(preferences.getUseCompass())
                 setScanning(preferences.getShowSweep())
@@ -99,11 +97,13 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     orientation.third
                 )
             }
-            binding.radarMap.setOnClickListener {
-                val bundle = bundleOf("catNum" to pass.catNum)
-                findNavController().navigateSafe(R.id.action_radar_to_map, bundle)
-            }
+            binding.radarMap.setOnClickListener { navigateToMap(pass.catNum) }
         }
+    }
+
+    private fun navigateToMap(catnum: Int) {
+        val direction = RadarFragmentDirections.actionGlobalMapFragment(catnum)
+        findNavController().navigate(direction)
     }
 
     private fun setPassText(satPass: SatPass, satPos: SatPos, binding: FragmentRadarBinding) {
