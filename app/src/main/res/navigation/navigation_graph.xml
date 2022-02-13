@@ -26,7 +26,7 @@
         tools:layout="@layout/fragment_radar">
         <argument
             android:name="catNum"
-            android:defaultValue="0"
+            android:defaultValue="-1"
             app:argType="integer" />
         <argument
             android:name="aosTime"
@@ -39,7 +39,7 @@
         tools:layout="@layout/fragment_map">
         <argument
             android:name="catNum"
-            android:defaultValue="0"
+            android:defaultValue="-1"
             app:argType="integer" />
     </fragment>
     <fragment

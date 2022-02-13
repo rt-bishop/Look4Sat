@@ -1,9 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_nav_host"
-    android:name="androidx.navigation.fragment.NavHostFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:defaultNavHost="true"
-    app:navGraph="@navigation/nav_graph" />
+    android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/navigation_host"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@+id/navigation_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/navigation_graph" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navigation_bar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        app:itemBackground="@color/surfaceToolbar"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/navigation_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

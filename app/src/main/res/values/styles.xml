@@ -7,11 +7,16 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
     </style>
 
-    <style name="Theme.Look4Sat.Main" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.Look4Sat.Main" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorAccent">@color/themeAccent</item>
         <item name="colorControlNormal">@color/themeLight</item>
         <item name="colorPrimary">@color/themeAccent</item>
         <item name="colorSecondary">@color/themeAccent</item>
+<!--        Bottom bar colors-->
+        <item name="colorOnSecondaryContainer">@color/themeLight</item>
+        <item name="colorOnSurfaceVariant">@color/themeLight</item>
+        <item name="colorSecondaryContainer">@color/surfaceIcon</item>
+<!--        -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:listDivider">@drawable/item_divider</item>
         <item name="android:navigationBarColor">@color/surfaceBg</item>

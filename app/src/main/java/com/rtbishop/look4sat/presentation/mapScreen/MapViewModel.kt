@@ -74,12 +74,12 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun selectDefaultSatellite(catnum: Int?) {
+    fun selectDefaultSatellite(catnum: Int) {
         viewModelScope.launch {
             dataRepository.getSelectedSatellites().also { satellites ->
                 if (satellites.isNotEmpty()) {
                     allSatList = satellites
-                    if (catnum == null) {
+                    if (catnum == -1) {
                         selectSatellite(satellites.first())
                     } else {
                         satellites.find { it.params.catnum == catnum }?.let { selectSatellite(it) }

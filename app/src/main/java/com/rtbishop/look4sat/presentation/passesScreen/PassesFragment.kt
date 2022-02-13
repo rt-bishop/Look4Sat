@@ -19,13 +19,11 @@ package com.rtbishop.look4sat.presentation.passesScreen
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
@@ -57,12 +55,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 this.layoutManager = layoutManager
                 addItemDecoration(itemDecoration)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        if (dy > 0 && passesFab.visibility == View.VISIBLE) passesFab.hide()
-                        else if (dy < 0 && passesFab.visibility != View.VISIBLE) passesFab.show()
-                    }
-                })
             }
             passesSwipe.apply {
                 setColorSchemeResources(R.color.surfaceToolbar)
@@ -74,17 +66,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         }
         passesViewModel.passes.observe(viewLifecycleOwner) { passesResult ->
             handleNewPasses(passesResult, adapter, binding)
-        }
-        passesViewModel.satellites.observe(viewLifecycleOwner) { satellites ->
-            satellites?.let {
-                if (satellites.isEmpty()) {
-                    binding.passesFab.setOnClickListener {
-                        Toast.makeText(requireContext(), "Nothing to show", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    binding.passesFab.setOnClickListener { findNavController().navigate(R.id.nav_entries) }
-                }
-            }
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)
