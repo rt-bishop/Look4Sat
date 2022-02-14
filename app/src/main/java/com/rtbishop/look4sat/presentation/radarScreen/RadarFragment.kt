@@ -40,21 +40,23 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     @Inject
     lateinit var preferences: ISettingsHandler
+    private lateinit var binding: FragmentRadarBinding
     private val args: RadarFragmentArgs by navArgs()
     private val viewModel: RadarViewModel by viewModels()
     private var radarView: RadarView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupComponents(view)
+        binding = FragmentRadarBinding.bind(view)
+        setupViews()
     }
 
-    private fun setupComponents(view: View) {
+    private fun setupViews() {
         val context = requireContext()
         val adapter = TransmittersAdapter()
         val layoutManager = LinearLayoutManager(context)
         val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
-        FragmentRadarBinding.bind(view).apply {
+        binding.run {
             radarRecycler.apply {
                 setHasFixedSize(true)
                 this.adapter = adapter
@@ -62,14 +64,11 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 addItemDecoration(itemDecoration)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
-            setupObservers(adapter, this)
+            setupObservers(adapter)
         }
     }
 
-    private fun setupObservers(
-        transmittersAdapter: TransmittersAdapter,
-        binding: FragmentRadarBinding
-    ) {
+    private fun setupObservers(transmittersAdapter: TransmittersAdapter) {
         viewModel.getPass(args.catNum, args.aosTime).observe(viewLifecycleOwner) { pass ->
             radarView = RadarView(requireContext()).apply {
                 setShowAim(preferences.getUseCompass())
@@ -79,7 +78,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
             viewModel.radarData.observe(viewLifecycleOwner) { passData ->
                 radarView?.setPosition(passData.satPos)
                 radarView?.setPositions(passData.satTrack)
-                setPassText(pass, passData.satPos, binding)
+                setPassText(pass, passData.satPos)
             }
             viewModel.transmitters.observe(viewLifecycleOwner) { list ->
                 if (list.isNotEmpty()) {
@@ -101,12 +100,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
         }
     }
 
-    private fun navigateToMap(catnum: Int) {
-        val direction = RadarFragmentDirections.actionGlobalMapFragment(catnum)
-        findNavController().navigate(direction)
-    }
-
-    private fun setPassText(satPass: SatPass, satPos: SatPos, binding: FragmentRadarBinding) {
+    private fun setPassText(satPass: SatPass, satPos: SatPos) {
         val timeNow = System.currentTimeMillis()
         val polarAz = getString(R.string.pat_azimuth)
         val polarEl = getString(R.string.pat_elevation)
@@ -133,6 +127,11 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
         } else {
             binding.radarTimer.text = 0L.toTimerString()
         }
+    }
+
+    private fun navigateToMap(catnum: Int) {
+        val direction = RadarFragmentDirections.actionGlobalMapFragment(catnum)
+        findNavController().navigate(direction)
     }
 
     override fun onResume() {

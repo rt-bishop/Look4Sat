@@ -46,6 +46,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
+    private lateinit var binding: FragmentSettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
@@ -64,23 +65,31 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val settingsBinding = FragmentSettingsBinding.bind(view)
-        settingsBinding.prefsBack.setOnClickListener { findNavController().navigateUp() }
-        setupAboutCard(settingsBinding)
-        setupDataCard(settingsBinding)
-        setupLocationCard(settingsBinding)
-        setupTrackingCard(settingsBinding)
-        setupOtherCard(settingsBinding)
-        setupWarrantyCard(settingsBinding)
+        binding = FragmentSettingsBinding.bind(view)
+        setupViews()
+        setupObservers()
+    }
+
+    private fun setupViews() {
+        binding.prefsBack.setOnClickListener { findNavController().navigateUp() }
+        setupAboutCard()
+        setupDataCard()
+        setupLocationCard()
+        setupTrackingCard()
+        setupOtherCard()
+        setupWarrantyCard()
+    }
+
+    private fun setupObservers() {
         viewModel.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
-            stationPos?.let { handleStationPosition(stationPos, settingsBinding) }
+            stationPos?.let { handleStationPosition(stationPos) }
         }
         viewModel.getUpdateState().asLiveData().observe(viewLifecycleOwner) { updateState ->
-            updateState?.let { handleSatState(updateState, settingsBinding) }
+            updateState?.let { handleSatState(updateState) }
         }
     }
 
-    private fun setupAboutCard(binding: FragmentSettingsBinding) {
+    private fun setupAboutCard() {
         binding.prefsInfo.aboutVersion.text =
             String.format(getString(R.string.about_version), BuildConfig.VERSION_NAME)
         binding.prefsInfo.aboutBtnGithub.setOnClickListener {
@@ -94,8 +103,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupLocationCard(binding: FragmentSettingsBinding) {
-        setPositionText(viewModel.getStationPosition(), binding)
+    private fun setupLocationCard() {
+        setPositionText(viewModel.getStationPosition())
         binding.prefsLocation.locationBtnGps.setOnClickListener {
             locationRequest.launch(arrayOf(locationFine, locationCoarse))
         }
@@ -114,7 +123,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupDataCard(binding: FragmentSettingsBinding) {
+    private fun setupDataCard() {
         binding.prefsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
         binding.prefsData.updateBtnWeb.setOnClickListener {
             val action = SettingsFragmentDirections.actionPrefsToSources()
@@ -126,7 +135,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupTrackingCard(binding: FragmentSettingsBinding) {
+    private fun setupTrackingCard() {
         binding.prefsTracking.trackingSwitch.apply {
             isChecked = viewModel.getRotatorEnabled()
             binding.prefsTracking.trackingIp.isEnabled = isChecked
@@ -147,7 +156,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupOtherCard(binding: FragmentSettingsBinding) {
+    private fun setupOtherCard() {
         binding.prefsOther.otherSwitchUtc.apply {
             isChecked = viewModel.getUseUTC()
             setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
@@ -162,22 +171,22 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupWarrantyCard(binding: FragmentSettingsBinding) {
+    private fun setupWarrantyCard() {
         binding.prefsWarranty.warrantyThanks.movementMethod = LinkMovementMethod.getInstance()
         binding.prefsWarranty.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
     }
 
-    private fun setPositionText(geoPos: GeoPos, binding: FragmentSettingsBinding) {
+    private fun setPositionText(geoPos: GeoPos) {
         val latFormat = getString(R.string.location_lat)
         val lonFormat = getString(R.string.location_lon)
         binding.prefsLocation.locationLat.text = String.format(latFormat, geoPos.latitude)
         binding.prefsLocation.locationLon.text = String.format(lonFormat, geoPos.longitude)
     }
 
-    private fun handleStationPosition(pos: DataState<GeoPos>, binding: FragmentSettingsBinding) {
+    private fun handleStationPosition(pos: DataState<GeoPos>) {
         when (pos) {
             is DataState.Success -> {
-                setPositionText(pos.data, binding)
+                setPositionText(pos.data)
                 binding.prefsLocation.locationProgress.isIndeterminate = false
                 viewModel.setPositionHandled()
                 showToast(getString(R.string.pref_pos_success))
@@ -194,7 +203,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun handleSatState(state: DataState<Long>, binding: FragmentSettingsBinding) {
+    private fun handleSatState(state: DataState<Long>) {
         when (state) {
             is DataState.Success -> {
                 binding.prefsData.updateProgress.isIndeterminate = false

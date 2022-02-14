@@ -67,6 +67,13 @@ class EntriesViewModel @Inject constructor(
         currentQuery.value = query
     }
 
+    fun saveSelection() {
+        itemsFromRepo.value?.let { itemsAll ->
+            val selectedIds = itemsAll.filter { it.isSelected }.map { it.catnum }
+            repository.updateSelection(selectedIds)
+        }
+    }
+
     override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
         itemsFromRepo.value?.let { itemsAll ->
             val copiedList = itemsAll.map { item -> item.copy() }

@@ -37,19 +37,21 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
+    private lateinit var binding: FragmentEntriesBinding
     private val viewModel: EntriesViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupComponents(view)
+        binding = FragmentEntriesBinding.bind(view)
+        setupComponents()
     }
 
-    private fun setupComponents(view: View) {
+    private fun setupComponents() {
         val context = requireContext()
         val adapter = EntriesAdapter(viewModel)
         val layoutManager = GridLayoutManager(context, 2)
         val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
-        val binding = FragmentEntriesBinding.bind(view).apply {
+        binding.run {
             entriesRecycler.apply {
                 setHasFixedSize(true)
                 this.adapter = adapter
@@ -61,6 +63,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
             entriesMode.setOnClickListener { showModesDialog() }
             entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
+            entriesAccept.setOnClickListener { viewModel.saveSelection() }
         }
         viewModel.satData.observe(viewLifecycleOwner) { satData ->
             handleSatData(satData, binding, adapter)

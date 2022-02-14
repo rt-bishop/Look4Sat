@@ -42,5 +42,5 @@ interface IDataRepository {
 
     suspend fun getTransmitters(catnum: Int): List<Transmitter>
 
-    suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean = true)
+    fun updateSelection(catnums: List<Int>)
 }

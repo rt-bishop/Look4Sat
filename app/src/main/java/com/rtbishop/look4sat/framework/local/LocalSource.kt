@@ -62,8 +62,8 @@ class LocalSource(
         entriesDao.updateEntries(entries.toFrameworkEntries())
     }
 
-    override suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
-        entriesDao.updateEntriesSelection(catnums, isSelected)
+    override suspend fun updateEntriesSelection(catnums: List<Int>) {
+        entriesDao.updateEntriesSelection(catnums)
     }
 
     override suspend fun updateTransmitters(transmitters: List<Transmitter>) {

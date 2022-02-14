@@ -39,25 +39,28 @@ interface EntriesDao {
     suspend fun insertEntries(entries: List<SatEntry>)
 
     @Transaction
-    suspend fun updateEntries(entries: List<SatEntry>, cleanup: Boolean = false) {
+    suspend fun updateEntries(entries: List<SatEntry>) {
         val entriesSelection = getEntriesSelection()
-        if (cleanup) deleteEntries()
         insertEntries(entries)
-        restoreSelection(entriesSelection, true)
-    }
-
-    @Query("UPDATE entries SET isSelected = :isSelected WHERE catnum = :catnum")
-    suspend fun updateEntrySelection(catnum: Int, isSelected: Boolean)
-
-    @Transaction
-    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean) {
-        catnums.forEach { catnum -> updateEntrySelection(catnum, isSelected) }
+        restoreEntriesSelection(entriesSelection)
     }
 
     @Transaction
-    suspend fun restoreSelection(catnums: List<Int>, isSelected: Boolean) {
-        updateEntriesSelection(catnums, isSelected)
+    suspend fun restoreEntriesSelection(catnums: List<Int>) {
+        updateEntriesSelection(catnums)
     }
+
+    @Transaction
+    suspend fun updateEntriesSelection(catnums: List<Int>) {
+        clearEntriesSelection()
+        catnums.forEach { catnum -> updateEntrySelection(catnum) }
+    }
+
+    @Query("UPDATE entries SET isSelected = 1 WHERE catnum = :catnum")
+    suspend fun updateEntrySelection(catnum: Int)
+
+    @Query("UPDATE entries SET isSelected = 0")
+    suspend fun clearEntriesSelection()
 
     @Query("DELETE FROM entries")
     suspend fun deleteEntries()

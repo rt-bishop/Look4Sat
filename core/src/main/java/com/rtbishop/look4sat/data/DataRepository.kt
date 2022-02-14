@@ -116,8 +116,10 @@ class DataRepository(
 
     override suspend fun getTransmitters(catnum: Int) = localSource.getTransmitters(catnum)
 
-    override suspend fun updateSelection(catnums: List<Int>, isSelected: Boolean) {
-        localSource.updateEntriesSelection(catnums, isSelected)
+    override fun updateSelection(catnums: List<Int>) {
+        repositoryScope.launch {
+            localSource.updateEntriesSelection(catnums)
+        }
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {

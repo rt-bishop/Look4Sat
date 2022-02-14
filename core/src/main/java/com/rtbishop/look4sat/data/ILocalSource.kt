@@ -36,7 +36,7 @@ interface ILocalSource {
 
     suspend fun updateEntries(entries: List<SatEntry>)
 
-    suspend fun updateEntriesSelection(catnums: List<Int>, isSelected: Boolean)
+    suspend fun updateEntriesSelection(catnums: List<Int>)
 
     suspend fun updateTransmitters(transmitters: List<Transmitter>)
 

@@ -36,19 +36,21 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
+    private lateinit var binding: FragmentPassesBinding
     private val passesViewModel: PassesViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupComponents(view)
+        binding = FragmentPassesBinding.bind(view)
+        setupComponents()
     }
 
-    private fun setupComponents(view: View) {
+    private fun setupComponents() {
         val context = requireContext()
         val adapter = PassesAdapter(passesViewModel.shouldUseUTC(), this)
         val layoutManager = LinearLayoutManager(context)
         val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
-        val binding = FragmentPassesBinding.bind(view).apply {
+        binding.run {
             passesList.apply {
                 setHasFixedSize(true)
                 this.adapter = adapter
@@ -71,16 +73,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)
             passesViewModel.forceCalculation(prefs.first, prefs.second)
         }
-    }
-
-    private fun navigateToPassPrefs() {
-        val direction = PassesFragmentDirections.actionPassesToPassPrefs()
-        findNavController().navigate(direction)
-    }
-
-    private fun navigateToSettings() {
-        val direction = PassesFragmentDirections.actionGlobalSettingsFragment()
-        findNavController().navigate(direction)
     }
 
     private fun handleNewPasses(
@@ -132,6 +124,16 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         } else {
             binding.passesTimer.text = 0L.toTimerString()
         }
+    }
+
+    private fun navigateToPassPrefs() {
+        val direction = PassesFragmentDirections.actionPassesToPassPrefs()
+        findNavController().navigate(direction)
+    }
+
+    private fun navigateToSettings() {
+        val direction = PassesFragmentDirections.actionGlobalSettingsFragment()
+        findNavController().navigate(direction)
     }
 
     override fun navigateToPass(satPass: SatPass) {
