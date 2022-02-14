@@ -8,10 +8,10 @@
         android:id="@+id/nav_passes"
         android:icon="@drawable/ic_list"
         android:title="@string/menu_passes" />
-<!--    <item-->
-<!--        android:id="@+id/nav_radar"-->
-<!--        android:icon="@drawable/ic_support"-->
-<!--        android:title="@string/menu_radar" />-->
+    <item
+        android:id="@+id/nav_radar"
+        android:icon="@drawable/ic_support"
+        android:title="@string/menu_radar" />
     <item
         android:id="@+id/nav_map"
         android:icon="@drawable/ic_world"
