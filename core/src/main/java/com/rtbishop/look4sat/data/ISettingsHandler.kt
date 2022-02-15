@@ -59,6 +59,10 @@ interface ISettingsHandler {
 
     fun loadModesSelection(): List<String>
 
+    fun saveSatelliteSelection(catnums: List<Int>)
+
+    fun loadSatelliteSelection(): List<Int>
+
     fun getRotatorEnabled(): Boolean
 
     fun setRotatorEnabled(value: Boolean)

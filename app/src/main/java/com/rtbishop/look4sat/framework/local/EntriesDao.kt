@@ -20,47 +20,28 @@ package com.rtbishop.look4sat.framework.local
 import androidx.room.*
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatItem
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EntriesDao {
 
     @Transaction
     @Query("SELECT catnum, name, isSelected FROM entries ORDER BY name ASC")
-    fun getSatelliteItems(): Flow<List<SatItem>>
+    suspend fun getAllSatellites(): List<SatItem>
 
-    @Query("SELECT catnum FROM entries WHERE isSelected = 1")
-    suspend fun getEntriesSelection(): List<Int>
+    @Transaction
+    suspend fun getSelectedSatellites(catnums: List<Int>): List<SatEntry> {
+        val selectedSatellites = mutableListOf<SatEntry>()
+        catnums.chunked(999).forEach { chunkedList ->
+            selectedSatellites.addAll(getSelectedSatellitesChunked(chunkedList))
+        }
+        return selectedSatellites
+    }
 
-    @Query("SELECT * FROM entries WHERE isSelected = 1")
-    suspend fun getSelectedSatellites(): List<SatEntry>
+    @Query("SELECT * FROM entries WHERE catnum IN (:catnums)")
+    suspend fun getSelectedSatellitesChunked(catnums: List<Int>): List<SatEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
-
-    @Transaction
-    suspend fun updateEntries(entries: List<SatEntry>) {
-        val entriesSelection = getEntriesSelection()
-        insertEntries(entries)
-        restoreEntriesSelection(entriesSelection)
-    }
-
-    @Transaction
-    suspend fun restoreEntriesSelection(catnums: List<Int>) {
-        updateEntriesSelection(catnums)
-    }
-
-    @Transaction
-    suspend fun updateEntriesSelection(catnums: List<Int>) {
-        clearEntriesSelection()
-        catnums.forEach { catnum -> updateEntrySelection(catnum) }
-    }
-
-    @Query("UPDATE entries SET isSelected = 1 WHERE catnum = :catnum")
-    suspend fun updateEntrySelection(catnum: Int)
-
-    @Query("UPDATE entries SET isSelected = 0")
-    suspend fun clearEntriesSelection()
 
     @Query("DELETE FROM entries")
     suspend fun deleteEntries()

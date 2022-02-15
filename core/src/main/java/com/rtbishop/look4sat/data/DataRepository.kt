@@ -22,8 +22,8 @@ import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.InputStream
@@ -43,13 +43,23 @@ class DataRepository(
         _updateState.value = DataState.Error(exception.message)
     }
     private val _updateState = MutableStateFlow<DataState<Long>>(DataState.Handled)
-    override val dataUpdateState: StateFlow<DataState<Long>> = _updateState
+    override val updateState: StateFlow<DataState<Long>> = _updateState
 
-    override fun setDataUpdateHandled() {
-        _updateState.value = DataState.Handled
+    override suspend fun getAllSatellites(): List<SatItem> {
+        val selection = settings.loadSatelliteSelection()
+        val satellites = localSource.getAllSatellites()
+        satellites.forEach { satItem -> satItem.isSelected = satItem.catnum in selection }
+        return satellites
     }
 
-    override fun updateDataFromFile(uri: String) {
+    override suspend fun getSelectedSatellites(): List<Satellite> {
+        val selection = settings.loadSatelliteSelection()
+        return localSource.getSelectedSatellites(selection)
+    }
+
+    override suspend fun getTransmitters(catnum: Int) = localSource.getTransmitters(catnum)
+
+    override fun updateFromFile(uri: String) {
         repositoryScope.launch(exceptionHandler) {
             _updateState.value = DataState.Loading
             val updateTimeMillis = measureTimeMillis {
@@ -61,7 +71,7 @@ class DataRepository(
         }
     }
 
-    override fun updateDataFromWeb(sources: List<String>) {
+    override fun updateFromWeb(sources: List<String>) {
         _updateState.value = DataState.Loading
         repositoryScope.launch(exceptionHandler) {
             settings.saveDataSources(sources)
@@ -102,23 +112,21 @@ class DataRepository(
         }
     }
 
-    override fun clearData() {
+    override fun updatesSelection(catnums: List<Int>) {
         repositoryScope.launch {
-            _updateState.value = DataState.Loading
-            localSource.clearData()
-            _updateState.value = DataState.Success(0L)
+            settings.saveSatelliteSelection(catnums)
         }
     }
 
-    override fun getSatelliteItems(): Flow<List<SatItem>> = localSource.getSatelliteItems()
+    override fun setUpdateStateHandled() {
+        _updateState.value = DataState.Handled
+    }
 
-    override suspend fun getSelectedSatellites() = localSource.getSelectedSatellites()
-
-    override suspend fun getTransmitters(catnum: Int) = localSource.getTransmitters(catnum)
-
-    override fun updateSelection(catnums: List<Int>) {
+    override fun clearAllData() {
         repositoryScope.launch {
-            localSource.updateEntriesSelection(catnums)
+            _updateState.value = DataState.Loading
+            localSource.clearAllData()
+            _updateState.value = DataState.Success(0L)
         }
     }
 

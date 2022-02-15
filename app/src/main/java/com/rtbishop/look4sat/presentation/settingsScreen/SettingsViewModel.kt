@@ -18,15 +18,15 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun updateDataFromFile(uri: String) {
-        repository.updateDataFromFile(uri)
+        repository.updateFromFile(uri)
     }
 
     fun updateDataFromWeb(sources: List<String>) {
-        repository.updateDataFromWeb(sources)
+        repository.updateFromWeb(sources)
     }
 
     fun clearData() {
-        repository.clearData()
+        repository.clearAllData()
     }
 
     fun getUseUTC(): Boolean = settings.getUseUTC()
@@ -53,9 +53,9 @@ class SettingsViewModel @Inject constructor(
 
     fun setRotatorPort(value: String) = settings.setRotatorPort(value)
 
-    fun getUpdateState() = repository.dataUpdateState
+    fun getUpdateState() = repository.updateState
 
-    fun setUpdateHandled() = repository.setDataUpdateHandled()
+    fun setUpdateHandled() = repository.setUpdateStateHandled()
 
     val stationPosition: SharedFlow<DataState<GeoPos>> = locationHandler.stationPosition
 

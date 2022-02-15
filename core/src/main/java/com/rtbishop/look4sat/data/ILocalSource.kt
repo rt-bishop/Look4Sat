@@ -21,24 +21,21 @@ import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.Transmitter
 import com.rtbishop.look4sat.domain.predict.Satellite
-import kotlinx.coroutines.flow.Flow
 import java.io.InputStream
 
 interface ILocalSource {
 
-    fun getSatelliteItems(): Flow<List<SatItem>>
+    suspend fun getAllSatellites(): List<SatItem>
 
-    suspend fun getFileStream(uri: String): InputStream?
-
-    suspend fun getSelectedSatellites(): List<Satellite>
+    suspend fun getSelectedSatellites(catnums: List<Int>): List<Satellite>
 
     suspend fun getTransmitters(catnum: Int): List<Transmitter>
 
-    suspend fun updateEntries(entries: List<SatEntry>)
+    suspend fun getFileStream(uri: String): InputStream?
 
-    suspend fun updateEntriesSelection(catnums: List<Int>)
+    suspend fun updateEntries(entries: List<SatEntry>)
 
     suspend fun updateTransmitters(transmitters: List<Transmitter>)
 
-    suspend fun clearData()
+    suspend fun clearAllData()
 }

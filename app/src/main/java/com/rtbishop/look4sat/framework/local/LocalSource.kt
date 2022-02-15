@@ -29,8 +29,6 @@ import com.rtbishop.look4sat.framework.toDomainItems
 import com.rtbishop.look4sat.framework.toFramework
 import com.rtbishop.look4sat.framework.toFrameworkEntries
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 
@@ -41,8 +39,16 @@ class LocalSource(
     private val transmittersDao: TransmittersDao,
 ) : ILocalSource {
 
-    override fun getSatelliteItems(): Flow<List<SatItem>> {
-        return entriesDao.getSatelliteItems().map { items -> items.toDomainItems() }
+    override suspend fun getAllSatellites(): List<SatItem> {
+        return entriesDao.getAllSatellites().toDomainItems()
+    }
+
+    override suspend fun getSelectedSatellites(catnums: List<Int>): List<Satellite> {
+        return entriesDao.getSelectedSatellites(catnums).map { entry -> entry.tle.createSat() }
+    }
+
+    override suspend fun getTransmitters(catnum: Int): List<Transmitter> {
+        return transmittersDao.getTransmitters(catnum).toDomain()
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -50,27 +56,15 @@ class LocalSource(
         return withContext(ioDispatcher) { resolver.openInputStream(Uri.parse(uri)) }
     }
 
-    override suspend fun getSelectedSatellites(): List<Satellite> {
-        return entriesDao.getSelectedSatellites().map { entry -> entry.tle.createSat() }
-    }
-
-    override suspend fun getTransmitters(catnum: Int): List<Transmitter> {
-        return transmittersDao.getTransmitters(catnum).toDomain()
-    }
-
     override suspend fun updateEntries(entries: List<SatEntry>) {
-        entriesDao.updateEntries(entries.toFrameworkEntries())
-    }
-
-    override suspend fun updateEntriesSelection(catnums: List<Int>) {
-        entriesDao.updateEntriesSelection(catnums)
+        entriesDao.insertEntries(entries.toFrameworkEntries())
     }
 
     override suspend fun updateTransmitters(transmitters: List<Transmitter>) {
         transmittersDao.updateTransmitters(transmitters.toFramework())
     }
 
-    override suspend fun clearData() {
+    override suspend fun clearAllData() {
         entriesDao.deleteEntries()
         transmittersDao.deleteTransmitters()
     }

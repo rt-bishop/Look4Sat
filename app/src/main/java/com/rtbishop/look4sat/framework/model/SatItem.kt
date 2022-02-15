@@ -22,7 +22,7 @@ import androidx.room.Relation
 data class SatItem(
     val catnum: Int,
     val name: String,
-    var isSelected: Boolean,
+    var isSelected: Boolean = false,
     @Relation(
         parentColumn = "catnum",
         entity = Transmitter::class,

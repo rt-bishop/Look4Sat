@@ -44,6 +44,7 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
         const val keyLongitude = "stationLon"
 //        const val keyPositionGPS = "setPositionGPS"
 //        const val keyPositionQTH = "setPositionQTH"
+        const val keySelection = "selection"
     }
 
     override fun loadStationPosition(): GeoPos {
@@ -58,6 +59,16 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
             putString(keyLatitude, latitude.toString())
             putString(keyLongitude, longitude.toString())
         }
+    }
+
+    override fun saveSatelliteSelection(catnums: List<Int>) {
+        val stringList = catnums.map { catnum -> catnum.toString() }
+        prefs.edit { putStringSet(keySelection, stringList.toSet()) }
+    }
+
+    override fun loadSatelliteSelection(): List<Int> {
+        val catnums = prefs.getStringSet(keySelection, emptySet())?.map { catnum -> catnum.toInt() }
+        return catnums?.sorted() ?: emptyList()
     }
 
     override fun getHoursAhead(): Int {
