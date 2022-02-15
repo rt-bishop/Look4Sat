@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.domain.predict
 
 import kotlin.math.*
 
-class NearEarthSat(params: TLE) : Satellite(params) {
+class NearEarthSat(data: OrbitalData) : Satellite(data) {
 
     private val aodp: Double
     private val aycof: Double
@@ -53,18 +53,18 @@ class NearEarthSat(params: TLE) : Satellite(params) {
 
     init {
         // Recover original mean motion (xnodp) and semimajor axis (aodp) from input elements
-        val a1 = (xke / super.params.xno).pow(twoThirds)
-        cosio = cos(super.params.xincl)
+        val a1 = (xke / super.data.xno).pow(twoThirds)
+        cosio = cos(super.data.xincl)
         val theta2 = sqr(cosio)
         x3thm1 = 3.0 * theta2 - 1.0
-        val eo = super.params.eccn
+        val eo = super.data.eccn
         val eosq = sqr(eo)
         val betao2 = 1.0 - eosq
         val betao = sqrt(betao2)
         val del1 = 1.5 * ck2 * x3thm1 / (sqr(a1) * betao * betao2)
         val ao = a1 * (1.0 - del1 * (0.5 * twoThirds + del1 * (1.0 + 134.0 / 81.0 * del1)))
         val delo = 1.5 * ck2 * x3thm1 / (sqr(ao) * betao * betao2)
-        xnodp = super.params.xno / (1.0 + delo)
+        xnodp = super.data.xno / (1.0 + delo)
         aodp = ao / (1.0 - delo)
 
         // For perigee less than 220 kilometers, the "simple" flag is set
@@ -80,15 +80,15 @@ class NearEarthSat(params: TLE) : Satellite(params) {
         val psisq = abs(1.0 - etasq)
         val coef = qoms24 * tsi.pow(4.0)
         val coef1 = coef / psisq.pow(3.5)
-        val bstar = super.params.bstar
+        val bstar = super.data.bstar
         val c2 = coef1 * xnodp * (aodp * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq)) + 0.75
                 * ck2 * tsi / psisq * x3thm1 * (8.0 + 3.0 * etasq * (8.0 + etasq)))
         c1 = bstar * c2
-        sinio = sin(super.params.xincl)
+        sinio = sin(super.data.xincl)
         val a3ovk2 = -j3Harmonic / ck2
         val c3 = coef * tsi * a3ovk2 * xnodp * sinio / eo
         x1mth2 = 1.0 - theta2
-        val omegao = super.params.omegao
+        val omegao = super.data.omegao
         c4 = 2 * xnodp * coef1 * aodp * betao2 * (eta * (2.0 + 0.5 * etasq) + eo * (0.5 + 2 * etasq)
                 - 2 * ck2 * tsi / (aodp * psisq) * (-3 * x3thm1 * (1.0 - 2 * eeta + etasq
                 * (1.5 - 0.5 * eeta)) + 0.75 * x1mth2 * (2.0 * etasq - eeta * (1.0 + etasq))
@@ -112,7 +112,7 @@ class NearEarthSat(params: TLE) : Satellite(params) {
         t2cof = 1.5 * c1
         xlcof = 0.125 * a3ovk2 * sinio * (3.0 + 5 * cosio) / (1.0 + cosio)
         aycof = 0.25 * a3ovk2 * sinio
-        val xmo = super.params.xmo
+        val xmo = super.data.xmo
         delmo = (1.0 + eta * cos(xmo)).pow(3.0)
         sinmo = sin(xmo)
         x7thm1 = 7.0 * theta2 - 1
@@ -138,14 +138,14 @@ class NearEarthSat(params: TLE) : Satellite(params) {
     internal fun calculateSGP4(tSince: Double) {
         synchronized(this) {
             val temp = DoubleArray(9)
-            val xmdf = params.xmo + xmdot * tSince
-            val omgadf = params.omegao + omgdot * tSince
-            val xnoddf = params.xnodeo + xnodot * tSince
+            val xmdf = data.xmo + xmdot * tSince
+            val omgadf = data.omegao + omgdot * tSince
+            val xnoddf = data.xnodeo + xnodot * tSince
             var omega = omgadf
             var xmp = xmdf
             val tsq = sqr(tSince)
             val xnode = xnoddf + xnodcf * tsq
-            val bstar = params.bstar
+            val bstar = data.bstar
             var tempa = 1.0 - c1 * tSince
             var tempe = bstar * c4 * tSince
             var templ = t2cof * tsq
@@ -162,7 +162,7 @@ class NearEarthSat(params: TLE) : Satellite(params) {
                 templ += t3cof * tcube + tfour * (t4cof + tSince * t5cof)
             }
             val a = aodp * tempa.pow(2.0)
-            val eo = params.eccn
+            val eo = data.eccn
             val e = eo - tempe
             val xl = xmp + omega + xnode + xnodp * templ
             val beta = sqrt(1.0 - e * e)
@@ -213,7 +213,7 @@ class NearEarthSat(params: TLE) : Satellite(params) {
         val rk = r * (1.0 - 1.5 * temp[2] * betal * x3thm1) + 0.5 * temp[1] * x1mth2 * cos2u
         val uk = u - 0.25 * temp[2] * x7thm1 * sin2u
         val xnodek = xnode + 1.5 * temp[2] * cosio * sin2u
-        val xinck = params.xincl + 1.5 * temp[2] * cosio * sinio * cos2u
+        val xinck = data.xincl + 1.5 * temp[2] * cosio * sinio * cos2u
         val rdotk = rdot - xn * temp[1] * x1mth2 * sin2u
         val rfdotk = rfdot + xn * temp[1] * (x1mth2 * cos2u + 1.5 * x3thm1)
         super.calculatePosAndVel(rk, uk, xnodek, xinck, rdotk, rfdotk)

@@ -15,29 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.sourcesScreen
+package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.databinding.ItemSourceBinding
-import com.rtbishop.look4sat.framework.model.Source
+import com.rtbishop.look4sat.framework.model.DataSource
 
-class SourcesAdapter(private val sources: MutableList<Source> = mutableListOf()) :
+class SourcesAdapter(private val sources: MutableList<DataSource> = mutableListOf()) :
     RecyclerView.Adapter<SourcesAdapter.TleSourceHolder>() {
 
-    fun getSources(): List<Source> {
-        return sources.filter { it.sourceUrl.contains("https://") }
+    fun getSources(): List<DataSource> {
+        return sources.filter { source -> source.url.contains("https://") }
     }
 
-    fun setSources(list: List<Source>) {
+    fun setSources(list: List<DataSource>) {
         sources.clear()
         sources.addAll(list)
     }
 
     fun addSource() {
-        sources.add(Source())
+        sources.add(DataSource())
         notifyItemInserted(itemCount - 1)
     }
 
@@ -58,9 +58,9 @@ class SourcesAdapter(private val sources: MutableList<Source> = mutableListOf())
     inner class TleSourceHolder(private val binding: ItemSourceBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(source: Source) {
-            binding.sourceUrl.setText(source.sourceUrl)
-            binding.sourceUrl.doOnTextChanged { txt, _, _, _ -> source.sourceUrl = txt.toString() }
+        fun bind(source: DataSource) {
+            binding.sourceUrl.setText(source.url)
+            binding.sourceUrl.doOnTextChanged { txt, _, _, _ -> source.url = txt.toString() }
             binding.sourceBtn.setOnClickListener {
                 sources.remove(source)
                 notifyItemRemoved(adapterPosition)

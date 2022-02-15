@@ -22,10 +22,9 @@ import androidx.room.Relation
 data class SatItem(
     val catnum: Int,
     val name: String,
-    var isSelected: Boolean = false,
     @Relation(
         parentColumn = "catnum",
-        entity = Transmitter::class,
+        entity = SatRadio::class,
         entityColumn = "catnum",
         projection = ["mode"]
     )

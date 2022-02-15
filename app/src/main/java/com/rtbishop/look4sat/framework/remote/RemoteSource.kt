@@ -8,8 +8,7 @@ import java.net.URL
 
 class RemoteSource(private val ioDispatcher: CoroutineDispatcher) : IRemoteSource {
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun fetchFileStream(url: String): InputStream? {
+    override suspend fun getFileStream(url: String): InputStream? {
         return withContext(ioDispatcher) { URL(url).openStream() }
     }
 }

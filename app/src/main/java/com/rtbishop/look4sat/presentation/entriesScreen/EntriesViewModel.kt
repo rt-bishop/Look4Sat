@@ -34,7 +34,7 @@ class EntriesViewModel @Inject constructor(
 
     private val transModes = MutableLiveData(preferences.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
-    private val itemsFromRepo = liveData { emit(repository.getAllSatellites()) } as MutableLiveData
+    private val itemsFromRepo = liveData { emit(repository.getEntriesWithModes()) } as MutableLiveData
     private val itemsWithModes = transModes.switchMap { modes ->
         itemsFromRepo.map { items -> filterByModes(items, modes) }
     }
@@ -68,7 +68,7 @@ class EntriesViewModel @Inject constructor(
     fun saveSelection() {
         itemsFromRepo.value?.let { itemsAll ->
             val filteredItems = itemsAll.filter { item -> item.isSelected }
-            repository.updatesSelection(filteredItems.map { item -> item.catnum })
+            repository.setEntriesSelection(filteredItems.map { item -> item.catnum })
         }
     }
 

@@ -24,24 +24,24 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ItemTransBinding
-import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.model.SatRadio
 import java.util.*
 
-class TransmittersAdapter : RecyclerView.Adapter<TransmittersAdapter.TransHolder>() {
+class RadiosAdapter : RecyclerView.Adapter<RadiosAdapter.TransHolder>() {
 
-    private val diffCallback = object : DiffUtil.ItemCallback<Transmitter>() {
-        override fun areItemsTheSame(oldItem: Transmitter, newItem: Transmitter): Boolean {
+    private val diffCallback = object : DiffUtil.ItemCallback<SatRadio>() {
+        override fun areItemsTheSame(oldItem: SatRadio, newItem: SatRadio): Boolean {
             return oldItem.uuid == newItem.uuid
         }
 
-        override fun areContentsTheSame(oldItem: Transmitter, newItem: Transmitter): Boolean {
+        override fun areContentsTheSame(oldItem: SatRadio, newItem: SatRadio): Boolean {
             return oldItem.downlink == newItem.downlink
         }
     }
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitList(transmitters: List<Transmitter>) {
-        differ.submitList(transmitters)
+    fun submitList(radios: List<SatRadio>) {
+        differ.submitList(radios)
     }
 
     override fun getItemCount() = differ.currentList.size
@@ -65,10 +65,10 @@ class TransmittersAdapter : RecyclerView.Adapter<TransmittersAdapter.TransHolder
         private val formatLinkNull = itemView.context.getString(R.string.trans_no_link)
         private val isInverted = itemView.context.getString(R.string.trans_inverted)
 
-        fun bind(transmitter: Transmitter) {
-            binding.transDesc.text = transmitter.info
+        fun bind(radio: SatRadio) {
+            binding.transDesc.text = radio.info
 
-            transmitter.downlink.let { downlink ->
+            radio.downlink.let { downlink ->
                 if (downlink != null) {
                     val downlinkFreq = downlink / divider
                     binding.transDownlink.text =
@@ -78,7 +78,7 @@ class TransmittersAdapter : RecyclerView.Adapter<TransmittersAdapter.TransHolder
                 }
             }
 
-            transmitter.uplink.let { uplink ->
+            radio.uplink.let { uplink ->
                 if (uplink != null) {
                     val uplinkFreq = uplink / divider
                     binding.transUplink.text = String.format(Locale.ENGLISH, formatLink, uplinkFreq)
@@ -87,13 +87,13 @@ class TransmittersAdapter : RecyclerView.Adapter<TransmittersAdapter.TransHolder
                 }
             }
 
-            if (transmitter.mode != null) {
-                binding.transMode.text = String.format(mode, transmitter.mode)
+            if (radio.mode != null) {
+                binding.transMode.text = String.format(mode, radio.mode)
             } else {
                 binding.transMode.text = String.format(mode, strNo)
             }
 
-            if (transmitter.isInverted) {
+            if (radio.isInverted) {
                 binding.transInverted.text = String.format(isInverted, strYes)
             } else {
                 binding.transInverted.text = String.format(isInverted, strNo)

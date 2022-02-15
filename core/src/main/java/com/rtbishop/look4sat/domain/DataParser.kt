@@ -17,8 +17,8 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.domain.model.Transmitter
-import com.rtbishop.look4sat.domain.predict.TLE
+import com.rtbishop.look4sat.domain.model.SatRadio
+import com.rtbishop.look4sat.domain.predict.OrbitalData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -28,8 +28,8 @@ import kotlin.math.pow
 
 class DataParser(private val parserDispatcher: CoroutineDispatcher) {
 
-    suspend fun parseCSVStream(csvStream: InputStream): List<TLE> = withContext(parserDispatcher) {
-        val parsedItems = mutableListOf<TLE>()
+    suspend fun parseCSVStream(csvStream: InputStream): List<OrbitalData> = withContext(parserDispatcher) {
+        val parsedItems = mutableListOf<OrbitalData>()
         csvStream.bufferedReader().useLines { lines ->
             lines.forEachIndexed { index, line ->
                 if (index != 0) {
@@ -41,9 +41,9 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
         return@withContext parsedItems
     }
 
-    suspend fun parseTLEStream(tleStream: InputStream): List<TLE> = withContext(parserDispatcher) {
+    suspend fun parseTLEStream(tleStream: InputStream): List<OrbitalData> = withContext(parserDispatcher) {
         val tleStrings = mutableListOf(String(), String(), String())
-        val parsedItems = mutableListOf<TLE>()
+        val parsedItems = mutableListOf<OrbitalData>()
         var lineIndex = 0
         tleStream.bufferedReader().forEachLine { line ->
             tleStrings[lineIndex] = line
@@ -60,9 +60,9 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
         return@withContext parsedItems
     }
 
-    suspend fun parseJSONStream(jsonStream: InputStream): List<Transmitter> {
+    suspend fun parseJSONStream(jsonStream: InputStream): List<SatRadio> {
         return withContext(parserDispatcher) {
-            val parsedItems = mutableListOf<Transmitter>()
+            val parsedItems = mutableListOf<SatRadio>()
             try {
                 val jsonArray = JSONArray(jsonStream.bufferedReader().readText())
                 for (index in 0 until jsonArray.length()) {
@@ -76,7 +76,7 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
         }
     }
 
-    private fun parseCSV(values: List<String>): TLE? {
+    private fun parseCSV(values: List<String>): OrbitalData? {
         try {
             val name = values[0]
             val year = values[2].substring(0, 4)
@@ -98,13 +98,13 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
             val meanan = values[8].toDouble()
             val catnum = values[11].toInt()
             val bstar = values[14].toDouble()
-            return TLE(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
+            return OrbitalData(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
         } catch (exception: Exception) {
             return null
         }
     }
 
-    private fun parseTLE(tle: List<String>): TLE? {
+    private fun parseTLE(tle: List<String>): OrbitalData? {
         if (tle[1].substring(0, 1) != "1" && tle[2].substring(0, 1) != "2") {
             return null
         }
@@ -120,13 +120,13 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
             val catnum: Int = tle[1].substring(2, 7).trim().toInt()
             val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() /
                     10.0.pow(tle[1].substring(60, 61).toDouble())
-            return TLE(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
+            return OrbitalData(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
         } catch (exception: Exception) {
             return null
         }
     }
 
-    private fun parseJSON(json: JSONObject): Transmitter? {
+    private fun parseJSON(json: JSONObject): SatRadio? {
         try {
             val uuid = json.getString("uuid")
             val info = json.getString("description")
@@ -140,7 +140,7 @@ class DataParser(private val parserDispatcher: CoroutineDispatcher) {
             val isInverted = json.getBoolean("invert")
             val catnum = if (json.isNull("norad_cat_id")) null
             else json.getInt("norad_cat_id")
-            return Transmitter(uuid, info, isAlive, downlink, uplink, mode, isInverted, catnum)
+            return SatRadio(uuid, info, isAlive, downlink, uplink, mode, isInverted, catnum)
         } catch (exception: Exception) {
             return null
         }

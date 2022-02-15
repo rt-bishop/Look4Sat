@@ -15,11 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.model
+package com.rtbishop.look4sat.framework.model
 
-data class SatItem(
-    val catnum: Int,
-    val name: String,
-    val modes: List<String>,
-    var isSelected: Boolean
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "radios")
+data class SatRadio(
+    @PrimaryKey val uuid: String,
+    val info: String,
+    val isAlive: Boolean,
+    var downlink: Long?,
+    var uplink: Long?,
+    val mode: String?,
+    val isInverted: Boolean,
+    val catnum: Int?,
+    var comment: String? = null
 )

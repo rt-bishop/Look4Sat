@@ -29,7 +29,8 @@ import com.rtbishop.look4sat.domain.ILocationHandler
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.framework.LocationHandler
 import com.rtbishop.look4sat.framework.SettingsHandler
-import com.rtbishop.look4sat.framework.local.*
+import com.rtbishop.look4sat.framework.local.LocalSource
+import com.rtbishop.look4sat.framework.local.Look4SatDb
 import com.rtbishop.look4sat.framework.remote.RemoteSource
 import dagger.Module
 import dagger.Provides
@@ -53,15 +54,14 @@ object CoreModule {
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): IDataRepository {
-        val db = Room.databaseBuilder(context, SatelliteDb::class.java, "SatelliteDb")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+        val db = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDb")
             .fallbackToDestructiveMigration().build()
         val dataParser = DataParser(defaultDispatcher)
         val resolver = context.contentResolver
-        val localSource = LocalSource(resolver, ioDispatcher, db.entriesDao(), db.transmittersDao())
-        val remoteSource = RemoteSource(ioDispatcher)
+        val local = LocalSource(db.entriesDao(), db.radiosDao(), settings, resolver, ioDispatcher)
+        val remote = RemoteSource(ioDispatcher)
         val repositoryScope = CoroutineScope(SupervisorJob())
-        return DataRepository(dataParser, settings, localSource, remoteSource, repositoryScope)
+        return DataRepository(dataParser, local, remote, repositoryScope)
     }
 
     @Provides

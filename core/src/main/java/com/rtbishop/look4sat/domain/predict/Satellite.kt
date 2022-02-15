@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.domain.predict
 
 import kotlin.math.*
 
-abstract class Satellite(val params: TLE) {
+abstract class Satellite(val data: OrbitalData) {
 
     private val flatFactor = 3.35281066474748E-3
     private val deg2Rad = 1.745329251994330E-2
@@ -30,7 +30,7 @@ abstract class Satellite(val params: TLE) {
     private val velocity = Vector4()
     private var gsPosTheta = 0.0
     private var perigee = 0.0
-    val orbitalPeriod = 24 * 60 / params.meanmo
+    val orbitalPeriod = 24 * 60 / data.meanmo
     val earthRadius = 6378.137
     val j3Harmonic = -2.53881E-6
     val twoPi = Math.PI * 2.0
@@ -42,11 +42,11 @@ abstract class Satellite(val params: TLE) {
     var s4 = 0.0
 
     internal fun willBeSeen(pos: GeoPos): Boolean {
-        return if (params.meanmo < 1e-8) false
+        return if (data.meanmo < 1e-8) false
         else {
-            val sma = 331.25 * exp(ln(1440.0 / params.meanmo) * (2.0 / 3.0))
-            val apogee = sma * (1.0 + params.eccn) - earthRadius
-            var lin = params.incl
+            val sma = 331.25 * exp(ln(1440.0 / data.meanmo) * (2.0 / 3.0))
+            val apogee = sma * (1.0 + data.eccn) - earthRadius
+            var lin = data.incl
             if (lin >= 90.0) lin = 180.0 - lin
             acos(earthRadius / (apogee + earthRadius)) + lin * deg2Rad > abs(pos.latitude * deg2Rad)
         }
@@ -57,7 +57,7 @@ abstract class Satellite(val params: TLE) {
         // Date/time at which the position and velocity were calculated
         val julUTC = calcCurrentDaynum(time) + 2444238.5
         // Convert satellite's epoch time to Julian and calculate time since epoch in minutes
-        val julEpoch = juliandDateOfEpoch(params.epoch)
+        val julEpoch = juliandDateOfEpoch(data.epoch)
         val tsince = (julUTC - julEpoch) * minPerDay
         calculateSDP4orSGP4(tsince)
         // Scale position and velocity vectors to km and km/sec
@@ -97,7 +97,7 @@ abstract class Satellite(val params: TLE) {
     }
 
     private fun calculateSDP4orSGP4(tsince: Double) {
-        if (params.isDeepspace) (this as DeepSpaceSat).calculateSDP4(tsince)
+        if (data.isDeepspace) (this as DeepSpaceSat).calculateSDP4(tsince)
         else (this as NearEarthSat).calculateSGP4(tsince)
     }
 

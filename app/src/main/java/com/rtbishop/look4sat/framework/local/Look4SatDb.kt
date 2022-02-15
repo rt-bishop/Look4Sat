@@ -17,24 +17,15 @@
  */
 package com.rtbishop.look4sat.framework.local
 
-import androidx.room.*
-import com.rtbishop.look4sat.framework.model.Transmitter
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import com.rtbishop.look4sat.framework.model.SatEntry
+import com.rtbishop.look4sat.framework.model.SatRadio
 
-@Dao
-interface TransmittersDao {
+@Database(entities = [SatEntry::class, SatRadio::class], version = 1, exportSchema = true)
+abstract class Look4SatDb : RoomDatabase() {
 
-    @Query("SELECT * FROM transmitters WHERE catnum = :catnum AND isAlive = 1")
-    suspend fun getTransmitters(catnum: Int): List<Transmitter>
+    abstract fun entriesDao(): SatEntriesDao
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTransmitters(transmitters: List<Transmitter>)
-
-    @Transaction
-    suspend fun updateTransmitters(transmitters: List<Transmitter>) {
-        deleteTransmitters()
-        insertTransmitters(transmitters)
-    }
-
-    @Query("DELETE FROM transmitters")
-    suspend fun deleteTransmitters()
+    abstract fun radiosDao(): SatRadiosDao
 }

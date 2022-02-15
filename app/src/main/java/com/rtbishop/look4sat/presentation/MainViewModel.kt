@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(
         timeRef: Long = System.currentTimeMillis()
     ) {
         viewModelScope.launch {
-            val satellites = dataRepository.getSelectedSatellites()
+            val satellites = dataRepository.getSelectedEntries()
             val stationPos = preferences.loadStationPosition()
             predictor.forceCalculation(satellites, stationPos, timeRef, hoursAhead, minElevation)
         }

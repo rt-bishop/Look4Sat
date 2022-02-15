@@ -17,9 +17,6 @@
  */
 package com.rtbishop.look4sat.domain.model
 
-import com.rtbishop.look4sat.domain.predict.TLE
+import com.rtbishop.look4sat.domain.predict.OrbitalData
 
-data class SatEntry(
-    val tle: TLE,
-    var isSelected: Boolean = false
-)
+data class SatEntry(val data: OrbitalData, var comment: String? = null)

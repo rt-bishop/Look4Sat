@@ -19,23 +19,31 @@ package com.rtbishop.look4sat.data
 
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.Satellite
 import java.io.InputStream
 
 interface ILocalSource {
 
-    suspend fun getAllSatellites(): List<SatItem>
+    suspend fun getEntriesWithModes(): List<SatItem>
 
-    suspend fun getSelectedSatellites(catnums: List<Int>): List<Satellite>
+    suspend fun getSelectedEntries(): List<Satellite>
 
-    suspend fun getTransmitters(catnum: Int): List<Transmitter>
+    suspend fun getRadios(catnum: Int): List<SatRadio>
 
     suspend fun getFileStream(uri: String): InputStream?
 
-    suspend fun updateEntries(entries: List<SatEntry>)
+    suspend fun insertEntries(entries: List<SatEntry>)
 
-    suspend fun updateTransmitters(transmitters: List<Transmitter>)
+    suspend fun insertRadios(radios: List<SatRadio>)
 
     suspend fun clearAllData()
+
+    suspend fun getDataSources(): List<String>
+
+    suspend fun setDataSources(sources: List<String>)
+
+    suspend fun getEntriesSelection(): List<Int>
+
+    suspend fun setEntriesSelection(catnums: List<Int>)
 }

@@ -65,7 +65,7 @@ class PassesViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
-            val satellites = repository.getSelectedSatellites()
+            val satellites = repository.getSelectedEntries()
             val stationPos = settings.loadStationPosition()
             predictor.forceCalculation(satellites, stationPos, timeRef, hoursAhead, minElevation)
         }

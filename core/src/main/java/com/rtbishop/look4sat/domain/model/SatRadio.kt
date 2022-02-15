@@ -17,9 +17,14 @@
  */
 package com.rtbishop.look4sat.domain.model
 
-data class SatItem(
-    val catnum: Int,
-    val name: String,
-    val modes: List<String>,
-    var isSelected: Boolean
+data class SatRadio(
+    val uuid: String,
+    val info: String,
+    val isAlive: Boolean,
+    var downlink: Long?,
+    var uplink: Long?,
+    val mode: String?,
+    val isInverted: Boolean,
+    val catnum: Int?,
+    var comment: String? = null
 )

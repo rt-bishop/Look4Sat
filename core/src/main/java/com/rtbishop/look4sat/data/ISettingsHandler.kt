@@ -28,8 +28,6 @@ interface ISettingsHandler {
             "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
             "https://amsat.org/tle/current/nasabare.txt"
         )
-    val transmittersSource: String
-        get() = "https://db.satnogs.org/api/transmitters/?format=json"
 
     fun loadStationPosition(): GeoPos
 
@@ -59,9 +57,9 @@ interface ISettingsHandler {
 
     fun loadModesSelection(): List<String>
 
-    fun saveSatelliteSelection(catnums: List<Int>)
+    fun saveEntriesSelection(catnums: List<Int>)
 
-    fun loadSatelliteSelection(): List<Int>
+    fun loadEntriesSelection(): List<Int>
 
     fun getRotatorEnabled(): Boolean
 

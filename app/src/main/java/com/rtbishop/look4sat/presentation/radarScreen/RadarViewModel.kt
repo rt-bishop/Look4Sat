@@ -22,7 +22,7 @@ import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.DataReporter
 import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
@@ -47,10 +47,10 @@ class RadarViewModel @Inject constructor(
 
     private val stationPos = preferences.loadStationPosition()
     private val _passData = MutableLiveData<RadarData>()
-    private val _transmitters = MutableLiveData<List<Transmitter>>()
+    private val _transmitters = MutableLiveData<List<SatRadio>>()
     private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
     val radarData: LiveData<RadarData> = _passData
-    val transmitters: LiveData<List<Transmitter>> = _transmitters
+    val transmitters: LiveData<List<SatRadio>> = _transmitters
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
@@ -107,7 +107,7 @@ class RadarViewModel @Inject constructor(
 
     private fun processTransmitters(pass: SatPass) {
         viewModelScope.launch {
-            val transmitters = dataRepository.getTransmitters(pass.catNum)
+            val transmitters = dataRepository.getRadios(pass.catNum)
             while (isActive) {
                 val time = System.currentTimeMillis()
                 val list = predictor.processRadios(pass.satellite, stationPos, transmitters, time)

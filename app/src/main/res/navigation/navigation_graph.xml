@@ -52,7 +52,7 @@
     </fragment>
     <dialog
         android:id="@+id/nav_sources"
-        android:name="com.rtbishop.look4sat.presentation.sourcesScreen.SourcesDialog"
+        android:name="com.rtbishop.look4sat.presentation.settingsScreen.SourcesDialog"
         tools:layout="@layout/dialog_sources" />
     <action
         android:id="@+id/action_global_entriesFragment"

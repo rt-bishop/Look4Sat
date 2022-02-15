@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.domain.predict
 
-import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.model.SatRadio
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -44,7 +44,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         }
     }
 
-    suspend fun processRadios(sat: Satellite, pos: GeoPos, radios: List<Transmitter>, time: Long): List<Transmitter> {
+    suspend fun processRadios(sat: Satellite, pos: GeoPos, radios: List<SatRadio>, time: Long): List<SatRadio> {
         return withContext(predictorDispatcher) {
             val satPos = sat.getPosition(pos, time)
             val copiedList = radios.map { it.copy() }
@@ -106,7 +106,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
         var lastAosDate: Long
         var count = 0
         if (this.willBeSeen(pos)) {
-            if (this.params.isDeepspace) {
+            if (this.data.isDeepspace) {
                 passes.add(getGeoPass(this, pos, time))
             } else {
                 do {

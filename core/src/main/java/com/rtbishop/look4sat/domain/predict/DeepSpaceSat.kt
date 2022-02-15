@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.domain.predict
 
 import kotlin.math.*
 
-class DeepSpaceSat(params: TLE) : Satellite(params) {
+class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
 
     private val c1: Double
     private val c4: Double
@@ -35,41 +35,41 @@ class DeepSpaceSat(params: TLE) : Satellite(params) {
 
     init {
         // Recover original mean motion (xnodp) and semimajor axis (aodp) from input elements
-        val a1 = (xke / super.params.xno).pow(twoThirds)
-        dsv.cosio = cos(super.params.xincl)
+        val a1 = (xke / super.data.xno).pow(twoThirds)
+        dsv.cosio = cos(super.data.xincl)
         dsv.theta2 = dsv.cosio * dsv.cosio
         x3thm1 = 3.0 * dsv.theta2 - 1
-        dsv.eosq = super.params.eccn * super.params.eccn
+        dsv.eosq = super.data.eccn * super.data.eccn
         dsv.betao2 = 1.0 - dsv.eosq
         dsv.betao = sqrt(dsv.betao2)
         val del1 = 1.5 * ck2 * x3thm1 / (a1 * a1 * dsv.betao * dsv.betao2)
         val ao = a1 * (1.0 - del1 * (0.5 * twoThirds + del1 * (1.0 + 134.0 / 81.0 * del1)))
         val delo = 1.5 * ck2 * x3thm1 / (ao * ao * dsv.betao * dsv.betao2)
-        dsv.xnodp = super.params.xno / (1.0 + delo)
+        dsv.xnodp = super.data.xno / (1.0 + delo)
         dsv.aodp = ao / (1.0 - delo)
         // For perigee below 156 km, the values of S and QOMS2T are altered
-        setPerigee((dsv.aodp * (1.0 - super.params.eccn) - 1.0) * earthRadius)
+        setPerigee((dsv.aodp * (1.0 - super.data.eccn) - 1.0) * earthRadius)
         val pinvsq = invert(dsv.aodp * dsv.aodp * dsv.betao2 * dsv.betao2)
-        dsv.sing = sin(super.params.omegao)
-        dsv.cosg = cos(super.params.omegao)
+        dsv.sing = sin(super.data.omegao)
+        dsv.cosg = cos(super.data.omegao)
         val tsi = invert(dsv.aodp - s4)
-        val eta = dsv.aodp * super.params.eccn * tsi
+        val eta = dsv.aodp * super.data.eccn * tsi
         val etasq = eta * eta
-        val eeta = super.params.eccn * eta
+        val eeta = super.data.eccn * eta
         val psisq = abs(1.0 - etasq)
         val coef = qoms24 * tsi.pow(4.0)
         val coef1 = coef / psisq.pow(3.5)
         val c2 = coef1 * dsv.xnodp * (dsv.aodp * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
                 + 0.75 * ck2 * tsi / psisq * x3thm1 * (8.0 + 3.0 * etasq * (8.0 + etasq)))
-        c1 = super.params.bstar * c2
-        dsv.sinio = sin(super.params.xincl)
+        c1 = super.data.bstar * c2
+        dsv.sinio = sin(super.data.xincl)
         val a3ovk2 = -j3Harmonic / ck2
         x1mth2 = 1.0 - dsv.theta2
         c4 =
-            2 * dsv.xnodp * coef1 * dsv.aodp * dsv.betao2 * (eta * (2.0 + 0.5 * etasq) + super.params.eccn
+            2 * dsv.xnodp * coef1 * dsv.aodp * dsv.betao2 * (eta * (2.0 + 0.5 * etasq) + super.data.eccn
                     * (0.5 + 2 * etasq) - 2 * ck2 * tsi / (dsv.aodp * psisq)
                     * (-3 * x3thm1 * (1.0 - 2 * eeta + etasq * (1.5 - 0.5 * eeta)) + (0.75 * x1mth2
-                    * (2.0 * etasq - eeta * (1.0 + etasq)) * cos(2.0 * super.params.omegao))))
+                    * (2.0 * etasq - eeta * (1.0 + etasq)) * cos(2.0 * super.data.omegao))))
         val theta4 = dsv.theta2 * dsv.theta2
         val temp1 = 3.0 * ck2 * pinvsq * dsv.xnodp
         val temp2 = temp1 * ck2 * pinvsq
@@ -93,18 +93,18 @@ class DeepSpaceSat(params: TLE) : Satellite(params) {
     internal fun calculateSDP4(tSince: Double) {
         synchronized(this) {
             val temp = DoubleArray(12)
-            val xmdf = params.xmo + dsv.xmdot * tSince
+            val xmdf = data.xmo + dsv.xmdot * tSince
             val tsq = tSince * tSince
             val templ = t2cof * tsq
             dsv.xll = xmdf + dsv.xnodp * templ
-            dsv.omgadf = params.omegao + dsv.omgdot * tSince
-            val xnoddf = params.xnodeo + dsv.xnodot * tSince
+            dsv.omgadf = data.omegao + dsv.omgdot * tSince
+            val xnoddf = data.xnodeo + dsv.xnodot * tSince
             dsv.xnode = xnoddf + xnodcf * tsq
             val tempa = 1.0 - c1 * tSince
-            val tempe = params.bstar * c4 * tSince
+            val tempe = data.bstar * c4 * tSince
             dsv.xn = dsv.xnodp
             dsv.t = tSince
-            deep.dpsec(params)
+            deep.dpsec(data)
             val a = (xke / dsv.xn).pow(twoThirds) * tempa * tempa
             dsv.em = dsv.em - tempe
             deep.dpper()
@@ -425,16 +425,16 @@ class DeepSpaceSat(params: TLE) : Satellite(params) {
         private var epochRestart = false
 
         init {
-            thgr = thetaG(params.epoch)
-            eq = params.eccn
+            thgr = thetaG(data.epoch)
+            eq = data.eccn
             xnq = dsv.xnodp
             aqnv = invert(dsv.aodp)
-            xqncl = params.xincl
-            xmao = params.xmo
+            xqncl = data.xincl
+            xmao = data.xmo
             xpidot = dsv.omgdot + dsv.xnodot
-            sinq = sin(params.xnodeo)
-            cosq = cos(params.xnodeo)
-            omegaq = params.omegao
+            sinq = sin(data.xnodeo)
+            cosq = cos(data.xnodeo)
+            omegaq = data.omegao
             // Initialize lunar solar terms, days since 1900 Jan 0.5
             day = dsv.ds50 + 18261.5
             if (abs(day - preep) > 1.0E-6) {
@@ -534,7 +534,7 @@ class DeepSpaceSat(params: TLE) : Satellite(params) {
                 temp = 2.0 * temp1 * root54
                 d5421 = temp * f542 * g521
                 d5433 = temp * f543 * g533
-                xlamo = xmao + params.xnodeo + params.xnodeo - thgr - thgr
+                xlamo = xmao + data.xnodeo + data.xnodeo - thgr - thgr
                 bfact = dsv.xmdot + dsv.xnodot + dsv.xnodot - tHdt - tHdt
                 bfact += ssl + ssh + ssh
             } else {
@@ -556,7 +556,7 @@ class DeepSpaceSat(params: TLE) : Satellite(params) {
                 fasx2 = 0.13130908
                 fasx4 = 2.8843198
                 fasx6 = 0.37448087
-                xlamo = xmao + params.xnodeo + params.omegao - thgr
+                xlamo = xmao + data.xnodeo + data.omegao - thgr
                 bfact = dsv.xmdot + xpidot - tHdt
                 bfact += ssl + ssg + ssh
             }
@@ -623,7 +623,7 @@ class DeepSpaceSat(params: TLE) : Satellite(params) {
         }
 
         // Entrance for deep space secular effects
-        fun dpsec(params: TLE) {
+        fun dpsec(params: OrbitalData) {
             dsv.xll = dsv.xll + ssl * dsv.t
             dsv.omgadf = dsv.omgadf + ssg * dsv.t
             dsv.xnode = dsv.xnode + ssh * dsv.t

@@ -76,13 +76,13 @@ class MapViewModel @Inject constructor(
 
     fun selectDefaultSatellite(catnum: Int) {
         viewModelScope.launch {
-            dataRepository.getSelectedSatellites().also { satellites ->
+            dataRepository.getSelectedEntries().also { satellites ->
                 if (satellites.isNotEmpty()) {
                     allSatList = satellites
                     if (catnum == -1) {
                         selectSatellite(satellites.first())
                     } else {
-                        satellites.find { it.params.catnum == catnum }?.let { selectSatellite(it) }
+                        satellites.find { it.data.catnum == catnum }?.let { selectSatellite(it) }
                     }
                 }
             }
@@ -164,7 +164,7 @@ class MapViewModel @Inject constructor(
         val osmPos = GeoPos(osmLat, osmLon)
         val qthLoc = QthConverter.positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
         val satData = MapData(
-            satellite, satellite.params.catnum, satellite.params.name, satPos.range,
+            satellite, satellite.data.catnum, satellite.data.name, satPos.range,
             satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos
         )
         _satData.postValue(satData)

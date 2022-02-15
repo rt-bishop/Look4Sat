@@ -17,8 +17,4 @@
  */
 package com.rtbishop.look4sat.framework.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "sources")
-data class Source(@PrimaryKey var sourceUrl: String = String())
+data class DataSource(var url: String = String())

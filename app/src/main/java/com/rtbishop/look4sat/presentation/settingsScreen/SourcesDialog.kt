@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.sourcesScreen
+package com.rtbishop.look4sat.presentation.settingsScreen
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,11 +23,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
-import com.rtbishop.look4sat.framework.model.Source
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.framework.model.DataSource
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -36,35 +36,37 @@ import javax.inject.Inject
 class SourcesDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var settings: ISettingsHandler
+    lateinit var repository: IDataRepository
+    private lateinit var binding: DialogSourcesBinding
 
-    override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_sources, group, false)
+    override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View {
+        binding = DialogSourcesBinding.inflate(inflater, group, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        val sources = settings.loadDataSources()
-        val adapter = SourcesAdapter().apply { setSources(sources.map { Source(it) }) }
-        val layoutManager = LinearLayoutManager(requireContext())
-        DialogSourcesBinding.bind(view).apply {
-            dialog?.window?.setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-            sourcesRecycler.apply {
-                setHasFixedSize(true)
-                this.adapter = adapter
-                this.layoutManager = layoutManager
+        dialog?.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        lifecycleScope.launchWhenResumed {
+            val adapter = SourcesAdapter()
+            val layoutManager = LinearLayoutManager(requireContext())
+            adapter.setSources(repository.getDataSources().map { url -> DataSource(url) })
+            binding.run {
+                sourcesRecycler.apply {
+                    setHasFixedSize(true)
+                    this.adapter = adapter
+                    this.layoutManager = layoutManager
+                }
+                sourcesBtnAdd.setOnClickListener { adapter.addSource() }
+                sourcesBtnNeg.setOnClickListener { dismiss() }
+                sourcesBtnPos.setOnClickListener {
+                    setNavResult("sources", adapter.getSources().map { source -> source.url })
+                    dismiss()
+                }
             }
-            sourcesBtnAdd.setOnClickListener {
-                adapter.addSource()
-            }
-            sourcesBtnPos.setOnClickListener {
-                setNavResult("sources", adapter.getSources().map { it.sourceUrl })
-                dismiss()
-            }
-            sourcesBtnNeg.setOnClickListener { dismiss() }
         }
     }
 }

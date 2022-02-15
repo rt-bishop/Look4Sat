@@ -29,7 +29,7 @@ data class SatPass(
     val satellite: Satellite,
     var progress: Int = 0
 ) {
-    val catNum: Int = satellite.params.catnum
-    val name: String = satellite.params.name
-    val isDeepSpace: Boolean = satellite.params.isDeepspace
+    val catNum: Int = satellite.data.catnum
+    val name: String = satellite.data.name
+    val isDeepSpace: Boolean = satellite.data.isDeepspace
 }

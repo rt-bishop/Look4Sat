@@ -61,12 +61,12 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
         }
     }
 
-    override fun saveSatelliteSelection(catnums: List<Int>) {
+    override fun saveEntriesSelection(catnums: List<Int>) {
         val stringList = catnums.map { catnum -> catnum.toString() }
         prefs.edit { putStringSet(keySelection, stringList.toSet()) }
     }
 
-    override fun loadSatelliteSelection(): List<Int> {
+    override fun loadEntriesSelection(): List<Int> {
         val catnums = prefs.getStringSet(keySelection, emptySet())?.map { catnum -> catnum.toInt() }
         return catnums?.sorted() ?: emptyList()
     }

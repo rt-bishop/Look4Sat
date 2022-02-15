@@ -21,5 +21,7 @@ import java.io.InputStream
 
 interface IRemoteSource {
 
-    suspend fun fetchFileStream(url: String): InputStream?
+    val radioApi: String get() = "https://db.satnogs.org/api/transmitters/?format=json"
+
+    suspend fun getFileStream(url: String): InputStream?
 }

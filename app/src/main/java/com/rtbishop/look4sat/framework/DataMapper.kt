@@ -19,29 +19,29 @@ package com.rtbishop.look4sat.framework
 
 import com.rtbishop.look4sat.domain.model.SatEntry as DomainEntry
 import com.rtbishop.look4sat.domain.model.SatItem as DomainItem
-import com.rtbishop.look4sat.domain.model.Transmitter as DomainTransmitter
+import com.rtbishop.look4sat.domain.model.SatRadio as DomainRadio
 import com.rtbishop.look4sat.framework.model.SatEntry as FrameworkEntry
 import com.rtbishop.look4sat.framework.model.SatItem as FrameworkItem
-import com.rtbishop.look4sat.framework.model.Transmitter as FrameworkTransmitter
+import com.rtbishop.look4sat.framework.model.SatRadio as FrameworkRadio
 
-fun DomainEntry.toFramework() = FrameworkEntry(this.tle, this.isSelected)
+fun DomainEntry.toFramework() = FrameworkEntry(this.data, this.comment)
 
-fun DomainTransmitter.toFramework() = FrameworkTransmitter(
-    this.uuid, this.info, this.isAlive, this.downlink,
-    this.uplink, this.mode, this.isInverted, this.catnum
+fun DomainRadio.toFramework() = FrameworkRadio(
+    this.uuid, this.info, this.isAlive, this.downlink, this.uplink,
+    this.mode, this.isInverted, this.catnum, this.comment
 )
 
-fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, this.isSelected, this.modes)
+fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, this.modes, false)
 
-fun FrameworkTransmitter.toDomain() = DomainTransmitter(
-    this.uuid, this.info, this.isAlive, this.downlink,
-    this.uplink, this.mode, this.isInverted, this.catnum
+fun FrameworkRadio.toDomain() = DomainRadio(
+    this.uuid, this.info, this.isAlive, this.downlink, this.uplink,
+    this.mode, this.isInverted, this.catnum, this.comment
 )
 
 fun List<DomainEntry>.toFrameworkEntries() = this.map { it.toFramework() }
 
-fun List<DomainTransmitter>.toFramework() = this.map { it.toFramework() }
+fun List<DomainRadio>.toFrameworkRadios() = this.map { it.toFramework() }
 
 fun List<FrameworkItem>.toDomainItems() = this.map { it.toDomain() }
 
-fun List<FrameworkTransmitter>.toDomain() = this.map { it.toDomain() }
+fun List<FrameworkRadio>.toDomainRadios() = this.map { it.toDomain() }

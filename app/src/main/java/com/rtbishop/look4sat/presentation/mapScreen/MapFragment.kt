@@ -130,7 +130,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     textLabelBackgroundColor = Color.TRANSPARENT
                     textLabelForegroundColor =
                         ContextCompat.getColor(requireContext(), R.color.themeAccent)
-                    setTextIcon(it.key.params.name)
+                    setTextIcon(it.key.data.name)
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     try {
                         position = GeoPoint(it.value.latitude, it.value.longitude)

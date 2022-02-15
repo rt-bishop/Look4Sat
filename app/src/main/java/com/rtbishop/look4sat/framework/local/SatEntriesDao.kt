@@ -15,19 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.model
+package com.rtbishop.look4sat.framework.local
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
+import com.rtbishop.look4sat.framework.model.SatEntry
+import com.rtbishop.look4sat.framework.model.SatItem
 
-@Entity(tableName = "transmitters")
-data class Transmitter(
-    @PrimaryKey val uuid: String,
-    val info: String,
-    val isAlive: Boolean,
-    var downlink: Long?,
-    var uplink: Long?,
-    val mode: String?,
-    val isInverted: Boolean,
-    val catnum: Int?
-)
+@Dao
+interface SatEntriesDao {
+
+    @Transaction
+    @Query("SELECT catnum, name FROM entries ORDER BY name ASC")
+    suspend fun getEntriesWithModes(): List<SatItem>
+
+    @Transaction
+    @Query("SELECT * FROM entries WHERE catnum IN (:catnums)")
+    suspend fun getSelectedEntries(catnums: List<Int>): List<SatEntry>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
+
+    @Query("DELETE FROM entries")
+    suspend fun deleteEntries()
+}

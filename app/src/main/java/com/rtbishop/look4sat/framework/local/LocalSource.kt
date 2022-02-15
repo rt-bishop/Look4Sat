@@ -20,52 +20,77 @@ package com.rtbishop.look4sat.framework.local
 import android.content.ContentResolver
 import android.net.Uri
 import com.rtbishop.look4sat.data.ILocalSource
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.Transmitter
+import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.Satellite
-import com.rtbishop.look4sat.framework.toDomain
 import com.rtbishop.look4sat.framework.toDomainItems
-import com.rtbishop.look4sat.framework.toFramework
+import com.rtbishop.look4sat.framework.toDomainRadios
 import com.rtbishop.look4sat.framework.toFrameworkEntries
+import com.rtbishop.look4sat.framework.toFrameworkRadios
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 
 class LocalSource(
+    private val entriesDao: SatEntriesDao,
+    private val radiosDao: SatRadiosDao,
+    private val settings: ISettingsHandler,
     private val resolver: ContentResolver,
-    private val ioDispatcher: CoroutineDispatcher,
-    private val entriesDao: EntriesDao,
-    private val transmittersDao: TransmittersDao,
+    private val ioDispatcher: CoroutineDispatcher
 ) : ILocalSource {
 
-    override suspend fun getAllSatellites(): List<SatItem> {
-        return entriesDao.getAllSatellites().toDomainItems()
+    override suspend fun getEntriesWithModes(): List<SatItem> {
+        val selectedCatnums = getEntriesSelection()
+        val entriesWithModes = entriesDao.getEntriesWithModes().toDomainItems()
+        entriesWithModes.forEach { entry -> entry.isSelected = entry.catnum in selectedCatnums }
+        return entriesWithModes
     }
 
-    override suspend fun getSelectedSatellites(catnums: List<Int>): List<Satellite> {
-        return entriesDao.getSelectedSatellites(catnums).map { entry -> entry.tle.createSat() }
+    override suspend fun getSelectedEntries(): List<Satellite> {
+        val selectedSatellites = mutableListOf<Satellite>()
+        getEntriesSelection().chunked(999).forEach { catnums ->
+            val entries = entriesDao.getSelectedEntries(catnums)
+            selectedSatellites.addAll(entries.map { entry -> entry.data.createSat() })
+        }
+        return selectedSatellites
     }
 
-    override suspend fun getTransmitters(catnum: Int): List<Transmitter> {
-        return transmittersDao.getTransmitters(catnum).toDomain()
+    override suspend fun getRadios(catnum: Int): List<SatRadio> {
+        return radiosDao.getRadios(catnum).toDomainRadios()
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun getFileStream(uri: String): InputStream? {
         return withContext(ioDispatcher) { resolver.openInputStream(Uri.parse(uri)) }
     }
 
-    override suspend fun updateEntries(entries: List<SatEntry>) {
+    override suspend fun insertEntries(entries: List<SatEntry>) {
         entriesDao.insertEntries(entries.toFrameworkEntries())
     }
 
-    override suspend fun updateTransmitters(transmitters: List<Transmitter>) {
-        transmittersDao.updateTransmitters(transmitters.toFramework())
+    override suspend fun insertRadios(radios: List<SatRadio>) {
+        radiosDao.insertRadios(radios.toFrameworkRadios())
     }
 
     override suspend fun clearAllData() {
         entriesDao.deleteEntries()
-        transmittersDao.deleteTransmitters()
+        radiosDao.deleteRadios()
+    }
+
+    override suspend fun getDataSources(): List<String> {
+        return withContext(ioDispatcher) { settings.loadDataSources() }
+    }
+
+    override suspend fun setDataSources(sources: List<String>) {
+        withContext(ioDispatcher) { settings.saveDataSources(sources) }
+    }
+
+    override suspend fun getEntriesSelection(): List<Int> {
+        return withContext(ioDispatcher) { settings.loadEntriesSelection() }
+    }
+
+    override suspend fun setEntriesSelection(catnums: List<Int>) {
+        withContext(ioDispatcher) { settings.saveEntriesSelection(catnums) }
     }
 }
