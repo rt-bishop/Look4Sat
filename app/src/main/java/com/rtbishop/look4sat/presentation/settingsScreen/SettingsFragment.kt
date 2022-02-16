@@ -27,6 +27,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -71,6 +72,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupViews() {
+        binding.settingsScroll.apply {
+            setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
+                if (y > newY) binding.settingsFab.hide() else binding.settingsFab.show()
+            })
+        }
         binding.prefsBack.setOnClickListener { findNavController().navigateUp() }
         setupAboutCard()
         setupDataCard()

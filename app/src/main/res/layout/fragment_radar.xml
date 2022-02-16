@@ -37,7 +37,6 @@
     <TextView
         android:id="@+id/radar_name"
         android:layout_width="0dp"
-        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="2dp"
@@ -45,6 +44,7 @@
         android:gravity="center"
         android:includeFontPadding="false"
         android:textSize="@dimen/text_size_medium"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_toolbar" />
@@ -115,7 +115,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/radar_coordinator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_recycler_msg">
@@ -131,7 +131,6 @@
     <TextView
         android:id="@+id/radar_recycler_msg"
         android:layout_width="0dp"
-        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="2dp"
@@ -140,8 +139,66 @@
         android:includeFontPadding="false"
         android:text="@string/trans_no_data"
         android:textSize="@dimen/text_size_medium"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radar_card" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/radar_coordinator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/radar_bottom_bar"
+            style="@style/BottomAppBar" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <Button
+        android:id="@+id/radar_prev_btn"
+        style="@style/AppButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="Notify"
+        app:icon="@drawable/ic_notify_2"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_coordinator"
+        app:layout_constraintEnd_toStartOf="@+id/radar_data_name"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/radar_coordinator"
+        app:layout_constraintStart_toStartOf="@+id/radar_coordinator"
+        app:layout_constraintTop_toTopOf="@+id/radar_coordinator" />
+
+    <TextView
+        android:id="@+id/radar_data_name"
+        style="@style/WorldMapText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:ellipsize="end"
+        android:gravity="center_horizontal"
+        android:maxLines="1"
+        android:text="@string/pat_osm_idName"
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_prev_btn"
+        app:layout_constraintEnd_toStartOf="@+id/radar_next_btn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/radar_prev_btn" />
+
+    <Button
+        android:id="@+id/radar_next_btn"
+        style="@style/AppButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="Settings"
+        app:icon="@drawable/ic_prefs"
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_prev_btn"
+        app:layout_constraintEnd_toEndOf="@+id/radar_coordinator"
+        app:layout_constraintStart_toEndOf="@+id/radar_data_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

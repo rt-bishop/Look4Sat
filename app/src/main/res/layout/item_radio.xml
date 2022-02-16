@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/trans_card"
     style="@style/RecyclerItemCard">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/trans_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/trans_guideline"
+            android:id="@+id/radio_guide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
 
         <TextView
-            android:id="@+id/trans_desc"
+            android:id="@+id/radio_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
@@ -28,57 +26,57 @@
             android:maxLines="1"
             android:text="@string/trans_description"
             android:textSize="@dimen/text_size_small"
-            app:layout_constraintEnd_toStartOf="@+id/trans_uplink_img"
+            app:layout_constraintEnd_toStartOf="@+id/radio_up_img"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toEndOf="@+id/trans_downlink_img"
+            app:layout_constraintStart_toEndOf="@+id/radio_down_img"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/trans_downlink_img"
+            android:id="@+id/radio_down_img"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_marginStart="4dp"
             android:rotation="90"
-            app:layout_constraintBottom_toBottomOf="@+id/trans_desc"
+            app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/trans_desc"
-            app:srcCompat="@drawable/ic_arrow" />
+            app:layout_constraintTop_toTopOf="@+id/radio_info"
+            app:srcCompat="@drawable/ic_arrow_right" />
 
         <TextView
-            android:id="@+id/trans_downlink"
+            android:id="@+id/radio_downlink"
             style="@style/ToolbarTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trans_link_low"
             android:textSize="@dimen/text_size_frequency"
-            app:layout_constraintEnd_toStartOf="@+id/trans_guideline"
+            app:layout_constraintEnd_toStartOf="@+id/radio_guide"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trans_desc" />
+            app:layout_constraintTop_toBottomOf="@+id/radio_info" />
 
         <ImageView
-            android:id="@+id/trans_uplink_img"
+            android:id="@+id/radio_up_img"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_marginEnd="4dp"
             android:rotation="270"
-            app:layout_constraintBottom_toBottomOf="@+id/trans_desc"
+            app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/trans_desc"
-            app:srcCompat="@drawable/ic_arrow" />
+            app:layout_constraintTop_toTopOf="@+id/radio_info"
+            app:srcCompat="@drawable/ic_arrow_right" />
 
         <TextView
-            android:id="@+id/trans_uplink"
+            android:id="@+id/radio_uplink"
             style="@style/ToolbarTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trans_link_low"
             android:textSize="@dimen/text_size_frequency"
-            app:layout_constraintBaseline_toBaselineOf="@+id/trans_downlink"
+            app:layout_constraintBaseline_toBaselineOf="@+id/radio_downlink"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/trans_guideline" />
+            app:layout_constraintStart_toStartOf="@+id/radio_guide" />
 
         <TextView
-            android:id="@+id/trans_mode"
+            android:id="@+id/radio_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
@@ -86,21 +84,21 @@
             android:text="@string/trans_mode"
             android:textSize="@dimen/text_size_small"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/trans_inverted"
+            app:layout_constraintEnd_toStartOf="@+id/radio_inverted"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trans_downlink" />
+            app:layout_constraintTop_toBottomOf="@+id/radio_downlink" />
 
         <TextView
-            android:id="@+id/trans_inverted"
+            android:id="@+id/radio_inverted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/trans_inverted"
             android:textSize="@dimen/text_size_small"
-            app:layout_constraintBaseline_toBaselineOf="@+id/trans_mode"
+            app:layout_constraintBaseline_toBaselineOf="@+id/radio_mode"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/trans_mode" />
+            app:layout_constraintStart_toEndOf="@+id/radio_mode" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

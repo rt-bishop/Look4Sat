@@ -43,5 +43,5 @@ interface IDataRepository {
 
     suspend fun getDataSources(): List<String>
 
-    fun setEntriesSelection(catnums: List<Int>)
+    suspend fun setEntriesSelection(catnums: List<Int>)
 }

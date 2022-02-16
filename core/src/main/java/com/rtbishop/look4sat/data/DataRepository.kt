@@ -110,8 +110,8 @@ class DataRepository(
 
     override suspend fun getDataSources() = localSource.getDataSources()
 
-    override fun setEntriesSelection(catnums: List<Int>) {
-        repositoryScope.launch { localSource.setEntriesSelection(catnums) }
+    override suspend fun setEntriesSelection(catnums: List<Int>) {
+        localSource.setEntriesSelection(catnums)
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {

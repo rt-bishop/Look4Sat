@@ -24,6 +24,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
@@ -51,59 +52,59 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         val layoutManager = LinearLayoutManager(context)
         val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
         binding.run {
-            passesList.apply {
+            passesRecycler.apply {
                 setHasFixedSize(true)
                 this.adapter = adapter
                 this.layoutManager = layoutManager
                 addItemDecoration(itemDecoration)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        if (dy > 0 && passesFab.visibility == View.VISIBLE) passesFab.hide()
+                        else if (dy < 0 && passesFab.visibility != View.VISIBLE) passesFab.show()
+                    }
+                })
             }
-            passesSwipe.apply {
-                setColorSchemeResources(R.color.surfaceToolbar)
-                setProgressBackgroundColorSchemeResource(R.color.themeAccent)
-                setOnRefreshListener { passesViewModel.forceCalculation() }
-            }
-            passesFilter.setOnClickListener { navigateToPassPrefs() }
-            passesSettings.setOnClickListener { navigateToSettings() }
+            passesRefreshBtn.setOnClickListener { refreshPasses() }
+            passesMapBtn.setOnClickListener { navigateToMap() }
+            passesFilterBtn.setOnClickListener { navigateToPassPrefs() }
+            passesFab.setOnClickListener { navigateToEntries() }
+            passesSettingsBtn.setOnClickListener { navigateToSettings() }
         }
         passesViewModel.passes.observe(viewLifecycleOwner) { passesResult ->
-            handleNewPasses(passesResult, adapter, binding)
+            handleNewPasses(passesResult, adapter)
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)
             passesViewModel.forceCalculation(prefs.first, prefs.second)
         }
+        getNavResult<List<Int>>(R.id.nav_passes, "selection") { selection ->
+            passesViewModel.saveSelectionAndRecalc(selection)
+        }
     }
 
-    private fun handleNewPasses(
-        dataState: DataState<List<SatPass>>,
-        passesAdapter: PassesAdapter,
-        binding: FragmentPassesBinding
-    ) {
-        when (dataState) {
+    private fun handleNewPasses(state: DataState<List<SatPass>>, adapter: PassesAdapter) {
+        when (state) {
             is DataState.Success -> {
-                passesAdapter.submitList(dataState.data)
+                adapter.submitList(state.data)
                 binding.apply {
-                    passesSwipe.isRefreshing = false
-                    passesList.visibility = View.VISIBLE
-                    passesError.visibility = View.INVISIBLE
+                    passesRecycler.visibility = View.VISIBLE
+                    passesErrorMsg.visibility = View.INVISIBLE
                 }
-                tickMainTimer(dataState.data, binding)
+                tickMainTimer(state.data, binding)
             }
             is DataState.Loading -> {
                 binding.apply {
                     passesTimer.text = 0L.toTimerString()
-                    passesSwipe.isRefreshing = true
-                    passesList.visibility = View.INVISIBLE
-                    passesError.visibility = View.INVISIBLE
+                    passesRecycler.visibility = View.INVISIBLE
+                    passesErrorMsg.visibility = View.INVISIBLE
                 }
             }
             else -> {
                 binding.apply {
                     passesTimer.text = 0L.toTimerString()
-                    passesSwipe.isRefreshing = false
-                    passesList.visibility = View.INVISIBLE
-                    passesError.visibility = View.VISIBLE
+                    passesRecycler.visibility = View.INVISIBLE
+                    passesErrorMsg.visibility = View.VISIBLE
                 }
             }
         }
@@ -126,8 +127,22 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         }
     }
 
+    private fun refreshPasses() {
+        passesViewModel.forceCalculation()
+    }
+
+    private fun navigateToMap() {
+        val direction = PassesFragmentDirections.actionGlobalMapFragment()
+        findNavController().navigate(direction)
+    }
+
     private fun navigateToPassPrefs() {
         val direction = PassesFragmentDirections.actionPassesToPassPrefs()
+        findNavController().navigate(direction)
+    }
+
+    private fun navigateToEntries() {
+        val direction = PassesFragmentDirections.actionGlobalEntriesFragment()
         findNavController().navigate(direction)
     }
 

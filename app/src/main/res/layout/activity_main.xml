@@ -20,6 +20,7 @@
         android:id="@+id/navigation_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:visibility="gone"
         app:itemBackground="@color/surfaceToolbar"
         app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"

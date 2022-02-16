@@ -32,6 +32,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,11 +60,15 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 addItemDecoration(itemDecoration)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
-            entriesBack.setOnClickListener { findNavController().navigateUp() }
+            entriesBackBtn.setOnClickListener { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
-            entriesMode.setOnClickListener { showModesDialog() }
-            entriesSelectAll.setOnClickListener { viewModel.selectCurrentItems() }
-            entriesAccept.setOnClickListener { viewModel.saveSelection() }
+            entriesModesBtn.setOnClickListener { showModesDialog() }
+            entriesSelectBtn.setOnClickListener { viewModel.selectCurrentItems(true) }
+            entriesClearBtn.setOnClickListener { viewModel.selectCurrentItems(false) }
+            entriesAcceptBtn.setOnClickListener {
+                setNavResult("selection", viewModel.saveSelection())
+                findNavController().popBackStack()
+            }
         }
         viewModel.satData.observe(viewLifecycleOwner) { satData ->
             handleSatData(satData, binding, adapter)

@@ -57,6 +57,13 @@ class PassesViewModel @Inject constructor(
         }
     }
 
+    fun saveSelectionAndRecalc(selection: List<Int>) {
+        viewModelScope.launch {
+            repository.setEntriesSelection(selection)
+            forceCalculation()
+        }
+    }
+
     fun forceCalculation(
         hoursAhead: Int = settings.getHoursAhead(),
         minElevation: Double = settings.getMinElevation(),

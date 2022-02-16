@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -7,12 +7,12 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/prefs_toolbar"
         style="@style/ToolbarCard"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="top"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginEnd="8dp">
 
         <ImageButton
             android:id="@+id/prefs_back"
@@ -28,85 +28,123 @@
 
     </androidx.cardview.widget.CardView>
 
-    <ScrollView
-        style="@style/AppRecycler"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <androidx.cardview.widget.CardView
+        style="@style/ToolbarCard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="64dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="64dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/prefs_toolbar">
+        android:backgroundTint="@color/surfaceBg">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/settings_scroll"
+            style="@style/AppRecycler"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <include
-                android:id="@+id/prefs_info"
-                layout="@layout/card_prefs_about"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_height="wrap_content">
 
-            <include
-                android:id="@+id/prefs_location"
-                layout="@layout/card_prefs_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/prefs_info" />
+                <include
+                    android:id="@+id/prefs_info"
+                    layout="@layout/card_prefs_about"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <include
-                android:id="@+id/prefs_data"
-                layout="@layout/card_prefs_update"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/prefs_location" />
+                <include
+                    android:id="@+id/prefs_location"
+                    layout="@layout/card_prefs_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/prefs_info" />
 
-            <include
-                android:id="@+id/prefs_tracking"
-                layout="@layout/card_prefs_tracking"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/prefs_data" />
+                <include
+                    android:id="@+id/prefs_data"
+                    layout="@layout/card_prefs_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/prefs_location" />
 
-            <include
-                android:id="@+id/prefs_other"
-                layout="@layout/card_prefs_other"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/prefs_tracking" />
+                <include
+                    android:id="@+id/prefs_tracking"
+                    layout="@layout/card_prefs_tracking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/prefs_data" />
 
-            <include
-                android:id="@+id/prefs_warranty"
-                layout="@layout/card_prefs_warranty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/prefs_other" />
+                <include
+                    android:id="@+id/prefs_other"
+                    layout="@layout/card_prefs_other"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/prefs_tracking" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <include
+                    android:id="@+id/prefs_warranty"
+                    layout="@layout/card_prefs_warranty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/prefs_other" />
 
-    </ScrollView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/settings_bottom_bar"
+        style="@style/BottomAppBar">
+
+        <Button
+            android:id="@+id/settings_prev_btn"
+            style="@style/AppButton"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="4dp"
+            android:text="Notify"
+            app:icon="@drawable/ic_notify_2" />
+
+        <Button
+            android:id="@+id/settings_next_btn"
+            style="@style/AppButton"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="4dp"
+            android:text="Settings"
+            app:icon="@drawable/ic_prefs" />
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/settings_fab"
+        style="@style/FloatingActionButton"
+        android:src="@drawable/ic_sputnik"
+        app:layout_anchor="@id/settings_bottom_bar" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

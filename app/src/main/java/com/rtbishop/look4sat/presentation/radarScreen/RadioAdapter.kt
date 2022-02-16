@@ -23,11 +23,11 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.ItemTransBinding
+import com.rtbishop.look4sat.databinding.ItemRadioBinding
 import com.rtbishop.look4sat.domain.model.SatRadio
 import java.util.*
 
-class RadiosAdapter : RecyclerView.Adapter<RadiosAdapter.TransHolder>() {
+class RadioAdapter : RecyclerView.Adapter<RadioAdapter.TransHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatRadio>() {
         override fun areItemsTheSame(oldItem: SatRadio, newItem: SatRadio): Boolean {
@@ -40,9 +40,7 @@ class RadiosAdapter : RecyclerView.Adapter<RadiosAdapter.TransHolder>() {
     }
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitList(radios: List<SatRadio>) {
-        differ.submitList(radios)
-    }
+    fun submitList(items: List<SatRadio>) = differ.submitList(items)
 
     override fun getItemCount() = differ.currentList.size
 
@@ -54,56 +52,51 @@ class RadiosAdapter : RecyclerView.Adapter<RadiosAdapter.TransHolder>() {
         holder.bind(differ.currentList[position])
     }
 
-    class TransHolder private constructor(private val binding: ItemTransBinding) :
+    class TransHolder private constructor(private val binding: ItemRadioBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         private val divider = 1000000f
-        private val strNo = itemView.context.getString(R.string.no)
-        private val strYes = itemView.context.getString(R.string.yes)
+        private val stringYes = itemView.context.getString(R.string.yes)
+        private val stringNo = itemView.context.getString(R.string.no)
+        private val link = itemView.context.getString(R.string.trans_link_low)
+        private val linkNull = itemView.context.getString(R.string.trans_no_link)
         private val mode = itemView.context.getString(R.string.trans_mode)
-        private val formatLink = itemView.context.getString(R.string.trans_link_low)
-        private val formatLinkNull = itemView.context.getString(R.string.trans_no_link)
-        private val isInverted = itemView.context.getString(R.string.trans_inverted)
+        private val inverted = itemView.context.getString(R.string.trans_inverted)
 
         fun bind(radio: SatRadio) {
-            binding.transDesc.text = radio.info
-
-            radio.downlink.let { downlink ->
-                if (downlink != null) {
-                    val downlinkFreq = downlink / divider
-                    binding.transDownlink.text =
-                        String.format(Locale.ENGLISH, formatLink, downlinkFreq)
-                } else {
-                    binding.transDownlink.text = formatLinkNull
+            binding.run {
+                radioInfo.text = radio.info
+                radio.downlink.let { downlink ->
+                    if (downlink != null) {
+                        radioDownlink.text = String.format(Locale.ENGLISH, link, downlink / divider)
+                    } else {
+                        radioDownlink.text = linkNull
+                    }
                 }
-            }
-
-            radio.uplink.let { uplink ->
-                if (uplink != null) {
-                    val uplinkFreq = uplink / divider
-                    binding.transUplink.text = String.format(Locale.ENGLISH, formatLink, uplinkFreq)
-                } else {
-                    binding.transUplink.text = formatLinkNull
+                radio.uplink.let { uplink ->
+                    if (uplink != null) {
+                        radioUplink.text = String.format(Locale.ENGLISH, link, uplink / divider)
+                    } else {
+                        radioUplink.text = linkNull
+                    }
                 }
-            }
-
-            if (radio.mode != null) {
-                binding.transMode.text = String.format(mode, radio.mode)
-            } else {
-                binding.transMode.text = String.format(mode, strNo)
-            }
-
-            if (radio.isInverted) {
-                binding.transInverted.text = String.format(isInverted, strYes)
-            } else {
-                binding.transInverted.text = String.format(isInverted, strNo)
+                if (radio.mode != null) {
+                    radioMode.text = String.format(mode, radio.mode)
+                } else {
+                    radioMode.text = String.format(mode, stringNo)
+                }
+                if (radio.isInverted) {
+                    radioInverted.text = String.format(inverted, stringYes)
+                } else {
+                    radioInverted.text = String.format(inverted, stringNo)
+                }
             }
         }
 
         companion object {
             fun from(parent: ViewGroup): TransHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                return TransHolder(ItemTransBinding.inflate(inflater, parent, false))
+                return TransHolder(ItemRadioBinding.inflate(inflater, parent, false))
             }
         }
     }

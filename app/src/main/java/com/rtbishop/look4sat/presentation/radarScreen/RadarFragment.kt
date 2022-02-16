@@ -53,7 +53,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     private fun setupViews() {
         val context = requireContext()
-        val adapter = RadiosAdapter()
+        val adapter = RadioAdapter()
         val layoutManager = LinearLayoutManager(context)
         val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
         binding.run {
@@ -68,7 +68,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
         }
     }
 
-    private fun setupObservers(radiosAdapter: RadiosAdapter) {
+    private fun setupObservers(radioAdapter: RadioAdapter) {
         viewModel.getPass(args.catNum, args.aosTime).observe(viewLifecycleOwner) { pass ->
             radarView = RadarView(requireContext()).apply {
                 setShowAim(preferences.getUseCompass())
@@ -82,7 +82,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
             }
             viewModel.transmitters.observe(viewLifecycleOwner) { list ->
                 if (list.isNotEmpty()) {
-                    radiosAdapter.submitList(list)
+                    radioAdapter.submitList(list)
                     binding.radarRecyclerMsg.text = getString(R.string.trans_data)
                 } else {
                     binding.radarRecyclerMsg.text = getString(R.string.trans_no_data)

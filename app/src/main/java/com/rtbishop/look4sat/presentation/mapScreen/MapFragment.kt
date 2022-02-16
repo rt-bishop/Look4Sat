@@ -92,9 +92,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
-            mapBack.setOnClickListener { findNavController().navigateUp() }
-            mapBtnPrev.setOnClickListener { viewModel.scrollSelection(true) }
-            mapBtnNext.setOnClickListener { viewModel.scrollSelection(false) }
+            mapBackBtn.setOnClickListener { findNavController().navigateUp() }
+            mapPrevBtn.setOnClickListener { viewModel.scrollSelection(true) }
+            mapNextBtn.setOnClickListener { viewModel.scrollSelection(false) }
         }
     }
 

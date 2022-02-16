@@ -6,7 +6,7 @@
     android:keepScreenOn="true">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/map_toolbar"
+        android:id="@+id/map_top_bar"
         style="@style/ToolbarCard"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/map_back"
+            android:id="@+id/map_back_btn"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
             android:src="@drawable/ic_back" />
@@ -37,11 +37,11 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="2dp"
-        app:layout_constraintBottom_toTopOf="@+id/map_btn_prev"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/map_card_info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/map_top_bar">
 
         <org.osmdroid.views.MapView
             android:id="@+id/map_view"
@@ -51,20 +51,22 @@
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/map_data_name"
-        style="@style/WorldMapText"
+        android:id="@+id/map_copyright"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
         android:ellipsize="end"
-        android:gravity="center_horizontal"
+        android:gravity="center"
+        android:includeFontPadding="false"
         android:maxLines="1"
-        android:text="@string/pat_osm_idName"
-        app:layout_constraintBottom_toTopOf="@+id/map_card_info"
-        app:layout_constraintEnd_toStartOf="@+id/map_btn_next"
-        app:layout_constraintStart_toEndOf="@+id/map_btn_prev"
-        app:layout_constraintTop_toBottomOf="@+id/map_card" />
+        android:text="@string/map_copyright"
+        android:textColor="@color/themeDisabled"
+        android:textSize="@dimen/text_size_copyright"
+        app:layout_constraintEnd_toEndOf="@+id/map_card"
+        app:layout_constraintStart_toStartOf="@+id/map_card"
+        app:layout_constraintTop_toTopOf="@+id/map_card" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/map_card_info"
@@ -73,8 +75,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/map_copyright"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/map_coordinator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -147,47 +149,56 @@
 
     </androidx.cardview.widget.CardView>
 
-    <ImageButton
-        android:id="@+id/map_btn_prev"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginBottom="2dp"
-        android:backgroundTint="@color/surfaceToolbar"
-        android:rotation="180"
-        android:src="@drawable/ic_arrow"
-        app:layout_constraintBottom_toTopOf="@+id/map_card_info"
-        app:layout_constraintStart_toStartOf="parent"
-        app:tint="@color/themeLight" />
-
-    <ImageButton
-        android:id="@+id/map_btn_next"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="12dp"
-        android:backgroundTint="@color/surfaceToolbar"
-        android:src="@drawable/ic_arrow"
-        app:layout_constraintBottom_toBottomOf="@+id/map_btn_prev"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/map_btn_prev"
-        app:tint="@color/themeLight" />
-
-    <TextView
-        android:id="@+id/map_copyright"
-        android:layout_width="0dp"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/map_coordinator"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="1"
-        android:text="@string/map_copyright"
-        android:textColor="@color/themeLight"
-        android:includeFontPadding="false"
-        android:textSize="@dimen/text_size_copyright"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/map_bottom_bar"
+            style="@style/BottomAppBar" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <Button
+        android:id="@+id/map_prev_btn"
+        style="@style/AppButton"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="Prev"
+        app:icon="@drawable/ic_arrow_left"
+        app:layout_constraintBottom_toBottomOf="@+id/map_coordinator"
+        app:layout_constraintStart_toStartOf="@+id/map_coordinator"
+        app:layout_constraintTop_toTopOf="@+id/map_coordinator" />
+
+    <TextView
+        android:id="@+id/map_data_name"
+        style="@style/WorldMapText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:ellipsize="end"
+        android:gravity="center_horizontal"
+        android:maxLines="1"
+        android:text="@string/pat_osm_idName"
+        app:layout_constraintBaseline_toBaselineOf="@+id/map_prev_btn"
+        app:layout_constraintEnd_toStartOf="@+id/map_next_btn"
+        app:layout_constraintStart_toEndOf="@+id/map_prev_btn" />
+
+    <Button
+        android:id="@+id/map_next_btn"
+        style="@style/AppButton"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="Next"
+        app:icon="@drawable/ic_arrow_right"
+        app:layout_constraintBaseline_toBaselineOf="@+id/map_prev_btn"
+        app:layout_constraintEnd_toEndOf="@+id/map_coordinator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

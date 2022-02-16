@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--    View values-->
     <dimen name="btn_corner_low">0dp</dimen>
     <dimen name="btn_corner_high">8dp</dimen>
     <dimen name="card_elev_low">0dp</dimen>
     <dimen name="card_elev_high">8dp</dimen>
     <dimen name="card_corner_low">0dp</dimen>
     <dimen name="card_corner_high">12dp</dimen>
+    <dimen name="view_default_margin">8dp</dimen>
+    <!--    Text values-->
     <dimen name="text_size_copyright">13sp</dimen>
     <dimen name="text_size_small">15sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>

@@ -10,6 +10,7 @@
     <color name="surfaceChip">#303030</color>
     <color name="surfaceButton">#242424</color>
     <color name="surfaceToolbar">#1A1A1A</color>
+    <color name="bottomAppBar">#1A1A1A</color>
     <color name="surfaceSystem">#1A1A1A</color>
     <color name="surfaceCard">#1A1A1A</color>
     <color name="surfaceBg">#121212</color>
