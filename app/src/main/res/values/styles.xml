@@ -17,7 +17,7 @@
         <item name="colorOnPrimaryContainer">@color/surfaceBg</item>
         <item name="colorOnSurfaceVariant">@color/themeLight</item>
         <item name="colorSecondaryContainer">@color/surfaceIcon</item>
-<!--        -->
+        <!--        -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:listDivider">@drawable/item_divider</item>
         <item name="android:navigationBarColor">@color/surfaceBg</item>
@@ -26,37 +26,88 @@
         <item name="android:windowBackground">@color/surfaceBg</item>
     </style>
 
-    <style name="AppButton" parent="Widget.Material3.Button.IconButton">
-        <item name="android:backgroundTint">@color/surfaceButton</item>
-        <item name="android:ellipsize">end</item>
-        <item name="cornerRadius">@dimen/btn_corner_high</item>
-        <item name="rippleColor">@color/themeLight</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/themeLight</item>
-        <item name="android:textSize">@dimen/text_size_medium</item>
-    </style>
-
-    <style name="AppRecycler">
-        <item name="android:overScrollMode">never</item>
-        <item name="android:scrollbars">none</item>
-    </style>
-
-    <style name="BottomAppBar">
+    <style name="Toolbar">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">56dp</item>
-        <item name="android:layout_gravity">bottom</item>
-        <item name="android:backgroundTint">@color/bottomAppBar</item>
-        <item name="contentInsetStart">4dp</item>
-        <item name="contentInsetEnd">4dp</item>
-        <item name="fabCradleMargin">8dp</item>
-        <item name="fabCradleRoundedCornerRadius">16dp</item>
+        <item name="android:layout_height">@dimen/toolbar_size</item>
+        <item name="android:layout_gravity">top|center_horizontal</item>
+        <item name="android:layout_marginStart">@dimen/view_default_margin</item>
+        <item name="android:layout_marginTop">@dimen/view_default_margin</item>
+        <item name="android:layout_marginEnd">@dimen/view_default_margin</item>
+        <item name="cardBackgroundColor">@color/surfaceToolbar</item>
+        <item name="cardCornerRadius">@dimen/card_corner_high</item>
+        <item name="cardElevation">@dimen/card_elev_low</item>
+    </style>
+
+    <style name="ToolbarButton">
+        <item name="android:layout_width">@dimen/toolbar_icon_size</item>
+        <item name="android:layout_height">@dimen/toolbar_icon_size</item>
+        <item name="android:background">?actionBarItemBackground</item>
+        <item name="android:tint">@color/themeLight</item>
+    </style>
+
+    <style name="ToolbarTimer">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:text">@string/timer_zero</item>
+        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textSize">@dimen/text_size_app_timer</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ToolbarTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@color/transparent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:inputType">text</item>
+        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textColorHint">@color/themeAccent</item>
+        <item name="android:textSize">@dimen/text_size_large</item>
     </style>
 
     <style name="FloatingActionButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/themeAccent</item>
+    </style>
+
+    <style name="NormalButton" parent="Widget.Material3.Button.IconButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:backgroundTint">@color/surfaceButton</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/themeLight</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="cornerRadius">@dimen/btn_corner_high</item>
+        <item name="iconTint">@color/themeLight</item>
+        <item name="rippleColor">@color/themeLight</item>
+    </style>
+
+    <style name="RadioFreq">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:text">@string/trans_link_low</item>
+        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textSize">@dimen/text_size_frequency</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Recycler">
+        <item name="android:overScrollMode">never</item>
+        <item name="android:scrollbars">none</item>
+    </style>
+
+    <style name="RecyclerProgress">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
     </style>
 
     <style name="RecyclerItemCard">
@@ -68,7 +119,6 @@
     </style>
 
     <style name="SurfaceCard">
-        <item name="android:clipChildren">true</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardBackgroundColor">@color/surfaceCard</item>
@@ -76,38 +126,15 @@
         <item name="cardElevation">@dimen/card_elev_low</item>
     </style>
 
-    <style name="ToolbarCard">
-        <item name="android:clipChildren">true</item>
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="cardBackgroundColor">@color/surfaceToolbar</item>
-        <item name="cardCornerRadius">@dimen/card_corner_high</item>
-        <item name="cardElevation">@dimen/card_elev_low</item>
-    </style>
-
-    <style name="ToolbarButton">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:background">?actionBarItemBackground</item>
-        <item name="android:tint">@color/themeLight</item>
-    </style>
-
-    <style name="ToolbarTimer">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:includeFontPadding">false</item>
-        <item name="android:text">@string/timer_zero</item>
-        <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:textSize">@dimen/text_size_app_timer</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="ToolbarTitle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:includeFontPadding">false</item>
-        <item name="android:textColor">@color/themeLight</item>
-        <item name="android:textSize">@dimen/text_size_large</item>
+    <style name="BottomBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_bar_size</item>
+        <item name="android:layout_gravity">bottom</item>
+        <item name="android:backgroundTint">@color/bottomAppBar</item>
+        <item name="contentInsetStart">@dimen/bottom_bar_inset</item>
+        <item name="contentInsetEnd">@dimen/bottom_bar_inset</item>
+        <item name="fabCradleMargin">@dimen/view_default_margin</item>
+        <item name="fabCradleRoundedCornerRadius">@dimen/view_default_margin</item>
     </style>
 
     <style name="WorldMapText">

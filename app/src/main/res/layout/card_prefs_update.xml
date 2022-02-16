@@ -32,14 +32,14 @@
 
         <Button
             android:id="@+id/update_btn_web"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:text="@string/update_web"
-            app:icon="@drawable/ic_world"
+            app:icon="@drawable/ic_map"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/update_btn_file"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +47,7 @@
 
         <Button
             android:id="@+id/update_btn_file"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/update_file"
@@ -58,12 +58,12 @@
 
         <Button
             android:id="@+id/update_btn_clear"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:text="@string/update_clear"
-            app:icon="@drawable/ic_delete"
+            app:icon="@drawable/ic_clear"
             app:layout_constraintBaseline_toBaselineOf="@+id/update_btn_web"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/update_btn_file" />

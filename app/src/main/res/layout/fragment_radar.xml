@@ -7,10 +7,7 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/radar_toolbar"
-        style="@style/ToolbarCard"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        style="@style/Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -23,44 +20,28 @@
 
         <TextView
             android:id="@+id/radar_timer"
-            style="@style/ToolbarTimer"
-            android:layout_gravity="center" />
+            style="@style/ToolbarTimer" />
 
         <ImageButton
             android:id="@+id/radar_map"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
-            android:src="@drawable/ic_world" />
+            android:src="@drawable/ic_map" />
 
     </androidx.cardview.widget.CardView>
-
-    <TextView
-        android:id="@+id/radar_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="8dp"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:textSize="@dimen/text_size_medium"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_toolbar" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/radar_card"
         style="@style/SurfaceCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/view_default_margin"
+        android:layout_marginTop="@dimen/view_default_margin"
+        android:layout_marginEnd="@dimen/view_default_margin"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_name" />
+        app:layout_constraintTop_toBottomOf="@+id/radar_toolbar" />
 
     <TextView
         android:id="@+id/radar_az"
@@ -111,38 +92,38 @@
         style="@style/SurfaceCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="@dimen/view_default_margin"
+        android:layout_marginTop="@dimen/view_default_margin"
+        android:layout_marginEnd="@dimen/view_default_margin"
+        android:layout_marginBottom="@dimen/view_default_margin"
         app:layout_constraintBottom_toTopOf="@+id/radar_coordinator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_recycler_msg">
+        app:layout_constraintTop_toBottomOf="@+id/radar_card">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/radar_recycler"
-            style="@style/AppRecycler"
+            style="@style/Recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </androidx.cardview.widget.CardView>
+        <ProgressBar
+            android:id="@+id/radar_progress"
+            style="@style/RecyclerProgress"
+            android:visibility="invisible" />
 
-    <TextView
-        android:id="@+id/radar_recycler_msg"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="8dp"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:text="@string/trans_no_data"
-        android:textSize="@dimen/text_size_medium"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radar_card" />
+        <TextView
+            android:id="@+id/radar_recycler_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="@string/trans_no_data"
+            android:textSize="@dimen/text_size_medium"
+            android:visibility="invisible" />
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/radar_coordinator"
@@ -154,18 +135,16 @@
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/radar_bottom_bar"
-            style="@style/BottomAppBar" />
+            style="@style/BottomBar" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <Button
         android:id="@+id/radar_prev_btn"
-        style="@style/AppButton"
+        style="@style/NormalButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="@dimen/button_margin_side"
         android:text="Notify"
-        app:icon="@drawable/ic_notify_2"
         app:layout_constraintBottom_toBottomOf="@+id/radar_coordinator"
         app:layout_constraintEnd_toStartOf="@+id/radar_data_name"
         app:layout_constraintHorizontal_bias="0.5"
@@ -191,12 +170,10 @@
 
     <Button
         android:id="@+id/radar_next_btn"
-        style="@style/AppButton"
+        style="@style/NormalButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="@dimen/button_margin_side"
         android:text="Settings"
-        app:icon="@drawable/ic_prefs"
         app:layout_constraintBaseline_toBaselineOf="@+id/radar_prev_btn"
         app:layout_constraintEnd_toEndOf="@+id/radar_coordinator"
         app:layout_constraintStart_toEndOf="@+id/radar_data_name" />

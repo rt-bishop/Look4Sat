@@ -56,13 +56,13 @@
 
         <Button
             android:id="@+id/location_btn_gps"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:drawableStart="@drawable/ic_pos"
+            android:drawableStart="@drawable/ic_gps"
             android:text="@string/location_gps"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/location_btn_qth"
@@ -73,7 +73,7 @@
 
         <Button
             android:id="@+id/location_btn_qth"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"

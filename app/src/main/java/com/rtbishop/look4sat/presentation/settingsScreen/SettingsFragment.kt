@@ -77,7 +77,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 if (y > newY) binding.settingsFab.hide() else binding.settingsFab.show()
             })
         }
-        binding.prefsBack.setOnClickListener { findNavController().navigateUp() }
+        binding.settingsBack.setOnClickListener { findNavController().navigateUp() }
         setupAboutCard()
         setupDataCard()
         setupLocationCard()
@@ -96,25 +96,25 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupAboutCard() {
-        binding.prefsInfo.aboutVersion.text =
+        binding.settingsInfo.aboutVersion.text =
             String.format(getString(R.string.about_version), BuildConfig.VERSION_NAME)
-        binding.prefsInfo.aboutBtnGithub.setOnClickListener {
+        binding.settingsInfo.aboutBtnGithub.setOnClickListener {
             gotoUrl("https://github.com/rt-bishop/Look4Sat/")
         }
-        binding.prefsInfo.aboutBtnDonate.setOnClickListener {
+        binding.settingsInfo.aboutBtnDonate.setOnClickListener {
             gotoUrl("https://www.buymeacoffee.com/rtbishop")
         }
-        binding.prefsInfo.aboutBtnFdroid.setOnClickListener {
+        binding.settingsInfo.aboutBtnFdroid.setOnClickListener {
             gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
         }
     }
 
     private fun setupLocationCard() {
         setPositionText(viewModel.getStationPosition())
-        binding.prefsLocation.locationBtnGps.setOnClickListener {
+        binding.settingsLocation.locationBtnGps.setOnClickListener {
             locationRequest.launch(arrayOf(locationFine, locationCoarse))
         }
-        binding.prefsLocation.locationBtnQth.setOnClickListener {
+        binding.settingsLocation.locationBtnQth.setOnClickListener {
             val editText = EditText(requireActivity())
             AlertDialog.Builder(requireContext())
                 .setTitle("Title")
@@ -130,80 +130,80 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupDataCard() {
-        binding.prefsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
-        binding.prefsData.updateBtnWeb.setOnClickListener {
+        binding.settingsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
+        binding.settingsData.updateBtnWeb.setOnClickListener {
             val action = SettingsFragmentDirections.actionPrefsToSources()
             findNavController().navigate(action)
         }
-        binding.prefsData.updateBtnClear.setOnClickListener { viewModel.clearData() }
+        binding.settingsData.updateBtnClear.setOnClickListener { viewModel.clearData() }
         getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
             viewModel.updateDataFromWeb(sources)
         }
     }
 
     private fun setupTrackingCard() {
-        binding.prefsTracking.trackingSwitch.apply {
+        binding.settingsTracking.trackingSwitch.apply {
             isChecked = viewModel.getRotatorEnabled()
-            binding.prefsTracking.trackingIp.isEnabled = isChecked
-            binding.prefsTracking.trackingIpEdit.setText(viewModel.getRotatorServer())
-            binding.prefsTracking.trackingPort.isEnabled = isChecked
-            binding.prefsTracking.trackingPortEdit.setText(viewModel.getRotatorPort())
+            binding.settingsTracking.trackingIp.isEnabled = isChecked
+            binding.settingsTracking.trackingIpEdit.setText(viewModel.getRotatorServer())
+            binding.settingsTracking.trackingPort.isEnabled = isChecked
+            binding.settingsTracking.trackingPortEdit.setText(viewModel.getRotatorPort())
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setRotatorEnabled(isChecked)
-                binding.prefsTracking.trackingIp.isEnabled = isChecked
-                binding.prefsTracking.trackingPort.isEnabled = isChecked
+                binding.settingsTracking.trackingIp.isEnabled = isChecked
+                binding.settingsTracking.trackingPort.isEnabled = isChecked
             }
         }
-        binding.prefsTracking.trackingIpEdit.doOnTextChanged { text, _, _, _ ->
+        binding.settingsTracking.trackingIpEdit.doOnTextChanged { text, _, _, _ ->
             if (text.toString().isValidIPv4()) viewModel.setRotatorServer(text.toString())
         }
-        binding.prefsTracking.trackingPortEdit.doOnTextChanged { text, _, _, _ ->
+        binding.settingsTracking.trackingPortEdit.doOnTextChanged { text, _, _, _ ->
             if (text.toString().isValidPort()) viewModel.setRotatorPort(text.toString())
         }
     }
 
     private fun setupOtherCard() {
-        binding.prefsOther.otherSwitchUtc.apply {
+        binding.settingsOther.otherSwitchUtc.apply {
             isChecked = viewModel.getUseUTC()
             setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
         }
-        binding.prefsOther.otherSwitchSweep.apply {
+        binding.settingsOther.otherSwitchSweep.apply {
             isChecked = viewModel.getShowSweep()
             setOnCheckedChangeListener { _, isChecked -> viewModel.setShowSweep(isChecked) }
         }
-        binding.prefsOther.otherSwitchSensors.apply {
+        binding.settingsOther.otherSwitchSensors.apply {
             isChecked = viewModel.getUseCompass()
             setOnCheckedChangeListener { _, isChecked -> viewModel.setUseCompass(isChecked) }
         }
     }
 
     private fun setupWarrantyCard() {
-        binding.prefsWarranty.warrantyThanks.movementMethod = LinkMovementMethod.getInstance()
-        binding.prefsWarranty.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
+        binding.settingsWarranty.warrantyThanks.movementMethod = LinkMovementMethod.getInstance()
+        binding.settingsWarranty.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun setPositionText(geoPos: GeoPos) {
         val latFormat = getString(R.string.location_lat)
         val lonFormat = getString(R.string.location_lon)
-        binding.prefsLocation.locationLat.text = String.format(latFormat, geoPos.latitude)
-        binding.prefsLocation.locationLon.text = String.format(lonFormat, geoPos.longitude)
+        binding.settingsLocation.locationLat.text = String.format(latFormat, geoPos.latitude)
+        binding.settingsLocation.locationLon.text = String.format(lonFormat, geoPos.longitude)
     }
 
     private fun handleStationPosition(pos: DataState<GeoPos>) {
         when (pos) {
             is DataState.Success -> {
                 setPositionText(pos.data)
-                binding.prefsLocation.locationProgress.isIndeterminate = false
+                binding.settingsLocation.locationProgress.isIndeterminate = false
                 viewModel.setPositionHandled()
                 showToast(getString(R.string.pref_pos_success))
             }
             is DataState.Error -> {
-                binding.prefsLocation.locationProgress.isIndeterminate = false
+                binding.settingsLocation.locationProgress.isIndeterminate = false
                 viewModel.setPositionHandled()
                 showToast(pos.message.toString())
             }
             DataState.Loading -> {
-                binding.prefsLocation.locationProgress.isIndeterminate = true
+                binding.settingsLocation.locationProgress.isIndeterminate = true
             }
             DataState.Handled -> {}
         }
@@ -212,17 +212,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun handleSatState(state: DataState<Long>) {
         when (state) {
             is DataState.Success -> {
-                binding.prefsData.updateProgress.isIndeterminate = false
+                binding.settingsData.updateProgress.isIndeterminate = false
                 viewModel.setUpdateHandled()
                 showToast("Data updated successfully")
             }
             is DataState.Error -> {
-                binding.prefsData.updateProgress.isIndeterminate = false
+                binding.settingsData.updateProgress.isIndeterminate = false
                 viewModel.setUpdateHandled()
                 showToast(state.message.toString())
             }
             is DataState.Loading -> {
-                binding.prefsData.updateProgress.isIndeterminate = true
+                binding.settingsData.updateProgress.isIndeterminate = true
             }
             is DataState.Handled -> {}
         }

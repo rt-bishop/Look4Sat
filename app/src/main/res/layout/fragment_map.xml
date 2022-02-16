@@ -6,11 +6,8 @@
     android:keepScreenOn="true">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/map_top_bar"
-        style="@style/ToolbarCard"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:id="@+id/map_toolbar"
+        style="@style/Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,7 +21,6 @@
         <TextView
             android:id="@+id/map_title"
             style="@style/ToolbarTitle"
-            android:layout_gravity="center"
             android:text="@string/map_title" />
 
     </androidx.cardview.widget.CardView>
@@ -34,14 +30,14 @@
         style="@style/SurfaceCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="@dimen/view_default_margin"
+        android:layout_marginTop="@dimen/view_default_margin"
+        android:layout_marginEnd="@dimen/view_default_margin"
+        android:layout_marginBottom="@dimen/view_default_margin"
         app:layout_constraintBottom_toTopOf="@+id/map_card_info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_top_bar">
+        app:layout_constraintTop_toBottomOf="@+id/map_toolbar">
 
         <org.osmdroid.views.MapView
             android:id="@+id/map_view"
@@ -73,9 +69,9 @@
         style="@style/SurfaceCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="@dimen/view_default_margin"
+        android:layout_marginEnd="@dimen/view_default_margin"
+        android:layout_marginBottom="@dimen/view_default_margin"
         app:layout_constraintBottom_toTopOf="@+id/map_coordinator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -159,18 +155,17 @@
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/map_bottom_bar"
-            style="@style/BottomAppBar" />
+            style="@style/BottomBar" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <Button
         android:id="@+id/map_prev_btn"
-        style="@style/AppButton"
-        android:layout_width="96dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        style="@style/NormalButton"
+        android:layout_width="@dimen/button_width_med"
+        android:layout_marginStart="@dimen/button_margin_side"
         android:text="Prev"
-        app:icon="@drawable/ic_arrow_left"
+        app:icon="@drawable/ic_prev"
         app:layout_constraintBottom_toBottomOf="@+id/map_coordinator"
         app:layout_constraintStart_toStartOf="@+id/map_coordinator"
         app:layout_constraintTop_toTopOf="@+id/map_coordinator" />
@@ -192,12 +187,12 @@
 
     <Button
         android:id="@+id/map_next_btn"
-        style="@style/AppButton"
-        android:layout_width="96dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
+        style="@style/NormalButton"
+        android:layout_width="@dimen/button_width_med"
+        android:layout_marginEnd="@dimen/button_margin_side"
         android:text="Next"
-        app:icon="@drawable/ic_arrow_right"
+        app:icon="@drawable/ic_next"
+        app:iconGravity="end"
         app:layout_constraintBaseline_toBaselineOf="@+id/map_prev_btn"
         app:layout_constraintEnd_toEndOf="@+id/map_coordinator" />
 

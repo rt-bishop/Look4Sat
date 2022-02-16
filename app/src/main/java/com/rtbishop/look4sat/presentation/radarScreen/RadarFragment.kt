@@ -110,7 +110,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
         binding.radarEl.text = String.format(polarEl, Math.toDegrees(satPos.elevation))
         binding.radarDst.text = String.format(polarRng, satPos.range)
         binding.radarAlt.text = String.format(polarAlt, satPos.altitude)
-        binding.radarName.text = satPass.name
+//        binding.radarName.text = satPass.name
 
         if (!satPass.isDeepSpace) {
             if (timeNow < satPass.aosTime) {

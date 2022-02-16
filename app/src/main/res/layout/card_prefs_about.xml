@@ -59,14 +59,13 @@
 
         <Button
             android:id="@+id/about_btn_github"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:text="@string/about_github"
-            app:icon="@drawable/ic_github"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/about_btn_donate"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -75,7 +74,7 @@
 
         <Button
             android:id="@+id/about_btn_donate"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/about_support"
@@ -86,12 +85,11 @@
 
         <Button
             android:id="@+id/about_btn_fdroid"
-            style="@style/AppButton"
+            style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:text="@string/about_fdroid"
-            app:icon="@drawable/ic_fdroid"
             app:layout_constraintBaseline_toBaselineOf="@+id/about_btn_github"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/about_btn_donate" />

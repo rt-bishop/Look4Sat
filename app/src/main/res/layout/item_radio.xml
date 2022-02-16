@@ -40,15 +40,11 @@
             app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/radio_info"
-            app:srcCompat="@drawable/ic_arrow_right" />
+            app:srcCompat="@drawable/ic_next" />
 
         <TextView
             android:id="@+id/radio_downlink"
-            style="@style/ToolbarTimer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/trans_link_low"
-            android:textSize="@dimen/text_size_frequency"
+            style="@style/RadioFreq"
             app:layout_constraintEnd_toStartOf="@+id/radio_guide"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radio_info" />
@@ -62,15 +58,11 @@
             app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/radio_info"
-            app:srcCompat="@drawable/ic_arrow_right" />
+            app:srcCompat="@drawable/ic_next" />
 
         <TextView
             android:id="@+id/radio_uplink"
-            style="@style/ToolbarTimer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/trans_link_low"
-            android:textSize="@dimen/text_size_frequency"
+            style="@style/RadioFreq"
             app:layout_constraintBaseline_toBaselineOf="@+id/radio_downlink"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/radio_guide" />

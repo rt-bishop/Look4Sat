@@ -17,14 +17,11 @@
  */
 package com.rtbishop.look4sat.presentation
 
-import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.fragment.NavHostFragment
-import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,22 +30,11 @@ class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        val host = supportFragmentManager.findFragmentById(R.id.navigation_host) as NavHostFragment
-        setContentView(binding.root)
-//        binding.navigationBar.apply {
-//            setupWithNavController(host.navController)
-//            setOnItemSelectedListener { item ->
-//                NavigationUI.onNavDestinationSelected(item, host.navController)
-//                host.navController.popBackStack(item.itemId, inclusive = false)
-//                true
-//            }
-//        }
+        setContentView(ActivityMainBinding.inflate(layoutInflater).root)
         mainViewModel.calculatePasses()
     }
 }

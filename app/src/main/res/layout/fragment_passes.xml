@@ -5,14 +5,8 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/passes_top_bar"
-        style="@style/ToolbarCard"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_gravity="top"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp">
+        android:id="@+id/passes_toolbar"
+        style="@style/Toolbar">
 
         <ImageButton
             android:id="@+id/passes_refresh_btn"
@@ -23,14 +17,13 @@
 
         <TextView
             android:id="@+id/passes_timer"
-            style="@style/ToolbarTimer"
-            android:layout_gravity="center" />
+            style="@style/ToolbarTimer" />
 
         <ImageButton
             android:id="@+id/passes_map_btn"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
-            android:src="@drawable/ic_world" />
+            android:src="@drawable/ic_map" />
 
     </androidx.cardview.widget.CardView>
 
@@ -38,23 +31,21 @@
         style="@style/SurfaceCard"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="64dp">
+        android:layout_marginStart="@dimen/view_default_margin"
+        android:layout_marginTop="@dimen/surface_margin_top"
+        android:layout_marginEnd="@dimen/view_default_margin"
+        android:layout_marginBottom="@dimen/surface_margin_bot">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/passes_recycler"
-            style="@style/AppRecycler"
+            style="@style/Recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
         <ProgressBar
-            android:visibility="invisible"
             android:id="@+id/passes_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:visibility="invisible"
+            style="@style/RecyclerProgress" />
 
         <TextView
             android:id="@+id/passes_error_msg"
@@ -69,26 +60,23 @@
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/passes_bottomBar"
-        style="@style/BottomAppBar">
+        style="@style/BottomBar">
 
         <Button
             android:id="@+id/passes_filter_btn"
-            style="@style/AppButton"
-            android:layout_width="136dp"
-            android:layout_height="wrap_content"
+            style="@style/NormalButton"
+            android:layout_width="@dimen/button_width_max"
+            android:layout_marginStart="@dimen/button_margin_side"
             android:layout_gravity="start|center_vertical"
-            android:text="Filter"
-            app:icon="@drawable/ic_filter" />
+            android:text="Filter" />
 
         <Button
             android:id="@+id/passes_settings_btn"
-            style="@style/AppButton"
-            android:layout_width="136dp"
-            android:layout_height="wrap_content"
+            style="@style/NormalButton"
+            android:layout_width="@dimen/button_width_max"
+            android:layout_marginEnd="@dimen/button_margin_side"
             android:layout_gravity="end|center_vertical"
-            android:text="Настройки"
-            app:icon="@drawable/ic_prefs"
-            app:iconGravity="end" />
+            android:text="Настройки" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
