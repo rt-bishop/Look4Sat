@@ -25,6 +25,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.framework.model.DataSource
@@ -33,11 +34,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SourcesDialog : AppCompatDialogFragment() {
+class SourcesDialog : AppCompatDialogFragment(), SourcesAdapter.SourcesClickListener {
 
     @Inject
     lateinit var repository: IDataRepository
     private lateinit var binding: DialogSourcesBinding
+    private lateinit var sourcesAdapter: SourcesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View {
         binding = DialogSourcesBinding.inflate(inflater, group, false)
@@ -46,27 +48,29 @@ class SourcesDialog : AppCompatDialogFragment() {
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
+        dialog?.window?.setBackgroundDrawableResource(R.color.transparent)
         dialog?.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
+            (resources.displayMetrics.widthPixels * 0.94).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         lifecycleScope.launchWhenResumed {
-            val adapter = SourcesAdapter()
+            val sources = repository.getDataSources().map { url -> DataSource(url) }
             val layoutManager = LinearLayoutManager(requireContext())
-            adapter.setSources(repository.getDataSources().map { url -> DataSource(url) })
+            sourcesAdapter = SourcesAdapter(this@SourcesDialog).apply { submitList(sources) }
             binding.run {
                 sourcesRecycler.apply {
-                    setHasFixedSize(true)
-                    this.adapter = adapter
+                    this.adapter = sourcesAdapter
                     this.layoutManager = layoutManager
                 }
-                sourcesBtnAdd.setOnClickListener { adapter.addSource() }
+                sourcesBtnAdd.setOnClickListener { sourcesAdapter.addSource() }
                 sourcesBtnNeg.setOnClickListener { dismiss() }
                 sourcesBtnPos.setOnClickListener {
-                    setNavResult("sources", adapter.getSources().map { source -> source.url })
+                    setNavResult("sources", sourcesAdapter.getSources().map { item -> item.url })
                     dismiss()
                 }
             }
         }
     }
+
+    override fun removeSource(source: DataSource) = sourcesAdapter.removeSource(source)
 }

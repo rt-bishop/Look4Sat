@@ -2,8 +2,9 @@
 <resources>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="btn_cancel">Отмена</string>
     <string name="btn_accept">Принять</string>
+    <string name="btn_add">Добавить</string>
+    <string name="btn_cancel">Отмена</string>
 
     <string name="menu_satellites">Спутники</string>
     <string name="menu_passes">Пролеты</string>
@@ -11,10 +12,8 @@
     <string name="menu_map">Карта</string>
     <string name="menu_settings">Настройки</string>
 
-    <string name="sources_title">Управление TLE</string>
-    <string name="sources_hint">URL источника</string>
-    <string name="sources_https">Только протокол HTTPS</string>
-    <string name="sources_error">Пожалуйста, проверьте URL</string>
+    <string name="sources_title">Источники данных</string>
+    <string name="sources_hint">Протокол HTTPS</string>
 
     <string name="entries_title">Спутники</string>
     <string name="entries_update">Обновить спутники:</string>

@@ -20,51 +20,69 @@ package com.rtbishop.look4sat.presentation.settingsScreen
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rtbishop.look4sat.databinding.ItemSourceBinding
 import com.rtbishop.look4sat.framework.model.DataSource
 
-class SourcesAdapter(private val sources: MutableList<DataSource> = mutableListOf()) :
-    RecyclerView.Adapter<SourcesAdapter.TleSourceHolder>() {
+class SourcesAdapter(private val clickListener: SourcesClickListener) :
+    RecyclerView.Adapter<SourcesAdapter.SourceHolder>() {
 
-    fun getSources(): List<DataSource> {
-        return sources.filter { source -> source.url.contains("https://") }
-    }
+    private val diffCallback = object : DiffUtil.ItemCallback<DataSource>() {
+        override fun areItemsTheSame(oldItem: DataSource, newItem: DataSource): Boolean {
+            return oldItem.url == newItem.url
+        }
 
-    fun setSources(list: List<DataSource>) {
-        sources.clear()
-        sources.addAll(list)
+        override fun areContentsTheSame(oldItem: DataSource, newItem: DataSource): Boolean {
+            return oldItem.url == newItem.url
+        }
     }
+    private val differ = AsyncListDiffer(this, diffCallback)
+    private val httpsString = "https://"
+
+    fun getSources() = differ.currentList.filter { source -> source.url.contains(httpsString) }
 
     fun addSource() {
-        sources.add(DataSource())
-        notifyItemInserted(itemCount - 1)
+        submitList((getSources() as MutableList).apply { add(DataSource(httpsString)) })
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TleSourceHolder {
-        val binding = ItemSourceBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false)
-        return TleSourceHolder(binding)
+    fun removeSource(source: DataSource) {
+        submitList((getSources() as MutableList).apply { remove(source) })
     }
 
-    override fun onBindViewHolder(holder: TleSourceHolder, position: Int) {
-        holder.bind(sources[position])
+    fun submitList(items: List<DataSource>) = differ.submitList(items)
+
+    override fun getItemCount(): Int = differ.currentList.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SourceHolder {
+        return SourceHolder.from(parent)
     }
 
-    override fun getItemCount(): Int {
-        return sources.size
+    override fun onBindViewHolder(holder: SourceHolder, position: Int) {
+        holder.bind(differ.currentList[position], clickListener)
     }
 
-    inner class TleSourceHolder(private val binding: ItemSourceBinding) :
+    class SourceHolder(private val binding: ItemSourceBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(source: DataSource) {
-            binding.sourceUrl.setText(source.url)
-            binding.sourceUrl.doOnTextChanged { txt, _, _, _ -> source.url = txt.toString() }
-            binding.sourceBtn.setOnClickListener {
-                sources.remove(source)
-                notifyItemRemoved(adapterPosition)
+        fun bind(source: DataSource, listener: SourcesClickListener) {
+            binding.run {
+                sourceText.setText(source.url)
+                sourceText.doOnTextChanged { text, _, _, _ -> source.url = text.toString() }
+                sourceInput.setEndIconOnClickListener { listener.removeSource(source) }
             }
         }
+
+        companion object {
+            fun from(parent: ViewGroup): SourceHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                return SourceHolder(ItemSourceBinding.inflate(inflater, parent, false))
+            }
+        }
+    }
+
+    interface SourcesClickListener {
+        fun removeSource(source: DataSource)
     }
 }

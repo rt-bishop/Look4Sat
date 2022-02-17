@@ -80,6 +80,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/surfaceButton</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:minWidth">96dp</item>
         <item name="android:maxLines">1</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/themeLight</item>
@@ -159,12 +160,18 @@
     </style>
 
     <style name="DialogButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/surfaceButton</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:minWidth">96dp</item>
         <item name="android:maxLines">1</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/themeAccent</item>
+        <item name="android:textColor">@color/themeLight</item>
         <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="cornerRadius">@dimen/btn_corner_high</item>
+        <item name="iconTint">@color/themeLight</item>
+        <item name="rippleColor">@color/themeLight</item>
     </style>
 
     <style name="DialogText">
@@ -174,11 +181,8 @@
         <item name="android:textSize">@dimen/text_size_medium</item>
     </style>
 
-    <style name="DialogTitle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/themeAccent</item>
-        <item name="android:textSize">@dimen/text_size_medium</item>
+    <style name="DialogTitle" parent="ToolbarTitle">
+        <item name="android:textSize">@dimen/text_size_mediumLarge</item>
     </style>
 
 </resources>

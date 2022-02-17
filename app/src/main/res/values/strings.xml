@@ -4,8 +4,9 @@
 
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="btn_cancel">Cancel</string>
     <string name="btn_accept">Accept</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_cancel">Cancel</string>
 
     <string name="menu_satellites">Satellites</string>
     <string name="menu_passes">Passes</string>
@@ -13,10 +14,8 @@
     <string name="menu_map">World Map</string>
     <string name="menu_settings">Settings</string>
 
-    <string name="sources_title">Manage TLE sources</string>
-    <string name="sources_hint">Source URL</string>
-    <string name="sources_https">Protocol HTTPS only</string>
-    <string name="sources_error">Please check the entered URL</string>
+    <string name="sources_title">Manage data sources</string>
+    <string name="sources_hint">HTTPS Source</string>
 
     <string name="entries_title">Satellites</string>
     <string name="entries_update">TLE data update:</string>
