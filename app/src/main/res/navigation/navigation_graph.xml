@@ -7,7 +7,11 @@
     <fragment
         android:id="@+id/nav_entries"
         android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
-        tools:layout="@layout/fragment_entries" />
+        tools:layout="@layout/fragment_entries">
+        <action
+            android:id="@+id/action_entries_to_modes"
+            app:destination="@id/nav_modes" />
+    </fragment>
     <fragment
         android:id="@+id/nav_passes"
         android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
@@ -54,6 +58,10 @@
         android:id="@+id/nav_sources"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.SourcesDialog"
         tools:layout="@layout/dialog_sources" />
+    <dialog
+        android:id="@+id/nav_modes"
+        android:name="com.rtbishop.look4sat.presentation.entriesScreen.ModesDialog"
+        tools:layout="@layout/dialog_modes" />
     <action
         android:id="@+id/action_global_entriesFragment"
         app:destination="@id/nav_entries" />

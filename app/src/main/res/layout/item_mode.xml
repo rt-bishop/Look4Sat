@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mode_card"
+    style="@style/RecyclerItemCard">
+
+    <CheckBox
+        android:id="@+id/mode_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:layout_marginStart="4dp"
+        android:background="@color/surfaceCard"
+        android:ellipsize="end"
+        android:lines="1"
+        android:padding="4dp"
+        android:textColor="@color/themeLight"
+        android:textSize="@dimen/text_size_medium" />
+
+</androidx.cardview.widget.CardView>

@@ -41,18 +41,12 @@ class EntriesViewModel @Inject constructor(
     private val itemsWithQuery = currentQuery.switchMap { query ->
         itemsWithModes.map { items -> filterByQuery(items, query) }
     }
-//    private var shouldSelectAll = true
     val satData = itemsWithQuery.map { items -> DataState.Success(items) }
 
     fun selectCurrentItems(selectAll: Boolean) {
         itemsWithQuery.value?.let { itemsWithQuery ->
             updateSelection(itemsWithQuery.map { item -> item.catnum }, selectAll)
-//            shouldSelectAll = shouldSelectAll.not()
         }
-    }
-
-    fun loadSelectedModes(): List<String> {
-        return preferences.loadModesSelection()
     }
 
     fun saveSelectedModes(modes: List<String>) {
@@ -61,15 +55,12 @@ class EntriesViewModel @Inject constructor(
     }
 
     fun setQuery(query: String) {
-//        shouldSelectAll = true
         currentQuery.value = query
     }
 
     fun saveSelection(): List<Int> {
         return itemsFromRepo.value?.let { itemsAll ->
-            val filteredItems = itemsAll.filter { item -> item.isSelected }
-//            repository.setEntriesSelection(filteredItems.map { item -> item.catnum })
-            filteredItems.map { item -> item.catnum }
+            itemsAll.filter { item -> item.isSelected }.map { item -> item.catnum }
         } ?: emptyList()
     }
 

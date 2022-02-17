@@ -19,19 +19,20 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -59,19 +60,28 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 this.layoutManager = layoutManager
                 addItemDecoration(itemDecoration)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        if (dy > 0 && entriesFab.visibility == View.VISIBLE) entriesFab.hide()
+                        else if (dy < 0 && entriesFab.visibility != View.VISIBLE) entriesFab.show()
+                    }
+                })
             }
             entriesBackBtn.setOnClickListener { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
-            entriesModesBtn.setOnClickListener { showModesDialog() }
+            entriesModesBtn.setOnClickListener { navigateToModesDialog() }
             entriesSelectBtn.setOnClickListener { viewModel.selectCurrentItems(true) }
             entriesClearBtn.setOnClickListener { viewModel.selectCurrentItems(false) }
-            entriesAcceptBtn.setOnClickListener {
+            entriesFab.setOnClickListener {
                 setNavResult("selection", viewModel.saveSelection())
                 findNavController().popBackStack()
             }
         }
         viewModel.satData.observe(viewLifecycleOwner) { satData ->
             handleSatData(satData, binding, adapter)
+        }
+        getNavResult<List<String>>(R.id.nav_entries, "modes") { modes ->
+            viewModel.saveSelectedModes(modes)
         }
     }
 
@@ -100,32 +110,8 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
         }
     }
 
-    private fun showModesDialog() {
-        val modes = arrayOf(
-            "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
-            "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
-            "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
-            "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
-            "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
-        )
-        val savedModes = BooleanArray(modes.size)
-        val selectedModes = viewModel.loadSelectedModes().toMutableList()
-        selectedModes.forEach { savedModes[modes.indexOf(it)] = true }
-        AlertDialog.Builder(requireContext()).apply {
-            setTitle(context.getString(R.string.modes_title))
-            setMultiChoiceItems(modes, savedModes) { _, which, isChecked ->
-                when {
-                    isChecked -> selectedModes.add(modes[which])
-                    selectedModes.contains(modes[which]) -> selectedModes.remove(modes[which])
-                }
-            }
-            setPositiveButton(context.getString(android.R.string.ok)) { _, _ ->
-                viewModel.saveSelectedModes(selectedModes)
-            }
-            setNeutralButton(context.getString(android.R.string.cancel)) { dialog, _ ->
-                dialog.dismiss()
-            }
-            create().show()
-        }
+    private fun navigateToModesDialog() {
+        val direction = EntriesFragmentDirections.actionEntriesToModes()
+        findNavController().navigate(direction)
     }
 }
