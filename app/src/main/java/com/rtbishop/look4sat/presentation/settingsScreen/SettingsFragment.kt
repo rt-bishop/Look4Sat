@@ -23,10 +23,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -41,7 +39,6 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.isValidIPv4
 import com.rtbishop.look4sat.presentation.isValidPort
-import com.rtbishop.look4sat.presentation.setEditText
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -115,17 +112,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             locationRequest.launch(arrayOf(locationFine, locationCoarse))
         }
         binding.settingsLocation.locationBtnQth.setOnClickListener {
-            val editText = EditText(requireActivity())
-            AlertDialog.Builder(requireContext())
-                .setTitle("Title")
-                .setEditText(editText)
-                .setPositiveButton("OK") { _, _ ->
-                    val editTextInput = editText.text.toString()
-                    viewModel.setPositionFromQth(editTextInput)
-                }
-                .setNeutralButton("Cancel", null)
-                .create()
-                .show()
+            val action = SettingsFragmentDirections.actionPrefsToLocator()
+            findNavController().navigate(action)
+        }
+        getNavResult<String>(R.id.nav_settings, "locator") { locator ->
+            viewModel.setPositionFromQth(locator)
         }
     }
 
