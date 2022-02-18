@@ -44,11 +44,9 @@
             android:layout_marginBottom="8dp"
             android:text="@string/btn_cancel"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/modes_btn_pos"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toEndOf="@+id/modes_btn_pos"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button

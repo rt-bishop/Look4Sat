@@ -17,13 +17,13 @@
         android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
         tools:layout="@layout/fragment_passes">
         <action
-            android:id="@+id/action_passes_to_pass_prefs"
-            app:destination="@id/nav_pass_prefs" />
+            android:id="@+id/action_passes_to_filter"
+            app:destination="@id/nav_dialog_filter" />
     </fragment>
     <dialog
-        android:id="@+id/nav_pass_prefs"
-        android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesPrefsDialog"
-        tools:layout="@layout/dialog_passes" />
+        android:id="@+id/nav_dialog_filter"
+        android:name="com.rtbishop.look4sat.presentation.passesScreen.FilterDialog"
+        tools:layout="@layout/dialog_filter" />
     <fragment
         android:id="@+id/nav_radar"
         android:name="com.rtbishop.look4sat.presentation.radarScreen.RadarFragment"

@@ -8,45 +8,46 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.ISettingsHandler
-import com.rtbishop.look4sat.databinding.DialogPassesBinding
+import com.rtbishop.look4sat.databinding.DialogFilterBinding
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PassesPrefsDialog : AppCompatDialogFragment() {
+class FilterDialog : AppCompatDialogFragment() {
 
     @Inject
     lateinit var preferences: ISettingsHandler
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_passes, group, false)
+        return inflater.inflate(R.layout.dialog_filter, group, false)
     }
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        DialogPassesBinding.bind(view).apply {
+        DialogFilterBinding.bind(view).apply {
+            dialog?.window?.setBackgroundDrawableResource(R.color.transparent)
             dialog?.window?.setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
+                (resources.displayMetrics.widthPixels * 0.94).toInt(),
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-            hoursAheadEdit.setText(preferences.getHoursAhead().toString())
-            minElevEdit.setText(preferences.getMinElevation().toString())
-            passPrefBtnPos.setOnClickListener {
+            filterHoursEdit.setText(preferences.getHoursAhead().toString())
+            filterElevEdit.setText(preferences.getMinElevation().toString())
+            filterPosBtn.setOnClickListener {
                 val hoursAhead = try {
-                    hoursAheadEdit.text.toString().toInt()
+                    filterHoursEdit.text.toString().toInt()
                 } catch (exception: Exception) {
                     8
                 }
                 val minElevation = try {
-                    minElevEdit.text.toString().toDouble()
+                    filterElevEdit.text.toString().toDouble()
                 } catch (exception: Exception) {
                     16.0
                 }
                 setNavResult("prefs", Pair(hoursAhead, minElevation))
                 dismiss()
             }
-            passPrefBtnNeg.setOnClickListener { dismiss() }
+            filterNegBtn.setOnClickListener { dismiss() }
         }
     }
 }

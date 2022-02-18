@@ -18,7 +18,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/tracking_switch"
             style="@style/SettingsText"
             android:layout_width="0dp"
@@ -26,6 +26,7 @@
             android:layout_marginEnd="4dp"
             android:minHeight="48dp"
             android:text="@string/tracking_switch"
+            app:trackTint="@color/themeDisabled"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tracking_title"
             app:layout_constraintTop_toBottomOf="@+id/tracking_title" />

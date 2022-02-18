@@ -19,7 +19,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/other_switch_utc"
             style="@style/SettingsText"
             android:layout_width="0dp"
@@ -28,22 +28,24 @@
             android:layout_marginEnd="4dp"
             android:minHeight="48dp"
             android:text="@string/other_switch_utc"
+            app:trackTint="@color/themeDisabled"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/other_title"
             app:layout_constraintTop_toBottomOf="@+id/other_title" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/other_switch_sweep"
             style="@style/SettingsText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:text="@string/other_switch_sweep"
+            app:trackTint="@color/themeDisabled"
             app:layout_constraintEnd_toEndOf="@+id/other_switch_utc"
             app:layout_constraintStart_toStartOf="@+id/other_switch_utc"
             app:layout_constraintTop_toBottomOf="@+id/other_switch_utc" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/other_switch_sensors"
             style="@style/SettingsText"
             android:layout_width="0dp"
@@ -51,6 +53,7 @@
             android:layout_marginBottom="8dp"
             android:minHeight="48dp"
             android:text="@string/other_switch_sensors"
+            app:trackTint="@color/themeDisabled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/other_switch_utc"
             app:layout_constraintStart_toStartOf="@+id/other_switch_sweep"

@@ -67,7 +67,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             }
             passesRefreshBtn.setOnClickListener { refreshPasses() }
             passesMapBtn.setOnClickListener { navigateToMap() }
-            passesFilterBtn.setOnClickListener { navigateToPassPrefs() }
+            passesFilterBtn.setOnClickListener { navigateToFilter() }
             passesFab.setOnClickListener { navigateToEntries() }
             passesSettingsBtn.setOnClickListener { navigateToSettings() }
         }
@@ -136,8 +136,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         findNavController().navigate(direction)
     }
 
-    private fun navigateToPassPrefs() {
-        val direction = PassesFragmentDirections.actionPassesToPassPrefs()
+    private fun navigateToFilter() {
+        val direction = PassesFragmentDirections.actionPassesToFilter()
         findNavController().navigate(direction)
     }
 
