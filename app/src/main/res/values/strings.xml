@@ -68,6 +68,7 @@
     <string name="pref_gsp_title">Ground station position</string>
     <string name="pref_pos_gps">Set position from GPS data</string>
     <string name="pref_pos_gps_null">No geolocation data</string>
+    <string name="pref_pos_manual_error">Invalid location entered</string>
     <string name="pref_pos_gps_error">Check your location permissions</string>
     <string name="pref_pos_qth">Set position from QTH locator</string>
     <string name="pref_pos_qth_error">Invalid QTH locator</string>

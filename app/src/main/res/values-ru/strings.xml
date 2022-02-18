@@ -52,6 +52,7 @@
     <string name="pref_gsp_title">Местоположение наземной станции</string>
     <string name="pref_pos_gps">Установить позицию по данным GPS</string>
     <string name="pref_pos_gps_null">Нет данных геолокации</string>
+    <string name="pref_pos_manual_error">Введены неверные данные</string>
     <string name="pref_pos_gps_error">Нет разрешения использовать геоданные</string>
     <string name="pref_pos_qth">Установить позицию по локатору QTH</string>
     <string name="pref_pos_qth_error">Неправильный локатор QTH</string>

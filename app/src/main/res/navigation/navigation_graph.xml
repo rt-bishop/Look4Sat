@@ -54,6 +54,9 @@
             android:id="@+id/action_prefs_to_sources"
             app:destination="@id/nav_sources" />
         <action
+            android:id="@+id/action_prefs_to_location"
+            app:destination="@id/nav_location" />
+        <action
             android:id="@+id/action_prefs_to_locator"
             app:destination="@id/nav_locator" />
     </fragment>
@@ -65,6 +68,10 @@
         android:id="@+id/nav_modes"
         android:name="com.rtbishop.look4sat.presentation.entriesScreen.ModesDialog"
         tools:layout="@layout/dialog_modes" />
+    <dialog
+        android:id="@+id/nav_location"
+        android:name="com.rtbishop.look4sat.presentation.settingsScreen.LocationDialog"
+        tools:layout="@layout/dialog_location" />
     <dialog
         android:id="@+id/nav_locator"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.LocatorDialog"

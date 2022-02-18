@@ -59,13 +59,14 @@ class LocationHandler @Inject constructor(
 
     override fun setStationPosition(latitude: Double, longitude: Double) {
         if (QthConverter.isValidPosition(latitude, longitude)) {
+            val tempLon = if (longitude > 180.0) longitude - 180 else longitude
             val newLat = latitude.round(4)
-            val newLon = longitude.round(4)
+            val newLon = tempLon.round(4)
             currentPosition = GeoPos(newLat, newLon)
             settingsHandler.saveStationPosition(newLat, newLon)
             _stationPosition.value = DataState.Success(currentPosition)
         } else _stationPosition.value =
-            DataState.Error(context.getString(R.string.pref_pos_gps_null))
+            DataState.Error(context.getString(R.string.pref_pos_manual_error))
     }
 
     override fun setPositionFromGps() {

@@ -61,6 +61,8 @@ class SettingsViewModel @Inject constructor(
 
     fun getStationPosition(): GeoPos = locationHandler.getStationPosition()
 
+    fun setStationPosition(lat: Double, lon: Double) = locationHandler.setStationPosition(lat, lon)
+
     fun setPositionFromGps() = locationHandler.setPositionFromGps()
 
     fun setPositionFromNet() = locationHandler.setPositionFromNet()

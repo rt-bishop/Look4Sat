@@ -111,9 +111,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.settingsLocation.locationBtnGps.setOnClickListener {
             locationRequest.launch(arrayOf(locationFine, locationCoarse))
         }
+        binding.settingsLocation.locationBtnManual.setOnClickListener {
+            val action = SettingsFragmentDirections.actionPrefsToLocation()
+            findNavController().navigate(action)
+        }
         binding.settingsLocation.locationBtnQth.setOnClickListener {
             val action = SettingsFragmentDirections.actionPrefsToLocator()
             findNavController().navigate(action)
+        }
+        getNavResult<Pair<Double, Double>>(R.id.nav_settings, "location") { location ->
+            viewModel.setStationPosition(location.first, location.second)
         }
         getNavResult<String>(R.id.nav_settings, "locator") { locator ->
             viewModel.setPositionFromQth(locator)

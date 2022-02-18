@@ -38,7 +38,7 @@ object QthConverter {
 
     fun positionToQth(lat: Double, lon: Double): String? {
         if (!isValidPosition(lat, lon)) return null
-        val tempLon = if (lon > 180.0) lon - 360 else lon
+        val tempLon = if (lon > 180.0) lon - 180 else lon
         val upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
         val lower = "abcdefghijklmnopqrstuvwx"
         val longitude = tempLon + 180
