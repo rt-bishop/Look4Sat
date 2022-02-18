@@ -29,9 +29,9 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.ILocationHandler
 import com.rtbishop.look4sat.domain.QthConverter
+import com.rtbishop.look4sat.domain.QthConverter.round
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,9 +51,12 @@ class LocationHandler @Inject constructor(
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val _stationPosition = MutableStateFlow<DataState<GeoPos>>(DataState.Handled)
+    private var currentLocator = settingsHandler.loadStationLocator()
     private var currentPosition = settingsHandler.loadStationPosition()
 
     override val stationPosition: StateFlow<DataState<GeoPos>> = _stationPosition
+
+    override fun getStationLocator(): String = currentLocator
 
     override fun getStationPosition(): GeoPos = currentPosition
 
@@ -62,11 +65,17 @@ class LocationHandler @Inject constructor(
             val tempLon = if (longitude > 180.0) longitude - 180 else longitude
             val newLat = latitude.round(4)
             val newLon = tempLon.round(4)
-            currentPosition = GeoPos(newLat, newLon)
-            settingsHandler.saveStationPosition(newLat, newLon)
-            _stationPosition.value = DataState.Success(currentPosition)
-        } else _stationPosition.value =
-            DataState.Error(context.getString(R.string.pref_pos_manual_error))
+            QthConverter.positionToQth(newLat, newLon)?.let { locator ->
+                currentLocator = locator
+                currentPosition = GeoPos(newLat, newLon)
+                settingsHandler.saveStationLocator(locator)
+                settingsHandler.saveStationPosition(currentPosition)
+                _stationPosition.value = DataState.Success(currentPosition)
+            }
+        } else {
+            _stationPosition.value =
+                DataState.Error(context.getString(R.string.pref_pos_manual_error))
+        }
     }
 
     override fun setPositionFromGps() {
@@ -79,8 +88,9 @@ class LocationHandler @Inject constructor(
                 _stationPosition.value = DataState.Loading
                 manager.requestLocationUpdates(providerGps, 0L, 0f, this)
             }
-        } else _stationPosition.value =
-            DataState.Error(context.getString(R.string.pref_pos_gps_null))
+        } else {
+            _stationPosition.value = DataState.Error(context.getString(R.string.pref_pos_gps_null))
+        }
     }
 
     override fun setPositionFromNet() {
@@ -93,16 +103,22 @@ class LocationHandler @Inject constructor(
                 _stationPosition.value = DataState.Loading
                 manager.requestLocationUpdates(providerNet, 0L, 0f, this)
             }
-        } else _stationPosition.value =
-            DataState.Error(context.getString(R.string.pref_pos_gps_null))
+        } else {
+            _stationPosition.value = DataState.Error(context.getString(R.string.pref_pos_gps_null))
+        }
     }
 
-    override fun setPositionFromQth(qthString: String) {
-        val position = QthConverter.qthToPosition(qthString)
+    override fun setPositionFromQth(locator: String) {
+        val position = QthConverter.qthToPosition(locator)
         if (position != null) {
-            setStationPosition(position.latitude, position.longitude)
-        } else _stationPosition.value =
-            DataState.Error(context.getString(R.string.pref_pos_qth_error))
+            currentLocator = locator
+            currentPosition = position
+            settingsHandler.saveStationLocator(locator)
+            settingsHandler.saveStationPosition(currentPosition)
+            _stationPosition.value = DataState.Success(currentPosition)
+        } else {
+            _stationPosition.value = DataState.Error(context.getString(R.string.pref_pos_qth_error))
+        }
     }
 
     override fun setPositionHandled() {

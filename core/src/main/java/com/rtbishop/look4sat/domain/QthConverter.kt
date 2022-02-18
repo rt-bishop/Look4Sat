@@ -22,17 +22,17 @@ import kotlin.math.round
 
 object QthConverter {
 
-    fun qthToPosition(qthString: String): GeoPos? {
-        val trimmedQth = qthString.take(6)
-        if (!isValidQth(trimmedQth)) return null
+    fun qthToPosition(locator: String): GeoPos? {
+        val trimmedQth = locator.take(6)
+        if (!isValidLocator(trimmedQth)) return null
         val lonFirst = (trimmedQth[0].uppercaseChar().code - 65) * 20
         val latFirst = (trimmedQth[1].uppercaseChar().code - 65) * 10
         val lonSecond = trimmedQth[2].toString().toInt() * 2
         val latSecond = trimmedQth[3].toString().toInt()
         val lonThird = (((trimmedQth[4].lowercaseChar().code - 97) / 12.0) + (1.0 / 24.0)) - 180
         val latThird = (((trimmedQth[5].lowercaseChar().code - 97) / 24.0) + (1.0 / 48.0)) - 90
-        val longitude = (lonFirst + lonSecond + lonThird).roundToDecimals(4)
-        val latitude = (latFirst + latSecond + latThird).roundToDecimals(4)
+        val longitude = (lonFirst + lonSecond + lonThird).round(4)
+        val latitude = (latFirst + latSecond + latThird).round(4)
         return GeoPos(latitude, longitude)
     }
 
@@ -53,15 +53,14 @@ object QthConverter {
     }
 
     fun isValidPosition(lat: Double, lon: Double): Boolean {
-        return (lat > -90.0 && lat < 90.0) && (lon > -180.0 && lon < 360.0)
+        return (lat >= -90.0 && lat <= 90.0) && (lon >= -180.0 && lon <= 360.0)
     }
 
-    private fun isValidQth(qthString: String): Boolean {
-        val qthPattern = "[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex()
-        return qthString.matches(qthPattern)
+    fun isValidLocator(locator: String): Boolean {
+        return locator.matches("[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex())
     }
 
-    private fun Double.roundToDecimals(decimals: Int): Double {
+    fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
         return round(this * multiplier) / multiplier

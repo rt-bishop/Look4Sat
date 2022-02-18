@@ -42,9 +42,16 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
         const val keyRotatorPort = "rotatorPort"
         const val keyLatitude = "stationLat"
         const val keyLongitude = "stationLon"
-//        const val keyPositionGPS = "setPositionGPS"
-//        const val keyPositionQTH = "setPositionQTH"
+        const val keyLocator = "stationQTH"
         const val keySelection = "selection"
+    }
+
+    override fun loadStationLocator(): String {
+        return prefs.getString(keyLocator, null) ?: "null"
+    }
+
+    override fun saveStationLocator(locator: String) {
+        prefs.edit { putString(keyLocator, locator) }
     }
 
     override fun loadStationPosition(): GeoPos {
@@ -54,10 +61,10 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
         return GeoPos(latitude.toDouble(), longitude.toDouble())
     }
 
-    override fun saveStationPosition(latitude: Double, longitude: Double) {
+    override fun saveStationPosition(position: GeoPos) {
         prefs.edit {
-            putString(keyLatitude, latitude.toString())
-            putString(keyLongitude, longitude.toString())
+            putString(keyLatitude, position.latitude.toString())
+            putString(keyLongitude, position.longitude.toString())
         }
     }
 

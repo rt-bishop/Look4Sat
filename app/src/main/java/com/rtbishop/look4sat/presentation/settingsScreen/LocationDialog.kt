@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.databinding.DialogLocationBinding
-import com.rtbishop.look4sat.domain.ILocationHandler
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class LocationDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var locationHandler: ILocationHandler
+    lateinit var preferences: ISettingsHandler
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_location, group, false)
@@ -31,7 +31,7 @@ class LocationDialog : AppCompatDialogFragment() {
                 (resources.displayMetrics.widthPixels * 0.94).toInt(),
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-            val location = locationHandler.getStationPosition()
+            val location = preferences.loadStationPosition()
             locationLatEdit.setText(location.latitude.toString())
             locationLonEdit.setText(location.longitude.toString())
             locationPosBtn.setOnClickListener {

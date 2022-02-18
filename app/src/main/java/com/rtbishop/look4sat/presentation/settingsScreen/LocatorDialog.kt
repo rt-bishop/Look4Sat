@@ -31,7 +31,7 @@ class LocatorDialog : AppCompatDialogFragment() {
                 (resources.displayMetrics.widthPixels * 0.94).toInt(),
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-//            locatorEdit.setText(preferences.getQthLocator())
+            locatorEdit.setText(preferences.loadStationLocator())
             locatorPosBtn.setOnClickListener {
                 setNavResult("locator", locatorEdit.text.toString())
                 dismiss()

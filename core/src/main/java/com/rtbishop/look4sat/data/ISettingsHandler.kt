@@ -29,9 +29,13 @@ interface ISettingsHandler {
             "https://amsat.org/tle/current/nasabare.txt"
         )
 
+    fun loadStationLocator(): String
+
+    fun saveStationLocator(locator: String)
+
     fun loadStationPosition(): GeoPos
 
-    fun saveStationPosition(latitude: Double, longitude: Double)
+    fun saveStationPosition(position: GeoPos)
 
     fun getHoursAhead(): Int
 

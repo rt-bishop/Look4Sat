@@ -8,6 +8,8 @@ interface ILocationHandler {
 
     val stationPosition: SharedFlow<DataState<GeoPos>>
 
+    fun getStationLocator(): String
+
     fun getStationPosition(): GeoPos
 
     fun setStationPosition(latitude: Double, longitude: Double)
@@ -16,7 +18,7 @@ interface ILocationHandler {
 
     fun setPositionFromNet()
 
-    fun setPositionFromQth(qthString: String)
+    fun setPositionFromQth(locator: String)
 
     fun setPositionHandled()
 }
