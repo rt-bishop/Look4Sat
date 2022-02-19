@@ -25,6 +25,9 @@
     <string name="btn_support">Поддержать</string>
     <string name="btn_fdroid">F-Droid</string>
 
+    <string name="fmt_entries">Спутников: %s</string>
+    <string name="fmt_radios">Трансиверов: %s</string>
+
     <string name="yes">Да</string>
     <string name="no">Нет</string>
 

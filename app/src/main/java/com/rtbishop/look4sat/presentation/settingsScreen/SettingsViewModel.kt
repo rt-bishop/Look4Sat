@@ -1,6 +1,7 @@
 package com.rtbishop.look4sat.presentation.settingsScreen
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ILocationHandler
@@ -16,6 +17,9 @@ class SettingsViewModel @Inject constructor(
     private val repository: IDataRepository,
     private val locationHandler: ILocationHandler
 ) : ViewModel() {
+
+    val entries = repository.getEntriesNumber().asLiveData()
+    val radios = repository.getRadiosNumber().asLiveData()
 
     fun updateDataFromFile(uri: String) {
         repository.updateFromFile(uri)

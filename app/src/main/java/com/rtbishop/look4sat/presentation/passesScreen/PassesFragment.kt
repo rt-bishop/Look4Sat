@@ -32,6 +32,7 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.toTimerString
+import com.rtbishop.look4sat.presentation.toast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -74,12 +75,22 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         passesViewModel.passes.observe(viewLifecycleOwner) { passesResult ->
             handleNewPasses(passesResult, adapter)
         }
+        passesViewModel.entries.observe(viewLifecycleOwner) { number ->
+            handleEntriesNumber(number)
+        }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)
             passesViewModel.forceCalculation(prefs.first, prefs.second)
         }
         getNavResult<List<Int>>(R.id.nav_passes, "selection") { selection ->
             passesViewModel.saveSelectionAndRecalc(selection)
+        }
+    }
+
+    private fun handleEntriesNumber(number: Int?) {
+        number?.let { num ->
+            if (num == 0) binding.passesFab.setOnClickListener { requireContext().toast("0") }
+            else binding.passesFab.setOnClickListener { navigateToEntries() }
         }
     }
 

@@ -134,6 +134,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             findNavController().navigate(action)
         }
         binding.settingsData.dataBtnClear.setOnClickListener { viewModel.clearData() }
+        viewModel.entries.observe(viewLifecycleOwner) { number ->
+            val entriesFormat = getString(R.string.fmt_entries)
+            binding.settingsData.dataSatellites.text = String.format(entriesFormat, number)
+        }
+        viewModel.radios.observe(viewLifecycleOwner) { number ->
+            val radiosFormat = getString(R.string.fmt_radios)
+            binding.settingsData.dataTransmitters.text = String.format(radiosFormat, number)
+        }
         getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
             viewModel.updateDataFromWeb(sources)
         }

@@ -27,6 +27,9 @@
     <string name="btn_support">Support</string>
     <string name="btn_fdroid">F-Droid</string>
 
+    <string name="fmt_entries">Satellites: %s</string>
+    <string name="fmt_radios">Transceivers: %s</string>
+
     <string name="yes">Yes</string>
     <string name="no">No</string>
 

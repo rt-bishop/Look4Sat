@@ -17,10 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.passesScreen
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.model.DataState
@@ -40,6 +37,7 @@ class PassesViewModel @Inject constructor(
     private var passesProcessing: Job? = null
     private val _passes = MutableLiveData<DataState<List<SatPass>>>()
     val passes: LiveData<DataState<List<SatPass>>> = _passes
+    val entries: LiveData<Int> = repository.getEntriesNumber().asLiveData()
 
     init {
         viewModelScope.launch {

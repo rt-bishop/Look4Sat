@@ -59,8 +59,8 @@ class DataRepository(
         repositoryScope.launch(exceptionHandler) {
             _updateState.value = DataState.Loading
             localSource.getFileStream(uri)?.let { fileStream ->
-                localSource.insertEntries(importSatellites(fileStream))
                 delay(updateStateDelay)
+                localSource.insertEntries(importSatellites(fileStream))
             }
             _updateState.value = DataState.Success(0L)
         }
@@ -94,11 +94,11 @@ class DataRepository(
             }
             streams.forEach { stream -> entries.addAll(importSatellites(stream)) }
             localSource.insertEntries(entries)
-            _updateState.value = DataState.Success(0L)
         }
         repositoryScope.launch(exceptionHandler) {
             remoteSource.getFileStream(remoteSource.radioApi)?.let { stream ->
                 localSource.insertRadios(dataParser.parseJSONStream(stream))
+                _updateState.value = DataState.Success(0L)
             }
         }
     }
@@ -106,8 +106,8 @@ class DataRepository(
     override fun clearAllData() {
         repositoryScope.launch {
             _updateState.value = DataState.Loading
-            localSource.clearAllData()
             delay(updateStateDelay)
+            localSource.clearAllData()
             _updateState.value = DataState.Success(0L)
         }
     }
