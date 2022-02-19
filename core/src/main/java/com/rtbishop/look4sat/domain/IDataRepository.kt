@@ -21,6 +21,7 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.Satellite
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface IDataRepository {
@@ -28,6 +29,10 @@ interface IDataRepository {
     val updateState: StateFlow<DataState<Long>>
 
     fun setUpdateStateHandled()
+
+    fun getEntriesNumber(): Flow<Int>
+
+    fun getRadiosNumber(): Flow<Int>
 
     suspend fun getEntriesWithModes(): List<SatItem>
 

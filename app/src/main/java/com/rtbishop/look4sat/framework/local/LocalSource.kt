@@ -41,6 +41,10 @@ class LocalSource(
     private val ioDispatcher: CoroutineDispatcher
 ) : ILocalSource {
 
+    override fun getEntriesNumber() = entriesDao.getEntriesNumber()
+
+    override fun getRadiosNumber() = radiosDao.getRadiosNumber()
+
     override suspend fun getEntriesWithModes(): List<SatItem> {
         val selectedCatnums = getEntriesSelection()
         val entriesWithModes = entriesDao.getEntriesWithModes().toDomainItems()

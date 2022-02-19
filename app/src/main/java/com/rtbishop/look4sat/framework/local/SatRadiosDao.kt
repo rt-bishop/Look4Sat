@@ -22,9 +22,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.rtbishop.look4sat.framework.model.SatRadio
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SatRadiosDao {
+
+    @Query("SELECT COUNT(*) FROM radios")
+    fun getRadiosNumber(): Flow<Int>
 
     @Query("SELECT * FROM radios WHERE catnum = :catnum AND isAlive = 1")
     suspend fun getRadios(catnum: Int): List<SatRadio>

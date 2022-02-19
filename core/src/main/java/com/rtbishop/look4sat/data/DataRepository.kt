@@ -45,6 +45,10 @@ class DataRepository(
         _updateState.value = DataState.Handled
     }
 
+    override fun getEntriesNumber() = localSource.getEntriesNumber()
+
+    override fun getRadiosNumber() = localSource.getRadiosNumber()
+
     override suspend fun getEntriesWithModes() = localSource.getEntriesWithModes()
 
     override suspend fun getSelectedEntries() = localSource.getSelectedEntries()

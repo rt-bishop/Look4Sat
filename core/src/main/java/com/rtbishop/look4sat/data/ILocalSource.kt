@@ -21,9 +21,14 @@ import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.Satellite
+import kotlinx.coroutines.flow.Flow
 import java.io.InputStream
 
 interface ILocalSource {
+
+    fun getEntriesNumber(): Flow<Int>
+
+    fun getRadiosNumber(): Flow<Int>
 
     suspend fun getEntriesWithModes(): List<SatItem>
 
