@@ -11,7 +11,9 @@
             android:id="@+id/about_img"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/ic_sputnik"
             app:layout_constraintBottom_toBottomOf="@+id/about_version"
             app:layout_constraintDimensionRatio="h,1:1"
@@ -26,22 +28,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
             android:includeFontPadding="false"
             android:text="@string/app_name"
             android:textColor="@color/themeAccent"
             android:textSize="@dimen/text_size_app_title"
+            app:layout_constraintBottom_toTopOf="@+id/about_version"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/about_img"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/about_version"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="@string/about_version"
             android:textColor="@color/themeLight"
             android:textSize="@dimen/text_size_large"
+            app:layout_constraintBottom_toTopOf="@+id/about_subtitle"
+            app:layout_constraintEnd_toEndOf="@+id/about_title"
             app:layout_constraintStart_toStartOf="@+id/about_title"
             app:layout_constraintTop_toBottomOf="@+id/about_title" />
 
@@ -49,50 +57,16 @@
             android:id="@+id/about_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
             android:text="@string/about_subtitle"
             android:textColor="@color/themeLight"
             android:textSize="@dimen/text_size_large"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/about_version" />
-
-        <Button
-            android:id="@+id/about_btn_github"
-            style="@style/NormalButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:text="@string/about_github"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/about_btn_donate"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/about_subtitle" />
-
-        <Button
-            android:id="@+id/about_btn_donate"
-            style="@style/NormalButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/about_support"
-            app:icon="@drawable/ic_support"
-            app:layout_constraintBaseline_toBaselineOf="@+id/about_btn_github"
-            app:layout_constraintEnd_toStartOf="@+id/about_btn_fdroid"
-            app:layout_constraintStart_toEndOf="@+id/about_btn_github" />
-
-        <Button
-            android:id="@+id/about_btn_fdroid"
-            style="@style/NormalButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:text="@string/about_fdroid"
-            app:layout_constraintBaseline_toBaselineOf="@+id/about_btn_github"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/about_btn_donate" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

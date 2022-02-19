@@ -22,7 +22,7 @@
     <dimen name="text_size_small">15sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
     <dimen name="text_size_mediumLarge">18sp</dimen>
-    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_large">21sp</dimen>
     <dimen name="text_size_frequency">24sp</dimen>
     <dimen name="text_size_app_timer">42sp</dimen>
     <dimen name="text_size_app_title">48sp</dimen>

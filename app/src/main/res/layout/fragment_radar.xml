@@ -16,6 +16,7 @@
             android:id="@+id/radar_back"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
+            android:contentDescription="@string/btn_back"
             android:src="@drawable/ic_back" />
 
         <TextView
@@ -26,6 +27,7 @@
             android:id="@+id/radar_map"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
+            android:contentDescription="@string/btn_map"
             android:src="@drawable/ic_map" />
 
     </androidx.cardview.widget.CardView>
@@ -144,7 +146,7 @@
         style="@style/NormalButton"
         android:layout_width="0dp"
         android:layout_marginStart="@dimen/button_margin_side"
-        android:text="Notify"
+        android:text="@string/btn_notify"
         app:layout_constraintBottom_toBottomOf="@+id/radar_coordinator"
         app:layout_constraintEnd_toStartOf="@+id/radar_data_name"
         app:layout_constraintHorizontal_bias="0.5"
@@ -173,7 +175,7 @@
         style="@style/NormalButton"
         android:layout_width="0dp"
         android:layout_marginEnd="@dimen/button_margin_side"
-        android:text="Settings"
+        android:text="@string/btn_settings"
         app:layout_constraintBaseline_toBaselineOf="@+id/radar_prev_btn"
         app:layout_constraintEnd_toEndOf="@+id/radar_coordinator"
         app:layout_constraintStart_toEndOf="@+id/radar_data_name" />

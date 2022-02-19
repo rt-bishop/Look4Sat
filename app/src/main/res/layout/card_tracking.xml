@@ -10,11 +10,13 @@
         <TextView
             android:id="@+id/tracking_title"
             style="@style/SettingsTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="12dp"
             android:text="@string/tracking_title"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,26 +25,24 @@
             style="@style/SettingsText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:minHeight="48dp"
+            android:minHeight="42dp"
             android:text="@string/tracking_switch"
-            app:trackTint="@color/themeDisabled"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/tracking_title"
             app:layout_constraintStart_toStartOf="@+id/tracking_title"
-            app:layout_constraintTop_toBottomOf="@+id/tracking_title" />
+            app:layout_constraintTop_toBottomOf="@+id/tracking_title"
+            app:trackTint="@color/themeDisabled" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tracking_ip"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="6dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tracking_port"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tracking_switch"
             app:layout_constraintTop_toBottomOf="@+id/tracking_switch"
             app:layout_constraintWidth_percent="0.69">
 
@@ -58,9 +58,8 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/tracking_ip"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/tracking_switch"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/tracking_ip"
             app:layout_constraintTop_toTopOf="@+id/tracking_ip">

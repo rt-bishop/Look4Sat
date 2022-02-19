@@ -16,6 +16,7 @@
             android:id="@+id/map_back_btn"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
+            android:contentDescription="@string/btn_back"
             android:src="@drawable/ic_back" />
 
         <TextView
@@ -164,7 +165,7 @@
         style="@style/NormalButton"
         android:layout_width="@dimen/button_width_med"
         android:layout_marginStart="@dimen/button_margin_side"
-        android:text="Prev"
+        android:text="@string/btn_prev"
         app:icon="@drawable/ic_prev"
         app:layout_constraintBottom_toBottomOf="@+id/map_coordinator"
         app:layout_constraintStart_toStartOf="@+id/map_coordinator"
@@ -190,7 +191,7 @@
         style="@style/NormalButton"
         android:layout_width="@dimen/button_width_med"
         android:layout_marginEnd="@dimen/button_margin_side"
-        android:text="Next"
+        android:text="@string/btn_next"
         app:icon="@drawable/ic_next"
         app:iconGravity="end"
         app:layout_constraintBaseline_toBaselineOf="@+id/map_prev_btn"

@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="btn_add">Добавить</string>
+    <string name="btn_accept">Принять</string>
+    <string name="btn_cancel">Отмена</string>
+    <string name="btn_back">Назад</string>
+    <string name="btn_modes">Режимы</string>
+    <string name="btn_select">Выбрать</string>
+    <string name="btn_done">Готово</string>
+    <string name="btn_clear">Очистка</string>
+    <string name="btn_refresh">Обновить</string>
+    <string name="btn_map">Карта</string>
+    <string name="btn_filter">Фильтр</string>
+    <string name="btn_satellites">Спутники</string>
+    <string name="btn_settings">Настройки</string>
+    <string name="btn_prev">Пред</string>
+    <string name="btn_next">След</string>
+    <string name="btn_notify">Уведомить</string>
+    <string name="btn_gps">GPS</string>
+    <string name="btn_manual">Ввести</string>
+    <string name="btn_qth">QTH</string>
+    <string name="btn_web">Онлайн</string>
+    <string name="btn_file">Файл</string>
+    <string name="btn_github">GitHub</string>
+    <string name="btn_support">Поддержать</string>
+    <string name="btn_fdroid">F-Droid</string>
+
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="btn_accept">Принять</string>
-    <string name="btn_add">Добавить</string>
-    <string name="btn_cancel">Отмена</string>
 
     <string name="menu_satellites">Спутники</string>
     <string name="menu_passes">Пролеты</string>
@@ -82,7 +104,7 @@
     <string name="about_subtitle">Трекер спутников для Android</string>
     <string name="about_support">Поддержать</string>
 
-    <string name="location_title">Местоположение наземной станции</string>
+    <string name="location_title">Местоположение</string>
     <string name="location_lat">Широта: %.4f°</string>
     <string name="location_lon">Долгота: %.4f°</string>
     <string name="location_gps">Данные GPS</string>
@@ -104,7 +126,7 @@
     <string name="tracking_port_hint">Порт</string>
     <string name="tracking_port_invalid">Введите порт в диапазоне от 1024 до 65535</string>
 
-    <string name="update_title">Обновление данных спутников</string>
+    <string name="update_title">Обновление данных</string>
     <string name="update_web">Вэб</string>
     <string name="update_file">Файл</string>
     <string name="update_clear">Удалить</string>

@@ -13,6 +13,7 @@
             style="@style/ToolbarButton"
             android:rotation="45"
             android:layout_gravity="start|center_vertical"
+            android:contentDescription="@string/btn_refresh"
             android:src="@drawable/ic_refresh" />
 
         <TextView
@@ -23,6 +24,7 @@
             android:id="@+id/passes_map_btn"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
+            android:contentDescription="@string/btn_map"
             android:src="@drawable/ic_map" />
 
     </androidx.cardview.widget.CardView>
@@ -68,7 +70,7 @@
             android:layout_width="@dimen/button_width_max"
             android:layout_marginStart="@dimen/button_margin_side"
             android:layout_gravity="start|center_vertical"
-            android:text="Filter" />
+            android:text="@string/btn_filter" />
 
         <Button
             android:id="@+id/passes_settings_btn"
@@ -76,7 +78,7 @@
             android:layout_width="@dimen/button_width_max"
             android:layout_marginEnd="@dimen/button_margin_side"
             android:layout_gravity="end|center_vertical"
-            android:text="Настройки" />
+            android:text="@string/btn_settings" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
@@ -84,6 +86,7 @@
         android:id="@+id/passes_fab"
         style="@style/FloatingActionButton"
         android:src="@drawable/ic_sputnik"
+        android:contentDescription="@string/btn_satellites"
         app:layout_anchor="@id/passes_bottomBar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

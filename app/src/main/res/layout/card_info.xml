@@ -10,11 +10,14 @@
         <TextView
             android:id="@+id/warranty_title"
             style="@style/SettingsTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="12dp"
             android:text="@string/warranty_title"
+            app:layout_constraintBottom_toTopOf="@+id/warranty_thanks"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,9 +27,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
             android:text="@string/warranty_thanks"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/warranty_license"
+            app:layout_constraintEnd_toEndOf="@+id/warranty_title"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/warranty_title"
             app:layout_constraintTop_toBottomOf="@+id/warranty_title" />
 
@@ -36,11 +40,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="10dp"
             android:text="@string/warranty_license"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/warranty_thanks"
-            app:layout_constraintStart_toStartOf="@+id/warranty_thanks"
+            app:layout_constraintEnd_toEndOf="@+id/warranty_title"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/warranty_title"
             app:layout_constraintTop_toBottomOf="@+id/warranty_thanks" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

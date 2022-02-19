@@ -12,6 +12,7 @@
             android:id="@+id/settings_back"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
+            android:contentDescription="@string/btn_back"
             android:src="@drawable/ic_back" />
 
         <TextView
@@ -43,7 +44,7 @@
 
                 <include
                     android:id="@+id/settings_info"
-                    layout="@layout/card_prefs_about"
+                    layout="@layout/card_about"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +53,7 @@
 
                 <include
                     android:id="@+id/settings_location"
-                    layout="@layout/card_prefs_location"
+                    layout="@layout/card_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/view_default_margin"
@@ -62,7 +63,7 @@
 
                 <include
                     android:id="@+id/settings_data"
-                    layout="@layout/card_prefs_update"
+                    layout="@layout/card_data"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/view_default_margin"
@@ -72,7 +73,7 @@
 
                 <include
                     android:id="@+id/settings_tracking"
-                    layout="@layout/card_prefs_tracking"
+                    layout="@layout/card_tracking"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/view_default_margin"
@@ -82,7 +83,7 @@
 
                 <include
                     android:id="@+id/settings_other"
-                    layout="@layout/card_prefs_other"
+                    layout="@layout/card_other"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/view_default_margin"
@@ -92,7 +93,7 @@
 
                 <include
                     android:id="@+id/settings_warranty"
-                    layout="@layout/card_prefs_warranty"
+                    layout="@layout/card_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/view_default_margin"
@@ -117,7 +118,7 @@
             android:layout_width="@dimen/button_width_max"
             android:layout_marginStart="@dimen/button_margin_side"
             android:layout_gravity="start|center_vertical"
-            android:text="@string/about_github" />
+            android:text="@string/btn_github" />
 
         <Button
             android:id="@+id/settings_next_btn"
@@ -125,7 +126,7 @@
             android:layout_width="@dimen/button_width_max"
             android:layout_marginEnd="@dimen/button_margin_side"
             android:layout_gravity="end|center_vertical"
-            android:text="@string/about_fdroid" />
+            android:text="@string/btn_fdroid" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
@@ -133,6 +134,7 @@
         android:id="@+id/settings_fab"
         style="@style/FloatingActionButton"
         android:src="@drawable/ic_support"
+        android:contentDescription="@string/btn_support"
         app:layout_anchor="@id/settings_bottom_bar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

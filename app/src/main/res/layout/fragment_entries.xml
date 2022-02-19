@@ -12,11 +12,13 @@
             android:id="@+id/entries_back_btn"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
+            android:contentDescription="@string/btn_back"
             android:src="@drawable/ic_back" />
 
         <EditText
             android:id="@+id/entries_search"
             style="@style/ToolbarTitle"
+            android:inputType="text"
             android:layout_marginStart="52dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="52dp"
@@ -28,6 +30,7 @@
             android:id="@+id/entries_modes_btn"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
+            android:contentDescription="@string/btn_modes"
             android:src="@drawable/ic_satellite" />
 
     </androidx.cardview.widget.CardView>
@@ -63,7 +66,7 @@
             android:layout_width="@dimen/button_width_max"
             android:layout_marginStart="@dimen/button_margin_side"
             android:layout_gravity="start|center_vertical"
-            android:text="Select" />
+            android:text="@string/btn_select" />
 
         <Button
             android:id="@+id/entries_clear_btn"
@@ -71,7 +74,7 @@
             android:layout_width="@dimen/button_width_max"
             android:layout_marginEnd="@dimen/button_margin_side"
             android:layout_gravity="end|center_vertical"
-            android:text="Clear" />
+            android:text="@string/btn_clear" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
@@ -79,6 +82,7 @@
         android:id="@+id/entries_fab"
         style="@style/FloatingActionButton"
         android:src="@drawable/ic_done"
+        android:contentDescription="@string/btn_done"
         app:layout_anchor="@id/entries_bottom_bar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

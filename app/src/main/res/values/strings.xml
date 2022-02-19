@@ -2,11 +2,33 @@
 <resources>
     <string name="app_name" translatable="false">Look4Sat</string>
 
+    <string name="btn_add">Add</string>
+    <string name="btn_accept">Accept</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_modes">Modes</string>
+    <string name="btn_select">Select</string>
+    <string name="btn_done">Done</string>
+    <string name="btn_clear">Clear</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="btn_map">Map</string>
+    <string name="btn_filter">Filter</string>
+    <string name="btn_satellites">Satellites</string>
+    <string name="btn_settings">Settings</string>
+    <string name="btn_prev">Prev</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_notify">Notify</string>
+    <string name="btn_gps">GPS</string>
+    <string name="btn_manual">Manual</string>
+    <string name="btn_qth">QTH</string>
+    <string name="btn_web">Online</string>
+    <string name="btn_file">File</string>
+    <string name="btn_github">GitHub</string>
+    <string name="btn_support">Support</string>
+    <string name="btn_fdroid">F-Droid</string>
+
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="btn_accept">Accept</string>
-    <string name="btn_add">Add</string>
-    <string name="btn_cancel">Cancel</string>
 
     <string name="menu_satellites">Satellites</string>
     <string name="menu_passes">Passes</string>
@@ -102,7 +124,7 @@
     <string name="about_support">Support</string>
     <string name="about_fdroid" translatable="false">F-Droid</string>
 
-    <string name="location_title">Station position update</string>
+    <string name="location_title">Station position</string>
     <string name="location_lat">Latitude: %.4f°</string>
     <string name="location_lon">Longitude: %.4f°</string>
     <string name="location_gps">From GPS</string>

@@ -63,7 +63,6 @@
         <item name="android:background">@color/transparent</item>
         <item name="android:gravity">center</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:inputType">text</item>
         <item name="android:textColor">@color/themeAccent</item>
         <item name="android:textColorHint">@color/themeAccent</item>
         <item name="android:textSize">@dimen/text_size_large</item>

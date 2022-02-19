@@ -95,15 +95,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun setupAboutCard() {
         binding.settingsInfo.aboutVersion.text =
             String.format(getString(R.string.about_version), BuildConfig.VERSION_NAME)
-        binding.settingsInfo.aboutBtnGithub.setOnClickListener {
-            gotoUrl("https://github.com/rt-bishop/Look4Sat/")
-        }
-        binding.settingsInfo.aboutBtnDonate.setOnClickListener {
-            gotoUrl("https://www.buymeacoffee.com/rtbishop")
-        }
-        binding.settingsInfo.aboutBtnFdroid.setOnClickListener {
-            gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
-        }
+//        binding.settingsInfo.aboutBtnGithub.setOnClickListener {
+//            gotoUrl("https://github.com/rt-bishop/Look4Sat/")
+//        }
+//        binding.settingsInfo.aboutBtnDonate.setOnClickListener {
+//            gotoUrl("https://www.buymeacoffee.com/rtbishop")
+//        }
+//        binding.settingsInfo.aboutBtnFdroid.setOnClickListener {
+//            gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
+//        }
     }
 
     private fun setupLocationCard() {
@@ -128,12 +128,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupDataCard() {
-        binding.settingsData.updateBtnFile.setOnClickListener { contentRequest.launch("*/*") }
-        binding.settingsData.updateBtnWeb.setOnClickListener {
+        binding.settingsData.dataBtnFile.setOnClickListener { contentRequest.launch("*/*") }
+        binding.settingsData.dataBtnWeb.setOnClickListener {
             val action = SettingsFragmentDirections.actionPrefsToSources()
             findNavController().navigate(action)
         }
-        binding.settingsData.updateBtnClear.setOnClickListener { viewModel.clearData() }
+        binding.settingsData.dataBtnClear.setOnClickListener { viewModel.clearData() }
         getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
             viewModel.updateDataFromWeb(sources)
         }
@@ -210,17 +210,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun handleSatState(state: DataState<Long>) {
         when (state) {
             is DataState.Success -> {
-                binding.settingsData.updateProgress.isIndeterminate = false
+                binding.settingsData.dataProgress.isIndeterminate = false
                 viewModel.setUpdateHandled()
                 showToast("Data updated successfully")
             }
             is DataState.Error -> {
-                binding.settingsData.updateProgress.isIndeterminate = false
+                binding.settingsData.dataProgress.isIndeterminate = false
                 viewModel.setUpdateHandled()
                 showToast(state.message.toString())
             }
             is DataState.Loading -> {
-                binding.settingsData.updateProgress.isIndeterminate = true
+                binding.settingsData.dataProgress.isIndeterminate = true
             }
             is DataState.Handled -> {}
         }
