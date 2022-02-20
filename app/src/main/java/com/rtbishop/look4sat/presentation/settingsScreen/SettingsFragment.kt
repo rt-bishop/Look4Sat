@@ -34,11 +34,11 @@ import androidx.navigation.fragment.findNavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
+import com.rtbishop.look4sat.domain.isValidIPv4
+import com.rtbishop.look4sat.domain.isValidPort
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.getNavResult
-import com.rtbishop.look4sat.presentation.isValidIPv4
-import com.rtbishop.look4sat.presentation.isValidPort
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -94,28 +94,28 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private fun setupAboutCard() {
         binding.settingsInfo.aboutVersion.text =
-            String.format(getString(R.string.about_version), BuildConfig.VERSION_NAME)
-//        binding.settingsInfo.aboutBtnGithub.setOnClickListener {
-//            gotoUrl("https://github.com/rt-bishop/Look4Sat/")
-//        }
-//        binding.settingsInfo.aboutBtnDonate.setOnClickListener {
-//            gotoUrl("https://www.buymeacoffee.com/rtbishop")
-//        }
-//        binding.settingsInfo.aboutBtnFdroid.setOnClickListener {
-//            gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
-//        }
+            String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
+        binding.settingsGithubBtn.setOnClickListener {
+            gotoUrl("https://github.com/rt-bishop/Look4Sat/")
+        }
+        binding.settingsFab.setOnClickListener {
+            gotoUrl("https://www.buymeacoffee.com/rtbishop")
+        }
+        binding.settingsFdroidBtn.setOnClickListener {
+            gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
+        }
     }
 
     private fun setupLocationCard() {
         setPositionText(viewModel.getStationPosition())
-        binding.settingsLocation.locationBtnGps.setOnClickListener {
+        binding.settingsLocation.positionBtnGps.setOnClickListener {
             locationRequest.launch(arrayOf(locationFine, locationCoarse))
         }
-        binding.settingsLocation.locationBtnManual.setOnClickListener {
+        binding.settingsLocation.positionBtnManual.setOnClickListener {
             val action = SettingsFragmentDirections.actionPrefsToLocation()
             findNavController().navigate(action)
         }
-        binding.settingsLocation.locationBtnQth.setOnClickListener {
+        binding.settingsLocation.positionBtnQth.setOnClickListener {
             val action = SettingsFragmentDirections.actionPrefsToLocator()
             findNavController().navigate(action)
         }
@@ -136,11 +136,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.settingsData.dataBtnClear.setOnClickListener { viewModel.clearData() }
         viewModel.entries.observe(viewLifecycleOwner) { number ->
             val entriesFormat = getString(R.string.fmt_entries)
-            binding.settingsData.dataSatellites.text = String.format(entriesFormat, number)
+            binding.settingsData.dataEntries.text = String.format(entriesFormat, number)
         }
         viewModel.radios.observe(viewLifecycleOwner) { number ->
             val radiosFormat = getString(R.string.fmt_radios)
-            binding.settingsData.dataTransmitters.text = String.format(radiosFormat, number)
+            binding.settingsData.dataRadios.text = String.format(radiosFormat, number)
         }
         getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
             viewModel.updateDataFromWeb(sources)
@@ -148,22 +148,22 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupTrackingCard() {
-        binding.settingsTracking.trackingSwitch.apply {
+        binding.settingsTracking.remoteSwitch.apply {
             isChecked = viewModel.getRotatorEnabled()
-            binding.settingsTracking.trackingIp.isEnabled = isChecked
-            binding.settingsTracking.trackingIpEdit.setText(viewModel.getRotatorServer())
-            binding.settingsTracking.trackingPort.isEnabled = isChecked
-            binding.settingsTracking.trackingPortEdit.setText(viewModel.getRotatorPort())
+            binding.settingsTracking.remoteIp.isEnabled = isChecked
+            binding.settingsTracking.remoteIpEdit.setText(viewModel.getRotatorServer())
+            binding.settingsTracking.remotePort.isEnabled = isChecked
+            binding.settingsTracking.remotePortEdit.setText(viewModel.getRotatorPort())
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setRotatorEnabled(isChecked)
-                binding.settingsTracking.trackingIp.isEnabled = isChecked
-                binding.settingsTracking.trackingPort.isEnabled = isChecked
+                binding.settingsTracking.remoteIp.isEnabled = isChecked
+                binding.settingsTracking.remotePort.isEnabled = isChecked
             }
         }
-        binding.settingsTracking.trackingIpEdit.doOnTextChanged { text, _, _, _ ->
+        binding.settingsTracking.remoteIpEdit.doOnTextChanged { text, _, _, _ ->
             if (text.toString().isValidIPv4()) viewModel.setRotatorServer(text.toString())
         }
-        binding.settingsTracking.trackingPortEdit.doOnTextChanged { text, _, _, _ ->
+        binding.settingsTracking.remotePortEdit.doOnTextChanged { text, _, _, _ ->
             if (text.toString().isValidPort()) viewModel.setRotatorPort(text.toString())
         }
     }
@@ -184,32 +184,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupWarrantyCard() {
-        binding.settingsWarranty.warrantyThanks.movementMethod = LinkMovementMethod.getInstance()
-        binding.settingsWarranty.warrantyLicense.movementMethod = LinkMovementMethod.getInstance()
+        binding.settingsWarranty.outroThanks.movementMethod = LinkMovementMethod.getInstance()
+        binding.settingsWarranty.outroLicense.movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun setPositionText(geoPos: GeoPos) {
         val latFormat = getString(R.string.location_lat)
         val lonFormat = getString(R.string.location_lon)
-        binding.settingsLocation.locationLat.text = String.format(latFormat, geoPos.latitude)
-        binding.settingsLocation.locationLon.text = String.format(lonFormat, geoPos.longitude)
+        binding.settingsLocation.positionLat.text = String.format(latFormat, geoPos.latitude)
+        binding.settingsLocation.positionLon.text = String.format(lonFormat, geoPos.longitude)
     }
 
     private fun handleStationPosition(pos: DataState<GeoPos>) {
         when (pos) {
             is DataState.Success -> {
                 setPositionText(pos.data)
-                binding.settingsLocation.locationProgress.isIndeterminate = false
+                binding.settingsLocation.positionProgress.isIndeterminate = false
                 viewModel.setPositionHandled()
                 showToast(getString(R.string.pref_pos_success))
             }
             is DataState.Error -> {
-                binding.settingsLocation.locationProgress.isIndeterminate = false
+                binding.settingsLocation.positionProgress.isIndeterminate = false
                 viewModel.setPositionHandled()
                 showToast(pos.message.toString())
             }
             DataState.Loading -> {
-                binding.settingsLocation.locationProgress.isIndeterminate = true
+                binding.settingsLocation.positionProgress.isIndeterminate = true
             }
             DataState.Handled -> {}
         }

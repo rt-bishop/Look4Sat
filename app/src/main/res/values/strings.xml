@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Look4Sat</string>
+    <string name="app_name">Look4Sat</string>
+    <string name="app_version">Version: %s</string>
+    <string name="app_subtitle">Satellite tracker and pass predictor</string>
 
     <string name="btn_add">Add</string>
     <string name="btn_accept">Accept</string>
@@ -30,28 +32,20 @@
     <string name="fmt_entries">Satellites: %s</string>
     <string name="fmt_radios">Transceivers: %s</string>
 
+    <string name="downlink">Downlink</string>
+    <string name="uplink">Uplink</string>
+
     <string name="yes">Yes</string>
     <string name="no">No</string>
-
-    <string name="menu_satellites">Satellites</string>
-    <string name="menu_passes">Passes</string>
-    <string name="menu_radar">Radar</string>
-    <string name="menu_map">World Map</string>
-    <string name="menu_settings">Settings</string>
 
     <string name="sources_title">Manage data sources</string>
     <string name="sources_hint">HTTPS Source</string>
 
-    <string name="entries_title">Satellites</string>
-    <string name="entries_update">TLE data update:</string>
+    <string name="entries_modes">Select modulation type</string>
     <string name="entries_search_hint">Search by Name / Id</string>
-    <string name="entries_select_all">Select All/None</string>
     <string name="entries_update_error">Error importing satellite data</string>
 
-    <string name="modes_title">Choose transceiver mode</string>
-
     <string name="timer_zero" translatable="false">00:00:00</string>
-    <string name="timer_placeholder" translatable="false">-</string>
 
     <string name="passes_error">No upcoming passes</string>
 
@@ -115,17 +109,9 @@
     <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
     <string name="pref_hours_ahead_input_error">Set the value between 1h and 168h</string>
     <string name="pref_min_el_key" translatable="false">minEl</string>
-    <string name="pref_min_el_hint">Minimum elevation</string>
+    <string name="pref_min_el_hint">Minimal elevation</string>
     <string name="pref_min_el_summary">Show passes with max elevation above</string>
     <string name="pref_min_el_input_error">Set the value between 0° and 90°</string>
-
-    <string name="settings_title">Settings</string>
-
-    <string name="about_version">Version: %s</string>
-    <string name="about_subtitle">Satellite tracker and pass predictor</string>
-    <string name="about_github" translatable="false">GitHub</string>
-    <string name="about_support">Support</string>
-    <string name="about_fdroid" translatable="false">F-Droid</string>
 
     <string name="location_title">Station position</string>
     <string name="location_lat">Latitude: %.4f°</string>
@@ -150,24 +136,21 @@
     <string name="tracking_port_invalid">Please enter a port between 1024 to 65535</string>
 
     <string name="update_title">Satellite data update</string>
-    <string name="update_web">Web</string>
-    <string name="update_file">File</string>
-    <string name="update_clear">Clear</string>
     <string name="update_error">Update completed with errors</string>
 
-    <string name="warranty_title">I would like to say thanks to:</string>
-    <string name="warranty_thanks"> • You for downloading and using Look4Sat! \nMay your sky always be clear!
+    <string name="outro_title">I would like to say thanks to:</string>
+    <string name="outro_thanks"> • You for downloading and using Look4Sat! \nMay your sky always be clear!
         \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
-        under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
+        under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
         \n • <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
-        satellite tracker that inspired the creation of Look4Sat
+        satellite tracker that inspired the creation of Look4Sat.
         \n • <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
-        <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data
+        <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
         \n • <a href="https://libre.space/">Libre Space Foundation</a> for their
-        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data
+        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data.
     </string>
-    <string name="warranty_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy.</a>
+    <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy.</a>
         The app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.
     </string>
 </resources>

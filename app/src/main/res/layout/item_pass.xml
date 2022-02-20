@@ -17,7 +17,7 @@
             android:layout_marginTop="4dp"
             android:text="@string/pass_satName"
             android:textSize="@dimen/text_size_small"
-            android:textColor="@color/themeAccent"
+            android:textColor="@color/accent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,7 +28,7 @@
             android:layout_marginEnd="6dp"
             android:text="@string/pass_satId"
             android:textSize="@dimen/text_size_small"
-            android:textColor="@color/themeAccent"
+            android:textColor="@color/accent"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_name"
             app:layout_constraintEnd_toEndOf="parent" />
 

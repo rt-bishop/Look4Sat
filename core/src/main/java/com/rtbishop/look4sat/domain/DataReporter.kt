@@ -25,27 +25,28 @@ import java.nio.channels.SocketChannel
 class DataReporter(reporterDispatcher: CoroutineDispatcher) {
 
     private val reporterScope = CoroutineScope(reporterDispatcher)
-    private var frequencySocketChannel: SocketChannel? = null
     private var rotationSocketChannel: SocketChannel? = null
-    private var frequencyReporting: Job? = null
     private var rotationReporting: Job? = null
 
-    fun reportFrequency(server: String, port: Int, frequency: Long) {
-        frequencyReporting = reporterScope.launch {
-            runCatching {
-                if (frequencySocketChannel == null) {
-                    frequencySocketChannel = SocketChannel.open(InetSocketAddress(server, port))
-                } else {
-                    val buffer = ByteBuffer.wrap("\\set_freq $frequency\n".toByteArray())
-                    frequencySocketChannel?.write(buffer)
-                }
-            }.onFailure { error ->
-                println(error.localizedMessage)
-                frequencySocketChannel = null
-                frequencyReporting?.cancelAndJoin()
-            }
-        }
-    }
+//    private var frequencySocketChannel: SocketChannel? = null
+//    private var frequencyReporting: Job? = null
+//
+//    fun reportFrequency(server: String, port: Int, frequency: Long) {
+//        frequencyReporting = reporterScope.launch {
+//            runCatching {
+//                if (frequencySocketChannel == null) {
+//                    frequencySocketChannel = SocketChannel.open(InetSocketAddress(server, port))
+//                } else {
+//                    val buffer = ByteBuffer.wrap("\\set_freq $frequency\n".toByteArray())
+//                    frequencySocketChannel?.write(buffer)
+//                }
+//            }.onFailure { error ->
+//                println(error.localizedMessage)
+//                frequencySocketChannel = null
+//                frequencyReporting?.cancelAndJoin()
+//            }
+//        }
+//    }
 
     fun reportRotation(server: String, port: Int, azimuth: Double, elevation: Double) {
         rotationReporting = reporterScope.launch {

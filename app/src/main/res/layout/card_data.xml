@@ -31,48 +31,50 @@
             app:layout_constraintTop_toTopOf="@+id/data_title" />
 
         <TextView
-            android:id="@+id/data_satellites"
+            android:id="@+id/data_entries"
             style="@style/SettingsText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="@string/location_lat"
-            app:layout_constraintEnd_toStartOf="@+id/data_transmitters"
+            android:text="@string/fmt_entries"
+            app:layout_constraintEnd_toStartOf="@+id/data_radios"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="@+id/data_title"
             app:layout_constraintTop_toBottomOf="@+id/data_title" />
 
         <TextView
-            android:id="@+id/data_transmitters"
+            android:id="@+id/data_radios"
             style="@style/SettingsText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/location_lon"
-            app:layout_constraintBaseline_toBaselineOf="@+id/data_satellites"
+            android:text="@string/fmt_radios"
+            app:layout_constraintBaseline_toBaselineOf="@+id/data_entries"
             app:layout_constraintEnd_toEndOf="@+id/data_progress"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/data_satellites" />
+            app:layout_constraintStart_toEndOf="@+id/data_entries" />
 
         <Button
             android:id="@+id/data_btn_web"
             style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="6dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="6dp"
             android:text="@string/btn_web"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/data_btn_file"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/data_satellites" />
+            app:layout_constraintTop_toBottomOf="@+id/data_entries" />
 
         <Button
             android:id="@+id/data_btn_file"
             style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
             android:text="@string/btn_file"
             app:layout_constraintBaseline_toBaselineOf="@+id/data_btn_web"
             app:layout_constraintEnd_toStartOf="@+id/data_btn_clear"
@@ -83,7 +85,7 @@
             style="@style/NormalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="6dp"
             android:text="@string/btn_clear"
             app:layout_constraintBaseline_toBaselineOf="@+id/data_btn_web"
             app:layout_constraintEnd_toEndOf="parent"

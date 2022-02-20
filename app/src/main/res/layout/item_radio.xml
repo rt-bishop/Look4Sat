@@ -40,6 +40,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/radio_info"
+            android:contentDescription="@string/downlink"
             app:srcCompat="@drawable/ic_next" />
 
         <TextView
@@ -58,6 +59,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/radio_info"
+            android:contentDescription="@string/uplink"
             app:srcCompat="@drawable/ic_next" />
 
         <TextView

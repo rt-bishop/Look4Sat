@@ -31,7 +31,7 @@ import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.presentation.toTimerString
+import com.rtbishop.look4sat.domain.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

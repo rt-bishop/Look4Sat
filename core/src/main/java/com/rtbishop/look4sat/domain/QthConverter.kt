@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.domain
 
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import kotlin.math.round
 
 object QthConverter {
 
@@ -58,11 +57,5 @@ object QthConverter {
 
     fun isValidLocator(locator: String): Boolean {
         return locator.matches("[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex())
-    }
-
-    fun Double.round(decimals: Int): Double {
-        var multiplier = 1.0
-        repeat(decimals) { multiplier *= 10 }
-        return round(this * multiplier) / multiplier
     }
 }

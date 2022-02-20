@@ -59,7 +59,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/map_copyright"
-        android:textColor="@color/themeDisabled"
+        android:textColor="@color/textDisabled"
         android:textSize="@dimen/text_size_copyright"
         app:layout_constraintEnd_toEndOf="@+id/map_card"
         app:layout_constraintStart_toStartOf="@+id/map_card"

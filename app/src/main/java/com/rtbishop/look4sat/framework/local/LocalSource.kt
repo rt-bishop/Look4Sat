@@ -65,6 +65,7 @@ class LocalSource(
         return radiosDao.getRadios(catnum).toDomainRadios()
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun getFileStream(uri: String): InputStream? {
         return withContext(ioDispatcher) { resolver.openInputStream(Uri.parse(uri)) }
     }

@@ -10,7 +10,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/location_title"
+            android:id="@+id/position_title"
             style="@style/DialogTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -34,9 +34,9 @@
             android:minHeight="48dp"
             app:endIconMode="clear_text"
             app:layout_constraintBottom_toTopOf="@+id/location_lon_layout"
-            app:layout_constraintEnd_toEndOf="@+id/location_title"
-            app:layout_constraintStart_toStartOf="@+id/location_title"
-            app:layout_constraintTop_toBottomOf="@+id/location_title">
+            app:layout_constraintEnd_toEndOf="@+id/position_title"
+            app:layout_constraintStart_toStartOf="@+id/position_title"
+            app:layout_constraintTop_toBottomOf="@+id/position_title">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/location_lat_edit"
@@ -74,9 +74,9 @@
             style="@style/NormalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="6dp"
             android:text="@string/btn_cancel"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/location_pos_btn"
@@ -90,7 +90,7 @@
             style="@style/NormalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="6dp"
             android:text="@string/btn_accept"
             app:layout_constraintBaseline_toBaselineOf="@+id/location_neg_btn"
             app:layout_constraintEnd_toEndOf="parent"

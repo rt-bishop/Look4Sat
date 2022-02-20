@@ -7,11 +7,11 @@
         android:layout_width="match_parent"
         android:layout_height="41dp"
         android:layout_marginStart="8dp"
-        android:background="@color/surfaceCard"
+        android:background="@color/cardRegular"
         android:ellipsize="end"
         android:lines="1"
         android:padding="6dp"
-        android:textColor="@color/themeLight"
+        android:textColor="@color/textMain"
         android:textSize="@dimen/text_size_medium" />
 
 </androidx.cardview.widget.CardView>

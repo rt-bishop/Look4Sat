@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="themeAccent">#FFE082</color>
-    <color name="themeLight">#D6FFFFFF</color>
-    <color name="themeGrey">#99FFFFFF</color>
-    <color name="themeDisabled">#5CFFFFFF</color>
-    <color name="themeDark">#121212</color>
-    <color name="surfaceIcon">#404040</color>
-    <color name="surfaceTop">#383838</color>
-    <color name="surfaceChip">#303030</color>
-    <color name="surfaceButton">#242424</color>
-    <color name="surfaceToolbar">#1A1A1A</color>
-    <color name="bottomAppBar">#1A1A1A</color>
-    <color name="surfaceSystem">#1A1A1A</color>
-    <color name="surfaceCard">#1A1A1A</color>
-    <color name="surfaceBg">#121212</color>
-    <color name="mapInfoLayout">#B3181818</color>
-    <color name="transparent">@android:color/transparent</color>
+    <color name="accent">#FFE082</color>
+    <color name="textMain">#CCFFFFFF</color>
+    <color name="textDisabled">#66FFFFFF</color>
+    <color name="buttonRegular">#242424</color>
+    <color name="systemBar">#1A1A1A</color>
+    <color name="toolbar">#1A1A1A</color>
+    <color name="cardRegular">#1A1A1A</color>
+    <color name="bottomBar">#1A1A1A</color>
+    <color name="background">#121212</color>
+    <color name="transparent">#00000000</color>
 </resources>

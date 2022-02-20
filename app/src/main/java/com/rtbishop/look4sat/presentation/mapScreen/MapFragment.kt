@@ -129,7 +129,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     textLabelFontSize = 24
                     textLabelBackgroundColor = Color.TRANSPARENT
                     textLabelForegroundColor =
-                        ContextCompat.getColor(requireContext(), R.color.themeAccent)
+                        ContextCompat.getColor(requireContext(), R.color.accent)
                     setTextIcon(it.key.data.name)
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     try {

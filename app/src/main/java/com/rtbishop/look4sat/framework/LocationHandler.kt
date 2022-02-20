@@ -29,9 +29,9 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.ILocationHandler
 import com.rtbishop.look4sat.domain.QthConverter
-import com.rtbishop.look4sat.domain.QthConverter.round
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.domain.round
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

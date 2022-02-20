@@ -27,8 +27,8 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
+import com.rtbishop.look4sat.domain.round
 import com.rtbishop.look4sat.framework.OrientationHandler
-import com.rtbishop.look4sat.presentation.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

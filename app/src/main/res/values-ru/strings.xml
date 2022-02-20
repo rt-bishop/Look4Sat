@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Look4Sat</string>
+    <string name="app_version">Версия: %s</string>
+    <string name="app_subtitle">Трекер спутников для Android</string>
+
     <string name="btn_add">Добавить</string>
     <string name="btn_accept">Принять</string>
-    <string name="btn_cancel">Отмена</string>
+    <string name="btn_cancel">Отменить</string>
     <string name="btn_back">Назад</string>
     <string name="btn_modes">Режимы</string>
     <string name="btn_select">Выбрать</string>
     <string name="btn_done">Готово</string>
-    <string name="btn_clear">Очистка</string>
+    <string name="btn_clear">Очистить</string>
     <string name="btn_refresh">Обновить</string>
     <string name="btn_map">Карта</string>
     <string name="btn_filter">Фильтр</string>
@@ -28,25 +32,18 @@
     <string name="fmt_entries">Спутников: %s</string>
     <string name="fmt_radios">Трансиверов: %s</string>
 
+    <string name="downlink">Даунлинк</string>
+    <string name="uplink">Аплинк</string>
+
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-
-    <string name="menu_satellites">Спутники</string>
-    <string name="menu_passes">Пролеты</string>
-    <string name="menu_radar">Радар</string>
-    <string name="menu_map">Карта</string>
-    <string name="menu_settings">Настройки</string>
 
     <string name="sources_title">Источники данных</string>
     <string name="sources_hint">Протокол HTTPS</string>
 
-    <string name="entries_title">Спутники</string>
-    <string name="entries_update">Обновить спутники:</string>
+    <string name="entries_modes">Выберите тип модуляции</string>
     <string name="entries_search_hint">Поиск по Имени / Id</string>
-    <string name="entries_select_all">Выбрать Все/Нет</string>
     <string name="entries_update_error">Ошибка обновления спутников</string>
-
-    <string name="modes_title">Выберите модуляцию трансивера</string>
 
     <string name="passes_error">Нет предстоящих пролётов</string>
 
@@ -101,12 +98,6 @@
     <string name="pref_min_el_summary">Показать пролеты с элевацией более</string>
     <string name="pref_min_el_input_error">Введите значение между 0° и 90°</string>
 
-    <string name="settings_title">Настройки</string>
-
-    <string name="about_version">Версия: %s</string>
-    <string name="about_subtitle">Трекер спутников для Android</string>
-    <string name="about_support">Поддержать</string>
-
     <string name="location_title">Местоположение</string>
     <string name="location_lat">Широта: %.4f°</string>
     <string name="location_lon">Долгота: %.4f°</string>
@@ -130,16 +121,13 @@
     <string name="tracking_port_invalid">Введите порт в диапазоне от 1024 до 65535</string>
 
     <string name="update_title">Обновление данных</string>
-    <string name="update_web">Вэб</string>
-    <string name="update_file">Файл</string>
-    <string name="update_clear">Удалить</string>
     <string name="update_error">При обновлении возникли ошибки</string>
 
-    <string name="warranty_title">Я хотел бы сказать спасибо:</string>
-    <string name="warranty_thanks"> • Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
+    <string name="outro_title">Я хотел бы сказать спасибо:</string>
+    <string name="outro_thanks"> • Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
         \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a> и
-        <a href="https://github.com/davidmoten">Dave Moten</a> за работу над predict4java и
-        доступ к ней по <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
+        <a href="https://github.com/davidmoten">Dave Moten</a> за работу над predict4java и доступ
+        к ней по <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
         \n • <a href="https://github.com/csete">Alexandru Csete</a> за его программу
         Gpredict, которая послужила для меня вдохновением.
         \n • <a href="https://celestrak.com/webmaster.php">Доктору T.S. Kelso</a> за его сайт
@@ -147,7 +135,7 @@
         \n • <a href="https://libre.space/">Libre Space Foundation</a> за проект
         <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с информацией о спутниках.
     </string>
-    <string name="warranty_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Политика конфиденциальности.</a>
+    <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Политика конфиденциальности.</a>
         \nЭто ПО поставляется без гарантий. \nПодробности в лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.
     </string>
 </resources>
