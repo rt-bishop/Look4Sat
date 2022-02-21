@@ -57,21 +57,17 @@ class PassesViewModel @Inject constructor(
 
     fun shouldUseUTC() = settings.getUseUTC()
 
-    fun saveSelectionAndRecalc(selection: List<Int>) {
-        viewModelScope.launch {
-            repository.setEntriesSelection(selection)
-            forceCalculation()
-        }
-    }
-
-    fun forceCalculation(
+    fun calculatePasses(
         hoursAhead: Int = settings.getHoursAhead(),
         minElevation: Double = settings.getMinElevation(),
-        timeRef: Long = System.currentTimeMillis()
+        timeRef: Long = System.currentTimeMillis(),
+        selection: List<Int>? = null
     ) {
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
+            delay(3000)
+            selection?.let { items -> repository.setEntriesSelection(items) }
             settings.setHoursAhead(hoursAhead)
             settings.setMinElevation(minElevation)
             val satellites = repository.getSelectedEntries()

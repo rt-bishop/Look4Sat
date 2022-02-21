@@ -69,7 +69,6 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
         private val losAzFormat = itemView.context.getString(R.string.pass_los)
         private val startTimeFormat = itemView.context.getString(R.string.pass_startTime)
         private val elevFormat = itemView.context.getString(R.string.pat_elevation)
-        private val maxElFormat = itemView.context.getString(R.string.pass_elevation)
         private val endTimeFormat = itemView.context.getString(R.string.pass_endTime)
         private val placeholder = itemView.context.getString(R.string.pass_placeholder)
         private val timeZoneUTC = TimeZone.getTimeZone("UTC")
@@ -99,7 +98,7 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
                     passAltitude.text = String.format(altFormat, satPass.altitude)
                     passLos.text = String.format(losAzFormat, satPass.losAzimuth)
                     passStart.text = startFormat.format(Date(satPass.aosTime))
-                    passElev.text = String.format(maxElFormat, satPass.maxElevation)
+                    passElev.text = String.format(elevFormat, satPass.maxElevation)
                     passEnd.text = endFormat.format(Date(satPass.losTime))
                     passProgress.progress = satPass.progress
                 }

@@ -69,7 +69,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     }
                 })
             }
-            passesRefreshBtn.setOnClickListener { refreshPasses() }
+            passesRefreshBtn.setOnClickListener { viewModel.calculatePasses() }
             passesMapBtn.setOnClickListener { navigateToMap() }
             passesFilterBtn.setOnClickListener { navigateToFilter() }
             passesFab.setOnClickListener { navigateToEntries() }
@@ -87,10 +87,10 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             handleEntriesNumber(number)
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
-            viewModel.forceCalculation(prefs.first, prefs.second)
+            viewModel.calculatePasses(prefs.first, prefs.second)
         }
-        getNavResult<List<Int>>(R.id.nav_passes, "selection") { selection ->
-            viewModel.saveSelectionAndRecalc(selection)
+        getNavResult<List<Int>>(R.id.nav_passes, "selection") { items ->
+            viewModel.calculatePasses(selection = items)
         }
     }
 
@@ -98,18 +98,17 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         refreshAnimator = ValueAnimator.ofFloat(0f, -360f).apply {
             duration = 875
             interpolator = LinearInterpolator()
-            repeatMode = ValueAnimator.RESTART
             repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { anim ->
-                binding.passesRefreshBtn.rotation = anim.animatedValue as Float
-            }
+            addUpdateListener { binding.passesRefreshBtn.rotation = animatedValue as Float }
         }
     }
 
-    private fun handleEntriesNumber(number: Int?) {
-        number?.let { num ->
-            if (num == 0) binding.passesFab.setOnClickListener { requireContext().toast("0") }
-            else binding.passesFab.setOnClickListener { navigateToEntries() }
+    private fun handleEntriesNumber(number: Int) {
+        if (number > 0) {
+            binding.passesFab.setOnClickListener { navigateToEntries() }
+        } else {
+            val errorMessage = getString(R.string.passes_empty_db)
+            binding.passesFab.setOnClickListener { requireContext().toast(errorMessage) }
         }
     }
 
@@ -161,10 +160,6 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         } else {
             binding.passesTimer.text = 0L.toTimerString()
         }
-    }
-
-    private fun refreshPasses() {
-        viewModel.forceCalculation()
     }
 
     private fun navigateToMap() {

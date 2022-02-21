@@ -13,11 +13,11 @@
             android:id="@+id/pass_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="@string/pass_satName"
-            android:textSize="@dimen/text_size_small"
             android:textColor="@color/accent"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,10 +25,10 @@
             android:id="@+id/pass_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/pass_satId"
-            android:textSize="@dimen/text_size_small"
             android:textColor="@color/accent"
+            android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_name"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -103,6 +103,7 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
             android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/pass_end"

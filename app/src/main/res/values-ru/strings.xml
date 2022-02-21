@@ -46,6 +46,7 @@
     <string name="entries_update_error">Ошибка обновления спутников</string>
 
     <string name="passes_error">Нет предстоящих пролётов</string>
+    <string name="passes_empty_db">Пожалуйста, обновите базу данных спутников через меню Настроек</string>
 
     <string name="pass_aosAz">НПС - %.1f°</string>
     <string name="pass_tcaAz">Азимут: %.1f°</string>
