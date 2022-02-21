@@ -44,19 +44,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <ProgressBar
-            android:id="@+id/passes_progress"
-            android:visibility="invisible"
-            style="@style/RecyclerProgress" />
-
         <TextView
             android:id="@+id/passes_error_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/passes_error"
-            android:textSize="@dimen/text_size_large"
-            android:visibility="invisible" />
+            android:textSize="@dimen/text_size_large" />
 
     </androidx.cardview.widget.CardView>
 

@@ -62,8 +62,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
 
     suspend fun processPasses(passList: List<SatPass>, time: Long): List<SatPass> {
         return withContext(predictorDispatcher) {
-            val copiedList = passList.map { it.copy() }
-            copiedList.forEach { pass ->
+            passList.forEach { pass ->
                 if (!pass.isDeepSpace) {
                     val timeStart = pass.aosTime
                     if (time > timeStart) {
@@ -73,7 +72,7 @@ class Predictor(private val predictorDispatcher: CoroutineDispatcher) {
                     }
                 }
             }
-            copiedList.filter { it.progress < 100 }.map { it.copy() }
+            passList.filter { pass -> pass.progress < 100 }.map { it.copy() }
         }
     }
 

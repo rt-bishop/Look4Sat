@@ -35,7 +35,7 @@ class PassesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var passesProcessing: Job? = null
-    private val _passes = MutableLiveData<DataState<List<SatPass>>>()
+    private val _passes = MutableLiveData<DataState<List<SatPass>>>(DataState.Loading)
     val passes: LiveData<DataState<List<SatPass>>> = _passes
     val entries: LiveData<Int> = repository.getEntriesNumber().asLiveData()
 
@@ -55,6 +55,8 @@ class PassesViewModel @Inject constructor(
         }
     }
 
+    fun shouldUseUTC() = settings.getUseUTC()
+
     fun saveSelectionAndRecalc(selection: List<Int>) {
         viewModelScope.launch {
             repository.setEntriesSelection(selection)
@@ -70,18 +72,11 @@ class PassesViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
+            settings.setHoursAhead(hoursAhead)
+            settings.setMinElevation(minElevation)
             val satellites = repository.getSelectedEntries()
             val stationPos = settings.loadStationPosition()
             predictor.forceCalculation(satellites, stationPos, timeRef, hoursAhead, minElevation)
         }
-    }
-
-    fun shouldUseUTC(): Boolean {
-        return settings.getUseUTC()
-    }
-
-    fun saveCalculationPrefs(hoursAhead: Int, minElevation: Double) {
-        settings.setHoursAhead(hoursAhead)
-        settings.setMinElevation(minElevation)
     }
 }

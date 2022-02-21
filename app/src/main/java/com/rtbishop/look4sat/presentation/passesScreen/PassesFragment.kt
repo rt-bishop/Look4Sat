@@ -17,8 +17,10 @@
  */
 package com.rtbishop.look4sat.presentation.passesScreen
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -38,8 +40,9 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
+    private val viewModel: PassesViewModel by viewModels()
     private lateinit var binding: FragmentPassesBinding
-    private val passesViewModel: PassesViewModel by viewModels()
+    private lateinit var refreshAnimator: ValueAnimator
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,7 +52,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
 
     private fun setupComponents() {
         val context = requireContext()
-        val adapter = PassesAdapter(passesViewModel.shouldUseUTC(), this)
+        val adapter = PassesAdapter(viewModel.shouldUseUTC(), this)
         val layoutManager = LinearLayoutManager(context)
         val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
         binding.run {
@@ -72,18 +75,34 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             passesFab.setOnClickListener { navigateToEntries() }
             passesSettingsBtn.setOnClickListener { navigateToSettings() }
         }
-        passesViewModel.passes.observe(viewLifecycleOwner) { passesResult ->
+        setupObservers(adapter)
+        setupAnimator()
+    }
+
+    private fun setupObservers(adapter: PassesAdapter) {
+        viewModel.passes.observe(viewLifecycleOwner) { passesResult ->
             handleNewPasses(passesResult, adapter)
         }
-        passesViewModel.entries.observe(viewLifecycleOwner) { number ->
+        viewModel.entries.observe(viewLifecycleOwner) { number ->
             handleEntriesNumber(number)
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
-            passesViewModel.saveCalculationPrefs(prefs.first, prefs.second)
-            passesViewModel.forceCalculation(prefs.first, prefs.second)
+            viewModel.forceCalculation(prefs.first, prefs.second)
         }
         getNavResult<List<Int>>(R.id.nav_passes, "selection") { selection ->
-            passesViewModel.saveSelectionAndRecalc(selection)
+            viewModel.saveSelectionAndRecalc(selection)
+        }
+    }
+
+    private fun setupAnimator() {
+        refreshAnimator = ValueAnimator.ofFloat(0f, -360f).apply {
+            duration = 875
+            interpolator = LinearInterpolator()
+            repeatMode = ValueAnimator.RESTART
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener { anim ->
+                binding.passesRefreshBtn.rotation = anim.animatedValue as Float
+            }
         }
     }
 
@@ -98,30 +117,36 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         when (state) {
             is DataState.Success -> {
                 adapter.submitList(state.data)
-                binding.apply {
-                    passesRecycler.visibility = View.VISIBLE
-                    passesErrorMsg.visibility = View.INVISIBLE
+                tickMainTimer(state.data)
+                if (state.data.isNotEmpty()) { // show new passes list
+                    binding.run {
+                        passesRecycler.visibility = View.VISIBLE
+                        passesErrorMsg.visibility = View.INVISIBLE
+                        binding.passesRefreshBtn.isEnabled = true
+                        refreshAnimator.cancel()
+                    }
+                } else { // show no passes message
+                    binding.run {
+                        passesRecycler.visibility = View.INVISIBLE
+                        passesErrorMsg.visibility = View.VISIBLE
+                        binding.passesRefreshBtn.isEnabled = true
+                        refreshAnimator.cancel()
+                    }
                 }
-                tickMainTimer(state.data, binding)
             }
             is DataState.Loading -> {
-                binding.apply {
+                binding.run {
+                    refreshAnimator.start()
+                    passesRefreshBtn.isEnabled = false
                     passesTimer.text = 0L.toTimerString()
-                    passesRecycler.visibility = View.INVISIBLE
                     passesErrorMsg.visibility = View.INVISIBLE
                 }
             }
-            else -> {
-                binding.apply {
-                    passesTimer.text = 0L.toTimerString()
-                    passesRecycler.visibility = View.INVISIBLE
-                    passesErrorMsg.visibility = View.VISIBLE
-                }
-            }
+            else -> {}
         }
     }
 
-    private fun tickMainTimer(passes: List<SatPass>, binding: FragmentPassesBinding) {
+    private fun tickMainTimer(passes: List<SatPass>) {
         if (passes.isNotEmpty()) {
             val timeNow = System.currentTimeMillis()
             try {
@@ -139,7 +164,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     }
 
     private fun refreshPasses() {
-        passesViewModel.forceCalculation()
+        viewModel.forceCalculation()
     }
 
     private fun navigateToMap() {
