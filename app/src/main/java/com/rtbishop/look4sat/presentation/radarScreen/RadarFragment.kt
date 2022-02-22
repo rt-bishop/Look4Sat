@@ -102,14 +102,14 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     private fun setPassText(satPass: SatPass, satPos: SatPos) {
         val timeNow = System.currentTimeMillis()
-        val polarAz = getString(R.string.pat_azimuth)
-        val polarEl = getString(R.string.pat_elevation)
-        val polarRng = getString(R.string.pat_distance)
-        val polarAlt = getString(R.string.pat_altitude)
-        binding.radarAz.text = String.format(polarAz, Math.toDegrees(satPos.azimuth))
-        binding.radarEl.text = String.format(polarEl, Math.toDegrees(satPos.elevation))
-        binding.radarDst.text = String.format(polarRng, satPos.range)
-        binding.radarAlt.text = String.format(polarAlt, satPos.altitude)
+        val radarAzim = getString(R.string.radar_az_value)
+        val radarElev = getString(R.string.radar_el_value)
+        val radarAlt = getString(R.string.radar_alt_value)
+        val radarDist = getString(R.string.radar_dist_value)
+        binding.radarAzValue.text = String.format(radarAzim, Math.toDegrees(satPos.azimuth))
+        binding.radarElValue.text = String.format(radarElev, Math.toDegrees(satPos.elevation))
+        binding.radarAltValue.text = String.format(radarAlt, satPos.altitude)
+        binding.radarDstValue.text = String.format(radarDist, satPos.distance)
 //        binding.radarName.text = satPass.name
 
         if (!satPass.isDeepSpace) {

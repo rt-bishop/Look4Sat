@@ -25,8 +25,8 @@ data class SatPos(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
     var altitude: Double = 0.0,
-    var range: Double = 0.0,
-    var rangeRate: Double = 0.0,
+    var distance: Double = 0.0,
+    var distanceRate: Double = 0.0,
     var theta: Double = 0.0,
     var time: Long = 0L
 ) {
@@ -34,11 +34,11 @@ data class SatPos(
     private val speedOfLight = 2.99792458E8
 
     fun getDownlinkFreq(freq: Long): Long {
-        return (freq.toDouble() * (speedOfLight - this.rangeRate * 1000.0) / speedOfLight).toLong()
+        return (freq.toDouble() * (speedOfLight - distanceRate * 1000.0) / speedOfLight).toLong()
     }
 
     fun getUplinkFreq(freq: Long): Long {
-        return (freq.toDouble() * (speedOfLight + this.rangeRate * 1000.0) / speedOfLight).toLong()
+        return (freq.toDouble() * (speedOfLight + distanceRate * 1000.0) / speedOfLight).toLong()
     }
 
     fun getOrbitalVelocity(): Double {
@@ -50,7 +50,7 @@ data class SatPos(
 
     fun getRangeCircle(): List<GeoPos> {
         val positions = mutableListOf<GeoPos>()
-        val beta = acos(earthRadiusKm / (earthRadiusKm + this.altitude))
+        val beta = acos(earthRadiusKm / (earthRadiusKm + altitude))
 //        val radiusKm = earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + altitude))
         var tempAzimuth = 0
         while (tempAzimuth < 360) {

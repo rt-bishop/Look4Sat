@@ -46,48 +46,80 @@
         app:layout_constraintTop_toBottomOf="@+id/radar_toolbar" />
 
     <TextView
+        android:id="@+id/radar_az_value"
+        style="@style/RadarValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/radar_az_value"
+        app:layout_constraintStart_toStartOf="@+id/radar_card"
+        app:layout_constraintTop_toTopOf="@+id/radar_card" />
+
+    <TextView
         android:id="@+id/radar_az"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-        android:text="@string/pat_azimuth"
+        android:text="@string/radar_az_text"
         android:textSize="@dimen/text_size_small"
-        app:layout_constraintStart_toStartOf="@+id/radar_card"
-        app:layout_constraintTop_toTopOf="@+id/radar_card" />
+        app:layout_constraintStart_toStartOf="@+id/radar_az_value"
+        app:layout_constraintTop_toBottomOf="@+id/radar_az_value" />
+
+    <TextView
+        android:id="@+id/radar_el_value"
+        style="@style/RadarValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/radar_el_value"
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_az_value"
+        app:layout_constraintEnd_toEndOf="@+id/radar_card" />
 
     <TextView
         android:id="@+id/radar_el"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:text="@string/pat_elevation"
+        android:text="@string/radar_el_text"
         android:textSize="@dimen/text_size_small"
-        app:layout_constraintEnd_toEndOf="@+id/radar_card"
-        app:layout_constraintTop_toTopOf="@+id/radar_card" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_az"
+        app:layout_constraintEnd_toEndOf="@+id/radar_el_value" />
+
+    <TextView
+        android:id="@+id/radar_alt_value"
+        style="@style/RadarValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="@string/radar_alt_value"
+        app:layout_constraintBottom_toBottomOf="@+id/radar_card"
+        app:layout_constraintStart_toStartOf="@+id/radar_az_value" />
 
     <TextView
         android:id="@+id/radar_alt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="4dp"
-        android:text="@string/pat_altitude"
+        android:text="@string/radar_alt_text"
         android:textSize="@dimen/text_size_small"
-        app:layout_constraintBottom_toBottomOf="@+id/radar_card"
-        app:layout_constraintStart_toStartOf="@+id/radar_card" />
+        app:layout_constraintBottom_toTopOf="@+id/radar_alt_value"
+        app:layout_constraintStart_toStartOf="@+id/radar_alt_value" />
+
+    <TextView
+        android:id="@+id/radar_dst_value"
+        style="@style/RadarValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/radar_dist_value"
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_alt_value"
+        app:layout_constraintEnd_toEndOf="@+id/radar_el_value" />
 
     <TextView
         android:id="@+id/radar_dst"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="4dp"
-        android:text="@string/pat_distance"
+        android:text="@string/radar_dist_text"
         android:textSize="@dimen/text_size_small"
-        app:layout_constraintBottom_toBottomOf="@+id/radar_card"
-        app:layout_constraintEnd_toEndOf="@+id/radar_card" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_alt"
+        app:layout_constraintEnd_toEndOf="@+id/radar_dst_value" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/radar_list_card"

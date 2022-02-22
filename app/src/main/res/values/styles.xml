@@ -132,6 +132,12 @@
         <item name="fabCradleRoundedCornerRadius">@dimen/view_default_margin</item>
     </style>
 
+    <style name="RadarValue">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textColor">@color/textMain</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
     <style name="WorldMapText">
         <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textColor">@color/textMain</item>

@@ -164,7 +164,7 @@ class MapViewModel @Inject constructor(
         val osmPos = GeoPos(osmLat, osmLon)
         val qthLoc = QthConverter.positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
         val satData = MapData(
-            satellite, satellite.data.catnum, satellite.data.name, satPos.range,
+            satellite, satellite.data.catnum, satellite.data.name, satPos.distance,
             satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos
         )
         _satData.postValue(satData)

@@ -31,8 +31,6 @@ class RadarView(context: Context) : View(context) {
 
     private val defaultColor = ContextCompat.getColor(context, R.color.accent)
     private val scale = resources.displayMetrics.density
-    private val radarWidth = resources.displayMetrics.widthPixels
-    private val radarRadius = radarWidth * 0.48f
     private val piDiv2 = Math.PI / 2.0
     private val strokeSize = scale * 2f
     private var position: SatPos? = null
@@ -125,12 +123,12 @@ class RadarView(context: Context) : View(context) {
     override fun onDraw(canvas: Canvas) {
         val radarWidth = width - paddingLeft - paddingRight
         val radarHeight = height - paddingTop - paddingBottom
-        val radarRadius = min(width, height) * 0.49f
+        val radarRadius = min(width, height) * 0.48f
         val cx = paddingLeft + radarWidth / 2f
         val cy = paddingTop + radarHeight / 2f
 
         if (positions.isNotEmpty() && !isTrackCreated) {
-            createPassTrajectory()
+            createPassTrajectory(radarRadius)
             createPassTrajectoryArrow()
             isTrackCreated = true
         }
@@ -146,10 +144,10 @@ class RadarView(context: Context) : View(context) {
             canvas.drawPath(trackPath, arrowPaint)
         }
         if (shouldShowBeacons) {
-            drawSatellite(canvas)
+            drawSatellite(canvas, radarRadius)
         }
         if (shouldShowAim) {
-            drawCrosshair(canvas, azimuth, pitch)
+            drawCrosshair(canvas, azimuth, pitch, radarRadius)
         }
         if (shouldShowSweep) {
             canvas.translate(-cx, -cy)
@@ -177,7 +175,7 @@ class RadarView(context: Context) : View(context) {
         }
     }
 
-    private fun drawSatellite(canvas: Canvas) {
+    private fun drawSatellite(canvas: Canvas, radarRadius: Float) {
         position?.let { satPos ->
             if (satPos.elevation > 0) {
                 val satX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
@@ -187,7 +185,7 @@ class RadarView(context: Context) : View(context) {
         }
     }
 
-    private fun drawCrosshair(canvas: Canvas, azimuth: Float, pitch: Float) {
+    private fun drawCrosshair(canvas: Canvas, azimuth: Float, pitch: Float, radarRadius: Float) {
         val azimuthRad = Math.toRadians(azimuth.toDouble())
         val tmpElevation = Math.toRadians(pitch.toDouble())
         val elevationRad = if (tmpElevation > 0.0) 0.0 else tmpElevation
@@ -208,7 +206,7 @@ class RadarView(context: Context) : View(context) {
         return (radius * sin(piDiv2 - azimuth)).toFloat()
     }
 
-    private fun createPassTrajectory() {
+    private fun createPassTrajectory(radarRadius: Float) {
         positions.forEachIndexed { index, satPos ->
             val passX = sph2CartX(satPos.azimuth, satPos.elevation, radarRadius.toDouble())
             val passY = sph2CartY(satPos.azimuth, satPos.elevation, radarRadius.toDouble())

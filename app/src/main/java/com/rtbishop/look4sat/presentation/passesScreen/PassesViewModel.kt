@@ -66,7 +66,6 @@ class PassesViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
-            delay(3000)
             selection?.let { items -> repository.setEntriesSelection(items) }
             settings.setHoursAhead(hoursAhead)
             settings.setMinElevation(minElevation)

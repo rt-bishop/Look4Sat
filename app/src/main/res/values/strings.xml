@@ -76,6 +76,15 @@
     <string name="map_coverage">Coverage: %.0f km</string>
     <string name="map_copyright" translatable="false">Wikimedia maps | Map data © OpenStreetMap contributors</string>
 
+    <string name="radar_az_text">Azimuth</string>
+    <string name="radar_az_value">%.1f°</string>
+    <string name="radar_el_text">Elevation</string>
+    <string name="radar_el_value">%.1f°</string>
+    <string name="radar_alt_text">Altitude</string>
+    <string name="radar_alt_value">%.0f km</string>
+    <string name="radar_dist_text">Distance</string>
+    <string name="radar_dist_value">%.0f km</string>
+
     <string name="pat_azimuth">Azimuth: %.1f°</string>
     <string name="pat_elevation">Elevation: %.1f°</string>
     <string name="pat_distance">Range: %.0f km</string>

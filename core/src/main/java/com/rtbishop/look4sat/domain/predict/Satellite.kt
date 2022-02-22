@@ -146,8 +146,8 @@ abstract class Satellite(val data: OrbitalData) {
         if (azim < 0.0) azim += twoPi
         satPos.azimuth = azim
         satPos.elevation = asin(topZ / range.w)
-        satPos.range = range.w
-        satPos.rangeRate = dot(range, rgvel) / range.w
+        satPos.distance = range.w
+        satPos.distanceRate = dot(range, rgvel) / range.w
     }
 
     // Returns the ECI position and velocity of the observer

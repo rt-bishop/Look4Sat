@@ -64,6 +64,15 @@
     <string name="map_qth">QTH Локатор: %s</string>
     <string name="map_coverage">Покрытие: %.0fкм</string>
 
+    <string name="radar_az_text">Азим.</string>
+    <string name="radar_az_value">%.1f°</string>
+    <string name="radar_el_text">Элев.</string>
+    <string name="radar_el_value">%.1f°</string>
+    <string name="radar_alt_text">Выс.</string>
+    <string name="radar_alt_value">%.0f km</string>
+    <string name="radar_dist_text">Дальн.</string>
+    <string name="radar_dist_value">%.0f km</string>
+
     <string name="pat_azimuth">Азимут: %.1f°</string>
     <string name="pat_elevation">Элевация: %.1f°</string>
     <string name="pat_distance">Дистанция: %.0fкм</string>
