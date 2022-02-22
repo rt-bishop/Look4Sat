@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
-import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.framework.model.DataSource
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +37,7 @@ import javax.inject.Inject
 class SourcesDialog : AppCompatDialogFragment(), SourcesAdapter.SourcesClickListener {
 
     @Inject
-    lateinit var repository: IDataRepository
+    lateinit var settings: ISettings
     private lateinit var binding: DialogSourcesBinding
     private lateinit var sourcesAdapter: SourcesAdapter
 
@@ -54,7 +54,7 @@ class SourcesDialog : AppCompatDialogFragment(), SourcesAdapter.SourcesClickList
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         lifecycleScope.launchWhenResumed {
-            val sources = repository.getDataSources().map { url -> DataSource(url) }
+            val sources = settings.loadDataSources().map { url -> DataSource(url) }
             val layoutManager = LinearLayoutManager(requireContext())
             sourcesAdapter = SourcesAdapter(this@SourcesDialog).apply { submitList(sources) }
             binding.run {

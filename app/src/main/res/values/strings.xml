@@ -84,6 +84,8 @@
     <string name="radar_alt_value">%.0f km</string>
     <string name="radar_dist_text">Distance</string>
     <string name="radar_dist_value">%.0f km</string>
+    <string name="radar_sat_id">Id: %d</string>
+    <string name="radar_sat_name">%s</string>
 
     <string name="pat_azimuth">Azimuth: %.1f°</string>
     <string name="pat_elevation">Elevation: %.1f°</string>

@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.mapScreen
 
-import android.content.SharedPreferences
+import android.content.Context
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -43,17 +43,12 @@ import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapFragment : Fragment(R.layout.fragment_map) {
 
-    @Inject
-    lateinit var sharedPreferences: SharedPreferences
-    private lateinit var binding: FragmentMapBinding
-
-    private val args: MapFragmentArgs by navArgs()
     private val viewModel: MapViewModel by viewModels()
+    private val navArgs: MapFragmentArgs by navArgs()
     private val minLat = MapView.getTileSystem().minLatitude
     private val maxLat = MapView.getTileSystem().maxLatitude
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -67,6 +62,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.parseColor("#26FFE082")
     }
+    private lateinit var binding: FragmentMapBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -76,7 +72,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun setupComponents() {
-        Configuration.getInstance().load(requireContext(), sharedPreferences)
+        val context = requireContext()
+        val preferences = context.getSharedPreferences("default", Context.MODE_PRIVATE)
+        Configuration.getInstance().load(context, preferences)
         binding.run {
             mapView.apply {
                 setMultiTouchControls(true)
@@ -99,15 +97,15 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun setupObservers() {
-        viewModel.selectDefaultSatellite(args.catNum)
-        viewModel.stationPosLiveData.observe(viewLifecycleOwner) { renderStationPos(it) }
-        viewModel.satPositions.observe(viewLifecycleOwner) { renderSatPositions(it) }
-        viewModel.satTrack.observe(viewLifecycleOwner) { renderSatTrack(it) }
-        viewModel.satFootprint.observe(viewLifecycleOwner) { renderSatFootprint(it) }
-        viewModel.mapData.observe(viewLifecycleOwner) { renderSatData(it) }
+        viewModel.selectDefaultSatellite(navArgs.catNum)
+        viewModel.stationPos.observe(viewLifecycleOwner) { handleStationPos(it) }
+        viewModel.positions.observe(viewLifecycleOwner) { handlePositions(it) }
+        viewModel.track.observe(viewLifecycleOwner) { handleTrack(it) }
+        viewModel.footprint.observe(viewLifecycleOwner) { handleFootprint(it) }
+        viewModel.mapData.observe(viewLifecycleOwner) { handleMapData(it) }
     }
 
-    private fun renderStationPos(stationPos: GeoPos) {
+    private fun handleStationPos(stationPos: GeoPos) {
         binding.apply {
             Marker(mapView).apply {
                 setInfoWindow(null)
@@ -120,7 +118,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun renderSatPositions(posMap: Map<Satellite, GeoPos>) {
+    private fun handlePositions(posMap: Map<Satellite, GeoPos>) {
         binding.apply {
             val markers = FolderOverlay()
             posMap.entries.forEach {
@@ -149,7 +147,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun renderSatTrack(satTrack: List<List<GeoPos>>) {
+    private fun handleTrack(satTrack: List<List<GeoPos>>) {
         val trackOverlay = FolderOverlay()
         satTrack.forEach { track ->
             val trackPoints = track.map { GeoPoint(it.latitude, it.longitude) }
@@ -166,7 +164,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         binding.mapView.overlays[1] = trackOverlay
     }
 
-    private fun renderSatFootprint(satFootprint: List<GeoPos>) {
+    private fun handleFootprint(satFootprint: List<GeoPos>) {
         val footprintPoints = satFootprint.map { GeoPoint(it.latitude, it.longitude) }
         val footprintOverlay = Polygon().apply {
             fillPaint.set(footprintPaint)
@@ -180,7 +178,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         binding.mapView.overlays[2] = footprintOverlay
     }
 
-    private fun renderSatData(mapData: MapData) {
+    private fun handleMapData(mapData: MapData) {
         binding.apply {
             mapDataName.text =
                 String.format(getString(R.string.pat_osm_idName), mapData.catNum, mapData.name)

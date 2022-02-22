@@ -19,9 +19,11 @@ package com.rtbishop.look4sat.data
 
 import java.io.InputStream
 
-interface IRemoteSource {
+interface IProvider {
 
     val radioApi: String get() = "https://db.satnogs.org/api/transmitters/?format=json"
 
-    suspend fun getFileStream(url: String): InputStream?
+    suspend fun getLocalFileStream(uri: String): InputStream?
+
+    suspend fun getRemoteFileStream(url: String): InputStream?
 }

@@ -174,20 +174,21 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <Button
-        android:id="@+id/radar_prev_btn"
+        android:id="@+id/radar_btn_notify"
         style="@style/NormalButton"
         android:layout_width="0dp"
         android:layout_marginStart="@dimen/button_margin_side"
         android:text="@string/btn_notify"
+        android:textColor="@color/textDisabled"
         app:layout_constraintBottom_toBottomOf="@+id/radar_coordinator"
-        app:layout_constraintEnd_toStartOf="@+id/radar_data_name"
+        app:layout_constraintEnd_toStartOf="@+id/radar_sat_id"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/radar_coordinator"
         app:layout_constraintStart_toStartOf="@+id/radar_coordinator"
         app:layout_constraintTop_toTopOf="@+id/radar_coordinator" />
 
     <TextView
-        android:id="@+id/radar_data_name"
+        android:id="@+id/radar_sat_id"
         style="@style/WorldMapText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -196,20 +197,20 @@
         android:ellipsize="end"
         android:gravity="center_horizontal"
         android:maxLines="1"
-        android:text="@string/pat_osm_idName"
-        app:layout_constraintBaseline_toBaselineOf="@+id/radar_prev_btn"
-        app:layout_constraintEnd_toStartOf="@+id/radar_next_btn"
+        android:text="@string/radar_sat_id"
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_btn_notify"
+        app:layout_constraintEnd_toStartOf="@+id/radar_btn_settings"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/radar_prev_btn" />
+        app:layout_constraintStart_toEndOf="@+id/radar_btn_notify" />
 
     <Button
-        android:id="@+id/radar_next_btn"
+        android:id="@+id/radar_btn_settings"
         style="@style/NormalButton"
         android:layout_width="0dp"
         android:layout_marginEnd="@dimen/button_margin_side"
         android:text="@string/btn_settings"
-        app:layout_constraintBaseline_toBaselineOf="@+id/radar_prev_btn"
+        app:layout_constraintBaseline_toBaselineOf="@+id/radar_btn_notify"
         app:layout_constraintEnd_toEndOf="@+id/radar_coordinator"
-        app:layout_constraintStart_toEndOf="@+id/radar_data_name" />
+        app:layout_constraintStart_toEndOf="@+id/radar_sat_id" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

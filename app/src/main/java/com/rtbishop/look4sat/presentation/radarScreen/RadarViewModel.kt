@@ -19,9 +19,9 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.hardware.GeomagneticField
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.DataReporter
-import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.IRepository
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
@@ -39,13 +39,13 @@ import javax.inject.Inject
 @HiltViewModel
 class RadarViewModel @Inject constructor(
     private val orientationHandler: OrientationHandler,
-    private val preferences: ISettingsHandler,
+    private val reporter: DataReporter,
     private val predictor: Predictor,
-    private val dataRepository: IDataRepository,
-    private val dataReporter: DataReporter
+    private val repository: IRepository,
+    private val settings: ISettings
 ) : ViewModel(), OrientationHandler.OrientationListener {
 
-    private val stationPos = preferences.loadStationPosition()
+    private val stationPos = settings.loadStationPosition()
     private val _passData = MutableLiveData<RadarData>()
     private val _transmitters = MutableLiveData<List<SatRadio>>()
     private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
@@ -55,7 +55,7 @@ class RadarViewModel @Inject constructor(
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
         predictor.calculatedPasses.collect { passes ->
-            val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
+            val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
             pass?.let { satPass ->
                 emit(satPass)
                 sendPassData(satPass)
@@ -65,12 +65,16 @@ class RadarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (preferences.getUseCompass()) orientationHandler.startListening(this)
+        if (settings.getUseCompass()) orientationHandler.startListening(this)
     }
 
     fun disableSensor() {
-        if (preferences.getUseCompass()) orientationHandler.stopListening()
+        if (settings.getUseCompass()) orientationHandler.stopListening()
     }
+
+    fun getUseCompass(): Boolean = settings.getUseCompass()
+
+    fun getShowSweep(): Boolean = settings.getShowSweep()
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
         _orientation.value = Triple(azimuth + getMagDeclination(stationPos), pitch, roll)
@@ -92,12 +96,12 @@ class RadarViewModel @Inject constructor(
             }
             while (isActive) {
                 val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date().time)
-                if (preferences.getRotatorEnabled()) {
-                    val server = preferences.getRotatorServer()
-                    val port = preferences.getRotatorPort().toInt()
+                if (settings.getRotatorEnabled()) {
+                    val server = settings.getRotatorServer()
+                    val port = settings.getRotatorPort().toInt()
                     val azimuth = Math.toDegrees(satPos.azimuth).round(1)
                     val elevation = Math.toDegrees(satPos.elevation).round(1)
-                    dataReporter.reportRotation(server, port, azimuth, elevation)
+                    reporter.reportRotation(server, port, azimuth, elevation)
                 }
                 _passData.postValue(RadarData(satPos, satTrack))
                 delay(1000)
@@ -107,7 +111,7 @@ class RadarViewModel @Inject constructor(
 
     private fun processTransmitters(pass: SatPass) {
         viewModelScope.launch {
-            val transmitters = dataRepository.getRadios(pass.catNum)
+            val transmitters = repository.getRadiosWithId(pass.catNum)
             while (isActive) {
                 val time = System.currentTimeMillis()
                 val list = predictor.processRadios(pass.satellite, stationPos, transmitters, time)

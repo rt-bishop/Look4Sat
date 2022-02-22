@@ -15,38 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain
+package com.rtbishop.look4sat.framework.data
 
-import com.rtbishop.look4sat.domain.model.DataState
-import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.domain.model.SatRadio
-import com.rtbishop.look4sat.domain.predict.Satellite
+import androidx.room.*
+import com.rtbishop.look4sat.framework.model.SatEntry
+import com.rtbishop.look4sat.framework.model.SatItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
-interface IDataRepository {
+@Dao
+interface EntriesDao {
 
-    val updateState: StateFlow<DataState<Long>>
+    @Query("SELECT COUNT(*) FROM entries")
+    fun getEntriesTotal(): Flow<Int>
 
-    fun setUpdateStateHandled()
-
-    fun getEntriesNumber(): Flow<Int>
-
-    fun getRadiosNumber(): Flow<Int>
-
+    @Transaction
+    @Query("SELECT catnum, name FROM entries ORDER BY name ASC")
     suspend fun getEntriesWithModes(): List<SatItem>
 
-    suspend fun getSelectedEntries(): List<Satellite>
+    @Transaction
+    @Query("SELECT * FROM entries WHERE catnum IN (:selectedIds)")
+    suspend fun getEntriesWithIds(selectedIds: List<Int>): List<SatEntry>
 
-    suspend fun getRadios(catnum: Int): List<SatRadio>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
 
-    fun updateFromFile(uri: String)
-
-    fun updateFromWeb(sources: List<String>)
-
-    fun clearAllData()
-
-    suspend fun getDataSources(): List<String>
-
-    suspend fun setEntriesSelection(catnums: List<Int>)
+    @Query("DELETE FROM entries")
+    suspend fun deleteEntries()
 }

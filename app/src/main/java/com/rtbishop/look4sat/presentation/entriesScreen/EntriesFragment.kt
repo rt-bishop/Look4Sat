@@ -39,8 +39,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
-    private lateinit var binding: FragmentEntriesBinding
     private val viewModel: EntriesViewModel by viewModels()
+    private lateinit var binding: FragmentEntriesBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

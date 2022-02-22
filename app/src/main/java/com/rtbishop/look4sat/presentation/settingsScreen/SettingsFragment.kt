@@ -44,7 +44,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
-    private lateinit var binding: FragmentSettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
@@ -60,15 +59,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private val contentRequest = registerForActivityResult(contentContract) { uri ->
         uri?.let { viewModel.updateDataFromFile(uri.toString()) }
     }
+    private lateinit var binding: FragmentSettingsBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSettingsBinding.bind(view)
-        setupViews()
+        setupComponents()
         setupObservers()
     }
 
-    private fun setupViews() {
+    private fun setupComponents() {
         binding.settingsScroll.apply {
             setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
                 if (y > newY) binding.settingsFab.hide() else binding.settingsFab.show()
@@ -134,11 +134,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             findNavController().navigate(action)
         }
         binding.settingsData.dataBtnClear.setOnClickListener { viewModel.clearData() }
-        viewModel.entries.observe(viewLifecycleOwner) { number ->
+        viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
             val entriesFormat = getString(R.string.fmt_entries)
             binding.settingsData.dataEntries.text = String.format(entriesFormat, number)
         }
-        viewModel.radios.observe(viewLifecycleOwner) { number ->
+        viewModel.radiosTotal.observe(viewLifecycleOwner) { number ->
             val radiosFormat = getString(R.string.fmt_radios)
             binding.settingsData.dataRadios.text = String.format(radiosFormat, number)
         }

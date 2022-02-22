@@ -6,7 +6,7 @@
         android:id="@+id/mode_checkbox"
         android:layout_width="match_parent"
         android:layout_height="41dp"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="6dp"
         android:background="@color/cardRegular"
         android:ellipsize="end"
         android:lines="1"

@@ -18,8 +18,8 @@
 package com.rtbishop.look4sat.presentation.entriesScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.ISettingsHandler
-import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.IRepository
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,13 +28,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val preferences: ISettingsHandler,
-    private val repository: IDataRepository
+    private val repository: IRepository,
+    private val settings: ISettings
 ) : ViewModel(), EntriesAdapter.EntriesClickListener {
 
-    private val transModes = MutableLiveData(preferences.loadModesSelection())
+    private val transModes = MutableLiveData(settings.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
-    private val itemsFromRepo = liveData { emit(repository.getEntriesWithModes()) } as MutableLiveData
+    private val itemsFromRepo = liveData { emit(loadEntriesWithSelection()) } as MutableLiveData
     private val itemsWithModes = transModes.switchMap { modes ->
         itemsFromRepo.map { items -> filterByModes(items, modes) }
     }
@@ -51,7 +51,7 @@ class EntriesViewModel @Inject constructor(
 
     fun saveSelectedModes(modes: List<String>) {
         transModes.value = modes
-        preferences.saveModesSelection(modes)
+        settings.saveModesSelection(modes)
     }
 
     fun setQuery(query: String) {
@@ -72,6 +72,11 @@ class EntriesViewModel @Inject constructor(
             }
             itemsFromRepo.value = copiedList
         }
+    }
+
+    private suspend fun loadEntriesWithSelection(): List<SatItem> {
+        val selectedIds = settings.loadEntriesSelection()
+        return repository.getEntriesWithModes().onEach { it.isSelected = it.catnum in selectedIds }
     }
 
     private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {

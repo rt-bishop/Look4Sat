@@ -26,8 +26,8 @@ import android.location.LocationManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.domain.ILocationHandler
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
@@ -41,7 +41,7 @@ import javax.inject.Singleton
 @Singleton
 class LocationHandler @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val settingsHandler: ISettingsHandler,
+    private val settings: ISettings,
 ) : LocationListener, ILocationHandler {
 
     private val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -51,8 +51,8 @@ class LocationHandler @Inject constructor(
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val _stationPosition = MutableStateFlow<DataState<GeoPos>>(DataState.Handled)
-    private var currentLocator = settingsHandler.loadStationLocator()
-    private var currentPosition = settingsHandler.loadStationPosition()
+    private var currentLocator = settings.loadStationLocator()
+    private var currentPosition = settings.loadStationPosition()
 
     override val stationPosition: StateFlow<DataState<GeoPos>> = _stationPosition
 
@@ -68,8 +68,8 @@ class LocationHandler @Inject constructor(
             QthConverter.positionToQth(newLat, newLon)?.let { locator ->
                 currentLocator = locator
                 currentPosition = GeoPos(newLat, newLon)
-                settingsHandler.saveStationLocator(locator)
-                settingsHandler.saveStationPosition(currentPosition)
+                settings.saveStationLocator(locator)
+                settings.saveStationPosition(currentPosition)
                 _stationPosition.value = DataState.Success(currentPosition)
             }
         } else {
@@ -113,8 +113,8 @@ class LocationHandler @Inject constructor(
         if (position != null) {
             currentLocator = locator
             currentPosition = position
-            settingsHandler.saveStationLocator(locator)
-            settingsHandler.saveStationPosition(currentPosition)
+            settings.saveStationLocator(locator)
+            settings.saveStationPosition(currentPosition)
             _stationPosition.value = DataState.Success(currentPosition)
         } else {
             _stationPosition.value = DataState.Error(context.getString(R.string.pref_pos_qth_error))

@@ -15,40 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.domain.model.SatEntry
+import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.flow.Flow
-import java.io.InputStream
+import kotlinx.coroutines.flow.StateFlow
 
-interface ILocalSource {
+interface IRepository {
 
-    fun getEntriesNumber(): Flow<Int>
+    val updateState: StateFlow<DataState<Long>>
 
-    fun getRadiosNumber(): Flow<Int>
+    fun getEntriesTotal(): Flow<Int>
+
+    fun getRadiosTotal(): Flow<Int>
 
     suspend fun getEntriesWithModes(): List<SatItem>
 
-    suspend fun getSelectedEntries(): List<Satellite>
+    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
 
-    suspend fun getRadios(catnum: Int): List<SatRadio>
+    suspend fun getRadiosWithId(id: Int): List<SatRadio>
 
-    suspend fun getFileStream(uri: String): InputStream?
+    fun updateFromFile(uri: String)
 
-    suspend fun insertEntries(entries: List<SatEntry>)
+    fun updateFromWeb(urls: List<String>)
 
-    suspend fun insertRadios(radios: List<SatRadio>)
+    fun setUpdateStateHandled()
 
-    suspend fun clearAllData()
-
-    suspend fun getDataSources(): List<String>
-
-    suspend fun setDataSources(sources: List<String>)
-
-    suspend fun getEntriesSelection(): List<Int>
-
-    suspend fun setEntriesSelection(catnums: List<Int>)
+    fun clearAllData()
 }

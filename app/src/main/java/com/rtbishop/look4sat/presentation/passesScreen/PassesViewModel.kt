@@ -18,8 +18,8 @@
 package com.rtbishop.look4sat.presentation.passesScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.ISettingsHandler
-import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.IRepository
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
@@ -30,14 +30,14 @@ import javax.inject.Inject
 @HiltViewModel
 class PassesViewModel @Inject constructor(
     private val predictor: Predictor,
-    private val settings: ISettingsHandler,
-    private val repository: IDataRepository
+    private val repository: IRepository,
+    private val settings: ISettings
 ) : ViewModel() {
 
     private var passesProcessing: Job? = null
     private val _passes = MutableLiveData<DataState<List<SatPass>>>(DataState.Loading)
     val passes: LiveData<DataState<List<SatPass>>> = _passes
-    val entries: LiveData<Int> = repository.getEntriesNumber().asLiveData()
+    val entriesTotal: LiveData<Int> = repository.getEntriesTotal().asLiveData()
 
     init {
         viewModelScope.launch {
@@ -53,6 +53,7 @@ class PassesViewModel @Inject constructor(
                 }
             }
         }
+        calculatePasses()
     }
 
     fun shouldUseUTC() = settings.getUseUTC()
@@ -66,11 +67,12 @@ class PassesViewModel @Inject constructor(
         viewModelScope.launch {
             _passes.postValue(DataState.Loading)
             passesProcessing?.cancelAndJoin()
-            selection?.let { items -> repository.setEntriesSelection(items) }
+            selection?.let { items -> settings.saveEntriesSelection(items) }
             settings.setHoursAhead(hoursAhead)
             settings.setMinElevation(minElevation)
-            val satellites = repository.getSelectedEntries()
             val stationPos = settings.loadStationPosition()
+            val selectedIds = settings.loadEntriesSelection()
+            val satellites = repository.getEntriesWithIds(selectedIds)
             predictor.forceCalculation(satellites, stationPos, timeRef, hoursAhead, minElevation)
         }
     }

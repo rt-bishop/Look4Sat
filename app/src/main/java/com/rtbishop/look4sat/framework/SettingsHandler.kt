@@ -19,15 +19,13 @@ package com.rtbishop.look4sat.framework
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.rtbishop.look4sat.data.ISettingsHandler
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.presentation.getDouble
-import com.rtbishop.look4sat.presentation.putDouble
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) : ISettingsHandler {
+class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) : ISettings {
 
     companion object {
         const val keyDataSources = "dataSources"
@@ -157,5 +155,13 @@ class SettingsHandler @Inject constructor(private val prefs: SharedPreferences) 
 
     override fun saveDataSources(sources: List<String>) {
         if (sources.isNotEmpty()) prefs.edit { putStringSet(keyDataSources, sources.toSet()) }
+    }
+
+    private fun SharedPreferences.getDouble(key: String, default: Double): Double {
+        return Double.fromBits(getLong(key, default.toRawBits()))
+    }
+
+    private fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
+        putLong(key, double.toRawBits())
     }
 }

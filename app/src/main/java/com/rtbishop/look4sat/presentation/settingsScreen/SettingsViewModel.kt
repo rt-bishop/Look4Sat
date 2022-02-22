@@ -2,9 +2,9 @@ package com.rtbishop.look4sat.presentation.settingsScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.rtbishop.look4sat.data.ISettingsHandler
-import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ILocationHandler
+import com.rtbishop.look4sat.domain.IRepository
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,19 +13,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val settings: ISettingsHandler,
-    private val repository: IDataRepository,
-    private val locationHandler: ILocationHandler
+    private val locationHandler: ILocationHandler,
+    private val repository: IRepository,
+    private val settings: ISettings
 ) : ViewModel() {
 
-    val entries = repository.getEntriesNumber().asLiveData()
-    val radios = repository.getRadiosNumber().asLiveData()
+    val entriesTotal = repository.getEntriesTotal().asLiveData()
+    val radiosTotal = repository.getRadiosTotal().asLiveData()
 
     fun updateDataFromFile(uri: String) {
         repository.updateFromFile(uri)
     }
 
     fun updateDataFromWeb(sources: List<String>) {
+        settings.saveDataSources(sources)
         repository.updateFromWeb(sources)
     }
 

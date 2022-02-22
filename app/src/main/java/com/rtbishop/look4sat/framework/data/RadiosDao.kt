@@ -15,10 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation
+package com.rtbishop.look4sat.framework.data
 
-import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import androidx.room.*
+import com.rtbishop.look4sat.framework.model.SatRadio
+import kotlinx.coroutines.flow.Flow
 
-@HiltAndroidApp
-class Look4SatApplication : Application()
+@Dao
+interface RadiosDao {
+
+    @Query("SELECT COUNT(*) FROM radios")
+    fun getRadiosTotal(): Flow<Int>
+
+    @Transaction
+    @Query("SELECT * FROM radios WHERE catnum = :id AND isAlive = 1")
+    suspend fun getRadiosWithId(id: Int): List<SatRadio>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRadios(radios: List<SatRadio>)
+
+    @Query("DELETE FROM radios")
+    suspend fun deleteRadios()
+}

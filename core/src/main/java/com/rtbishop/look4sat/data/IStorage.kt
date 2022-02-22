@@ -15,30 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.local
+package com.rtbishop.look4sat.data
 
-import androidx.room.*
-import com.rtbishop.look4sat.framework.model.SatEntry
-import com.rtbishop.look4sat.framework.model.SatItem
+import com.rtbishop.look4sat.domain.model.SatEntry
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.model.SatRadio
+import com.rtbishop.look4sat.domain.predict.Satellite
 import kotlinx.coroutines.flow.Flow
 
-@Dao
-interface SatEntriesDao {
+interface IStorage {
 
-    @Query("SELECT COUNT(*) FROM entries")
-    fun getEntriesNumber(): Flow<Int>
+    fun getEntriesTotal(): Flow<Int>
 
-    @Transaction
-    @Query("SELECT catnum, name FROM entries ORDER BY name ASC")
+    fun getRadiosTotal(): Flow<Int>
+
     suspend fun getEntriesWithModes(): List<SatItem>
 
-    @Transaction
-    @Query("SELECT * FROM entries WHERE catnum IN (:catnums)")
-    suspend fun getSelectedEntries(catnums: List<Int>): List<SatEntry>
+    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun getRadiosWithId(id: Int): List<SatRadio>
+
     suspend fun insertEntries(entries: List<SatEntry>)
 
-    @Query("DELETE FROM entries")
-    suspend fun deleteEntries()
+    suspend fun insertRadios(radios: List<SatRadio>)
+
+    suspend fun clearAllData()
 }

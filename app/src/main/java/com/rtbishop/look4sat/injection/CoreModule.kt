@@ -20,18 +20,18 @@ package com.rtbishop.look4sat.injection
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import com.rtbishop.look4sat.data.DataRepository
-import com.rtbishop.look4sat.data.ISettingsHandler
-import com.rtbishop.look4sat.domain.DataParser
+import com.rtbishop.look4sat.data.DataParser
+import com.rtbishop.look4sat.data.Repository
 import com.rtbishop.look4sat.domain.DataReporter
-import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ILocationHandler
+import com.rtbishop.look4sat.domain.IRepository
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.framework.LocationHandler
 import com.rtbishop.look4sat.framework.SettingsHandler
-import com.rtbishop.look4sat.framework.local.LocalSource
-import com.rtbishop.look4sat.framework.local.Look4SatDb
-import com.rtbishop.look4sat.framework.remote.RemoteSource
+import com.rtbishop.look4sat.framework.data.Provider
+import com.rtbishop.look4sat.framework.data.Storage
+import com.rtbishop.look4sat.framework.data.StorageDb
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,24 +49,22 @@ object CoreModule {
     @Provides
     @Singleton
     fun provideSatelliteRepo(
-        settings: ISettingsHandler,
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
-    ): IDataRepository {
-        val db = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDb")
+    ): IRepository {
+        val db = Room.databaseBuilder(context, StorageDb::class.java, "Look4SatDb")
             .fallbackToDestructiveMigration().build()
         val dataParser = DataParser(defaultDispatcher)
-        val resolver = context.contentResolver
-        val local = LocalSource(db.entriesDao(), db.radiosDao(), settings, resolver, ioDispatcher)
-        val remote = RemoteSource(ioDispatcher)
+        val localSource = Storage(db.entriesDao(), db.radiosDao())
+        val remoteSource = Provider(context.contentResolver, ioDispatcher)
         val repositoryScope = CoroutineScope(SupervisorJob())
-        return DataRepository(dataParser, local, remote, repositoryScope)
+        return Repository(dataParser, localSource, remoteSource, repositoryScope)
     }
 
     @Provides
     @Singleton
-    fun provideSettingsHandler(sharedPreferences: SharedPreferences): ISettingsHandler {
+    fun provideSettingsHandler(sharedPreferences: SharedPreferences): ISettings {
         return SettingsHandler(sharedPreferences)
     }
 
@@ -74,9 +72,9 @@ object CoreModule {
     @Singleton
     fun provideLocationHandler(
         @ApplicationContext context: Context,
-        settingsHandler: ISettingsHandler
+        settings: ISettings
     ): ILocationHandler {
-        return LocationHandler(context, settingsHandler)
+        return LocationHandler(context, settings)
     }
 
     @Provides

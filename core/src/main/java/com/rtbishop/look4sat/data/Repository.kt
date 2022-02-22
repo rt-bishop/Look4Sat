@@ -17,8 +17,7 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.DataParser
-import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.IRepository
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatEntry
 import kotlinx.coroutines.*
@@ -27,12 +26,12 @@ import kotlinx.coroutines.flow.StateFlow
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 
-class DataRepository(
+class Repository(
     private val dataParser: DataParser,
-    private val localSource: ILocalSource,
-    private val remoteSource: IRemoteSource,
-    private val repositoryScope: CoroutineScope
-) : IDataRepository {
+    private val storage: IStorage,
+    private val provider: IProvider,
+    private val repoScope: CoroutineScope
+) : IRepository {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         _updateState.value = DataState.Error(exception.message)
@@ -41,42 +40,35 @@ class DataRepository(
     private val _updateState = MutableStateFlow<DataState<Long>>(DataState.Handled)
     override val updateState: StateFlow<DataState<Long>> = _updateState
 
-    override fun setUpdateStateHandled() {
-        _updateState.value = DataState.Handled
-    }
+    override fun getEntriesTotal() = storage.getEntriesTotal()
 
-    override fun getEntriesNumber() = localSource.getEntriesNumber()
+    override fun getRadiosTotal() = storage.getRadiosTotal()
 
-    override fun getRadiosNumber() = localSource.getRadiosNumber()
+    override suspend fun getEntriesWithModes() = storage.getEntriesWithModes()
 
-    override suspend fun getEntriesWithModes() = localSource.getEntriesWithModes()
+    override suspend fun getEntriesWithIds(ids: List<Int>) = storage.getEntriesWithIds(ids)
 
-    override suspend fun getSelectedEntries() = localSource.getSelectedEntries()
-
-    override suspend fun getRadios(catnum: Int) = localSource.getRadios(catnum)
+    override suspend fun getRadiosWithId(id: Int) = storage.getRadiosWithId(id)
 
     override fun updateFromFile(uri: String) {
-        repositoryScope.launch(exceptionHandler) {
+        repoScope.launch(exceptionHandler) {
             _updateState.value = DataState.Loading
-            localSource.getFileStream(uri)?.let { fileStream ->
+            provider.getLocalFileStream(uri)?.let { fileStream ->
                 delay(updateStateDelay)
-                localSource.insertEntries(importSatellites(fileStream))
+                storage.insertEntries(importSatellites(fileStream))
             }
             _updateState.value = DataState.Success(0L)
         }
     }
 
-    override fun updateFromWeb(sources: List<String>) {
+    override fun updateFromWeb(urls: List<String>) {
         _updateState.value = DataState.Loading
-        repositoryScope.launch(exceptionHandler) {
-            localSource.setDataSources(sources)
-        }
-        repositoryScope.launch(exceptionHandler) {
+        repoScope.launch(exceptionHandler) {
             val jobsMap = mutableMapOf<String, Deferred<InputStream?>>()
             val streamsMap = mutableMapOf<String, InputStream?>()
             val streams = mutableListOf<InputStream>()
             val entries = mutableListOf<SatEntry>()
-            sources.forEach { jobsMap[it] = async { remoteSource.getFileStream(it) } }
+            urls.forEach { jobsMap[it] = async { provider.getRemoteFileStream(it) } }
             jobsMap.forEach { job -> streamsMap[job.key] = job.value.await() }
             streamsMap.forEach { stream ->
                 stream.value?.let { inputStream ->
@@ -93,29 +85,27 @@ class DataRepository(
                 }
             }
             streams.forEach { stream -> entries.addAll(importSatellites(stream)) }
-            localSource.insertEntries(entries)
+            storage.insertEntries(entries)
         }
-        repositoryScope.launch(exceptionHandler) {
-            remoteSource.getFileStream(remoteSource.radioApi)?.let { stream ->
-                localSource.insertRadios(dataParser.parseJSONStream(stream))
+        repoScope.launch(exceptionHandler) {
+            provider.getRemoteFileStream(provider.radioApi)?.let { stream ->
+                storage.insertRadios(dataParser.parseJSONStream(stream))
                 _updateState.value = DataState.Success(0L)
             }
         }
     }
 
-    override fun clearAllData() {
-        repositoryScope.launch {
-            _updateState.value = DataState.Loading
-            delay(updateStateDelay)
-            localSource.clearAllData()
-            _updateState.value = DataState.Success(0L)
-        }
+    override fun setUpdateStateHandled() {
+        _updateState.value = DataState.Handled
     }
 
-    override suspend fun getDataSources() = localSource.getDataSources()
-
-    override suspend fun setEntriesSelection(catnums: List<Int>) {
-        localSource.setEntriesSelection(catnums)
+    override fun clearAllData() {
+        repoScope.launch {
+            _updateState.value = DataState.Loading
+            delay(updateStateDelay)
+            storage.clearAllData()
+            _updateState.value = DataState.Success(0L)
+        }
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {

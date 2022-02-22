@@ -18,8 +18,8 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.data.ISettingsHandler
-import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.IRepository
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
@@ -33,52 +33,54 @@ import kotlin.math.min
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val dataRepository: IDataRepository,
     private val predictor: Predictor,
-    preferences: ISettingsHandler,
+    private val repository: IRepository,
+    private val settings: ISettings,
 ) : ViewModel() {
 
-    private val stationPos = preferences.loadStationPosition()
+    private val stationPosition = settings.loadStationPosition()
+    private var allSatellites = listOf<Satellite>()
     private var dataUpdateJob: Job? = null
-    private var allSatList = listOf<Satellite>()
-    private lateinit var selectedSat: Satellite
+    private var dataUpdateRate = 2000L
+    private lateinit var selectedSatellite: Satellite
 
-    val stationPosLiveData = liveData {
-        val osmLat = clipLat(stationPos.latitude)
-        val osmLon = clipLon(stationPos.longitude)
+    val stationPos = liveData {
+        val osmLat = clipLat(stationPosition.latitude)
+        val osmLon = clipLon(stationPosition.longitude)
         emit(GeoPos(osmLat, osmLon))
     }
 
-    private val _satTrack = MutableLiveData<List<List<GeoPos>>>()
-    val satTrack: LiveData<List<List<GeoPos>>> = _satTrack
+    private val _track = MutableLiveData<List<List<GeoPos>>>()
+    val track: LiveData<List<List<GeoPos>>> = _track
 
-    private val _satFootprint = MutableLiveData<List<GeoPos>>()
-    val satFootprint: LiveData<List<GeoPos>> = _satFootprint
+    private val _footprint = MutableLiveData<List<GeoPos>>()
+    val footprint: LiveData<List<GeoPos>> = _footprint
 
-    private val _satData = MutableLiveData<MapData>()
-    val mapData: LiveData<MapData> = this._satData
+    private val _mapData = MutableLiveData<MapData>()
+    val mapData: LiveData<MapData> = this._mapData
 
-    private val _satPositions = MutableLiveData<Map<Satellite, GeoPos>>()
-    val satPositions: LiveData<Map<Satellite, GeoPos>> = _satPositions
+    private val _positions = MutableLiveData<Map<Satellite, GeoPos>>()
+    val positions: LiveData<Map<Satellite, GeoPos>> = _positions
 
     fun scrollSelection(decrement: Boolean) {
-        if (allSatList.isNotEmpty()) {
-            val index = allSatList.indexOf(selectedSat)
+        if (allSatellites.isNotEmpty()) {
+            val index = allSatellites.indexOf(selectedSatellite)
             if (decrement) {
-                if (index > 0) selectSatellite(allSatList[index - 1])
-                else selectSatellite(allSatList[allSatList.size - 1])
+                if (index > 0) selectSatellite(allSatellites[index - 1])
+                else selectSatellite(allSatellites[allSatellites.size - 1])
             } else {
-                if (index < allSatList.size - 1) selectSatellite(allSatList[index + 1])
-                else selectSatellite(allSatList[0])
+                if (index < allSatellites.size - 1) selectSatellite(allSatellites[index + 1])
+                else selectSatellite(allSatellites[0])
             }
         }
     }
 
     fun selectDefaultSatellite(catnum: Int) {
         viewModelScope.launch {
-            dataRepository.getSelectedEntries().also { satellites ->
+            val selectedIds = settings.loadEntriesSelection()
+            repository.getEntriesWithIds(selectedIds).also { satellites ->
                 if (satellites.isNotEmpty()) {
-                    allSatList = satellites
+                    allSatellites = satellites
                     if (catnum == -1) {
                         selectSatellite(satellites.first())
                     } else {
@@ -89,18 +91,18 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun selectSatellite(satellite: Satellite, updateFreq: Long = 2000) {
-        selectedSat = satellite
+    fun selectSatellite(satellite: Satellite, updateFreq: Long = dataUpdateRate) {
+        selectedSatellite = satellite
         viewModelScope.launch {
             dataUpdateJob?.cancelAndJoin()
             dataUpdateJob = launch {
                 val dateNow = Date()
-                getSatTrack(selectedSat, stationPos, dateNow)
+                getSatTrack(selectedSatellite, stationPosition, dateNow)
                 while (isActive) {
                     dateNow.time = System.currentTimeMillis()
-                    getPositions(allSatList, stationPos, dateNow)
-                    getSatFootprint(selectedSat, stationPos, dateNow)
-                    getSatData(selectedSat, stationPos, dateNow)
+                    getPositions(allSatellites, stationPosition, dateNow)
+                    getSatFootprint(selectedSatellite, stationPosition, dateNow)
+                    getSatData(selectedSatellite, stationPosition, dateNow)
                     delay(updateFreq)
                 }
             }
@@ -133,7 +135,7 @@ class MapViewModel @Inject constructor(
             currentTrack.add(currentPosition)
         }
         satTracks.add(currentTrack)
-        _satTrack.postValue(satTracks)
+        _track.postValue(satTracks)
     }
 
     private suspend fun getPositions(satellites: List<Satellite>, pos: GeoPos, date: Date) {
@@ -144,7 +146,7 @@ class MapViewModel @Inject constructor(
             val osmLon = clipLon(Math.toDegrees(satPos.longitude))
             positions[satellite] = GeoPos(osmLat, osmLon)
         }
-        _satPositions.postValue(positions)
+        _positions.postValue(positions)
     }
 
     private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
@@ -154,7 +156,7 @@ class MapViewModel @Inject constructor(
             val osmLon = clipLon(rangePos.longitude)
             GeoPos(osmLat, osmLon)
         }
-        _satFootprint.postValue(satFootprint)
+        _footprint.postValue(satFootprint)
     }
 
     private suspend fun getSatData(satellite: Satellite, pos: GeoPos, date: Date) {
@@ -167,7 +169,7 @@ class MapViewModel @Inject constructor(
             satellite, satellite.data.catnum, satellite.data.name, satPos.distance,
             satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos
         )
-        _satData.postValue(satData)
+        _mapData.postValue(satData)
     }
 
     private fun clipLat(latitude: Double): Double {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.local
+package com.rtbishop.look4sat.framework.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -23,9 +23,9 @@ import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatRadio
 
 @Database(entities = [SatEntry::class, SatRadio::class], version = 1, exportSchema = true)
-abstract class Look4SatDb : RoomDatabase() {
+abstract class StorageDb : RoomDatabase() {
 
-    abstract fun entriesDao(): SatEntriesDao
+    abstract fun entriesDao(): EntriesDao
 
-    abstract fun radiosDao(): SatRadiosDao
+    abstract fun radiosDao(): RadiosDao
 }

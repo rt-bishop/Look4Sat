@@ -18,9 +18,11 @@
 package com.rtbishop.look4sat.presentation.passesScreen
 
 import android.animation.ValueAnimator
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.animation.LinearInterpolator
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -34,7 +36,6 @@ import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.toTimerString
 import com.rtbishop.look4sat.presentation.getNavResult
-import com.rtbishop.look4sat.presentation.toast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -83,8 +84,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         viewModel.passes.observe(viewLifecycleOwner) { passesResult ->
             handleNewPasses(passesResult, adapter)
         }
-        viewModel.entries.observe(viewLifecycleOwner) { number ->
-            handleEntriesNumber(number)
+        viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
+            handleEntriesTotal(number)
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             viewModel.calculatePasses(prefs.first, prefs.second)
@@ -103,7 +104,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         }
     }
 
-    private fun handleEntriesNumber(number: Int) {
+    private fun handleEntriesTotal(number: Int) {
         if (number > 0) {
             binding.passesFab.setOnClickListener { navigateToEntries() }
         } else {
@@ -189,5 +190,9 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             val action = PassesFragmentDirections.actionGlobalRadarFragment(catNum, aosTime)
             findNavController().navigate(action)
         }
+    }
+
+    private fun Context.toast(text: String, duration: Int = Toast.LENGTH_SHORT) {
+        Toast.makeText(this, text, duration).apply { show() }
     }
 }

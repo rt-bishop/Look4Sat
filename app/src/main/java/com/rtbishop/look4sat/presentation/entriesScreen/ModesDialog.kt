@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.data.ISettingsHandler
 import com.rtbishop.look4sat.databinding.DialogModesBinding
+import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class ModesDialog : AppCompatDialogFragment(), ModesAdapter.ModesClickListener {
 
     @Inject
-    lateinit var preferences: ISettingsHandler
+    lateinit var preferences: ISettings
     private lateinit var binding: DialogModesBinding
     private val allModes = listOf(
         "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
