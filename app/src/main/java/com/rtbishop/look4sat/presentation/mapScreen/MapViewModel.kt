@@ -23,6 +23,7 @@ import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.QthConverter
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.Predictor
+import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -53,8 +54,8 @@ class MapViewModel @Inject constructor(
     private val _track = MutableLiveData<List<List<GeoPos>>>()
     val track: LiveData<List<List<GeoPos>>> = _track
 
-    private val _footprint = MutableLiveData<List<GeoPos>>()
-    val footprint: LiveData<List<GeoPos>> = _footprint
+    private val _footprint = MutableLiveData<SatPos>()
+    val footprint: LiveData<SatPos> = _footprint
 
     private val _mapData = MutableLiveData<MapData>()
     val mapData: LiveData<MapData> = this._mapData
@@ -151,12 +152,7 @@ class MapViewModel @Inject constructor(
 
     private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
         val satPos = predictor.getSatPos(satellite, pos, date.time)
-        val satFootprint = satPos.getRangeCircle().map { rangePos ->
-            val osmLat = clipLat(rangePos.latitude)
-            val osmLon = clipLon(rangePos.longitude)
-            GeoPos(osmLat, osmLon)
-        }
-        _footprint.postValue(satFootprint)
+        _footprint.postValue(satPos)
     }
 
     private suspend fun getSatData(satellite: Satellite, pos: GeoPos, date: Date) {

@@ -51,7 +51,6 @@ data class SatPos(
     fun getRangeCircle(): List<GeoPos> {
         val positions = mutableListOf<GeoPos>()
         val beta = acos(earthRadiusKm / (earthRadiusKm + altitude))
-//        val radiusKm = earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + altitude))
         var tempAzimuth = 0
         while (tempAzimuth < 360) {
             val azimuth = tempAzimuth / 360.0 * 2.0 * Math.PI
@@ -79,5 +78,9 @@ data class SatPos(
             tempAzimuth += 1
         }
         return positions
+    }
+
+    fun getRangeCircleRadiusKm(): Double {
+        return earthRadiusKm * acos(earthRadiusKm / (earthRadiusKm + altitude))
     }
 }

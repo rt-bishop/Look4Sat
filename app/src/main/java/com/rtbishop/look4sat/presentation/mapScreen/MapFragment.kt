@@ -32,6 +32,7 @@ import androidx.navigation.fragment.navArgs
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
@@ -41,7 +42,6 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 
 @AndroidEntryPoint
@@ -59,8 +59,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         strokeJoin = Paint.Join.ROUND
     }
     private val footprintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        strokeWidth = 2f
         style = Paint.Style.FILL_AND_STROKE
-        color = Color.parseColor("#26FFE082")
+        color = Color.parseColor("#FFE082")
     }
     private lateinit var binding: FragmentMapBinding
 
@@ -124,7 +125,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             posMap.entries.forEach {
                 Marker(mapView).apply {
                     setInfoWindow(null)
-                    textLabelFontSize = 24
+                    textLabelFontSize = 28
                     textLabelBackgroundColor = Color.TRANSPARENT
                     textLabelForegroundColor =
                         ContextCompat.getColor(requireContext(), R.color.accent)
@@ -164,13 +165,17 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         binding.mapView.overlays[1] = trackOverlay
     }
 
-    private fun handleFootprint(satFootprint: List<GeoPos>) {
-        val footprintPoints = satFootprint.map { GeoPoint(it.latitude, it.longitude) }
-        val footprintOverlay = Polygon().apply {
-            fillPaint.set(footprintPaint)
+    private fun handleFootprint(satPos: SatPos) {
+        val center = GeoPoint(Math.toDegrees(satPos.latitude), Math.toDegrees(satPos.longitude))
+        val radiusM = satPos.getRangeCircleRadiusKm() * 1000
+        val footprintPoints = mutableListOf<GeoPoint>()
+        for (i in 0..720) {
+            footprintPoints.add(center.destinationPoint(radiusM, i.toDouble()))
+        }
+        val footprintOverlay = Polyline().apply {
             outlinePaint.set(footprintPaint)
             try {
-                this.points = footprintPoints
+                setPoints(footprintPoints)
             } catch (exception: IllegalArgumentException) {
                 println(exception.stackTraceToString())
             }
@@ -180,8 +185,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun handleMapData(mapData: MapData) {
         binding.apply {
-            mapDataName.text =
-                String.format(getString(R.string.pat_osm_idName), mapData.catNum, mapData.name)
+            mapTitle.text = mapData.name
+            mapDataId.text = String.format(getString(R.string.map_sat_id), mapData.catNum)
             mapDataQth.text = String.format(getString(R.string.map_qth), mapData.qthLoc)
             mapDataAlt.text = String.format(getString(R.string.pat_altitude), mapData.altitude)
             mapDataDst.text = String.format(getString(R.string.pat_distance), mapData.range)

@@ -63,6 +63,8 @@
     <string name="map_title">Карта Мира</string>
     <string name="map_qth">QTH Локатор: %s</string>
     <string name="map_coverage">Покрытие: %.0fкм</string>
+    <string name="map_sat_id">Id: %d</string>
+    <string name="map_sat_name">%s</string>
 
     <string name="radar_az_text">Азим.</string>
     <string name="radar_az_value">%.1f°</string>

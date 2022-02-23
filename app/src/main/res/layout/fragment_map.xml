@@ -22,6 +22,12 @@
         <TextView
             android:id="@+id/map_title"
             style="@style/ToolbarTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="52dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="52dp"
+            android:layout_marginBottom="4dp"
             android:text="@string/map_title" />
 
     </androidx.cardview.widget.CardView>
@@ -86,7 +92,7 @@
                 style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="6dp"
                 android:text="@string/pat_osm_lat"
                 app:layout_constraintStart_toStartOf="parent"
@@ -119,7 +125,7 @@
                 style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="10dp"
                 android:text="@string/pat_altitude"
                 app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lat"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -172,7 +178,7 @@
         app:layout_constraintTop_toTopOf="@+id/map_coordinator" />
 
     <TextView
-        android:id="@+id/map_data_name"
+        android:id="@+id/map_data_id"
         style="@style/WorldMapText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -181,7 +187,7 @@
         android:ellipsize="end"
         android:gravity="center_horizontal"
         android:maxLines="1"
-        android:text="@string/pat_osm_idName"
+        android:text="@string/map_sat_id"
         app:layout_constraintBaseline_toBaselineOf="@+id/map_prev_btn"
         app:layout_constraintEnd_toStartOf="@+id/map_next_btn"
         app:layout_constraintStart_toEndOf="@+id/map_prev_btn" />

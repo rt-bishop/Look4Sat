@@ -57,6 +57,8 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@color/transparent</item>
         <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">@color/accent</item>
         <item name="android:textColorHint">@color/accent</item>

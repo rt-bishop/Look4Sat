@@ -18,11 +18,13 @@
         <EditText
             android:id="@+id/entries_search"
             style="@style/ToolbarTitle"
-            android:inputType="text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginStart="52dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="52dp"
             android:layout_marginBottom="4dp"
+            android:inputType="text"
             android:hint="@string/entries_search_hint"
             android:importantForAutofill="no" />
 
