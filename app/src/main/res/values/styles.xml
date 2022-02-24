@@ -142,7 +142,7 @@
 
     <style name="WorldMapText">
         <item name="android:textSize">@dimen/text_size_medium</item>
-        <item name="android:textColor">@color/textMain</item>
+        <item name="android:textColor">@color/accent</item>
     </style>
 
     <style name="WorldMapTitle">

@@ -66,7 +66,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         textSize = 28f
         strokeWidth = 2f
         style = Paint.Style.FILL
-        color = Color.parseColor("#FFE082")
+        color = Color.parseColor("#CCFFFFFF")
         setShadowLayer(3f, 3f, 3f, Color.BLACK)
     }
     private val labelRect = Rect()
@@ -165,6 +165,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun handleTrack(satTrack: List<List<GeoPos>>) {
+        val center = GeoPoint(satTrack[0][0].latitude, satTrack[0][0].longitude)
         val trackOverlay = FolderOverlay()
         satTrack.forEach { track ->
             val trackPoints = track.map { GeoPoint(it.latitude, it.longitude) }
@@ -179,6 +180,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             }
         }
         binding.mapView.overlays[1] = trackOverlay
+        binding.mapView.controller.animateTo(center)
     }
 
     private fun handleFootprint(satPos: SatPos) {
