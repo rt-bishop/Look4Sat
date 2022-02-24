@@ -18,10 +18,9 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.Paint
+import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -63,6 +62,14 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.parseColor("#FFE082")
     }
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textSize = 28f
+        strokeWidth = 2f
+        style = Paint.Style.FILL
+        color = Color.parseColor("#FFE082")
+        setShadowLayer(3f, 3f, 3f, Color.BLACK)
+    }
+    private val labelRect = Rect()
     private lateinit var binding: FragmentMapBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -125,12 +132,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             posMap.entries.forEach {
                 Marker(mapView).apply {
                     setInfoWindow(null)
-                    textLabelFontSize = 28
-                    textLabelBackgroundColor = Color.TRANSPARENT
-                    textLabelForegroundColor =
-                        ContextCompat.getColor(requireContext(), R.color.accent)
-                    setTextIcon(it.key.data.name)
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    icon = getCustomTextIcon(it.key.data.name)
                     try {
                         position = GeoPoint(it.value.latitude, it.value.longitude)
                     } catch (exception: IllegalArgumentException) {
@@ -146,6 +149,19 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             mapView.overlays[3] = markers
             mapView.invalidate()
         }
+    }
+
+    private fun getCustomTextIcon(textLabel: String): Drawable {
+        textPaint.getTextBounds(textLabel, 0, textLabel.length, labelRect)
+        val iconSize = 8f
+        val width = labelRect.width() + iconSize * 2f
+        val height = textPaint.textSize * 3f + iconSize * 2f
+        val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
+        Canvas(bitmap).run {
+            drawCircle(width / 2f, height / 2f, iconSize, textPaint)
+            drawText(textLabel, iconSize / 2f, height - iconSize, textPaint)
+        }
+        return BitmapDrawable(binding.mapView.context.resources, bitmap)
     }
 
     private fun handleTrack(satTrack: List<List<GeoPos>>) {
