@@ -18,7 +18,9 @@
 package com.rtbishop.look4sat.presentation
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
@@ -39,6 +41,13 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContentView(ActivityMainBinding.inflate(layoutInflater).root)
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        val newConfig = Configuration(newBase?.resources?.configuration)
+        newConfig.fontScale = 1.0f
+        applyOverrideConfiguration(newConfig)
+        super.attachBaseContext(newBase)
     }
 }
 
