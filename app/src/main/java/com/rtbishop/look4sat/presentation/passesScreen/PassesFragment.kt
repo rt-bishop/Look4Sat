@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.presentation.passesScreen
 
 import android.animation.ValueAnimator
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -42,27 +41,20 @@ import dagger.hilt.android.AndroidEntryPoint
 class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesClickListener {
 
     private val viewModel: PassesViewModel by viewModels()
-    private lateinit var binding: FragmentPassesBinding
-    private lateinit var refreshAnimator: ValueAnimator
+    private val passesAdapter = PassesAdapter(this)
+    private var binding: FragmentPassesBinding? = null
+    private var refreshAnimator: ValueAnimator? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentPassesBinding.bind(view)
-        setupComponents()
-    }
-
-    private fun setupComponents() {
-        val context = requireContext()
-        val adapter = PassesAdapter(viewModel.shouldUseUTC(), this)
-        val layoutManager = LinearLayoutManager(context)
-        val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
-        binding.run {
+        binding = FragmentPassesBinding.bind(view).apply {
+            passesAdapter.setUTC(viewModel.shouldUseUTC())
             passesRecycler.apply {
                 setHasFixedSize(true)
-                this.adapter = adapter
-                this.layoutManager = layoutManager
-                addItemDecoration(itemDecoration)
+                adapter = passesAdapter
+                layoutManager = LinearLayoutManager(requireContext())
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addItemDecoration(DividerItemDecoration(requireContext(), 1))
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         if (dy > 0 && passesFab.visibility == View.VISIBLE) passesFab.hide()
@@ -71,21 +63,51 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 })
             }
             passesRefreshBtn.setOnClickListener { viewModel.calculatePasses() }
-            passesMapBtn.setOnClickListener { navigateToMap() }
-            passesFilterBtn.setOnClickListener { navigateToFilter() }
-            passesFab.setOnClickListener { navigateToEntries() }
-            passesSettingsBtn.setOnClickListener { navigateToSettings() }
+            passesMapBtn.setOnClickListener {
+                val dir = PassesFragmentDirections.actionGlobalMapFragment()
+                findNavController().navigate(dir)
+            }
+            passesFilterBtn.setOnClickListener {
+                val dir = PassesFragmentDirections.actionPassesToFilter()
+                findNavController().navigate(dir)
+            }
+            passesSettingsBtn.setOnClickListener {
+                val dir = PassesFragmentDirections.actionGlobalSettingsFragment()
+                findNavController().navigate(dir)
+            }
+            setupAnimator()
+            setupObservers()
         }
-        setupObservers(adapter)
-        setupAnimator()
     }
 
-    private fun setupObservers(adapter: PassesAdapter) {
-        viewModel.passes.observe(viewLifecycleOwner) { passesResult ->
-            handleNewPasses(passesResult, adapter)
+    override fun navigateToPass(satPass: SatPass) {
+        if (satPass.progress < 100) satPass.run {
+            val dir = PassesFragmentDirections.actionGlobalRadarFragment(this.catNum, this.aosTime)
+            findNavController().navigate(dir)
         }
+    }
+
+    override fun onDestroyView() {
+        binding?.passesRecycler?.adapter = null
+        binding = null
+        super.onDestroyView()
+    }
+
+    private fun setupAnimator() {
+        refreshAnimator = ValueAnimator.ofFloat(0f, -360f).apply {
+            duration = 875
+            interpolator = LinearInterpolator()
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener { binding?.passesRefreshBtn?.rotation = animatedValue as Float }
+        }
+    }
+
+    private fun setupObservers() {
         viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
             handleEntriesTotal(number)
+        }
+        viewModel.passes.observe(viewLifecycleOwner) { passesResult ->
+            handleNewPasses(passesResult)
         }
         getNavResult<Pair<Int, Double>>(R.id.nav_passes, "prefs") { prefs ->
             viewModel.calculatePasses(prefs.first, prefs.second)
@@ -95,104 +117,67 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         }
     }
 
-    private fun setupAnimator() {
-        refreshAnimator = ValueAnimator.ofFloat(0f, -360f).apply {
-            duration = 875
-            interpolator = LinearInterpolator()
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { binding.passesRefreshBtn.rotation = animatedValue as Float }
-        }
-    }
-
     private fun handleEntriesTotal(number: Int) {
-        if (number > 0) {
-            binding.passesFab.setOnClickListener { navigateToEntries() }
-        } else {
-            val errorMessage = getString(R.string.passes_empty_db)
-            binding.passesFab.setOnClickListener { requireContext().toast(errorMessage) }
-        }
-    }
-
-    private fun handleNewPasses(state: DataState<List<SatPass>>, adapter: PassesAdapter) {
-        when (state) {
-            is DataState.Success -> {
-                adapter.submitList(state.data)
-                tickMainTimer(state.data)
-                if (state.data.isNotEmpty()) { // show new passes list
-                    binding.run {
-                        passesRecycler.visibility = View.VISIBLE
-                        passesErrorMsg.visibility = View.INVISIBLE
-                        binding.passesRefreshBtn.isEnabled = true
-                        refreshAnimator.cancel()
-                    }
-                } else { // show no passes message
-                    binding.run {
-                        passesRecycler.visibility = View.INVISIBLE
-                        passesErrorMsg.visibility = View.VISIBLE
-                        binding.passesRefreshBtn.isEnabled = true
-                        refreshAnimator.cancel()
-                    }
+        binding?.run {
+            if (number > 0) {
+                passesFab.setOnClickListener {
+                    val direction = PassesFragmentDirections.actionGlobalEntriesFragment()
+                    findNavController().navigate(direction)
+                }
+            } else {
+                passesFab.setOnClickListener {
+                    val errorMessage = getString(R.string.passes_empty_db)
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
-            is DataState.Loading -> {
-                binding.run {
-                    refreshAnimator.start()
+        }
+    }
+
+    private fun handleNewPasses(state: DataState<List<SatPass>>) {
+        binding?.run {
+            when (state) {
+                is DataState.Success -> {
+                    passesAdapter.submitList(state.data)
+                    tickMainTimer(state.data)
+                    if (state.data.isNotEmpty()) { // show new passes list
+                        passesRecycler.visibility = View.VISIBLE
+                        passesErrorMsg.visibility = View.INVISIBLE
+                        passesRefreshBtn.isEnabled = true
+                        refreshAnimator?.cancel()
+                    } else { // show no passes message
+                        passesRecycler.visibility = View.INVISIBLE
+                        passesErrorMsg.visibility = View.VISIBLE
+                        passesRefreshBtn.isEnabled = true
+                        refreshAnimator?.cancel()
+                    }
+                }
+                is DataState.Loading -> {
+                    refreshAnimator?.start()
                     passesRefreshBtn.isEnabled = false
                     passesTimer.text = 0L.toTimerString()
                     passesErrorMsg.visibility = View.INVISIBLE
                 }
+                else -> {}
             }
-            else -> {}
         }
     }
 
     private fun tickMainTimer(passes: List<SatPass>) {
-        if (passes.isNotEmpty()) {
-            val timeNow = System.currentTimeMillis()
-            try {
-                val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
-                val millisBeforeStart = nextPass.aosTime.minus(timeNow)
-                binding.passesTimer.text = millisBeforeStart.toTimerString()
-            } catch (e: NoSuchElementException) {
-                val lastPass = passes.last()
-                val millisBeforeEnd = lastPass.losTime.minus(timeNow)
-                binding.passesTimer.text = millisBeforeEnd.toTimerString()
+        binding?.run {
+            if (passes.isNotEmpty()) {
+                val timeNow = System.currentTimeMillis()
+                try {
+                    val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
+                    val millisBeforeStart = nextPass.aosTime.minus(timeNow)
+                    passesTimer.text = millisBeforeStart.toTimerString()
+                } catch (e: NoSuchElementException) {
+                    val lastPass = passes.last()
+                    val millisBeforeEnd = lastPass.losTime.minus(timeNow)
+                    passesTimer.text = millisBeforeEnd.toTimerString()
+                }
+            } else {
+                passesTimer.text = 0L.toTimerString()
             }
-        } else {
-            binding.passesTimer.text = 0L.toTimerString()
         }
-    }
-
-    private fun navigateToMap() {
-        val direction = PassesFragmentDirections.actionGlobalMapFragment()
-        findNavController().navigate(direction)
-    }
-
-    private fun navigateToFilter() {
-        val direction = PassesFragmentDirections.actionPassesToFilter()
-        findNavController().navigate(direction)
-    }
-
-    private fun navigateToEntries() {
-        val direction = PassesFragmentDirections.actionGlobalEntriesFragment()
-        findNavController().navigate(direction)
-    }
-
-    private fun navigateToSettings() {
-        val direction = PassesFragmentDirections.actionGlobalSettingsFragment()
-        findNavController().navigate(direction)
-    }
-
-    override fun navigateToPass(satPass: SatPass) {
-        if (satPass.progress < 100) {
-            val catNum = satPass.catNum
-            val aosTime = satPass.aosTime
-            val action = PassesFragmentDirections.actionGlobalRadarFragment(catNum, aosTime)
-            findNavController().navigate(action)
-        }
-    }
-
-    private fun Context.toast(text: String, duration: Int = Toast.LENGTH_SHORT) {
-        Toast.makeText(this, text, duration).apply { show() }
     }
 }

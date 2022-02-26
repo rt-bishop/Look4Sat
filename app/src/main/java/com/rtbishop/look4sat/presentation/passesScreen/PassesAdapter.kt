@@ -28,7 +28,7 @@ import com.rtbishop.look4sat.domain.predict.SatPass
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PassesAdapter(private val isUTC: Boolean, private val clickListener: PassesClickListener) :
+class PassesAdapter(private val clickListener: PassesClickListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<SatPass>() {
@@ -41,6 +41,7 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
         }
     }
     private val differ = AsyncListDiffer(this, diffCallback)
+    private var isUTC: Boolean = false
 
     interface PassesClickListener {
         fun navigateToPass(satPass: SatPass)
@@ -48,6 +49,10 @@ class PassesAdapter(private val isUTC: Boolean, private val clickListener: Passe
 
     fun submitList(passes: List<SatPass>) {
         differ.submitList(passes)
+    }
+
+    fun setUTC(isUTC: Boolean) {
+        this.isUTC = isUTC
     }
 
     override fun getItemCount() = differ.currentList.size
