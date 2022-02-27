@@ -38,101 +38,22 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     private val viewModel: RadarViewModel by viewModels()
     private val navArgs: RadarFragmentArgs by navArgs()
-    private lateinit var binding: FragmentRadarBinding
-    private lateinit var radarView: RadarView
+    private val radioAdapter = RadioAdapter()
+    private var binding: FragmentRadarBinding? = null
+    private var radarView: RadarView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentRadarBinding.bind(view)
-        setupComponents()
-    }
-
-    private fun setupComponents() {
-        val context = requireContext()
-        val adapter = RadioAdapter()
-        val layoutManager = LinearLayoutManager(context)
-        val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
-        binding.run {
+        binding = FragmentRadarBinding.bind(view).apply {
             radarRecycler.apply {
                 setHasFixedSize(true)
-                this.adapter = adapter
-                this.layoutManager = LinearLayoutManager(context)
-                addItemDecoration(itemDecoration)
+                this.adapter = radioAdapter
+                this.layoutManager = LinearLayoutManager(requireContext())
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addItemDecoration(DividerItemDecoration(requireContext(), 1))
             }
-            setupObservers(adapter)
+            setupObservers()
         }
-    }
-
-    private fun setupObservers(radioAdapter: RadioAdapter) {
-        viewModel.getPass(navArgs.catNum, navArgs.aosTime).observe(viewLifecycleOwner) { pass ->
-            radarView = RadarView(requireContext()).apply {
-                setShowAim(viewModel.getUseCompass())
-                setScanning(viewModel.getShowSweep())
-            }
-            binding.radarCard.addView(radarView)
-            viewModel.radarData.observe(viewLifecycleOwner) { passData ->
-                radarView.setPosition(passData.satPos)
-                radarView.setPositions(passData.satTrack)
-                setPassText(pass, passData.satPos)
-            }
-            viewModel.transmitters.observe(viewLifecycleOwner) { list ->
-                if (list.isNotEmpty()) {
-                    radioAdapter.submitList(list)
-                    binding.radarRecyclerMsg.text = getString(R.string.trans_data)
-                } else {
-                    binding.radarRecyclerMsg.text = getString(R.string.trans_no_data)
-                }
-                radarView.invalidate()
-            }
-            viewModel.orientation.observe(viewLifecycleOwner) { value ->
-                radarView.setOrientation(value.first, value.second, value.third)
-            }
-            binding.radarBack.setOnClickListener { findNavController().navigateUp() }
-            binding.radarMap.setOnClickListener { navigateToMap(pass.catNum) }
-            binding.radarBtnNotify.isEnabled = false
-            binding.radarBtnSettings.setOnClickListener { navigateToSettings() }
-        }
-    }
-
-    private fun setPassText(satPass: SatPass, satPos: SatPos) {
-        val timeNow = System.currentTimeMillis()
-        val radarAzim = getString(R.string.radar_az_value)
-        val radarElev = getString(R.string.radar_el_value)
-        val radarAlt = getString(R.string.radar_alt_value)
-        val radarDist = getString(R.string.radar_dist_value)
-        val radarId = getString(R.string.radar_sat_id)
-        binding.radarAzValue.text = String.format(radarAzim, Math.toDegrees(satPos.azimuth))
-        binding.radarElValue.text = String.format(radarElev, Math.toDegrees(satPos.elevation))
-        binding.radarAltValue.text = String.format(radarAlt, satPos.altitude)
-        binding.radarDstValue.text = String.format(radarDist, satPos.distance)
-        binding.radarSatId.text = String.format(radarId, satPass.catNum)
-
-        if (!satPass.isDeepSpace) {
-            if (timeNow < satPass.aosTime) {
-                val millisBeforeStart = satPass.aosTime.minus(timeNow)
-                binding.radarTimer.text = millisBeforeStart.toTimerString()
-            } else {
-                val millisBeforeEnd = satPass.losTime.minus(timeNow)
-                binding.radarTimer.text = millisBeforeEnd.toTimerString()
-                if (timeNow > satPass.losTime) {
-                    binding.radarTimer.text = 0L.toTimerString()
-                    findNavController().navigateUp()
-                }
-            }
-        } else {
-            binding.radarTimer.text = 0L.toTimerString()
-        }
-    }
-
-    private fun navigateToMap(catnum: Int) {
-        val direction = RadarFragmentDirections.actionGlobalMapFragment(catnum)
-        findNavController().navigate(direction)
-    }
-
-    private fun navigateToSettings() {
-        val direction = RadarFragmentDirections.actionGlobalSettingsFragment()
-        findNavController().navigate(direction)
     }
 
     override fun onResume() {
@@ -143,5 +64,80 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
     override fun onPause() {
         super.onPause()
         viewModel.disableSensor()
+    }
+
+    override fun onDestroyView() {
+        binding?.radarRecycler?.adapter = null
+        radarView = null
+        binding = null
+        super.onDestroyView()
+    }
+
+    private fun setupObservers() {
+        viewModel.getPass(navArgs.catNum, navArgs.aosTime).observe(viewLifecycleOwner) { pass ->
+            binding?.run {
+                radarView = RadarView(requireContext()).apply {
+                    setShowAim(viewModel.getUseCompass())
+                    setScanning(viewModel.getShowSweep())
+                }
+                radarCard.addView(radarView)
+                viewModel.radarData.observe(viewLifecycleOwner) { passData ->
+                    radarView?.setPosition(passData.satPos)
+                    radarView?.setPositions(passData.satTrack)
+                    setPassText(pass, passData.satPos)
+                }
+                viewModel.transmitters.observe(viewLifecycleOwner) { list ->
+                    if (list.isNotEmpty()) {
+                        radioAdapter.submitList(list)
+                        radarRecyclerMsg.text = getString(R.string.trans_data)
+                    } else {
+                        radarRecyclerMsg.text = getString(R.string.trans_no_data)
+                    }
+                    radarView?.invalidate()
+                }
+                viewModel.orientation.observe(viewLifecycleOwner) { value ->
+                    radarView?.setOrientation(value.first, value.second, value.third)
+                }
+                radarBack.setOnClickListener { findNavController().navigateUp() }
+                radarMap.setOnClickListener {
+                    val direction = RadarFragmentDirections.actionGlobalMapFragment(pass.catNum)
+                    findNavController().navigate(direction)
+                }
+                radarBtnNotify.isEnabled = false
+                radarBtnSettings.setOnClickListener {
+                    val direction = RadarFragmentDirections.actionGlobalSettingsFragment()
+                    findNavController().navigate(direction)
+                }
+            }
+        }
+    }
+
+    private fun setPassText(satPass: SatPass, satPos: SatPos) {
+        binding?.run {
+            val timeNow = System.currentTimeMillis()
+            val radarAzim = getString(R.string.radar_az_value)
+            val radarElev = getString(R.string.radar_el_value)
+            val radarAlt = getString(R.string.radar_alt_value)
+            val radarDist = getString(R.string.radar_dist_value)
+            val radarId = getString(R.string.radar_sat_id)
+            radarAzValue.text = String.format(radarAzim, Math.toDegrees(satPos.azimuth))
+            radarElValue.text = String.format(radarElev, Math.toDegrees(satPos.elevation))
+            radarAltValue.text = String.format(radarAlt, satPos.altitude)
+            radarDstValue.text = String.format(radarDist, satPos.distance)
+            radarSatId.text = String.format(radarId, satPass.catNum)
+            if (!satPass.isDeepSpace) {
+                if (timeNow < satPass.aosTime) {
+                    val millisBeforeStart = satPass.aosTime.minus(timeNow)
+                    radarTimer.text = millisBeforeStart.toTimerString()
+                } else {
+                    val millisBeforeEnd = satPass.losTime.minus(timeNow)
+                    radarTimer.text = millisBeforeEnd.toTimerString()
+                    if (timeNow > satPass.losTime) {
+                        radarTimer.text = 0L.toTimerString()
+                        findNavController().navigateUp()
+                    }
+                }
+            } else radarTimer.text = 0L.toTimerString()
+        }
     }
 }

@@ -35,17 +35,19 @@
             android:id="@+id/radio_down_img"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="6dp"
+            android:contentDescription="@string/downlink"
             android:rotation="90"
             app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/radio_info"
-            android:contentDescription="@string/downlink"
             app:srcCompat="@drawable/ic_next" />
 
         <TextView
             android:id="@+id/radio_downlink"
             style="@style/RadioFreq"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="3dp"
             app:layout_constraintEnd_toStartOf="@+id/radio_guide"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radio_info" />
@@ -54,17 +56,18 @@
             android:id="@+id/radio_up_img"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="@string/uplink"
             android:rotation="270"
             app:layout_constraintBottom_toBottomOf="@+id/radio_info"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/radio_info"
-            android:contentDescription="@string/uplink"
             app:srcCompat="@drawable/ic_next" />
 
         <TextView
             android:id="@+id/radio_uplink"
             style="@style/RadioFreq"
+            android:layout_marginEnd="4dp"
             app:layout_constraintBaseline_toBaselineOf="@+id/radio_downlink"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/radio_guide" />
@@ -73,7 +76,8 @@
             android:id="@+id/radio_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
             android:layout_marginBottom="4dp"
             android:text="@string/trans_mode"
             android:textSize="@dimen/text_size_small"
@@ -87,7 +91,7 @@
             android:id="@+id/radio_inverted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/trans_inverted"
             android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/radio_mode"
