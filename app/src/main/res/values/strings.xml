@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Look4Sat</string>
+    <string name="app_timer">00:00:00</string>
     <string name="app_version">Version: %s</string>
     <string name="app_subtitle">Satellite tracker and pass predictor</string>
+
+    <!--Buttons-->
 
     <string name="btn_add">Add</string>
     <string name="btn_accept">Accept</string>
@@ -29,54 +32,45 @@
     <string name="btn_support">Support</string>
     <string name="btn_fdroid">F-Droid</string>
 
-    <string name="fmt_entries">Satellites: %s</string>
-    <string name="fmt_radios">Transceivers: %s</string>
+    <!--Dialogs-->
 
-    <string name="downlink">Downlink</string>
-    <string name="uplink">Uplink</string>
+    <string name="filter_title">Filter passes</string>
+    <string name="filter_hours_hint">Hours ahead</string>
+    <string name="filter_hours_text">Show passes that occur within X hours</string>
+    <string name="filter_elev_hint">Minimal elevation</string>
+    <string name="filter_elev_text">Show passes with max elevation above</string>
 
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="locator_title">QTH locator settings</string>
+    <string name="locator_text">Set station\'s position using your locator</string>
+    <string name="locator_hint">QTH</string>
+
+    <string name="modes_title">Select modulation type</string>
+
+    <string name="position_title">Station position settings</string>
+    <string name="position_lat_text">Set your ground station\'s latitude</string>
+    <string name="position_lat_hint">Latitude</string>
+    <string name="position_lon_text">Set your ground station\'s longitude</string>
+    <string name="position_lon_hint">Longitude</string>
 
     <string name="sources_title">Manage data sources</string>
     <string name="sources_hint">HTTPS Source</string>
 
-    <string name="entries_modes">Select modulation type</string>
-    <string name="entries_search_hint">Search by Name / Id</string>
-    <string name="entries_update_error">Error importing satellite data</string>
+    <!--Fragments-->
 
-    <string name="timer_zero" translatable="false">00:00:00</string>
+    <string name="entries_search_hint">Search by Name / Id</string>
 
     <string name="passes_error">There are no upcoming satellite passes to display</string>
     <string name="passes_empty_db">No data to show. Please update the database via Settings menu.</string>
 
-    <string name="pass_satName" translatable="false">%s</string>
-    <string name="pass_satId" translatable="false">Id:%d</string>
+    <string name="pass_satName">%s</string>
+    <string name="pass_satId">Id:%d</string>
     <string name="pass_aosAz">AOS - %.1f°</string>
-    <string name="pass_tcaAz">Azimuth: %.1f°</string>
-    <string name="pass_elevation">MaxElev: %.1f°</string>
+    <string name="pass_elevation">Elevation: %.1f°</string>
     <string name="pass_los">%.1f° - LOS</string>
     <string name="pass_altitude">Altitude: %.0f km</string>
-    <string name="pass_placeholder" translatable="false"> - - : - - </string>
-    <string name="pass_startTime" translatable="false">HH:mm:ss - EEE</string>
-    <string name="pass_endTime" translatable="false">EEE - HH:mm:ss</string>
-
-    <string name="trans_mode">Mode: %s</string>
-    <string name="trans_no_mode">Mode: null</string>
-    <string name="trans_inverted">Inverted: %s</string>
-    <string name="trans_description" translatable="false">%s</string>
-    <string name="trans_no_link" translatable="false">- - . - -</string>
-    <string name="trans_link_low" translatable="false">%.4f</string>
-    <string name="trans_link_lowHigh" translatable="false">%.4f - %.4f</string>
-    <string name="trans_data">Satellite transceivers:</string>
-    <string name="trans_no_data">No transceivers found for this satellite</string>
-
-    <string name="map_title">World Map</string>
-    <string name="map_qth">QTH Locator: %s</string>
-    <string name="map_coverage">Coverage: %.0f km</string>
-    <string name="map_sat_id">Id: %d</string>
-    <string name="map_sat_name">%s</string>
-    <string name="map_copyright" translatable="false">Wikimedia maps | Map data © OpenStreetMap contributors</string>
+    <string name="pass_placeholder"> - - : - - </string>
+    <string name="pass_startTime">HH:mm:ss - EEE</string>
+    <string name="pass_endTime">EEE - HH:mm:ss</string>
 
     <string name="radar_az_text">Azimuth</string>
     <string name="radar_az_value">%.1f°</string>
@@ -86,71 +80,59 @@
     <string name="radar_alt_value">%.0f km</string>
     <string name="radar_dist_text">Distance</string>
     <string name="radar_dist_value">%.0f km</string>
-    <string name="radar_sat_id">Id: %d</string>
     <string name="radar_sat_name">%s</string>
+    <string name="radar_sat_id">Id:%d</string>
 
-    <string name="pat_azimuth">Azimuth: %.1f°</string>
-    <string name="pat_elevation">Elevation: %.1f°</string>
-    <string name="pat_distance">Range: %.0f km</string>
-    <string name="pat_altitude">Altitude: %.0f km</string>
-    <string name="pat_osm_idName" translatable="false">%s : %s</string>
-    <string name="pat_osm_lat">Latitude: %.1f°</string>
-    <string name="pat_osm_lon">Longitude: %.1f°</string>
-    <string name="pat_osm_vel">Velocity: %.2f km/s</string>
+    <string name="radio_mode">Mode: %s</string>
+    <string name="radio_inverted">Inverted: %s</string>
+    <string name="radio_info">%s</string>
+    <string name="radio_no_link">- - . - -</string>
+    <string name="radio_link_low">%.4f</string>
+    <string name="radio_link_lowHigh">%.4f - %.4f</string>
+    <string name="radio_data">Satellite transceivers:</string>
+    <string name="radio_no_data">No transceivers found for this satellite</string>
+    <string name="radio_string_yes">Yes</string>
+    <string name="radio_string_no">No</string>
+    <string name="radio_downlink">Downlink</string>
+    <string name="radio_uplink">Uplink</string>
 
-    <string name="pref_gsp_title">Ground station position</string>
-    <string name="pref_pos_gps">Set position from GPS data</string>
-    <string name="pref_pos_gps_null">No geolocation data</string>
-    <string name="pref_pos_manual_error">Invalid location entered</string>
-    <string name="pref_pos_gps_error">Check your location permissions</string>
-    <string name="pref_pos_qth">Set position from QTH locator</string>
-    <string name="pref_pos_qth_error">Invalid QTH locator</string>
-    <string name="pref_pos_success">Position updated successfully</string>
-    <string name="pref_pass_title">Satellite pass preferences</string>
-    <string name="pref_hours_title">Hours ahead</string>
-    <string name="pref_elev_title">Minimal elevation</string>
-    <string name="pref_map_labels_title">Map preferences</string>
-    <string name="pref_map_labels">Use text labels instead of icons</string>
-    <string name="pref_other_title">Other</string>
-    <string name="pref_time_utc_title">Show pass time in UTC</string>
-    <string name="pref_radar_sweep">Enable radar sweep animation</string>
-    <string name="pref_compass_title">Use sensors to rotate radar view</string>
+    <string name="map_title">World Map</string>
+    <string name="map_sat_name">%s</string>
+    <string name="map_sat_id">Id:%d</string>
+    <string name="map_latitude">Latitude: %.1f°</string>
+    <string name="map_longitude">Longitude: %.1f°</string>
+    <string name="map_qth">QTH Locator: %s</string>
+    <string name="map_altitude">Altitude: %.0f km</string>
+    <string name="map_distance">Distance: %.0f km</string>
+    <string name="map_velocity">Velocity: %.2f km/s</string>
+    <string name="map_copyright">Wikimedia maps | Map data © OpenStreetMap contributors</string>
 
-    <string name="dialog_filter_passes">Filter passes</string>
-
-    <string name="pref_hours_ahead_key" translatable="false">hoursAhead</string>
-    <string name="pref_hours_ahead_hint">Hours ahead</string>
-    <string name="pref_hours_ahead_summary">Show passes that occur within X hours</string>
-    <string name="pref_hours_ahead_input_error">Set the value between 1h and 168h</string>
-    <string name="pref_min_el_key" translatable="false">minEl</string>
-    <string name="pref_min_el_hint">Minimal elevation</string>
-    <string name="pref_min_el_summary">Show passes with max elevation above</string>
-    <string name="pref_min_el_input_error">Set the value between 0° and 90°</string>
+    <!--Cards-->
 
     <string name="location_title">Station position</string>
     <string name="location_lat">Latitude: %.4f°</string>
     <string name="location_lon">Longitude: %.4f°</string>
-    <string name="location_gps">From GPS</string>
-    <string name="location_gps_null">No geolocation data</string>
+    <string name="location_null">No geolocation data</string>
     <string name="location_gps_error">Check your location permissions</string>
-    <string name="location_qth">From QTH</string>
+    <string name="location_manual_error">Invalid location entered</string>
     <string name="location_qth_error">Invalid QTH locator</string>
     <string name="location_success">Position updated successfully</string>
+
+    <string name="data_title">Satellite data update</string>
+    <string name="data_error">Update completed with errors</string>
+    <string name="data_entries">Satellites: %s</string>
+    <string name="data_radios">Transceivers: %s</string>
+    <string name="data_success">Update completed successfully</string>
+
+    <string name="remote_title">Rotator preferences</string>
+    <string name="remote_switch">Enable remote control</string>
+    <string name="remote_ip_hint">IP address</string>
+    <string name="remote_port_hint">Port</string>
 
     <string name="other_title">Other preferences</string>
     <string name="other_switch_utc">Show pass time in UTC</string>
     <string name="other_switch_sweep">Enable radar sweep animation</string>
     <string name="other_switch_sensors">Use sensors to rotate radar view</string>
-
-    <string name="tracking_title">Tracking preferences</string>
-    <string name="tracking_switch">Antenna rotator control</string>
-    <string name="tracking_ip_hint">IP address</string>
-    <string name="tracking_ip_invalid">Please enter a valid IP address</string>
-    <string name="tracking_port_hint">Port</string>
-    <string name="tracking_port_invalid">Please enter a port between 1024 to 65535</string>
-
-    <string name="update_title">Satellite data update</string>
-    <string name="update_error">Update completed with errors</string>
 
     <string name="outro_title">I would like to say thanks to:</string>
     <string name="outro_thanks"> • You for downloading and using Look4Sat! \nMay your sky always be clear!

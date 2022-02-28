@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.google.android.material.snackbar.Snackbar
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.DataState
@@ -44,22 +43,14 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentEntriesBinding.bind(view)
-        setupComponents()
-    }
-
-    private fun setupComponents() {
-        val context = requireContext()
-        val adapter = EntriesAdapter(viewModel)
-        val layoutManager = GridLayoutManager(context, 2)
-        val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
-        binding.run {
+        val entriesAdapter = EntriesAdapter(viewModel)
+        binding = FragmentEntriesBinding.bind(view).apply {
             entriesRecycler.apply {
                 setHasFixedSize(true)
-                this.adapter = adapter
-                this.layoutManager = layoutManager
-                addItemDecoration(itemDecoration)
+                adapter = entriesAdapter
+                layoutManager = GridLayoutManager(requireContext(), 2)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addItemDecoration(DividerItemDecoration(requireContext(), 1))
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         if (dy > 0 && entriesFab.visibility == View.VISIBLE) entriesFab.hide()
@@ -67,29 +58,28 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                     }
                 })
             }
-            entriesBackBtn.setOnClickListener { findNavController().navigateUp() }
+            entriesBtnBack.setOnClickListener { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
-            entriesModesBtn.setOnClickListener { navigateToModesDialog() }
-            entriesSelectBtn.setOnClickListener { viewModel.selectCurrentItems(true) }
-            entriesClearBtn.setOnClickListener { viewModel.selectCurrentItems(false) }
+            entriesBtnModes.setOnClickListener {
+                val direction = EntriesFragmentDirections.entriesToModes()
+                findNavController().navigate(direction)
+            }
+            entriesBtnSelect.setOnClickListener { viewModel.selectCurrentItems(true) }
+            entriesBtnClear.setOnClickListener { viewModel.selectCurrentItems(false) }
             entriesFab.setOnClickListener {
                 setNavResult("selection", viewModel.saveSelection())
                 findNavController().popBackStack()
             }
         }
         viewModel.satData.observe(viewLifecycleOwner) { satData ->
-            handleSatData(satData, binding, adapter)
+            handleSatData(satData, entriesAdapter)
         }
         getNavResult<List<String>>(R.id.nav_entries, "modes") { modes ->
             viewModel.saveSelectedModes(modes)
         }
     }
 
-    private fun handleSatData(
-        dataState: DataState<List<SatItem>>,
-        binding: FragmentEntriesBinding,
-        entriesAdapter: EntriesAdapter
-    ) {
+    private fun handleSatData(dataState: DataState<List<SatItem>>, entriesAdapter: EntriesAdapter) {
         when (dataState) {
             is DataState.Success -> {
                 entriesAdapter.submitList(dataState.data)
@@ -100,18 +90,7 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 binding.entriesProgress.visibility = View.VISIBLE
                 binding.entriesRecycler.visibility = View.INVISIBLE
             }
-            is DataState.Error -> {
-                binding.entriesProgress.visibility = View.INVISIBLE
-                binding.entriesRecycler.visibility = View.VISIBLE
-                val message = getString(R.string.entries_update_error)
-                Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
-            }
-            DataState.Handled -> {}
+            else -> {}
         }
-    }
-
-    private fun navigateToModesDialog() {
-        val direction = EntriesFragmentDirections.actionEntriesToModes()
-        findNavController().navigate(direction)
     }
 }

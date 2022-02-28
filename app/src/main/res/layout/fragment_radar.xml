@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/radar_back"
+            android:id="@+id/radar_btn_back"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
             android:contentDescription="@string/btn_back"
@@ -24,7 +24,7 @@
             style="@style/ToolbarTimer" />
 
         <ImageButton
-            android:id="@+id/radar_map"
+            android:id="@+id/radar_btn_map"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/btn_map"
@@ -147,13 +147,13 @@
             android:visibility="invisible" />
 
         <TextView
-            android:id="@+id/radar_recycler_msg"
+            android:id="@+id/radar_empty_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
             android:includeFontPadding="false"
-            android:text="@string/trans_no_data"
+            android:text="@string/radio_no_data"
             android:textSize="@dimen/text_size_medium"
             android:visibility="invisible" />
 

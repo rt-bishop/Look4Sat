@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Look4Sat</string>
+    <string name="app_timer">00:00:00</string>
     <string name="app_version">Версия: %s</string>
     <string name="app_subtitle">Трекер спутников для Android</string>
+
+    <!--Buttons-->
 
     <string name="btn_add">Добавить</string>
     <string name="btn_accept">Принять</string>
@@ -29,42 +32,45 @@
     <string name="btn_support">Поддержать</string>
     <string name="btn_fdroid">F-Droid</string>
 
-    <string name="fmt_entries">Спутников: %s</string>
-    <string name="fmt_radios">Трансиверов: %s</string>
+    <!--Dialogs-->
 
-    <string name="downlink">Даунлинк</string>
-    <string name="uplink">Аплинк</string>
+    <string name="filter_title">Фильтровать пролеты</string>
+    <string name="filter_hours_hint">Количество часов</string>
+    <string name="filter_hours_text">Показать пролеты за след. Х часов</string>
+    <string name="filter_elev_hint">Минимальная элевация</string>
+    <string name="filter_elev_text">Показать пролеты с элевацией более</string>
 
-    <string name="yes">Да</string>
-    <string name="no">Нет</string>
+    <string name="locator_title">Настройки локатора QTH</string>
+    <string name="locator_text">Установить позицию используя локатор</string>
+    <string name="locator_hint">QTH</string>
+
+    <string name="modes_title">Выберите тип модуляции</string>
+
+    <string name="position_title">Настройки местоположения</string>
+    <string name="position_lat_text">Установите широту наземной станции</string>
+    <string name="position_lat_hint">Широта</string>
+    <string name="position_lon_text">Установите долготу наземной станции</string>
+    <string name="position_lon_hint">Долгота</string>
 
     <string name="sources_title">Источники данных</string>
     <string name="sources_hint">Протокол HTTPS</string>
 
-    <string name="entries_modes">Выберите тип модуляции</string>
+    <!--Fragments-->
+
     <string name="entries_search_hint">Поиск по Имени / Id</string>
-    <string name="entries_update_error">Ошибка обновления спутников</string>
 
     <string name="passes_error">Нет предстоящих пролётов спутников</string>
     <string name="passes_empty_db">Пожалуйста, обновите базу данных спутников через меню Настроек</string>
 
+    <string name="pass_satName">%s</string>
+    <string name="pass_satId">Id:%d</string>
     <string name="pass_aosAz">НПС - %.1f°</string>
-    <string name="pass_tcaAz">Азимут: %.1f°</string>
-    <string name="pass_elevation">МаксЭлев: %.1f°</string>
+    <string name="pass_elevation">Элевация: %.1f°</string>
     <string name="pass_los">%.1f° - КПС</string>
     <string name="pass_altitude">Высота: %.0fкм</string>
-
-    <string name="trans_mode">Модуляция: %s</string>
-    <string name="trans_no_mode">Модуляция: нет</string>
-    <string name="trans_inverted">Инверсия: %s</string>
-    <string name="trans_data">Трансиверы спутника:</string>
-    <string name="trans_no_data">Не найдены трансиверы для этого спутника</string>
-
-    <string name="map_title">Карта Мира</string>
-    <string name="map_qth">QTH Локатор: %s</string>
-    <string name="map_coverage">Покрытие: %.0fкм</string>
-    <string name="map_sat_id">Id: %d</string>
-    <string name="map_sat_name">%s</string>
+    <string name="pass_placeholder"> - - : - - </string>
+    <string name="pass_startTime">HH:mm:ss - EEE</string>
+    <string name="pass_endTime">EEE - HH:mm:ss</string>
 
     <string name="radar_az_text">Азим.</string>
     <string name="radar_az_value">%.1f°</string>
@@ -74,68 +80,59 @@
     <string name="radar_alt_value">%.0f km</string>
     <string name="radar_dist_text">Дальн.</string>
     <string name="radar_dist_value">%.0f km</string>
-    <string name="radar_sat_id">Id: %d</string>
     <string name="radar_sat_name">%s</string>
+    <string name="radar_sat_id">Id:%d</string>
 
-    <string name="pat_azimuth">Азимут: %.1f°</string>
-    <string name="pat_elevation">Элевация: %.1f°</string>
-    <string name="pat_distance">Дистанция: %.0fкм</string>
-    <string name="pat_altitude">Высота: %.0fкм</string>
-    <string name="pat_osm_lat">Широта: %.1f°</string>
-    <string name="pat_osm_lon">Долгота: %.1f°</string>
-    <string name="pat_osm_vel">Скорость: %.2fкм/с</string>
+    <string name="radio_mode">Модуляция: %s</string>
+    <string name="radio_inverted">Инверсия: %s</string>
+    <string name="radio_info">%s</string>
+    <string name="radio_no_link">- - . - -</string>
+    <string name="radio_link_low">%.4f</string>
+    <string name="radio_link_lowHigh">%.4f - %.4f</string>
+    <string name="radio_data">Трансиверы спутника:</string>
+    <string name="radio_no_data">Не найдены трансиверы для этого спутника</string>
+    <string name="radio_string_yes">Да</string>
+    <string name="radio_string_no">Нет</string>
+    <string name="radio_downlink">Даунлинк</string>
+    <string name="radio_uplink">Аплинк</string>
 
-    <string name="pref_gsp_title">Местоположение наземной станции</string>
-    <string name="pref_pos_gps">Установить позицию по данным GPS</string>
-    <string name="pref_pos_gps_null">Нет данных геолокации</string>
-    <string name="pref_pos_manual_error">Введены неверные данные</string>
-    <string name="pref_pos_gps_error">Нет разрешения использовать геоданные</string>
-    <string name="pref_pos_qth">Установить позицию по локатору QTH</string>
-    <string name="pref_pos_qth_error">Неправильный локатор QTH</string>
-    <string name="pref_pos_success">Позиция успешно обновлена</string>
-    <string name="pref_pass_title">Настройки пролетов спутников</string>
-    <string name="pref_hours_title">Количество часов</string>
-    <string name="pref_elev_title">Минимальная элевация</string>
-    <string name="pref_map_labels_title">Настройки карты</string>
-    <string name="pref_map_labels">Использовать текстовые метки</string>
-    <string name="pref_other_title">Другие настройки</string>
-    <string name="pref_compass_title">Использовать компас</string>
-    <string name="pref_radar_sweep">Показывать анимацию радара</string>
-    <string name="pref_time_utc_title">Показывать время пролета по UTC</string>
+    <string name="map_title">Карта Мира</string>
+    <string name="map_sat_name">%s</string>
+    <string name="map_sat_id">Id:%d</string>
+    <string name="map_latitude">Широта: %.1f°</string>
+    <string name="map_longitude">Долгота: %.1f°</string>
+    <string name="map_qth">QTH Локатор: %s</string>
+    <string name="map_altitude">Высота: %.0fкм</string>
+    <string name="map_distance">Дистанция: %.0fкм</string>
+    <string name="map_velocity">Скорость: %.2fкм/с</string>
+    <string name="map_copyright">Wikimedia maps | Map data © OpenStreetMap contributors</string>
 
-    <string name="dialog_filter_passes">Фильтровать пролеты</string>
-
-    <string name="pref_hours_ahead_hint">Количество часов</string>
-    <string name="pref_hours_ahead_summary">Показать пролеты за след. Х часов</string>
-    <string name="pref_hours_ahead_input_error">Введите значение между 1ч и 168ч</string>
-    <string name="pref_min_el_hint">Минимальная элевация</string>
-    <string name="pref_min_el_summary">Показать пролеты с элевацией более</string>
-    <string name="pref_min_el_input_error">Введите значение между 0° и 90°</string>
+    <!--Cards-->
 
     <string name="location_title">Местоположение</string>
     <string name="location_lat">Широта: %.4f°</string>
     <string name="location_lon">Долгота: %.4f°</string>
-    <string name="location_gps">Данные GPS</string>
-    <string name="location_gps_null">Нет данных геолокации</string>
+    <string name="location_null">Нет данных геолокации</string>
     <string name="location_gps_error">Нет разрешения использовать геоданные</string>
-    <string name="location_qth">Локатор QTH</string>
+    <string name="location_manual_error">Введены неверные данные</string>
     <string name="location_qth_error">Неправильный локатор QTH</string>
     <string name="location_success">Позиция успешно обновлена</string>
 
+    <string name="data_title">Обновление данных</string>
+    <string name="data_error">При обновлении возникли ошибки</string>
+    <string name="data_entries">Спутников: %s</string>
+    <string name="data_radios">Трансиверов: %s</string>
+    <string name="data_success">Обновление прошло успешно</string>
+
+    <string name="remote_title">Настройки ротатора</string>
+    <string name="remote_switch">Удаленное управление</string>
+    <string name="remote_ip_hint">IP адрес</string>
+    <string name="remote_port_hint">Порт</string>
+
     <string name="other_title">Другие настройки</string>
-    <string name="other_switch_utc">Показывать время пролета по UTC</string>
+    <string name="other_switch_utc">Показывать время по UTC</string>
     <string name="other_switch_sweep">Показывать анимацию радара</string>
-    <string name="other_switch_sensors">Использовать компас</string>
-
-    <string name="tracking_title">Настройки слежения</string>
-    <string name="tracking_switch">Управление поворотным устройством</string>
-    <string name="tracking_ip_hint">IP адрес</string>
-    <string name="tracking_ip_invalid">Введён неправильный IP адрес</string>
-    <string name="tracking_port_hint">Порт</string>
-    <string name="tracking_port_invalid">Введите порт в диапазоне от 1024 до 65535</string>
-
-    <string name="update_title">Обновление данных</string>
-    <string name="update_error">При обновлении возникли ошибки</string>
+    <string name="other_switch_sensors">Использовать сенсоры устройства</string>
 
     <string name="outro_title">Я хотел бы сказать спасибо:</string>
     <string name="outro_thanks"> • Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!

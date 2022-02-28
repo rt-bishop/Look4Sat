@@ -16,11 +16,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:minHeight="48dp"
-            android:text="@string/dialog_filter_passes"
+            android:text="@string/locator_title"
             app:layout_constraintBottom_toTopOf="@+id/locator_text"
-            app:layout_constraintEnd_toEndOf="@+id/locator_pos_btn"
+            app:layout_constraintEnd_toEndOf="@+id/locator_btn_pos"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/locator_neg_btn"
+            app:layout_constraintStart_toStartOf="@+id/locator_btn_neg"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -28,9 +28,9 @@
             style="@style/DialogText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:text="@string/pref_hours_ahead_summary"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/locator_text"
             app:layout_constraintBottom_toTopOf="@+id/locator_layout"
             app:layout_constraintEnd_toEndOf="@+id/locator_title"
             app:layout_constraintHorizontal_bias="0.5"
@@ -42,12 +42,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/pref_hours_ahead_hint"
+            android:hint="@string/locator_hint"
             android:importantForAutofill="no"
             android:inputType="number"
             android:minHeight="48dp"
             app:endIconMode="clear_text"
-            app:layout_constraintBottom_toTopOf="@+id/locator_neg_btn"
+            app:layout_constraintBottom_toTopOf="@+id/locator_btn_neg"
             app:layout_constraintEnd_toEndOf="@+id/locator_text"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/locator_text"
@@ -62,7 +62,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/locator_neg_btn"
+            android:id="@+id/locator_btn_neg"
             style="@style/NormalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -71,23 +71,23 @@
             android:layout_marginBottom="6dp"
             android:text="@string/btn_cancel"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/locator_pos_btn"
+            app:layout_constraintEnd_toStartOf="@+id/locator_btn_pos"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/locator_layout" />
 
         <Button
-            android:id="@+id/locator_pos_btn"
+            android:id="@+id/locator_btn_pos"
             style="@style/NormalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/btn_accept"
-            app:layout_constraintBaseline_toBaselineOf="@+id/locator_neg_btn"
+            app:layout_constraintBaseline_toBaselineOf="@+id/locator_btn_neg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/locator_neg_btn" />
+            app:layout_constraintStart_toEndOf="@+id/locator_btn_neg" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

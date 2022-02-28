@@ -10,7 +10,7 @@
         style="@style/Toolbar">
 
         <ImageButton
-            android:id="@+id/passes_refresh_btn"
+            android:id="@+id/passes_btn_refresh"
             style="@style/ToolbarButton"
             android:rotation="45"
             android:layout_gravity="start|center_vertical"
@@ -22,7 +22,7 @@
             style="@style/ToolbarTimer" />
 
         <ImageButton
-            android:id="@+id/passes_map_btn"
+            android:id="@+id/passes_btn_map"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/btn_map"
@@ -84,7 +84,7 @@
         style="@style/BottomBar">
 
         <Button
-            android:id="@+id/passes_filter_btn"
+            android:id="@+id/passes_btn_filter"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
             android:layout_marginStart="@dimen/button_margin_side"
@@ -92,7 +92,7 @@
             android:text="@string/btn_filter" />
 
         <Button
-            android:id="@+id/passes_settings_btn"
+            android:id="@+id/passes_btn_settings"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
             android:layout_marginEnd="@dimen/button_margin_side"
@@ -104,7 +104,7 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/passes_fab"
         style="@style/FloatingActionButton"
-        android:src="@drawable/ic_sputnik"
+        android:src="@drawable/ic_satellite"
         android:contentDescription="@string/btn_satellites"
         app:layout_anchor="@id/passes_bottomBar" />
 

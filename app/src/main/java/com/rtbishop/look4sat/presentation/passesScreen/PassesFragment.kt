@@ -62,17 +62,17 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     }
                 })
             }
-            passesRefreshBtn.setOnClickListener { viewModel.calculatePasses() }
-            passesMapBtn.setOnClickListener {
-                val dir = PassesFragmentDirections.actionGlobalMapFragment()
+            passesBtnRefresh.setOnClickListener { viewModel.calculatePasses() }
+            passesBtnMap.setOnClickListener {
+                val dir = PassesFragmentDirections.globalToMap()
                 findNavController().navigate(dir)
             }
-            passesFilterBtn.setOnClickListener {
-                val dir = PassesFragmentDirections.actionPassesToFilter()
+            passesBtnFilter.setOnClickListener {
+                val dir = PassesFragmentDirections.passesToFilter()
                 findNavController().navigate(dir)
             }
-            passesSettingsBtn.setOnClickListener {
-                val dir = PassesFragmentDirections.actionGlobalSettingsFragment()
+            passesBtnSettings.setOnClickListener {
+                val dir = PassesFragmentDirections.globalToSettings()
                 findNavController().navigate(dir)
             }
             setupAnimator()
@@ -82,7 +82,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
 
     override fun navigateToPass(satPass: SatPass) {
         if (satPass.progress < 100) satPass.run {
-            val dir = PassesFragmentDirections.actionGlobalRadarFragment(this.catNum, this.aosTime)
+            val dir = PassesFragmentDirections.globalToRadar(this.catNum, this.aosTime)
             findNavController().navigate(dir)
         }
     }
@@ -98,7 +98,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             duration = 875
             interpolator = LinearInterpolator()
             repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { binding?.passesRefreshBtn?.rotation = animatedValue as Float }
+            addUpdateListener { binding?.passesBtnRefresh?.rotation = animatedValue as Float }
         }
     }
 
@@ -121,7 +121,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         binding?.run {
             if (number > 0) {
                 passesFab.setOnClickListener {
-                    val direction = PassesFragmentDirections.actionGlobalEntriesFragment()
+                    val direction = PassesFragmentDirections.globalToEntries()
                     findNavController().navigate(direction)
                 }
             } else {
@@ -140,20 +140,18 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     passesAdapter.submitList(state.data)
                     tickMainTimer(state.data)
                     if (state.data.isNotEmpty()) { // show new passes list
-                        passesRecycler.visibility = View.VISIBLE
                         passesEmpty.visibility = View.INVISIBLE
-                        passesRefreshBtn.isEnabled = true
+                        passesBtnRefresh.isEnabled = true
                         refreshAnimator?.cancel()
                     } else { // show no passes message
-                        passesRecycler.visibility = View.INVISIBLE
                         passesEmpty.visibility = View.VISIBLE
-                        passesRefreshBtn.isEnabled = true
+                        passesBtnRefresh.isEnabled = true
                         refreshAnimator?.cancel()
                     }
                 }
                 is DataState.Loading -> {
                     refreshAnimator?.start()
-                    passesRefreshBtn.isEnabled = false
+                    passesBtnRefresh.isEnabled = false
                     passesTimer.text = 0L.toTimerString()
                 }
                 else -> {}

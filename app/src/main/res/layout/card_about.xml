@@ -14,7 +14,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_sputnik"
+            android:src="@drawable/ic_satellite"
             app:layout_constraintBottom_toBottomOf="@+id/about_version"
             app:layout_constraintDimensionRatio="h,1:1"
             app:layout_constraintEnd_toStartOf="@+id/about_title"

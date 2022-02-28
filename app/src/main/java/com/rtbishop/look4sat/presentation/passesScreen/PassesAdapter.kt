@@ -73,7 +73,7 @@ class PassesAdapter(private val clickListener: PassesClickListener) :
         private val altFormat = itemView.context.getString(R.string.pass_altitude)
         private val losAzFormat = itemView.context.getString(R.string.pass_los)
         private val startTimeFormat = itemView.context.getString(R.string.pass_startTime)
-        private val elevFormat = itemView.context.getString(R.string.pat_elevation)
+        private val elevFormat = itemView.context.getString(R.string.pass_elevation)
         private val endTimeFormat = itemView.context.getString(R.string.pass_endTime)
         private val placeholder = itemView.context.getString(R.string.pass_placeholder)
         private val timeZoneUTC = TimeZone.getTimeZone("UTC")

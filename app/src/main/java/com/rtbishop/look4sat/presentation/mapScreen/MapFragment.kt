@@ -98,9 +98,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
-            mapBackBtn.setOnClickListener { findNavController().navigateUp() }
-            mapPrevBtn.setOnClickListener { viewModel.scrollSelection(true) }
-            mapNextBtn.setOnClickListener { viewModel.scrollSelection(false) }
+            mapBtnBack.setOnClickListener { findNavController().navigateUp() }
+            mapBtnPrev.setOnClickListener { viewModel.scrollSelection(true) }
+            mapBtnNext.setOnClickListener { viewModel.scrollSelection(false) }
         }
     }
 
@@ -118,7 +118,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             Marker(mapView).apply {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_gps)
+                icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_position)
                 position = GeoPoint(stationPos.latitude, stationPos.longitude)
                 mapView.overlays[0] = this
                 mapView.invalidate()
@@ -206,13 +206,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             mapTitle.text = mapData.name
             mapDataId.text = String.format(getString(R.string.map_sat_id), mapData.catNum)
             mapDataQth.text = String.format(getString(R.string.map_qth), mapData.qthLoc)
-            mapDataAlt.text = String.format(getString(R.string.pat_altitude), mapData.altitude)
-            mapDataDst.text = String.format(getString(R.string.pat_distance), mapData.range)
-            mapDataVel.text = String.format(getString(R.string.pat_osm_vel), mapData.velocity)
+            mapDataAlt.text = String.format(getString(R.string.map_altitude), mapData.altitude)
+            mapDataDst.text = String.format(getString(R.string.map_distance), mapData.range)
+            mapDataVel.text = String.format(getString(R.string.map_velocity), mapData.velocity)
             mapDataLat.text =
-                String.format(getString(R.string.pat_osm_lat), mapData.osmPos.latitude)
+                String.format(getString(R.string.map_latitude), mapData.osmPos.latitude)
             mapDataLon.text =
-                String.format(getString(R.string.pat_osm_lon), mapData.osmPos.longitude)
+                String.format(getString(R.string.map_longitude), mapData.osmPos.longitude)
         }
         binding.mapView.invalidate()
     }

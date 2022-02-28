@@ -9,7 +9,7 @@
         style="@style/Toolbar">
 
         <ImageButton
-            android:id="@+id/settings_back"
+            android:id="@+id/settings_btn_back"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
             android:contentDescription="@string/btn_back"
@@ -27,9 +27,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/view_default_margin"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="@dimen/surface_margin_top"
         android:layout_marginEnd="@dimen/view_default_margin"
-        android:layout_marginBottom="62dp"
+        android:layout_marginBottom="@dimen/surface_margin_bot"
         android:backgroundTint="@color/background">
 
         <androidx.core.widget.NestedScrollView
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content">
 
                 <include
-                    android:id="@+id/settings_info"
+                    android:id="@+id/settings_about"
                     layout="@layout/card_about"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -53,13 +53,13 @@
 
                 <include
                     android:id="@+id/settings_location"
-                    layout="@layout/card_position"
+                    layout="@layout/card_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/view_default_margin"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/settings_info" />
+                    app:layout_constraintTop_toBottomOf="@+id/settings_about" />
 
                 <include
                     android:id="@+id/settings_data"
@@ -72,7 +72,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/settings_location" />
 
                 <include
-                    android:id="@+id/settings_tracking"
+                    android:id="@+id/settings_remote"
                     layout="@layout/card_remote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -89,10 +89,10 @@
                     android:layout_marginTop="@dimen/view_default_margin"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/settings_tracking" />
+                    app:layout_constraintTop_toBottomOf="@+id/settings_remote" />
 
                 <include
-                    android:id="@+id/settings_warranty"
+                    android:id="@+id/settings_outro"
                     layout="@layout/card_outro"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
         style="@style/BottomBar">
 
         <Button
-            android:id="@+id/settings_github_btn"
+            android:id="@+id/settings_btn_github"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
             android:layout_marginStart="@dimen/button_margin_side"
@@ -121,7 +121,7 @@
             android:text="@string/btn_github" />
 
         <Button
-            android:id="@+id/settings_fdroid_btn"
+            android:id="@+id/settings_btn_fdroid"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
             android:layout_marginEnd="@dimen/button_margin_side"

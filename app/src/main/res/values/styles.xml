@@ -45,7 +45,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:text">@string/timer_zero</item>
+        <item name="android:text">@string/app_timer</item>
         <item name="android:textColor">@color/accent</item>
         <item name="android:textSize">@dimen/text_size_app_timer</item>
         <item name="android:textStyle">bold</item>
@@ -90,7 +90,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="android:text">@string/trans_link_low</item>
+        <item name="android:text">@string/radio_link_low</item>
         <item name="android:textColor">@color/accent</item>
         <item name="android:textSize">@dimen/text_size_frequency</item>
         <item name="android:textStyle">bold</item>
@@ -143,11 +143,6 @@
     <style name="WorldMapText">
         <item name="android:textSize">@dimen/text_size_medium</item>
         <item name="android:textColor">@color/accent</item>
-    </style>
-
-    <style name="WorldMapTitle">
-        <item name="android:textSize">@dimen/text_size_medium</item>
-        <item name="android:textColor">@color/textMain</item>
     </style>
 
     <style name="SettingsText">

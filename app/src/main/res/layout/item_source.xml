@@ -9,7 +9,7 @@
     android:layout_marginEnd="4dp"
     android:layout_marginBottom="4dp"
     android:hint="@string/sources_hint"
-    app:endIconDrawable="@drawable/ic_clear"
+    app:endIconDrawable="@drawable/ic_delete"
     app:endIconMode="custom">
 
     <com.google.android.material.textfield.TextInputEditText

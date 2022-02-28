@@ -32,11 +32,11 @@ class LocatorDialog : AppCompatDialogFragment() {
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
             locatorEdit.setText(preferences.loadStationLocator())
-            locatorPosBtn.setOnClickListener {
+            locatorBtnPos.setOnClickListener {
                 setNavResult("locator", locatorEdit.text.toString())
                 dismiss()
             }
-            locatorNegBtn.setOnClickListener { dismiss() }
+            locatorBtnNeg.setOnClickListener { dismiss() }
         }
     }
 }

@@ -15,7 +15,7 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="12dp"
-            android:text="@string/tracking_title"
+            android:text="@string/remote_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -26,7 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:minHeight="42dp"
-            android:text="@string/tracking_switch"
+            android:text="@string/remote_switch"
             app:layout_constraintEnd_toEndOf="@+id/remote_title"
             app:layout_constraintStart_toStartOf="@+id/remote_title"
             app:layout_constraintTop_toBottomOf="@+id/remote_title"
@@ -48,7 +48,7 @@
                 android:id="@+id/remote_ip_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/tracking_ip_hint"
+                android:hint="@string/remote_ip_hint"
                 android:textColorHint="@color/textMain" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -66,7 +66,7 @@
                 android:id="@+id/remote_port_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/tracking_port_hint"
+                android:hint="@string/remote_port_hint"
                 android:textColorHint="@color/textMain" />
 
         </com.google.android.material.textfield.TextInputLayout>

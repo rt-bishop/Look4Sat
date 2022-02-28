@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/map_back_btn"
+            android:id="@+id/map_btn_back"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
             android:contentDescription="@string/btn_back"
@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="6dp"
-                android:text="@string/pat_osm_lat"
+                android:text="@string/map_latitude"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -104,7 +104,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="@string/pat_osm_lon"
+                android:text="@string/map_longitude"
                 app:layout_constraintStart_toStartOf="@+id/map_data_lat"
                 app:layout_constraintTop_toBottomOf="@+id/map_data_lat" />
 
@@ -126,7 +126,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:text="@string/pat_altitude"
+                android:text="@string/map_altitude"
                 app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lat"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -135,7 +135,7 @@
                 style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pat_distance"
+                android:text="@string/map_distance"
                 app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lon"
                 app:layout_constraintEnd_toEndOf="@+id/map_data_alt" />
 
@@ -144,7 +144,7 @@
                 style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pat_osm_vel"
+                android:text="@string/map_velocity"
                 app:layout_constraintBaseline_toBaselineOf="@+id/map_data_qth"
                 app:layout_constraintEnd_toEndOf="@+id/map_data_dst" />
 
@@ -167,7 +167,7 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <Button
-        android:id="@+id/map_prev_btn"
+        android:id="@+id/map_btn_prev"
         style="@style/NormalButton"
         android:layout_width="@dimen/button_width_med"
         android:layout_marginStart="@dimen/button_margin_side"
@@ -188,19 +188,19 @@
         android:gravity="center_horizontal"
         android:maxLines="1"
         android:text="@string/map_sat_id"
-        app:layout_constraintBaseline_toBaselineOf="@+id/map_prev_btn"
-        app:layout_constraintEnd_toStartOf="@+id/map_next_btn"
-        app:layout_constraintStart_toEndOf="@+id/map_prev_btn" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/map_btn_prev"
+        app:layout_constraintEnd_toStartOf="@+id/map_btn_next"
+        app:layout_constraintStart_toEndOf="@+id/map_btn_prev" />
 
     <Button
-        android:id="@+id/map_next_btn"
+        android:id="@+id/map_btn_next"
         style="@style/NormalButton"
         android:layout_width="@dimen/button_width_med"
         android:layout_marginEnd="@dimen/button_margin_side"
         android:text="@string/btn_next"
         app:icon="@drawable/ic_next"
         app:iconGravity="end"
-        app:layout_constraintBaseline_toBaselineOf="@+id/map_prev_btn"
+        app:layout_constraintBaseline_toBaselineOf="@+id/map_btn_prev"
         app:layout_constraintEnd_toEndOf="@+id/map_coordinator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,48 +7,48 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.DialogLocationBinding
+import com.rtbishop.look4sat.databinding.DialogPositionBinding
 import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LocationDialog : AppCompatDialogFragment() {
+class PositionDialog : AppCompatDialogFragment() {
 
     @Inject
     lateinit var preferences: ISettings
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_location, group, false)
+        return inflater.inflate(R.layout.dialog_position, group, false)
     }
 
     override fun onViewCreated(view: View, state: Bundle?) {
         super.onViewCreated(view, state)
-        DialogLocationBinding.bind(view).run {
+        DialogPositionBinding.bind(view).run {
             dialog?.window?.setBackgroundDrawableResource(R.color.transparent)
             dialog?.window?.setLayout(
                 (resources.displayMetrics.widthPixels * 0.94).toInt(),
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
             val location = preferences.loadStationPosition()
-            locationLatEdit.setText(location.latitude.toString())
-            locationLonEdit.setText(location.longitude.toString())
-            locationPosBtn.setOnClickListener {
+            positionLatEdit.setText(location.latitude.toString())
+            positionLonEdit.setText(location.longitude.toString())
+            positionBtnPos.setOnClickListener {
                 val latitude = try {
-                    locationLatEdit.text.toString().toDouble()
+                    positionLatEdit.text.toString().toDouble()
                 } catch (exception: Exception) {
                     180.0
                 }
                 val longitude = try {
-                    locationLonEdit.text.toString().toDouble()
+                    positionLonEdit.text.toString().toDouble()
                 } catch (exception: Exception) {
                     400.0
                 }
-                setNavResult("location", Pair(latitude, longitude))
+                setNavResult("position", Pair(latitude, longitude))
                 dismiss()
             }
-            locationNegBtn.setOnClickListener { dismiss() }
+            positionBtnNeg.setOnClickListener { dismiss() }
         }
     }
 }

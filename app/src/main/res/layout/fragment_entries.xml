@@ -9,7 +9,7 @@
         style="@style/Toolbar">
 
         <ImageButton
-            android:id="@+id/entries_back_btn"
+            android:id="@+id/entries_btn_back"
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
             android:contentDescription="@string/btn_back"
@@ -29,11 +29,11 @@
             android:importantForAutofill="no" />
 
         <ImageButton
-            android:id="@+id/entries_modes_btn"
+            android:id="@+id/entries_btn_modes"
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/btn_modes"
-            android:src="@drawable/ic_satellite" />
+            android:src="@drawable/ic_modes" />
 
     </androidx.cardview.widget.CardView>
 
@@ -63,7 +63,7 @@
         style="@style/BottomBar">
 
         <Button
-            android:id="@+id/entries_select_btn"
+            android:id="@+id/entries_btn_select"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
             android:layout_marginStart="@dimen/button_margin_side"
@@ -71,7 +71,7 @@
             android:text="@string/btn_select" />
 
         <Button
-            android:id="@+id/entries_clear_btn"
+            android:id="@+id/entries_btn_clear"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
             android:layout_marginEnd="@dimen/button_margin_side"

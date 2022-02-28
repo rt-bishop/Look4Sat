@@ -52,7 +52,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         when {
             permissions[locationFine] == true -> viewModel.setPositionFromGps()
             permissions[locationCoarse] == true -> viewModel.setPositionFromNet()
-            else -> showToast(getString(R.string.pref_pos_gps_error))
+            else -> showToast(getString(R.string.location_gps_error))
         }
     }
     private val contentContract = ActivityResultContracts.GetContent()
@@ -63,27 +63,28 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentSettingsBinding.bind(view)
-        setupComponents()
-        setupObservers()
-    }
-
-    private fun setupComponents() {
-        binding.settingsScroll.apply {
-            setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
-                if (y > newY) binding.settingsFab.hide() else binding.settingsFab.show()
+        binding = FragmentSettingsBinding.bind(view).apply {
+            settingsBtnBack.setOnClickListener { findNavController().navigateUp() }
+            settingsScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
+                if (y > newY) settingsFab.hide() else settingsFab.show()
             })
+            settingsAbout.aboutVersion.text =
+                String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
+            settingsBtnGithub.setOnClickListener {
+                gotoUrl("https://github.com/rt-bishop/Look4Sat/")
+            }
+            settingsFab.setOnClickListener {
+                gotoUrl("https://www.buymeacoffee.com/rtbishop")
+            }
+            settingsBtnFdroid.setOnClickListener {
+                gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
+            }
         }
-        binding.settingsBack.setOnClickListener { findNavController().navigateUp() }
-        setupAboutCard()
-        setupDataCard()
         setupLocationCard()
-        setupTrackingCard()
+        setupDataCard()
+        setupRemoteCard()
         setupOtherCard()
-        setupWarrantyCard()
-    }
-
-    private fun setupObservers() {
+        setupOutroCard()
         viewModel.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
             stationPos?.let { handleStationPosition(stationPos) }
         }
@@ -92,126 +93,124 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupAboutCard() {
-        binding.settingsInfo.aboutVersion.text =
-            String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
-        binding.settingsGithubBtn.setOnClickListener {
-            gotoUrl("https://github.com/rt-bishop/Look4Sat/")
-        }
-        binding.settingsFab.setOnClickListener {
-            gotoUrl("https://www.buymeacoffee.com/rtbishop")
-        }
-        binding.settingsFdroidBtn.setOnClickListener {
-            gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
-        }
-    }
-
     private fun setupLocationCard() {
-        setPositionText(viewModel.getStationPosition())
-        binding.settingsLocation.positionBtnGps.setOnClickListener {
-            locationRequest.launch(arrayOf(locationFine, locationCoarse))
-        }
-        binding.settingsLocation.positionBtnManual.setOnClickListener {
-            val action = SettingsFragmentDirections.actionPrefsToLocation()
-            findNavController().navigate(action)
-        }
-        binding.settingsLocation.positionBtnQth.setOnClickListener {
-            val action = SettingsFragmentDirections.actionPrefsToLocator()
-            findNavController().navigate(action)
-        }
-        getNavResult<Pair<Double, Double>>(R.id.nav_settings, "location") { location ->
-            viewModel.setStationPosition(location.first, location.second)
-        }
-        getNavResult<String>(R.id.nav_settings, "locator") { locator ->
-            viewModel.setPositionFromQth(locator)
+        binding.run {
+            setPositionText(viewModel.getStationPosition())
+            settingsLocation.locationBtnGps.setOnClickListener {
+                locationRequest.launch(arrayOf(locationFine, locationCoarse))
+            }
+            settingsLocation.locationBtnManual.setOnClickListener {
+                val action = SettingsFragmentDirections.globalToPosition()
+                findNavController().navigate(action)
+            }
+            settingsLocation.locationBtnQth.setOnClickListener {
+                val action = SettingsFragmentDirections.globalToLocator()
+                findNavController().navigate(action)
+            }
+            getNavResult<Pair<Double, Double>>(R.id.nav_settings, "position") { position ->
+                viewModel.setStationPosition(position.first, position.second)
+            }
+            getNavResult<String>(R.id.nav_settings, "locator") { locator ->
+                viewModel.setPositionFromQth(locator)
+            }
         }
     }
 
     private fun setupDataCard() {
-        binding.settingsData.dataBtnFile.setOnClickListener { contentRequest.launch("*/*") }
-        binding.settingsData.dataBtnWeb.setOnClickListener {
-            val action = SettingsFragmentDirections.actionPrefsToSources()
-            findNavController().navigate(action)
-        }
-        binding.settingsData.dataBtnClear.setOnClickListener { viewModel.clearData() }
-        viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
-            val entriesFormat = getString(R.string.fmt_entries)
-            binding.settingsData.dataEntries.text = String.format(entriesFormat, number)
-        }
-        viewModel.radiosTotal.observe(viewLifecycleOwner) { number ->
-            val radiosFormat = getString(R.string.fmt_radios)
-            binding.settingsData.dataRadios.text = String.format(radiosFormat, number)
-        }
-        getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
-            viewModel.updateDataFromWeb(sources)
+        binding.run {
+            settingsData.dataBtnFile.setOnClickListener { contentRequest.launch("*/*") }
+            settingsData.dataBtnWeb.setOnClickListener {
+                val action = SettingsFragmentDirections.settingsToSources()
+                findNavController().navigate(action)
+            }
+            settingsData.dataBtnClear.setOnClickListener { viewModel.clearData() }
+            viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
+                val entriesFormat = getString(R.string.data_entries)
+                settingsData.dataEntries.text = String.format(entriesFormat, number)
+            }
+            viewModel.radiosTotal.observe(viewLifecycleOwner) { number ->
+                val radiosFormat = getString(R.string.data_radios)
+                settingsData.dataRadios.text = String.format(radiosFormat, number)
+            }
+            getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
+                viewModel.updateDataFromWeb(sources)
+            }
         }
     }
 
-    private fun setupTrackingCard() {
-        binding.settingsTracking.remoteSwitch.apply {
-            isChecked = viewModel.getRotatorEnabled()
-            binding.settingsTracking.remoteIp.isEnabled = isChecked
-            binding.settingsTracking.remoteIpEdit.setText(viewModel.getRotatorServer())
-            binding.settingsTracking.remotePort.isEnabled = isChecked
-            binding.settingsTracking.remotePortEdit.setText(viewModel.getRotatorPort())
-            setOnCheckedChangeListener { _, isChecked ->
-                viewModel.setRotatorEnabled(isChecked)
-                binding.settingsTracking.remoteIp.isEnabled = isChecked
-                binding.settingsTracking.remotePort.isEnabled = isChecked
+    private fun setupRemoteCard() {
+        binding.run {
+            settingsRemote.remoteSwitch.apply {
+                isChecked = viewModel.getRotatorEnabled()
+                settingsRemote.remoteIp.isEnabled = isChecked
+                settingsRemote.remoteIpEdit.setText(viewModel.getRotatorServer())
+                settingsRemote.remotePort.isEnabled = isChecked
+                settingsRemote.remotePortEdit.setText(viewModel.getRotatorPort())
+                setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.setRotatorEnabled(isChecked)
+                    settingsRemote.remoteIp.isEnabled = isChecked
+                    settingsRemote.remotePort.isEnabled = isChecked
+                }
             }
-        }
-        binding.settingsTracking.remoteIpEdit.doOnTextChanged { text, _, _, _ ->
-            if (text.toString().isValidIPv4()) viewModel.setRotatorServer(text.toString())
-        }
-        binding.settingsTracking.remotePortEdit.doOnTextChanged { text, _, _, _ ->
-            if (text.toString().isValidPort()) viewModel.setRotatorPort(text.toString())
+            settingsRemote.remoteIpEdit.doOnTextChanged { text, _, _, _ ->
+                if (text.toString().isValidIPv4()) viewModel.setRotatorServer(text.toString())
+            }
+            settingsRemote.remotePortEdit.doOnTextChanged { text, _, _, _ ->
+                if (text.toString().isValidPort()) viewModel.setRotatorPort(text.toString())
+            }
         }
     }
 
     private fun setupOtherCard() {
-        binding.settingsOther.otherSwitchUtc.apply {
-            isChecked = viewModel.getUseUTC()
-            setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
-        }
-        binding.settingsOther.otherSwitchSweep.apply {
-            isChecked = viewModel.getShowSweep()
-            setOnCheckedChangeListener { _, isChecked -> viewModel.setShowSweep(isChecked) }
-        }
-        binding.settingsOther.otherSwitchSensors.apply {
-            isChecked = viewModel.getUseCompass()
-            setOnCheckedChangeListener { _, isChecked -> viewModel.setUseCompass(isChecked) }
+        binding.run {
+            settingsOther.otherSwitchUtc.apply {
+                isChecked = viewModel.getUseUTC()
+                setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
+            }
+            settingsOther.otherSwitchSweep.apply {
+                isChecked = viewModel.getShowSweep()
+                setOnCheckedChangeListener { _, isChecked -> viewModel.setShowSweep(isChecked) }
+            }
+            settingsOther.otherSwitchSensors.apply {
+                isChecked = viewModel.getUseCompass()
+                setOnCheckedChangeListener { _, isChecked -> viewModel.setUseCompass(isChecked) }
+            }
         }
     }
 
-    private fun setupWarrantyCard() {
-        binding.settingsWarranty.outroThanks.movementMethod = LinkMovementMethod.getInstance()
-        binding.settingsWarranty.outroLicense.movementMethod = LinkMovementMethod.getInstance()
-    }
-
-    private fun setPositionText(geoPos: GeoPos) {
-        val latFormat = getString(R.string.location_lat)
-        val lonFormat = getString(R.string.location_lon)
-        binding.settingsLocation.positionLat.text = String.format(latFormat, geoPos.latitude)
-        binding.settingsLocation.positionLon.text = String.format(lonFormat, geoPos.longitude)
+    private fun setupOutroCard() {
+        binding.run {
+            settingsOutro.outroThanks.movementMethod = LinkMovementMethod.getInstance()
+            settingsOutro.outroLicense.movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     private fun handleStationPosition(pos: DataState<GeoPos>) {
         when (pos) {
             is DataState.Success -> {
                 setPositionText(pos.data)
-                binding.settingsLocation.positionProgress.isIndeterminate = false
+                binding.settingsLocation.locationProgress.isIndeterminate = false
                 viewModel.setPositionHandled()
-                showToast(getString(R.string.pref_pos_success))
+                showToast(getString(R.string.location_success))
             }
             is DataState.Error -> {
-                binding.settingsLocation.positionProgress.isIndeterminate = false
+                binding.settingsLocation.locationProgress.isIndeterminate = false
                 viewModel.setPositionHandled()
                 showToast(pos.message.toString())
             }
             DataState.Loading -> {
-                binding.settingsLocation.positionProgress.isIndeterminate = true
+                binding.settingsLocation.locationProgress.isIndeterminate = true
             }
             DataState.Handled -> {}
+        }
+    }
+
+    private fun setPositionText(geoPos: GeoPos) {
+        binding.run {
+            val latFormat = getString(R.string.location_lat)
+            val lonFormat = getString(R.string.location_lon)
+            settingsLocation.locationLat.text = String.format(latFormat, geoPos.latitude)
+            settingsLocation.locationLon.text = String.format(lonFormat, geoPos.longitude)
         }
     }
 
@@ -220,12 +219,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             is DataState.Success -> {
                 binding.settingsData.dataProgress.isIndeterminate = false
                 viewModel.setUpdateHandled()
-                showToast("Data updated successfully")
+                showToast(getString(R.string.data_success))
             }
             is DataState.Error -> {
                 binding.settingsData.dataProgress.isIndeterminate = false
                 viewModel.setUpdateHandled()
-                showToast(state.message.toString())
+                showToast(getString(R.string.data_error))
             }
             is DataState.Loading -> {
                 binding.settingsData.dataProgress.isIndeterminate = true

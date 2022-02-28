@@ -33,7 +33,7 @@ class FilterDialog : AppCompatDialogFragment() {
             )
             filterHoursEdit.setText(preferences.getHoursAhead().toString())
             filterElevEdit.setText(preferences.getMinElevation().toString())
-            filterPosBtn.setOnClickListener {
+            filterBtnPos.setOnClickListener {
                 val hoursAhead = try {
                     filterHoursEdit.text.toString().toInt()
                 } catch (exception: Exception) {
@@ -47,7 +47,7 @@ class FilterDialog : AppCompatDialogFragment() {
                 setNavResult("prefs", Pair(hoursAhead, minElevation))
                 dismiss()
             }
-            filterNegBtn.setOnClickListener { dismiss() }
+            filterBtnNeg.setOnClickListener { dismiss() }
         }
     }
 }

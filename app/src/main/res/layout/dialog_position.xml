@@ -10,51 +10,51 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/filter_title"
+            android:id="@+id/position_title"
             style="@style/DialogTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:minHeight="48dp"
-            android:text="@string/filter_title"
-            app:layout_constraintBottom_toTopOf="@+id/filter_hours_text"
-            app:layout_constraintEnd_toEndOf="@+id/filter_btn_pos"
+            android:text="@string/position_title"
+            app:layout_constraintBottom_toTopOf="@+id/position_lat_text"
+            app:layout_constraintEnd_toEndOf="@+id/position_btn_pos"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/filter_btn_neg"
+            app:layout_constraintStart_toStartOf="@+id/position_btn_neg"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/filter_hours_text"
+            android:id="@+id/position_lat_text"
             style="@style/DialogText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:text="@string/filter_hours_text"
-            app:layout_constraintBottom_toTopOf="@+id/filter_hours_layout"
-            app:layout_constraintEnd_toEndOf="@+id/filter_title"
+            android:text="@string/position_lat_text"
+            app:layout_constraintBottom_toTopOf="@+id/position_lat_layout"
+            app:layout_constraintEnd_toEndOf="@+id/position_title"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/filter_title"
-            app:layout_constraintTop_toBottomOf="@+id/filter_title" />
+            app:layout_constraintStart_toStartOf="@+id/position_title"
+            app:layout_constraintTop_toBottomOf="@+id/position_title" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/filter_hours_layout"
+            android:id="@+id/position_lat_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/filter_hours_hint"
+            android:hint="@string/position_lat_hint"
             android:importantForAutofill="no"
             android:inputType="number"
             android:minHeight="48dp"
             app:endIconMode="clear_text"
-            app:layout_constraintBottom_toTopOf="@+id/filter_elev_text"
-            app:layout_constraintEnd_toEndOf="@+id/filter_hours_text"
+            app:layout_constraintBottom_toTopOf="@+id/position_lon_text"
+            app:layout_constraintEnd_toEndOf="@+id/position_lat_text"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/filter_hours_text"
-            app:layout_constraintTop_toBottomOf="@+id/filter_hours_text">
+            app:layout_constraintStart_toStartOf="@+id/position_lat_text"
+            app:layout_constraintTop_toBottomOf="@+id/position_lat_text">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/filter_hours_edit"
+                android:id="@+id/position_lat_edit"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textUri" />
@@ -62,36 +62,36 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/filter_elev_text"
+            android:id="@+id/position_lon_text"
             style="@style/DialogText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/filter_elev_text"
-            app:layout_constraintBottom_toTopOf="@+id/filter_elev_layout"
-            app:layout_constraintEnd_toEndOf="@+id/filter_hours_text"
+            android:text="@string/position_lon_text"
+            app:layout_constraintBottom_toTopOf="@+id/position_lon_layout"
+            app:layout_constraintEnd_toEndOf="@+id/position_lat_text"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/filter_hours_text"
-            app:layout_constraintTop_toBottomOf="@+id/filter_hours_layout" />
+            app:layout_constraintStart_toStartOf="@+id/position_lat_text"
+            app:layout_constraintTop_toBottomOf="@+id/position_lat_layout" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/filter_elev_layout"
+            android:id="@+id/position_lon_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/filter_elev_hint"
+            android:hint="@string/position_lon_hint"
             android:importantForAutofill="no"
             android:inputType="number|numberDecimal"
             android:minHeight="48dp"
             app:endIconMode="clear_text"
-            app:layout_constraintBottom_toTopOf="@+id/filter_btn_neg"
-            app:layout_constraintEnd_toEndOf="@+id/filter_hours_layout"
+            app:layout_constraintBottom_toTopOf="@+id/position_btn_neg"
+            app:layout_constraintEnd_toEndOf="@+id/position_lat_layout"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/filter_hours_layout"
-            app:layout_constraintTop_toBottomOf="@+id/filter_elev_text">
+            app:layout_constraintStart_toStartOf="@+id/position_lat_layout"
+            app:layout_constraintTop_toBottomOf="@+id/position_lon_text">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/filter_elev_edit"
+                android:id="@+id/position_lon_edit"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textUri" />
@@ -99,7 +99,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/filter_btn_neg"
+            android:id="@+id/position_btn_neg"
             style="@style/NormalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -108,23 +108,23 @@
             android:layout_marginBottom="6dp"
             android:text="@string/btn_cancel"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/filter_btn_pos"
+            app:layout_constraintEnd_toStartOf="@+id/position_btn_pos"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/filter_elev_layout" />
+            app:layout_constraintTop_toBottomOf="@+id/position_lon_layout" />
 
         <Button
-            android:id="@+id/filter_btn_pos"
+            android:id="@+id/position_btn_pos"
             style="@style/NormalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="@string/btn_accept"
-            app:layout_constraintBaseline_toBaselineOf="@+id/filter_btn_neg"
+            app:layout_constraintBaseline_toBaselineOf="@+id/position_btn_neg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/filter_btn_neg" />
+            app:layout_constraintStart_toEndOf="@+id/position_btn_neg" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

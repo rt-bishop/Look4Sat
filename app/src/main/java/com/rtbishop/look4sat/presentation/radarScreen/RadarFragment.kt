@@ -89,23 +89,23 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 viewModel.transmitters.observe(viewLifecycleOwner) { list ->
                     if (list.isNotEmpty()) {
                         radioAdapter.submitList(list)
-                        radarRecyclerMsg.text = getString(R.string.trans_data)
+                        radarEmptyMsg.text = getString(R.string.radio_data)
                     } else {
-                        radarRecyclerMsg.text = getString(R.string.trans_no_data)
+                        radarEmptyMsg.text = getString(R.string.radio_no_data)
                     }
                     radarView?.invalidate()
                 }
                 viewModel.orientation.observe(viewLifecycleOwner) { value ->
                     radarView?.setOrientation(value.first, value.second, value.third)
                 }
-                radarBack.setOnClickListener { findNavController().navigateUp() }
-                radarMap.setOnClickListener {
-                    val direction = RadarFragmentDirections.actionGlobalMapFragment(pass.catNum)
+                radarBtnBack.setOnClickListener { findNavController().navigateUp() }
+                radarBtnMap.setOnClickListener {
+                    val direction = RadarFragmentDirections.globalToMap(pass.catNum)
                     findNavController().navigate(direction)
                 }
                 radarBtnNotify.isEnabled = false
                 radarBtnSettings.setOnClickListener {
-                    val direction = RadarFragmentDirections.actionGlobalSettingsFragment()
+                    val direction = RadarFragmentDirections.globalToSettings()
                     findNavController().navigate(direction)
                 }
             }

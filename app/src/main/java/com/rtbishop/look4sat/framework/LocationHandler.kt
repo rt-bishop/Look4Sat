@@ -74,7 +74,7 @@ class LocationHandler @Inject constructor(
             }
         } else {
             _stationPosition.value =
-                DataState.Error(context.getString(R.string.pref_pos_manual_error))
+                DataState.Error(context.getString(R.string.location_manual_error))
         }
     }
 
@@ -89,7 +89,7 @@ class LocationHandler @Inject constructor(
                 manager.requestLocationUpdates(providerGps, 0L, 0f, this)
             }
         } else {
-            _stationPosition.value = DataState.Error(context.getString(R.string.pref_pos_gps_null))
+            _stationPosition.value = DataState.Error(context.getString(R.string.location_null))
         }
     }
 
@@ -104,7 +104,7 @@ class LocationHandler @Inject constructor(
                 manager.requestLocationUpdates(providerNet, 0L, 0f, this)
             }
         } else {
-            _stationPosition.value = DataState.Error(context.getString(R.string.pref_pos_gps_null))
+            _stationPosition.value = DataState.Error(context.getString(R.string.location_null))
         }
     }
 
@@ -117,7 +117,7 @@ class LocationHandler @Inject constructor(
             settings.saveStationPosition(currentPosition)
             _stationPosition.value = DataState.Success(currentPosition)
         } else {
-            _stationPosition.value = DataState.Error(context.getString(R.string.pref_pos_qth_error))
+            _stationPosition.value = DataState.Error(context.getString(R.string.location_qth_error))
         }
     }
 

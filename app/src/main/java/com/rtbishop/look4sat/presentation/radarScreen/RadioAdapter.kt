@@ -56,12 +56,12 @@ class RadioAdapter : RecyclerView.Adapter<RadioAdapter.TransHolder>() {
         RecyclerView.ViewHolder(binding.root) {
 
         private val divider = 1000000f
-        private val stringYes = itemView.context.getString(R.string.yes)
-        private val stringNo = itemView.context.getString(R.string.no)
-        private val link = itemView.context.getString(R.string.trans_link_low)
-        private val linkNull = itemView.context.getString(R.string.trans_no_link)
-        private val mode = itemView.context.getString(R.string.trans_mode)
-        private val inverted = itemView.context.getString(R.string.trans_inverted)
+        private val stringYes = itemView.context.getString(R.string.radio_string_yes)
+        private val stringNo = itemView.context.getString(R.string.radio_string_no)
+        private val link = itemView.context.getString(R.string.radio_link_low)
+        private val linkNull = itemView.context.getString(R.string.radio_no_link)
+        private val mode = itemView.context.getString(R.string.radio_mode)
+        private val inverted = itemView.context.getString(R.string.radio_inverted)
 
         fun bind(radio: SatRadio) {
             binding.run {
