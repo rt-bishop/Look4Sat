@@ -12,9 +12,10 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_back">Back</string>
     <string name="btn_modes">Modes</string>
-    <string name="btn_select">Select</string>
+    <string name="btn_select">Select all</string>
     <string name="btn_done">Done</string>
     <string name="btn_clear">Clear</string>
+    <string name="btn_clear_all">Clear all</string>
     <string name="btn_refresh">Refresh</string>
     <string name="btn_map">Map</string>
     <string name="btn_filter">Filter</string>
@@ -90,7 +91,7 @@
     <string name="radio_link_low">%.4f</string>
     <string name="radio_link_lowHigh">%.4f - %.4f</string>
     <string name="radio_data">Satellite transceivers:</string>
-    <string name="radio_no_data">No transceivers found for this satellite</string>
+    <string name="radio_no_data">This satellite has no transceivers</string>
     <string name="radio_string_yes">Yes</string>
     <string name="radio_string_no">No</string>
     <string name="radio_downlink">Downlink</string>

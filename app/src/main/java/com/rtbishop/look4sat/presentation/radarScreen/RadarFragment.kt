@@ -89,9 +89,10 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 viewModel.transmitters.observe(viewLifecycleOwner) { list ->
                     if (list.isNotEmpty()) {
                         radioAdapter.submitList(list)
-                        radarEmptyMsg.text = getString(R.string.radio_data)
+                        radarProgress.visibility = View.INVISIBLE
                     } else {
-                        radarEmptyMsg.text = getString(R.string.radio_no_data)
+                        radarProgress.visibility = View.INVISIBLE
+                        radarEmptyLayout.visibility = View.VISIBLE
                     }
                     radarView?.invalidate()
                 }

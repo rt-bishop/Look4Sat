@@ -141,12 +141,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     tickMainTimer(state.data)
                     if (state.data.isNotEmpty()) { // show new passes list
                         passesEmpty.visibility = View.INVISIBLE
-                        passesBtnRefresh.isEnabled = true
-                        refreshAnimator?.cancel()
                     } else { // show no passes message
                         passesEmpty.visibility = View.VISIBLE
-                        passesBtnRefresh.isEnabled = true
-                        refreshAnimator?.cancel()
                     }
                 }
                 is DataState.Loading -> {
@@ -175,6 +171,8 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
             } else {
                 passesTimer.text = 0L.toTimerString()
             }
+            passesBtnRefresh.isEnabled = true
+            refreshAnimator?.cancel()
         }
     }
 }

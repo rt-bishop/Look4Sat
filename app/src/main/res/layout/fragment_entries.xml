@@ -77,7 +77,7 @@
             android:layout_width="@dimen/button_width_max"
             android:layout_marginEnd="@dimen/button_margin_side"
             android:layout_gravity="end|center_vertical"
-            android:text="@string/btn_clear" />
+            android:text="@string/btn_clear_all" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 

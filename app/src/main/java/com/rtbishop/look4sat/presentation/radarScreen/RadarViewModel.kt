@@ -111,6 +111,7 @@ class RadarViewModel @Inject constructor(
 
     private fun processTransmitters(pass: SatPass) {
         viewModelScope.launch {
+            delay(125)
             val transmitters = repository.getRadiosWithId(pass.catNum)
             while (isActive) {
                 val time = System.currentTimeMillis()
