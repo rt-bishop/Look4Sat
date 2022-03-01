@@ -23,6 +23,7 @@ import com.rtbishop.look4sat.domain.ISettings
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import java.util.*
 import javax.inject.Inject
 
@@ -34,7 +35,10 @@ class EntriesViewModel @Inject constructor(
 
     private val transModes = MutableLiveData(settings.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
-    private val itemsFromRepo = liveData { emit(loadEntriesWithSelection()) } as MutableLiveData
+    private val itemsFromRepo = liveData {
+        delay(125)
+        emit(loadEntriesWithSelection())
+    } as MutableLiveData
     private val itemsWithModes = transModes.switchMap { modes ->
         itemsFromRepo.map { items -> filterByModes(items, modes) }
     }

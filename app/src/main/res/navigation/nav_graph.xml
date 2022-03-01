@@ -10,7 +10,11 @@
         tools:layout="@layout/fragment_entries">
         <action
             android:id="@+id/entries_to_modes"
-            app:destination="@id/nav_modes" />
+            app:destination="@id/nav_modes"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/nav_passes"
@@ -18,7 +22,11 @@
         tools:layout="@layout/fragment_passes">
         <action
             android:id="@+id/passes_to_filter"
-            app:destination="@id/nav_filter" />
+            app:destination="@id/nav_filter"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/nav_radar"
@@ -48,7 +56,11 @@
         tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/settings_to_sources"
-            app:destination="@id/nav_sources" />
+            app:destination="@id/nav_sources"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <dialog
         android:id="@+id/nav_modes"
@@ -72,23 +84,51 @@
         tools:layout="@layout/dialog_locator" />
     <action
         android:id="@+id/global_to_entries"
-        app:destination="@id/nav_entries" />
+        app:destination="@id/nav_entries"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     <action
         android:id="@+id/global_to_passes"
-        app:destination="@id/nav_passes" />
+        app:destination="@id/nav_passes"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     <action
         android:id="@+id/global_to_radar"
-        app:destination="@id/nav_radar" />
+        app:destination="@id/nav_radar"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     <action
         android:id="@+id/global_to_map"
-        app:destination="@id/nav_map" />
+        app:destination="@id/nav_map"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     <action
         android:id="@+id/global_to_settings"
-        app:destination="@id/nav_settings" />
+        app:destination="@id/nav_settings"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     <action
         android:id="@+id/global_to_position"
-        app:destination="@id/nav_position" />
+        app:destination="@id/nav_position"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     <action
         android:id="@+id/global_to_locator"
-        app:destination="@id/nav_locator" />
+        app:destination="@id/nav_locator"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation>

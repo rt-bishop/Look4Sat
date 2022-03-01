@@ -84,11 +84,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             is DataState.Success -> {
                 entriesAdapter.submitList(dataState.data)
                 binding.entriesProgress.visibility = View.INVISIBLE
-                binding.entriesRecycler.visibility = View.VISIBLE
             }
             is DataState.Loading -> {
                 binding.entriesProgress.visibility = View.VISIBLE
-                binding.entriesRecycler.visibility = View.INVISIBLE
             }
             else -> {}
         }
