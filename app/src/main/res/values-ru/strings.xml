@@ -145,6 +145,8 @@
         <a href="https://celestrak.com/">Celestrak</a> и доступ к файлам орбит Two-Line Element.
         \n • <a href="https://libre.space/">Libre Space Foundation</a> за проект
         <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с информацией о спутниках.
+        \n • <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
+        за интерес к приложению и публикацию интервью на сайте.
     </string>
     <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Политика конфиденциальности.</a>
         \nЭто ПО поставляется без гарантий. \nПодробности в лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.

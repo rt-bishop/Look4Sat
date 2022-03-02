@@ -1,6 +1,6 @@
 /*
  * Look4Sat. Amateur radio satellite tracker and pass predictor.
- * Copyright (C) 2019-2021 Arty Bishop (bishop.arty@gmail.com)
+ * Copyright (C) 2019-2022 Arty Bishop (bishop.arty@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

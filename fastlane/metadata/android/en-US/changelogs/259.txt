@@ -1,6 +1,0 @@
-Restored missing app icons for low-res/api screens
-Removed redundant material components
-Fixed Redmi dark theme colors bug
-Fixed RemoteSource update crash
-Matched CSV and TLE parsers output
-Further code refactoring and cleanup

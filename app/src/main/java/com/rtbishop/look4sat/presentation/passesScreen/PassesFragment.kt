@@ -1,6 +1,6 @@
 /*
  * Look4Sat. Amateur radio satellite tracker and pass predictor.
- * Copyright (C) 2019-2021 Arty Bishop (bishop.arty@gmail.com)
+ * Copyright (C) 2019-2022 Arty Bishop (bishop.arty@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,8 @@
  */
 package com.rtbishop.look4sat.presentation.passesScreen
 
-import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.View
-import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,7 +41,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     private val viewModel: PassesViewModel by viewModels()
     private val passesAdapter = PassesAdapter(this)
     private var binding: FragmentPassesBinding? = null
-    private var refreshAnimator: ValueAnimator? = null
+//    private var refreshAnimator: ValueAnimator? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -75,7 +73,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 val dir = PassesFragmentDirections.globalToSettings()
                 findNavController().navigate(dir)
             }
-            setupAnimator()
+//            setupAnimator()
             setupObservers()
         }
     }
@@ -93,14 +91,14 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
         super.onDestroyView()
     }
 
-    private fun setupAnimator() {
-        refreshAnimator = ValueAnimator.ofFloat(0f, -360f).apply {
-            duration = 875
-            interpolator = LinearInterpolator()
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { binding?.passesBtnRefresh?.rotation = animatedValue as Float }
-        }
-    }
+//    private fun setupAnimator() {
+//        refreshAnimator = ValueAnimator.ofFloat(0f, -360f).apply {
+//            duration = 875
+//            interpolator = LinearInterpolator()
+//            repeatCount = ValueAnimator.INFINITE
+//            addUpdateListener { binding?.passesBtnRefresh?.rotation = animatedValue as Float }
+//        }
+//    }
 
     private fun setupObservers() {
         viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
@@ -146,7 +144,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     }
                 }
                 is DataState.Loading -> {
-                    refreshAnimator?.start()
+//                    refreshAnimator?.start()
                     passesBtnRefresh.isEnabled = false
                     passesTimer.text = 0L.toTimerString()
                 }
@@ -172,7 +170,7 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                 passesTimer.text = 0L.toTimerString()
             }
             passesBtnRefresh.isEnabled = true
-            refreshAnimator?.cancel()
+//            refreshAnimator?.cancel()
         }
     }
 }

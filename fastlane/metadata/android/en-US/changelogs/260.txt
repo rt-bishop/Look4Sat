@@ -1,3 +1,0 @@
-Fixed James Webb Space Telescope crash
-However still reporting erroneous data
-Fixed DataParser bug, issues #77 & #80
