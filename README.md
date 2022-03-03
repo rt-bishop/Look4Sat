@@ -16,7 +16,7 @@
 
 ### Track satellite passes with ease!
 
-Thanks to the huge database provided by Celestrak and SatNOGS you have access to more than 5000 active satellites orbiting Earth. You can search the entire DB by satellite name or by NORAD catnum.
+Thanks to the huge database provided by [Celestrak](https://celestrak.com/) and [SatNOGS](https://satnogs.org/) you have access to more than 5000 active satellites orbiting Earth. You can search the entire DB by satellite name or by NORAD catnum.
 
 Satellite positions and passes are calculated relative to your location. To get reliable info make sure to set the observation position using GPS or QTH Locator in the Settings menu.
 
