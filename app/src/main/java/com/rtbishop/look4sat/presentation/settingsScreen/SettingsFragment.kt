@@ -74,7 +74,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 gotoUrl("https://github.com/rt-bishop/Look4Sat/")
             }
             settingsFab.setOnClickListener {
-                gotoUrl("https://www.buymeacoffee.com/rtbishop")
+                gotoUrl("https://ko-fi.com/rt_bishop")
             }
             settingsBtnFdroid.setOnClickListener {
                 gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
