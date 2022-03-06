@@ -18,10 +18,10 @@
 package com.rtbishop.look4sat.presentation.passesScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.IRepository
-import com.rtbishop.look4sat.domain.ISettings
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISatelliteManager
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
-import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -29,9 +29,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val predictor: Predictor,
-    private val repository: IRepository,
-    private val settings: ISettings
+    private val satelliteManager: ISatelliteManager,
+    private val repository: IDataRepository,
+    private val settings: ISettingsManager
 ) : ViewModel() {
 
     private var passesProcessing: Job? = null
@@ -41,12 +41,12 @@ class PassesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            predictor.calculatedPasses.collect { passes ->
+            satelliteManager.calculatedPasses.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch {
                     while (isActive) {
                         val time = System.currentTimeMillis()
-                        val newPasses = predictor.processPasses(passes, time)
+                        val newPasses = satelliteManager.processPasses(passes, time)
                         _passes.postValue(DataState.Success(newPasses))
                         delay(1000)
                     }
@@ -73,7 +73,7 @@ class PassesViewModel @Inject constructor(
             val stationPos = settings.loadStationPosition()
             val selectedIds = settings.loadEntriesSelection()
             val satellites = repository.getEntriesWithIds(selectedIds)
-            predictor.forceCalculation(satellites, stationPos, timeRef, hoursAhead, minElevation)
+            satelliteManager.calculatePasses(satellites, stationPos, timeRef, hoursAhead, minElevation)
         }
     }
 }

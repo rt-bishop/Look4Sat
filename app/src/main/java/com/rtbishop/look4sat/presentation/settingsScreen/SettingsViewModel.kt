@@ -19,9 +19,9 @@ package com.rtbishop.look4sat.presentation.settingsScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.rtbishop.look4sat.domain.ILocationHandler
-import com.rtbishop.look4sat.domain.IRepository
-import com.rtbishop.look4sat.domain.ISettings
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ILocationManager
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,9 +30,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val locationHandler: ILocationHandler,
-    private val repository: IRepository,
-    private val settings: ISettings
+    private val locationManager: ILocationManager,
+    private val repository: IDataRepository,
+    private val settings: ISettingsManager
 ) : ViewModel() {
 
     val entriesTotal = repository.getEntriesTotal().asLiveData()
@@ -79,17 +79,17 @@ class SettingsViewModel @Inject constructor(
 
     fun setUpdateHandled() = repository.setUpdateStateHandled()
 
-    val stationPosition: SharedFlow<DataState<GeoPos>> = locationHandler.stationPosition
+    val stationPosition: SharedFlow<DataState<GeoPos>> = locationManager.stationPosition
 
-    fun getStationPosition(): GeoPos = locationHandler.getStationPosition()
+    fun getStationPosition(): GeoPos = locationManager.getStationPosition()
 
-    fun setStationPosition(lat: Double, lon: Double) = locationHandler.setStationPosition(lat, lon)
+    fun setStationPosition(lat: Double, lon: Double) = locationManager.setStationPosition(lat, lon)
 
-    fun setPositionFromGps() = locationHandler.setPositionFromGps()
+    fun setPositionFromGps() = locationManager.setPositionFromGps()
 
-    fun setPositionFromNet() = locationHandler.setPositionFromNet()
+    fun setPositionFromNet() = locationManager.setPositionFromNet()
 
-    fun setPositionFromQth(qthString: String) = locationHandler.setPositionFromQth(qthString)
+    fun setPositionFromQth(qthString: String) = locationManager.setPositionFromQth(qthString)
 
-    fun setPositionHandled() = locationHandler.setPositionHandled()
+    fun setPositionHandled() = locationManager.setPositionHandled()
 }

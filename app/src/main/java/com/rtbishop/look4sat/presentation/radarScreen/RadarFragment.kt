@@ -30,7 +30,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.toTimerString
+import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

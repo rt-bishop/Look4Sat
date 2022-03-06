@@ -34,11 +34,11 @@ import androidx.navigation.fragment.findNavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
-import com.rtbishop.look4sat.domain.isValidIPv4
-import com.rtbishop.look4sat.domain.isValidPort
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.getNavResult
+import com.rtbishop.look4sat.utility.isValidIPv4
+import com.rtbishop.look4sat.utility.isValidPort
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

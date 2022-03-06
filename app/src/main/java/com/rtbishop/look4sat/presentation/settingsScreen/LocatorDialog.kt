@@ -25,7 +25,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogLocatorBinding
-import com.rtbishop.look4sat.domain.ISettings
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,7 +34,7 @@ import javax.inject.Inject
 class LocatorDialog : AppCompatDialogFragment() {
 
     @Inject
-    lateinit var preferences: ISettings
+    lateinit var preferences: ISettingsManager
 
     override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_locator, group, false)

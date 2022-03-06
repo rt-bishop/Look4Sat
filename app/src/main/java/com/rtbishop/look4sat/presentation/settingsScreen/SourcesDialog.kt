@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogSourcesBinding
-import com.rtbishop.look4sat.domain.ISettings
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.framework.model.DataSource
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +37,7 @@ import javax.inject.Inject
 class SourcesDialog : AppCompatDialogFragment(), SourcesAdapter.SourcesClickListener {
 
     @Inject
-    lateinit var settings: ISettings
+    lateinit var settings: ISettingsManager
     private lateinit var binding: DialogSourcesBinding
     private lateinit var sourcesAdapter: SourcesAdapter
 

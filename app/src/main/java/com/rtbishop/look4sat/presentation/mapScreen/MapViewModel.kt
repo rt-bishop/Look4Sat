@@ -18,13 +18,13 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.IRepository
-import com.rtbishop.look4sat.domain.ISettings
-import com.rtbishop.look4sat.domain.QthConverter
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISatelliteManager
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.utility.QthConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -34,9 +34,9 @@ import kotlin.math.min
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val predictor: Predictor,
-    private val repository: IRepository,
-    private val settings: ISettings,
+    private val satelliteManager: ISatelliteManager,
+    private val repository: IDataRepository,
+    private val settings: ISettingsManager,
 ) : ViewModel() {
 
     private val stationPosition = settings.loadStationPosition()
@@ -115,7 +115,7 @@ class MapViewModel @Inject constructor(
         val currentTrack = mutableListOf<GeoPos>()
         val endDate = Date(date.time + (satellite.orbitalPeriod * 2.4 * 60000L).toLong())
         var oldLongitude = 0.0
-        predictor.getSatTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
+        satelliteManager.getTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
             val osmLat = clipLat(Math.toDegrees(satPos.latitude))
             val osmLon = clipLon(Math.toDegrees(satPos.longitude))
             val currentPosition = GeoPos(osmLat, osmLon)
@@ -142,7 +142,7 @@ class MapViewModel @Inject constructor(
     private suspend fun getPositions(satellites: List<Satellite>, pos: GeoPos, date: Date) {
         val positions = mutableMapOf<Satellite, GeoPos>()
         satellites.forEach { satellite ->
-            val satPos = predictor.getSatPos(satellite, pos, date.time)
+            val satPos = satelliteManager.getPosition(satellite, pos, date.time)
             val osmLat = clipLat(Math.toDegrees(satPos.latitude))
             val osmLon = clipLon(Math.toDegrees(satPos.longitude))
             positions[satellite] = GeoPos(osmLat, osmLon)
@@ -151,12 +151,12 @@ class MapViewModel @Inject constructor(
     }
 
     private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
-        val satPos = predictor.getSatPos(satellite, pos, date.time)
+        val satPos = satelliteManager.getPosition(satellite, pos, date.time)
         _footprint.postValue(satPos)
     }
 
     private suspend fun getSatData(satellite: Satellite, pos: GeoPos, date: Date) {
-        val satPos = predictor.getSatPos(satellite, pos, date.time)
+        val satPos = satelliteManager.getPosition(satellite, pos, date.time)
         val osmLat = clipLat(Math.toDegrees(satPos.latitude))
         val osmLon = clipLon(Math.toDegrees(satPos.longitude))
         val osmPos = GeoPos(osmLat, osmLon)

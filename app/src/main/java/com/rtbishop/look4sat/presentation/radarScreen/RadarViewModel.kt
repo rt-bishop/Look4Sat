@@ -19,16 +19,16 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.hardware.GeomagneticField
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.DataReporter
-import com.rtbishop.look4sat.domain.IRepository
-import com.rtbishop.look4sat.domain.ISettings
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISatelliteManager
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.domain.predict.Predictor
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.round
-import com.rtbishop.look4sat.framework.OrientationHandler
+import com.rtbishop.look4sat.framework.OrientationManager
+import com.rtbishop.look4sat.utility.DataReporter
+import com.rtbishop.look4sat.utility.round
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -38,12 +38,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RadarViewModel @Inject constructor(
-    private val orientationHandler: OrientationHandler,
+    private val orientationManager: OrientationManager,
     private val reporter: DataReporter,
-    private val predictor: Predictor,
-    private val repository: IRepository,
-    private val settings: ISettings
-) : ViewModel(), OrientationHandler.OrientationListener {
+    private val satelliteManager: ISatelliteManager,
+    private val repository: IDataRepository,
+    private val settings: ISettingsManager
+) : ViewModel(), OrientationManager.OrientationListener {
 
     private val stationPos = settings.loadStationPosition()
     private val _passData = MutableLiveData<RadarData>()
@@ -54,7 +54,7 @@ class RadarViewModel @Inject constructor(
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
-        predictor.calculatedPasses.collect { passes ->
+        satelliteManager.calculatedPasses.collect { passes ->
             val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
             pass?.let { satPass ->
                 emit(satPass)
@@ -65,11 +65,11 @@ class RadarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (settings.getUseCompass()) orientationHandler.startListening(this)
+        if (settings.getUseCompass()) orientationManager.startListening(this)
     }
 
     fun disableSensor() {
-        if (settings.getUseCompass()) orientationHandler.stopListening()
+        if (settings.getUseCompass()) orientationManager.stopListening()
     }
 
     fun getUseCompass(): Boolean = settings.getUseCompass()
@@ -92,10 +92,10 @@ class RadarViewModel @Inject constructor(
             if (!satPass.isDeepSpace) {
                 val startDate = satPass.aosTime
                 val endDate = satPass.losTime
-                satTrack = predictor.getSatTrack(satPass.satellite, stationPos, startDate, endDate)
+                satTrack = satelliteManager.getTrack(satPass.satellite, stationPos, startDate, endDate)
             }
             while (isActive) {
-                val satPos = predictor.getSatPos(satPass.satellite, stationPos, Date().time)
+                val satPos = satelliteManager.getPosition(satPass.satellite, stationPos, Date().time)
                 if (settings.getRotatorEnabled()) {
                     val server = settings.getRotatorServer()
                     val port = settings.getRotatorPort().toInt()
@@ -115,7 +115,7 @@ class RadarViewModel @Inject constructor(
             val transmitters = repository.getRadiosWithId(pass.catNum)
             while (isActive) {
                 val time = System.currentTimeMillis()
-                val list = predictor.processRadios(pass.satellite, stationPos, transmitters, time)
+                val list = satelliteManager.processRadios(pass.satellite, stationPos, transmitters, time)
                 _transmitters.postValue(list)
                 delay(1000)
             }

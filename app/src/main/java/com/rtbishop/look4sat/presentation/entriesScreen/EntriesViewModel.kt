@@ -18,8 +18,8 @@
 package com.rtbishop.look4sat.presentation.entriesScreen
 
 import androidx.lifecycle.*
-import com.rtbishop.look4sat.domain.IRepository
-import com.rtbishop.look4sat.domain.ISettings
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,8 +29,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val repository: IRepository,
-    private val settings: ISettings
+    private val repository: IDataRepository,
+    private val settings: ISettingsManager
 ) : ViewModel(), EntriesAdapter.EntriesClickListener {
 
     private val transModes = MutableLiveData(settings.loadModesSelection())
