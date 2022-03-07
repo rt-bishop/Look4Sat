@@ -19,16 +19,19 @@ package com.rtbishop.look4sat.domain.predict
 
 import kotlin.math.*
 
-const val PI = 3.141592653589793
+const val ASTRONOMICAL_UNIT = 1.49597870691E8
 const val DEG2RAD = 0.017453292519943295
 const val RAD2DEG = 57.29577951308232
 const val EARTH_RADIUS = 6378.137
 const val EPSILON = 1.0E-12
-const val FLAT_FACTOR = 3.35281066474748E-3
+const val FLAT_FACT = 3.35281066474748E-3
 const val J3_HARMONIC = -2.53881E-6
 const val MIN_PER_DAY = 1.44E3
 const val SEC_PER_DAY = 8.6400E4
+const val SOLAR_RADIUS = 6.96000E5
 const val SPEED_OF_LIGHT = 2.99792458E8
+const val PI = 3.141592653589793
+const val PI_2 = PI / 2.0
 const val TWO_PI = PI * 2.0
 const val TWO_THIRDS = 2.0 / 3.0
 const val CK2 = 5.413079E-4
@@ -39,7 +42,10 @@ abstract class Satellite(val data: OrbitalData) {
 
     private val position = Vector4()
     private val velocity = Vector4()
+    private var satPos = SatPos()
+    private var eclipseDepth = 0.0
     private var gsPosTheta = 0.0
+    private var julUTC = 0.0
     private var perigee = 0.0
     val orbitalPeriod = 24 * 60 / data.meanmo
     var qoms24 = 0.0
@@ -52,14 +58,14 @@ abstract class Satellite(val data: OrbitalData) {
             val apogee = sma * (1.0 + data.eccn) - EARTH_RADIUS
             var lin = data.incl
             if (lin >= 90.0) lin = 180.0 - lin
-            acos(EARTH_RADIUS / (apogee + EARTH_RADIUS)) + lin * DEG2RAD > abs(pos.latitude * DEG2RAD)
+            acos(EARTH_RADIUS / (apogee + EARTH_RADIUS)) + lin * DEG2RAD > abs(pos.lat * DEG2RAD)
         }
     }
 
     internal fun getPosition(pos: GeoPos, time: Long): SatPos {
-        val satPos = SatPos()
+        satPos = SatPos()
         // Date/time at which the position and velocity were calculated
-        val julUTC = calcCurrentDaynum(time) + 2444238.5
+        julUTC = calcCurrentDaynum(time) + 2444238.5
         // Convert satellite's epoch time to Julian and calculate time since epoch in minutes
         val julEpoch = juliandDateOfEpoch(data.epoch)
         val tsince = (julUTC - julEpoch) * MIN_PER_DAY
@@ -70,16 +76,17 @@ abstract class Satellite(val data: OrbitalData) {
         magnitude(velocity)
         val squintVector = Vector4()
         // Angles in rads, dist in km, vel in km/S. Calculate sat Az, El, Range and Range-rate.
-        calculateObs(julUTC, position, velocity, pos, squintVector, satPos)
-        calculateLatLonAlt(julUTC, satPos, position)
-        return satPos.apply { this.time = time }
+        calculateObs(julUTC, position, velocity, pos, squintVector)
+        calculateLatLonAlt(julUTC)
+        satPos.time = time
+        satPos.eclipsed = isEclipsed()
+        satPos.eclipseDepth = eclipseDepth
+        return satPos
     }
 
-    // Read the system clock and return the number of days since 31Dec79 00:00:00 UTC (daynum 0)
     private fun calcCurrentDaynum(now: Long): Double {
         val then = 315446400000 // time in millis on 31Dec79 00:00:00 UTC (daynum 0)
-        val millis = now - then
-        return millis / 1000.0 / 60.0 / 60.0 / 24.0
+        return (now - then) / 1000.0 / 60.0 / 60.0 / 24.0
     }
 
     private fun juliandDateOfEpoch(epoch: Double): Double {
@@ -117,8 +124,7 @@ abstract class Satellite(val data: OrbitalData) {
         positionVector: Vector4,
         velocityVector: Vector4,
         gsPos: GeoPos,
-        squintVector: Vector4,
-        satPos: SatPos
+        squintVector: Vector4
     ) {
         val obsPos = Vector4()
         val obsVel = Vector4()
@@ -138,8 +144,8 @@ abstract class Satellite(val data: OrbitalData) {
             velocityVector.z - obsVel.z
         )
         magnitude(range)
-        val sinLat = sin(DEG2RAD * gsPos.latitude)
-        val cosLat = cos(DEG2RAD * gsPos.latitude)
+        val sinLat = sin(DEG2RAD * gsPos.lat)
+        val cosLat = cos(DEG2RAD * gsPos.lat)
         val sinTheta = sin(gsPosTheta)
         val cosTheta = cos(gsPosTheta)
         val topS = sinLat * cosTheta * range.x + sinLat * sinTheta * range.y - cosLat * range.z
@@ -152,6 +158,9 @@ abstract class Satellite(val data: OrbitalData) {
         satPos.elevation = asin(topZ / range.w)
         satPos.distance = range.w
         satPos.distanceRate = dot(range, rgvel) / range.w
+        var elevation = satPos.elevation / TWO_PI * 360.0
+        if (elevation > 90) elevation = 180 - elevation
+        satPos.aboveHorizon = elevation - 0 > EPSILON
     }
 
     // Returns the ECI position and velocity of the observer
@@ -162,14 +171,13 @@ abstract class Satellite(val data: OrbitalData) {
         obsVel: Vector4
     ) {
         val mFactor = 7.292115E-5
-        gsPosTheta = mod2PI(thetaGJD(time) + DEG2RAD * gsPos.longitude)
-        val c =
-            invert(sqrt(1.0 + FLAT_FACTOR * (FLAT_FACTOR - 2) * sqr(sin(DEG2RAD * gsPos.latitude))))
-        val sq = sqr(1.0 - FLAT_FACTOR) * c
-        val achcp = (EARTH_RADIUS * c) * cos(DEG2RAD * gsPos.latitude)
+        gsPosTheta = mod2PI(thetaGJD(time) + DEG2RAD * gsPos.lon)
+        val c = invert(sqrt(1.0 + FLAT_FACT * (FLAT_FACT - 2) * sqr(sin(DEG2RAD * gsPos.lat))))
+        val sq = sqr(1.0 - FLAT_FACT) * c
+        val achcp = (EARTH_RADIUS * c + gsPos.alt / 1000.0) * cos(DEG2RAD * gsPos.lat)
         obsPos.setXYZ(
             achcp * cos(gsPosTheta), achcp * sin(gsPosTheta),
-            (EARTH_RADIUS * sq) * sin(DEG2RAD * gsPos.latitude)
+            (EARTH_RADIUS * sq + gsPos.alt / 1000.0) * sin(DEG2RAD * gsPos.lat)
         )
         obsVel.setXYZ(-mFactor * obsPos.y, mFactor * obsPos.x, 0.0)
         magnitude(obsPos)
@@ -177,15 +185,11 @@ abstract class Satellite(val data: OrbitalData) {
     }
 
     // Calculate the geodetic position of an object given its ECI pos and time
-    private fun calculateLatLonAlt(
-        time: Double,
-        satPos: SatPos,
-        position: Vector4 = this.position
-    ) {
+    private fun calculateLatLonAlt(time: Double) {
         satPos.theta = atan2(position.y, position.x)
         satPos.longitude = mod2PI(satPos.theta - thetaGJD(time))
         val r = sqrt(sqr(position.x) + sqr(position.y))
-        val e2 = FLAT_FACTOR * (2.0 - FLAT_FACTOR)
+        val e2 = FLAT_FACT * (2.0 - FLAT_FACT)
         satPos.latitude = atan2(position.z, r)
         var phi: Double
         var c: Double
@@ -199,7 +203,7 @@ abstract class Satellite(val data: OrbitalData) {
         } while (i++ < 10 && !converged)
         satPos.altitude = r / cos(satPos.latitude) - EARTH_RADIUS * c
         var temp = satPos.latitude
-        if (temp > Math.PI / 2.0) {
+        if (temp > PI_2) {
             temp -= TWO_PI
             satPos.latitude = temp
         }
@@ -232,11 +236,12 @@ abstract class Satellite(val data: OrbitalData) {
         velocity.z = rdotk * uz + rfdotk * vz
     }
 
-    internal class Vector4 {
-        var w = 0.0
-        var x = 0.0
-        var y = 0.0
-        var z = 0.0
+    internal class Vector4(
+        var w: Double = 0.0,
+        var x: Double = 0.0,
+        var y: Double = 0.0,
+        var z: Double = 0.0
+    ) {
 
         fun multiply(multiplier: Double) {
             x *= multiplier
@@ -284,6 +289,12 @@ abstract class Satellite(val data: OrbitalData) {
         } while (i++ < 10 && !converged)
     }
 
+    internal fun calculatePhase(xlt: Double, xnode: Double, omgadf: Double) {
+        var phaseValue = xlt - xnode - omgadf + TWO_PI
+        if (phaseValue < 0.0) phaseValue += TWO_PI
+        satPos.phase = mod2PI(phaseValue)
+    }
+
     // Sets perigee and checks and adjusts the calculation if the perigee is less tan 156KM
     internal fun setPerigee(perigee: Double) {
         this.perigee = perigee
@@ -301,6 +312,75 @@ abstract class Satellite(val data: OrbitalData) {
         }
     }
 
+    // Checks if the satellite is in sunlight
+    private fun isEclipsed(): Boolean {
+        val sunVector = calculateSunVector()
+        val sdEarth = asin(EARTH_RADIUS / position.w)
+        val rho = subtract(sunVector, position)
+        val sdSun = asin(SOLAR_RADIUS / rho.w)
+        val earth = scalarNegMultiply(position)
+        val delta = angle(sunVector, earth)
+        eclipseDepth = sdEarth - sdSun - delta
+        return if (sdEarth < sdSun) false else eclipseDepth >= 0
+    }
+
+    private fun calculateSunVector(): Vector4 {
+        val mjd = julUTC - 2415020.0
+        val year = 1900 + mjd / 365.25
+        val solTime = (mjd + deltaEt(year) / SEC_PER_DAY) / 36525.0
+        val mTemp = modulus(35999.04975 * solTime, 360.0)
+        val m = radians(
+            modulus(358.47583 + mTemp - (0.000150 + 0.0000033 * solTime) * sqr(solTime), 360.0)
+        )
+        val lTemp = modulus(36000.76892 * solTime, 360.0)
+        val l = radians(
+            modulus(279.69668 + lTemp + 0.0003025 * sqr(solTime), 360.0)
+        )
+        val e = 0.01675104 - (0.0000418 + 0.000000126 * solTime) * solTime
+        val c = radians(
+            ((1.919460 - (0.004789 + 0.000014 * solTime) * solTime) * sin(m))
+                    + ((0.020094 - 0.000100 * solTime) * sin(2 * m)) + 0.000293 * sin(3 * m)
+        )
+        val o = radians(modulus(259.18 - 1934.142 * solTime, 360.0))
+        val lsa = modulus(l + c - radians(0.00569 - 0.00479 * sin(o)), TWO_PI)
+        val nu = modulus(m + c, TWO_PI)
+        var r = (1.0000002 * (1.0 - sqr(e)) / (1.0 + e * cos(nu)))
+        val eps = radians(
+            23.452294 - (0.0130125 + (0.00000164 - 0.000000503 * solTime) * solTime)
+                    * solTime + 0.00256 * cos(o)
+        )
+        r *= ASTRONOMICAL_UNIT
+        return Vector4(r, r * cos(lsa), r * sin(lsa) * cos(eps), r * sin(lsa) * sin(eps))
+    }
+
+    private fun subtract(v1: Vector4, v2: Vector4): Vector4 {
+        val v3 = Vector4()
+        v3.x = v1.x - v2.x
+        v3.y = v1.y - v2.y
+        v3.z = v1.z - v2.z
+        magnitude(v3)
+        return v3
+    }
+
+    private fun scalarNegMultiply(vector: Vector4): Vector4 {
+        val neg = -1.0
+        return Vector4(vector.w * abs(neg), vector.x * neg, vector.y * neg, vector.z * neg)
+    }
+
+    private fun angle(v1: Vector4, v2: Vector4): Double {
+        magnitude(v1)
+        magnitude(v2)
+        return acos(dot(v1, v2) / (v1.w * v2.w))
+    }
+
+    private fun deltaEt(year: Double): Double {
+        return 26.465 + 0.747622 * (year - 1950) + (1.886913 * sin(TWO_PI * (year - 1975) / 33))
+    }
+
+    private fun radians(degrees: Double): Double {
+        return degrees * DEG2RAD
+    }
+
     // Calculates the dot product of two vectors
     private fun dot(v1: Vector4, v2: Vector4): Double {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
@@ -316,11 +396,11 @@ abstract class Satellite(val data: OrbitalData) {
         v.w = sqrt(sqr(v.x) + sqr(v.y) + sqr(v.z))
     }
 
-    private fun modulus(arg1: Double): Double {
+    private fun modulus(arg1: Double, arg2: Double = SEC_PER_DAY): Double {
         var returnValue = arg1
-        val i = floor(returnValue / SEC_PER_DAY).toInt()
-        returnValue -= i * SEC_PER_DAY
-        if (returnValue < 0.0) returnValue += SEC_PER_DAY
+        val i = floor(returnValue / arg2).toInt()
+        returnValue -= i * arg2
+        if (returnValue < 0.0) returnValue += arg2
         return returnValue
     }
 

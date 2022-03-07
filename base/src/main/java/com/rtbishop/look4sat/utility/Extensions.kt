@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat.utility
 
+import com.rtbishop.look4sat.domain.predict.DEG2RAD
+import com.rtbishop.look4sat.domain.predict.RAD2DEG
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.security.MessageDigest
@@ -36,6 +38,10 @@ fun Double.round(decimals: Int): Double {
     repeat(decimals) { multiplier *= 10 }
     return kotlin.math.round(this * multiplier) / multiplier
 }
+
+fun Double.toDegrees(): Double = this * RAD2DEG
+
+fun Double.toRadians(): Double = this * DEG2RAD
 
 fun String.getHash(type: String = "SHA-256"): String {
     val hexChars = "0123456789ABCDEF"

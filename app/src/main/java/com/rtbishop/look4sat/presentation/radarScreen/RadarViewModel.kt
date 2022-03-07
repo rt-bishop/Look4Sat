@@ -29,6 +29,7 @@ import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.framework.OrientationManager
 import com.rtbishop.look4sat.utility.DataReporter
 import com.rtbishop.look4sat.utility.round
+import com.rtbishop.look4sat.utility.toDegrees
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -81,8 +82,8 @@ class RadarViewModel @Inject constructor(
     }
 
     private fun getMagDeclination(geoPos: GeoPos, time: Long = System.currentTimeMillis()): Float {
-        val latitude = geoPos.latitude.toFloat()
-        val longitude = geoPos.longitude.toFloat()
+        val latitude = geoPos.lat.toFloat()
+        val longitude = geoPos.lon.toFloat()
         return GeomagneticField(latitude, longitude, 0f, time).declination
     }
 
@@ -99,8 +100,8 @@ class RadarViewModel @Inject constructor(
                 if (settings.getRotatorEnabled()) {
                     val server = settings.getRotatorServer()
                     val port = settings.getRotatorPort().toInt()
-                    val azimuth = Math.toDegrees(satPos.azimuth).round(1)
-                    val elevation = Math.toDegrees(satPos.elevation).round(1)
+                    val azimuth = satPos.azimuth.toDegrees().round(1)
+                    val elevation = satPos.elevation.toDegrees().round(1)
                     reporter.reportRotation(server, port, azimuth, elevation)
                 }
                 _passData.postValue(RadarData(satPos, satTrack))

@@ -54,7 +54,7 @@ class FilterDialog : AppCompatDialogFragment() {
                 val hoursAhead = try {
                     filterHoursEdit.text.toString().toInt()
                 } catch (exception: Exception) {
-                    8
+                    24
                 }
                 val minElevation = try {
                     filterElevEdit.text.toString().toDouble()

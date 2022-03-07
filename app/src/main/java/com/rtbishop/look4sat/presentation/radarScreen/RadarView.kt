@@ -22,7 +22,10 @@ import android.graphics.*
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.domain.predict.PI_2
 import com.rtbishop.look4sat.domain.predict.SatPos
+import com.rtbishop.look4sat.domain.predict.TWO_PI
+import com.rtbishop.look4sat.utility.toRadians
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -31,7 +34,6 @@ class RadarView(context: Context) : View(context) {
 
     private val defaultColor = ContextCompat.getColor(context, R.color.accent)
     private val scale = resources.displayMetrics.density
-    private val piDiv2 = Math.PI / 2.0
     private val strokeSize = scale * 2f
     private var position: SatPos? = null
     private var positions: List<SatPos> = emptyList()
@@ -186,8 +188,8 @@ class RadarView(context: Context) : View(context) {
     }
 
     private fun drawCrosshair(canvas: Canvas, azimuth: Float, pitch: Float, radarRadius: Float) {
-        val azimuthRad = Math.toRadians(azimuth.toDouble())
-        val tmpElevation = Math.toRadians(pitch.toDouble())
+        val azimuthRad = azimuth.toDouble().toRadians()
+        val tmpElevation = pitch.toDouble().toRadians()
         val elevationRad = if (tmpElevation > 0.0) 0.0 else tmpElevation
         val crossX = sph2CartX(azimuthRad, -elevationRad, radarRadius.toDouble())
         val crossY = sph2CartY(azimuthRad, -elevationRad, radarRadius.toDouble())
@@ -197,13 +199,13 @@ class RadarView(context: Context) : View(context) {
     }
 
     private fun sph2CartX(azimuth: Double, elevation: Double, r: Double): Float {
-        val radius = r * (piDiv2 - elevation) / piDiv2
-        return (radius * cos(piDiv2 - azimuth)).toFloat()
+        val radius = r * (PI_2 - elevation) / PI_2
+        return (radius * cos(PI_2 - azimuth)).toFloat()
     }
 
     private fun sph2CartY(azimuth: Double, elevation: Double, r: Double): Float {
-        val radius = r * (piDiv2 - elevation) / piDiv2
-        return (radius * sin(piDiv2 - azimuth)).toFloat()
+        val radius = r * (PI_2 - elevation) / PI_2
+        return (radius * sin(PI_2 - azimuth)).toFloat()
     }
 
     private fun createPassTrajectory(radarRadius: Float) {
@@ -221,7 +223,7 @@ class RadarView(context: Context) : View(context) {
     private fun createPassTrajectoryArrow() {
         val radius = beaconSize
         val sides = 3
-        val angle = 2.0 * Math.PI / sides
+        val angle = TWO_PI / sides
         arrowPath.moveTo((radius * cos(angle)).toFloat(), (radius * sin(angle)).toFloat())
         for (i in 1 until sides) {
             val x = (radius * cos(angle - angle * i)).toFloat()

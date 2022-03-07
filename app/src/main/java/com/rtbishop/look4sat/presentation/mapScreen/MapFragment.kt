@@ -119,7 +119,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_position)
-                position = GeoPoint(stationPos.latitude, stationPos.longitude)
+                position = GeoPoint(stationPos.lat, stationPos.lon)
                 mapView.overlays[0] = this
                 mapView.invalidate()
             }
@@ -135,7 +135,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     icon = getCustomTextIcon(it.key.data.name)
                     try {
-                        position = GeoPoint(it.value.latitude, it.value.longitude)
+                        position = GeoPoint(it.value.lat, it.value.lon)
                     } catch (exception: IllegalArgumentException) {
                         println(exception.stackTraceToString())
                     }
@@ -165,10 +165,10 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun handleTrack(satTrack: List<List<GeoPos>>) {
-        val center = GeoPoint(satTrack[0][0].latitude, satTrack[0][0].longitude)
+        val center = GeoPoint(satTrack[0][0].lat, satTrack[0][0].lon)
         val trackOverlay = FolderOverlay()
         satTrack.forEach { track ->
-            val trackPoints = track.map { GeoPoint(it.latitude, it.longitude) }
+            val trackPoints = track.map { GeoPoint(it.lat, it.lon) }
             Polyline().apply {
                 try {
                     setPoints(trackPoints)
@@ -184,12 +184,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun handleFootprint(satPos: SatPos) {
-        val center = GeoPoint(Math.toDegrees(satPos.latitude), Math.toDegrees(satPos.longitude))
-        val radiusM = satPos.getRangeCircleRadiusKm() * 1000
-        val footprintPoints = mutableListOf<GeoPoint>()
-        for (i in 0..720) {
-            footprintPoints.add(center.destinationPoint(radiusM, i.toDouble()))
-        }
+        val footprintPoints = satPos.getRangeCircle().map { GeoPoint(it.lat, it.lon) }
         val footprintOverlay = Polyline().apply {
             outlinePaint.set(footprintPaint)
             try {
@@ -210,9 +205,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             mapDataDst.text = String.format(getString(R.string.map_distance), mapData.range)
             mapDataVel.text = String.format(getString(R.string.map_velocity), mapData.velocity)
             mapDataLat.text =
-                String.format(getString(R.string.map_latitude), mapData.osmPos.latitude)
+                String.format(getString(R.string.map_latitude), mapData.osmPos.lat)
             mapDataLon.text =
-                String.format(getString(R.string.map_longitude), mapData.osmPos.longitude)
+                String.format(getString(R.string.map_longitude), mapData.osmPos.lon)
         }
         binding.mapView.invalidate()
     }

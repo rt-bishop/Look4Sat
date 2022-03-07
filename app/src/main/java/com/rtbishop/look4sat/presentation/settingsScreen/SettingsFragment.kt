@@ -209,8 +209,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.run {
             val latFormat = getString(R.string.location_lat)
             val lonFormat = getString(R.string.location_lon)
-            settingsLocation.locationLat.text = String.format(latFormat, geoPos.latitude)
-            settingsLocation.locationLon.text = String.format(lonFormat, geoPos.longitude)
+            settingsLocation.locationLat.text = String.format(latFormat, geoPos.lat)
+            settingsLocation.locationLon.text = String.format(lonFormat, geoPos.lon)
         }
     }
 

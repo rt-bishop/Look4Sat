@@ -111,7 +111,6 @@ class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
             val xl = dsv.xll + dsv.omgadf + dsv.xnode
             val beta = sqrt(1.0 - dsv.em * dsv.em)
             dsv.xn = XKE / a.pow(1.5)
-
             // Long period periodics
             val axn = dsv.em * cos(dsv.omgadf)
             temp[0] = invert(a * beta * beta)
@@ -119,12 +118,12 @@ class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
             val aynl = temp[0] * aycof
             val xlt = xl + xll
             val ayn = dsv.em * sin(dsv.omgadf) + aynl
-
             // Solve Kepler's equation
             val capu = mod2PI(xlt - dsv.xnode)
             temp[2] = capu
             converge(temp, axn, ayn, capu)
             calculatePosAndVel(temp, a, axn, ayn)
+            calculatePhase(xlt, dsv.xnode, dsv.omgadf)
         }
     }
 
@@ -149,7 +148,6 @@ class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
         temp[0] = invert(pl)
         temp[1] = CK2 * temp[0]
         temp[2] = temp[1] * temp[0]
-
         // Update for short periodics
         val rk = temp[9] * (1.0 - 1.5 * temp[2] * betal * x3thm1) + 0.5 * temp[1] * x1mth2 * cos2u
         val uk = u - 0.25 * temp[2] * x7thm1 * sin2u
@@ -161,6 +159,7 @@ class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
     }
 
     inner class DeepSpaceValueObject {
+
         var eosq = 0.0
         var sinio = 0.0
         var cosio = 0.0
@@ -174,7 +173,6 @@ class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
         var omgdot = 0.0
         var xnodot = 0.0
         var xnodp = 0.0
-
         // Used by dpsec and dpper parts of Deep()
         var xll = 0.0
         var omgadf = 0.0
@@ -183,7 +181,6 @@ class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
         var xinc = 0.0
         var xn = 0.0
         var t = 0.0
-
         // Used by thetg and Deep()
         var ds50 = 0.0
     }
@@ -212,14 +209,12 @@ class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
         private val g44 = 1.8014998
         private val g52 = 1.0508330
         private val g54 = 4.4108898
-
         private val thgr: Double
         private val xnq: Double
         private val xqncl: Double
         private val omegaq: Double
         private var zmol = 0.0
         private var zmos = 0.0
-
         // Many fields below cannot be final because they are iteratively refined
         private var savtsn = 0.0
         private var ee2 = 0.0

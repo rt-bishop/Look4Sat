@@ -181,6 +181,7 @@ class NearEarthSat(data: OrbitalData) : Satellite(data) {
             temp[2] = capu
             converge(temp, axn, ayn, capu)
             calculatePosAndVel(temp, xnode, a, xn, axn, ayn)
+            calculatePhase(xlt, xnode, omgadf)
         }
     }
 
@@ -208,7 +209,6 @@ class NearEarthSat(data: OrbitalData) : Satellite(data) {
         temp[0] = invert(pl)
         temp[1] = CK2 * temp[0]
         temp[2] = temp[1] * temp[0]
-
         // Update for short periodics
         val rk = r * (1.0 - 1.5 * temp[2] * betal * x3thm1) + 0.5 * temp[1] * x1mth2 * cos2u
         val uk = u - 0.25 * temp[2] * x7thm1 * sin2u

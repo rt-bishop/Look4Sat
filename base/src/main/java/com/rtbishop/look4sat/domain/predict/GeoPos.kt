@@ -17,4 +17,4 @@
  */
 package com.rtbishop.look4sat.domain.predict
 
-data class GeoPos(val latitude: Double, val longitude: Double, val name: String? = null)
+data class GeoPos(val lat: Double, val lon: Double, val alt: Double = 0.0, val name: String? = null)

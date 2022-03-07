@@ -25,11 +25,11 @@ class QthConverterTest {
     @Test
     fun `Given valid QTH returns correct POS`() {
         var result = QthConverter.qthToPosition("io91VL39FX")
-        assert(result?.latitude == 51.4792 && result.longitude == -0.2083)
+        assert(result?.lat == 51.4792 && result.lon == -0.2083)
         result = QthConverter.qthToPosition("JN58TD")
-        assert(result?.latitude == 48.1458 && result.longitude == 11.6250)
+        assert(result?.lat == 48.1458 && result.lon == 11.6250)
         result = QthConverter.qthToPosition("gf15vc")
-        assert(result?.latitude == -34.8958 && result.longitude == -56.2083)
+        assert(result?.lat == -34.8958 && result.lon == -56.2083)
     }
 
     @Test

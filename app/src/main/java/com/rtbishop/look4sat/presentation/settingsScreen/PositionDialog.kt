@@ -49,8 +49,8 @@ class PositionDialog : AppCompatDialogFragment() {
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
             val location = preferences.loadStationPosition()
-            positionLatEdit.setText(location.latitude.toString())
-            positionLonEdit.setText(location.longitude.toString())
+            positionLatEdit.setText(location.lat.toString())
+            positionLonEdit.setText(location.lon.toString())
             positionBtnPos.setOnClickListener {
                 val latitude = try {
                     positionLatEdit.text.toString().toDouble()

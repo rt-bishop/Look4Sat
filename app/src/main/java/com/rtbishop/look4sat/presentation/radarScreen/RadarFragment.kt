@@ -30,6 +30,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
+import com.rtbishop.look4sat.utility.toDegrees
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -121,8 +122,8 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
             val radarAlt = getString(R.string.radar_alt_value)
             val radarDist = getString(R.string.radar_dist_value)
             val radarId = getString(R.string.radar_sat_id)
-            radarAzValue.text = String.format(radarAzim, Math.toDegrees(satPos.azimuth))
-            radarElValue.text = String.format(radarElev, Math.toDegrees(satPos.elevation))
+            radarAzValue.text = String.format(radarAzim, satPos.azimuth.toDegrees())
+            radarElValue.text = String.format(radarElev, satPos.elevation.toDegrees())
             radarAltValue.text = String.format(radarAlt, satPos.altitude)
             radarDstValue.text = String.format(radarDist, satPos.distance)
             radarSatId.text = String.format(radarId, satPass.catNum)

@@ -28,7 +28,11 @@ data class SatPos(
     var distance: Double = 0.0,
     var distanceRate: Double = 0.0,
     var theta: Double = 0.0,
-    var time: Long = 0L
+    var time: Long = 0L,
+    var phase: Double = 0.0,
+    var eclipseDepth: Double = 0.0,
+    var eclipsed: Boolean = false,
+    var aboveHorizon: Boolean = false
 ) {
 
     fun getDownlinkFreq(freq: Long): Long {
@@ -47,38 +51,17 @@ data class SatPos(
     }
 
     fun getRangeCircle(): List<GeoPos> {
-        val positions = mutableListOf<GeoPos>()
-        val beta = acos(EARTH_RADIUS / (EARTH_RADIUS + altitude))
-        var tempAzimuth = 0
-        while (tempAzimuth < 360) {
-            val azimuth = tempAzimuth / 360.0 * 2.0 * Math.PI
-            var lat = asin(sin(latitude) * cos(beta) + cos(azimuth) * sin(beta) * cos(latitude))
-            val num = (cos(beta) - (sin(latitude) * sin(lat)))
-            val den = cos(latitude) * cos(lat)
-            var lon = if (tempAzimuth == 0 && (beta > ((Math.PI / 2.0) - latitude))) {
-                longitude + Math.PI
-            } else if (tempAzimuth == 180 && (beta > ((Math.PI / 2.0) - latitude))) {
-                longitude + Math.PI
-            } else if (abs(num / den) > 1.0) {
-                longitude
-            } else {
-                if ((180 - tempAzimuth) >= 0) {
-                    longitude - acos(num / den)
-                } else {
-                    longitude + acos(num / den)
-                }
-            }
-            while (lon < 0.0) lon += Math.PI * 2.0
-            while (lon > Math.PI * 2.0) lon -= Math.PI * 2.0
-            lat = Math.toDegrees(lat)
-            lon = Math.toDegrees(lon)
-            positions.add(GeoPos(lat, lon))
-            tempAzimuth += 1
+        val rangeCirclePoints = mutableListOf<GeoPos>()
+        val beta = acos(EARTH_RADIUS / (EARTH_RADIUS + altitude)) // * EARTH_RADIUS = radiusKm
+        for (azimuth in 0..720) {
+            val rads = azimuth * DEG2RAD
+            val lat = asin(sin(latitude) * cos(beta) + (cos(latitude) * sin(beta) * cos(rads)))
+            val lon = (longitude + atan2(
+                sin(rads) * sin(beta) * cos(latitude),
+                cos(beta) - sin(latitude) * sin(lat)
+            ))
+            rangeCirclePoints.add(GeoPos(lat * RAD2DEG, lon * RAD2DEG))
         }
-        return positions
-    }
-
-    fun getRangeCircleRadiusKm(): Double {
-        return EARTH_RADIUS * acos(EARTH_RADIUS / (EARTH_RADIUS + altitude))
+        return rangeCirclePoints
     }
 }

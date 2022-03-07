@@ -61,8 +61,8 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
 
     override fun saveStationPosition(position: GeoPos) {
         prefs.edit {
-            putString(keyLatitude, position.latitude.toString())
-            putString(keyLongitude, position.longitude.toString())
+            putString(keyLatitude, position.lat.toString())
+            putString(keyLongitude, position.lon.toString())
         }
     }
 
@@ -77,7 +77,7 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
     }
 
     override fun getHoursAhead(): Int {
-        return prefs.getInt(keyHoursAhead, 8)
+        return prefs.getInt(keyHoursAhead, 24)
     }
 
     override fun setHoursAhead(hoursAhead: Int) {
