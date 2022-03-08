@@ -201,14 +201,14 @@
         android:text="@string/btn_notify"
         android:textColor="@color/textDisabled"
         app:layout_constraintBottom_toBottomOf="@+id/radar_coordinator"
-        app:layout_constraintEnd_toStartOf="@+id/radar_sat_id"
+        app:layout_constraintEnd_toStartOf="@+id/radar_visibility"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/radar_coordinator"
         app:layout_constraintStart_toStartOf="@+id/radar_coordinator"
         app:layout_constraintTop_toTopOf="@+id/radar_coordinator" />
 
     <TextView
-        android:id="@+id/radar_sat_id"
+        android:id="@+id/radar_visibility"
         style="@style/WorldMapText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -217,7 +217,7 @@
         android:ellipsize="end"
         android:gravity="center_horizontal"
         android:maxLines="1"
-        android:text="@string/radar_sat_id"
+        android:text="@string/radar_visible"
         app:layout_constraintBaseline_toBaselineOf="@+id/radar_btn_notify"
         app:layout_constraintEnd_toStartOf="@+id/radar_btn_settings"
         app:layout_constraintHorizontal_bias="0.5"
@@ -231,6 +231,6 @@
         android:text="@string/btn_settings"
         app:layout_constraintBaseline_toBaselineOf="@+id/radar_btn_notify"
         app:layout_constraintEnd_toEndOf="@+id/radar_coordinator"
-        app:layout_constraintStart_toEndOf="@+id/radar_sat_id" />
+        app:layout_constraintStart_toEndOf="@+id/radar_visibility" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

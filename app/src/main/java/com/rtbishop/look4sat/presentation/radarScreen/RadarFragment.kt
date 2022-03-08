@@ -121,12 +121,15 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
             val radarElev = getString(R.string.radar_el_value)
             val radarAlt = getString(R.string.radar_alt_value)
             val radarDist = getString(R.string.radar_dist_value)
-            val radarId = getString(R.string.radar_sat_id)
             radarAzValue.text = String.format(radarAzim, satPos.azimuth.toDegrees())
             radarElValue.text = String.format(radarElev, satPos.elevation.toDegrees())
             radarAltValue.text = String.format(radarAlt, satPos.altitude)
             radarDstValue.text = String.format(radarDist, satPos.distance)
-            radarSatId.text = String.format(radarId, satPass.catNum)
+            if (satPos.eclipsed) {
+                radarVisibility.text = getText(R.string.radar_eclipsed)
+            } else {
+                radarVisibility.text = getText(R.string.radar_visible)
+            }
             if (!satPass.isDeepSpace) {
                 if (timeNow < satPass.aosTime) {
                     val millisBeforeStart = satPass.aosTime.minus(timeNow)
