@@ -104,6 +104,10 @@
     <string name="map_latitude">Широта: %.1f°</string>
     <string name="map_longitude">Долгота: %.1f°</string>
     <string name="map_qth">QTH Локатор: %s</string>
+    <string name="map_visible">Видимый</string>
+    <string name="map_eclipsed">В тени</string>
+    <string name="map_visibility">Видимость: %s</string>
+    <string name="map_phase">Фаза: %.1f°</string>
     <string name="map_altitude">Высота: %.0fкм</string>
     <string name="map_distance">Дистанция: %.0fкм</string>
     <string name="map_velocity">Скорость: %.2fкм/с</string>

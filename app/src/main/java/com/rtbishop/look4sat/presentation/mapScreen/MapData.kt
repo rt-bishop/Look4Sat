@@ -28,5 +28,7 @@ data class MapData(
     val altitude: Double,
     val velocity: Double,
     val qthLoc: String,
-    val osmPos: GeoPos
+    val osmPos: GeoPos,
+    val phase: Double,
+    val eclipsed: Boolean
 )

@@ -89,15 +89,35 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/map_data_lat"
+                android:id="@+id/map_data_visibility"
                 style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="6dp"
-                android:text="@string/map_latitude"
+                android:text="@string/map_visibility"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/map_data_phase"
+                style="@style/WorldMapText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="@string/map_phase"
+                app:layout_constraintBaseline_toBaselineOf="@+id/map_data_visibility"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/map_data_lat"
+                style="@style/WorldMapText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/map_latitude"
+                app:layout_constraintStart_toStartOf="@+id/map_data_visibility"
+                app:layout_constraintTop_toBottomOf="@+id/map_data_visibility" />
 
             <TextView
                 android:id="@+id/map_data_lon"
@@ -126,10 +146,9 @@
                 style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
                 android:text="@string/map_altitude"
                 app:layout_constraintBaseline_toBaselineOf="@+id/map_data_lat"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="@+id/map_data_phase" />
 
             <TextView
                 android:id="@+id/map_data_dst"

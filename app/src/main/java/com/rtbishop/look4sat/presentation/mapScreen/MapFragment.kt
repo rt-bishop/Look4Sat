@@ -208,6 +208,14 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 String.format(getString(R.string.map_latitude), mapData.osmPos.lat)
             mapDataLon.text =
                 String.format(getString(R.string.map_longitude), mapData.osmPos.lon)
+            mapDataPhase.text = String.format(getString(R.string.map_phase), mapData.phase)
+            if (mapData.eclipsed) {
+                val eclipsed = getString(R.string.map_eclipsed)
+                mapDataVisibility.text = String.format(getString(R.string.map_visibility), eclipsed)
+            } else {
+                val visible = getString(R.string.map_visible)
+                mapDataVisibility.text = String.format(getString(R.string.map_visibility), visible)
+            }
         }
         binding.mapView.invalidate()
     }

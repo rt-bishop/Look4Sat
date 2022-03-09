@@ -162,9 +162,11 @@ class MapViewModel @Inject constructor(
         val osmLon = clipLon(satPos.longitude.toDegrees())
         val osmPos = GeoPos(osmLat, osmLon)
         val qthLoc = QthConverter.positionToQth(osmPos.lat, osmPos.lon) ?: "-- --"
+        val phase = satPos.phase.toDegrees()
+        val visibility = satPos.eclipsed
         val satData = MapData(
             satellite, satellite.data.catnum, satellite.data.name, satPos.distance,
-            satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos
+            satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos, phase, visibility
         )
         _mapData.postValue(satData)
     }
