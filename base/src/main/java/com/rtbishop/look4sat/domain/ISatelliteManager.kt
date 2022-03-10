@@ -11,6 +11,8 @@ interface ISatelliteManager {
 
     val calculatedPasses: SharedFlow<List<SatPass>>
 
+    fun getPasses(): List<SatPass>
+
     suspend fun getPosition(sat: Satellite, pos: GeoPos, time: Long): SatPos
 
     suspend fun getTrack(sat: Satellite, pos: GeoPos, start: Long, end: Long): List<SatPos>

@@ -198,7 +198,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun handleMapData(mapData: MapData) {
         binding.apply {
-            mapTitle.text = mapData.name
+            mapTimer.text = mapData.aosTime
+            mapAzimuth.text = String.format(getString(R.string.map_azimuth), mapData.azimuth)
+            mapElevation.text = String.format(getString(R.string.map_elevation), mapData.elevation)
             mapDataId.text = String.format(getString(R.string.map_sat_id), mapData.catNum)
             mapDataQth.text = String.format(getString(R.string.map_qth), mapData.qthLoc)
             mapDataAlt.text = String.format(getString(R.string.map_altitude), mapData.altitude)

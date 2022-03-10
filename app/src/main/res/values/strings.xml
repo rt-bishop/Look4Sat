@@ -102,6 +102,8 @@
     <string name="map_title">World Map</string>
     <string name="map_sat_name">%s</string>
     <string name="map_sat_id">Id:%d</string>
+    <string name="map_azimuth">Azimuth: %.1f°</string>
+    <string name="map_elevation">Elevation: %.1f°</string>
     <string name="map_latitude">Latitude: %.1f°</string>
     <string name="map_longitude">Longitude: %.1f°</string>
     <string name="map_qth">QTH Locator: %s</string>

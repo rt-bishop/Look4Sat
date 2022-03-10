@@ -27,8 +27,11 @@ import kotlinx.coroutines.withContext
 
 class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISatelliteManager {
 
+    private var passes = listOf<SatPass>()
     private val _calculatedPasses = MutableSharedFlow<List<SatPass>>(replay = 1)
     override val calculatedPasses: SharedFlow<List<SatPass>> = _calculatedPasses
+
+    override fun getPasses(): List<SatPass> = passes
 
     override suspend fun getPosition(sat: Satellite, pos: GeoPos, time: Long): SatPos {
         return withContext(defaultDispatcher) { sat.getPosition(pos, time) }
@@ -96,14 +99,18 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
         minElevation: Double
     ) {
         if (satList.isEmpty()) {
-            _calculatedPasses.emit(emptyList())
+            val newPasses = emptyList<SatPass>()
+            passes = newPasses
+            _calculatedPasses.emit(newPasses)
         } else {
             withContext(defaultDispatcher) {
                 val allPasses = mutableListOf<SatPass>()
                 satList.forEach { satellite ->
                     allPasses.addAll(satellite.getPasses(pos, time, hoursAhead))
                 }
-                _calculatedPasses.emit(allPasses.filter(time, hoursAhead, minElevation))
+                val newPasses = allPasses.filter(time, hoursAhead, minElevation)
+                passes = newPasses
+                _calculatedPasses.emit(newPasses)
             }
         }
     }

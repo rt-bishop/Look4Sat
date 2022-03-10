@@ -101,6 +101,8 @@
     <string name="map_title">Карта Мира</string>
     <string name="map_sat_name">%s</string>
     <string name="map_sat_id">Id:%d</string>
+    <string name="map_azimuth">Азимут: %.1f°</string>
+    <string name="map_elevation">Элевация: %.1f°</string>
     <string name="map_latitude">Широта: %.1f°</string>
     <string name="map_longitude">Долгота: %.1f°</string>
     <string name="map_qth">QTH Локатор: %s</string>

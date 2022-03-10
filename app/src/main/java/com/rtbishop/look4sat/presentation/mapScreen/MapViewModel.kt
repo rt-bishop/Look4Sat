@@ -26,6 +26,7 @@ import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.toDegrees
+import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -41,9 +42,10 @@ class MapViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val stationPosition = settings.loadStationPosition()
+    private var allPasses = satelliteManager.getPasses()
     private var allSatellites = listOf<Satellite>()
     private var dataUpdateJob: Job? = null
-    private var dataUpdateRate = 2000L
+    private var dataUpdateRate = 1000L
     private lateinit var selectedSatellite: Satellite
 
     val stationPos = liveData {
@@ -84,7 +86,8 @@ class MapViewModel @Inject constructor(
                 if (satellites.isNotEmpty()) {
                     allSatellites = satellites
                     if (catnum == -1) {
-                        selectSatellite(satellites.first())
+                        allPasses.find { pass -> pass.progress < 100 && !pass.isDeepSpace }
+                            ?.let { pass -> selectSatellite(pass.satellite) }
                     } else {
                         satellites.find { it.data.catnum == catnum }?.let { selectSatellite(it) }
                     }
@@ -156,8 +159,23 @@ class MapViewModel @Inject constructor(
         _footprint.postValue(satPos)
     }
 
-    private suspend fun getSatData(satellite: Satellite, pos: GeoPos, date: Date) {
-        val satPos = satelliteManager.getPosition(satellite, pos, date.time)
+    private suspend fun getSatData(sat: Satellite, pos: GeoPos, date: Date) {
+        var aosTime = 0L.toTimerString()
+        allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 100 }
+            ?.let { satPass ->
+                if (!satPass.isDeepSpace) {
+                    aosTime = if (date.time < satPass.aosTime) {
+                        val millisBeforeStart = satPass.aosTime.minus(date.time)
+                        millisBeforeStart.toTimerString()
+                    } else {
+                        val millisBeforeEnd = satPass.losTime.minus(date.time)
+                        millisBeforeEnd.toTimerString()
+                    }
+                }
+            }
+        val satPos = satelliteManager.getPosition(sat, pos, date.time)
+        val azimuth = satPos.azimuth.toDegrees()
+        val elevation = satPos.elevation.toDegrees()
         val osmLat = clipLat(satPos.latitude.toDegrees())
         val osmLon = clipLon(satPos.longitude.toDegrees())
         val osmPos = GeoPos(osmLat, osmLon)
@@ -165,7 +183,7 @@ class MapViewModel @Inject constructor(
         val phase = satPos.phase.toDegrees()
         val visibility = satPos.eclipsed
         val satData = MapData(
-            satellite, satellite.data.catnum, satellite.data.name, satPos.distance,
+            sat, sat.data.catnum, sat.data.name, aosTime, azimuth, elevation, satPos.distance,
             satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos, phase, visibility
         )
         _mapData.postValue(satData)
