@@ -52,20 +52,19 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private val minLat = MapView.getTileSystem().minLatitude
     private val maxLat = MapView.getTileSystem().maxLatitude
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        strokeWidth = 2f
+        strokeWidth = 3f
         style = Paint.Style.STROKE
         color = Color.RED
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
     }
     private val footprintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        strokeWidth = 2f
+        strokeWidth = 3f
         style = Paint.Style.FILL_AND_STROKE
         color = Color.parseColor("#FFE082")
     }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = 32f
-        strokeWidth = 2f
+        textSize = 36f
         style = Paint.Style.FILL
         color = Color.parseColor("#CCFFFFFF")
         setShadowLayer(3f, 3f, 3f, Color.BLACK)
