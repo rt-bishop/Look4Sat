@@ -33,6 +33,7 @@ import com.rtbishop.look4sat.databinding.FragmentMapBinding
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.presentation.clickWithDebounce
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -98,7 +99,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
                 overlays.addAll(Array(4) { FolderOverlay() })
             }
-            mapBtnBack.setOnClickListener { findNavController().navigateUp() }
+            mapBtnBack.clickWithDebounce { findNavController().navigateUp() }
             mapBtnPrev.setOnClickListener { viewModel.scrollSelection(true) }
             mapBtnNext.setOnClickListener { viewModel.scrollSelection(false) }
         }
@@ -199,24 +200,22 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private fun handleMapData(mapData: MapData) {
         binding.apply {
             mapTimer.text = mapData.aosTime
+            mapDataPeriod.text = String.format(getString(R.string.map_period, mapData.period))
+            mapDataPhase.text = String.format(getString(R.string.map_phase), mapData.phase)
             mapAzimuth.text = String.format(getString(R.string.map_azimuth), mapData.azimuth)
             mapElevation.text = String.format(getString(R.string.map_elevation), mapData.elevation)
-            mapDataId.text = String.format(getString(R.string.map_sat_id), mapData.catNum)
-            mapDataQth.text = String.format(getString(R.string.map_qth), mapData.qthLoc)
             mapDataAlt.text = String.format(getString(R.string.map_altitude), mapData.altitude)
             mapDataDst.text = String.format(getString(R.string.map_distance), mapData.range)
-            mapDataVel.text = String.format(getString(R.string.map_velocity), mapData.velocity)
             mapDataLat.text =
                 String.format(getString(R.string.map_latitude), mapData.osmPos.lat)
             mapDataLon.text =
                 String.format(getString(R.string.map_longitude), mapData.osmPos.lon)
-            mapDataPhase.text = String.format(getString(R.string.map_phase), mapData.phase)
+            mapDataQth.text = String.format(getString(R.string.map_qth), mapData.qthLoc)
+            mapDataVel.text = String.format(getString(R.string.map_velocity), mapData.velocity)
             if (mapData.eclipsed) {
-                val eclipsed = getString(R.string.map_eclipsed)
-                mapDataVisibility.text = String.format(getString(R.string.map_visibility), eclipsed)
+                mapDataVisibility.text = getString(R.string.map_eclipsed)
             } else {
-                val visible = getString(R.string.map_visible)
-                mapDataVisibility.text = String.format(getString(R.string.map_visibility), visible)
+                mapDataVisibility.text = getString(R.string.map_visible)
             }
         }
         binding.mapView.invalidate()

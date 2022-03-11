@@ -30,6 +30,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
+import com.rtbishop.look4sat.presentation.clickWithDebounce
 import com.rtbishop.look4sat.utility.toDegrees
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,13 +101,13 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 viewModel.orientation.observe(viewLifecycleOwner) { value ->
                     radarView?.setOrientation(value.first, value.second, value.third)
                 }
-                radarBtnBack.setOnClickListener { findNavController().navigateUp() }
-                radarBtnMap.setOnClickListener {
+                radarBtnBack.clickWithDebounce { findNavController().navigateUp() }
+                radarBtnMap.clickWithDebounce {
                     val direction = RadarFragmentDirections.globalToMap(pass.catNum)
                     findNavController().navigate(direction)
                 }
                 radarBtnNotify.isEnabled = false
-                radarBtnSettings.setOnClickListener {
+                radarBtnSettings.clickWithDebounce {
                     val direction = RadarFragmentDirections.globalToSettings()
                     findNavController().navigate(direction)
                 }

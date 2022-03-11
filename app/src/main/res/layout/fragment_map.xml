@@ -89,8 +89,8 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/map_azimuth"
                 app:layout_constraintBottom_toTopOf="@+id/map_data_alt"
-                app:layout_constraintStart_toStartOf="@+id/map_data_visibility"
-                app:layout_constraintTop_toBottomOf="@+id/map_data_visibility" />
+                app:layout_constraintStart_toStartOf="@+id/map_data_period"
+                app:layout_constraintTop_toBottomOf="@+id/map_data_period" />
 
             <TextView
                 android:id="@+id/map_data_lat"
@@ -142,13 +142,13 @@
                 app:layout_constraintEnd_toEndOf="@+id/map_data_phase" />
 
             <TextView
-                android:id="@+id/map_data_visibility"
+                android:id="@+id/map_data_period"
                 style="@style/WorldMapText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="6dp"
-                android:text="@string/map_visibility"
+                android:text="@string/map_period"
                 app:layout_constraintBottom_toTopOf="@+id/map_azimuth"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -160,7 +160,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="@string/map_phase"
-                app:layout_constraintBaseline_toBaselineOf="@+id/map_data_visibility"
+                app:layout_constraintBaseline_toBaselineOf="@+id/map_data_period"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <TextView
@@ -214,7 +214,7 @@
         app:layout_constraintTop_toTopOf="@+id/map_coordinator" />
 
     <TextView
-        android:id="@+id/map_data_id"
+        android:id="@+id/map_data_visibility"
         style="@style/WorldMapText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -223,7 +223,7 @@
         android:ellipsize="end"
         android:gravity="center_horizontal"
         android:maxLines="1"
-        android:text="@string/map_sat_id"
+        android:text="@string/map_visible"
         app:layout_constraintBaseline_toBaselineOf="@+id/map_btn_prev"
         app:layout_constraintEnd_toStartOf="@+id/map_btn_next"
         app:layout_constraintStart_toEndOf="@+id/map_btn_prev" />

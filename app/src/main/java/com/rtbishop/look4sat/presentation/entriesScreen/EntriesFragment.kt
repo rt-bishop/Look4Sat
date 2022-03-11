@@ -31,6 +31,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentEntriesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.presentation.clickWithDebounce
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,21 +59,21 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                     }
                 })
             }
-            entriesBtnBack.setOnClickListener { findNavController().navigateUp() }
+            entriesBtnBack.clickWithDebounce { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
-            entriesBtnModes.setOnClickListener {
+            entriesBtnModes.clickWithDebounce {
                 val direction = EntriesFragmentDirections.entriesToModes()
                 findNavController().navigate(direction)
             }
-            entriesBtnSelect.setOnClickListener { viewModel.selectCurrentItems(true) }
-            entriesBtnClear.setOnClickListener { viewModel.selectCurrentItems(false) }
-            entriesFab.setOnClickListener {
-                setNavResult("selection", viewModel.saveSelection())
-                findNavController().popBackStack()
-            }
+            entriesBtnSelect.clickWithDebounce { viewModel.selectCurrentItems(true) }
+            entriesBtnClear.clickWithDebounce { viewModel.selectCurrentItems(false) }
         }
         viewModel.satData.observe(viewLifecycleOwner) { satData ->
             handleSatData(satData, entriesAdapter)
+            binding.entriesFab.clickWithDebounce {
+                setNavResult("selection", viewModel.saveSelection())
+                findNavController().popBackStack()
+            }
         }
         getNavResult<List<String>>(R.id.nav_entries, "modes") { modes ->
             viewModel.saveSelectedModes(modes)

@@ -117,7 +117,7 @@ class MapViewModel @Inject constructor(
     private suspend fun getSatTrack(satellite: Satellite, pos: GeoPos, date: Date) {
         val satTracks = mutableListOf<List<GeoPos>>()
         val currentTrack = mutableListOf<GeoPos>()
-        val endDate = Date(date.time + (satellite.orbitalPeriod * 2.4 * 60000L).toLong())
+        val endDate = Date(date.time + (satellite.data.orbitalPeriod * 2.4 * 60000L).toLong())
         var oldLongitude = 0.0
         satelliteManager.getTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
             val osmLat = clipLat(satPos.latitude.toDegrees())
@@ -180,11 +180,12 @@ class MapViewModel @Inject constructor(
         val osmLon = clipLon(satPos.longitude.toDegrees())
         val osmPos = GeoPos(osmLat, osmLon)
         val qthLoc = QthConverter.positionToQth(osmPos.lat, osmPos.lon) ?: "-- --"
+        val velocity = satPos.getOrbitalVelocity()
         val phase = satPos.phase.toDegrees()
         val visibility = satPos.eclipsed
         val satData = MapData(
-            sat, sat.data.catnum, sat.data.name, aosTime, azimuth, elevation, satPos.distance,
-            satPos.altitude, satPos.getOrbitalVelocity(), qthLoc, osmPos, phase, visibility
+            sat.data.catnum, sat.data.name, aosTime, azimuth, elevation, satPos.distance,
+            satPos.altitude, velocity, qthLoc, osmPos, sat.data.orbitalPeriod, phase, visibility
         )
         _mapData.postValue(satData)
     }

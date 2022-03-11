@@ -56,9 +56,9 @@ class DataRepository(
     override fun updateFromFile(uri: String) {
         repositoryScope.launch(exceptionHandler) {
             _updateState.value = DataState.Loading
-            fileSource.getDataStream(uri)?.let { fileStream ->
+            fileSource.getDataStream(uri)?.let { stream ->
                 delay(updateStateDelay)
-                entrySource.insertEntries(importSatellites(fileStream))
+                entrySource.insertEntries(importSatellites(stream))
             }
             _updateState.value = DataState.Success(0L)
         }
@@ -67,23 +67,20 @@ class DataRepository(
     override fun updateFromWeb(urls: List<String>) {
         _updateState.value = DataState.Loading
         repositoryScope.launch(exceptionHandler) {
-            val jobsMap = mutableMapOf<String, Deferred<InputStream?>>()
-            val streamsMap = mutableMapOf<String, InputStream?>()
             val streams = mutableListOf<InputStream>()
             val entries = mutableListOf<SatEntry>()
-            urls.forEach { jobsMap[it] = async { remoteSource.getDataStream(it) } }
-            jobsMap.forEach { job -> streamsMap[job.key] = job.value.await() }
-            streamsMap.forEach { stream ->
-                stream.value?.let { inputStream ->
+            val jobs = urls.associateWith { url -> async { remoteSource.getDataStream(url) } }
+            jobs.mapValues { job -> job.value.await() }.forEach { result ->
+                result.value?.let { stream ->
                     when {
-                        stream.key.contains("=csv", true) -> {
-                            val tles = dataParser.parseCSVStream(inputStream)
-                            entries.addAll(tles.map { tle -> SatEntry(tle) })
+                        result.key.contains("=csv", true) -> {
+                            val orbitalData = dataParser.parseCSVStream(stream)
+                            entries.addAll(orbitalData.map { data -> SatEntry(data) })
                         }
-                        stream.key.contains(".zip", true) -> {
-                            streams.add(ZipInputStream(inputStream).apply { nextEntry })
+                        result.key.contains(".zip", true) -> {
+                            streams.add(ZipInputStream(stream).apply { nextEntry })
                         }
-                        else -> streams.add(inputStream)
+                        else -> streams.add(stream)
                     }
                 }
             }
@@ -113,6 +110,6 @@ class DataRepository(
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {
-        return dataParser.parseTLEStream(stream).map { tle -> SatEntry(tle) }
+        return dataParser.parseTLEStream(stream).map { data -> SatEntry(data) }
     }
 }

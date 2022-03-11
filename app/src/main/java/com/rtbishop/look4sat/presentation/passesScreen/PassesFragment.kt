@@ -31,6 +31,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentPassesBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.SatPass
+import com.rtbishop.look4sat.presentation.clickWithDebounce
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,16 +61,16 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     }
                 })
             }
-            passesBtnRefresh.setOnClickListener { viewModel.calculatePasses() }
-            passesBtnMap.setOnClickListener {
+            passesBtnRefresh.clickWithDebounce { viewModel.calculatePasses() }
+            passesBtnMap.clickWithDebounce {
                 val dir = PassesFragmentDirections.globalToMap()
                 findNavController().navigate(dir)
             }
-            passesBtnFilter.setOnClickListener {
+            passesBtnFilter.clickWithDebounce {
                 val dir = PassesFragmentDirections.passesToFilter()
                 findNavController().navigate(dir)
             }
-            passesBtnSettings.setOnClickListener {
+            passesBtnSettings.clickWithDebounce {
                 val dir = PassesFragmentDirections.globalToSettings()
                 findNavController().navigate(dir)
             }
@@ -118,12 +119,12 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
     private fun handleEntriesTotal(number: Int) {
         binding?.run {
             if (number > 0) {
-                passesFab.setOnClickListener {
+                passesFab.clickWithDebounce {
                     val direction = PassesFragmentDirections.globalToEntries()
                     findNavController().navigate(direction)
                 }
             } else {
-                passesFab.setOnClickListener {
+                passesFab.clickWithDebounce {
                     val errorMessage = getString(R.string.passes_empty_db)
                     Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
                 }
@@ -139,13 +140,17 @@ class PassesFragment : Fragment(R.layout.fragment_passes), PassesAdapter.PassesC
                     tickMainTimer(state.data)
                     if (state.data.isNotEmpty()) { // show new passes list
                         passesEmpty.visibility = View.INVISIBLE
+                        passesProgress.visibility = View.INVISIBLE
                     } else { // show no passes message
                         passesEmpty.visibility = View.VISIBLE
+                        passesProgress.visibility = View.INVISIBLE
                     }
                 }
                 is DataState.Loading -> {
 //                    refreshAnimator?.start()
-                    passesBtnRefresh.isEnabled = false
+//                    passesBtnRefresh.isEnabled = false
+                    passesEmpty.visibility = View.INVISIBLE
+                    passesProgress.visibility = View.VISIBLE
                     passesTimer.text = 0L.toTimerString()
                 }
                 else -> {}

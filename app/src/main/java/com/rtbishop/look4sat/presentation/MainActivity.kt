@@ -22,6 +22,8 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.SystemClock
+import android.view.View
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -67,4 +69,16 @@ fun <T> Fragment.getNavResult(@IdRes id: Int, key: String, onResult: (result: T)
 
 fun <T> Fragment.setNavResult(key: String, value: T) {
     findNavController().previousBackStackEntry?.savedStateHandle?.set(key, value)
+}
+
+fun View.clickWithDebounce(debounceTime: Long = 875L, action: () -> Unit) {
+    this.setOnClickListener(object : View.OnClickListener {
+        private var lastClickTime: Long = 0
+
+        override fun onClick(v: View) {
+            if (SystemClock.elapsedRealtime() - lastClickTime < debounceTime) return
+            else action()
+            lastClickTime = SystemClock.elapsedRealtime()
+        }
+    })
 }

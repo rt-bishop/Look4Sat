@@ -31,5 +31,5 @@ data class SatPass(
 ) {
     val catNum: Int = satellite.data.catnum
     val name: String = satellite.data.name
-    val isDeepSpace: Boolean = satellite.data.isDeepspace
+    val isDeepSpace: Boolean = satellite.data.isDeepSpace
 }

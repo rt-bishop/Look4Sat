@@ -18,10 +18,8 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.domain.predict.Satellite
 
 data class MapData(
-    val pass: Satellite,
     val catNum: Int,
     val name: String,
     val aosTime: String,
@@ -32,6 +30,7 @@ data class MapData(
     val velocity: Double,
     val qthLoc: String,
     val osmPos: GeoPos,
+    val period: Double,
     val phase: Double,
     val eclipsed: Boolean
 )

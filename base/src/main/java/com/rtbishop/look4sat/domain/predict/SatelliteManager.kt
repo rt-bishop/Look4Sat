@@ -118,13 +118,13 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     private fun Satellite.getPasses(pos: GeoPos, time: Long, hours: Int): List<SatPass> {
         val passes = mutableListOf<SatPass>()
         val endDate = time + hours * 60L * 60L * 1000L
-        val quarterOrbitMin = (this.orbitalPeriod / 4.0).toInt()
+        val quarterOrbitMin = (this.data.orbitalPeriod / 4.0).toInt()
         var startDate = time
         var shouldRewind = true
         var lastAosDate: Long
         var count = 0
         if (this.willBeSeen(pos)) {
-            if (this.data.isDeepspace) {
+            if (this.data.isDeepSpace) {
                 passes.add(getGeoPass(this, pos, time))
             } else {
                 do {
@@ -160,7 +160,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     }
 
     private fun getLeoPass(sat: Satellite, pos: GeoPos, time: Long, rewind: Boolean): SatPass {
-        val quarterOrbitMin = (sat.orbitalPeriod / 4.0).toInt()
+        val quarterOrbitMin = (sat.data.orbitalPeriod / 4.0).toInt()
         var calendarTimeMillis = time
         var elevation: Double
         var maxElevation = 0.0

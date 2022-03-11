@@ -36,6 +36,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.presentation.clickWithDebounce
 import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.utility.isValidIPv4
 import com.rtbishop.look4sat.utility.isValidPort
@@ -64,19 +65,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSettingsBinding.bind(view).apply {
-            settingsBtnBack.setOnClickListener { findNavController().navigateUp() }
+            settingsBtnBack.clickWithDebounce { findNavController().navigateUp() }
             settingsScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
                 if (y > newY) settingsFab.hide() else settingsFab.show()
             })
             settingsAbout.aboutVersion.text =
                 String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
-            settingsBtnGithub.setOnClickListener {
+            settingsBtnGithub.clickWithDebounce {
                 gotoUrl("https://github.com/rt-bishop/Look4Sat/")
             }
-            settingsFab.setOnClickListener {
+            settingsFab.clickWithDebounce {
                 gotoUrl("https://ko-fi.com/rt_bishop")
             }
-            settingsBtnFdroid.setOnClickListener {
+            settingsBtnFdroid.clickWithDebounce {
                 gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
             }
         }
@@ -96,14 +97,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun setupLocationCard() {
         binding.run {
             setPositionText(viewModel.getStationPosition())
-            settingsLocation.locationBtnGps.setOnClickListener {
+            settingsLocation.locationBtnGps.clickWithDebounce {
                 locationRequest.launch(arrayOf(locationFine, locationCoarse))
             }
-            settingsLocation.locationBtnManual.setOnClickListener {
+            settingsLocation.locationBtnManual.clickWithDebounce {
                 val action = SettingsFragmentDirections.globalToPosition()
                 findNavController().navigate(action)
             }
-            settingsLocation.locationBtnQth.setOnClickListener {
+            settingsLocation.locationBtnQth.clickWithDebounce {
                 val action = SettingsFragmentDirections.globalToLocator()
                 findNavController().navigate(action)
             }
@@ -118,12 +119,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private fun setupDataCard() {
         binding.run {
-            settingsData.dataBtnFile.setOnClickListener { contentRequest.launch("*/*") }
-            settingsData.dataBtnWeb.setOnClickListener {
+            settingsData.dataBtnWeb.clickWithDebounce {
                 val action = SettingsFragmentDirections.settingsToSources()
                 findNavController().navigate(action)
             }
-            settingsData.dataBtnClear.setOnClickListener { viewModel.clearData() }
+            settingsData.dataBtnFile.clickWithDebounce { contentRequest.launch("*/*") }
+            settingsData.dataBtnClear.clickWithDebounce { viewModel.clearData() }
             viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
                 val entriesFormat = getString(R.string.data_entries)
                 settingsData.dataEntries.text = String.format(entriesFormat, number)

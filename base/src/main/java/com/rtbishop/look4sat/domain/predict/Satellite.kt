@@ -47,7 +47,6 @@ abstract class Satellite(val data: OrbitalData) {
     private var gsPosTheta = 0.0
     private var julUTC = 0.0
     private var perigee = 0.0
-    val orbitalPeriod = 24 * 60 / data.meanmo
     var qoms24 = 0.0
     var s4 = 0.0
 
@@ -108,7 +107,7 @@ abstract class Satellite(val data: OrbitalData) {
     }
 
     private fun calculateSDP4orSGP4(tsince: Double) {
-        if (data.isDeepspace) (this as DeepSpaceSat).calculateSDP4(tsince)
+        if (data.isDeepSpace) (this as DeepSpaceSat).calculateSDP4(tsince)
         else (this as NearEarthSat).calculateSGP4(tsince)
     }
 

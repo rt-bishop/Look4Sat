@@ -48,7 +48,7 @@ object BaseModule {
     @Singleton
     fun provideDataRepository(@ApplicationContext context: Context): IDataRepository {
         val db = Room.databaseBuilder(context, LocalDatabase::class.java, "Look4SatDb")
-            .fallbackToDestructiveMigration().build()
+            .addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration().build()
         val parser = DataParser(Dispatchers.Default)
         val fileSource = FileDataSource(context.contentResolver, Dispatchers.IO)
         val entries = LocalEntrySource(db.entriesDao())

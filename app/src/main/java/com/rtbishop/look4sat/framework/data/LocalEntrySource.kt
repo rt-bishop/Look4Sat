@@ -37,7 +37,7 @@ class LocalEntrySource(private val entriesDao: EntriesDao) : ILocalEntrySource {
         val selectedSatellites = mutableListOf<Satellite>()
         ids.chunked(999).forEach { idsPart ->
             val entries = entriesDao.getEntriesWithIds(idsPart)
-            selectedSatellites.addAll(entries.map { entry -> entry.data.createSat() })
+            selectedSatellites.addAll(entries.map { entry -> entry.data.getSatellite() })
         }
         return selectedSatellites
     }
