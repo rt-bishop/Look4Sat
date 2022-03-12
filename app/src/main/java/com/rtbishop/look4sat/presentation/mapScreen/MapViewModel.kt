@@ -46,7 +46,7 @@ class MapViewModel @Inject constructor(
     private var allSatellites = listOf<Satellite>()
     private var dataUpdateJob: Job? = null
     private var dataUpdateRate = 1000L
-    private lateinit var selectedSatellite: Satellite
+    private var selectedSatellite: Satellite? = null
 
     val stationPos = liveData {
         val osmLat = clipLat(stationPosition.lat)
@@ -102,12 +102,12 @@ class MapViewModel @Inject constructor(
             dataUpdateJob?.cancelAndJoin()
             dataUpdateJob = launch {
                 val dateNow = Date()
-                getSatTrack(selectedSatellite, stationPosition, dateNow)
+                getSatTrack(satellite, stationPosition, dateNow)
                 while (isActive) {
                     dateNow.time = System.currentTimeMillis()
                     getPositions(allSatellites, stationPosition, dateNow)
-                    getSatFootprint(selectedSatellite, stationPosition, dateNow)
-                    getSatData(selectedSatellite, stationPosition, dateNow)
+                    getSatFootprint(satellite, stationPosition, dateNow)
+                    getSatData(satellite, stationPosition, dateNow)
                     delay(updateFreq)
                 }
             }
