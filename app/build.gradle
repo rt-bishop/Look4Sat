@@ -14,8 +14,8 @@ android {
         applicationId "com.rtbishop.look4sat"
         minSdk 21
         targetSdk 31
-        versionCode 302
-        versionName "3.0.2"
+        versionCode 303
+        versionName "3.0.3"
         resConfigs "en,ru"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
