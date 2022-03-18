@@ -77,6 +77,22 @@ interface ISettingsManager {
 
     fun setRotatorPort(value: String)
 
+    fun getBTEnabled(): Boolean
+
+    fun setBTEnabled(value: Boolean)
+
+    fun getBTDeviceAddr(): String
+
+    fun setBTDeviceAddr(value: String)
+
+    fun getBTDeviceName(): String
+
+    fun setBTDeviceName(value: String)
+
+    fun getBTFormat(): String
+
+    fun setBTFormat(value: String)
+
     fun loadDataSources(): List<String>
 
     fun saveDataSources(sources: List<String>)
