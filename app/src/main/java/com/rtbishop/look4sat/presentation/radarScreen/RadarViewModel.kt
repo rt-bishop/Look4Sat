@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.hardware.GeomagneticField
+import android.util.Log
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteManager
@@ -41,6 +42,7 @@ import javax.inject.Inject
 class RadarViewModel @Inject constructor(
     private val orientationManager: OrientationManager,
     private val reporter: DataReporter,
+    private val BTreporter: BTReporter,
     private val satelliteManager: ISatelliteManager,
     private val repository: IDataRepository,
     private val settings: ISettingsManager
@@ -60,6 +62,7 @@ class RadarViewModel @Inject constructor(
             pass?.let { satPass ->
                 emit(satPass)
                 sendPassData(satPass)
+                sendPassDataBT(satPass)
                 processTransmitters(satPass)
             }
         }
@@ -106,6 +109,28 @@ class RadarViewModel @Inject constructor(
                 }
                 _passData.postValue(RadarData(satPos, satTrack))
                 delay(1000)
+            }
+        }
+    }
+
+    private fun sendPassDataBT(satPass: SatPass) {
+        viewModelScope.launch {
+            while (isActive) {
+                val satPos = satelliteManager.getPosition(satPass.satellite, stationPos, Date().time)
+                if (settings.getBTEnabled()) {
+                    val server = settings.getBTDeviceAddr()
+                    if(BTreporter.isBTConnected()) {
+                        val port = settings.getBTFormat()
+                        val azimuth = satPos.azimuth.toDegrees().round(0).toInt()
+                        val elevation = satPos.elevation.toDegrees().round(0).toInt()
+                        BTreporter.reportRotationBT(server, port, azimuth, elevation)
+                    }
+                    else if(!BTreporter.connectInProg()) {
+                        Log.i("look4satBT", "Attempting to connect...")
+                        BTreporter.connectBTDevice(server)
+                    }
+                }
+                delay(2000)
             }
         }
     }

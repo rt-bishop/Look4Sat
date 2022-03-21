@@ -83,6 +83,16 @@
                     app:layout_constraintTop_toBottomOf="@+id/settings_data" />
 
                 <include
+                    android:id="@+id/settings_btremote"
+                    layout="@layout/card_btremote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/view_default_margin"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_remote" />
+
+                <include
                     android:id="@+id/settings_other"
                     layout="@layout/card_other"
                     android:layout_width="match_parent"
@@ -90,7 +100,7 @@
                     android:layout_marginTop="@dimen/view_default_margin"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/settings_remote" />
+                    app:layout_constraintTop_toBottomOf="@+id/settings_btremote" />
 
                 <include
                     android:id="@+id/settings_outro"

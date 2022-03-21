@@ -38,6 +38,10 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         const val keyRotator = "isRotatorEnabled"
         const val keyRotatorAddress = "rotatorAddress"
         const val keyRotatorPort = "rotatorPort"
+        const val keyBTEnabled = "isBTEnabled"
+        const val keyBTDeviceName = "BTDevice"
+        const val keyBTDeviceAddr = "BTDevice"
+        const val keyBTFormat = "BTFormat"
         const val keyLatitude = "stationLat"
         const val keyLongitude = "stationLon"
         const val keyLocator = "stationQTH"
@@ -146,6 +150,37 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
 
     override fun setRotatorPort(value: String) {
         prefs.edit { putString(keyRotatorPort, value) }
+    }
+
+    override fun getBTEnabled(): Boolean {
+        return prefs.getBoolean(keyBTEnabled, true)
+    }
+
+    override fun setBTEnabled(value: Boolean) {
+        prefs.edit { putBoolean(keyBTEnabled, value) }
+    }
+
+    override fun getBTDeviceAddr(): String {
+        return prefs.getString(keyBTDeviceAddr, null) ?: "00:0C:BF:13:80:5D"
+    }
+
+    override fun setBTDeviceAddr(value: String) {
+        prefs.edit { putString(keyBTDeviceAddr, value) }
+    }
+    override fun getBTDeviceName(): String {
+        return prefs.getString(keyBTDeviceName, null) ?: "Default"
+    }
+
+    override fun setBTDeviceName(value: String) {
+        prefs.edit { putString(keyBTDeviceName, value) }
+    }
+
+    override fun getBTFormat(): String {
+        return prefs.getString(keyBTFormat, null) ?: "W\$AZ \$EL"
+    }
+
+    override fun setBTFormat(value: String) {
+        prefs.edit { putString(keyBTFormat, value) }
     }
 
     override fun loadDataSources(): List<String> {

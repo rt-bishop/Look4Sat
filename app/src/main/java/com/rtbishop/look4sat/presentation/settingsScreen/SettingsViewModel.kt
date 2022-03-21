@@ -75,6 +75,22 @@ class SettingsViewModel @Inject constructor(
 
     fun setRotatorPort(value: String) = settings.setRotatorPort(value)
 
+    fun getBTEnabled(): Boolean = settings.getBTEnabled()
+
+    fun setBTEnabled(value: Boolean) = settings.setBTEnabled(value)
+
+    fun getBTFormat(): String = settings.getBTFormat()
+
+    fun setBTFormat(value: String) = settings.setBTFormat(value)
+
+    fun getBTDeviceName(): String = settings.getBTDeviceName()
+
+    fun setBTDeviceName(value: String) = settings.setBTDeviceName(value)
+
+    fun getBTDeviceAddr(): String = settings.getBTDeviceAddr()
+
+    fun setBTDeviceAddr(value: String) = settings.setBTDeviceAddr(value)
+
     fun getUpdateState() = repository.updateState
 
     fun setUpdateHandled() = repository.setUpdateStateHandled()

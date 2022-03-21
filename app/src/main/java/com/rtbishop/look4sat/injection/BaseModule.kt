@@ -28,6 +28,7 @@ import com.rtbishop.look4sat.domain.predict.SatelliteManager
 import com.rtbishop.look4sat.framework.LocationManager
 import com.rtbishop.look4sat.framework.SettingsManager
 import com.rtbishop.look4sat.framework.data.*
+import com.rtbishop.look4sat.presentation.radarScreen.BTReporter
 import com.rtbishop.look4sat.utility.DataParser
 import com.rtbishop.look4sat.utility.DataReporter
 import dagger.Module
@@ -61,6 +62,10 @@ object BaseModule {
     @Provides
     @Singleton
     fun provideDataReporter(): DataReporter = DataReporter(CoroutineScope(Dispatchers.IO))
+
+    @Provides
+    @Singleton
+    fun provideBTReporter(): BTReporter = BTReporter(CoroutineScope(Dispatchers.IO))
 
     @Provides
     @Singleton
