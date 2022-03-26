@@ -39,8 +39,8 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         const val keyRotatorAddress = "rotatorAddress"
         const val keyRotatorPort = "rotatorPort"
         const val keyBTEnabled = "isBTEnabled"
-        const val keyBTDeviceName = "BTDevice"
-        const val keyBTDeviceAddr = "BTDevice"
+        const val keyBTDeviceName = "BTDeviceName"
+        const val keyBTDeviceAddr = "BTDeviceAddr"
         const val keyBTFormat = "BTFormat"
         const val keyLatitude = "stationLat"
         const val keyLongitude = "stationLon"
@@ -153,7 +153,7 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
     }
 
     override fun getBTEnabled(): Boolean {
-        return prefs.getBoolean(keyBTEnabled, true)
+        return prefs.getBoolean(keyBTEnabled, false)
     }
 
     override fun setBTEnabled(value: Boolean) {

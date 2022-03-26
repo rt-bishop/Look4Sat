@@ -67,7 +67,8 @@ fun String.isValidIPv4(): Boolean {
 }
 
 fun String.isValidPort(): Boolean {
-    return this.isNotEmpty() && this.toInt() in 1024..65535
+    val port = "([1-9]|[1-9]\\d{1,3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])"
+    return this.matches(port.toRegex()) && this.toInt() in 1024..65535
 }
 
 fun ping(hostname: String, port: Int): Int {

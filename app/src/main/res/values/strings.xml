@@ -139,10 +139,11 @@
     <string name="remote_ip_hint">IP address</string>
     <string name="remote_port_hint">Port</string>
 
-    <string name="BTremote_title">Bluetooth Output</string>
-    <string name="BTremote_switch">Enable Bluetooth</string>
-    <string name="BTremote_device_hint">Device</string>
-    <string name="BTremote_output_hint">Output format</string>
+    <string name="BTremote_title">Bluetooth data output</string>
+    <string name="BTremote_switch">Enable output</string>
+    <string name="BTremote_device_hint">Device id</string>
+    <string name="BTremote_output_hint">Data format</string>
+    <string name="BTremote_perm_error">Check your bluetooth permission</string>
 
     <string name="other_title">Other preferences</string>
     <string name="other_switch_utc">Show pass time in UTC</string>

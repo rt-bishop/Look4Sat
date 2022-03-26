@@ -42,8 +42,8 @@ import javax.inject.Inject
 class RadarViewModel @Inject constructor(
     private val orientationManager: OrientationManager,
     private val reporter: DataReporter,
-    private val BTreporter: BTReporter,
-    private val satelliteManager: ISatelliteManager,
+    private val btReporter: BTReporter,
+    private val satManager: ISatelliteManager,
     private val repository: IDataRepository,
     private val settings: ISettingsManager
 ) : ViewModel(), OrientationManager.OrientationListener {
@@ -57,7 +57,7 @@ class RadarViewModel @Inject constructor(
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
     fun getPass(catNum: Int, aosTime: Long) = liveData {
-        satelliteManager.calculatedPasses.collect { passes ->
+        satManager.calculatedPasses.collect { passes ->
             val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
             pass?.let { satPass ->
                 emit(satPass)
@@ -94,12 +94,11 @@ class RadarViewModel @Inject constructor(
         viewModelScope.launch {
             var satTrack: List<SatPos> = emptyList()
             if (!satPass.isDeepSpace) {
-                val startDate = satPass.aosTime
-                val endDate = satPass.losTime
-                satTrack = satelliteManager.getTrack(satPass.satellite, stationPos, startDate, endDate)
+                satTrack = satManager
+                    .getTrack(satPass.satellite, stationPos, satPass.aosTime, satPass.losTime)
             }
             while (isActive) {
-                val satPos = satelliteManager.getPosition(satPass.satellite, stationPos, Date().time)
+                val satPos = satManager.getPosition(satPass.satellite, stationPos, Date().time)
                 if (settings.getRotatorEnabled()) {
                     val server = settings.getRotatorServer()
                     val port = settings.getRotatorPort().toInt()
@@ -116,21 +115,20 @@ class RadarViewModel @Inject constructor(
     private fun sendPassDataBT(satPass: SatPass) {
         viewModelScope.launch {
             while (isActive) {
-                val satPos = satelliteManager.getPosition(satPass.satellite, stationPos, Date().time)
+                val satPos = satManager.getPosition(satPass.satellite, stationPos, Date().time)
                 if (settings.getBTEnabled()) {
-                    val server = settings.getBTDeviceAddr()
-                    if(BTreporter.isBTConnected()) {
-                        val port = settings.getBTFormat()
+                    val btDevice = settings.getBTDeviceAddr()
+                    if (btReporter.isConnected()) {
+                        val format = settings.getBTFormat()
                         val azimuth = satPos.azimuth.toDegrees().round(0).toInt()
                         val elevation = satPos.elevation.toDegrees().round(0).toInt()
-                        BTreporter.reportRotationBT(server, port, azimuth, elevation)
-                    }
-                    else if(!BTreporter.connectInProg()) {
-                        Log.i("look4satBT", "Attempting to connect...")
-                        BTreporter.connectBTDevice(server)
+                        btReporter.reportRotation(format, azimuth, elevation)
+                    } else if (!btReporter.isConnecting()) {
+                        Log.i("BTReporter", "BTReporter: Attempting to connect...")
+                        btReporter.connectBTDevice(btDevice)
                     }
                 }
-                delay(2000)
+                delay(1000)
             }
         }
     }
@@ -141,7 +139,7 @@ class RadarViewModel @Inject constructor(
             val transmitters = repository.getRadiosWithId(pass.catNum)
             while (isActive) {
                 val time = System.currentTimeMillis()
-                val list = satelliteManager.processRadios(pass.satellite, stationPos, transmitters, time)
+                val list = satManager.processRadios(pass.satellite, stationPos, transmitters, time)
                 _transmitters.postValue(list)
                 delay(1000)
             }

@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.injection
 
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import androidx.room.Room
 import com.rtbishop.look4sat.domain.IDataRepository
@@ -65,7 +66,9 @@ object BaseModule {
 
     @Provides
     @Singleton
-    fun provideBTReporter(): BTReporter = BTReporter(CoroutineScope(Dispatchers.IO))
+    fun provideBTReporter(manager: BluetoothManager): BTReporter {
+        return BTReporter(manager, CoroutineScope(Dispatchers.IO))
+    }
 
     @Provides
     @Singleton

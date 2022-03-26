@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     style="@style/SurfaceCard">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -38,27 +37,28 @@
             android:id="@+id/BTremote_address"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/BTremote_switch"
-            app:layout_constraintEnd_toEndOf="@+id/BTremote_title"
-            app:layout_constraintStart_toStartOf="@+id/BTremote_title"
-            tools:layout_editor_absoluteY="70dp">
+            app:layout_constraintEnd_toEndOf="@+id/BTremote_switch"
+            app:layout_constraintStart_toStartOf="@+id/BTremote_switch"
+            app:layout_constraintTop_toBottomOf="@id/BTremote_switch">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/BT_address_edit"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/BTremote_device_hint"
-            android:textColorHint="@color/textMain" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/BT_address_edit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/BTremote_device_hint"
+                android:textColorHint="@color/textMain" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/BTremote_format"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/BTremote_address"
-            app:layout_constraintEnd_toEndOf="@+id/BTremote_title"
-            app:layout_constraintStart_toStartOf="@+id/BTremote_title"
-            tools:layout_editor_absoluteY="70dp">
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/BTremote_address"
+            app:layout_constraintStart_toStartOf="@+id/BTremote_address"
+            app:layout_constraintTop_toBottomOf="@id/BTremote_address">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/BT_format_edit"

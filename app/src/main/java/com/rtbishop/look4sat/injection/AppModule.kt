@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.injection
 
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.hardware.SensorManager
@@ -31,6 +32,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideBluetoothManager(@ApplicationContext context: Context): BluetoothManager {
+        return context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    }
 
     @Provides
     @Singleton

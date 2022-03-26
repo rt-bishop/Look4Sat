@@ -17,15 +17,13 @@
  */
 package com.rtbishop.look4sat.presentation.settingsScreen
 
-//import com.rtbishop.look4sat.BuildConfig
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.NestedScrollView
@@ -34,6 +32,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
+import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
 import com.rtbishop.look4sat.domain.model.DataState
@@ -44,11 +43,21 @@ import com.rtbishop.look4sat.utility.isValidIPv4
 import com.rtbishop.look4sat.utility.isValidPort
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private val viewModel: SettingsViewModel by viewModels()
+    private val bluetooth = when {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
+        else -> Manifest.permission.BLUETOOTH_CONNECT
+    }
+    private val bluetoothContract = ActivityResultContracts.RequestPermission()
+    private val bluetoothRequest = registerForActivityResult(bluetoothContract) { isGranted ->
+        if (!isGranted) {
+            showToast(getString(R.string.BTremote_perm_error))
+            toggleBTstate(isGranted)
+        }
+    }
     private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
     private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     private val locationContract = ActivityResultContracts.RequestMultiplePermissions()
@@ -73,7 +82,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 if (y > newY) settingsFab.hide() else settingsFab.show()
             })
             settingsAbout.aboutVersion.text =
-                String.format(getString(R.string.app_version), 0)
+                String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
             settingsBtnGithub.clickWithDebounce {
                 gotoUrl("https://github.com/rt-bishop/Look4Sat/")
             }
@@ -84,8 +93,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
             }
         }
-
-
         setupLocationCard()
         setupDataCard()
         setupRemoteCard()
@@ -154,7 +161,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 settingsRemote.remotePort.isEnabled = isChecked
                 settingsRemote.remotePortEdit.setText(viewModel.getRotatorPort())
                 setOnCheckedChangeListener { _, isChecked ->
-                    viewModel.setRotatorEnabled(isChecked)
                     settingsRemote.remoteIp.isEnabled = isChecked
                     settingsRemote.remotePort.isEnabled = isChecked
                 }
@@ -169,28 +175,33 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupBTCard() {
-
         binding.run {
             settingsBtremote.BTremoteSwitch.apply {
                 isChecked = viewModel.getBTEnabled()
                 settingsBtremote.BTremoteAddress.isEnabled = isChecked
-                settingsBtremote.BTremoteFormat.isEnabled = isChecked
                 settingsBtremote.BTAddressEdit.setText(viewModel.getBTDeviceAddr())
+                settingsBtremote.BTremoteFormat.isEnabled = isChecked
                 settingsBtremote.BTFormatEdit.setText(viewModel.getBTFormat())
                 setOnCheckedChangeListener { _, isChecked ->
-                    viewModel.setBTEnabled(isChecked)
-                    settingsBtremote.BTremoteAddress.isEnabled = isChecked
-                    settingsBtremote.BTremoteFormat.isEnabled = isChecked
+                    toggleBTstate(isChecked)
+                    bluetoothRequest.launch(bluetooth)
                 }
             }
-
             settingsBtremote.BTAddressEdit.doOnTextChanged { text, _, _, _ ->
                 viewModel.setBTDeviceAddr(text.toString())
             }
-
             settingsBtremote.BTFormatEdit.doOnTextChanged { text, _, _, _ ->
                 viewModel.setBTFormat(text.toString())
             }
+        }
+    }
+
+    private fun toggleBTstate(value: Boolean) {
+        binding.run {
+            viewModel.setBTEnabled(value)
+            settingsBtremote.BTremoteSwitch.isChecked = value
+            settingsBtremote.BTremoteAddress.isEnabled = value
+            settingsBtremote.BTremoteFormat.isEnabled = value
         }
     }
 

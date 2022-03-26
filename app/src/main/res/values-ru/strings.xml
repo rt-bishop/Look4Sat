@@ -138,6 +138,12 @@
     <string name="remote_ip_hint">IP адрес</string>
     <string name="remote_port_hint">Порт</string>
 
+    <string name="BTremote_title">Передача данных по Bluetooth</string>
+    <string name="BTremote_switch">Включить передачу</string>
+    <string name="BTremote_device_hint">Id устройства</string>
+    <string name="BTremote_output_hint">Формат данных</string>
+    <string name="BTremote_perm_error">Нет разрешения использовать bluetooth</string>
+
     <string name="other_title">Другие настройки</string>
     <string name="other_switch_utc">Показывать время по UTC</string>
     <string name="other_switch_sweep">Показывать анимацию радара</string>
