@@ -28,6 +28,34 @@ interface ISettingsManager {
             "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
             "https://amsat.org/tle/current/nasabare.txt"
         )
+    val sourcesMap: Map<String, String>
+        get() = mapOf(
+            "AMSAT" to "https://amsat.org/tle/current/nasabare.txt",
+            "Amateur" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=amateur&FORMAT=csv",
+            "Classified" to "https://www.prismnet.com/~mmccants/tles/classfd.zip",
+            "Cubesat" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=cubesat&FORMAT=csv",
+            "Education" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=education&FORMAT=csv",
+            "Engineer" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=engineering&FORMAT=csv",
+            "Geostationary" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=geo&FORMAT=csv",
+            "Globalstar" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=globalstar&FORMAT=csv",
+            "GNSS" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=gnss&FORMAT=csv",
+            "Intelsat" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=intelsat&FORMAT=csv",
+            "Iridium" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=iridium-NEXT&FORMAT=csv",
+            "McCants" to "https://www.prismnet.com/~mmccants/tles/inttles.zip",
+            "Military" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=military&FORMAT=csv",
+            "New" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=last-30-days&FORMAT=csv",
+            "OneWeb" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=csv",
+            "Orbcomm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=orbcomm&FORMAT=csv",
+            "Other" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
+            "Resource" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=resource&FORMAT=csv",
+            "SatNOGS" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=satnogs&FORMAT=csv",
+            "Science" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=science&FORMAT=csv",
+            "Spire" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=spire&FORMAT=csv",
+            "Starlink" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=starlink&FORMAT=csv",
+            "Swarm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=swarm&FORMAT=csv",
+            "Weather" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=weather&FORMAT=csv",
+            "X-Comm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
+        )
 
     fun loadStationLocator(): String
 
