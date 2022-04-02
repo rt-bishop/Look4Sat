@@ -27,6 +27,7 @@ import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
+import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.framework.OrientationManager
 import com.rtbishop.look4sat.utility.DataReporter
 import com.rtbishop.look4sat.utility.round
@@ -35,7 +36,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,9 +61,17 @@ class RadarViewModel @Inject constructor(
             val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
             pass?.let { satPass ->
                 emit(satPass)
-                sendPassData(satPass)
-                sendPassDataBT(satPass)
-                processTransmitters(satPass)
+                val transmitters = repository.getRadiosWithId(satPass.catNum)
+                viewModelScope.launch {
+                    while (isActive) {
+                        val timeNow = System.currentTimeMillis()
+                        val satPos = satManager.getPosition(satPass.satellite, stationPos, timeNow)
+                        sendPassData(satPass, satPos, satPass.satellite)
+                        sendPassDataBT(satPos)
+                        processRadios(transmitters, satPass.satellite, timeNow)
+                        delay(1000)
+                    }
+                }
             }
         }
     }
@@ -90,59 +98,45 @@ class RadarViewModel @Inject constructor(
         return GeomagneticField(latitude, longitude, 0f, time).declination
     }
 
-    private fun sendPassData(satPass: SatPass) {
+    private fun sendPassData(satPass: SatPass, satPos: SatPos, satellite: Satellite) {
         viewModelScope.launch {
-            var satTrack: List<SatPos> = emptyList()
+            var track: List<SatPos> = emptyList()
             if (!satPass.isDeepSpace) {
-                satTrack = satManager
-                    .getTrack(satPass.satellite, stationPos, satPass.aosTime, satPass.losTime)
+                track = satManager.getTrack(satellite, stationPos, satPass.aosTime, satPass.losTime)
             }
-            while (isActive) {
-                val satPos = satManager.getPosition(satPass.satellite, stationPos, Date().time)
-                if (settings.getRotatorEnabled()) {
-                    val server = settings.getRotatorServer()
-                    val port = settings.getRotatorPort().toInt()
-                    val azimuth = satPos.azimuth.toDegrees().round(1)
-                    val elevation = satPos.elevation.toDegrees().round(1)
-                    reporter.reportRotation(server, port, azimuth, elevation)
-                }
-                _passData.postValue(RadarData(satPos, satTrack))
-                delay(1000)
+            if (settings.getRotatorEnabled()) {
+                val server = settings.getRotatorServer()
+                val port = settings.getRotatorPort().toInt()
+                val azimuth = satPos.azimuth.toDegrees().round(1)
+                val elevation = satPos.elevation.toDegrees().round(1)
+                reporter.reportRotation(server, port, azimuth, elevation)
             }
+            _passData.postValue(RadarData(satPos, track))
         }
     }
 
-    private fun sendPassDataBT(satPass: SatPass) {
+    private fun sendPassDataBT(satPos: SatPos) {
         viewModelScope.launch {
-            while (isActive) {
-                val satPos = satManager.getPosition(satPass.satellite, stationPos, Date().time)
-                if (settings.getBTEnabled()) {
-                    val btDevice = settings.getBTDeviceAddr()
-                    if (btReporter.isConnected()) {
-                        val format = settings.getBTFormat()
-                        val azimuth = satPos.azimuth.toDegrees().round(0).toInt()
-                        val elevation = satPos.elevation.toDegrees().round(0).toInt()
-                        btReporter.reportRotation(format, azimuth, elevation)
-                    } else if (!btReporter.isConnecting()) {
-                        Log.i("BTReporter", "BTReporter: Attempting to connect...")
-                        btReporter.connectBTDevice(btDevice)
-                    }
+            if (settings.getBTEnabled()) {
+                val btDevice = settings.getBTDeviceAddr()
+                if (btReporter.isConnected()) {
+                    val format = settings.getBTFormat()
+                    val azimuth = satPos.azimuth.toDegrees().round(0).toInt()
+                    val elevation = satPos.elevation.toDegrees().round(0).toInt()
+                    btReporter.reportRotation(format, azimuth, elevation)
+                } else if (!btReporter.isConnecting()) {
+                    Log.i("BTReporter", "BTReporter: Attempting to connect...")
+                    btReporter.connectBTDevice(btDevice)
                 }
-                delay(1000)
             }
         }
     }
 
-    private fun processTransmitters(pass: SatPass) {
+    private fun processRadios(radios: List<SatRadio>, satellite: Satellite, time: Long) {
         viewModelScope.launch {
             delay(125)
-            val transmitters = repository.getRadiosWithId(pass.catNum)
-            while (isActive) {
-                val time = System.currentTimeMillis()
-                val list = satManager.processRadios(pass.satellite, stationPos, transmitters, time)
-                _transmitters.postValue(list)
-                delay(1000)
-            }
+            val list = satManager.processRadios(satellite, stationPos, radios, time)
+            _transmitters.postValue(list)
         }
     }
 }
