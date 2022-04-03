@@ -33,19 +33,28 @@ class EntriesViewModel @Inject constructor(
     private val settings: ISettingsManager
 ) : ViewModel(), EntriesAdapter.EntriesClickListener {
 
+    private val satType = MutableLiveData(String())
     private val transModes = MutableLiveData(settings.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsFromRepo = liveData {
         delay(125)
         emit(loadEntriesWithSelection())
     } as MutableLiveData
+    private val itemsWithType = satType.switchMap { type ->
+        itemsFromRepo.map { items -> filterByType(items, type) }
+    }
     private val itemsWithModes = transModes.switchMap { modes ->
-        itemsFromRepo.map { items -> filterByModes(items, modes) }
+        itemsWithType.map { items -> filterByModes(items, modes) }
     }
     private val itemsWithQuery = currentQuery.switchMap { query ->
         itemsWithModes.map { items -> filterByQuery(items, query) }
     }
     val satData = itemsWithQuery.map { items -> DataState.Success(items) }
+    val satTypes: List<String> = settings.sourcesMap.keys.sorted()
+
+    fun setSatType(type: String) {
+        satType.value = type
+    }
 
     fun selectCurrentItems(selectAll: Boolean) {
         itemsWithQuery.value?.let { itemsWithQuery ->
@@ -81,6 +90,12 @@ class EntriesViewModel @Inject constructor(
     private suspend fun loadEntriesWithSelection(): List<SatItem> {
         val selectedIds = settings.loadEntriesSelection()
         return repository.getEntriesWithModes().onEach { it.isSelected = it.catnum in selectedIds }
+    }
+
+    private fun filterByType(items: List<SatItem>, type: String): List<SatItem> {
+        val catnums = settings.loadSatType(type)
+        if (catnums.isEmpty()) return items
+        return items.filter { item -> item.catnum in catnums }
     }
 
     private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {

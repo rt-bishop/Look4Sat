@@ -30,7 +30,8 @@ interface ISettingsManager {
         )
     val sourcesMap: Map<String, String>
         get() = mapOf(
-            "AMSAT" to "https://amsat.org/tle/current/nasabare.txt",
+            "All" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
+            "Amsat" to "https://amsat.org/tle/current/nasabare.txt",
             "Amateur" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=amateur&FORMAT=csv",
             "Classified" to "https://www.prismnet.com/~mmccants/tles/classfd.zip",
             "Cubesat" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=cubesat&FORMAT=csv",
@@ -46,7 +47,6 @@ interface ISettingsManager {
             "New" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=last-30-days&FORMAT=csv",
             "OneWeb" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=csv",
             "Orbcomm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=orbcomm&FORMAT=csv",
-            "Other" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
             "Resource" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=resource&FORMAT=csv",
             "SatNOGS" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=satnogs&FORMAT=csv",
             "Science" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=science&FORMAT=csv",

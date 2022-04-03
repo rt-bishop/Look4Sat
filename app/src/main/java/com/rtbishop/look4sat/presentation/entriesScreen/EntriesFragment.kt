@@ -19,6 +19,8 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -67,6 +69,29 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             }
             entriesBtnSelect.clickWithDebounce { viewModel.selectCurrentItems(true) }
             entriesBtnClear.clickWithDebounce { viewModel.selectCurrentItems(false) }
+
+            val spinnerListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>, view: View?,
+                    position: Int, id: Long
+                ) {
+                    viewModel.setSatType(parent.getItemAtPosition(position).toString())
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    viewModel.setSatType(String())
+                }
+            }
+            ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                viewModel.satTypes
+            ).also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                entriesSpinner.onItemSelectedListener = spinnerListener
+                entriesSpinner.adapter = adapter
+            }
+
         }
         viewModel.satData.observe(viewLifecycleOwner) { satData ->
             handleSatData(satData, entriesAdapter)

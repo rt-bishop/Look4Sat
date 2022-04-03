@@ -25,9 +25,9 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="52dp"
             android:layout_marginBottom="4dp"
-            android:inputType="text"
             android:hint="@string/entries_search_hint"
-            android:importantForAutofill="no" />
+            android:importantForAutofill="no"
+            android:inputType="text" />
 
         <ImageButton
             android:id="@+id/entries_btn_modes"
@@ -38,12 +38,20 @@
 
     </androidx.cardview.widget.CardView>
 
+    <Spinner
+        android:id="@+id/entries_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginStart="@dimen/view_default_margin"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="@dimen/view_default_margin" />
+
     <androidx.cardview.widget.CardView
         style="@style/SurfaceCard"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/view_default_margin"
-        android:layout_marginTop="@dimen/surface_margin_top"
+        android:layout_marginTop="98dp"
         android:layout_marginEnd="@dimen/view_default_margin"
         android:layout_marginBottom="@dimen/surface_margin_bot">
 
@@ -67,16 +75,16 @@
             android:id="@+id/entries_btn_select"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
-            android:layout_marginStart="@dimen/button_margin_side"
             android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="@dimen/button_margin_side"
             android:text="@string/btn_select" />
 
         <Button
             android:id="@+id/entries_btn_clear"
             style="@style/NormalButton"
             android:layout_width="@dimen/button_width_max"
-            android:layout_marginEnd="@dimen/button_margin_side"
             android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="@dimen/button_margin_side"
             android:text="@string/btn_clear_all" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
@@ -84,8 +92,8 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/entries_fab"
         style="@style/FloatingActionButton"
-        android:src="@drawable/ic_done"
         android:contentDescription="@string/btn_done"
+        android:src="@drawable/ic_done"
         app:layout_anchor="@id/entries_bottom_bar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

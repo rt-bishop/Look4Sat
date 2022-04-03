@@ -133,8 +133,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun setupDataCard() {
         binding.run {
             settingsData.dataBtnWeb.clickWithDebounce {
-                val action = SettingsFragmentDirections.settingsToSources()
-                findNavController().navigate(action)
+//                val action = SettingsFragmentDirections.settingsToSources()
+//                findNavController().navigate(action)
+                viewModel.updateDataFromWeb(emptyList())
             }
             settingsData.dataBtnFile.clickWithDebounce { contentRequest.launch("*/*") }
             settingsData.dataBtnClear.clickWithDebounce { viewModel.clearData() }
