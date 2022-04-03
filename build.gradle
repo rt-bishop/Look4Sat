@@ -1,14 +1,42 @@
 buildscript {
+    ext {
+        hilt_version = '2.41'
+        safe_args_version = '2.4.1'
+        application_version = '7.1.2'
+        library_version = '7.1.2'
+        kotlin_android_version = '1.6.10'
+        core_ktx_version = '1.7.0'
+        core_splashscreen_version = '1.0.0-beta02'
+        constraint_version = '2.1.3'
+        lifecycle_version = '2.4.1'
+        navigation_version = '2.4.1'
+        room_version = '2.4.2'
+        material_version = '1.5.0'
+        osmdroid_version = '6.1.11'
+        json_version = '20220320'
+        compose_version = '1.1.1'
+        activity_compose_version = '1.4.0'
+        material_adapter_version = '1.1.6'
+        fragment_test_version = '1.4.1'
+        leakcanary_version = '2.8.1'
+        junit_version = '4.13.2'
+        mockito_version = '4.4.0'
+        robolectric_version = '4.7.3'
+        coroutines_test_version = '1.6.0'
+        androidx_test_version = '1.4.0'
+        androidx_junit_version = '1.1.3'
+        espresso_version = '3.4.0'
+    }
     dependencies {
-        classpath "com.google.dagger:hilt-android-gradle-plugin:2.41"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.4.1"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$safe_args_version"
     }
 }
 
 plugins {
-    id "com.android.application" version "7.1.2" apply false
-    id "com.android.library" version "7.1.2" apply false
-    id "org.jetbrains.kotlin.android" version "1.6.10" apply false
+    id "com.android.application" version "$application_version" apply false
+    id "com.android.library" version "$library_version" apply false
+    id "org.jetbrains.kotlin.android" version "$kotlin_android_version" apply false
 }
 
 task clean(type: Delete) {
