@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.domain.data
 
 import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.utility.DataParser
@@ -33,7 +34,8 @@ class DataRepository(
     private val entrySource: ILocalEntrySource,
     private val radioSource: ILocalRadioSource,
     private val remoteSource: IRemoteDataSource,
-    private val repositoryScope: CoroutineScope
+    private val repositoryScope: CoroutineScope,
+    private val settingsManager: ISettingsManager
 ) : IDataRepository {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
@@ -91,6 +93,51 @@ class DataRepository(
             remoteSource.getDataStream(remoteSource.radioApi)?.let { stream ->
                 radioSource.insertRadios(dataParser.parseJSONStream(stream))
                 _updateState.value = DataState.Success(0L)
+            }
+        }
+    }
+
+    override fun updateFromWebNew() {
+        _updateState.value = DataState.Loading
+        repositoryScope.launch(exceptionHandler) {
+            val importedEntries = mutableListOf<SatEntry>()
+            val sourcesMap = settingsManager.sourcesMap
+            val jobsMap = sourcesMap.mapValues { async { remoteSource.getDataStream(it.value) } }
+            jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
+                entry.value?.let { stream ->
+                    when (val type = entry.key) {
+                        "AMSAT" -> {
+                            // parse tle stream
+                            val satellites = importSatellites(stream)
+                            val catnums = satellites.map { it.data.catnum }
+                            settingsManager.saveSatType(type, catnums)
+                            importedEntries.addAll(satellites)
+                        }
+                        "McCants", "Classified" -> {
+                            // unzip and parse tle stream
+                            val unzipped = ZipInputStream(stream).apply { nextEntry }
+                            val satellites = importSatellites(unzipped)
+                            val catnums = satellites.map { it.data.catnum }
+                            settingsManager.saveSatType(type, catnums)
+                            importedEntries.addAll(satellites)
+                        }
+                        else -> {
+                            // parse csv stream
+                            val parsed = dataParser.parseCSVStream(stream)
+                            val satellites = parsed.map { data -> SatEntry(data) }
+                            val catnums = satellites.map { it.data.catnum }
+                            settingsManager.saveSatType(type, catnums)
+                            importedEntries.addAll(satellites)
+                        }
+                    }
+                }
+            }
+            entrySource.insertEntries(importedEntries)
+            _updateState.value = DataState.Success(0L)
+        }
+        repositoryScope.launch(exceptionHandler) {
+            remoteSource.getDataStream(remoteSource.radioApi)?.let { stream ->
+                radioSource.insertRadios(dataParser.parseJSONStream(stream))
             }
         }
     }

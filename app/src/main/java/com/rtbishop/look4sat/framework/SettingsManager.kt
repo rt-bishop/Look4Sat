@@ -80,6 +80,16 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         return catnums?.sorted() ?: emptyList()
     }
 
+    override fun saveSatType(type: String, catnums: List<Int>) {
+        val stringList = catnums.map { catnum -> catnum.toString() }
+        prefs.edit { putStringSet("type$type", stringList.toSet()) }
+    }
+
+    override fun loadSatType(type: String): List<Int> {
+        val catnums = prefs.getStringSet("type$type", emptySet())?.map { catnum -> catnum.toInt() }
+        return catnums ?: emptyList()
+    }
+
     override fun getHoursAhead(): Int {
         return prefs.getInt(keyHoursAhead, 24)
     }

@@ -42,6 +42,8 @@ interface IDataRepository {
 
     fun updateFromWeb(urls: List<String>)
 
+    fun updateFromWebNew()
+
     fun setUpdateStateHandled()
 
     fun clearAllData()

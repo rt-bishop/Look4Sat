@@ -93,6 +93,10 @@ interface ISettingsManager {
 
     fun loadEntriesSelection(): List<Int>
 
+    fun saveSatType(type: String, catnums: List<Int>)
+
+    fun loadSatType(type: String): List<Int>
+
     fun getRotatorEnabled(): Boolean
 
     fun setRotatorEnabled(value: Boolean)

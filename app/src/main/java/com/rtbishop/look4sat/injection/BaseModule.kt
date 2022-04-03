@@ -48,7 +48,10 @@ object BaseModule {
 
     @Provides
     @Singleton
-    fun provideDataRepository(@ApplicationContext context: Context): IDataRepository {
+    fun provideDataRepository(
+        @ApplicationContext context: Context,
+        settings: ISettingsManager
+    ): IDataRepository {
         val db = Room.databaseBuilder(context, LocalDatabase::class.java, "Look4SatDb")
             .addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration().build()
         val parser = DataParser(Dispatchers.Default)
@@ -56,8 +59,8 @@ object BaseModule {
         val entries = LocalEntrySource(db.entriesDao())
         val radios = LocalRadioSource(db.radiosDao())
         val remoteSource = RemoteDataSource(Dispatchers.IO)
-        val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-        return DataRepository(parser, fileSource, entries, radios, remoteSource, repositoryScope)
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        return DataRepository(parser, fileSource, entries, radios, remoteSource, scope, settings)
     }
 
     @Provides
