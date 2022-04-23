@@ -135,7 +135,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             settingsData.dataBtnWeb.clickWithDebounce {
 //                val action = SettingsFragmentDirections.settingsToSources()
 //                findNavController().navigate(action)
-                viewModel.updateDataFromWeb(emptyList())
+                viewModel.updateDataFromWeb()
             }
             settingsData.dataBtnFile.clickWithDebounce { contentRequest.launch("*/*") }
             settingsData.dataBtnClear.clickWithDebounce { viewModel.clearData() }
@@ -147,8 +147,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val radiosFormat = getString(R.string.data_radios)
                 settingsData.dataRadios.text = String.format(radiosFormat, number)
             }
-            getNavResult<List<String>>(R.id.nav_settings, "sources") { sources ->
-                viewModel.updateDataFromWeb(sources)
+            getNavResult<List<String>>(R.id.nav_settings, "sources") {
+                viewModel.updateDataFromWeb()
             }
         }
     }

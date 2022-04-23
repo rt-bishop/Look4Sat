@@ -42,7 +42,7 @@ class SettingsViewModel @Inject constructor(
         repository.updateFromFile(uri)
     }
 
-    fun updateDataFromWeb(sources: List<String>) {
+    fun updateDataFromWeb() {
 //        settings.saveDataSources(sources)
 //        repository.updateFromWeb(sources)
         repository.updateFromWebNew()
