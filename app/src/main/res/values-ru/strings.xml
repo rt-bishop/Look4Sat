@@ -55,6 +55,9 @@
     <string name="sources_title">Источники данных</string>
     <string name="sources_hint">Протокол HTTPS</string>
 
+    <string name="types_title">Выберите тип спутника</string>
+    <string name="types_message">Выбран тип: %s</string>
+
     <!--Fragments-->
 
     <string name="entries_search_hint">Поиск по Имени / Id</string>

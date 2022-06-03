@@ -19,8 +19,7 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -69,29 +68,10 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             }
             entriesBtnSelect.clickWithDebounce { viewModel.selectCurrentItems(true) }
             entriesBtnClear.clickWithDebounce { viewModel.selectCurrentItems(false) }
-
-            val spinnerListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>, view: View?,
-                    position: Int, id: Long
-                ) {
-                    viewModel.setSatType(parent.getItemAtPosition(position).toString())
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                    viewModel.setSatType(String())
-                }
-            }
-            ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                viewModel.satTypes
-            ).also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                entriesSpinner.onItemSelectedListener = spinnerListener
-                entriesSpinner.adapter = adapter
-            }
-
+            val typeMessageFormat = requireContext().getString(R.string.types_message)
+            val type = if (viewModel.getSatType().isNullOrBlank()) "All" else viewModel.getSatType()
+            entriesTypeMessage.text = String.format(typeMessageFormat, type)
+            entriesTypeCard.setOnClickListener { showSelectTypeDialog() }
         }
         viewModel.satData.observe(viewLifecycleOwner) { satData ->
             handleSatData(satData, entriesAdapter)
@@ -115,6 +95,23 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 binding.entriesProgress.visibility = View.VISIBLE
             }
             else -> {}
+        }
+    }
+
+    private fun showSelectTypeDialog() {
+        val satelliteTypes = viewModel.satTypes.toTypedArray()
+        val selectedValue = satelliteTypes.indexOf(viewModel.getSatType())
+        val typeFormat = requireContext().getString(R.string.types_message)
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle(R.string.types_title)
+            setSingleChoiceItems(satelliteTypes, selectedValue) { dialog, index ->
+                val selectedItem = satelliteTypes[index]
+                binding.entriesTypeMessage.text = String.format(typeFormat, selectedItem)
+                viewModel.setSatType(selectedItem)
+                dialog.dismiss()
+            }
+            create()
+            show()
         }
     }
 }

@@ -28,6 +28,7 @@ import javax.inject.Singleton
 class SettingsManager @Inject constructor(private val prefs: SharedPreferences) : ISettingsManager {
 
     companion object {
+        const val keyFirstEverLaunch = "isFirstEverLaunch"
         const val keyDataSources = "dataSources"
         const val keyModes = "satModes"
         const val keyCompass = "compass"
@@ -46,6 +47,14 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         const val keyLongitude = "stationLon"
         const val keyLocator = "stationQTH"
         const val keySelection = "selection"
+    }
+
+    override fun isFirstEverLaunchDone(): Boolean {
+        return prefs.getBoolean(keyFirstEverLaunch, false)
+    }
+
+    override fun setFirstEverLaunchDone() {
+        prefs.edit { putBoolean(keyFirstEverLaunch, true) }
     }
 
     override fun loadStationLocator(): String {
@@ -177,6 +186,7 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
     override fun setBTDeviceAddr(value: String) {
         prefs.edit { putString(keyBTDeviceAddr, value) }
     }
+
     override fun getBTDeviceName(): String {
         return prefs.getString(keyBTDeviceName, null) ?: "Default"
     }

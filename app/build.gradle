@@ -8,20 +8,17 @@ plugins {
 
 android {
     compileSdkVersion 31
-    buildToolsVersion "31.0.0"
+    buildToolsVersion '31.0.0'
 
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
         minSdk 21
         targetSdk 31
-        versionCode 303
-        versionName "3.0.3"
-        resConfigs "en,ru"
+        versionCode 310
+        versionName '3.1.0'
+        resConfigs 'en,ru,zh_CN'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary true
-        }
 
         kapt {
             arguments {
@@ -42,7 +39,7 @@ android {
         }
     }
     buildFeatures {
-        compose true
+//        compose true
         viewBinding true
     }
     composeOptions {
@@ -85,16 +82,16 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     implementation "org.osmdroid:osmdroid-android:$osmdroid_version"
 
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling:$compose_version"
-    implementation "androidx.compose.animation:animation:$compose_version"
-    implementation "androidx.compose.foundation:foundation:$compose_version"
-    implementation "androidx.activity:activity-compose:$activity_compose_version"
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    implementation "com.google.android.material:compose-theme-adapter:$material_adapter_version"
+//    implementation "androidx.compose.ui:ui:$compose_version"
+//    implementation "androidx.compose.ui:ui-tooling:$compose_version"
+//    implementation "androidx.compose.animation:animation:$compose_version"
+//    implementation "androidx.compose.foundation:foundation:$compose_version"
+//    implementation "androidx.activity:activity-compose:$activity_compose_version"
+//    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
+//    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
+//    implementation "androidx.compose.material:material:$compose_version"
+//    implementation "androidx.compose.material:material-icons-extended:$compose_version"
+//    implementation "com.google.android.material:compose-theme-adapter:$material_adapter_version"
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.fragment:fragment-testing:$fragment_test_version"

@@ -57,6 +57,10 @@ interface ISettingsManager {
             "X-Comm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
         )
 
+    fun isFirstEverLaunchDone(): Boolean
+
+    fun setFirstEverLaunchDone()
+
     fun loadStationLocator(): String
 
     fun saveStationLocator(locator: String)

@@ -38,20 +38,47 @@
 
     </androidx.cardview.widget.CardView>
 
-    <Spinner
-        android:id="@+id/entries_spinner"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/entries_type_card"
+        style="@style/SurfaceCard"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="42dp"
         android:layout_marginStart="@dimen/view_default_margin"
         android:layout_marginTop="60dp"
-        android:layout_marginEnd="@dimen/view_default_margin" />
+        android:layout_marginEnd="@dimen/view_default_margin">
+
+        <TextView
+            android:id="@+id/entries_type_message"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start|center_vertical"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:text="@string/types_title"
+            android:textColor="@color/accent"
+            android:textSize="@dimen/text_size_mediumLarge" />
+
+        <ImageView
+            android:id="@+id/entries_type_img"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end|center_vertical"
+            android:contentDescription="@string/types_title"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:src="@drawable/ic_next"
+            app:tint="@color/accent" />
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         style="@style/SurfaceCard"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/view_default_margin"
-        android:layout_marginTop="98dp"
+        android:layout_marginTop="108dp"
         android:layout_marginEnd="@dimen/view_default_margin"
         android:layout_marginBottom="@dimen/surface_margin_bot">
 

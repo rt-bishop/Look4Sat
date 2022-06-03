@@ -52,6 +52,8 @@ class EntriesViewModel @Inject constructor(
     val satData = itemsWithQuery.map { items -> DataState.Success(items) }
     val satTypes: List<String> = settings.sourcesMap.keys.sorted()
 
+    fun getSatType(): String? = satType.value
+
     fun setSatType(type: String) {
         satType.value = type
     }
@@ -93,6 +95,7 @@ class EntriesViewModel @Inject constructor(
     }
 
     private fun filterByType(items: List<SatItem>, type: String): List<SatItem> {
+        if (type == "All") return items
         val catnums = settings.loadSatType(type)
         if (catnums.isEmpty()) return items
         return items.filter { item -> item.catnum in catnums }

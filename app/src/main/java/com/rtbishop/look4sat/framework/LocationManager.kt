@@ -134,5 +134,6 @@ class LocationManager @Inject constructor(
 
     override fun onProviderDisabled(provider: String) {}
 
+    @Deprecated("Deprecated in Java")
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
 }

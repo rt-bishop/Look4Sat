@@ -56,6 +56,9 @@
     <string name="sources_title">Manage data sources</string>
     <string name="sources_hint">HTTPS Source</string>
 
+    <string name="types_title">Select satellite type</string>
+    <string name="types_message">Selected type: %s</string>
+
     <!--Fragments-->
 
     <string name="entries_search_hint">Search by Name / Id</string>
