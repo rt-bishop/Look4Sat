@@ -57,7 +57,7 @@
                 android:id="@+id/position_lat_edit"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:digits="0123456789."
+                android:digits="0123456789.-"
                 android:inputType="number" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -95,7 +95,7 @@
                 android:id="@+id/position_lon_edit"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:digits="0123456789."
+                android:digits="0123456789.-"
                 android:inputType="number" />
 
         </com.google.android.material.textfield.TextInputLayout>
