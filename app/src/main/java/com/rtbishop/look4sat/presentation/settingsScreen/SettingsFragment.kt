@@ -162,6 +162,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 settingsRemote.remotePort.isEnabled = isChecked
                 settingsRemote.remotePortEdit.setText(viewModel.getRotatorPort())
                 setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.setRotatorEnabled(isChecked)
                     settingsRemote.remoteIp.isEnabled = isChecked
                     settingsRemote.remotePort.isEnabled = isChecked
                 }
