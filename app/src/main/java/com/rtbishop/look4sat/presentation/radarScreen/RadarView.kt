@@ -49,7 +49,7 @@ class RadarView(context: Context) : View(context) {
     private var shouldShowSweep = true
     private var sweepColor = defaultColor
     private var sweepDegrees = 0f
-    private var sweepSpeed = 30.0f
+    private var sweepSpeed = 15.0f
     private var sweepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = sweepColor
     }
