@@ -66,38 +66,7 @@ class DataRepository(
         }
     }
 
-    override fun updateFromWeb(urls: List<String>) {
-        _updateState.value = DataState.Loading
-        repositoryScope.launch(exceptionHandler) {
-            val streams = mutableListOf<InputStream>()
-            val entries = mutableListOf<SatEntry>()
-            val jobs = urls.associateWith { url -> async { remoteSource.getDataStream(url) } }
-            jobs.mapValues { job -> job.value.await() }.forEach { result ->
-                result.value?.let { stream ->
-                    when {
-                        result.key.contains("=csv", true) -> {
-                            val orbitalData = dataParser.parseCSVStream(stream)
-                            entries.addAll(orbitalData.map { data -> SatEntry(data) })
-                        }
-                        result.key.contains(".zip", true) -> {
-                            streams.add(ZipInputStream(stream).apply { nextEntry })
-                        }
-                        else -> streams.add(stream)
-                    }
-                }
-            }
-            streams.forEach { stream -> entries.addAll(importSatellites(stream)) }
-            entrySource.insertEntries(entries)
-        }
-        repositoryScope.launch(exceptionHandler) {
-            remoteSource.getDataStream(remoteSource.radioApi)?.let { stream ->
-                radioSource.insertRadios(dataParser.parseJSONStream(stream))
-                _updateState.value = DataState.Success(0L)
-            }
-        }
-    }
-
-    override fun updateFromWebNew() {
+    override fun updateFromWeb() {
         _updateState.value = DataState.Loading
         repositoryScope.launch(exceptionHandler) {
             val importedEntries = mutableListOf<SatEntry>()
@@ -106,7 +75,7 @@ class DataRepository(
             jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
                 entry.value?.let { stream ->
                     when (val type = entry.key) {
-                        "AMSAT" -> {
+                        "AMSAT", "R4UAB" -> {
                             // parse tle stream
                             val satellites = importSatellites(stream)
                             val catnums = satellites.map { it.data.catnum }

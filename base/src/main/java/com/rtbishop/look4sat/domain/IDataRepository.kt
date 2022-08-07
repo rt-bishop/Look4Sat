@@ -40,9 +40,7 @@ interface IDataRepository {
 
     fun updateFromFile(uri: String)
 
-    fun updateFromWeb(urls: List<String>)
-
-    fun updateFromWebNew()
+    fun updateFromWeb()
 
     fun setUpdateStateHandled()
 

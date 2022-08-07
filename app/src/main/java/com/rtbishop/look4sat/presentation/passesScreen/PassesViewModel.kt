@@ -42,7 +42,7 @@ class PassesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             if (!settings.isFirstEverLaunchDone()) {
-                repository.updateFromWebNew()
+                repository.updateFromWeb()
                 settings.setFirstEverLaunchDone()
             }
         }

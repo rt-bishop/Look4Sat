@@ -29,7 +29,6 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
 
     companion object {
         const val keyFirstEverLaunch = "isFirstEverLaunch"
-        const val keyDataSources = "dataSources"
         const val keyModes = "satModes"
         const val keyCompass = "compass"
         const val keyRadarSweep = "radarSweep"
@@ -201,15 +200,6 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
 
     override fun setBTFormat(value: String) {
         prefs.edit { putString(keyBTFormat, value) }
-    }
-
-    override fun loadDataSources(): List<String> {
-        val sourcesList = prefs.getStringSet(keyDataSources, null)?.toList()
-        return if (sourcesList.isNullOrEmpty()) defaultSources else sourcesList.sortedDescending()
-    }
-
-    override fun saveDataSources(sources: List<String>) {
-        if (sources.isNotEmpty()) prefs.edit { putStringSet(keyDataSources, sources.toSet()) }
     }
 
     private fun SharedPreferences.getDouble(key: String, default: Double): Double {

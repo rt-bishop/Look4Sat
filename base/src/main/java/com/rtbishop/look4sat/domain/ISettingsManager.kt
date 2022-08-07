@@ -21,13 +21,6 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 
 interface ISettingsManager {
 
-    val defaultSources: List<String>
-        get() = listOf(
-            "https://www.prismnet.com/~mmccants/tles/inttles.zip",
-            "https://www.prismnet.com/~mmccants/tles/classfd.zip",
-            "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-            "https://amsat.org/tle/current/nasabare.txt"
-        )
     val sourcesMap: Map<String, String>
         get() = mapOf(
             "All" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
@@ -47,6 +40,7 @@ interface ISettingsManager {
             "New" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=last-30-days&FORMAT=csv",
             "OneWeb" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=csv",
             "Orbcomm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=orbcomm&FORMAT=csv",
+            "R4UAB" to "https://r4uab.ru/satonline.txt",
             "Resource" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=resource&FORMAT=csv",
             "SatNOGS" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=satnogs&FORMAT=csv",
             "Science" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=science&FORMAT=csv",
@@ -128,8 +122,4 @@ interface ISettingsManager {
     fun getBTFormat(): String
 
     fun setBTFormat(value: String)
-
-    fun loadDataSources(): List<String>
-
-    fun saveDataSources(sources: List<String>)
 }

@@ -54,13 +54,6 @@
         android:id="@+id/nav_settings"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.SettingsFragment"
         tools:layout="@layout/fragment_settings">
-        <action
-            android:id="@+id/settings_to_sources"
-            app:destination="@id/nav_sources"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <dialog
         android:id="@+id/nav_modes"
@@ -70,10 +63,6 @@
         android:id="@+id/nav_filter"
         android:name="com.rtbishop.look4sat.presentation.passesScreen.FilterDialog"
         tools:layout="@layout/dialog_filter" />
-    <dialog
-        android:id="@+id/nav_sources"
-        android:name="com.rtbishop.look4sat.presentation.settingsScreen.SourcesDialog"
-        tools:layout="@layout/dialog_sources" />
     <dialog
         android:id="@+id/nav_position"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.PositionDialog"
