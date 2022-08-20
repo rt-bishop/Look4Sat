@@ -59,6 +59,11 @@ class PassesViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            repository.updateState.collect { updateState ->
+                if (updateState is DataState.Success) calculatePasses()
+            }
+        }
         calculatePasses()
     }
 
