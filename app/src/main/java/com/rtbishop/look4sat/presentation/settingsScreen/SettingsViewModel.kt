@@ -24,6 +24,7 @@ import com.rtbishop.look4sat.domain.ILocationManager
 import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.framework.UpdateManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
@@ -32,7 +33,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val locationManager: ILocationManager,
     private val repository: IDataRepository,
-    private val settings: ISettingsManager
+    private val settings: ISettingsManager,
+    private val updateManager: UpdateManager
 ) : ViewModel() {
 
     val entriesTotal = repository.getEntriesTotal().asLiveData()
@@ -55,6 +57,13 @@ class SettingsViewModel @Inject constructor(
     fun getUseUTC(): Boolean = settings.getUseUTC()
 
     fun setUseUTC(value: Boolean) = settings.setUseUTC(value)
+
+    fun getUpdateEnabled(): Boolean = settings.getUpdateEnabled()
+
+    fun setUpdateEnabled(value: Boolean) {
+        updateManager.toggleAutoUpdate(value)
+        settings.setUpdateEnabled(value)
+    }
 
     fun getUseCompass(): Boolean = settings.getUseCompass()
 

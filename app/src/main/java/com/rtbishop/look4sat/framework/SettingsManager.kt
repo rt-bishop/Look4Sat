@@ -33,6 +33,7 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         const val keyCompass = "compass"
         const val keyRadarSweep = "radarSweep"
         const val keyTimeUTC = "timeUTC"
+        const val keyAutoUpdate = "autoUpdate"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
         const val keyRotator = "isRotatorEnabled"
@@ -120,6 +121,14 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
 
     override fun setUseUTC(value: Boolean) {
         prefs.edit { putBoolean(keyTimeUTC, value) }
+    }
+
+    override fun getUpdateEnabled(): Boolean {
+        return prefs.getBoolean(keyAutoUpdate, false)
+    }
+
+    override fun setUpdateEnabled(value: Boolean) {
+        prefs.edit { putBoolean(keyAutoUpdate, value) }
     }
 
     override fun getUseCompass(): Boolean {

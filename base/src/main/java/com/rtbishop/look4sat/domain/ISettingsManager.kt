@@ -75,6 +75,10 @@ interface ISettingsManager {
 
     fun setUseUTC(value: Boolean)
 
+    fun getUpdateEnabled(): Boolean
+
+    fun setUpdateEnabled(value: Boolean)
+
     fun getUseCompass(): Boolean
 
     fun setUseCompass(value: Boolean)

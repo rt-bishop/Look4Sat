@@ -31,11 +31,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.fragment.findNavController
-import androidx.work.*
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
-import com.rtbishop.look4sat.framework.UpdateWorker
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -46,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContentView(ActivityMainBinding.inflate(layoutInflater).root)
-        refreshUpdateWorker(this)
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -54,14 +50,6 @@ class MainActivity : AppCompatActivity() {
         newConfig.fontScale = 1.0f
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
-    }
-
-    private fun refreshUpdateWorker(context: Context, workerName: String = "UpdateWorker") {
-        val workPolicy = ExistingPeriodicWorkPolicy.REPLACE
-        val network = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        val request = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 24, TimeUnit.HOURS)
-            .setConstraints(network).build()
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(workerName, workPolicy, request)
     }
 }
 
