@@ -149,6 +149,7 @@
 
     <string name="other_title">Другие настройки</string>
     <string name="other_switch_utc">Показывать время по UTC</string>
+    <string name="other_switch_update">Обновлять данные автоматически</string>
     <string name="other_switch_sweep">Показывать анимацию радара</string>
     <string name="other_switch_sensors">Использовать сенсоры устройства</string>
 

@@ -150,6 +150,7 @@
 
     <string name="other_title">Other preferences</string>
     <string name="other_switch_utc">Show pass time in UTC</string>
+    <string name="other_switch_update">Enable automatic data update</string>
     <string name="other_switch_sweep">Enable radar sweep animation</string>
     <string name="other_switch_sensors">Use sensors to rotate radar view</string>
 

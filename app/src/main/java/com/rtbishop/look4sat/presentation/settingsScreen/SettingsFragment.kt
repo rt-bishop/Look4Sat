@@ -213,6 +213,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 isChecked = viewModel.getUseUTC()
                 setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
             }
+            settingsOther.otherSwitchUpdate.apply {
+                isChecked = viewModel.getUpdateEnabled()
+                setOnCheckedChangeListener { _, isChecked -> viewModel.setUpdateEnabled(isChecked) }
+            }
             settingsOther.otherSwitchSweep.apply {
                 isChecked = viewModel.getShowSweep()
                 setOnCheckedChangeListener { _, isChecked -> viewModel.setShowSweep(isChecked) }
