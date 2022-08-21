@@ -18,7 +18,13 @@
 package com.rtbishop.look4sat.presentation
 
 import android.app.Application
+import com.rtbishop.look4sat.domain.IDataRepository
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class MainApplication : Application()
+class MainApplication : Application() {
+
+    @Inject
+    lateinit var repository: IDataRepository
+}

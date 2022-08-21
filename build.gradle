@@ -10,6 +10,7 @@ buildscript {
         constraint_version = '2.1.4'
         lifecycle_version = '2.5.1'
         navigation_version = '2.5.1'
+        work_version = '2.7.1'
         room_version = '2.4.3'
         material_version = '1.6.1'
         osmdroid_version = '6.1.13'
