@@ -15,6 +15,7 @@
     <string name="btn_select">Выбрать</string>
     <string name="btn_done">Готово</string>
     <string name="btn_clear">Очистить</string>
+    <string name="btn_clear_all">Очистить</string>
     <string name="btn_refresh">Обновить</string>
     <string name="btn_map">Карта</string>
     <string name="btn_filter">Фильтр</string>
@@ -132,6 +133,7 @@
 
     <string name="data_title">Обновление данных</string>
     <string name="data_error">При обновлении возникли ошибки</string>
+    <string name="data_update">Обновлено: %s</string>
     <string name="data_entries">Спутников: %s</string>
     <string name="data_radios">Трансиверов: %s</string>
     <string name="data_success">Обновление прошло успешно</string>

@@ -133,6 +133,7 @@
 
     <string name="data_title">Satellite data update</string>
     <string name="data_error">Update completed with errors</string>
+    <string name="data_update">Last updated: %s</string>
     <string name="data_entries">Satellites: %s</string>
     <string name="data_radios">Transceivers: %s</string>
     <string name="data_success">Update completed successfully</string>

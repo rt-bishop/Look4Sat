@@ -42,6 +42,8 @@ import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.utility.isValidIPv4
 import com.rtbishop.look4sat.utility.isValidPort
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.*
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
@@ -132,6 +134,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private fun setupDataCard() {
         binding.run {
+            setUpdateTime(viewModel.getUpdateTime())
             settingsData.dataBtnWeb.clickWithDebounce {
 //                val action = SettingsFragmentDirections.settingsToSources()
 //                findNavController().navigate(action)
@@ -268,6 +271,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         when (state) {
             is DataState.Success -> {
                 binding.settingsData.dataProgress.isIndeterminate = false
+                setUpdateTime(state.data)
                 viewModel.setUpdateHandled()
                 showToast(getString(R.string.data_success))
             }
@@ -281,6 +285,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             is DataState.Handled -> {}
         }
+    }
+
+    private fun setUpdateTime(updateTime: Long) {
+        val updatePattern = getString(R.string.data_update)
+        val updateDate = if (updateTime == 0L) {
+            getString(R.string.pass_placeholder)
+        } else {
+            SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault()).format(Date(updateTime))
+        }
+        binding.settingsData.dataUpdate.text = String.format(updatePattern, updateDate)
     }
 
     private fun showToast(message: String) {
