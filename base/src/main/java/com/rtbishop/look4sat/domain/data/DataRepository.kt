@@ -62,7 +62,7 @@ class DataRepository(
                 delay(updateStateDelay)
                 entrySource.insertEntries(importSatellites(stream))
             }
-            _updateState.value = DataState.Success(0L)
+            setUpdateSuccessful()
         }
     }
 
@@ -102,7 +102,7 @@ class DataRepository(
                 }
             }
             entrySource.insertEntries(importedEntries)
-            _updateState.value = DataState.Success(0L)
+            setUpdateSuccessful()
         }
         repositoryScope.launch(exceptionHandler) {
             remoteSource.getDataStream(remoteSource.radioApi)?.let { stream ->
@@ -121,8 +121,13 @@ class DataRepository(
             delay(updateStateDelay)
             entrySource.deleteEntries()
             radioSource.deleteRadios()
-            _updateState.value = DataState.Success(0L)
+            setUpdateSuccessful(0L)
         }
+    }
+
+    private fun setUpdateSuccessful(updateTime: Long = System.currentTimeMillis()) {
+        settingsManager.setUpdateTime(updateTime)
+        _updateState.value = DataState.Success(updateTime)
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {

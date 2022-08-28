@@ -58,6 +58,8 @@ class SettingsViewModel @Inject constructor(
 
     fun setUseUTC(value: Boolean) = settings.setUseUTC(value)
 
+    fun getUpdateTime(): Long = settings.getUpdateTime()
+
     fun getUpdateEnabled(): Boolean = settings.getUpdateEnabled()
 
     fun setUpdateEnabled(value: Boolean) {

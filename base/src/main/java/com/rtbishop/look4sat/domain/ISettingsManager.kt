@@ -75,6 +75,10 @@ interface ISettingsManager {
 
     fun setUseUTC(value: Boolean)
 
+    fun getUpdateTime(): Long
+
+    fun setUpdateTime(updateTime: Long)
+
     fun getUpdateEnabled(): Boolean
 
     fun setUpdateEnabled(value: Boolean)

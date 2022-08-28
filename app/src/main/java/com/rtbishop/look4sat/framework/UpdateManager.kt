@@ -22,7 +22,7 @@ import android.util.Log
 import androidx.work.*
 import com.rtbishop.look4sat.presentation.MainApplication
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class UpdateManager @Inject constructor(@ApplicationContext context: Context) {
 
     private fun enableAutoUpdate() {
         val network = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        val request = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 24, TimeUnit.HOURS)
+        val request = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 30, TimeUnit.MINUTES)
             .setConstraints(network).build()
         workManager.enqueueUniquePeriodicWork(workTag, ExistingPeriodicWorkPolicy.REPLACE, request)
     }
@@ -54,8 +54,8 @@ class UpdateManager @Inject constructor(@ApplicationContext context: Context) {
         Worker(context, params) {
 
         override fun doWork(): Result {
-            val dateTime = DateFormat.getDateTimeInstance().format(Calendar.getInstance().time)
-            Log.d("UpdateWorker", "Started periodic data update on $dateTime")
+            val date = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault()).format(Date())
+            Log.d("UpdateWorker", "Started periodic data update on $date")
             (context.applicationContext as MainApplication).repository.updateFromWeb()
             return Result.success()
         }
