@@ -9,13 +9,14 @@ plugins {
 android {
     compileSdkVersion 33
     buildToolsVersion '33.0.0'
+    namespace 'com.rtbishop.look4sat'
 
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
         minSdk 21
         targetSdk 33
-        versionCode 311
-        versionName '3.1.1'
+        versionCode 312
+        versionName '3.1.2'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
