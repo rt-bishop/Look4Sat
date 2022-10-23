@@ -51,10 +51,6 @@ interface ISettingsManager {
             "X-Comm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
         )
 
-    fun isFirstEverLaunchDone(): Boolean
-
-    fun setFirstEverLaunchDone()
-
     fun loadStationLocator(): String
 
     fun saveStationLocator(locator: String)
@@ -75,13 +71,13 @@ interface ISettingsManager {
 
     fun setUseUTC(value: Boolean)
 
-    fun getUpdateTime(): Long
+    fun getLastUpdateTime(): Long
 
-    fun setUpdateTime(updateTime: Long)
+    fun setLastUpdateTime(updateTime: Long)
 
-    fun getUpdateEnabled(): Boolean
+    fun getAutoUpdateEnabled(): Boolean
 
-    fun setUpdateEnabled(value: Boolean)
+    fun setAutoUpdateEnabled(value: Boolean)
 
     fun getUseCompass(): Boolean
 

@@ -137,6 +137,7 @@
     <string name="data_entries">Спутников: %s</string>
     <string name="data_radios">Трансиверов: %s</string>
     <string name="data_success">Обновление прошло успешно</string>
+    <string name="data_clear_success">Очистка прошла успешно</string>
 
     <string name="remote_title">Настройки ротатора</string>
     <string name="remote_switch">Удаленное управление</string>

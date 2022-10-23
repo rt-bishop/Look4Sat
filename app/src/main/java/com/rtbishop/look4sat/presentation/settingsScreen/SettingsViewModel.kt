@@ -24,7 +24,6 @@ import com.rtbishop.look4sat.domain.ILocationManager
 import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.framework.UpdateManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharedFlow
 import javax.inject.Inject
@@ -33,39 +32,27 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val locationManager: ILocationManager,
     private val repository: IDataRepository,
-    private val settings: ISettingsManager,
-    private val updateManager: UpdateManager
+    private val settings: ISettingsManager
 ) : ViewModel() {
 
     val entriesTotal = repository.getEntriesTotal().asLiveData()
     val radiosTotal = repository.getRadiosTotal().asLiveData()
 
-    fun updateDataFromFile(uri: String) {
-        repository.updateFromFile(uri)
-    }
+    fun updateFromFile(uri: String) = repository.updateFromFile(uri)
 
-    fun updateDataFromWeb() {
-//        settings.saveDataSources(sources)
-//        repository.updateFromWeb(sources)
-        repository.updateFromWeb()
-    }
+    fun updateFromWeb() = repository.updateFromWeb()
 
-    fun clearData() {
-        repository.clearAllData()
-    }
+    fun clearAllData() = repository.clearAllData()
 
     fun getUseUTC(): Boolean = settings.getUseUTC()
 
     fun setUseUTC(value: Boolean) = settings.setUseUTC(value)
 
-    fun getUpdateTime(): Long = settings.getUpdateTime()
+    fun getLastUpdateTime(): Long = settings.getLastUpdateTime()
 
-    fun getUpdateEnabled(): Boolean = settings.getUpdateEnabled()
+    fun getAutoUpdateEnabled(): Boolean = settings.getAutoUpdateEnabled()
 
-    fun setUpdateEnabled(value: Boolean) {
-        updateManager.toggleAutoUpdate(value)
-        settings.setUpdateEnabled(value)
-    }
+    fun setAutoUpdateEnabled(value: Boolean) = settings.setAutoUpdateEnabled(value)
 
     fun getUseCompass(): Boolean = settings.getUseCompass()
 
@@ -95,9 +82,9 @@ class SettingsViewModel @Inject constructor(
 
     fun setBTFormat(value: String) = settings.setBTFormat(value)
 
-    fun getBTDeviceName(): String = settings.getBTDeviceName()
+//    fun getBTDeviceName(): String = settings.getBTDeviceName()
 
-    fun setBTDeviceName(value: String) = settings.setBTDeviceName(value)
+//    fun setBTDeviceName(value: String) = settings.setBTDeviceName(value)
 
     fun getBTDeviceAddr(): String = settings.getBTDeviceAddr()
 

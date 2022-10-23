@@ -72,7 +72,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
     private val contentContract = ActivityResultContracts.GetContent()
     private val contentRequest = registerForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.updateDataFromFile(uri.toString()) }
+        uri?.let { viewModel.updateFromFile(uri.toString()) }
     }
     private lateinit var binding: FragmentSettingsBinding
 
@@ -134,14 +134,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private fun setupDataCard() {
         binding.run {
-            setUpdateTime(viewModel.getUpdateTime())
-            settingsData.dataBtnWeb.clickWithDebounce {
-//                val action = SettingsFragmentDirections.settingsToSources()
-//                findNavController().navigate(action)
-                viewModel.updateDataFromWeb()
-            }
+            setUpdateTime(viewModel.getLastUpdateTime())
+            settingsData.dataBtnWeb.clickWithDebounce { viewModel.updateFromWeb() }
             settingsData.dataBtnFile.clickWithDebounce { contentRequest.launch("*/*") }
-            settingsData.dataBtnClear.clickWithDebounce { viewModel.clearData() }
+            settingsData.dataBtnClear.clickWithDebounce { viewModel.clearAllData() }
             viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
                 val entriesFormat = getString(R.string.data_entries)
                 settingsData.dataEntries.text = String.format(entriesFormat, number)
@@ -151,7 +147,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 settingsData.dataRadios.text = String.format(radiosFormat, number)
             }
             getNavResult<List<String>>(R.id.nav_settings, "sources") {
-                viewModel.updateDataFromWeb()
+                viewModel.updateFromWeb()
             }
         }
     }
@@ -217,8 +213,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
             }
             settingsOther.otherSwitchUpdate.apply {
-                isChecked = viewModel.getUpdateEnabled()
-                setOnCheckedChangeListener { _, isChecked -> viewModel.setUpdateEnabled(isChecked) }
+                isChecked = viewModel.getAutoUpdateEnabled()
+                setOnCheckedChangeListener { _, isChecked -> viewModel.setAutoUpdateEnabled(isChecked) }
             }
             settingsOther.otherSwitchSweep.apply {
                 isChecked = viewModel.getShowSweep()
@@ -273,7 +269,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 binding.settingsData.dataProgress.isIndeterminate = false
                 setUpdateTime(state.data)
                 viewModel.setUpdateHandled()
-                showToast(getString(R.string.data_success))
+                if (state.data == 0L) {
+                    showToast(getString(R.string.data_clear_success))
+                } else {
+                    showToast(getString(R.string.data_success))
+                }
             }
             is DataState.Error -> {
                 binding.settingsData.dataProgress.isIndeterminate = false

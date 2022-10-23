@@ -128,6 +128,7 @@
     <string name="data_entries">卫星：%s</string>
     <string name="data_radios">收发器：%s</string>
     <string name="data_success">更新成功完成</string>
+    <string name="data_clear_success">Update completed successfully</string>
     <string name="remote_title">旋转器首选项</string>
     <string name="remote_switch">启用远程控制</string>
 </resources>
