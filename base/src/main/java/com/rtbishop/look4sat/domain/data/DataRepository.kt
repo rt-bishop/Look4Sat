@@ -126,7 +126,7 @@ class DataRepository(
     }
 
     private fun setUpdateSuccessful(updateTime: Long = System.currentTimeMillis()) {
-        settingsManager.setUpdateTime(updateTime)
+        settingsManager.setLastUpdateTime(updateTime)
         _updateState.value = DataState.Success(updateTime)
     }
 

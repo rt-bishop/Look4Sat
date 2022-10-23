@@ -137,6 +137,7 @@
     <string name="data_entries">Satellites: %s</string>
     <string name="data_radios">Transceivers: %s</string>
     <string name="data_success">Update completed successfully</string>
+    <string name="data_clear_success">Data was cleared successfully</string>
 
     <string name="remote_title">Rotator preferences</string>
     <string name="remote_switch">Enable remote control</string>

@@ -41,12 +41,6 @@ class PassesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (!settings.isFirstEverLaunchDone()) {
-                repository.updateFromWeb()
-                settings.setFirstEverLaunchDone()
-            }
-        }
-        viewModelScope.launch {
             satelliteManager.calculatedPasses.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch {

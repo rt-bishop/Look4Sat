@@ -28,13 +28,12 @@ import javax.inject.Singleton
 class SettingsManager @Inject constructor(private val prefs: SharedPreferences) : ISettingsManager {
 
     companion object {
-        const val keyFirstEverLaunch = "isFirstEverLaunch"
         const val keyModes = "satModes"
         const val keyCompass = "compass"
         const val keyRadarSweep = "radarSweep"
         const val keyTimeUTC = "timeUTC"
-        const val keyUpdateTime = "updateTime"
-        const val keyAutoUpdate = "autoUpdate"
+        const val keyLastUpdateTime = "lastUpdateTime"
+        const val keyAutoUpdateEnabled = "autoUpdateEnabled"
         const val keyHoursAhead = "hoursAhead"
         const val keyMinElevation = "minElevation"
         const val keyRotator = "isRotatorEnabled"
@@ -48,14 +47,6 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         const val keyLongitude = "stationLon"
         const val keyLocator = "stationQTH"
         const val keySelection = "selection"
-    }
-
-    override fun isFirstEverLaunchDone(): Boolean {
-        return prefs.getBoolean(keyFirstEverLaunch, false)
-    }
-
-    override fun setFirstEverLaunchDone() {
-        prefs.edit { putBoolean(keyFirstEverLaunch, true) }
     }
 
     override fun loadStationLocator(): String {
@@ -124,20 +115,20 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         prefs.edit { putBoolean(keyTimeUTC, value) }
     }
 
-    override fun getUpdateTime(): Long {
-        return prefs.getLong(keyUpdateTime, 0L)
+    override fun getLastUpdateTime(): Long {
+        return prefs.getLong(keyLastUpdateTime, 0L)
     }
 
-    override fun setUpdateTime(updateTime: Long) {
-        prefs.edit { putLong(keyUpdateTime, updateTime) }
+    override fun setLastUpdateTime(updateTime: Long) {
+        prefs.edit { putLong(keyLastUpdateTime, updateTime) }
     }
 
-    override fun getUpdateEnabled(): Boolean {
-        return prefs.getBoolean(keyAutoUpdate, false)
+    override fun getAutoUpdateEnabled(): Boolean {
+        return prefs.getBoolean(keyAutoUpdateEnabled, true)
     }
 
-    override fun setUpdateEnabled(value: Boolean) {
-        prefs.edit { putBoolean(keyAutoUpdate, value) }
+    override fun setAutoUpdateEnabled(value: Boolean) {
+        prefs.edit { putBoolean(keyAutoUpdateEnabled, value) }
     }
 
     override fun getUseCompass(): Boolean {
