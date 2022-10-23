@@ -55,7 +55,7 @@ object QthConverter {
         return (lat >= -90.0 && lat <= 90.0) && (lon >= -180.0 && lon <= 360.0)
     }
 
-    fun isValidLocator(locator: String): Boolean {
+    private fun isValidLocator(locator: String): Boolean {
         return locator.matches("[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex())
     }
 }
