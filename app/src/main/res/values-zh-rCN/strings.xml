@@ -2,76 +2,76 @@
 <resources>
     <string name="app_name">Look4Sat</string>
     <string name="app_timer">00:00:00</string>
-    <string name="app_version">版本: %s</string>
-    <string name="app_subtitle">卫星追踪器</string>
+    <string name="app_version">版本：%s</string>
+    <string name="app_subtitle">人造卫星追踪和过境预测</string>
 
     <!--Buttons-->
 
     <string name="btn_add">添加</string>
-    <string name="btn_accept">接受</string>
+    <string name="btn_accept">确定</string>
     <string name="btn_cancel">取消</string>
     <string name="btn_back">后退</string>
     <string name="btn_modes">模式</string>
     <string name="btn_select">全选</string>
     <string name="btn_done">完毕</string>
-    <string name="btn_clear">清除</string>
-    <string name="btn_clear_all">全部清除</string>
+    <string name="btn_clear">清空</string>
+    <string name="btn_clear_all">全部清空</string>
     <string name="btn_refresh">刷新</string>
     <string name="btn_map">地图</string>
     <string name="btn_filter">筛选</string>
     <string name="btn_satellites">卫星</string>
     <string name="btn_settings">设置</string>
-    <string name="btn_prev">上一页</string>
+    <string name="btn_prev">上一个</string>
     <string name="btn_next">下一个</string>
     <string name="btn_notify">通知</string>
-    <string name="btn_gps">GPS</string>
-    <string name="btn_manual">手动</string>
-    <string name="btn_qth">QTH</string>
-    <string name="btn_web">在线</string>
-    <string name="btn_file">文件</string>
+    <string name="btn_gps">GPS 定位</string>
+    <string name="btn_manual">手动输入</string>
+    <string name="btn_qth">QTH 网格</string>
+    <string name="btn_web">在线更新</string>
+    <string name="btn_file">本地文件</string>
     <string name="btn_github">GitHub</string>
     <string name="btn_support">支持</string>
     <string name="btn_fdroid">F-Droid</string>
 
     <!--Dialogs-->
 
-    <string name="filter_title">过滤通过</string>
-    <string name="filter_hours_hint">前几小时</string>
-    <string name="filter_hours_text">显示 X 小时内</string>
-    <string name="filter_elev_hint">最低仰角</string>
-    <string name="filter_elev_text">显示仰角超过</string>
+    <string name="filter_title">筛选过境</string>
+    <string name="filter_hours_hint">小时数</string>
+    <string name="filter_hours_text">显示未来 X 小时内的过境</string>
+    <string name="filter_elev_hint">仰角值</string>
+    <string name="filter_elev_text">显示最高仰角超过该值的过境</string>
 
-    <string name="locator_title">QTH 定位器</string>
-    <string name="locator_text">使用定位器设置电台位置</string>
-    <string name="locator_hint">QTH</string>
+    <string name="locator_title">QTH 网格</string>
+    <string name="locator_text">使用梅登黑德网格设置站位</string>
+    <string name="locator_hint">6 位网格代码</string>
 
     <string name="modes_title">选择调制类型</string>
 
     <string name="position_title">站位设置</string>
-    <string name="position_lat_text">设置地面站的纬度</string>
+    <string name="position_lat_text">输入站位的纬度</string>
     <string name="position_lat_hint">纬度</string>
-    <string name="position_lon_text">设置地面站的经度</string>
+    <string name="position_lon_text">输入站位的经度</string>
     <string name="position_lon_hint">经度</string>
 
     <string name="sources_title">管理数据源</string>
     <string name="sources_hint">HTTPS 来源</string>
 
-    <string name="types_title">Select satellite type</string>
-    <string name="types_message">Selected type: %s</string>
+    <string name="types_title">选择卫星类型</string>
+    <string name="types_message">选择类型：%s</string>
 
     <!--Fragments-->
 
-    <string name="entries_search_hint">按名称或ID搜索</string>
+    <string name="entries_search_hint">按名称或 ID 搜索</string>
 
-    <string name="passes_error">没有即将到来的卫星</string>
-    <string name="passes_empty_db">没有数据可显示,请通过设置菜单更新数据库。</string>
+    <string name="passes_error">没有即将过境的卫星</string>
+    <string name="passes_empty_db">没有数据可显示，请通过设置菜单更新卫星数据。</string>
 
     <string name="pass_satName">%s</string>
     <string name="pass_satId">Id:%d</string>
     <string name="pass_aosAz">入境 - %.1f°</string>
-    <string name="pass_elevation">仰角: %.1f°</string>
+    <string name="pass_elevation">仰角：%.1f°</string>
     <string name="pass_los">%.1f° - 出境</string>
-    <string name="pass_altitude">高度: %.0f km</string>
+    <string name="pass_altitude">高度：%.0f km</string>
     <string name="pass_placeholder">" - - : - - "</string>
     <string name="pass_startTime">HH:mm:ss - EEE</string>
     <string name="pass_endTime">EEE - HH:mm:ss</string>
@@ -84,13 +84,13 @@
     <string name="radar_alt_value">%.0f km</string>
     <string name="radar_dist_text">距离</string>
     <string name="radar_dist_value">%.0f km</string>
-    <string name="radar_visible">可见的</string>
-    <string name="radar_eclipsed">蒙蔽的</string>
+    <string name="radar_visible">日照中</string>
+    <string name="radar_eclipsed">地影中</string>
     <string name="radar_sat_name">%s</string>
     <string name="radar_sat_id">Id:%d</string>
 
-    <string name="radio_mode">调制: %s</string>
-    <string name="radio_inverted">倒置: %s</string>
+    <string name="radio_mode">调制：%s</string>
+    <string name="radio_inverted">倒置：%s</string>
     <string name="radio_info">%s</string>
     <string name="radio_no_link">- - . - -</string>
     <string name="radio_link_low">%.4f</string>
@@ -105,14 +105,14 @@
     <string name="map_title">世界地图</string>
     <string name="map_sat_name">%s</string>
     <string name="map_sat_id">Id:%d</string>
-    <string name="map_azimuth">方位角: %.1f°</string>
-    <string name="map_elevation">仰角: %.1f°</string>
-    <string name="map_latitude">纬度: %.1f°</string>
-    <string name="map_longitude">经度: %.1f°</string>
-    <string name="map_qth">QTH 定位器: %s</string>
-    <string name="map_visible">可见的</string>
-    <string name="map_eclipsed">蒙蔽的</string>
-    <string name="map_visibility">能见度: %s</string>
+    <string name="map_azimuth">方位角：%.1f°</string>
+    <string name="map_elevation">仰角：%.1f°</string>
+    <string name="map_latitude">纬度：%.1f°</string>
+    <string name="map_longitude">经度：%.1f°</string>
+    <string name="map_qth">QTH 网格：%s</string>
+    <string name="map_visible">日照中</string>
+    <string name="map_eclipsed">地影中</string>
+    <string name="map_visibility">能见度：%s</string>
     <string name="map_period">周期：% .0f min</string>
     <string name="map_phase">相位：%.1f°</string>
     <string name="map_altitude">高度：%.0f km</string>
@@ -128,43 +128,50 @@
     <string name="location_null">没有地理位置数据</string>
     <string name="location_gps_error">检查您的位置权限</string>
     <string name="location_manual_error">输入的位置无效</string>
-    <string name="location_qth_error">无效的 QTH 定位器</string>
+    <string name="location_qth_error">无效的 QTH 网格</string>
     <string name="location_success">位置更新成功</string>
 
     <string name="data_title">卫星数据更新</string>
     <string name="data_error">更新完成但出现错误</string>
-    <string name="data_update">Last updated: %s</string>
+    <string name="data_update">最后更新时间：%s</string>
     <string name="data_entries">卫星：%s</string>
     <string name="data_radios">收发器：%s</string>
-    <string name="data_success">更新成功完成</string>
-    <string name="data_clear_success">Update completed successfully</string>
+    <string name="data_success">更新成功</string>
+    <string name="data_clear_success">数据清空成功</string>
 
     <string name="remote_title">旋转器首选项</string>
     <string name="remote_switch">启用远程控制</string>
     <string name="remote_ip_hint">IP地址</string>
     <string name="remote_port_hint">端口</string>
 
-    <string name="BTremote_title">Bluetooth data output</string>
-    <string name="BTremote_switch">Enable output</string>
-    <string name="BTremote_device_hint">Device id</string>
-    <string name="BTremote_output_hint">Data format</string>
-    <string name="BTremote_perm_error">Check your bluetooth permission</string>
+    <string name="BTremote_title">蓝牙数据输出</string>
+    <string name="BTremote_switch">启用输出</string>
+    <string name="BTremote_device_hint">蓝牙设备 ID</string>
+    <string name="BTremote_output_hint">数据格式</string>
+    <string name="BTremote_perm_error">请检查蓝牙权限</string>
 
     <string name="other_title">其他偏好</string>
-    <string name="other_switch_utc">以 UTC 显示时间</string>
-    <string name="other_switch_update">Enable automatic data update</string>
+    <string name="other_switch_utc">以 UTC 时间显示</string>
+    <string name="other_switch_update">启用卫星数据自动更新</string>
     <string name="other_switch_sweep">启用雷达扫描动画</string>
     <string name="other_switch_sensors">使用传感器旋转雷达视图</string>
 
     <string name="outro_title">我要感谢：</string>
-    <string name="outro_thanks">
-    	• 感谢下载和使用 Look4Sat！ 愿你的天空永远晴朗！
-    	• 简体中文版由 BA7LWN 于 2022.5.10 翻译
-		• "<a href="https://github.com/g4dpz">David A. B. Johnson</a> and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>".
-		• "<a href="https://github.com/csete">Alexandru Csete</a>" for creating Gpredict satellite tracker that inspired the creation of Look4Sat.
-		• "<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his <a href="https://celestrak.com/">Celestrak</a>" website that provides access to the TLE data.
-		• "<a href="https://libre.space/">Libre Space Foundation</a> for their <a href="https://db.satnogs.org/">SatNOGS</a>" API and DB providing a huge amount of satellite data.
-		• "<a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>" team for their interest to the app and the interview published. "
-	</string>
-    <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">隐私政策</a>该应用程序不提供任何保修。 有关详细信息，请参阅 <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> 许可证。</string>
+    <string name="outro_thanks">• 感谢下载和使用 Look4Sat！愿你的天空永远晴朗！
+        \n • 简体中文版翻译由 <a href="https://github.com/BA7LWN">BA7LWN</a> 于 2022.5.10 创建。
+        \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
+        and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
+        under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
+        \n • <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
+        satellite tracker that inspired the creation of Look4Sat.
+        \n • <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
+        <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
+        \n • <a href="https://libre.space/">Libre Space Foundation</a> for their
+        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data.
+        \n • <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
+        team for their interest to the app and the interview published.
+    </string>
+    <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">隐私政策</a>
+        该应用程序不提供任何保修。\n有关详细信息，请参阅 <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3 许可证</a> 。
+    </string>
 </resources>
