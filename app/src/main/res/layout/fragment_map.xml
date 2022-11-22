@@ -205,7 +205,7 @@
     <Button
         android:id="@+id/map_btn_prev"
         style="@style/NormalButton"
-        android:layout_width="@dimen/button_width_med"
+        android:layout_width="@dimen/button_width_max"
         android:layout_marginStart="@dimen/button_margin_side"
         android:text="@string/btn_prev"
         app:icon="@drawable/ic_prev"
@@ -231,7 +231,7 @@
     <Button
         android:id="@+id/map_btn_next"
         style="@style/NormalButton"
-        android:layout_width="@dimen/button_width_med"
+        android:layout_width="@dimen/button_width_max"
         android:layout_marginEnd="@dimen/button_margin_side"
         android:text="@string/btn_next"
         app:icon="@drawable/ic_next"
