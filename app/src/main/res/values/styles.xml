@@ -12,7 +12,12 @@
         <item name="colorControlNormal">@color/textMain</item>
         <item name="colorPrimary">@color/accent</item>
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorOnPrimaryContainer">@color/background</item>
+        <!--        Bottom bar colors-->
+        <item name="colorOnSecondaryContainer">@color/background</item>
+        <item name="colorOnSurfaceVariant">@color/textMain</item>
+        <item name="colorSecondaryContainer">@color/accent</item>
+        <item name="colorOnPrimaryContainer">@color/textMain</item>
+        <!--        -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:listDivider">@drawable/item_divider</item>
         <item name="android:navigationBarColor">@color/background</item>
@@ -127,6 +132,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/bottom_bar_size</item>
         <item name="android:layout_gravity">bottom</item>
+        <item name="android:layout_marginBottom">3dp</item>
         <item name="android:backgroundTint">@color/bottomBar</item>
         <item name="contentInsetStart">@dimen/bottom_bar_inset</item>
         <item name="contentInsetEnd">@dimen/bottom_bar_inset</item>

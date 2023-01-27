@@ -53,7 +53,19 @@
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.SettingsFragment"
-        tools:layout="@layout/fragment_settings">
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.rtbishop.look4sat.presentation.radarScreen.RadarFragment"
+        tools:layout="@layout/fragment_radar">
+        <argument
+            android:name="catNum"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="aosTime"
+            android:defaultValue="0L"
+            app:argType="long" />
     </fragment>
     <dialog
         android:id="@+id/nav_modes"
