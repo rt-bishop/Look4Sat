@@ -40,7 +40,7 @@ android {
         viewBinding true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compose_compiler_version
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -49,15 +49,14 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
-    }
     testOptions {
         animationsDisabled true
         unitTests.includeAndroidResources true
     }
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 dependencies {
@@ -71,7 +70,6 @@ dependencies {
     implementation "androidx.navigation:navigation-runtime-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
-    implementation "androidx.work:work-runtime-ktx:$work_version"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -82,29 +80,33 @@ dependencies {
 
 //    implementation "androidx.compose.ui:ui:$compose_version"
 //    implementation "androidx.compose.ui:ui-tooling:$compose_version"
-//    implementation "androidx.compose.animation:animation:$compose_version"
-//    implementation "androidx.compose.foundation:foundation:$compose_version"
-//    implementation "androidx.activity:activity-compose:$activity_compose_version"
+//    implementation "androidx.compose.runtime:runtime:$compose_version"
 //    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
+//    implementation "androidx.compose.compiler:compiler:$compose_compiler_version"
+//    implementation "androidx.compose.animation:animation:$compose_version"
+//    implementation "androidx.compose.foundation:foundation:$compose_foundation_version"
+//    implementation "androidx.activity:activity-compose:$activity_compose_version"
 //    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
-//    implementation "androidx.compose.material:material:$compose_version"
-//    implementation "androidx.compose.material:material-icons-extended:$compose_version"
+//    implementation "androidx.compose.material:material:$compose_material_version"
+//    implementation "androidx.compose.material:material-icons-extended:$compose_material_version"
 //    implementation "com.google.android.material:compose-theme-adapter:$material_adapter_version"
 
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+//    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.fragment:fragment-testing:$fragment_test_version"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
+
     testImplementation "junit:junit:$junit_version"
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.robolectric:robolectric:$robolectric_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
+
     androidTestImplementation "androidx.test:core:$androidx_test_version"
     androidTestImplementation "androidx.test:runner:$androidx_test_version"
     androidTestImplementation "androidx.test:rules:$androidx_test_version"
     androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
     androidTestImplementation "androidx.test.ext:truth:$androidx_test_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+//    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     androidTestImplementation "org.mockito:mockito-android:$mockito_version"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
 }
