@@ -30,19 +30,27 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.NavigationUiSaveStateControl
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    @OptIn(NavigationUiSaveStateControl::class)
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        setContentView(ActivityMainBinding.inflate(layoutInflater).root)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        val host = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
+        NavigationUI.setupWithNavController(binding.navBar, host.navController, false)
+        setContentView(binding.root)
     }
 
     override fun attachBaseContext(newBase: Context?) {

@@ -5,6 +5,12 @@
     <string name="app_version">Version: %s</string>
     <string name="app_subtitle">Satellite tracker and pass predictor</string>
 
+    <string name="menu_satellites">Satellites</string>
+    <string name="menu_passes">Passes</string>
+    <string name="menu_map">World Map</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_about">About</string>
+
     <!--Buttons-->
 
     <string name="btn_add">Add</string>
