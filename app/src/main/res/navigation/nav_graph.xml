@@ -56,8 +56,7 @@
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/nav_about"
-        android:name="com.rtbishop.look4sat.presentation.radarScreen.RadarFragment"
-        tools:layout="@layout/fragment_radar">
+        android:name="com.rtbishop.look4sat.presentation.aboutScreen.AboutFragment">
         <argument
             android:name="catNum"
             android:defaultValue="-1"
