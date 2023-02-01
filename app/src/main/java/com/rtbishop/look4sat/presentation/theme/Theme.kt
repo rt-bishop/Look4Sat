@@ -14,7 +14,7 @@ fun Look4SatTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
 
 private val LightColors = lightColors(
     primary = SurfaceGrey,
-    primaryVariant = Background,
+    primaryVariant = ButtonGrey,
     secondary = Yellow,
     background = Background,
     surface = SurfaceGrey,
@@ -26,7 +26,7 @@ private val LightColors = lightColors(
 
 private val DarkColors = darkColors(
     primary = SurfaceGrey,
-    primaryVariant = Background,
+    primaryVariant = ButtonGrey,
     secondary = Yellow,
     background = Background,
     surface = SurfaceGrey,
