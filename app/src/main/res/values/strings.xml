@@ -38,6 +38,8 @@
     <string name="btn_github">GitHub</string>
     <string name="btn_support">Support</string>
     <string name="btn_fdroid">F-Droid</string>
+    <string name="btn_privacy">Privacy Policy</string>
+    <string name="btn_license">GPLv3 Licence</string>
 
     <!--Dialogs-->
 
@@ -176,7 +178,5 @@
         \n\n • <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
         team for their interest to the app and the interview published.
     </string>
-    <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Privacy Policy.</a>
-        The app comes with no warranty. \nSee the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a> license for details.
-    </string>
+    <string name="outro_license">The app comes with no warranty.</string>
 </resources>
