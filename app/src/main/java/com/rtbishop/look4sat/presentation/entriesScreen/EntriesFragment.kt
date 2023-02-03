@@ -62,10 +62,10 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
             }
             entriesBtnBack.clickWithDebounce { findNavController().navigateUp() }
             entriesSearch.doOnTextChanged { text, _, _, _ -> viewModel.setQuery(text.toString()) }
-            entriesBtnModes.clickWithDebounce {
-                val direction = EntriesFragmentDirections.entriesToModes()
-                findNavController().navigate(direction)
-            }
+//            entriesBtnModes.clickWithDebounce {
+//                val direction = EntriesFragmentDirections.entriesToModes()
+//                findNavController().navigate(direction)
+//            }
             entriesBtnSelect.clickWithDebounce { viewModel.selectCurrentItems(true) }
             entriesBtnClear.clickWithDebounce { viewModel.selectCurrentItems(false) }
             val typeMessageFormat = requireContext().getString(R.string.types_message)
