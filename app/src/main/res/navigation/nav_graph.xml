@@ -6,7 +6,7 @@
     app:startDestination="@id/nav_passes">
     <fragment
         android:id="@+id/nav_entries"
-        android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragment"
+        android:name="com.rtbishop.look4sat.presentation.entriesScreen.EntriesFragmentCompose"
         tools:layout="@layout/fragment_entries">
         <action
             android:id="@+id/entries_to_modes"
