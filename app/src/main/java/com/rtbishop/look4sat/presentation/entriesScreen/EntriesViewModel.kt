@@ -34,20 +34,20 @@ class EntriesViewModel @Inject constructor(
 ) : ViewModel(), EntriesAdapter.EntriesClickListener {
 
     private val satType = MutableLiveData(String())
-    private val transModes = MutableLiveData(settings.loadModesSelection())
+//    private val transModes = MutableLiveData(settings.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsFromRepo = liveData {
-        delay(125)
+        delay(250)
         emit(loadEntriesWithSelection())
     } as MutableLiveData
     private val itemsWithType = satType.switchMap { type ->
         itemsFromRepo.map { items -> filterByType(items, type) }
     }
-    private val itemsWithModes = transModes.switchMap { modes ->
-        itemsWithType.map { items -> filterByModes(items, modes) }
-    }
+//    private val itemsWithModes = transModes.switchMap { modes ->
+//        itemsWithType.map { items -> filterByModes(items, modes) }
+//    }
     private val itemsWithQuery = currentQuery.switchMap { query ->
-        itemsWithModes.map { items -> filterByQuery(items, query) }
+        itemsWithType.map { items -> filterByQuery(items, query) }
     }
     val satData = itemsWithQuery.map { items -> DataState.Success(items) }
     val satTypes: List<String> = settings.sourcesMap.keys.sorted()
@@ -64,10 +64,10 @@ class EntriesViewModel @Inject constructor(
         }
     }
 
-    fun saveSelectedModes(modes: List<String>) {
-        transModes.value = modes
-        settings.saveModesSelection(modes)
-    }
+//    fun saveSelectedModes(modes: List<String>) {
+//        transModes.value = modes
+//        settings.saveModesSelection(modes)
+//    }
 
     fun setQuery(query: String) {
         currentQuery.value = query
@@ -101,10 +101,10 @@ class EntriesViewModel @Inject constructor(
         return items.filter { item -> item.catnum in catnums }
     }
 
-    private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {
-        if (modes.isEmpty()) return items
-        return items.filter { item -> item.modes.any { mode -> mode in modes } }
-    }
+//    private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {
+//        if (modes.isEmpty()) return items
+//        return items.filter { item -> item.modes.any { mode -> mode in modes } }
+//    }
 
     private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
         if (query.isBlank()) return items

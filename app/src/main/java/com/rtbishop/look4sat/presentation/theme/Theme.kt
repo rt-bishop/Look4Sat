@@ -20,7 +20,7 @@ private val LightColors = lightColors(
     surface = SurfaceGrey,
     onPrimary = TextWhite,
     onSecondary = TextBlack,
-    onBackground = TextWhite,
+    onBackground = TextGrey,
     onSurface = TextWhite
 )
 
@@ -32,6 +32,6 @@ private val DarkColors = darkColors(
     surface = SurfaceGrey,
     onPrimary = TextWhite,
     onSecondary = TextBlack,
-    onBackground = TextWhite,
+    onBackground = TextGrey,
     onSurface = TextWhite
 )

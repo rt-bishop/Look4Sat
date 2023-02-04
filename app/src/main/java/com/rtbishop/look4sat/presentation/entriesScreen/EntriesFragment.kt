@@ -80,9 +80,9 @@ class EntriesFragment : Fragment(R.layout.fragment_entries) {
                 findNavController().popBackStack()
             }
         }
-        getNavResult<List<String>>(R.id.nav_entries, "modes") { modes ->
-            viewModel.saveSelectedModes(modes)
-        }
+//        getNavResult<List<String>>(R.id.nav_entries, "modes") { modes ->
+//            viewModel.saveSelectedModes(modes)
+//        }
     }
 
     private fun handleSatData(dataState: DataState<List<SatItem>>, entriesAdapter: EntriesAdapter) {
