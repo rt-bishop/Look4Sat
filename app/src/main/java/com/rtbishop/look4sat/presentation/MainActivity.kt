@@ -24,36 +24,31 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.NavigationUiSaveStateControl
-import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.presentation.bottomNav.MainScreenView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
-    @OptIn(NavigationUiSaveStateControl::class)
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        val host = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
-        NavigationUI.setupWithNavController(binding.navBar, host.navController, false)
-        setContentView(binding.root)
-//        setContent { MainTheme { MainScreenView() } }
+        setContent { MainTheme { MainScreenView() } }
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -62,6 +57,10 @@ class MainActivity : AppCompatActivity() {
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
     }
+}
+
+fun Modifier.onClick(onClick: () -> Unit): Modifier = composed {
+    clickable(remember { MutableInteractionSource() }, null) { onClick() }
 }
 
 fun <T> Fragment.getNavResult(@IdRes id: Int, key: String, onResult: (result: T) -> Unit) {

@@ -15,6 +15,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.aboutScreen.AboutScreen
+import com.rtbishop.look4sat.presentation.entriesScreen.EntriesScreenView
 
 @Composable
 fun BottomNavBar(navController: NavController) {
@@ -44,8 +46,8 @@ fun BottomNavBar(navController: NavController) {
 
 @Composable
 fun NavigationGraph(navController: NavHostController) {
-    NavHost(navController, startDestination = BottomNavItem.Satellites.screen_route) {
-        composable(BottomNavItem.Satellites.screen_route) { SatellitesScreen() }
+    NavHost(navController, startDestination = BottomNavItem.Passes.screen_route) {
+        composable(BottomNavItem.Satellites.screen_route) { EntriesScreenView() }
         composable(BottomNavItem.Passes.screen_route) { PassesScreen() }
         composable(BottomNavItem.WorldMap.screen_route) { WorldMapScreen() }
         composable(BottomNavItem.Settings.screen_route) { SettingsScreen() }
