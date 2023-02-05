@@ -38,7 +38,6 @@ import androidx.navigation.ui.NavigationUiSaveStateControl
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.ActivityMainBinding
 import com.rtbishop.look4sat.presentation.bottomNav.MainScreenView
-import com.rtbishop.look4sat.presentation.theme.Look4SatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -54,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         val host = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         NavigationUI.setupWithNavController(binding.navBar, host.navController, false)
         setContentView(binding.root)
-//        setContent { Look4SatTheme { MainScreenView() } }
+//        setContent { MainTheme { MainScreenView() } }
     }
 
     override fun attachBaseContext(newBase: Context?) {

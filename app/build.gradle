@@ -19,6 +19,9 @@ android {
         versionName '3.1.2'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
 
         kapt {
             arguments {
@@ -52,6 +55,11 @@ android {
     testOptions {
         animationsDisabled true
         unitTests.includeAndroidResources true
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 
@@ -89,9 +97,12 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
     implementation "androidx.compose.material:material:$compose_material_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_material_version"
+    implementation "androidx.compose.material3:material3:$material3_version"
+    implementation "androidx.compose.material3:material3-window-size-class:$material3_version"
     implementation "com.google.android.material:compose-theme-adapter:$material_adapter_version"
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
     debugImplementation "androidx.fragment:fragment-testing:$fragment_test_version"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
 
