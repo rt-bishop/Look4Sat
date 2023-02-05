@@ -1,25 +1,23 @@
 package com.rtbishop.look4sat.presentation.bottomNav
 
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.presentation.theme.Yellow
-import com.rtbishop.look4sat.presentation.theme.Look4SatTheme
-import com.rtbishop.look4sat.presentation.theme.TextWhite
+import com.rtbishop.look4sat.presentation.MainTheme
 
 @Composable
-fun BottomNavView(navController: NavController) {
+fun BottomNavBar(navController: NavController) {
     val items = listOf(
         BottomNavItem.Satellites,
         BottomNavItem.Passes,
@@ -27,27 +25,19 @@ fun BottomNavView(navController: NavController) {
         BottomNavItem.Settings,
         BottomNavItem.About
     )
-    BottomNavigation(backgroundColor = colorResource(id = R.color.bottomBar)) {
+    NavigationBar(modifier = Modifier.height(56.dp)) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
-            BottomNavigationItem(icon = {
-                Icon(painterResource(id = item.icon), contentDescription = item.title)
-            },
-                label = { Text(text = item.title, fontSize = 9.sp) },
-                selectedContentColor = Yellow,
-                unselectedContentColor = TextWhite.copy(0.4f),
-                alwaysShowLabel = true,
-                selected = currentRoute == item.screen_route,
-                onClick = {
-                    navController.navigate(item.screen_route) {
-                        navController.graph.startDestinationRoute?.let { screen_route ->
-                            popUpTo(screen_route) { saveState = true }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
+            NavigationBarItem(selected = currentRoute == item.screen_route, onClick = {
+                navController.navigate(item.screen_route) {
+                    navController.graph.startDestinationRoute?.let { screen_route ->
+                        popUpTo(screen_route) { saveState = false }
                     }
-                })
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            }, icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) })
         }
     }
 }
@@ -63,10 +53,11 @@ fun NavigationGraph(navController: NavHostController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenView() {
     val navController = rememberNavController()
-    Scaffold(bottomBar = { BottomNavView(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavBar(navController = navController) }) {
         NavigationGraph(navController = navController)
         it.calculateBottomPadding()
     }
@@ -75,5 +66,5 @@ fun MainScreenView() {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    Look4SatTheme { MainScreenView() }
+    MainTheme { MainScreenView() }
 }
