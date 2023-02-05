@@ -1,8 +1,6 @@
 package com.rtbishop.look4sat.presentation
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -19,7 +17,7 @@ private val SurfaceGrey = Color(0xFF1C1C1C)
 private val Background = Color(0xFF121212)
 private val Transparent = Color(0x00000000)
 
-private val DarkColorScheme = darkColorScheme(
+private val DarkColors = lightColorScheme(
     primary = SurfaceGrey,
     secondary = Yellow,
     tertiary = ButtonGrey,
@@ -29,7 +27,8 @@ private val DarkColorScheme = darkColorScheme(
     onSecondary = TextBlack,
     onTertiary = TextWhite,
     onBackground = TextWhite,
-    onSurface = TextWhite
+    onSurface = TextWhite,
+    surfaceTint = SurfaceGrey
 )
 
 private val Typography = Typography(
@@ -54,6 +53,10 @@ private val Typography = Typography(
     )
 )
 
+val Shapes = Shapes(
+
+)
+
 @Composable
 fun MainTheme(
 //    darkTheme: Boolean = isSystemInDarkTheme(),
@@ -68,7 +71,7 @@ fun MainTheme(
 //        darkTheme -> DarkColorScheme
 //        else -> LightColorScheme
 //    }
-    val colorScheme = DarkColorScheme
+    val colors = DarkColors
 //    val view = LocalView.current
 //    if (!view.isInEditMode) {
 //        SideEffect {
@@ -76,5 +79,5 @@ fun MainTheme(
 //            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
 //        }
 //    }
-    MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+    MaterialTheme(colorScheme = colors, typography = Typography, content = content, shapes = Shapes)
 }

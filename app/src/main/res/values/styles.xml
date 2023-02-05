@@ -7,16 +7,16 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
     </style>
 
-    <style name="Theme.Look4Sat.Main" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Look4Sat.Main" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlNormal">@color/textMain</item>
         <item name="colorPrimary">@color/accent</item>
         <item name="colorSecondary">@color/accent</item>
         <!--        Bottom bar colors-->
-        <item name="colorOnSecondaryContainer">@color/background</item>
-        <item name="colorOnSurfaceVariant">@color/textMain</item>
-        <item name="colorSecondaryContainer">@color/accent</item>
-        <item name="colorOnPrimaryContainer">@color/textMain</item>
+<!--        <item name="colorOnSecondaryContainer">@color/background</item>-->
+<!--        <item name="colorOnSurfaceVariant">@color/textMain</item>-->
+<!--        <item name="colorSecondaryContainer">@color/accent</item>-->
+<!--        <item name="colorOnPrimaryContainer">@color/textMain</item>-->
         <!--        -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:listDivider">@drawable/item_divider</item>
@@ -76,7 +76,7 @@
         <item name="android:backgroundTint">@color/accent</item>
     </style>
 
-    <style name="NormalButton" parent="Widget.Material3.Button.IconButton">
+    <style name="NormalButton" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/buttonRegular</item>
