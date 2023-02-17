@@ -83,6 +83,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    implementation "com.jakewharton.timber:timber:$timber_version"
     implementation "org.osmdroid:osmdroid-android:$osmdroid_version"
 
     implementation "androidx.activity:activity-compose:$activity_compose_version"
