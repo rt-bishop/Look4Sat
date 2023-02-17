@@ -1,34 +1,57 @@
 package com.rtbishop.look4sat.presentation
 
-import androidx.compose.material3.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Yellow = Color(0xFFFFE082)
+private val AccentYellow = Color(0xFFFFE082)
 private val TextWhite = Color(0xCCFFFFFF)
 private val TextGrey = Color(0x66FFFFFF)
 private val TextBlack = Color(0xFF000000)
-private val ButtonGrey = Color(0xFF2A2A2A)
-private val SurfaceGrey = Color(0xFF1C1C1C)
-private val Background = Color(0xFF121212)
+private val SurfaceBtn = Color(0xFF2A2A2A)
+private val SurfaceCard = Color(0xFF1C1C1C)
+private val SurfaceBg = Color(0xFF121212)
 private val Transparent = Color(0x00000000)
 
-private val DarkColors = lightColorScheme(
-    primary = SurfaceGrey,
-    secondary = Yellow,
-    tertiary = ButtonGrey,
-    background = Background,
-    surface = SurfaceGrey,
-    onPrimary = TextWhite,
+private val MainColors = lightColorScheme(
+    primary = AccentYellow,
+    onPrimary = TextBlack,
+//    primaryContainer = primaryContainer,
+//    onPrimaryContainer = onPrimaryContainer,
+//    inversePrimary = inversePrimary,
+    secondary = AccentYellow,
     onSecondary = TextBlack,
+    secondaryContainer = AccentYellow, // navBar indicator
+    onSecondaryContainer = TextBlack, // navBar active icon
+    tertiary = SurfaceBtn,
     onTertiary = TextWhite,
+//    tertiaryContainer = tertiaryContainer,
+//    onTertiaryContainer = onTertiaryContainer,
+    background = SurfaceBg,
     onBackground = TextWhite,
+    surface = SurfaceCard,
     onSurface = TextWhite,
-    surfaceTint = SurfaceGrey
+    surfaceVariant = SurfaceCard,
+    onSurfaceVariant = TextGrey, // navBar inactive icon
+    surfaceTint = Transparent,
+//    inverseSurface = inverseSurface,
+//    inverseOnSurface = inverseOnSurface,
+//    error = error,
+//    onError = onError,
+//    errorContainer = errorContainer,
+//    onErrorContainer = onErrorContainer,
+//    outline = outline,
+//    outlineVariant = outlineVariant,
+//    scrim = scrim,
 )
 
 private val Typography = Typography(
@@ -53,8 +76,12 @@ private val Typography = Typography(
     )
 )
 
-val Shapes = Shapes(
-
+private val Shapes = Shapes(
+    extraSmall = RoundedCornerShape(4.dp),
+    small = RoundedCornerShape(6.dp),
+    medium = RoundedCornerShape(8.dp),
+    large = RoundedCornerShape(12.dp),
+    extraLarge = RoundedCornerShape(16.dp)
 )
 
 @Composable
@@ -71,7 +98,7 @@ fun MainTheme(
 //        darkTheme -> DarkColorScheme
 //        else -> LightColorScheme
 //    }
-    val colors = DarkColors
+    val colors = MainColors
 //    val view = LocalView.current
 //    if (!view.isInEditMode) {
 //        SideEffect {
