@@ -3,12 +3,11 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -18,51 +17,60 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.onClick
 
 @Composable
-fun EntriesScreenView() {
-    val viewModel = hiltViewModel<EntriesViewModel>()
+fun EntriesScreen(viewModel: EntriesViewModel = hiltViewModel()) {
     val dataState = viewModel.satData.observeAsState(DataState.Loading)
-    Column(modifier = Modifier.padding(6.dp)) {
+    Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Card { SearchBar(setQuery = { newQuery -> viewModel.setQuery(newQuery) }) }
-        Spacer(modifier = Modifier.height(6.dp))
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            LoadingOrList(state = dataState.value) { list, value ->
-                viewModel.updateSelection(list, value)
-            }
-        }
-        Spacer(modifier = Modifier.height(6.dp))
-        EntryTypeBar(entryType = "All")
-
-    }
-}
-
-@Composable
-fun EntryTypeBar(entryType: String, modifier: Modifier = Modifier) {
-    val icon = Icons.Outlined.ArrowForward
-    val text = "Selected type: $entryType"
-    Card {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-//                Icon(painter = painterResource(id = R.drawable.ic_next), contentDescription = null)
-            Icon(imageVector = icon, contentDescription = null, modifier = modifier.size(48.dp))
-            Text(text = text, maxLines = 1, modifier = modifier.fillMaxWidth())
+        EntryType(entryType = "All")
+        Card(modifier = Modifier.fillMaxWidth()) {
+            LoadingOrList(dataState.value) { list, value -> viewModel.updateSelection(list, value) }
         }
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun LoadingOrList(state: DataState<List<SatItem>>, onSelected: (List<Int>, Boolean) -> Unit) {
+private fun EntryTypeBarPreview() {
+    MainTheme { EntryType(entryType = "Amateur") }
+}
+
+@Composable
+private fun EntryType(entryType: String, modifier: Modifier = Modifier) {
+    ElevatedCard(modifier.height(48.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
+            Icon(
+                imageVector = Icons.Outlined.PlayArrow,
+                contentDescription = null,
+                modifier = modifier.size(32.dp)
+            )
+            Text(
+                text = "Selected type: $entryType",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = modifier.padding(start = 6.dp, end = 6.dp, bottom = 2.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun LoadingOrList(
+    state: DataState<List<SatItem>>, onSelected: (List<Int>, Boolean) -> Unit
+) {
     when (state) {
         is DataState.Loading -> {
             LoadingProgress()
@@ -77,7 +85,7 @@ fun LoadingOrList(state: DataState<List<SatItem>>, onSelected: (List<Int>, Boole
 }
 
 @Composable
-fun LoadingProgress() {
+private fun LoadingProgress() {
     Row(
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
     ) { CircularProgressIndicator(modifier = Modifier.size(64.dp)) }
@@ -85,26 +93,46 @@ fun LoadingProgress() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EntriesList(entries: List<SatItem>, onSelected: (List<Int>, Boolean) -> Unit) {
-    LazyVerticalGrid(columns = GridCells.Adaptive(200.dp)) {
+private fun EntriesList(entries: List<SatItem>, onSelected: (List<Int>, Boolean) -> Unit) {
+    LazyColumn {
         items(items = entries, key = { item -> item.catnum }) { entry ->
-            EntryItem(entry, onSelected, Modifier.animateItemPlacement())
+            Entry(entry, onSelected, Modifier.animateItemPlacement())
         }
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun EntryItem(entry: SatItem, onSelected: (List<Int>, Boolean) -> Unit, modifier: Modifier) {
+private fun EntryPreview() {
+    val satItem = SatItem(45555, "SatName", emptyList(), true)
+    MainTheme { Entry(item = satItem, onSelected = { _, _ -> run {} }, modifier = Modifier) }
+}
+
+@Composable
+private fun Entry(item: SatItem, onSelected: (List<Int>, Boolean) -> Unit, modifier: Modifier) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
-        Surface(modifier = modifier.padding(bottom = 1.dp)) {
+        Surface(modifier = Modifier.padding(bottom = 1.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier
+                modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
-                    .onClick { onSelected(listOf(entry.catnum), entry.isSelected.not()) }) {
-                Checkbox(
-                    checked = entry.isSelected, onCheckedChange = null, Modifier.padding(6.dp)
+                    .padding(start = 0.dp, top = 6.dp, end = 12.dp, bottom = 6.dp)
+                    .onClick { onSelected(listOf(item.catnum), item.isSelected.not()) }) {
+                Text(
+                    text = "Id:${item.catnum}  -  ",
+                    modifier = Modifier.width(100.dp),
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.secondary
                 )
-                Text(text = entry.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = item.name,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Checkbox(checked = item.isSelected, onCheckedChange = null)
             }
         }
     }
@@ -112,10 +140,9 @@ fun EntryItem(entry: SatItem, onSelected: (List<Int>, Boolean) -> Unit, modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(setQuery: (String) -> Unit) {
+private fun SearchBar(setQuery: (String) -> Unit) {
     val currentQuery = rememberSaveable { mutableStateOf("") }
-    OutlinedTextField(
-        value = currentQuery.value,
+    OutlinedTextField(value = currentQuery.value,
         onValueChange = { newValue ->
             currentQuery.value = newValue
             setQuery(newValue)
@@ -123,9 +150,7 @@ fun SearchBar(setQuery: (String) -> Unit) {
         maxLines = 1,
 //            label = { Text(text = stringResource(id = R.string.entries_search_hint)) },
         placeholder = { Text(text = stringResource(id = R.string.entries_search_hint)) },
-        leadingIcon = {
-            Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
-        },
+        leadingIcon = { Icon(imageVector = Icons.Outlined.Search, contentDescription = null) },
         trailingIcon = {
             Icon(imageVector = Icons.Outlined.Close,
                 contentDescription = null,
@@ -138,8 +163,6 @@ fun SearchBar(setQuery: (String) -> Unit) {
 //                focusedBorderColor = MaterialTheme.colorScheme.onBackground,
 //                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground
 //            ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
     )
 }
