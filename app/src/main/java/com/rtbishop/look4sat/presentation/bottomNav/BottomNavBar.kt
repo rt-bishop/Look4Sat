@@ -1,6 +1,8 @@
 package com.rtbishop.look4sat.presentation.bottomNav
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,7 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.aboutScreen.AboutScreen
-import com.rtbishop.look4sat.presentation.entriesScreen.EntriesScreenView
+import com.rtbishop.look4sat.presentation.entriesScreen.EntriesScreen
 
 @Composable
 fun BottomNavBar(navController: NavController) {
@@ -27,7 +29,7 @@ fun BottomNavBar(navController: NavController) {
         BottomNavItem.Settings,
         BottomNavItem.About
     )
-    NavigationBar(modifier = Modifier.height(56.dp)) {
+    NavigationBar(modifier = Modifier.height(52.dp)) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
@@ -47,7 +49,7 @@ fun BottomNavBar(navController: NavController) {
 @Composable
 fun NavigationGraph(navController: NavHostController) {
     NavHost(navController, startDestination = BottomNavItem.Passes.screen_route) {
-        composable(BottomNavItem.Satellites.screen_route) { EntriesScreenView() }
+        composable(BottomNavItem.Satellites.screen_route) { EntriesScreen() }
         composable(BottomNavItem.Passes.screen_route) { PassesScreen() }
         composable(BottomNavItem.WorldMap.screen_route) { WorldMapScreen() }
         composable(BottomNavItem.Settings.screen_route) { SettingsScreen() }
@@ -57,11 +59,9 @@ fun NavigationGraph(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreenView() {
-    val navController = rememberNavController()
-    Scaffold(bottomBar = { BottomNavBar(navController = navController) }) {
-        NavigationGraph(navController = navController)
-        it.calculateBottomPadding()
+fun MainScreenView(navController: NavHostController = rememberNavController()) {
+    Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) { NavigationGraph(navController) }
     }
 }
 

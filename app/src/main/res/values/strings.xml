@@ -165,17 +165,17 @@
     <string name="other_switch_sensors">Use sensors to rotate radar view</string>
 
     <string name="outro_title">I would like to say thanks to:</string>
-    <string name="outro_thanks"> • You for downloading and using Look4Sat! \nMay your sky always be clear!
-        \n\n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
+    <string name="outro_thanks">• You for downloading and using Look4Sat! \nMay your sky always be clear!
+        \n\n• <a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
         under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
-        \n\n • <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
+        \n\n• <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
         satellite tracker that inspired the creation of Look4Sat.
-        \n\n • <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
+        \n\n• <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
         <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
-        \n\n • <a href="https://libre.space/">Libre Space Foundation</a> for their
-        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data.
-        \n\n • <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
+        \n\n• <a href="https://libre.space/">Libre Space Foundation</a> for their
+        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of data.
+        \n\n• <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
         team for their interest to the app and the interview published.
     </string>
     <string name="outro_license">The app comes with no warranty.</string>

@@ -27,11 +27,6 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.IdRes
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -57,10 +52,6 @@ class MainActivity : ComponentActivity() {
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
     }
-}
-
-fun Modifier.onClick(onClick: () -> Unit): Modifier = composed {
-    clickable(remember { MutableInteractionSource() }, null) { onClick() }
 }
 
 fun <T> Fragment.getNavResult(@IdRes id: Int, key: String, onResult: (result: T) -> Unit) {
