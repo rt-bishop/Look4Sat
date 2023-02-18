@@ -77,11 +77,9 @@ private val Typography = Typography(
 )
 
 private val Shapes = Shapes(
-    extraSmall = RoundedCornerShape(4.dp),
-    small = RoundedCornerShape(6.dp),
-    medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(12.dp),
-    extraLarge = RoundedCornerShape(16.dp)
+    extraSmall = RoundedCornerShape(4.dp), small = RoundedCornerShape(6.dp), // buttons corners
+    medium = RoundedCornerShape(8.dp), // cards corners
+    large = RoundedCornerShape(12.dp), extraLarge = RoundedCornerShape(16.dp)
 )
 
 @Composable
