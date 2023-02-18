@@ -1,6 +1,7 @@
 package com.rtbishop.look4sat.presentation.aboutScreen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,9 +29,11 @@ private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.loo
 
 @Composable
 fun AboutScreen() {
-    Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        CardAbout(BuildConfig.VERSION_NAME)
-        CardCredits()
+    LazyColumn(
+        modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        item { CardAbout(BuildConfig.VERSION_NAME) }
+        item { CardCredits() }
     }
 }
 

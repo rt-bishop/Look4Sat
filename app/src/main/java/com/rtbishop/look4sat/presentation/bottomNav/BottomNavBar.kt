@@ -29,7 +29,7 @@ fun BottomNavBar(navController: NavController) {
         BottomNavItem.Settings,
         BottomNavItem.About
     )
-    NavigationBar(modifier = Modifier.height(52.dp)) {
+    NavigationBar(modifier = Modifier.height(48.dp)) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
@@ -48,8 +48,9 @@ fun BottomNavBar(navController: NavController) {
 
 @Composable
 fun NavigationGraph(navController: NavHostController) {
+    val navToPasses = { navController.navigate(BottomNavItem.Passes.screen_route) }
     NavHost(navController, startDestination = BottomNavItem.Passes.screen_route) {
-        composable(BottomNavItem.Satellites.screen_route) { EntriesScreen() }
+        composable(BottomNavItem.Satellites.screen_route) { EntriesScreen(navToPasses) }
         composable(BottomNavItem.Passes.screen_route) { PassesScreen() }
         composable(BottomNavItem.WorldMap.screen_route) { WorldMapScreen() }
         composable(BottomNavItem.Settings.screen_route) { SettingsScreen() }
