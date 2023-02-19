@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.domain.predict
 
 import com.rtbishop.look4sat.domain.ISatelliteManager
 import com.rtbishop.look4sat.domain.model.SatRadio
+import com.rtbishop.look4sat.utility.round
 import com.rtbishop.look4sat.utility.toDegrees
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,10 +39,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     }
 
     override suspend fun getTrack(
-        sat: Satellite,
-        pos: GeoPos,
-        start: Long,
-        end: Long
+        sat: Satellite, pos: GeoPos, start: Long, end: Long
     ): List<SatPos> {
         return withContext(defaultDispatcher) {
             val positions = mutableListOf<SatPos>()
@@ -55,10 +53,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     }
 
     override suspend fun processRadios(
-        sat: Satellite,
-        pos: GeoPos,
-        radios: List<SatRadio>,
-        time: Long
+        sat: Satellite, pos: GeoPos, radios: List<SatRadio>, time: Long
     ): List<SatRadio> {
         return withContext(defaultDispatcher) {
             val satPos = sat.getPosition(pos, time)
@@ -92,11 +87,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     }
 
     override suspend fun calculatePasses(
-        satList: List<Satellite>,
-        pos: GeoPos,
-        time: Long,
-        hoursAhead: Int,
-        minElevation: Double
+        satList: List<Satellite>, pos: GeoPos, time: Long, hoursAhead: Int, minElevation: Double
     ) {
         if (satList.isEmpty()) {
             val newPasses = emptyList<SatPass>()
@@ -142,21 +133,19 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
 
     private fun List<SatPass>.filter(time: Long, hoursAhead: Int, minElev: Double): List<SatPass> {
         val timeFuture = time + (hoursAhead * 60L * 60L * 1000L)
-        return this.filter { it.losTime > time }
-            .filter { it.aosTime < timeFuture }
-            .filter { it.maxElevation > minElev }
-            .sortedBy { it.aosTime }
+        return this.filter { it.losTime > time }.filter { it.aosTime < timeFuture }
+            .filter { it.maxElevation > minElev }.sortedBy { it.aosTime }
     }
 
     private fun getGeoPass(sat: Satellite, pos: GeoPos, time: Long): SatPass {
         val satPos = sat.getPosition(pos, time)
         val aos = time - 24 * 60L * 60L * 1000L
         val los = time + 24 * 60L * 60L * 1000L
-        val tca = (aos + los) / 2
-        val az = satPos.azimuth.toDegrees()
-        val elev = satPos.elevation.toDegrees()
+//        val tca = (aos + los) / 2
+        val az = satPos.azimuth.toDegrees().round(1)
+        val elev = satPos.elevation.toDegrees().round(1)
         val alt = satPos.altitude
-        return SatPass(aos, az, los, az, tca, az, alt, elev, sat)
+        return SatPass(aos, az, los, az, alt.toInt(), elev, sat)
     }
 
     private fun getLeoPass(sat: Satellite, pos: GeoPos, time: Long, rewind: Boolean): SatPass {
@@ -165,7 +154,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
         var elevation: Double
         var maxElevation = 0.0
         var alt = 0.0
-        var tcaAz = 0.0
+//        var tcaAz = 0.0
         // rewind 1/4 of an orbit
         if (rewind) calendarTimeMillis += -quarterOrbitMin * 60L * 1000L
 
@@ -188,7 +177,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
             if (elevation > maxElevation) {
                 maxElevation = elevation
                 alt = satPos.altitude
-                tcaAz = satPos.azimuth.toDegrees()
+//                tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation < 0.0)
 
@@ -201,12 +190,12 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
             if (elevation > maxElevation) {
                 maxElevation = elevation
                 alt = satPos.altitude
-                tcaAz = satPos.azimuth.toDegrees()
+//                tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation < 0.0)
 
         val aos = satPos.time
-        val aosAz = satPos.azimuth.toDegrees()
+        val aosAz = satPos.azimuth.toDegrees().round(1)
 
         // find when sat goes below
         do {
@@ -216,7 +205,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
             if (elevation > maxElevation) {
                 maxElevation = elevation
                 alt = satPos.altitude
-                tcaAz = satPos.azimuth.toDegrees()
+//                tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation > 0.0)
 
@@ -229,14 +218,14 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
             if (elevation > maxElevation) {
                 maxElevation = elevation
                 alt = satPos.altitude
-                tcaAz = satPos.azimuth.toDegrees()
+//                tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation > 0.0)
 
         val los = satPos.time
-        val losAz = satPos.azimuth.toDegrees()
-        val tca = (aos + los) / 2
-        val elev = maxElevation.toDegrees()
-        return SatPass(aos, aosAz, los, losAz, tca, tcaAz, alt, elev, sat)
+        val losAz = satPos.azimuth.toDegrees().round(1)
+//        val tca = (aos + los) / 2
+        val elev = maxElevation.toDegrees().round(1)
+        return SatPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat)
     }
 }
