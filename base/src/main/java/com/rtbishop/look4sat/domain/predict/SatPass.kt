@@ -22,9 +22,9 @@ data class SatPass(
     val aosAzimuth: Double,
     val losTime: Long,
     val losAzimuth: Double,
-    val tcaTime: Long,
-    val tcaAzimuth: Double,
-    val altitude: Double,
+//    val tcaTime: Long,
+//    val tcaAzimuth: Double,
+    val altitude: Int,
     val maxElevation: Double,
     val satellite: Satellite,
     var progress: Int = 0
