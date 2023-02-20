@@ -105,7 +105,7 @@ class PassesAdapter(private val clickListener: PassesClickListener) :
                     passStart.text = startFormat.format(Date(satPass.aosTime))
                     passElev.text = String.format(elevFormat, satPass.maxElevation)
                     passEnd.text = endFormat.format(Date(satPass.losTime))
-                    passProgress.progress = satPass.progress
+                    passProgress.progress = satPass.progress.toInt()
                 }
             }
 
