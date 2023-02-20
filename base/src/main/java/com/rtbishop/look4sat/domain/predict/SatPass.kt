@@ -18,16 +18,14 @@
 package com.rtbishop.look4sat.domain.predict
 
 data class SatPass(
-    val aosTime: Long,
-    val aosAzimuth: Double,
-    val losTime: Long,
-    val losAzimuth: Double,
-//    val tcaTime: Long,
-//    val tcaAzimuth: Double,
-    val altitude: Int,
-    val maxElevation: Double,
+    val aosTime: Long = 0L,
+    val aosAzimuth: Double = 90.0,
+    val losTime: Long = 0L,
+    val losAzimuth: Double = 270.0,
+    val altitude: Int = 1000,
+    val maxElevation: Double = 75.0,
     val satellite: Satellite,
-    var progress: Int = 0
+    var progress: Float = 0.0f
 ) {
     val catNum: Int = satellite.data.catnum
     val name: String = satellite.data.name
