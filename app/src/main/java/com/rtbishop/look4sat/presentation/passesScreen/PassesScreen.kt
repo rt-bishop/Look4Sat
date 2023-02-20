@@ -36,7 +36,7 @@ private fun PassPreview() {
         "Satellite", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
     )
     val satellite = NearEarthSat(data)
-    val pass = SatPass(1L, 25.0, 10L, 75.0, 850, 45.0, satellite, 150)
+    val pass = SatPass(1L, 25.0, 10L, 75.0, 850, 45.0, satellite, 0.5f)
     MainTheme { Pass(pass = pass) }
 }
 
@@ -82,7 +82,7 @@ private fun Pass(pass: SatPass, modifier: Modifier = Modifier) {
                     Text(text = "Elevation: 75")
                     Text(text = "Sun - 16:02:28")
                 }
-                LinearProgressIndicator(progress = 0.5f, modifier.fillMaxWidth())
+                LinearProgressIndicator(progress = pass.progress, modifier = modifier.fillMaxWidth())
             }
         }
     }
@@ -95,7 +95,7 @@ private fun PassesCard(state: DataState<List<SatPass>>) {
         when (state) {
             is DataState.Success -> {
                 LazyColumn {
-                    items(items = state.data, key = { item -> item.aosTime }) { pass ->
+                    items(items = state.data, key = { item -> item.catNum + item.aosTime }) { pass ->
                         Pass(pass, Modifier.animateItemPlacement())
                     }
                 }

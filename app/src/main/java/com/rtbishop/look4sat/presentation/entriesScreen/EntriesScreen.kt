@@ -33,9 +33,12 @@ import com.rtbishop.look4sat.presentation.onClick
 import com.rtbishop.look4sat.presentation.passesScreen.PassesViewModel
 
 @Composable
-fun EntriesScreen(navToPasses: () -> Unit, viewModel: EntriesViewModel = hiltViewModel()) {
+fun EntriesScreen(
+    navToPasses: () -> Unit,
+    viewModel: EntriesViewModel = hiltViewModel(),
+    passesViewModel: PassesViewModel = hiltViewModel()
+) {
     val state = viewModel.satData.observeAsState(DataState.Loading)
-    val passesViewModel: PassesViewModel = hiltViewModel()
     val unselectAll = { viewModel.selectCurrentItems(false) }
     val selectAll = { viewModel.selectCurrentItems(true) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

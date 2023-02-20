@@ -78,11 +78,11 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
                     if (time > timeStart) {
                         val deltaNow = time.minus(timeStart).toFloat()
                         val deltaTotal = pass.losTime.minus(timeStart).toFloat()
-                        pass.progress = ((deltaNow / deltaTotal) * 100).toInt()
+                        pass.progress = (deltaNow / deltaTotal).round(2)
                     }
                 }
             }
-            passList.filter { pass -> pass.progress < 100 }.map { it.copy() }
+            passList.filter { pass -> pass.progress < 1.0 }.map { it.copy() }
         }
     }
 
