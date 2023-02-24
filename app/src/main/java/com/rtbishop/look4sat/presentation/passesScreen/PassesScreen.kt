@@ -10,11 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.NearEarthSat
 import com.rtbishop.look4sat.domain.predict.OrbitalData
@@ -52,6 +55,12 @@ private fun Pass(pass: SatPass, modifier: Modifier = Modifier) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
+                        text = "Id:${pass.catNum}  -  ",
+                        modifier = Modifier.width(90.dp),
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
                         text = pass.name,
                         modifier = Modifier
                             .weight(1f)
@@ -60,8 +69,16 @@ private fun Pass(pass: SatPass, modifier: Modifier = Modifier) {
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_elevation),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
                     Text(
-                        text = "Id:${pass.catNum}", color = MaterialTheme.colorScheme.secondary
+                        text = " ${pass.maxElevation}°",
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
                 Row(
@@ -79,10 +96,14 @@ private fun Pass(pass: SatPass, modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "16:02:28 - Sun")
-                    Text(text = "Elevation: 75")
                     Text(text = "Sun - 16:02:28")
                 }
-                LinearProgressIndicator(progress = pass.progress, modifier = modifier.fillMaxWidth())
+                LinearProgressIndicator(
+                    progress = pass.progress,
+                    modifier = modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.inverseSurface
+                )
             }
         }
     }
@@ -95,7 +116,9 @@ private fun PassesCard(state: DataState<List<SatPass>>) {
         when (state) {
             is DataState.Success -> {
                 LazyColumn {
-                    items(items = state.data, key = { item -> item.catNum + item.aosTime }) { pass ->
+                    items(
+                        items = state.data,
+                        key = { item -> item.catNum + item.aosTime }) { pass ->
                         Pass(pass, Modifier.animateItemPlacement())
                     }
                 }
