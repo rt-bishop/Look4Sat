@@ -11,6 +11,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,6 +24,10 @@ import com.rtbishop.look4sat.domain.predict.NearEarthSat
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.presentation.MainTheme
+import java.text.SimpleDateFormat
+import java.util.*
+
+private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
 fun PassesScreen(viewModel: PassesViewModel = hiltViewModel()) {
@@ -86,24 +91,29 @@ private fun Pass(pass: SatPass, modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "AOS - 90")
-                    Text(text = "Altitude: 1800 km")
-                    Text(text = "180 - LOS")
+                    Text(text = stringResource(id = R.string.pass_aosAz, pass.aosAzimuth))
+                    Text(
+                        text = stringResource(id = R.string.pass_altitude, pass.altitude),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(text = stringResource(id = R.string.pass_losAz, pass.losAzimuth))
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "16:02:28 - Sun")
-                    Text(text = "Sun - 16:02:28")
+                    val deepTime = stringResource(id = R.string.pass_placeholder)
+                    Text(text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.aosTime)))
+                    LinearProgressIndicator(
+                        progress = pass.progress,
+                        modifier = modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.inverseSurface
+                    )
+                    Text(text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.losTime)))
                 }
-                LinearProgressIndicator(
-                    progress = pass.progress,
-                    modifier = modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.inverseSurface
-                )
             }
         }
     }
