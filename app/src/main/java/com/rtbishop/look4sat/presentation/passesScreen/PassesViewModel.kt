@@ -64,7 +64,7 @@ class PassesViewModel @Inject constructor(
     fun shouldUseUTC() = settings.getUseUTC()
 
     fun calculatePasses(
-        hoursAhead: Int = settings.getHoursAhead(),
+        hoursAhead: Int = 1,
         minElevation: Double = settings.getMinElevation(),
         timeRef: Long = System.currentTimeMillis(),
         selection: List<Int>? = null

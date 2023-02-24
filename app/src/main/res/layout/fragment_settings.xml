@@ -144,7 +144,7 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/settings_fab"
         style="@style/FloatingActionButton"
-        android:src="@drawable/ic_support"
+        android:src="@drawable/ic_done"
         android:contentDescription="@string/btn_support"
         app:layout_anchor="@id/settings_bottom_bar" />
 
