@@ -71,7 +71,7 @@ class PassesAdapter(private val clickListener: PassesClickListener) :
         private val satIdFormat = itemView.context.getString(R.string.pass_satId)
         private val aosAzFormat = itemView.context.getString(R.string.pass_aosAz)
         private val altFormat = itemView.context.getString(R.string.pass_altitude)
-        private val losAzFormat = itemView.context.getString(R.string.pass_los)
+        private val losAzFormat = itemView.context.getString(R.string.pass_losAz)
         private val startTimeFormat = itemView.context.getString(R.string.pass_startTime)
         private val elevFormat = itemView.context.getString(R.string.pass_elevation)
         private val endTimeFormat = itemView.context.getString(R.string.pass_endTime)

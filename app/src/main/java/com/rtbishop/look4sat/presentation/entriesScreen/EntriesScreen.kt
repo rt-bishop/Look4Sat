@@ -2,6 +2,7 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,6 +40,15 @@ fun EntriesScreen(
     passesViewModel: PassesViewModel = hiltViewModel()
 ) {
     val state = viewModel.satData.observeAsState(DataState.Loading)
+
+    val showDialog = rememberSaveable { mutableStateOf(false) }
+    val toggleDialog = { showDialog.value = showDialog.value.not() }
+    if (showDialog.value) {
+        TypesDialog(list = viewModel.satTypes, selected = viewModel.getSatType(), toggleDialog) {
+            viewModel.setSatType(it)
+        }
+    }
+
     val unselectAll = { viewModel.selectCurrentItems(false) }
     val selectAll = { viewModel.selectCurrentItems(true) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -47,7 +57,12 @@ fun EntriesScreen(
             passesViewModel.calculatePasses(selection = entries)
             navToPasses()
         })
-        MiddleBar(unselectAll = { unselectAll() }, selectAll = { selectAll() })
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
+            EntryTypeCard(
+                type = viewModel.getSatType(), { toggleDialog() }, modifier = Modifier.weight(1f)
+            )
+            SelectionCard(unselectAll = { unselectAll() }, selectAll = { selectAll() })
+        }
         EntriesCard(state = state.value) { list, value -> viewModel.updateSelection(list, value) }
     }
 }
@@ -125,19 +140,19 @@ private fun SaveButton(saveSelection: () -> Unit, modifier: Modifier = Modifier)
 @Composable
 private fun MiddleBar(unselectAll: () -> Unit, selectAll: () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
-        EntryTypeCard(type = "Amateur", modifier = Modifier.weight(1f))
+        EntryTypeCard(type = "Amateur", {}, modifier = Modifier.weight(1f))
         SelectionCard(unselectAll = { unselectAll() }, selectAll = { selectAll() })
     }
 }
 
 @Composable
-private fun EntryTypeCard(type: String, modifier: Modifier = Modifier) {
+private fun EntryTypeCard(type: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ElevatedCard(modifier = modifier) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
+        Row(horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(48.dp)
-        ) {
+            modifier = Modifier
+                .height(48.dp)
+                .clickable { onClick() }) {
             Icon(
                 imageVector = Icons.Outlined.PlayArrow,
                 contentDescription = null,

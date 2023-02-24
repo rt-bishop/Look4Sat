@@ -58,7 +58,7 @@
             android:id="@+id/pass_los"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pass_los"
+            android:text="@string/pass_losAz"
             android:textSize="@dimen/text_size_small"
             app:layout_constraintBaseline_toBaselineOf="@+id/pass_aos"
             app:layout_constraintEnd_toEndOf="@+id/pass_id"

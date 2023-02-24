@@ -31,9 +31,9 @@ import javax.inject.Inject
 class EntriesViewModel @Inject constructor(
     private val repository: IDataRepository,
     private val settings: ISettingsManager
-) : ViewModel(), EntriesAdapter.EntriesClickListener {
+) : ViewModel() {
 
-    private val satType = MutableLiveData(String())
+    private val satType = MutableLiveData("All")
 //    private val transModes = MutableLiveData(settings.loadModesSelection())
     private val currentQuery = MutableLiveData(String())
     private val itemsFromRepo = liveData {
@@ -52,7 +52,7 @@ class EntriesViewModel @Inject constructor(
     val satData = itemsWithQuery.map { items -> DataState.Success(items) }
     val satTypes: List<String> = settings.sourcesMap.keys.sorted()
 
-    fun getSatType(): String? = satType.value
+    fun getSatType() = satType.value ?: "All"
 
     fun setSatType(type: String) {
         satType.value = type
@@ -79,7 +79,7 @@ class EntriesViewModel @Inject constructor(
         } ?: emptyList()
     }
 
-    override fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
+    fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
         itemsFromRepo.value?.let { itemsAll ->
             val copiedList = itemsAll.map { item -> item.copy() }
             catNums.forEach { catnum ->
