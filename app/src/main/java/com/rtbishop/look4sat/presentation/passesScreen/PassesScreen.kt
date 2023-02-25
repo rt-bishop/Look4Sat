@@ -15,6 +15,8 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -42,13 +44,22 @@ fun PassesScreen(viewModel: PassesViewModel = hiltViewModel()) {
     val state = viewModel.passes.observeAsState()
     val timerText = viewModel.timerText.observeAsState()
     val isRefreshing = state.value is DataState.Loading
-    val refreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
+    val refreshState = rememberPullRefreshState(refreshing = isRefreshing,
         onRefresh = { viewModel.calculatePasses() })
 
     val value = state.value
     var passes = emptyList<SatPass>()
     if (value is DataState.Success) passes = value.data
+
+    val showDialog = rememberSaveable { mutableStateOf(false) }
+    val toggleDialog = { showDialog.value = showDialog.value.not() }
+    if (showDialog.value) {
+        FilterDialog(viewModel.getHoursAhead(),
+            viewModel.getMinElevation(),
+            { toggleDialog() }) { hours, elev ->
+            viewModel.calculatePasses(hours, elev)
+        }
+    }
 
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         ElevatedCard(modifier = Modifier.height(52.dp)) {
@@ -57,7 +68,7 @@ fun PassesScreen(viewModel: PassesViewModel = hiltViewModel()) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxSize()
             ) {
-                IconButton(onClick = {}) {
+                IconButton(onClick = { toggleDialog() }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_filter),
                         contentDescription = null
