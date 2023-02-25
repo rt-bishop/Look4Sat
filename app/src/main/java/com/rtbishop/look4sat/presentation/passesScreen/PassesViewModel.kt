@@ -43,6 +43,10 @@ class PassesViewModel @Inject constructor(
     val passes: LiveData<DataState<List<SatPass>>> = _passes
     val timerText: LiveData<Triple<String, String, String>> = _timerText
 
+    fun getHoursAhead() = settings.getHoursAhead()
+
+    fun getMinElevation() = settings.getMinElevation()
+
     init {
         viewModelScope.launch {
             satelliteManager.calculatedPasses.collect { passes ->
