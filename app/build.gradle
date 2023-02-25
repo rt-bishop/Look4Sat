@@ -89,6 +89,7 @@ dependencies {
     implementation "androidx.activity:activity-compose:$activity_compose_version"
     implementation "androidx.compose.animation:animation:$compose_version"
     implementation "androidx.compose.compiler:compiler:$compose_compiler_version"
+    implementation "androidx.compose.material:material:$material_version"
     implementation "androidx.compose.material3:material3:$material3_version"
     implementation "androidx.compose.runtime:runtime:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"

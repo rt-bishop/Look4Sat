@@ -80,7 +80,7 @@
     <string name="pass_elevation">仰角：%.1f°</string>
     <string name="pass_losAz">%.1f° - 出境</string>
     <string name="pass_altitude">高度：%d km</string>
-    <string name="pass_placeholder">" - - : - - "</string>
+    <string name="pass_placeholder"> -- : -- : -- </string>
     <string name="pass_startTime">HH:mm:ss - EEE</string>
     <string name="pass_endTime">EEE - HH:mm:ss</string>
 

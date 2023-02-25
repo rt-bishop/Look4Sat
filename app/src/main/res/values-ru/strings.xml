@@ -80,7 +80,7 @@
     <string name="pass_elevation">Элевация: %.1f°</string>
     <string name="pass_losAz">%.1f° - КПС</string>
     <string name="pass_altitude">Высота: %d км</string>
-    <string name="pass_placeholder"> - - : - - </string>
+    <string name="pass_placeholder"> -- : -- : -- </string>
     <string name="pass_startTime">HH:mm:ss - EEE</string>
     <string name="pass_endTime">EEE - HH:mm:ss</string>
 
