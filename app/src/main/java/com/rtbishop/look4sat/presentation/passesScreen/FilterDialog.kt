@@ -17,54 +17,70 @@
  */
 package com.rtbishop.look4sat.presentation.passesScreen
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.appcompat.app.AppCompatDialogFragment
-import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.databinding.DialogFilterBinding
-import com.rtbishop.look4sat.domain.ISettingsManager
-import com.rtbishop.look4sat.presentation.setNavResult
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.window.Dialog
+import com.rtbishop.look4sat.presentation.CardButton
+import com.rtbishop.look4sat.presentation.MainTheme
 
-@AndroidEntryPoint
-class FilterDialog : AppCompatDialogFragment() {
+@Preview(showBackground = true)
+@Composable
+private fun FilterDialogPreview() {
+    MainTheme { FilterDialog(8, 16.0, {}) { _, _ -> } }
+}
 
-    @Inject
-    lateinit var preferences: ISettingsManager
-
-    override fun onCreateView(inflater: LayoutInflater, group: ViewGroup?, state: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_filter, group, false)
-    }
-
-    override fun onViewCreated(view: View, state: Bundle?) {
-        super.onViewCreated(view, state)
-        DialogFilterBinding.bind(view).apply {
-            dialog?.window?.setBackgroundDrawableResource(R.color.transparent)
-            dialog?.window?.setLayout(
-                (resources.displayMetrics.widthPixels * 0.94).toInt(),
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-            filterHoursEdit.setText(preferences.getHoursAhead().toString())
-            filterElevEdit.setText(preferences.getMinElevation().toString())
-            filterBtnPos.setOnClickListener {
-                val hoursAhead = try {
-                    filterHoursEdit.text.toString().toInt()
-                } catch (exception: Exception) {
-                    24
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterDialog(hours: Int, elevation: Double, toggle: () -> Unit, save: (Int, Double) -> Unit) {
+    val hoursValue = rememberSaveable { mutableStateOf(hours) }
+    val elevValue = rememberSaveable { mutableStateOf(elevation) }
+    Dialog(onDismissRequest = { toggle() }) {
+        ElevatedCard {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(1f)
+            ) {
+                Text(text = "Filter passes", color = MaterialTheme.colorScheme.primary)
+                Text(text = "Show passes that occur within X hours")
+                OutlinedTextField(value = hoursValue.value.toString(), onValueChange = { newValue ->
+                    val hoursAhead = try {
+                        newValue.toInt()
+                    } catch (exception: Exception) {
+                        12
+                    }
+                    hoursValue.value = hoursAhead
+                })
+                Text(text = "Show passes with max elevation above")
+                OutlinedTextField(value = elevValue.value.toString(), onValueChange = { newValue ->
+                    val maxElevation = try {
+                        newValue.toDouble()
+                    } catch (exception: Exception) {
+                        16.0
+                    }
+                    elevValue.value = maxElevation
+                })
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    CardButton(onClick = { toggle() }, text = "Cancel")
+                    CardButton(
+                        onClick = {
+                            save(hoursValue.value, elevValue.value)
+                            toggle()
+                        }, text = "Accept"
+                    )
                 }
-                val minElevation = try {
-                    filterElevEdit.text.toString().toDouble()
-                } catch (exception: Exception) {
-                    16.0
-                }
-                setNavResult("prefs", Pair(hoursAhead, minElevation))
-                dismiss()
             }
-            filterBtnNeg.setOnClickListener { dismiss() }
         }
     }
 }

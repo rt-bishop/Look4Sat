@@ -3,19 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_root"
-    app:startDestination="@id/nav_passes">
-    <fragment
-        android:id="@+id/nav_passes"
-        android:name="com.rtbishop.look4sat.presentation.passesScreen.PassesFragment"
-        tools:layout="@layout/fragment_passes">
-        <action
-            android:id="@+id/passes_to_filter"
-            app:destination="@id/nav_filter"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-    </fragment>
+    app:startDestination="@id/nav_radar">
     <fragment
         android:id="@+id/nav_radar"
         android:name="com.rtbishop.look4sat.presentation.radarScreen.RadarFragment"
@@ -46,10 +34,6 @@
         android:id="@+id/nav_modes"
         android:name="com.rtbishop.look4sat.presentation.entriesScreen.ModesDialog"
         tools:layout="@layout/dialog_modes" />
-    <dialog
-        android:id="@+id/nav_filter"
-        android:name="com.rtbishop.look4sat.presentation.passesScreen.FilterDialog"
-        tools:layout="@layout/dialog_filter" />
     <dialog
         android:id="@+id/nav_position"
         android:name="com.rtbishop.look4sat.presentation.settingsScreen.PositionDialog"
