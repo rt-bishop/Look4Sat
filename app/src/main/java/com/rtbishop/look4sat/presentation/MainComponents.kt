@@ -11,17 +11,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.scale
@@ -38,6 +37,13 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
             contentColor = MaterialTheme.colorScheme.onTertiary
         ), shape = MaterialTheme.shapes.small, modifier = modifier.padding(start = 4.dp, end = 4.dp)
     ) { Text(text = text, fontSize = 17.sp) }
+}
+
+@Composable
+fun CardLoadingIndicator() {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(modifier = Modifier.size(80.dp))
+    }
 }
 
 @Composable

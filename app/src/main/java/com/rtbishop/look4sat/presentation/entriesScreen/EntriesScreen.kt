@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.presentation.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.onClick
 import com.rtbishop.look4sat.presentation.passesScreen.PassesViewModel
@@ -229,11 +230,7 @@ fun EntriesCard(state: DataState<List<SatItem>>, onSelected: (List<Int>, Boolean
                     }
                 }
             }
-            else -> {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(modifier = Modifier.size(80.dp))
-                }
-            }
+            else -> CardLoadingIndicator()
         }
     }
 }
