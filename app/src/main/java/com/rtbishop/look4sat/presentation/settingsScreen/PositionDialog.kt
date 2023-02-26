@@ -26,7 +26,6 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogPositionBinding
 import com.rtbishop.look4sat.domain.ISettingsManager
-import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -52,17 +51,17 @@ class PositionDialog : AppCompatDialogFragment() {
             positionLatEdit.setText(location.lat.toString())
             positionLonEdit.setText(location.lon.toString())
             positionBtnPos.setOnClickListener {
-                val latitude = try {
-                    positionLatEdit.text.toString().toDouble()
-                } catch (exception: Exception) {
-                    180.0
-                }
-                val longitude = try {
-                    positionLonEdit.text.toString().toDouble()
-                } catch (exception: Exception) {
-                    400.0
-                }
-                setNavResult("position", Pair(latitude, longitude))
+//                val latitude = try {
+//                    positionLatEdit.text.toString().toDouble()
+//                } catch (exception: Exception) {
+//                    180.0
+//                }
+//                val longitude = try {
+//                    positionLonEdit.text.toString().toDouble()
+//                } catch (exception: Exception) {
+//                    400.0
+//                }
+//                setNavResult("position", Pair(latitude, longitude))
                 dismiss()
             }
             positionBtnNeg.setOnClickListener { dismiss() }

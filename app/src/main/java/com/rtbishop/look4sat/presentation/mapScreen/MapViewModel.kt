@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.mapScreen
 
+import android.content.SharedPreferences
 import androidx.lifecycle.*
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteManager
@@ -36,9 +37,10 @@ import kotlin.math.min
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val satelliteManager: ISatelliteManager,
+    private val preferences: SharedPreferences,
     private val repository: IDataRepository,
-    private val settings: ISettingsManager,
+    private val satelliteManager: ISatelliteManager,
+    private val settings: ISettingsManager
 ) : ViewModel() {
 
     private val stationPosition = settings.loadStationPosition()
@@ -65,6 +67,8 @@ class MapViewModel @Inject constructor(
 
     private val _positions = MutableLiveData<Map<Satellite, GeoPos>>()
     val positions: LiveData<Map<Satellite, GeoPos>> = _positions
+
+    fun getPreferences() = preferences
 
     fun scrollSelection(decrement: Boolean) {
         if (allSatellites.isNotEmpty()) {
@@ -184,8 +188,19 @@ class MapViewModel @Inject constructor(
         val phase = satPos.phase.toDegrees()
         val visibility = satPos.eclipsed
         val satData = MapData(
-            sat.data.catnum, sat.data.name, aosTime, azimuth, elevation, satPos.distance,
-            satPos.altitude, velocity, qthLoc, osmPos, sat.data.orbitalPeriod, phase, visibility
+            sat.data.catnum,
+            sat.data.name,
+            aosTime,
+            azimuth,
+            elevation,
+            satPos.distance,
+            satPos.altitude,
+            velocity,
+            qthLoc,
+            osmPos,
+            sat.data.orbitalPeriod,
+            phase,
+            visibility
         )
         _mapData.postValue(satData)
     }

@@ -26,7 +26,6 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogLocatorBinding
 import com.rtbishop.look4sat.domain.ISettingsManager
-import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -50,7 +49,7 @@ class LocatorDialog : AppCompatDialogFragment() {
             )
             locatorEdit.setText(preferences.loadStationLocator())
             locatorBtnPos.setOnClickListener {
-                setNavResult("locator", locatorEdit.text.toString())
+//                setNavResult("locator", locatorEdit.text.toString())
                 dismiss()
             }
             locatorBtnNeg.setOnClickListener { dismiss() }

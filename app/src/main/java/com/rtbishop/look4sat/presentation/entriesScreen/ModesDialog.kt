@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.DialogModesBinding
 import com.rtbishop.look4sat.domain.ISettingsManager
-import com.rtbishop.look4sat.presentation.setNavResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -74,7 +73,7 @@ class ModesDialog : AppCompatDialogFragment(), ModesAdapter.ModesClickListener {
             }
             modesBtnNeg.setOnClickListener { dismiss() }
             modesBtnPos.setOnClickListener {
-                setNavResult("modes", selectedModes.toList())
+//                setNavResult("modes", selectedModes.toList())
                 dismiss()
             }
         }

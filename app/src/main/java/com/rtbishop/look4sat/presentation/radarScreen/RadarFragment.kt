@@ -17,14 +17,10 @@
  */
 package com.rtbishop.look4sat.presentation.radarScreen
 
-import android.content.Intent
 import android.os.Bundle
-import android.provider.CalendarContract
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -32,7 +28,6 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentRadarBinding
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.presentation.clickWithDebounce
 import com.rtbishop.look4sat.utility.toDegrees
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +36,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class RadarFragment : Fragment(R.layout.fragment_radar) {
 
     private val viewModel: RadarViewModel by viewModels()
-    private val navArgs: RadarFragmentArgs by navArgs()
     private val radioAdapter = RadioAdapter()
     private var binding: FragmentRadarBinding? = null
     private var radarView: RadarView? = null
@@ -78,7 +72,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
     }
 
     private fun setupObservers() {
-        viewModel.getPass(navArgs.catNum, navArgs.aosTime).observe(viewLifecycleOwner) { pass ->
+        viewModel.getPass(45000, System.currentTimeMillis()).observe(viewLifecycleOwner) { pass ->
             binding?.run {
                 radarView = RadarView(requireContext()).apply {
                     setShowAim(viewModel.getUseCompass())
@@ -103,24 +97,16 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                 viewModel.orientation.observe(viewLifecycleOwner) { value ->
                     radarView?.setOrientation(value.first, value.second, value.third)
                 }
-                radarBtnBack.clickWithDebounce { findNavController().navigateUp() }
-                radarBtnMap.clickWithDebounce {
-                    val direction = RadarFragmentDirections.globalToMap(pass.catNum)
-                    findNavController().navigate(direction)
-                }
-                radarBtnNotify.clickWithDebounce {
-                    val intent = Intent(Intent.ACTION_INSERT)
-                        .setData(CalendarContract.Events.CONTENT_URI)
-                        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, pass.aosTime)
-                        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, pass.losTime)
-                        .putExtra(CalendarContract.Events.TITLE, pass.name)
-                        .putExtra(CalendarContract.Events.DESCRIPTION, "Look4Sat")
-                    startActivity(intent)
-                }
-                radarBtnSettings.clickWithDebounce {
-                    val direction = RadarFragmentDirections.globalToSettings()
-                    findNavController().navigate(direction)
-                }
+//                radarBtnBack.clickWithDebounce { findNavController().navigateUp() }
+//                radarBtnMap.clickWithDebounce {
+//                    val direction = RadarFragmentDirections.globalToMap(pass.catNum)
+//                    findNavController().navigate(direction)
+//                }
+//                radarBtnNotify.isEnabled = false
+//                radarBtnSettings.clickWithDebounce {
+//                    val direction = RadarFragmentDirections.globalToSettings()
+//                    findNavController().navigate(direction)
+//                }
             }
         }
     }
@@ -150,7 +136,7 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     radarTimer.text = millisBeforeEnd.toTimerString()
                     if (timeNow > satPass.losTime) {
                         radarTimer.text = 0L.toTimerString()
-                        findNavController().navigateUp()
+//                        findNavController().navigateUp()
                     }
                 }
             } else radarTimer.text = 0L.toTimerString()
