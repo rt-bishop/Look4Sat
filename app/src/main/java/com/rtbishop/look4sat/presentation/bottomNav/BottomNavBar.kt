@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.aboutScreen.AboutScreen
 import com.rtbishop.look4sat.presentation.entriesScreen.EntriesScreen
+import com.rtbishop.look4sat.presentation.mapScreen.MapScreen
 import com.rtbishop.look4sat.presentation.passesScreen.PassesScreen
 import com.rtbishop.look4sat.presentation.passesScreen.PassesViewModel
 
@@ -58,7 +59,7 @@ fun NavigationGraph(navController: NavHostController) {
             EntriesScreen(navToPasses, passesViewModel = passesViewModel)
         }
         composable(BottomNavItem.Passes.screen_route) { PassesScreen(viewModel = passesViewModel) }
-        composable(BottomNavItem.WorldMap.screen_route) {}
+        composable(BottomNavItem.WorldMap.screen_route) { MapScreen() }
         composable(BottomNavItem.Settings.screen_route) {}
         composable(BottomNavItem.About.screen_route) { AboutScreen() }
     }

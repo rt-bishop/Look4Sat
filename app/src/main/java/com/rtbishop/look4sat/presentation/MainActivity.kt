@@ -26,12 +26,7 @@ import android.os.SystemClock
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.IdRes
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.navigation.fragment.findNavController
 import com.rtbishop.look4sat.presentation.bottomNav.MainScreenView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -52,24 +47,6 @@ class MainActivity : ComponentActivity() {
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
     }
-}
-
-fun <T> Fragment.getNavResult(@IdRes id: Int, key: String, onResult: (result: T) -> Unit) {
-    val backStackEntry = findNavController().getBackStackEntry(id)
-    val observer = LifecycleEventObserver { _, event ->
-        if (event == Lifecycle.Event.ON_RESUME && backStackEntry.savedStateHandle.contains(key)) {
-            backStackEntry.savedStateHandle.get<T>(key)?.let(onResult)
-            backStackEntry.savedStateHandle.remove<T>(key)
-        }
-    }
-    backStackEntry.lifecycle.addObserver(observer)
-    viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
-        if (event == Lifecycle.Event.ON_DESTROY) backStackEntry.lifecycle.removeObserver(observer)
-    })
-}
-
-fun <T> Fragment.setNavResult(key: String, value: T) {
-    findNavController().previousBackStackEntry?.savedStateHandle?.set(key, value)
 }
 
 fun View.clickWithDebounce(debounceTime: Long = 875L, action: () -> Unit) {

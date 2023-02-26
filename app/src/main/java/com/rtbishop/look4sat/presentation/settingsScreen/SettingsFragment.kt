@@ -31,14 +31,12 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
-import androidx.navigation.fragment.findNavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.clickWithDebounce
-import com.rtbishop.look4sat.presentation.getNavResult
 import com.rtbishop.look4sat.utility.isValidIPv4
 import com.rtbishop.look4sat.utility.isValidPort
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,7 +77,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSettingsBinding.bind(view).apply {
-            settingsBtnBack.clickWithDebounce { findNavController().navigateUp() }
+//            settingsBtnBack.clickWithDebounce { findNavController().navigateUp() }
             settingsScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
                 if (y > newY) settingsFab.hide() else settingsFab.show()
             })
@@ -115,20 +113,20 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             settingsLocation.locationBtnGps.clickWithDebounce {
                 locationRequest.launch(arrayOf(locationFine, locationCoarse))
             }
-            settingsLocation.locationBtnManual.clickWithDebounce {
-                val action = SettingsFragmentDirections.globalToPosition()
-                findNavController().navigate(action)
-            }
-            settingsLocation.locationBtnQth.clickWithDebounce {
-                val action = SettingsFragmentDirections.globalToLocator()
-                findNavController().navigate(action)
-            }
-            getNavResult<Pair<Double, Double>>(R.id.nav_settings, "position") { position ->
-                viewModel.setStationPosition(position.first, position.second)
-            }
-            getNavResult<String>(R.id.nav_settings, "locator") { locator ->
-                viewModel.setPositionFromQth(locator)
-            }
+//            settingsLocation.locationBtnManual.clickWithDebounce {
+//                val action = SettingsFragmentDirections.globalToPosition()
+//                findNavController().navigate(action)
+//            }
+//            settingsLocation.locationBtnQth.clickWithDebounce {
+//                val action = SettingsFragmentDirections.globalToLocator()
+//                findNavController().navigate(action)
+//            }
+//            getNavResult<Pair<Double, Double>>(R.id.nav_settings, "position") { position ->
+//                viewModel.setStationPosition(position.first, position.second)
+//            }
+//            getNavResult<String>(R.id.nav_settings, "locator") { locator ->
+//                viewModel.setPositionFromQth(locator)
+//            }
         }
     }
 
@@ -146,9 +144,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val radiosFormat = getString(R.string.data_radios)
                 settingsData.dataRadios.text = String.format(radiosFormat, number)
             }
-            getNavResult<List<String>>(R.id.nav_settings, "sources") {
-                viewModel.updateFromWeb()
-            }
+//            getNavResult<List<String>>(R.id.nav_settings, "sources") {
+//                viewModel.updateFromWeb()
+//            }
         }
     }
 
