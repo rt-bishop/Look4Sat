@@ -2,7 +2,7 @@ buildscript {
     ext {
         hilt_version = '2.45'
         hilt_compose_version = '1.0.0'
-        application_version = '7.4.1'
+        application_version = '7.4.2'
         library_version = '7.1.2'
         kotlin_android_version = '1.8.10'
         core_ktx_version = '1.9.0'
