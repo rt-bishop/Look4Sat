@@ -4,6 +4,7 @@ package com.rtbishop.look4sat.presentation.passesScreen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,7 +41,7 @@ private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PassesScreen(viewModel: PassesViewModel = hiltViewModel()) {
+fun PassesScreen(navToRadar: () -> Unit, viewModel: PassesViewModel = hiltViewModel()) {
     val state = viewModel.passes.observeAsState()
     val timerText = viewModel.timerText.observeAsState()
     val isRefreshing = state.value is DataState.Loading
@@ -92,7 +93,7 @@ fun PassesScreen(viewModel: PassesViewModel = hiltViewModel()) {
                 )
             }
         }
-        PassesCard(refreshState, isRefreshing, passes)
+        PassesCard(refreshState, isRefreshing, passes, navToRadar)
     }
 }
 
@@ -104,13 +105,15 @@ private fun PassPreview() {
     )
     val satellite = NearEarthSat(data)
     val pass = SatPass(1L, 25.0, 10L, 75.0, 850, 45.0, satellite, 0.5f)
-    MainTheme { Pass(pass = pass) }
+    MainTheme { Pass(pass = pass, {}) }
 }
 
 @Composable
-private fun Pass(pass: SatPass, modifier: Modifier = Modifier) {
+private fun Pass(pass: SatPass, navToRadar: () -> Unit, modifier: Modifier = Modifier) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
-        Surface(modifier = Modifier.padding(bottom = 2.dp)) {
+        Surface(modifier = Modifier
+            .padding(bottom = 2.dp)
+            .clickable { navToRadar() }) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier
@@ -196,13 +199,16 @@ private fun Pass(pass: SatPass, modifier: Modifier = Modifier) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PassesCard(
-    refreshState: PullRefreshState, isRefreshing: Boolean, passes: List<SatPass>
+    refreshState: PullRefreshState,
+    isRefreshing: Boolean,
+    passes: List<SatPass>,
+    navToRadar: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
         Box(Modifier.pullRefresh(refreshState)) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    Pass(pass, Modifier.animateItemPlacement())
+                    Pass(pass, navToRadar, Modifier.animateItemPlacement())
                 }
             }
             PullRefreshIndicator(

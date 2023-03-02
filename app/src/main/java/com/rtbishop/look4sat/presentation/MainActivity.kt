@@ -27,7 +27,6 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.rtbishop.look4sat.presentation.bottomNav.MainScreenView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
