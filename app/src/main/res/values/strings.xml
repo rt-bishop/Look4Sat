@@ -36,10 +36,10 @@
     <string name="btn_web">Online</string>
     <string name="btn_file">File</string>
     <string name="btn_github">GitHub</string>
-    <string name="btn_support">Support</string>
+    <string name="btn_donate">Donate</string>
     <string name="btn_fdroid">F-Droid</string>
-    <string name="btn_privacy">Privacy Policy</string>
     <string name="btn_license">GPLv3 Licence</string>
+    <string name="btn_privacy">Privacy Policy</string>
 
     <!--Dialogs-->
 

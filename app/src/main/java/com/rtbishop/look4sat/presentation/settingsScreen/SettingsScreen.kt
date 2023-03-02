@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.presentation.aboutScreen
+package com.rtbishop.look4sat.presentation.settingsScreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,11 +24,11 @@ import com.rtbishop.look4sat.presentation.gotoUrl
 private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
 private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
 private const val GITHUB_URL = "https://github.com/rt-bishop/Look4Sat/"
-private const val SUPPORT_URL = "https://ko-fi.com/rt_bishop"
+private const val DONATE_URL = "https://ko-fi.com/rt_bishop"
 private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
 
 @Composable
-fun AboutScreen() {
+fun SettingsScreen() {
     LazyColumn(
         modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -71,13 +71,18 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.padding(4.dp)
             ) {
                 CardButton(
-                    onClick = { gotoUrl(context, POLICY_URL) },
-                    text = stringResource(id = R.string.btn_privacy),
+                    onClick = { gotoUrl(context, GITHUB_URL) },
+                    text = stringResource(id = R.string.btn_github),
                     modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = { gotoUrl(context, LICENSE_URL) },
-                    text = stringResource(id = R.string.btn_license),
+                    onClick = { gotoUrl(context, DONATE_URL) },
+                    text = stringResource(id = R.string.btn_donate),
+                    modifier = Modifier.weight(1f)
+                )
+                CardButton(
+                    onClick = { gotoUrl(context, FDROID_URL) },
+                    text = stringResource(id = R.string.btn_fdroid),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -114,18 +119,13 @@ private fun CardCredits(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.padding(4.dp)
             ) {
                 CardButton(
-                    onClick = { gotoUrl(context, GITHUB_URL) },
-                    text = stringResource(id = R.string.btn_github),
+                    onClick = { gotoUrl(context, LICENSE_URL) },
+                    text = stringResource(id = R.string.btn_license),
                     modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = { gotoUrl(context, SUPPORT_URL) },
-                    text = stringResource(id = R.string.btn_support),
-                    modifier = Modifier.weight(1f)
-                )
-                CardButton(
-                    onClick = { gotoUrl(context, FDROID_URL) },
-                    text = stringResource(id = R.string.btn_fdroid),
+                    onClick = { gotoUrl(context, POLICY_URL) },
+                    text = stringResource(id = R.string.btn_privacy),
                     modifier = Modifier.weight(1f)
                 )
             }

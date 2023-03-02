@@ -4,7 +4,7 @@
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
         <item name="windowSplashScreenBackground">@color/background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
     </style>
 
     <style name="Theme.Look4Sat.Main" parent="Theme.MaterialComponents.NoActionBar">
@@ -19,7 +19,6 @@
 <!--        <item name="colorOnPrimaryContainer">@color/textMain</item>-->
         <!--        -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <item name="android:listDivider">@drawable/item_divider</item>
         <item name="android:navigationBarColor">@color/background</item>
         <item name="android:textColorPrimary">@color/textMain</item>
         <item name="android:statusBarColor">@color/background</item>

@@ -14,7 +14,7 @@
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
             android:contentDescription="@string/btn_back"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_prev" />
 
         <TextView
             android:id="@+id/settings_title"
@@ -44,15 +44,6 @@
                 android:layout_height="wrap_content">
 
                 <include
-                    android:id="@+id/settings_about"
-                    layout="@layout/card_about"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <include
                     android:id="@+id/settings_location"
                     layout="@layout/card_location"
                     android:layout_width="match_parent"
@@ -60,7 +51,7 @@
                     android:layout_marginTop="@dimen/view_default_margin"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/settings_about" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <include
                     android:id="@+id/settings_data"
@@ -102,17 +93,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/settings_btremote" />
 
-                <include
-                    android:id="@+id/settings_outro"
-                    layout="@layout/card_outro"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/view_default_margin"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/settings_other" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.core.widget.NestedScrollView>
@@ -144,8 +124,8 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/settings_fab"
         style="@style/FloatingActionButton"
-        android:src="@drawable/ic_done"
-        android:contentDescription="@string/btn_support"
+        android:src="@drawable/ic_checkmark"
+        android:contentDescription="@string/btn_donate"
         app:layout_anchor="@id/settings_bottom_bar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

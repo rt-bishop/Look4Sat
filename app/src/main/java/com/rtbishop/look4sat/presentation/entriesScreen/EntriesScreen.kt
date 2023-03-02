@@ -135,7 +135,7 @@ private fun SaveButton(saveSelection: () -> Unit, modifier: Modifier = Modifier)
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ), shape = MaterialTheme.shapes.medium, modifier = modifier.width(96.dp)
-    ) { Icon(painter = painterResource(id = R.drawable.ic_done), contentDescription = null) }
+    ) { Icon(painter = painterResource(id = R.drawable.ic_checkmark), contentDescription = null) }
 }
 
 @Composable

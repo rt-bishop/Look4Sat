@@ -22,7 +22,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,7 +30,6 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
-import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.databinding.FragmentSettingsBinding
 import com.rtbishop.look4sat.domain.model.DataState
@@ -81,8 +79,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             settingsScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
                 if (y > newY) settingsFab.hide() else settingsFab.show()
             })
-            settingsAbout.aboutVersion.text =
-                String.format(getString(R.string.app_version), BuildConfig.VERSION_NAME)
             settingsBtnGithub.clickWithDebounce {
                 gotoUrl("https://github.com/rt-bishop/Look4Sat/")
             }
@@ -98,7 +94,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         setupRemoteCard()
         setupBTCard()
         setupOtherCard()
-        setupOutroCard()
         viewModel.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
             stationPos?.let { handleStationPosition(stationPos) }
         }
@@ -222,13 +217,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 isChecked = viewModel.getUseCompass()
                 setOnCheckedChangeListener { _, isChecked -> viewModel.setUseCompass(isChecked) }
             }
-        }
-    }
-
-    private fun setupOutroCard() {
-        binding.run {
-            settingsOutro.outroThanks.movementMethod = LinkMovementMethod.getInstance()
-            settingsOutro.outroLicense.movementMethod = LinkMovementMethod.getInstance()
         }
     }
 

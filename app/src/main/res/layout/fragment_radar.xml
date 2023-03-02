@@ -19,7 +19,7 @@
             style="@style/ToolbarButton"
             android:layout_gravity="start|center_vertical"
             android:contentDescription="@string/btn_back"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_prev" />
 
         <TextView
             android:id="@+id/radar_timer"
@@ -30,7 +30,7 @@
             style="@style/ToolbarButton"
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/btn_map"
-            android:src="@drawable/ic_map" />
+            android:src="@drawable/ic_world" />
 
     </androidx.cardview.widget.CardView>
 
@@ -163,7 +163,7 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="24dp"
                 android:contentDescription="@string/radio_no_data"
-                android:src="@drawable/ic_modes" />
+                android:src="@drawable/ic_satellite" />
 
             <TextView
                 android:id="@+id/radar_empty_msg"

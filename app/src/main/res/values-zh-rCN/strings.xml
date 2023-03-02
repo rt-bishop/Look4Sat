@@ -36,10 +36,10 @@
     <string name="btn_web">在线更新</string>
     <string name="btn_file">本地文件</string>
     <string name="btn_github">GitHub</string>
-    <string name="btn_support">支持</string>
+    <string name="btn_donate">支持</string>
     <string name="btn_fdroid">F-Droid</string>
-    <string name="btn_privacy">隐私政策</string>
     <string name="btn_license">GNU GPLv3</string>
+    <string name="btn_privacy">隐私政策</string>
 
     <!--Dialogs-->
 
