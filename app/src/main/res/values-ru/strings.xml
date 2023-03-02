@@ -36,10 +36,10 @@
     <string name="btn_web">Онлайн</string>
     <string name="btn_import">Импорт</string>
     <string name="btn_github">GitHub</string>
-    <string name="btn_support">Поддержать</string>
+    <string name="btn_donate">Поддержать</string>
     <string name="btn_fdroid">F-Droid</string>
-    <string name="btn_privacy">Конфиденц.</string>
     <string name="btn_license">Лицензия</string>
+    <string name="btn_privacy">Конфиденц.</string>
 
     <!--Dialogs-->
 
