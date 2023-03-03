@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.Look4Sat.SplashScreen" parent="Theme.SplashScreen">
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
+        <item name="windowSplashScreenBackground">@color/background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
+    </style>
+
+    <style name="Theme.Look4Sat.Main" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:textColorPrimary">@color/textMain</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowBackground">@color/background</item>
+    </style>
+
+</resources>

@@ -22,8 +22,6 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.SystemClock
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -46,16 +44,4 @@ class MainActivity : ComponentActivity() {
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
     }
-}
-
-fun View.clickWithDebounce(debounceTime: Long = 875L, action: () -> Unit) {
-    this.setOnClickListener(object : View.OnClickListener {
-        private var lastClickTime: Long = 0
-
-        override fun onClick(v: View) {
-            if (SystemClock.elapsedRealtime() - lastClickTime < debounceTime) return
-            else action()
-            lastClickTime = SystemClock.elapsedRealtime()
-        }
-    })
 }

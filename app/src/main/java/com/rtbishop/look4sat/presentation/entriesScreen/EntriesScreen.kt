@@ -12,7 +12,7 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -40,7 +40,7 @@ fun EntriesScreen(
     viewModel: EntriesViewModel = hiltViewModel(),
     passesViewModel: PassesViewModel = hiltViewModel()
 ) {
-    val state = viewModel.satData.observeAsState(DataState.Loading)
+    val state = viewModel.satData.collectAsState(initial = DataState.Loading)
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val toggleDialog = { showDialog.value = showDialog.value.not() }

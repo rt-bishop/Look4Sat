@@ -17,7 +17,8 @@
  */
 package com.rtbishop.look4sat.presentation.passesScreen
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteManager
 import com.rtbishop.look4sat.domain.ISettingsManager
@@ -26,6 +27,8 @@ import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,13 +38,12 @@ class PassesViewModel @Inject constructor(
     private val settings: ISettingsManager
 ) : ViewModel() {
 
-    private val _passes = MutableLiveData<DataState<List<SatPass>>>()
+    private val _passes = MutableStateFlow<DataState<List<SatPass>>>(DataState.Loading)
     private val timerData = Triple("Next - Id:Null", "Name: Null", "00:00:00")
-    private val _timerText = MutableLiveData<Triple<String, String, String>>()
+    private val _timerText = MutableStateFlow(timerData)
     private var passesProcessing: Job? = null
-    val entriesTotal: LiveData<Int> = repository.getEntriesTotal().asLiveData()
-    val passes: LiveData<DataState<List<SatPass>>> = _passes
-    val timerText: LiveData<Triple<String, String, String>> = _timerText
+    val passes: StateFlow<DataState<List<SatPass>>> = _passes
+    val timerText: StateFlow<Triple<String, String, String>?> = _timerText
 
     fun getHoursAhead() = settings.getHoursAhead()
 
@@ -63,18 +65,18 @@ class PassesViewModel @Inject constructor(
                                 val name = nextPass.name
                                 val millisBeforeStart = nextPass.aosTime.minus(timeNow)
                                 val timerString = millisBeforeStart.toTimerString()
-                                _timerText.postValue(Triple("Next - Id:$catNum", name, timerString))
+                                _timerText.emit(Triple("Next - Id:$catNum", name, timerString))
                             } catch (e: NoSuchElementException) {
                                 val lastPass = newPasses.last()
                                 val catNum = lastPass.catNum
                                 val name = lastPass.name
                                 val millisBeforeEnd = lastPass.losTime.minus(timeNow)
                                 val timerString = millisBeforeEnd.toTimerString()
-                                _timerText.postValue(Triple("Next - Id:$catNum", name, timerString))
+                                _timerText.emit(Triple("Next - Id:$catNum", name, timerString))
                             }
-                        } else _timerText.postValue(timerData)
+                        } else _timerText.emit(timerData)
 
-                        _passes.postValue(DataState.Success(newPasses))
+                        _passes.emit(DataState.Success(newPasses))
                         delay(1000)
                     }
                 }
@@ -97,7 +99,7 @@ class PassesViewModel @Inject constructor(
         selection: List<Int>? = null
     ) {
         viewModelScope.launch {
-            _passes.postValue(DataState.Loading)
+            _passes.emit(DataState.Loading)
 //            _timerText.postValue(timerDefaultText)
             passesProcessing?.cancelAndJoin()
             selection?.let { items -> settings.saveEntriesSelection(items) }
