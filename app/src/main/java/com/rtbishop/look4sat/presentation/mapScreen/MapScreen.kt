@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -63,10 +63,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val context = LocalContext.current
     Configuration.getInstance().load(context, viewModel.getPreferences())
     viewModel.selectDefaultSatellite(-1)
-    val stationPos = viewModel.stationPos.observeAsState()
-    val positions = viewModel.positions.observeAsState()
-    val satTrack = viewModel.track.observeAsState()
-    val footprint = viewModel.footprint.observeAsState()
+    val stationPos = viewModel.stationPos.collectAsState(initial = null)
+    val positions = viewModel.positions.collectAsState(initial = null)
+    val satTrack = viewModel.track.collectAsState(initial = null)
+    val footprint = viewModel.footprint.collectAsState(initial = null)
     val positionClick = { satellite: Satellite -> viewModel.selectSatellite(satellite) }
     Timber.d("MapScreen recomposition")
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -195,8 +195,7 @@ private fun MapView(modifier: Modifier = Modifier, update: ((map: MapView) -> Un
 
 @Composable
 private fun rememberMapViewWithLifecycle(context: Context = LocalContext.current): MapView {
-    // add clipToOutline = true if needed
-    val mapView = remember { MapView(context).apply { id = R.id.osm_map_view } }.apply {
+    val mapView = remember { MapView(context) }.apply {
         setMultiTouchControls(true)
         setTileSource(TileSourceFactory.WIKIMEDIA)
         minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels) + 0.25

@@ -6,9 +6,8 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion '33.0.0'
     namespace 'com.rtbishop.look4sat'
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
@@ -21,7 +20,6 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-
         kapt {
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas")
@@ -31,6 +29,9 @@ android {
             correctErrorTypes true
         }
     }
+    buildFeatures {
+        compose true
+    }
     buildTypes {
         release {
             minifyEnabled true
@@ -38,28 +39,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    buildFeatures {
-        compose true
-        viewBinding true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion compose_compiler_version
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_compiler_version
+    }
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-    testOptions {
-        animationsDisabled true
-        unitTests.includeAndroidResources true
     }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
+    }
+    testOptions {
+        animationsDisabled true
+        unitTests.includeAndroidResources true
     }
 }
 
@@ -69,43 +66,34 @@ kotlin {
 
 dependencies {
     implementation project(":base")
-    implementation "androidx.core:core-ktx:$core_ktx_version"
-    implementation "androidx.core:core-splashscreen:$core_splashscreen_version"
-    implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$navigation_version"
+    // Android
+    implementation "androidx.core:core-splashscreen:$splashscreen_version"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
-    implementation "com.jakewharton.timber:timber:$timber_version"
-    implementation "org.osmdroid:osmdroid-android:$osmdroid_version"
-
+    implementation "com.google.dagger:hilt-android:$hilt_android_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_android_version"
+    // Compose
     implementation "androidx.activity:activity-compose:$activity_compose_version"
     implementation "androidx.compose.animation:animation:$compose_version"
     implementation "androidx.compose.compiler:compiler:$compose_compiler_version"
-    implementation "androidx.compose.material:material:$material_version"
     implementation "androidx.compose.material3:material3:$material3_version"
     implementation "androidx.compose.runtime:runtime:$compose_version"
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling:$compose_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation "androidx.hilt:hilt-navigation-compose:$hilt_compose_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
     implementation "androidx.navigation:navigation-compose:$navigation_version"
-
+    // Utility
+    implementation "com.jakewharton.timber:timber:$timber_version"
+    implementation "org.osmdroid:osmdroid-android:$osmdroid_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
-
+    // Test
     testImplementation "junit:junit:$junit_version"
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
-
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
     androidTestImplementation "org.mockito:mockito-android:$mockito_version"
 }

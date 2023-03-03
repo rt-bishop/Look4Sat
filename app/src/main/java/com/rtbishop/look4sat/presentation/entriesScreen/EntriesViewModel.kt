@@ -17,50 +17,59 @@
  */
 package com.rtbishop.look4sat.presentation.entriesScreen
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val repository: IDataRepository,
-    private val settings: ISettingsManager
+    private val repository: IDataRepository, private val settings: ISettingsManager
 ) : ViewModel() {
 
-    private val satType = MutableLiveData("All")
+    private val satType = MutableStateFlow("All")
 //    private val transModes = MutableLiveData(settings.loadModesSelection())
-    private val currentQuery = MutableLiveData(String())
-    private val itemsFromRepo = liveData {
-        delay(250)
-        emit(loadEntriesWithSelection())
-    } as MutableLiveData
-    private val itemsWithType = satType.switchMap { type ->
+    private val currentQuery = MutableStateFlow(String())
+    private val itemsFromRepo = MutableStateFlow<List<SatItem>>(emptyList())
+    private val itemsWithType = satType.flatMapLatest { type ->
         itemsFromRepo.map { items -> filterByType(items, type) }
     }
 //    private val itemsWithModes = transModes.switchMap { modes ->
 //        itemsWithType.map { items -> filterByModes(items, modes) }
 //    }
-    private val itemsWithQuery = currentQuery.switchMap { query ->
+    private val itemsWithQuery = currentQuery.flatMapLatest { query ->
         itemsWithType.map { items -> filterByQuery(items, query) }
     }
     val satData = itemsWithQuery.map { items -> DataState.Success(items) }
     val satTypes: List<String> = settings.sourcesMap.keys.sorted()
 
-    fun getSatType() = satType.value ?: "All"
+    init {
+        viewModelScope.launch {
+            delay(250)
+            itemsFromRepo.value = loadEntriesWithSelection()
+        }
+    }
+
+    fun getSatType() = satType.value
 
     fun setSatType(type: String) {
         satType.value = type
     }
 
     fun selectCurrentItems(selectAll: Boolean) {
-        itemsWithQuery.value?.let { itemsWithQuery ->
-            updateSelection(itemsWithQuery.map { item -> item.catnum }, selectAll)
+        viewModelScope.launch {
+            val lastValue = itemsWithQuery.last()
+            updateSelection(lastValue.map { item -> item.catnum }, selectAll)
         }
     }
 
@@ -74,13 +83,13 @@ class EntriesViewModel @Inject constructor(
     }
 
     fun saveSelection(): List<Int> {
-        return itemsFromRepo.value?.let { itemsAll ->
+        return itemsFromRepo.value.let { itemsAll ->
             itemsAll.filter { item -> item.isSelected }.map { item -> item.catnum }
-        } ?: emptyList()
+        }
     }
 
     fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        itemsFromRepo.value?.let { itemsAll ->
+        itemsFromRepo.value.let { itemsAll ->
             val copiedList = itemsAll.map { item -> item.copy() }
             catNums.forEach { catnum ->
                 copiedList.find { item -> item.catnum == catnum }?.isSelected = isSelected

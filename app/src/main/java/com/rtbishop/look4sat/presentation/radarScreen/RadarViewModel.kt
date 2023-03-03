@@ -19,7 +19,10 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.hardware.GeomagneticField
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteManager
 import com.rtbishop.look4sat.domain.ISettingsManager
@@ -34,6 +37,7 @@ import com.rtbishop.look4sat.utility.round
 import com.rtbishop.look4sat.utility.toDegrees
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -56,7 +60,7 @@ class RadarViewModel @Inject constructor(
     val transmitters: LiveData<List<SatRadio>> = _transmitters
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
-    fun getPass(catNum: Int, aosTime: Long) = liveData {
+    fun getPass(catNum: Int, aosTime: Long) = flow {
         satManager.calculatedPasses.collect { passes ->
             val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
             pass?.let { satPass ->
