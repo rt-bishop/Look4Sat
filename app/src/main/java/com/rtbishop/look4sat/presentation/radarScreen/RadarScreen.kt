@@ -55,3 +55,79 @@ fun RadarScreen(viewModel: RadarViewModel = hiltViewModel()) {
         }
     }
 }
+
+//private val divider = 1000000f
+//radioDownlink.text = String.format(Locale.ENGLISH, link, downlink / divider)
+//radioUplink.text = String.format(Locale.ENGLISH, link, uplink / divider)
+
+//private fun setupObservers() {
+//    viewModel.getPass(45000, System.currentTimeMillis()).observe(viewLifecycleOwner) { pass ->
+//        binding?.run {
+//            radarView = RadarView(requireContext()).apply {
+//                setShowAim(viewModel.getUseCompass())
+//                setScanning(viewModel.getShowSweep())
+//            }
+//            radarCard.addView(radarView)
+//            viewModel.radarData.observe(viewLifecycleOwner) { passData ->
+//                radarView?.setPosition(passData.satPos)
+//                radarView?.setPositions(passData.satTrack)
+//                setPassText(pass, passData.satPos)
+//            }
+//            viewModel.transmitters.observe(viewLifecycleOwner) { list ->
+//                if (list.isNotEmpty()) {
+//                    radioAdapter.submitList(list)
+//                    radarProgress.visibility = View.INVISIBLE
+//                } else {
+//                    radarProgress.visibility = View.INVISIBLE
+//                    radarEmptyLayout.visibility = View.VISIBLE
+//                }
+//                radarView?.invalidate()
+//            }
+//            viewModel.orientation.observe(viewLifecycleOwner) { value ->
+//                radarView?.setOrientation(value.first, value.second, value.third)
+//            }
+//                radarBtnBack.clickWithDebounce { findNavController().navigateUp() }
+//                radarBtnMap.clickWithDebounce {
+//                    val direction = RadarFragmentDirections.globalToMap(pass.catNum)
+//                    findNavController().navigate(direction)
+//                }
+//                radarBtnNotify.isEnabled = false
+//                radarBtnSettings.clickWithDebounce {
+//                    val direction = RadarFragmentDirections.globalToSettings()
+//                    findNavController().navigate(direction)
+//                }
+//        }
+//    }
+//}
+//
+//private fun setPassText(satPass: SatPass, satPos: SatPos) {
+//    binding?.run {
+//        val timeNow = System.currentTimeMillis()
+//        val radarAzim = getString(R.string.radar_az_value)
+//        val radarElev = getString(R.string.radar_el_value)
+//        val radarAlt = getString(R.string.radar_alt_value)
+//        val radarDist = getString(R.string.radar_dist_value)
+//        radarAzValue.text = String.format(radarAzim, satPos.azimuth.toDegrees())
+//        radarElValue.text = String.format(radarElev, satPos.elevation.toDegrees())
+//        radarAltValue.text = String.format(radarAlt, satPos.altitude)
+//        radarDstValue.text = String.format(radarDist, satPos.distance)
+//        if (satPos.eclipsed) {
+//            radarVisibility.text = getText(R.string.radar_eclipsed)
+//        } else {
+//            radarVisibility.text = getText(R.string.radar_visible)
+//        }
+//        if (!satPass.isDeepSpace) {
+//            if (timeNow < satPass.aosTime) {
+//                val millisBeforeStart = satPass.aosTime.minus(timeNow)
+//                radarTimer.text = millisBeforeStart.toTimerString()
+//            } else {
+//                val millisBeforeEnd = satPass.losTime.minus(timeNow)
+//                radarTimer.text = millisBeforeEnd.toTimerString()
+//                if (timeNow > satPass.losTime) {
+//                    radarTimer.text = 0L.toTimerString()
+////                        findNavController().navigateUp()
+//                }
+//            }
+//        } else radarTimer.text = 0L.toTimerString()
+//    }
+//}

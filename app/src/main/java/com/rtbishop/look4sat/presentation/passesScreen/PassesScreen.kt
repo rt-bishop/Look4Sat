@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.rtbishop.look4sat.presentation.passesScreen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -8,14 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.PullRefreshState
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -34,16 +27,19 @@ import com.rtbishop.look4sat.domain.predict.NearEarthSat
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.pullRefresh.PullRefreshIndicator
+import com.rtbishop.look4sat.presentation.pullRefresh.PullRefreshState
+import com.rtbishop.look4sat.presentation.pullRefresh.pullRefresh
+import com.rtbishop.look4sat.presentation.pullRefresh.rememberPullRefreshState
 import java.text.SimpleDateFormat
 import java.util.*
 
 private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PassesScreen(navToRadar: () -> Unit, viewModel: PassesViewModel = hiltViewModel()) {
-    val state = viewModel.passes.observeAsState()
-    val timerText = viewModel.timerText.observeAsState()
+    val state = viewModel.passes.collectAsState(initial = null)
+    val timerText = viewModel.timerText.collectAsState(initial = null)
     val isRefreshing = state.value is DataState.Loading
     val refreshState = rememberPullRefreshState(refreshing = isRefreshing,
         onRefresh = { viewModel.calculatePasses() })

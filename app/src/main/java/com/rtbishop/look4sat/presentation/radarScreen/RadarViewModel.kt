@@ -22,7 +22,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteManager
@@ -37,10 +36,11 @@ import com.rtbishop.look4sat.utility.DataReporter
 import com.rtbishop.look4sat.utility.round
 import com.rtbishop.look4sat.utility.toDegrees
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class RadarViewModel @Inject constructor(
@@ -60,7 +60,7 @@ class RadarViewModel @Inject constructor(
     val transmitters: LiveData<List<SatRadio>> = _transmitters
     val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
 
-    fun getPass(catNum: Int, aosTime: Long) = liveData {
+    fun getPass(catNum: Int, aosTime: Long) = flow {
         satManager.calculatedPasses.collect { passes ->
             val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
             pass?.let { satPass ->
@@ -111,8 +111,8 @@ class RadarViewModel @Inject constructor(
             if (settings.getRotatorEnabled()) {
                 val server = settings.getRotatorServer()
                 val port = settings.getRotatorPort().toInt()
-                val azimuth = satPos.azimuth.toDegrees().round(2)
-                val elevation = satPos.elevation.toDegrees().round(2)
+                val azimuth = satPos.azimuth.toDegrees().round(1)
+                val elevation = satPos.elevation.toDegrees().round(1)
                 reporter.reportRotation(server, port, azimuth, elevation)
             }
             _passData.postValue(RadarData(satPos, track))

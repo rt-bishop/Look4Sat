@@ -18,7 +18,8 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
 import android.content.SharedPreferences
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteManager
 import com.rtbishop.look4sat.domain.ISettingsManager
@@ -30,8 +31,12 @@ import com.rtbishop.look4sat.utility.toDegrees
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.flow
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.set
 import kotlin.math.max
 import kotlin.math.min
 
@@ -50,23 +55,23 @@ class MapViewModel @Inject constructor(
     private var dataUpdateRate = 1000L
     private var selectedSatellite: Satellite? = null
 
-    val stationPos = liveData {
+    val stationPos = flow {
         val osmLat = clipLat(stationPosition.lat)
         val osmLon = clipLon(stationPosition.lon)
         emit(GeoPos(osmLat, osmLon))
     }
 
-    private val _track = MutableLiveData<List<List<GeoPos>>>()
-    val track: LiveData<List<List<GeoPos>>> = _track
+    private val _track = MutableSharedFlow<List<List<GeoPos>>>()
+    val track: SharedFlow<List<List<GeoPos>>> = _track
 
-    private val _footprint = MutableLiveData<SatPos>()
-    val footprint: LiveData<SatPos> = _footprint
+    private val _footprint = MutableSharedFlow<SatPos>()
+    val footprint: SharedFlow<SatPos> = _footprint
 
-    private val _mapData = MutableLiveData<MapData>()
-    val mapData: LiveData<MapData> = this._mapData
+    private val _mapData = MutableSharedFlow<MapData>()
+    val mapData: SharedFlow<MapData> = _mapData
 
-    private val _positions = MutableLiveData<Map<Satellite, GeoPos>>()
-    val positions: LiveData<Map<Satellite, GeoPos>> = _positions
+    private val _positions = MutableSharedFlow<Map<Satellite, GeoPos>>()
+    val positions: SharedFlow<Map<Satellite, GeoPos>> = _positions
 
     fun getPreferences() = preferences
 
@@ -144,7 +149,7 @@ class MapViewModel @Inject constructor(
             currentTrack.add(currentPosition)
         }
         satTracks.add(currentTrack)
-        _track.postValue(satTracks)
+        _track.emit(satTracks)
     }
 
     private suspend fun getPositions(satellites: List<Satellite>, pos: GeoPos, date: Date) {
@@ -155,12 +160,12 @@ class MapViewModel @Inject constructor(
             val osmLon = clipLon(satPos.longitude.toDegrees())
             positions[satellite] = GeoPos(osmLat, osmLon)
         }
-        _positions.postValue(positions)
+        _positions.emit(positions)
     }
 
     private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
         val satPos = satelliteManager.getPosition(satellite, pos, date.time)
-        _footprint.postValue(satPos)
+        _footprint.emit(satPos)
     }
 
     private suspend fun getSatData(sat: Satellite, pos: GeoPos, date: Date) {
@@ -202,7 +207,7 @@ class MapViewModel @Inject constructor(
             phase,
             visibility
         )
-        _mapData.postValue(satData)
+        _mapData.emit(satData)
     }
 
     private fun clipLat(latitude: Double): Double {
