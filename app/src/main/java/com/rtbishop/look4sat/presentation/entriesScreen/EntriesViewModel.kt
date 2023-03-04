@@ -20,6 +20,7 @@ package com.rtbishop.look4sat.presentation.entriesScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISatelliteManager
 import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
@@ -34,19 +35,17 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val repository: IDataRepository, private val settings: ISettingsManager
+    private val satelliteManager: ISatelliteManager,
+    private val repository: IDataRepository,
+    private val settings: ISettingsManager
 ) : ViewModel() {
 
     private val satType = MutableStateFlow("All")
-//    private val transModes = MutableLiveData(settings.loadModesSelection())
     private val currentQuery = MutableStateFlow(String())
     private val itemsFromRepo = MutableStateFlow<List<SatItem>>(emptyList())
     private val itemsWithType = satType.flatMapLatest { type ->
         itemsFromRepo.map { items -> filterByType(items, type) }
     }
-//    private val itemsWithModes = transModes.switchMap { modes ->
-//        itemsWithType.map { items -> filterByModes(items, modes) }
-//    }
     private val itemsWithQuery = currentQuery.flatMapLatest { query ->
         itemsWithType.map { items -> filterByQuery(items, query) }
     }
@@ -66,26 +65,24 @@ class EntriesViewModel @Inject constructor(
         satType.value = type
     }
 
-    fun selectCurrentItems(selectAll: Boolean) {
-        viewModelScope.launch {
-            val lastValue = itemsWithQuery.last()
-            updateSelection(lastValue.map { item -> item.catnum }, selectAll)
-        }
+    fun selectCurrentItems(selectAll: Boolean) = viewModelScope.launch {
+        updateSelection(itemsWithQuery.first().map { item -> item.catnum }, selectAll)
     }
-
-//    fun saveSelectedModes(modes: List<String>) {
-//        transModes.value = modes
-//        settings.saveModesSelection(modes)
-//    }
 
     fun setQuery(query: String) {
         currentQuery.value = query
     }
 
-    fun saveSelection(): List<Int> {
-        return itemsFromRepo.value.let { itemsAll ->
-            itemsAll.filter { item -> item.isSelected }.map { item -> item.catnum }
-        }
+    fun saveSelection() = viewModelScope.launch {
+        val newSelection = itemsFromRepo.value.filter { it.isSelected }.map { it.catnum }
+        settings.saveEntriesSelection(newSelection)
+        val selectedIds = settings.loadEntriesSelection()
+        val satellites = repository.getEntriesWithIds(selectedIds)
+        val stationPos = settings.loadStationPosition()
+        val timeRef = System.currentTimeMillis()
+        val hoursAhead = settings.getHoursAhead()
+        val minElev = settings.getMinElevation()
+        satelliteManager.calculatePasses(satellites, stationPos, timeRef, hoursAhead, minElev)
     }
 
     fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
@@ -109,11 +106,6 @@ class EntriesViewModel @Inject constructor(
         if (catnums.isEmpty()) return items
         return items.filter { item -> item.catnum in catnums }
     }
-
-//    private fun filterByModes(items: List<SatItem>, modes: List<String>): List<SatItem> {
-//        if (modes.isEmpty()) return items
-//        return items.filter { item -> item.modes.any { mode -> mode in modes } }
-//    }
 
     private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
         if (query.isBlank()) return items
