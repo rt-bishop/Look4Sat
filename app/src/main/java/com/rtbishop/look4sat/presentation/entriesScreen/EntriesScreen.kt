@@ -26,21 +26,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.onClick
-import com.rtbishop.look4sat.presentation.passesScreen.PassesViewModel
 
 @Composable
-fun EntriesScreen(
-    navToPasses: () -> Unit,
-    viewModel: EntriesViewModel = hiltViewModel(),
-    passesViewModel: PassesViewModel = hiltViewModel()
-) {
+fun EntriesScreen(navController: NavController) {
+    val viewModel: EntriesViewModel = hiltViewModel()
     val state = viewModel.satData.collectAsState(initial = DataState.Loading)
+    val navToPasses = { navController.navigate(Screen.Passes.route) }
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val toggleDialog = { showDialog.value = showDialog.value.not() }
@@ -54,8 +53,7 @@ fun EntriesScreen(
     val selectAll = { viewModel.selectCurrentItems(true) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         TopBar(setQuery = { newQuery: String -> viewModel.setQuery(newQuery) }, saveSelection = {
-            val entries = viewModel.saveSelection()
-            passesViewModel.calculatePasses(selection = entries)
+            viewModel.saveSelection()
             navToPasses()
         })
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
