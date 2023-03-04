@@ -2,10 +2,7 @@ package com.rtbishop.look4sat.presentation.settingsScreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,11 +11,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.CardButton
+import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.gotoUrl
 
 private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
@@ -28,7 +28,7 @@ private const val DONATE_URL = "https://ko-fi.com/rt_bishop"
 private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(navController: NavController) {
     LazyColumn(
         modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -44,7 +44,7 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row(horizontalArrangement = Arrangement.Center) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_satellite),
+                    painter = painterResource(id = R.drawable.ic_entries),
                     tint = MaterialTheme.colorScheme.secondary,
                     contentDescription = null,
                     modifier = Modifier
@@ -90,43 +90,102 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-private fun CardCredits(modifier: Modifier = Modifier) {
+private fun LocationCardPreview() {
+    MainTheme { LocationCard() }
+}
+
+@Composable
+private fun LocationCard() {
     val context = LocalContext.current
-    ElevatedCard(modifier = modifier.fillMaxWidth()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(id = R.string.outro_title),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = modifier.padding(8.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.outro_thanks),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                modifier = modifier.padding(horizontal = 6.dp, vertical = 4.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.outro_license),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = modifier.padding(8.dp)
-            )
+    // setPositionText(viewModel.getStationPosition())
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Station position")
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 6.dp, end = 6.dp)
+                )
+            }
             Row(
-                horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.padding(4.dp)
+                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
+                Text(text = "Updated: 3 Mar 2023 - 15:51")
+                Text(text = "QTH: IO91vl")
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Latitude: *")
+                Text(text = "Longitude: *")
+            }
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = { gotoUrl(context, LICENSE_URL) },
-                    text = stringResource(id = R.string.btn_license),
-                    modifier = Modifier.weight(1f)
+                    onClick = { }, // locationRequest.launch(arrayOf(locationFine, locationCoarse))
+                    text = stringResource(id = R.string.btn_gps), modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = { gotoUrl(context, POLICY_URL) },
-                    text = stringResource(id = R.string.btn_privacy),
-                    modifier = Modifier.weight(1f)
+                    onClick = { }, // open Position dialog
+                    text = stringResource(id = R.string.btn_manual), modifier = Modifier.weight(1f)
+                ) // viewModel.setStationPosition(position.first, position.second)
+                CardButton(
+                    onClick = { }, // open Locator dialog
+                    text = stringResource(id = R.string.btn_qth), modifier = Modifier.weight(1f)
+                ) // viewModel.setPositionFromQth(locator)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DataCardPreview() {
+    MainTheme { DataCard() }
+}
+
+@Composable
+private fun DataCard() {
+    val context = LocalContext.current
+    // setUpdateTime(viewModel.getLastUpdateTime())
+    // viewModel.entriesTotal
+    // viewModel.radiosTotal
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Satellite data")
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 6.dp, end = 6.dp)
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Updated: 3 Mar 2023 - 15:51")
+                Text(text = "")
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Satellites: 7749")
+                Text(text = "Transceivers: 2240")
+            }
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                CardButton(
+                    onClick = { }, // viewModel.updateFromWeb()
+                    text = stringResource(id = R.string.btn_web), modifier = Modifier.weight(1f)
+                )
+                CardButton(
+                    onClick = { }, // contentRequest.launch("*/*")
+                    text = stringResource(id = R.string.btn_file), modifier = Modifier.weight(1f)
+                )
+                CardButton(
+                    onClick = { }, // viewModel.clearAllData()
+                    text = stringResource(id = R.string.btn_clear), modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -158,80 +217,6 @@ private fun CardCredits(modifier: Modifier = Modifier) {
 //private val contentContract = ActivityResultContracts.GetContent()
 //private val contentRequest = registerForActivityResult(contentContract) { uri ->
 //    uri?.let { viewModel.updateFromFile(uri.toString()) }
-//}
-//private lateinit var binding: FragmentSettingsBinding
-//
-//override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//    super.onViewCreated(view, savedInstanceState)
-//    binding = FragmentSettingsBinding.bind(view).apply {
-//        settingsBtnBack.clickWithDebounce { findNavController().navigateUp() }
-//        settingsScroll.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, y, _, newY ->
-//            if (y > newY) settingsFab.hide() else settingsFab.show()
-//        })
-//        settingsBtnGithub.clickWithDebounce {
-//            gotoUrl("https://github.com/rt-bishop/Look4Sat/")
-//        }
-//        settingsFab.clickWithDebounce {
-//            gotoUrl("https://ko-fi.com/rt_bishop")
-//        }
-//        settingsBtnFdroid.clickWithDebounce {
-//            gotoUrl("https://f-droid.org/en/packages/com.rtbishop.look4sat/")
-//        }
-//    }
-//    setupLocationCard()
-//    setupDataCard()
-//    setupRemoteCard()
-//    setupBTCard()
-//    setupOtherCard()
-//    viewModel.stationPosition.asLiveData().observe(viewLifecycleOwner) { stationPos ->
-//        stationPos?.let { handleStationPosition(stationPos) }
-//    }
-//    viewModel.getUpdateState().asLiveData().observe(viewLifecycleOwner) { updateState ->
-//        updateState?.let { handleSatState(updateState) }
-//    }
-//}
-//
-//private fun setupLocationCard() {
-//    binding.run {
-//        setPositionText(viewModel.getStationPosition())
-//        settingsLocation.locationBtnGps.clickWithDebounce {
-//            locationRequest.launch(arrayOf(locationFine, locationCoarse))
-//        }
-//        settingsLocation.locationBtnManual.clickWithDebounce {
-//            val action = SettingsFragmentDirections.globalToPosition()
-//            findNavController().navigate(action)
-//        }
-//        settingsLocation.locationBtnQth.clickWithDebounce {
-//            val action = SettingsFragmentDirections.globalToLocator()
-//            findNavController().navigate(action)
-//        }
-//        getNavResult<Pair<Double, Double>>(R.id.nav_settings, "position") { position ->
-//            viewModel.setStationPosition(position.first, position.second)
-//        }
-//        getNavResult<String>(R.id.nav_settings, "locator") { locator ->
-//            viewModel.setPositionFromQth(locator)
-//        }
-//    }
-//}
-//
-//private fun setupDataCard() {
-//    binding.run {
-//        setUpdateTime(viewModel.getLastUpdateTime())
-//        settingsData.dataBtnWeb.clickWithDebounce { viewModel.updateFromWeb() }
-//        settingsData.dataBtnFile.clickWithDebounce { contentRequest.launch("*/*") }
-//        settingsData.dataBtnClear.clickWithDebounce { viewModel.clearAllData() }
-//        viewModel.entriesTotal.observe(viewLifecycleOwner) { number ->
-//            val entriesFormat = getString(R.string.data_entries)
-//            settingsData.dataEntries.text = String.format(entriesFormat, number)
-//        }
-//        viewModel.radiosTotal.observe(viewLifecycleOwner) { number ->
-//            val radiosFormat = getString(R.string.data_radios)
-//            settingsData.dataRadios.text = String.format(radiosFormat, number)
-//        }
-//        getNavResult<List<String>>(R.id.nav_settings, "sources") {
-//            viewModel.updateFromWeb()
-//        }
-//    }
 //}
 //
 //private fun setupRemoteCard() {
@@ -288,26 +273,54 @@ private fun CardCredits(modifier: Modifier = Modifier) {
 //    }
 //}
 //
-//private fun setupOtherCard() {
-//    binding.run {
-//        settingsOther.otherSwitchUtc.apply {
-//            isChecked = viewModel.getUseUTC()
-//            setOnCheckedChangeListener { _, isChecked -> viewModel.setUseUTC(isChecked) }
-//        }
-//        settingsOther.otherSwitchUpdate.apply {
-//            isChecked = viewModel.getAutoUpdateEnabled()
-//            setOnCheckedChangeListener { _, isChecked -> viewModel.setAutoUpdateEnabled(isChecked) }
-//        }
-//        settingsOther.otherSwitchSweep.apply {
-//            isChecked = viewModel.getShowSweep()
-//            setOnCheckedChangeListener { _, isChecked -> viewModel.setShowSweep(isChecked) }
-//        }
-//        settingsOther.otherSwitchSensors.apply {
-//            isChecked = viewModel.getUseCompass()
-//            setOnCheckedChangeListener { _, isChecked -> viewModel.setUseCompass(isChecked) }
-//        }
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+private fun OtherCardPreview() {
+    MainTheme { OtherCard() }
+}
+
+@Composable
+private fun OtherCard() {
+    val context = LocalContext.current
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            Text(text = stringResource(id = R.string.other_title))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.other_switch_utc))
+                Switch(checked = true, onCheckedChange = {})
+            } // viewModel.setUseUTC(isChecked)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.other_switch_update))
+                Switch(checked = true, onCheckedChange = {})
+            } // AutoUpdateEnabled(isChecked)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.other_switch_sweep))
+                Switch(checked = true, onCheckedChange = {})
+            } // viewModel.setShowSweep(isChecked)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.other_switch_sensors))
+                Switch(checked = true, onCheckedChange = {})
+            } // viewModel.setUseCompass(isChecked)
+        }
+    }
+}
+
 //
 //private fun handleStationPosition(pos: DataState<GeoPos>) {
 //    when (pos) {
@@ -372,10 +385,45 @@ private fun CardCredits(modifier: Modifier = Modifier) {
 //    binding.settingsData.dataUpdate.text = String.format(updatePattern, updateDate)
 //}
 //
-//private fun showToast(message: String) {
-//    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-//}
-//
-//private fun gotoUrl(url: String) {
-//    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-//}
+@Composable
+private fun CardCredits(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    ElevatedCard(modifier = modifier.fillMaxWidth()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(id = R.string.outro_title),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = modifier.padding(8.dp)
+            )
+            Text(
+                text = stringResource(id = R.string.outro_thanks),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                modifier = modifier.padding(horizontal = 6.dp, vertical = 4.dp)
+            )
+            Text(
+                text = stringResource(id = R.string.outro_license),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = modifier.padding(8.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.padding(4.dp)
+            ) {
+                CardButton(
+                    onClick = { gotoUrl(context, LICENSE_URL) },
+                    text = stringResource(id = R.string.btn_license),
+                    modifier = Modifier.weight(1f)
+                )
+                CardButton(
+                    onClick = { gotoUrl(context, POLICY_URL) },
+                    text = stringResource(id = R.string.btn_privacy),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}

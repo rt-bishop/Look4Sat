@@ -3,6 +3,7 @@ package com.rtbishop.look4sat.presentation
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
@@ -66,6 +67,10 @@ fun RadarPing() {
                 color = pingColor.copy(alpha = 1 - scaleAnimation.value)
             )
     )
+}
+
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 fun gotoUrl(context: Context, url: String) {

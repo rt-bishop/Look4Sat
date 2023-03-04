@@ -24,7 +24,27 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.presentation.entriesScreen.EntriesScreen
+import com.rtbishop.look4sat.presentation.mapScreen.MapScreen
+import com.rtbishop.look4sat.presentation.passesScreen.PassesScreen
+import com.rtbishop.look4sat.presentation.radarScreen.RadarScreen
+import com.rtbishop.look4sat.presentation.settingsScreen.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,7 +55,7 @@ class MainActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        setContent { MainTheme { MainScreenView() } }
+        setContent { MainTheme { MainScreen() } }
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -43,5 +63,52 @@ class MainActivity : ComponentActivity() {
         newConfig.fontScale = 1.0f
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
+    }
+}
+
+sealed class Screen(var title: String, var icon: Int, var route: String) {
+    object Entries : Screen("Entries", R.drawable.ic_entries, "entries")
+    object Passes : Screen("Passes", R.drawable.ic_passes, "passes")
+    object Radar : Screen("Radar", R.drawable.ic_radar, "radar")
+    object Map : Screen("World Map", R.drawable.ic_world_map, "world_map")
+    object Settings : Screen("Settings", R.drawable.ic_settings, "settings")
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MainScreen(navController: NavHostController = rememberNavController()) {
+    Scaffold(bottomBar = { MainNavBar(navController = navController) }) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) { MainNavGraph(navController) }
+    }
+}
+
+@Composable
+private fun MainNavBar(navController: NavController) {
+    val items = listOf(Screen.Entries, Screen.Passes, Screen.Radar, Screen.Map, Screen.Settings)
+    NavigationBar(modifier = Modifier.height(48.dp)) {
+        val navBackStackEntry = navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry.value?.destination?.route
+        items.forEach { item ->
+            NavigationBarItem(selected = currentRoute == item.route, onClick = {
+                navController.navigate(item.route) {
+                    navController.graph.startDestinationRoute?.let { route ->
+                        popUpTo(route) { saveState = false }
+                    }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            }, icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) })
+        }
+    }
+}
+
+@Composable
+private fun MainNavGraph(navController: NavHostController) {
+    NavHost(navController, startDestination = Screen.Passes.route) {
+        composable(Screen.Entries.route) { EntriesScreen(navController) }
+        composable(Screen.Passes.route) { PassesScreen(navController) }
+        composable(Screen.Radar.route) { RadarScreen() }
+        composable(Screen.Map.route) { MapScreen() }
+        composable(Screen.Settings.route) { SettingsScreen(navController) }
     }
 }
