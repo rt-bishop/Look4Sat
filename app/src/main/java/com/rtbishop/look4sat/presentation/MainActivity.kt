@@ -39,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.entriesScreen.EntriesScreen
 import com.rtbishop.look4sat.presentation.mapScreen.MapScreen
@@ -89,7 +90,7 @@ private fun MainNavBar(navController: NavController) {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry.value?.destination?.route
         items.forEach { item ->
-            NavigationBarItem(selected = currentRoute == item.route, onClick = {
+            NavigationBarItem(selected = currentRoute?.contains(item.route) ?: false, onClick = {
                 navController.navigate(item.route) {
                     navController.graph.startDestinationRoute?.let { route ->
                         popUpTo(route) { saveState = false }
@@ -104,10 +105,13 @@ private fun MainNavBar(navController: NavController) {
 
 @Composable
 private fun MainNavGraph(navController: NavHostController) {
+    val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
+    val radarArgs = listOf(navArgument("catNum") { defaultValue = 0 },
+        navArgument("aosTime") { defaultValue = 0L })
     NavHost(navController, startDestination = Screen.Passes.route) {
         composable(Screen.Entries.route) { EntriesScreen(navController) }
         composable(Screen.Passes.route) { PassesScreen(navController) }
-        composable(Screen.Radar.route) { RadarScreen() }
+        composable(radarRoute, radarArgs) { RadarScreen(navController) }
         composable(Screen.Map.route) { MapScreen() }
         composable(Screen.Settings.route) { SettingsScreen(navController) }
     }

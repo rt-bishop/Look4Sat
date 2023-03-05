@@ -41,7 +41,9 @@ private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 @Composable
 fun PassesScreen(navController: NavController) {
     val viewModel: PassesViewModel = hiltViewModel()
-    val navToRadar = { navController.navigate(Screen.Radar.route) }
+    val navToRadar = { catNum: Int, aosTime: Long ->
+        navController.navigate("${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}")
+    }
     val state = viewModel.passes.collectAsState(initial = null)
     val timerText = viewModel.timerText.collectAsState(initial = null)
     val isRefreshing = state.value is DataState.Loading
@@ -105,15 +107,15 @@ private fun PassPreview() {
     )
     val satellite = NearEarthSat(data)
     val pass = SatPass(1L, 25.0, 10L, 75.0, 850, 45.0, satellite, 0.5f)
-    MainTheme { Pass(pass = pass, {}) }
+    MainTheme { Pass(pass = pass, { _,_ -> }) }
 }
 
 @Composable
-private fun Pass(pass: SatPass, navToRadar: () -> Unit, modifier: Modifier = Modifier) {
+private fun Pass(pass: SatPass, navToRadar: (Int, Long) -> Unit, modifier: Modifier = Modifier) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
             .padding(bottom = 2.dp)
-            .clickable { navToRadar() }) {
+            .clickable { navToRadar(pass.catNum, pass.aosTime) }) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier
@@ -202,7 +204,7 @@ private fun PassesCard(
     refreshState: PullRefreshState,
     isRefreshing: Boolean,
     passes: List<SatPass>,
-    navToRadar: () -> Unit
+    navToRadar: (Int, Long) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
         Box(Modifier.pullRefresh(refreshState)) {

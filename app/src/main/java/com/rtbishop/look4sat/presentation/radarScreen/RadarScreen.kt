@@ -1,20 +1,35 @@
 package com.rtbishop.look4sat.presentation.radarScreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.domain.model.SatRadio
+import timber.log.Timber
 
 @Composable
-fun RadarScreen(viewModel: RadarViewModel = hiltViewModel()) {
+fun RadarScreen(navController: NavController) {
+    val viewModel: RadarViewModel = hiltViewModel()
+    val currentPass = viewModel.getPass().collectAsState(null)
+    val radarData = viewModel.radarData.collectAsState()
+    val transmitters = viewModel.transmitters.collectAsState()
+    val orientation = viewModel.orientation.collectAsState()
 
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         ElevatedCard(modifier = Modifier.height(52.dp)) {
@@ -47,11 +62,106 @@ fun RadarScreen(viewModel: RadarViewModel = hiltViewModel()) {
                 )
             }
         }
-        ElevatedCard(modifier = Modifier.fillMaxSize().weight(1f)) {
-
+        ElevatedCard(modifier = Modifier
+            .fillMaxSize()
+            .weight(1f)) {
+//            val context = LocalContext.current
+//            AndroidView({ RadarView(context) }, modifier = Modifier.fillMaxSize()) { radarView ->
+//                Timber.d("Radar view recomposition")
+//                radarView.setShowAim(true)
+//                radarView.setScanning(true)
+//                radarData.value?.let {
+//                    radarView.setPosition(it.satPos)
+//                    radarView.setPositions(it.satTrack)
+//                }
+//                orientation.value?.let {
+//                    radarView.setOrientation(it.first, it.second, it.first)
+//                }
+//            }
+            radarData.value?.let { data ->
+                orientation.value?.let { triple ->
+                    RadarViewCompose(
+                        item = data.satPos,
+                        items = data.satTrack,
+                        orientation = triple
+                    )
+                }
+            }
         }
-        ElevatedCard(modifier = Modifier.fillMaxSize().weight(1f)) {
+        ElevatedCard(modifier = Modifier
+            .fillMaxSize()
+            .weight(1f)) {
+            TransmittersList(transmitters = transmitters.value)
+        }
+    }
+}
 
+@Composable
+private fun TransmittersList(transmitters: List<SatRadio>) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(items = transmitters, key = { item -> item.uuid }) { radio ->
+            TransmitterItem(radio)
+        }
+    }
+}
+
+@Composable
+private fun TransmitterItem(radio: SatRadio) {
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Surface(modifier = Modifier.padding(bottom = 2.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(6.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_prev),
+                        contentDescription = null
+                    )
+                    Text(
+                        text = radio.info,
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_next),
+                        contentDescription = null
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.radio_downlink, radio.downlink ?: 0L),
+                        textAlign = TextAlign.Center,
+                        fontSize = 15.sp,
+                        modifier = Modifier.weight(0.5f)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.radio_uplink, radio.uplink ?: 0L),
+                        textAlign = TextAlign.Center,
+                        fontSize = 15.sp,
+                        modifier = Modifier.weight(0.5f)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = radio.mode ?: "",
+                        fontSize = 15.sp
+                    )
+                    Text(
+                        text = radio.isInverted.toString(),
+                        fontSize = 15.sp
+                    )
+                }
+            }
         }
     }
 }
@@ -73,29 +183,9 @@ fun RadarScreen(viewModel: RadarViewModel = hiltViewModel()) {
 //                radarView?.setPositions(passData.satTrack)
 //                setPassText(pass, passData.satPos)
 //            }
-//            viewModel.transmitters.observe(viewLifecycleOwner) { list ->
-//                if (list.isNotEmpty()) {
-//                    radioAdapter.submitList(list)
-//                    radarProgress.visibility = View.INVISIBLE
-//                } else {
-//                    radarProgress.visibility = View.INVISIBLE
-//                    radarEmptyLayout.visibility = View.VISIBLE
-//                }
-//                radarView?.invalidate()
-//            }
 //            viewModel.orientation.observe(viewLifecycleOwner) { value ->
 //                radarView?.setOrientation(value.first, value.second, value.third)
 //            }
-//                radarBtnBack.clickWithDebounce { findNavController().navigateUp() }
-//                radarBtnMap.clickWithDebounce {
-//                    val direction = RadarFragmentDirections.globalToMap(pass.catNum)
-//                    findNavController().navigate(direction)
-//                }
-//                radarBtnNotify.isEnabled = false
-//                radarBtnSettings.clickWithDebounce {
-//                    val direction = RadarFragmentDirections.globalToSettings()
-//                    findNavController().navigate(direction)
-//                }
 //        }
 //    }
 //}
