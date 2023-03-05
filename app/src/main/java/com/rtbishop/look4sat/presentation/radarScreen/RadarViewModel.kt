@@ -19,8 +19,7 @@ package com.rtbishop.look4sat.presentation.radarScreen
 
 import android.hardware.GeomagneticField
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
@@ -37,6 +36,8 @@ import com.rtbishop.look4sat.utility.round
 import com.rtbishop.look4sat.utility.toDegrees
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -44,6 +45,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RadarViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val orientationManager: OrientationManager,
     private val reporter: DataReporter,
     private val btReporter: BTReporter,
@@ -53,17 +55,29 @@ class RadarViewModel @Inject constructor(
 ) : ViewModel(), OrientationManager.OrientationListener {
 
     private val stationPos = settings.loadStationPosition()
-    private val _passData = MutableLiveData<RadarData>()
-    private val _transmitters = MutableLiveData<List<SatRadio>>()
-    private val _orientation = MutableLiveData<Triple<Float, Float, Float>>()
-    val radarData: LiveData<RadarData> = _passData
-    val transmitters: LiveData<List<SatRadio>> = _transmitters
-    val orientation: LiveData<Triple<Float, Float, Float>> = _orientation
+    private val _passData = MutableStateFlow<RadarData?>(null)
+    private val _transmitters = MutableStateFlow<List<SatRadio>>(emptyList())
+    private val _orientation = MutableStateFlow<Triple<Float, Float, Float>?>(null)
+    val radarData: StateFlow<RadarData?> = _passData
+    val transmitters: StateFlow<List<SatRadio>> = _transmitters
+    val orientation: StateFlow<Triple<Float, Float, Float>?> = _orientation
 
-    fun getPass(catNum: Int, aosTime: Long) = flow {
+    init {
+        enableSensor()
+    }
+
+    override fun onCleared() {
+        disableSensor()
+        super.onCleared()
+    }
+
+    fun getPass() = flow {
+        val catNum = savedStateHandle.get<Int>("catNum") ?: 0
+        val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
         satManager.calculatedPasses.collect { passes ->
             val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
-            pass?.let { satPass ->
+            val currentPass = pass ?: passes.firstOrNull()
+            currentPass?.let { satPass ->
                 emit(satPass)
                 val transmitters = repository.getRadiosWithId(satPass.catNum)
                 viewModelScope.launch {
@@ -115,7 +129,7 @@ class RadarViewModel @Inject constructor(
                 val elevation = satPos.elevation.toDegrees().round(1)
                 reporter.reportRotation(server, port, azimuth, elevation)
             }
-            _passData.postValue(RadarData(satPos, track))
+            _passData.value = RadarData(satPos, track)
         }
     }
 
@@ -140,7 +154,7 @@ class RadarViewModel @Inject constructor(
         viewModelScope.launch {
             delay(125)
             val list = satManager.processRadios(satellite, stationPos, radios, time)
-            _transmitters.postValue(list)
+            _transmitters.value = list
         }
     }
 }
