@@ -9,19 +9,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatRadio
-import timber.log.Timber
 
 @Composable
 fun RadarScreen(navController: NavController) {
@@ -65,19 +62,6 @@ fun RadarScreen(navController: NavController) {
         ElevatedCard(modifier = Modifier
             .fillMaxSize()
             .weight(1f)) {
-//            val context = LocalContext.current
-//            AndroidView({ RadarView(context) }, modifier = Modifier.fillMaxSize()) { radarView ->
-//                Timber.d("Radar view recomposition")
-//                radarView.setShowAim(true)
-//                radarView.setScanning(true)
-//                radarData.value?.let {
-//                    radarView.setPosition(it.satPos)
-//                    radarView.setPositions(it.satTrack)
-//                }
-//                orientation.value?.let {
-//                    radarView.setOrientation(it.first, it.second, it.first)
-//                }
-//            }
             radarData.value?.let { data ->
                 orientation.value?.let { triple ->
                     RadarViewCompose(
