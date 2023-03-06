@@ -12,6 +12,6 @@ class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.rtbishop.bbctestapp", appContext.packageName)
+        assertEquals("com.rtbishop.look4sat", appContext.packageName)
     }
 }
