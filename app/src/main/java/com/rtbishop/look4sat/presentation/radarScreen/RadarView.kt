@@ -2,6 +2,7 @@
 
 package com.rtbishop.look4sat.presentation.radarScreen
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -15,7 +16,6 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.domain.predict.PI_2
 import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.predict.TWO_PI
 import com.rtbishop.look4sat.utility.toRadians
 import kotlin.math.cos
 import kotlin.math.sin
@@ -26,6 +26,9 @@ fun RadarViewCompose(item: SatPos, items: List<SatPos>, orientation: Triple<Floa
     val primaryColor = Color(0xFFFFE082)
     val secondaryColor = Color(0xFFDC0000)
     val strokeWidth = 4f
+    val animTransition = rememberInfiniteTransition()
+    val animSpec = infiniteRepeatable<Float>(tween(1000))
+    val animScale = animTransition.animateFloat(16f, 64f, animSpec)
     val measurer = rememberTextMeasurer()
     val sweepDegrees = remember { mutableStateOf(0f) }
     val trackCreated = remember { mutableStateOf(false) }
@@ -44,7 +47,7 @@ fun RadarViewCompose(item: SatPos, items: List<SatPos>, orientation: Triple<Floa
             drawInfo(radius, primaryColor, measurer, 3)
             translate(center.x, center.y) {
                 drawTrack(trackPath.value, trackEffect.value, secondaryColor, primaryColor)
-                if (item.elevation > 0) drawPosition(item, radius, primaryColor)
+                if (item.elevation > 0) drawPosition(item, radius, animScale.value, primaryColor)
                 drawAim(orientation.first, orientation.second, radius, strokeWidth, secondaryColor)
             }
             sweepDegrees.value = (sweepDegrees.value + 360 / 12.0f / 60) % 360
@@ -74,10 +77,11 @@ private fun DrawScope.drawTrack(path: Path, effect: PathEffect, color: Color, ef
     drawPath(path, effectColor, style = Stroke(pathEffect = effect))
 }
 
-private fun DrawScope.drawPosition(item: SatPos, radius: Float, color: Color) {
+private fun DrawScope.drawPosition(item: SatPos, radius: Float, posRadius: Float, color: Color) {
     val satX = sph2CartX(item.azimuth, item.elevation, radius.toDouble())
     val satY = sph2CartY(item.azimuth, item.elevation, radius.toDouble())
-    drawCircle(color, 18f, center.copy(satX, -satY))
+    drawCircle(color, 16f, center.copy(satX, -satY))
+    drawCircle(color.copy(alpha = 1 - (posRadius / 64f)), posRadius, center.copy(satX, -satY))
 }
 
 private fun DrawScope.drawAim(azim: Float, elev: Float, radius: Float, width: Float, color: Color) {
@@ -97,7 +101,7 @@ private fun DrawScope.drawAim(azim: Float, elev: Float, radius: Float, width: Fl
 }
 
 private fun DrawScope.drawSweep(center: Offset, degrees: Float, radius: Float, color: Color) {
-    val colors = listOf(Color.Transparent, Color(0x80FFE082), color)
+    val colors = listOf(Color.Transparent, color.copy(alpha = 0.5f), color)
     val colorStops = listOf(0.64f, 0.995f, 1f)
     val brush = ShaderBrush(SweepGradientShader(center, colors, colorStops))
     rotate(-90 + degrees, center) { drawCircle(brush, radius, style = Fill) }
@@ -115,11 +119,10 @@ private fun createTrackPath(positions: List<SatPos>, radius: Float): Path {
 
 private fun createTrackEffect(trackPath: Path): PathEffect {
     val shape = Path()
-    val shapeSides = 3
-    val shapeRadius = 18f
-    val angle = TWO_PI / shapeSides
+    val shapeRadius = 16f
+    val angle = 120.0.toRadians()
     shape.moveTo((shapeRadius * cos(angle)).toFloat(), (shapeRadius * sin(angle)).toFloat())
-    for (i in 1 until shapeSides) {
+    for (i in 1 until 3) {
         val x = (shapeRadius * cos(angle - angle * i)).toFloat()
         val y = (shapeRadius * sin(angle - angle * i)).toFloat()
         shape.lineTo(x, y)
