@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.presentation.mapScreen
 
-import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -194,7 +193,8 @@ private fun MapView(modifier: Modifier = Modifier, update: ((map: MapView) -> Un
 }
 
 @Composable
-private fun rememberMapViewWithLifecycle(context: Context = LocalContext.current): MapView {
+private fun rememberMapViewWithLifecycle(): MapView {
+    val context = LocalContext.current
     val mapView = remember { MapView(context) }.apply {
         setMultiTouchControls(true)
         setTileSource(TileSourceFactory.WIKIMEDIA)
