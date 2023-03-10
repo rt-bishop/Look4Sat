@@ -20,17 +20,14 @@ import com.rtbishop.look4sat.presentation.MainTheme
 @Preview(showBackground = true)
 @Composable
 private fun LocatorDialogPreview() {
-    MainTheme { LocatorDialog(8, 16.0, {}) { _, _ -> } }
+    MainTheme { LocatorDialog("IO91vl", {}) { } }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocatorDialog(
-    hours: Int, elevation: Double, toggle: () -> Unit, save: (Int, Double) -> Unit
-) {
-    val hoursValue = rememberSaveable { mutableStateOf(hours) }
-    val elevValue = rememberSaveable { mutableStateOf(elevation) }
-    Dialog(onDismissRequest = { toggle() }) {
+fun LocatorDialog(qthLocator: String, hide: () -> Unit, save: (String) -> Unit) {
+    val locator = rememberSaveable { mutableStateOf(qthLocator) }
+    Dialog(onDismissRequest = { hide() }) {
         ElevatedCard {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -41,24 +38,19 @@ fun LocatorDialog(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(text = stringResource(id = R.string.locator_text))
-                OutlinedTextField(value = hoursValue.value.toString(), onValueChange = { newValue ->
-                    val hoursAhead = try {
-                        newValue.toInt()
-                    } catch (exception: Exception) {
-                        12
-                    }
-                    hoursValue.value = hoursAhead
-                })
+                OutlinedTextField(value = locator.value, onValueChange = { locator.value = it })
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    CardButton(onClick = { toggle() }, text = "Cancel")
+                    CardButton(
+                        onClick = { hide() }, text = stringResource(id = R.string.btn_cancel)
+                    )
                     CardButton(
                         onClick = {
-                            save(hoursValue.value, elevValue.value)
-                            toggle()
-                        }, text = "Accept"
+                            save(locator.value)
+                            hide()
+                        }, text = stringResource(id = R.string.btn_accept)
                     )
                 }
             }

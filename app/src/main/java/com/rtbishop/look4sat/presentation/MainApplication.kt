@@ -45,7 +45,7 @@ class MainApplication : Application() {
     }
 
     private fun checkAutoUpdate() {
-        if (settingsManager.getAutoUpdateEnabled()) {
+        if (settingsManager.isUpdateEnabled()) {
             val timeDelta = System.currentTimeMillis() - settingsManager.getLastUpdateTime()
             if (timeDelta > 172800000) { // 48 hours in ms
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
