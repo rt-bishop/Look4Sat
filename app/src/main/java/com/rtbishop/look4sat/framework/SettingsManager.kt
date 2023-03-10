@@ -50,7 +50,7 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
     }
 
     override fun loadStationLocator(): String {
-        return prefs.getString(keyLocator, null) ?: "null"
+        return prefs.getString(keyLocator, null) ?: ""
     }
 
     override fun saveStationLocator(locator: String) {
@@ -107,11 +107,11 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         prefs.edit { putDouble(keyMinElevation, minElevation) }
     }
 
-    override fun getUseUTC(): Boolean {
+    override fun isUtcEnabled(): Boolean {
         return prefs.getBoolean(keyTimeUTC, false)
     }
 
-    override fun setUseUTC(value: Boolean) {
+    override fun setUtcState(value: Boolean) {
         prefs.edit { putBoolean(keyTimeUTC, value) }
     }
 
@@ -123,27 +123,27 @@ class SettingsManager @Inject constructor(private val prefs: SharedPreferences) 
         prefs.edit { putLong(keyLastUpdateTime, updateTime) }
     }
 
-    override fun getAutoUpdateEnabled(): Boolean {
+    override fun isUpdateEnabled(): Boolean {
         return prefs.getBoolean(keyAutoUpdateEnabled, true)
     }
 
-    override fun setAutoUpdateEnabled(value: Boolean) {
+    override fun setUpdateState(value: Boolean) {
         prefs.edit { putBoolean(keyAutoUpdateEnabled, value) }
     }
 
-    override fun getUseCompass(): Boolean {
+    override fun isSensorEnabled(): Boolean {
         return prefs.getBoolean(keyCompass, true)
     }
 
-    override fun setUseCompass(value: Boolean) {
+    override fun setSensorState(value: Boolean) {
         prefs.edit { putBoolean(keyCompass, value) }
     }
 
-    override fun getShowSweep(): Boolean {
+    override fun isSweepEnabled(): Boolean {
         return prefs.getBoolean(keyRadarSweep, true)
     }
 
-    override fun setShowSweep(value: Boolean) {
+    override fun setSweepState(value: Boolean) {
         prefs.edit { putBoolean(keyRadarSweep, value) }
     }
 

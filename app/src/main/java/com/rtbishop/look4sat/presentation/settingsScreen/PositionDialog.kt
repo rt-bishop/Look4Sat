@@ -20,17 +20,15 @@ import com.rtbishop.look4sat.presentation.MainTheme
 @Preview(showBackground = true)
 @Composable
 private fun PositionDialogPreview() {
-    MainTheme { PositionDialog(8, 16.0, {}) { _, _ -> } }
+    MainTheme { PositionDialog(0.0, 0.0, {}) { _, _ -> } }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PositionDialog(
-    hours: Int, elevation: Double, toggle: () -> Unit, save: (Int, Double) -> Unit
-) {
-    val hoursValue = rememberSaveable { mutableStateOf(hours) }
-    val elevValue = rememberSaveable { mutableStateOf(elevation) }
-    Dialog(onDismissRequest = { toggle() }) {
+fun PositionDialog(lat: Double, lon: Double, hide: () -> Unit, save: (Double, Double) -> Unit) {
+    val latValue = rememberSaveable { mutableStateOf(lat.toString()) }
+    val lonValue = rememberSaveable { mutableStateOf(lon.toString()) }
+    Dialog(onDismissRequest = { hide() }) {
         ElevatedCard {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -41,36 +39,31 @@ fun PositionDialog(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(text = stringResource(id = R.string.position_lat_text))
-                OutlinedTextField(value = hoursValue.value.toString(), onValueChange = { newValue ->
-                    val hoursAhead = try {
-                        newValue.toInt()
-                    } catch (exception: Exception) {
-                        12
-                    }
-                    hoursValue.value = hoursAhead
-                })
+                OutlinedTextField(value = latValue.value, onValueChange = { latValue.value = it })
                 Text(text = stringResource(id = R.string.position_lon_text))
-                OutlinedTextField(value = elevValue.value.toString(), onValueChange = { newValue ->
-                    val maxElevation = try {
-                        newValue.toDouble()
-                    } catch (exception: Exception) {
-                        16.0
-                    }
-                    elevValue.value = maxElevation
-                })
+                OutlinedTextField(value = lonValue.value, onValueChange = { lonValue.value = it })
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    CardButton(onClick = { toggle() }, text = "Cancel")
                     CardButton(
-                        onClick = {
-                            save(hoursValue.value, elevValue.value)
-                            toggle()
-                        }, text = "Accept"
+                        onClick = { hide() }, text = stringResource(id = R.string.btn_cancel)
+                    )
+                    CardButton(
+                        onClick = { saveValues(latValue.value, lonValue.value, hide, save) },
+                        text = stringResource(id = R.string.btn_accept)
                     )
                 }
             }
         }
     }
+}
+
+private fun saveValues(lat: String, lon: String, hide: () -> Unit, save: (Double, Double) -> Unit) {
+    val latValue = lat.toDoubleOrNull() ?: 0.0
+    val lonValue = lon.toDoubleOrNull() ?: 0.0
+    val newLat = if (latValue > 90) 90.0 else if (latValue < -90) -90.0 else latValue
+    val newLon = if (lonValue > 180) 180.0 else if (lonValue < -180) -180.0 else lonValue
+    save(newLat, newLon)
+    hide()
 }

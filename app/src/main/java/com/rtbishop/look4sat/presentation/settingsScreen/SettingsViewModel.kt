@@ -22,9 +22,12 @@ import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ILocationManager
 import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,6 +36,36 @@ class SettingsViewModel @Inject constructor(
     private val repository: IDataRepository,
     private val settings: ISettingsManager
 ) : ViewModel() {
+
+    private val _otherSettings = MutableStateFlow(
+        OtherSettings(
+            settings.isUtcEnabled(),
+            settings.isUpdateEnabled(),
+            settings.isSweepEnabled(),
+            settings.isSensorEnabled()
+        )
+    )
+    val otherSettings: StateFlow<OtherSettings> = _otherSettings
+
+    fun setUtcState(value: Boolean) {
+        settings.setUtcState(value)
+        _otherSettings.value = otherSettings.value.copy(isUtcEnabled = value)
+    }
+
+    fun setUpdateState(value: Boolean) {
+        settings.setUpdateState(value)
+        _otherSettings.value = otherSettings.value.copy(isUpdateEnabled = value)
+    }
+
+    fun setSweepState(value: Boolean) {
+        settings.setSweepState(value)
+        _otherSettings.value = otherSettings.value.copy(isSweepEnabled = value)
+    }
+
+    fun setSensorState(value: Boolean) {
+        settings.setSensorState(value)
+        _otherSettings.value = otherSettings.value.copy(isSensorEnabled = value)
+    }
 
     val entriesTotal = repository.getEntriesTotal()
     val radiosTotal = repository.getRadiosTotal()
@@ -43,23 +76,15 @@ class SettingsViewModel @Inject constructor(
 
     fun clearAllData() = repository.clearAllData()
 
-    fun getUseUTC(): Boolean = settings.getUseUTC()
-
-    fun setUseUTC(value: Boolean) = settings.setUseUTC(value)
+    fun getUseUTC(): Boolean = settings.isUtcEnabled()
 
     fun getLastUpdateTime(): Long = settings.getLastUpdateTime()
 
-    fun getAutoUpdateEnabled(): Boolean = settings.getAutoUpdateEnabled()
+    fun getAutoUpdateEnabled(): Boolean = settings.isUpdateEnabled()
 
-    fun setAutoUpdateEnabled(value: Boolean) = settings.setAutoUpdateEnabled(value)
+    fun getUseCompass(): Boolean = settings.isSensorEnabled()
 
-    fun getUseCompass(): Boolean = settings.getUseCompass()
-
-    fun setUseCompass(value: Boolean) = settings.setUseCompass(value)
-
-    fun getShowSweep(): Boolean = settings.getShowSweep()
-
-    fun setShowSweep(value: Boolean) = settings.setShowSweep(value)
+    fun getShowSweep(): Boolean = settings.isSweepEnabled()
 
     fun getRotatorEnabled(): Boolean = settings.getRotatorEnabled()
 
@@ -89,13 +114,15 @@ class SettingsViewModel @Inject constructor(
 
     fun setBTDeviceAddr(value: String) = settings.setBTDeviceAddr(value)
 
-    fun getUpdateState() = repository.updateState
+    fun getDataUpdateState() = repository.updateState
 
     fun setUpdateHandled() = repository.setUpdateStateHandled()
 
     val stationPosition: SharedFlow<DataState<GeoPos>> = locationManager.stationPosition
 
     fun getStationPosition(): GeoPos = locationManager.getStationPosition()
+
+    fun getStationLocator(): String = settings.loadStationLocator()
 
     fun setStationPosition(lat: Double, lon: Double) = locationManager.setStationPosition(lat, lon)
 

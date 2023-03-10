@@ -90,7 +90,7 @@ class PassesViewModel @Inject constructor(
         calculatePasses()
     }
 
-    fun shouldUseUTC() = settings.getUseUTC()
+    fun shouldUseUTC() = settings.isUtcEnabled()
 
     fun calculatePasses(
         hoursAhead: Int = 1,
