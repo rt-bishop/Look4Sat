@@ -67,25 +67,25 @@ interface ISettingsManager {
 
     fun setMinElevation(minElevation: Double)
 
-    fun getUseUTC(): Boolean
+    fun isUtcEnabled(): Boolean
 
-    fun setUseUTC(value: Boolean)
+    fun setUtcState(value: Boolean)
 
     fun getLastUpdateTime(): Long
 
     fun setLastUpdateTime(updateTime: Long)
 
-    fun getAutoUpdateEnabled(): Boolean
+    fun isUpdateEnabled(): Boolean
 
-    fun setAutoUpdateEnabled(value: Boolean)
+    fun setUpdateState(value: Boolean)
 
-    fun getUseCompass(): Boolean
+    fun isSensorEnabled(): Boolean
 
-    fun setUseCompass(value: Boolean)
+    fun setSensorState(value: Boolean)
 
-    fun getShowSweep(): Boolean
+    fun isSweepEnabled(): Boolean
 
-    fun setShowSweep(value: Boolean)
+    fun setSweepState(value: Boolean)
 
     fun saveModesSelection(modes: List<String>)
 

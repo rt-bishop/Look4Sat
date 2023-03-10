@@ -1,9 +1,16 @@
 package com.rtbishop.look4sat.presentation.settingsScreen
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -14,12 +21,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.gotoUrl
+import com.rtbishop.look4sat.presentation.showToast
 
 private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
 private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
@@ -29,10 +39,71 @@ private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.loo
 
 @Composable
 fun SettingsScreen(navController: NavController) {
+    val context = LocalContext.current
+    val viewModel: SettingsViewModel = hiltViewModel()
+
+    // Permissions setup
+    val bluetoothContract = ActivityResultContracts.RequestPermission()
+    val bluetoothError = stringResource(R.string.BTremote_perm_error)
+    val bluetoothPerm = when {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
+        else -> Manifest.permission.BLUETOOTH_CONNECT
+    }
+    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
+        viewModel.setBTEnabled(isGranted)
+        if (!isGranted) showToast(context, bluetoothError)
+    }
+    val locationContract = ActivityResultContracts.RequestMultiplePermissions()
+    val locationError = stringResource(R.string.location_gps_error)
+    val locationPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
+    val locationPermFine = Manifest.permission.ACCESS_FINE_LOCATION
+    val locationRequest = rememberLauncherForActivityResult(locationContract) { permissions ->
+        when {
+            permissions[locationPermFine] == true -> viewModel.setPositionFromGps()
+            permissions[locationPermCoarse] == true -> viewModel.setPositionFromNet()
+            else -> showToast(context, locationError)
+        }
+    }
+    val contentContract = ActivityResultContracts.GetContent()
+    val contentRequest = rememberLauncherForActivityResult(contentContract) { uri ->
+        uri?.let { viewModel.updateFromFile(uri.toString()) }
+    }
+
+    // Location settings
+    val setGpsLoc = { locationRequest.launch(arrayOf(locationPermCoarse, locationPermFine)) }
+    val geoPos = viewModel.getStationPosition()
+    val showPosDialog = rememberSaveable { mutableStateOf(false) }
+    val togglePosDialog = { showPosDialog.value = showPosDialog.value.not() }
+    val savePos = { lat: Double, lon: Double -> viewModel.setStationPosition(lat, lon) }
+    if (showPosDialog.value) {
+        PositionDialog(lat = geoPos.lat, lon = geoPos.lon, hide = togglePosDialog, save = savePos)
+    }
+    val qthLocator = viewModel.getStationLocator()
+    val showLocDialog = rememberSaveable { mutableStateOf(false) }
+    val toggleLocDialog = { showLocDialog.value = showLocDialog.value.not() }
+    val saveLocator = { locator: String -> viewModel.setPositionFromQth(locator) }
+    if (showLocDialog.value) {
+        LocatorDialog(qthLocator = qthLocator, hide = toggleLocDialog, save = saveLocator)
+    }
+    // Data settings
+    val updateFromWeb = { viewModel.updateFromWeb() }
+    val updateFromFile = { contentRequest.launch("*/*") }
+    val clearAllData = { viewModel.clearAllData() }
+    // Other settings
+    val otherSettings = viewModel.otherSettings.collectAsState()
+    val setUtc = { value: Boolean -> viewModel.setUtcState(value) }
+    val setUpdate = { value: Boolean -> viewModel.setUpdateState(value) }
+    val setSweep = { value: Boolean -> viewModel.setSweepState(value) }
+    val setSensor = { value: Boolean -> viewModel.setSensorState(value) }
+
+    // Screen setup
     LazyColumn(
         modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         item { CardAbout(BuildConfig.VERSION_NAME) }
+        item { LocationCard(setGpsLoc, togglePosDialog, toggleLocDialog) }
+        item { DataCard(updateFromWeb, updateFromFile, clearAllData) }
+        item { OtherCard(otherSettings.value, setUtc, setUpdate, setSweep, setSensor) }
         item { CardCredits() }
     }
 }
@@ -93,11 +164,13 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun LocationCardPreview() {
-    MainTheme { LocationCard() }
+    MainTheme { LocationCard({}, {}, {}) }
 }
 
 @Composable
-private fun LocationCard() {
+private fun LocationCard(
+    setGpsLoc: () -> Unit, togglePosDialog: () -> Unit, toggleLocDialog: () -> Unit
+) {
     val context = LocalContext.current
     // setPositionText(viewModel.getStationPosition())
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
@@ -124,15 +197,15 @@ private fun LocationCard() {
             }
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = { }, // locationRequest.launch(arrayOf(locationFine, locationCoarse))
+                    onClick = setGpsLoc, // locationRequest.launch(arrayOf(locationFine, locationCoarse))
                     text = stringResource(id = R.string.btn_gps), modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = { }, // open Position dialog
+                    onClick = togglePosDialog, // open Position dialog
                     text = stringResource(id = R.string.btn_manual), modifier = Modifier.weight(1f)
                 ) // viewModel.setStationPosition(position.first, position.second)
                 CardButton(
-                    onClick = { }, // open Locator dialog
+                    onClick = toggleLocDialog, // open Locator dialog
                     text = stringResource(id = R.string.btn_qth), modifier = Modifier.weight(1f)
                 ) // viewModel.setPositionFromQth(locator)
             }
@@ -143,11 +216,11 @@ private fun LocationCard() {
 @Preview(showBackground = true)
 @Composable
 private fun DataCardPreview() {
-    MainTheme { DataCard() }
+    MainTheme { DataCard({}, {}, {}) }
 }
 
 @Composable
-private fun DataCard() {
+private fun DataCard(updateOnline: () -> Unit, updateFile: () -> Unit, clearData: () -> Unit) {
     val context = LocalContext.current
     // setUpdateTime(viewModel.getLastUpdateTime())
     // viewModel.entriesTotal
@@ -176,15 +249,15 @@ private fun DataCard() {
             }
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = { }, // viewModel.updateFromWeb()
+                    onClick = updateOnline, // viewModel.updateFromWeb()
                     text = stringResource(id = R.string.btn_web), modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = { }, // contentRequest.launch("*/*")
+                    onClick = updateFile, // contentRequest.launch("*/*")
                     text = stringResource(id = R.string.btn_file), modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = { }, // viewModel.clearAllData()
+                    onClick = clearData, // viewModel.clearAllData()
                     text = stringResource(id = R.string.btn_clear), modifier = Modifier.weight(1f)
                 )
             }
@@ -192,33 +265,6 @@ private fun DataCard() {
     }
 }
 
-//private val viewModel: SettingsViewModel by viewModels()
-//private val bluetooth = when {
-//    Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
-//    else -> Manifest.permission.BLUETOOTH_CONNECT
-//}
-//private val bluetoothContract = ActivityResultContracts.RequestPermission()
-//private val bluetoothRequest = registerForActivityResult(bluetoothContract) { isGranted ->
-//    if (!isGranted) {
-//        showToast(getString(R.string.BTremote_perm_error))
-//        toggleBTstate(isGranted)
-//    }
-//}
-//private val locationFine = Manifest.permission.ACCESS_FINE_LOCATION
-//private val locationCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
-//private val locationContract = ActivityResultContracts.RequestMultiplePermissions()
-//private val locationRequest = registerForActivityResult(locationContract) { permissions ->
-//    when {
-//        permissions[locationFine] == true -> viewModel.setPositionFromGps()
-//        permissions[locationCoarse] == true -> viewModel.setPositionFromNet()
-//        else -> showToast(getString(R.string.location_gps_error))
-//    }
-//}
-//private val contentContract = ActivityResultContracts.GetContent()
-//private val contentRequest = registerForActivityResult(contentContract) { uri ->
-//    uri?.let { viewModel.updateFromFile(uri.toString()) }
-//}
-//
 //private fun setupRemoteCard() {
 //    binding.run {
 //        settingsRemote.remoteSwitch.apply {
@@ -264,24 +310,20 @@ private fun DataCard() {
 //    }
 //}
 //
-//private fun toggleBTstate(value: Boolean) {
-//    binding.run {
-//        viewModel.setBTEnabled(value)
-//        settingsBtremote.BTremoteSwitch.isChecked = value
-//        settingsBtremote.BTremoteAddress.isEnabled = value
-//        settingsBtremote.BTremoteFormat.isEnabled = value
-//    }
-//}
-//
 @Preview(showBackground = true)
 @Composable
 private fun OtherCardPreview() {
-    MainTheme { OtherCard() }
+    MainTheme { }
 }
 
 @Composable
-private fun OtherCard() {
-    val context = LocalContext.current
+private fun OtherCard(
+    settings: OtherSettings,
+    setUtc: (Boolean) -> Unit,
+    setUpdate: (Boolean) -> Unit,
+    setSweep: (Boolean) -> Unit,
+    setSensor: (Boolean) -> Unit
+) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
             Text(text = stringResource(id = R.string.other_title))
@@ -291,7 +333,7 @@ private fun OtherCard() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_utc))
-                Switch(checked = true, onCheckedChange = {})
+                Switch(checked = settings.isUtcEnabled, onCheckedChange = { setUtc(it) })
             } // viewModel.setUseUTC(isChecked)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -299,7 +341,7 @@ private fun OtherCard() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_update))
-                Switch(checked = true, onCheckedChange = {})
+                Switch(checked = settings.isUpdateEnabled, onCheckedChange = { setUpdate(it) })
             } // AutoUpdateEnabled(isChecked)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -307,7 +349,7 @@ private fun OtherCard() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sweep))
-                Switch(checked = true, onCheckedChange = {})
+                Switch(checked = settings.isSweepEnabled, onCheckedChange = { setSweep(it) })
             } // viewModel.setShowSweep(isChecked)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -315,7 +357,7 @@ private fun OtherCard() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sensors))
-                Switch(checked = true, onCheckedChange = {})
+                Switch(checked = settings.isSensorEnabled, onCheckedChange = { setSensor(it) })
             } // viewModel.setUseCompass(isChecked)
         }
     }

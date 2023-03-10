@@ -95,16 +95,16 @@ class RadarViewModel @Inject constructor(
     }
 
     fun enableSensor() {
-        if (settings.getUseCompass()) orientationManager.startListening(this)
+        if (settings.isSensorEnabled()) orientationManager.startListening(this)
     }
 
     fun disableSensor() {
-        if (settings.getUseCompass()) orientationManager.stopListening()
+        if (settings.isSensorEnabled()) orientationManager.stopListening()
     }
 
-    fun getUseCompass(): Boolean = settings.getUseCompass()
+    fun getUseCompass(): Boolean = settings.isSensorEnabled()
 
-    fun getShowSweep(): Boolean = settings.getShowSweep()
+    fun getShowSweep(): Boolean = settings.isSweepEnabled()
 
     override fun onOrientationChanged(azimuth: Float, pitch: Float, roll: Float) {
         _orientation.value = Triple(azimuth + getMagDeclination(stationPos), pitch, roll)
