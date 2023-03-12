@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -25,7 +24,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.gotoUrl
@@ -50,7 +48,7 @@ fun SettingsScreen(navController: NavController) {
         else -> Manifest.permission.BLUETOOTH_CONNECT
     }
     val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
-        viewModel.setBTEnabled(isGranted)
+//        viewModel.setBTEnabled(isGranted)
         if (!isGranted) showToast(context, bluetoothError)
     }
     val locationContract = ActivityResultContracts.RequestMultiplePermissions()
@@ -59,51 +57,43 @@ fun SettingsScreen(navController: NavController) {
     val locationPermFine = Manifest.permission.ACCESS_FINE_LOCATION
     val locationRequest = rememberLauncherForActivityResult(locationContract) { permissions ->
         when {
-            permissions[locationPermFine] == true -> viewModel.setPositionFromGps()
-            permissions[locationPermCoarse] == true -> viewModel.setPositionFromNet()
+            permissions[locationPermFine] == true -> viewModel.locationSettings.value.setGpsLoc
+            permissions[locationPermCoarse] == true -> viewModel.locationSettings.value.setGpsLoc
             else -> showToast(context, locationError)
         }
     }
     val contentContract = ActivityResultContracts.GetContent()
     val contentRequest = rememberLauncherForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.updateFromFile(uri.toString()) }
+        uri?.let { viewModel.dataSettings.value.updateFromFile(uri.toString()) }
     }
 
     // Location settings
+    val locSettings = viewModel.locationSettings.value
     val setGpsLoc = { locationRequest.launch(arrayOf(locationPermCoarse, locationPermFine)) }
-    val geoPos = viewModel.getStationPosition()
     val showPosDialog = rememberSaveable { mutableStateOf(false) }
     val togglePosDialog = { showPosDialog.value = showPosDialog.value.not() }
-    val savePos = { lat: Double, lon: Double -> viewModel.setStationPosition(lat, lon) }
     if (showPosDialog.value) {
-        PositionDialog(lat = geoPos.lat, lon = geoPos.lon, hide = togglePosDialog, save = savePos)
+        PositionDialog(
+            locSettings.getLatitude,
+            locSettings.getLongitude,
+            togglePosDialog,
+            locSettings.setManualLoc
+        )
     }
-    val qthLocator = viewModel.getStationLocator()
     val showLocDialog = rememberSaveable { mutableStateOf(false) }
     val toggleLocDialog = { showLocDialog.value = showLocDialog.value.not() }
-    val saveLocator = { locator: String -> viewModel.setPositionFromQth(locator) }
     if (showLocDialog.value) {
-        LocatorDialog(qthLocator = qthLocator, hide = toggleLocDialog, save = saveLocator)
+        LocatorDialog(locSettings.getLocator, toggleLocDialog, locSettings.setQthLoc)
     }
-    // Data settings
-    val updateFromWeb = { viewModel.updateFromWeb() }
-    val updateFromFile = { contentRequest.launch("*/*") }
-    val clearAllData = { viewModel.clearAllData() }
-    // Other settings
-    val otherSettings = viewModel.otherSettings.collectAsState()
-    val setUtc = { value: Boolean -> viewModel.setUtcState(value) }
-    val setUpdate = { value: Boolean -> viewModel.setUpdateState(value) }
-    val setSweep = { value: Boolean -> viewModel.setSweepState(value) }
-    val setSensor = { value: Boolean -> viewModel.setSensorState(value) }
 
     // Screen setup
     LazyColumn(
         modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         item { CardAbout(BuildConfig.VERSION_NAME) }
-        item { LocationCard(setGpsLoc, togglePosDialog, toggleLocDialog) }
-        item { DataCard(updateFromWeb, updateFromFile, clearAllData) }
-        item { OtherCard(otherSettings.value, setUtc, setUpdate, setSweep, setSensor) }
+        item { LocationCard(locSettings, setGpsLoc, togglePosDialog, toggleLocDialog) }
+        item { DataCard(viewModel.dataSettings.value) { contentRequest.launch("*/*") } }
+        item { OtherCard(viewModel.otherSettings.value) }
         item { CardCredits() }
     }
 }
@@ -164,36 +154,33 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun LocationCardPreview() {
-    MainTheme { LocationCard({}, {}, {}) }
+    MainTheme { }
 }
 
 @Composable
 private fun LocationCard(
-    setGpsLoc: () -> Unit, togglePosDialog: () -> Unit, toggleLocDialog: () -> Unit
+    settings: LocationSettings,
+    setGpsLoc: () -> Unit,
+    togglePosDialog: () -> Unit,
+    toggleLocDialog: () -> Unit
 ) {
-    val context = LocalContext.current
-    // setPositionText(viewModel.getStationPosition())
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Station position")
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 6.dp, end = 6.dp)
-                )
+                UpdateIndicator(isUpdating = settings.getUpdating, Modifier.weight(1f))
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Updated: 3 Mar 2023 - 15:51")
-                Text(text = "QTH: IO91vl")
+                Text(text = "Updated: ${settings.getLastUpdated}")
+                Text(text = "QTH: ${settings.getLocator}")
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Latitude: *")
-                Text(text = "Longitude: *")
+                Text(text = "Latitude: ${settings.getLatitude}")
+                Text(text = "Longitude: ${settings.getLongitude}")
             }
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
@@ -216,48 +203,40 @@ private fun LocationCard(
 @Preview(showBackground = true)
 @Composable
 private fun DataCardPreview() {
-    MainTheme { DataCard({}, {}, {}) }
+    MainTheme { }
 }
 
 @Composable
-private fun DataCard(updateOnline: () -> Unit, updateFile: () -> Unit, clearData: () -> Unit) {
-    val context = LocalContext.current
-    // setUpdateTime(viewModel.getLastUpdateTime())
-    // viewModel.entriesTotal
-    // viewModel.radiosTotal
+private fun DataCard(settings: DataSettings, updateFromFile: () -> Unit) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Satellite data")
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 6.dp, end = 6.dp)
-                )
+                UpdateIndicator(isUpdating = settings.getUpdating, Modifier.weight(1f))
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Updated: 3 Mar 2023 - 15:51")
+                Text(text = "Updated: ${settings.getLastUpdated}")
                 Text(text = "")
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Satellites: 7749")
-                Text(text = "Transceivers: 2240")
+                Text(text = "Satellites: ${settings.getSatellites}")
+                Text(text = "Transceivers: ${settings.getRadios}")
             }
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = updateOnline, // viewModel.updateFromWeb()
+                    onClick = settings.updateFromWeb, // viewModel.updateFromWeb()
                     text = stringResource(id = R.string.btn_web), modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = updateFile, // contentRequest.launch("*/*")
+                    onClick = updateFromFile, // contentRequest.launch("*/*")
                     text = stringResource(id = R.string.btn_file), modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = clearData, // viewModel.clearAllData()
+                    onClick = settings.clearAllData, // viewModel.clearAllData()
                     text = stringResource(id = R.string.btn_clear), modifier = Modifier.weight(1f)
                 )
             }
@@ -317,13 +296,7 @@ private fun OtherCardPreview() {
 }
 
 @Composable
-private fun OtherCard(
-    settings: OtherSettings,
-    setUtc: (Boolean) -> Unit,
-    setUpdate: (Boolean) -> Unit,
-    setSweep: (Boolean) -> Unit,
-    setSensor: (Boolean) -> Unit
-) {
+private fun OtherCard(settings: OtherSettings) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
             Text(text = stringResource(id = R.string.other_title))
@@ -333,7 +306,7 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_utc))
-                Switch(checked = settings.isUtcEnabled, onCheckedChange = { setUtc(it) })
+                Switch(checked = settings.getUtc, onCheckedChange = { settings.setUtc(it) })
             } // viewModel.setUseUTC(isChecked)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -341,7 +314,7 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_update))
-                Switch(checked = settings.isUpdateEnabled, onCheckedChange = { setUpdate(it) })
+                Switch(checked = settings.getUpdate, onCheckedChange = { settings.setUpdate(it) })
             } // AutoUpdateEnabled(isChecked)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -349,7 +322,7 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sweep))
-                Switch(checked = settings.isSweepEnabled, onCheckedChange = { setSweep(it) })
+                Switch(checked = settings.getSweep, onCheckedChange = { settings.setSweep(it) })
             } // viewModel.setShowSweep(isChecked)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -357,65 +330,15 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sensors))
-                Switch(checked = settings.isSensorEnabled, onCheckedChange = { setSensor(it) })
+                Switch(checked = settings.getSensor, onCheckedChange = { settings.setSensor(it) })
             } // viewModel.setUseCompass(isChecked)
         }
     }
 }
 
 //
-//private fun handleStationPosition(pos: DataState<GeoPos>) {
-//    when (pos) {
-//        is DataState.Success -> {
-//            setPositionText(pos.data)
-//            binding.settingsLocation.locationProgress.isIndeterminate = false
-//            viewModel.setPositionHandled()
-//            showToast(getString(R.string.location_success))
-//        }
-//        is DataState.Error -> {
-//            binding.settingsLocation.locationProgress.isIndeterminate = false
-//            viewModel.setPositionHandled()
-//            showToast(pos.message.toString())
-//        }
-//        DataState.Loading -> {
-//            binding.settingsLocation.locationProgress.isIndeterminate = true
-//        }
-//        DataState.Handled -> {}
-//    }
-//}
-//
-//private fun setPositionText(geoPos: GeoPos) {
-//    binding.run {
-//        val latFormat = getString(R.string.location_lat)
-//        val lonFormat = getString(R.string.location_lon)
-//        settingsLocation.locationLat.text = String.format(latFormat, geoPos.lat)
-//        settingsLocation.locationLon.text = String.format(lonFormat, geoPos.lon)
-//    }
-//}
-//
-//private fun handleSatState(state: DataState<Long>) {
-//    when (state) {
-//        is DataState.Success -> {
-//            binding.settingsData.dataProgress.isIndeterminate = false
-//            setUpdateTime(state.data)
-//            viewModel.setUpdateHandled()
-//            if (state.data == 0L) {
 //                showToast(getString(R.string.data_clear_success))
-//            } else {
 //                showToast(getString(R.string.data_success))
-//            }
-//        }
-//        is DataState.Error -> {
-//            binding.settingsData.dataProgress.isIndeterminate = false
-//            viewModel.setUpdateHandled()
-//            showToast(getString(R.string.data_error))
-//        }
-//        is DataState.Loading -> {
-//            binding.settingsData.dataProgress.isIndeterminate = true
-//        }
-//        is DataState.Handled -> {}
-//    }
-//}
 //
 //private fun setUpdateTime(updateTime: Long) {
 //    val updatePattern = getString(R.string.data_update)
@@ -468,4 +391,11 @@ private fun CardCredits(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+@Composable
+private fun UpdateIndicator(isUpdating: Boolean, modifier: Modifier = Modifier) = if (isUpdating) {
+    LinearProgressIndicator(modifier = modifier.padding(start = 6.dp, end = 6.dp))
+} else {
+    LinearProgressIndicator(modifier = modifier.padding(start = 6.dp, end = 6.dp), progress = 0f)
 }
