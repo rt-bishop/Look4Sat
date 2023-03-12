@@ -17,17 +17,16 @@
  */
 package com.rtbishop.look4sat.presentation.settingsScreen
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ILocationManager
 import com.rtbishop.look4sat.domain.ISettingsManager
 import com.rtbishop.look4sat.domain.model.DataState
-import com.rtbishop.look4sat.domain.model.OtherSettings
-import com.rtbishop.look4sat.domain.predict.GeoPos
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,100 +36,89 @@ class SettingsViewModel @Inject constructor(
     private val settings: ISettingsManager
 ) : ViewModel() {
 
-    private val _otherSettings = MutableStateFlow(
-        OtherSettings(
-            settings.isUtcEnabled(),
-            settings.isUpdateEnabled(),
-            settings.isSweepEnabled(),
-            settings.isSensorEnabled()
-        )
-    )
-    val otherSettings: StateFlow<OtherSettings> = _otherSettings
+    private val defaultLocationSettings = LocationSettings(false,
+        settings.getLastUpdateTime(),
+        locationManager.getStationPosition().lat,
+        locationManager.getStationPosition().lon,
+        settings.loadStationLocator(),
+        { locationManager.setPositionFromGps() },
+        { lat, lon -> locationManager.setStationPosition(lat, lon) },
+        { locationManager.setPositionFromQth(it) })
+    var locationSettings = mutableStateOf(defaultLocationSettings)
+        private set
 
-    fun setUtcState(value: Boolean) {
+    private val defaultDataSettings = DataSettings(false,
+        settings.getLastUpdateTime(),
+        0,
+        0,
+        { repository.updateFromWeb() },
+        { repository.updateFromFile(it) },
+        { repository.clearAllData() })
+    var dataSettings = mutableStateOf(defaultDataSettings)
+        private set
+
+    private val defaultOtherSettings = OtherSettings(settings.isUtcEnabled(),
+        settings.isUpdateEnabled(),
+        settings.isSweepEnabled(),
+        settings.isSensorEnabled(),
+        { setUtc(it) },
+        { setUpdate(it) },
+        { setSweep(it) },
+        { setSensor(it) })
+    var otherSettings = mutableStateOf(defaultOtherSettings)
+        private set
+
+    init {
+        viewModelScope.launch {
+            repository.updateState.collect {
+                val isUpdating = it is DataState.Loading
+                dataSettings.value = dataSettings.value.copy(
+                    getUpdating = isUpdating, getLastUpdated = settings.getLastUpdateTime()
+                )
+            }
+        }
+        viewModelScope.launch {
+            combine(repository.getEntriesTotal(), repository.getRadiosTotal()) { sats, radios ->
+                dataSettings.value =
+                    dataSettings.value.copy(getSatellites = sats, getRadios = radios)
+            }.collect {
+
+            }
+        }
+    }
+
+    private fun setUtc(value: Boolean) {
         settings.setUtcState(value)
-        _otherSettings.value = otherSettings.value.copy(isUtcEnabled = value)
+        otherSettings.value = otherSettings.value.copy(getUtc = value)
     }
 
-    fun setUpdateState(value: Boolean) {
+    private fun setUpdate(value: Boolean) {
         settings.setUpdateState(value)
-        _otherSettings.value = otherSettings.value.copy(isUpdateEnabled = value)
+        otherSettings.value = otherSettings.value.copy(getUpdate = value)
     }
 
-    fun setSweepState(value: Boolean) {
+    private fun setSweep(value: Boolean) {
         settings.setSweepState(value)
-        _otherSettings.value = otherSettings.value.copy(isSweepEnabled = value)
+        otherSettings.value = otherSettings.value.copy(getSweep = value)
     }
 
-    fun setSensorState(value: Boolean) {
+    private fun setSensor(value: Boolean) {
         settings.setSensorState(value)
-        _otherSettings.value = otherSettings.value.copy(isSensorEnabled = value)
+        otherSettings.value = otherSettings.value.copy(getSensor = value)
     }
 
-    val entriesTotal = repository.getEntriesTotal()
-    val radiosTotal = repository.getRadiosTotal()
-
-    fun updateFromFile(uri: String) = repository.updateFromFile(uri)
-
-    fun updateFromWeb() = repository.updateFromWeb()
-
-    fun clearAllData() = repository.clearAllData()
-
-    fun getUseUTC(): Boolean = settings.isUtcEnabled()
-
-    fun getLastUpdateTime(): Long = settings.getLastUpdateTime()
-
-    fun getAutoUpdateEnabled(): Boolean = settings.isUpdateEnabled()
-
-    fun getUseCompass(): Boolean = settings.isSensorEnabled()
-
-    fun getShowSweep(): Boolean = settings.isSweepEnabled()
-
-    fun getRotatorEnabled(): Boolean = settings.getRotatorEnabled()
-
-    fun setRotatorEnabled(value: Boolean) = settings.setRotatorEnabled(value)
-
-    fun getRotatorServer(): String = settings.getRotatorServer()
-
-    fun setRotatorServer(value: String) = settings.setRotatorServer(value)
-
-    fun getRotatorPort(): String = settings.getRotatorPort()
-
-    fun setRotatorPort(value: String) = settings.setRotatorPort(value)
-
-    fun getBTEnabled(): Boolean = settings.getBTEnabled()
-
-    fun setBTEnabled(value: Boolean) = settings.setBTEnabled(value)
-
-    fun getBTFormat(): String = settings.getBTFormat()
-
-    fun setBTFormat(value: String) = settings.setBTFormat(value)
-
+//    fun getRotatorEnabled(): Boolean = settings.getRotatorEnabled()
+//    fun setRotatorEnabled(value: Boolean) = settings.setRotatorEnabled(value)
+//    fun getRotatorServer(): String = settings.getRotatorServer()
+//    fun setRotatorServer(value: String) = settings.setRotatorServer(value)
+//    fun getRotatorPort(): String = settings.getRotatorPort()
+//    fun setRotatorPort(value: String) = settings.setRotatorPort(value)
+//    fun getBTEnabled(): Boolean = settings.getBTEnabled()
+//    fun setBTEnabled(value: Boolean) = settings.setBTEnabled(value)
+//    fun getBTFormat(): String = settings.getBTFormat()
+//    fun setBTFormat(value: String) = settings.setBTFormat(value)
 //    fun getBTDeviceName(): String = settings.getBTDeviceName()
-
 //    fun setBTDeviceName(value: String) = settings.setBTDeviceName(value)
-
-    fun getBTDeviceAddr(): String = settings.getBTDeviceAddr()
-
-    fun setBTDeviceAddr(value: String) = settings.setBTDeviceAddr(value)
-
-    fun getDataUpdateState() = repository.updateState
-
-    fun setUpdateHandled() = repository.setUpdateStateHandled()
-
-    val stationPosition: SharedFlow<DataState<GeoPos>> = locationManager.stationPosition
-
-    fun getStationPosition(): GeoPos = locationManager.getStationPosition()
-
-    fun getStationLocator(): String = settings.loadStationLocator()
-
-    fun setStationPosition(lat: Double, lon: Double) = locationManager.setStationPosition(lat, lon)
-
-    fun setPositionFromGps() = locationManager.setPositionFromGps()
-
-    fun setPositionFromNet() = locationManager.setPositionFromNet()
-
-    fun setPositionFromQth(qthString: String) = locationManager.setPositionFromQth(qthString)
-
-    fun setPositionHandled() = locationManager.setPositionHandled()
+//    fun getBTDeviceAddr(): String = settings.getBTDeviceAddr()
+//    fun setBTDeviceAddr(value: String) = settings.setBTDeviceAddr(value)
 }

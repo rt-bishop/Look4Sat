@@ -82,13 +82,17 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 }
 
 private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
-    Marker(mapView).apply {
-        setInfoWindow(null)
-        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        icon = ContextCompat.getDrawable(mapView.context, R.drawable.ic_position)
-        position = GeoPoint(stationPos.lat, stationPos.lon)
-        mapView.overlays[0] = this
-        mapView.invalidate()
+    try {
+        Marker(mapView).apply {
+            setInfoWindow(null)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            icon = ContextCompat.getDrawable(mapView.context, R.drawable.ic_position)
+            position = GeoPoint(stationPos.lat, stationPos.lon)
+            mapView.overlays[0] = this
+            mapView.invalidate()
+        }
+    } catch (exception: Exception) {
+        Timber.d(exception)
     }
 }
 
@@ -97,20 +101,24 @@ private fun setPositions(
 ) {
     val markers = FolderOverlay()
     posMap.entries.forEach {
-        Marker(mapView).apply {
-            setInfoWindow(null)
-            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-            icon = getCustomTextIcon(it.key.data.name, mapView)
-            try {
-                position = GeoPoint(it.value.lat, it.value.lon)
-            } catch (exception: IllegalArgumentException) {
-                println(exception.stackTraceToString())
+        try {
+            Marker(mapView).apply {
+                setInfoWindow(null)
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                icon = getCustomTextIcon(it.key.data.name, mapView)
+                try {
+                    position = GeoPoint(it.value.lat, it.value.lon)
+                } catch (exception: IllegalArgumentException) {
+                    println(exception.stackTraceToString())
+                }
+                setOnMarkerClickListener { _, _ ->
+                    action(it.key)
+                    return@setOnMarkerClickListener true
+                }
+                markers.add(this)
             }
-            setOnMarkerClickListener { _, _ ->
-                action(it.key)
-                return@setOnMarkerClickListener true
-            }
-            markers.add(this)
+        } catch (exception: Exception) {
+            Timber.d(exception)
         }
     }
     mapView.overlays[3] = markers
