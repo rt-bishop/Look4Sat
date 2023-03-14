@@ -15,33 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain
+package com.rtbishop.look4sat.model
 
-import com.rtbishop.look4sat.model.DataState
-import com.rtbishop.look4sat.model.SatItem
-import com.rtbishop.look4sat.model.SatRadio
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-
-interface IDataRepository {
-
-    val updateState: StateFlow<DataState<Long>>
-
-    fun getEntriesTotal(): Flow<Int>
-
-    fun getRadiosTotal(): Flow<Int>
-
-    suspend fun getEntriesWithModes(): List<SatItem>
-
-    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
-
-    suspend fun getRadiosWithId(id: Int): List<SatRadio>
-
-    fun updateFromFile(uri: String)
-
-    fun updateFromWeb()
-
-    fun setUpdateStateHandled()
-
-    fun clearAllData()
-}
+data class SatRadio(
+    val uuid: String,
+    val info: String,
+    val isAlive: Boolean,
+    var downlink: Long?,
+    var uplink: Long?,
+    val mode: String?,
+    val isInverted: Boolean,
+    val catnum: Int?,
+    var comment: String? = null
+)

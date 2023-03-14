@@ -17,8 +17,8 @@
  */
 package com.rtbishop.look4sat.utility
 
-import com.rtbishop.look4sat.domain.predict.DEG2RAD
-import com.rtbishop.look4sat.domain.predict.RAD2DEG
+import com.rtbishop.look4sat.domain.DEG2RAD
+import com.rtbishop.look4sat.domain.RAD2DEG
 import java.util.concurrent.TimeUnit
 
 fun Long.toTimerString(): String {
@@ -64,7 +64,7 @@ fun Double.toRadians(): Double = this * DEG2RAD
 //}
 
 fun String.isValidIPv4(): Boolean {
-    val ip4 = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!\$)|\$)){4}\$"
+    val ip4 = "^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])(\\.(?!\$)|\$)){4}\$"
     return this.matches(ip4.toRegex())
 }
 

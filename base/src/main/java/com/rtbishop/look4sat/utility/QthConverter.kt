@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.utility
 
-import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.model.GeoPos
 
 object QthConverter {
 
@@ -35,27 +35,27 @@ object QthConverter {
         return GeoPos(latitude, longitude)
     }
 
-    fun positionToQth(lat: Double, lon: Double): String? {
-        if (!isValidPosition(lat, lon)) return null
-        val tempLon = if (lon > 180.0) lon - 180 else lon
+    fun positionToQth(latitude: Double, longitude: Double): String? {
+        if (!isValidPosition(latitude, longitude)) return null
+        val tempLon = if (longitude > 180.0) longitude - 180 else longitude
         val upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
         val lower = "abcdefghijklmnopqrstuvwx"
-        val longitude = tempLon + 180
-        val latitude = lat + 90
-        val lonFirst = upper[(longitude / 20).toInt()]
-        val latFirst = upper[(latitude / 10).toInt()]
-        val lonSecond = ((longitude / 2) % 10).toInt().toString()
-        val latSecond = (latitude % 10).toInt().toString()
-        val lonThird = lower[((longitude % 2) * 12).toInt()]
-        val latThird = lower[((latitude % 1) * 24).toInt()]
+        val newLongitude = tempLon + 180
+        val newLatitude = latitude + 90
+        val lonFirst = upper[(newLongitude / 20).toInt()]
+        val latFirst = upper[(newLatitude / 10).toInt()]
+        val lonSecond = ((newLongitude / 2) % 10).toInt().toString()
+        val latSecond = (newLatitude % 10).toInt().toString()
+        val lonThird = lower[((newLongitude % 2) * 12).toInt()]
+        val latThird = lower[((newLatitude % 1) * 24).toInt()]
         return "$lonFirst$latFirst$lonSecond$latSecond$lonThird$latThird"
     }
 
-    fun isValidPosition(lat: Double, lon: Double): Boolean {
+    private fun isValidPosition(lat: Double, lon: Double): Boolean {
         return (lat >= -90.0 && lat <= 90.0) && (lon >= -180.0 && lon <= 360.0)
     }
 
     private fun isValidLocator(locator: String): Boolean {
-        return locator.matches("[a-xA-X][a-xA-X][0-9][0-9][a-xA-X][a-xA-X]".toRegex())
+        return locator.matches("[a-xA-X][a-xA-X]\\d\\d[a-xA-X][a-xA-X]".toRegex())
     }
 }

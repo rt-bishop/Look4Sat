@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.framework.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
-import com.rtbishop.look4sat.domain.predict.OrbitalData
+import com.rtbishop.look4sat.model.OrbitalData
 
 @Entity(tableName = "entries", primaryKeys = ["catnum"])
 data class SatEntry(@Embedded val data: OrbitalData, var comment: String? = null)

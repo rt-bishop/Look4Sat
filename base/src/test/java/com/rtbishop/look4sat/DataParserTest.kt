@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat
 
-import com.rtbishop.look4sat.utility.DataParser
+import com.rtbishop.look4sat.data.DataParser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
