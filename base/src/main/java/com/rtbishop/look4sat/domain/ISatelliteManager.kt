@@ -1,10 +1,9 @@
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.domain.model.SatRadio
-import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.model.GeoPos
+import com.rtbishop.look4sat.model.SatPass
+import com.rtbishop.look4sat.model.SatPos
+import com.rtbishop.look4sat.model.SatRadio
 import kotlinx.coroutines.flow.SharedFlow
 
 interface ISatelliteManager {
