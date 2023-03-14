@@ -17,31 +17,16 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.model.DataState
-import com.rtbishop.look4sat.model.SatItem
-import com.rtbishop.look4sat.model.SatRadio
-import kotlinx.coroutines.flow.Flow
+import com.rtbishop.look4sat.model.StationPos
 import kotlinx.coroutines.flow.StateFlow
 
-interface IDataRepository {
+interface ILocationSource {
 
-    val updateState: StateFlow<DataState<Long>>
+    val stationPosition: StateFlow<StationPos>
 
-    fun getEntriesTotal(): Flow<Int>
+    fun setGpsPosition(): Boolean
 
-    fun getRadiosTotal(): Flow<Int>
+    fun setGeoPosition(latitude: Double, longitude: Double): Boolean
 
-    suspend fun getEntriesWithModes(): List<SatItem>
-
-    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
-
-    suspend fun getRadiosWithId(id: Int): List<SatRadio>
-
-    fun updateFromFile(uri: String)
-
-    fun updateFromWeb()
-
-    fun setUpdateStateHandled()
-
-    fun clearAllData()
+    fun setQthPosition(locator: String): Boolean
 }
