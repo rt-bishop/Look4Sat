@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat
 
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,15 +31,13 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent { MainTheme { MainScreen() } }
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        val newConfig = Configuration(newBase?.resources?.configuration)
-        newConfig.fontScale = 1.0f
+        val newConfig = Configuration(newBase?.resources?.configuration).apply { fontScale = 1.0f }
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
     }

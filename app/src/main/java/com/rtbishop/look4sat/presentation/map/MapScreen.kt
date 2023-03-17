@@ -102,8 +102,8 @@ private fun setPositions(
     posMap: Map<Satellite, GeoPos>, mapView: MapView, action: (Satellite) -> Unit
 ) {
     val markers = FolderOverlay()
-    posMap.entries.forEach {
-        try {
+    try {
+        posMap.entries.forEach {
             Marker(mapView).apply {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
@@ -119,12 +119,12 @@ private fun setPositions(
                 }
                 markers.add(this)
             }
-        } catch (exception: Exception) {
-            Timber.d(exception)
         }
+        mapView.overlays[3] = markers
+        mapView.invalidate()
+    } catch (exception: Exception) {
+        Timber.d(exception)
     }
-    mapView.overlays[3] = markers
-    mapView.invalidate()
 }
 
 private fun getCustomTextIcon(textLabel: String, mapView: MapView): Drawable {
@@ -143,33 +143,33 @@ private fun getCustomTextIcon(textLabel: String, mapView: MapView): Drawable {
 private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
 //    val center = GeoPoint(satTrack[0][0].lat, satTrack[0][0].lon)
     val trackOverlay = FolderOverlay()
-    satTrack.forEach { track ->
-        val trackPoints = track.map { GeoPoint(it.lat, it.lon) }
-        Polyline().apply {
-            try {
+    try {
+        satTrack.forEach { track ->
+            val trackPoints = track.map { GeoPoint(it.lat, it.lon) }
+            Polyline().apply {
                 setPoints(trackPoints)
                 outlinePaint.set(trackPaint)
                 trackOverlay.add(this)
-            } catch (exception: IllegalArgumentException) {
-                println(exception.stackTraceToString())
             }
         }
+        mapView.overlays[1] = trackOverlay
+    } catch (exception: Exception) {
+        Timber.d(exception)
     }
-    mapView.overlays[1] = trackOverlay
 //    mapView.controller.animateTo(center)
 }
 
 private fun setFootprint(satPos: SatPos, mapView: MapView) {
     val footprintPoints = satPos.getRangeCircle().map { GeoPoint(it.lat, it.lon) }
-    val footprintOverlay = Polyline().apply {
-        outlinePaint.set(footprintPaint)
-        try {
+    try {
+        val footprintOverlay = Polyline().apply {
+            outlinePaint.set(footprintPaint)
             setPoints(footprintPoints)
-        } catch (exception: IllegalArgumentException) {
-            println(exception.stackTraceToString())
         }
+        mapView.overlays[2] = footprintOverlay
+    } catch (exception: Exception) {
+        Timber.d(exception)
     }
-    mapView.overlays[2] = footprintOverlay
 }
 
 //private fun handleMapData(mapData: MapData) {

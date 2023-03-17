@@ -9,7 +9,6 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -28,7 +27,7 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
         onClick = { onClick() }, colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.onTertiary
-        ), shape = MaterialTheme.shapes.small, modifier = modifier.padding(start = 4.dp, end = 4.dp)
+        ), shape = MaterialTheme.shapes.small, modifier = modifier
     ) { Text(text = text, fontSize = 17.sp) }
 }
 

@@ -21,15 +21,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.model.StationPos
 import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.dialogs.LocatorDialog
 import com.rtbishop.look4sat.presentation.dialogs.PositionDialog
 import com.rtbishop.look4sat.presentation.gotoUrl
 import com.rtbishop.look4sat.presentation.showToast
+import java.text.SimpleDateFormat
+import java.util.*
 
 private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
 private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
@@ -38,9 +40,8 @@ private const val DONATE_URL = "https://ko-fi.com/rt_bishop"
 private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val context = LocalContext.current
-    val viewModel: SettingsViewModel = hiltViewModel()
 
     // Permissions setup
     val bluetoothContract = ActivityResultContracts.RequestPermission()
@@ -76,8 +77,8 @@ fun SettingsScreen(navController: NavController) {
     val togglePosDialog = { showPosDialog.value = showPosDialog.value.not() }
     if (showPosDialog.value) {
         PositionDialog(
-            locSettings.getLatitude,
-            locSettings.getLongitude,
+            locSettings.stationPos.latitude,
+            locSettings.stationPos.longitude,
             togglePosDialog,
             locSettings.setManualLoc
         )
@@ -85,7 +86,7 @@ fun SettingsScreen(navController: NavController) {
     val showLocDialog = rememberSaveable { mutableStateOf(false) }
     val toggleLocDialog = { showLocDialog.value = showLocDialog.value.not() }
     if (showLocDialog.value) {
-        LocatorDialog(locSettings.getLocator, toggleLocDialog, locSettings.setQthLoc)
+        LocatorDialog(locSettings.stationPos.qthLocator, toggleLocDialog, locSettings.setQthLoc)
     }
 
     // Screen setup
@@ -100,11 +101,18 @@ fun SettingsScreen(navController: NavController) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun CardAboutPreview() = MainTheme { CardAbout(version = "4.0.0") }
+
 @Composable
 private fun CardAbout(version: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     ElevatedCard(modifier = modifier.fillMaxWidth()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
             Row(horizontalArrangement = Arrangement.Center) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_entries),
@@ -128,21 +136,21 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(id = R.string.app_subtitle),
                 fontSize = 20.sp,
-                modifier = modifier.padding(top = 4.dp)
+                modifier = modifier.padding(top = 4.dp, bottom = 2.dp)
             )
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.padding(4.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
                     onClick = { gotoUrl(context, GITHUB_URL) },
                     text = stringResource(id = R.string.btn_github),
                     modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
                     onClick = { gotoUrl(context, DONATE_URL) },
                     text = stringResource(id = R.string.btn_donate),
                     modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
                     onClick = { gotoUrl(context, FDROID_URL) },
                     text = stringResource(id = R.string.btn_fdroid),
@@ -155,8 +163,11 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-private fun LocationCardPreview() {
-    MainTheme { }
+private fun LocationCardPreview() = MainTheme {
+    val stationPos = StationPos(0.0, 0.0, "IO91vl", 0L)
+    LocationCard(
+        settings = LocationSettings(true, stationPos, {}, { _, _ -> }, { }),
+        setGpsLoc = {}, togglePosDialog = {}) {}
 }
 
 @Composable
@@ -167,36 +178,56 @@ private fun LocationCard(
     toggleLocDialog: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(4.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Station position")
-                UpdateIndicator(isUpdating = settings.getUpdating, Modifier.weight(1f))
+                Text(
+                    text = stringResource(id = R.string.location_title),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                UpdateIndicator(isUpdating = settings.isUpdating, Modifier.weight(1f))
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Updated: ${settings.getLastUpdated}")
-                Text(text = "QTH: ${settings.getLocator}")
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = setUpdateTime(updateTime = settings.stationPos.timestamp))
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = "Lat: ${settings.stationPos.latitude}°",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = "Lon: ${settings.stationPos.longitude}°",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "Qth: ${settings.stationPos.qthLocator}",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Latitude: ${settings.getLatitude}")
-                Text(text = "Longitude: ${settings.getLongitude}")
-            }
+            Spacer(modifier = Modifier.height(1.dp))
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = setGpsLoc, // locationRequest.launch(arrayOf(locationFine, locationCoarse))
-                    text = stringResource(id = R.string.btn_gps), modifier = Modifier.weight(1f)
+                    onClick = setGpsLoc,
+                    text = stringResource(id = R.string.btn_gps),
+                    modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = togglePosDialog, // open Position dialog
-                    text = stringResource(id = R.string.btn_manual), modifier = Modifier.weight(1f)
-                ) // viewModel.setStationPosition(position.first, position.second)
+                    onClick = togglePosDialog,
+                    text = stringResource(id = R.string.btn_manual),
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = toggleLocDialog, // open Locator dialog
-                    text = stringResource(id = R.string.btn_qth), modifier = Modifier.weight(1f)
-                ) // viewModel.setPositionFromQth(locator)
+                    onClick = toggleLocDialog,
+                    text = stringResource(id = R.string.btn_qth),
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
@@ -204,42 +235,52 @@ private fun LocationCard(
 
 @Preview(showBackground = true)
 @Composable
-private fun DataCardPreview() {
-    MainTheme { }
+private fun DataCardPreview() = MainTheme {
+    DataCard(settings = DataSettings(
+        true, 0L, 5000, 2500, {}, { }, {})
+    ) {}
 }
 
 @Composable
 private fun DataCard(settings: DataSettings, updateFromFile: () -> Unit) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(4.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Satellite data")
-                UpdateIndicator(isUpdating = settings.getUpdating, Modifier.weight(1f))
+                Text(
+                    text = stringResource(id = R.string.data_title),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                UpdateIndicator(isUpdating = settings.isUpdating, Modifier.weight(1f))
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Updated: ${settings.getLastUpdated}")
-                Text(text = "")
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = setUpdateTime(updateTime = settings.lastUpdated))
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Satellites: ${settings.satsTotal}")
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = "Transceivers: ${settings.radiosTotal}")
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Satellites: ${settings.getSatellites}")
-                Text(text = "Transceivers: ${settings.getRadios}")
-            }
+            Spacer(modifier = Modifier.height(1.dp))
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = settings.updateFromWeb, // viewModel.updateFromWeb()
-                    text = stringResource(id = R.string.btn_web), modifier = Modifier.weight(1f)
+                    onClick = settings.updateFromWeb,
+                    text = stringResource(id = R.string.btn_web),
+                    modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = updateFromFile, // contentRequest.launch("*/*")
-                    text = stringResource(id = R.string.btn_file), modifier = Modifier.weight(1f)
+                    onClick = updateFromFile,
+                    text = stringResource(id = R.string.btn_file),
+                    modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = settings.clearAllData, // viewModel.clearAllData()
-                    text = stringResource(id = R.string.btn_clear), modifier = Modifier.weight(1f)
+                    onClick = settings.clearAllData,
+                    text = stringResource(id = R.string.btn_clear),
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -293,15 +334,17 @@ private fun DataCard(settings: DataSettings, updateFromFile: () -> Unit) {
 //
 @Preview(showBackground = true)
 @Composable
-private fun OtherCardPreview() {
-    MainTheme { }
+private fun OtherCardPreview() = MainTheme {
+    OtherCard(settings = OtherSettings(
+        getUtc = false, getUpdate = true, getSweep = true, getSensor = true,
+        setUtc = {}, setUpdate = {}, setSweep = {}, setSensor = {})
+    )
 }
 
 @Composable
 private fun OtherCard(settings: OtherSettings) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(4.dp)) {
-            Text(text = stringResource(id = R.string.other_title))
+        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -309,7 +352,7 @@ private fun OtherCard(settings: OtherSettings) {
             ) {
                 Text(text = stringResource(id = R.string.other_switch_utc))
                 Switch(checked = settings.getUtc, onCheckedChange = { settings.setUtc(it) })
-            } // viewModel.setUseUTC(isChecked)
+            }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -317,7 +360,7 @@ private fun OtherCard(settings: OtherSettings) {
             ) {
                 Text(text = stringResource(id = R.string.other_switch_update))
                 Switch(checked = settings.getUpdate, onCheckedChange = { settings.setUpdate(it) })
-            } // AutoUpdateEnabled(isChecked)
+            }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -325,7 +368,7 @@ private fun OtherCard(settings: OtherSettings) {
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sweep))
                 Switch(checked = settings.getSweep, onCheckedChange = { settings.setSweep(it) })
-            } // viewModel.setShowSweep(isChecked)
+            }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -333,58 +376,49 @@ private fun OtherCard(settings: OtherSettings) {
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sensors))
                 Switch(checked = settings.getSensor, onCheckedChange = { settings.setSensor(it) })
-            } // viewModel.setUseCompass(isChecked)
+            }
         }
     }
 }
 
-//
-//                showToast(getString(R.string.data_clear_success))
-//                showToast(getString(R.string.data_success))
-//
-//private fun setUpdateTime(updateTime: Long) {
-//    val updatePattern = getString(R.string.data_update)
-//    val updateDate = if (updateTime == 0L) {
-//        getString(R.string.pass_placeholder)
-//    } else {
-//        SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault()).format(Date(updateTime))
-//    }
-//    binding.settingsData.dataUpdate.text = String.format(updatePattern, updateDate)
-//}
-//
+@Preview(showBackground = true)
+@Composable
+private fun CardCreditsPreview() = MainTheme { CardCredits() }
+
 @Composable
 private fun CardCredits(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     ElevatedCard(modifier = modifier.fillMaxWidth()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
             Text(
                 text = stringResource(id = R.string.outro_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.secondary,
-                modifier = modifier.padding(8.dp)
+                modifier = modifier.padding(6.dp)
             )
             Text(
                 text = stringResource(id = R.string.outro_thanks),
                 fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                modifier = modifier.padding(horizontal = 6.dp, vertical = 4.dp)
+                textAlign = TextAlign.Center
             )
             Text(
                 text = stringResource(id = R.string.outro_license),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.secondary,
-                modifier = modifier.padding(8.dp)
+                modifier = modifier.padding(6.dp)
             )
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.padding(4.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
                     onClick = { gotoUrl(context, LICENSE_URL) },
                     text = stringResource(id = R.string.btn_license),
                     modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
                     onClick = { gotoUrl(context, POLICY_URL) },
                     text = stringResource(id = R.string.btn_privacy),
@@ -396,8 +430,26 @@ private fun CardCredits(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun setUpdateTime(updateTime: Long): String {
+    val updateDate = if (updateTime != 0L) {
+        val timePattern = stringResource(id = R.string.last_updated_pattern)
+        SimpleDateFormat(timePattern, Locale.getDefault()).format(Date(updateTime))
+    } else {
+        stringResource(id = R.string.pass_placeholder)
+    }
+    return stringResource(id = R.string.data_update, updateDate)
+}
+
+@Composable
 private fun UpdateIndicator(isUpdating: Boolean, modifier: Modifier = Modifier) = if (isUpdating) {
-    LinearProgressIndicator(modifier = modifier.padding(start = 6.dp, end = 6.dp))
+    LinearProgressIndicator(
+        modifier = modifier.padding(start = 6.dp),
+        trackColor = MaterialTheme.colorScheme.inverseSurface
+    )
 } else {
-    LinearProgressIndicator(modifier = modifier.padding(start = 6.dp, end = 6.dp), progress = 0f)
+    LinearProgressIndicator(
+        progress = 0f,
+        modifier = modifier.padding(start = 6.dp),
+        trackColor = MaterialTheme.colorScheme.inverseSurface
+    )
 }
