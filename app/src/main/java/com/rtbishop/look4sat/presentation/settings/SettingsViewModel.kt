@@ -25,6 +25,7 @@ import com.rtbishop.look4sat.domain.ILocationSource
 import com.rtbishop.look4sat.domain.ISettingsSource
 import com.rtbishop.look4sat.model.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,11 +38,8 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val defaultLocationSettings = LocationSettings(false,
-        locationSource.stationPosition.value.timestamp,
-        locationSource.stationPosition.value.latitude,
-        locationSource.stationPosition.value.longitude,
-        locationSource.stationPosition.value.qthLocator,
-        { locationSource.setGpsPosition() },
+        locationSource.stationPosition.value,
+        { updateStationPosition() },
         { lat, lon -> locationSource.setGeoPosition(lat, lon) },
         { locationSource.setQthPosition(it) })
     val locationSettings = mutableStateOf(defaultLocationSettings)
@@ -67,19 +65,31 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            locationSource.stationPosition.collect { stationPos ->
+                delay(125)
+                locationSettings.value = locationSettings.value.copy(
+                    isUpdating = false, stationPos = stationPos
+                )
+            }
+        }
+        viewModelScope.launch {
             repository.updateState.collect {
                 val isUpdating = it is DataState.Loading
                 dataSettings.value = dataSettings.value.copy(
-                    getUpdating = isUpdating, getLastUpdated = settings.getLastUpdateTime()
+                    isUpdating = isUpdating, lastUpdated = settings.getLastUpdateTime()
                 )
             }
         }
         viewModelScope.launch {
             combine(repository.getEntriesTotal(), repository.getRadiosTotal()) { sats, radios ->
-                dataSettings.value =
-                    dataSettings.value.copy(getSatellites = sats, getRadios = radios)
+                dataSettings.value = dataSettings.value.copy(satsTotal = sats, radiosTotal = radios)
             }.collect {}
         }
+    }
+
+    private fun updateStationPosition() {
+        val isSuccessful = locationSource.setGpsPosition()
+        locationSettings.value = locationSettings.value.copy(isUpdating = isSuccessful)
     }
 
     private fun setUtc(value: Boolean) {

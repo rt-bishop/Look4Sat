@@ -60,14 +60,18 @@ private fun MainNavBar(navController: NavController) {
 
 @Composable
 private fun MainNavGraph(navController: NavHostController) {
+    val navToPasses = { navController.navigate(Screen.Passes.route) }
+    val navToRadar = { catNum: Int, aosTime: Long ->
+        navController.navigate("${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}")
+    }
     val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
     val radarArgs = listOf(navArgument("catNum") { defaultValue = 0 },
         navArgument("aosTime") { defaultValue = 0L })
     NavHost(navController, startDestination = Screen.Passes.route) {
-        composable(Screen.Entries.route) { EntriesScreen(navController) }
-        composable(Screen.Passes.route) { PassesScreen(navController) }
-        composable(radarRoute, radarArgs) { RadarScreen(navController) }
+        composable(Screen.Entries.route) { EntriesScreen(navToPasses) }
+        composable(Screen.Passes.route) { PassesScreen(navToRadar) }
+        composable(radarRoute, radarArgs) { RadarScreen() }
         composable(Screen.Map.route) { MapScreen() }
-        composable(Screen.Settings.route) { SettingsScreen(navController) }
+        composable(Screen.Settings.route) { SettingsScreen() }
     }
 }
