@@ -158,25 +158,24 @@
     <string name="BTremote_output_hint">数据格式</string>
     <string name="BTremote_perm_error">请检查蓝牙权限</string>
 
-    <string name="other_title">其他偏好</string>
-    <string name="other_switch_utc">以 UTC 时间显示</string>
-    <string name="other_switch_update">启用卫星数据自动更新</string>
-    <string name="other_switch_sweep">启用雷达扫描动画</string>
-    <string name="other_switch_sensors">使用传感器旋转雷达视图</string>
+    <string name="other_switch_utc">• 以 UTC 时间显示</string>
+    <string name="other_switch_update">• 启用卫星数据自动更新</string>
+    <string name="other_switch_sweep">• 启用雷达扫描动画</string>
+    <string name="other_switch_sensors">• 使用传感器旋转雷达视图</string>
 
     <string name="outro_title">我要感谢：</string>
     <string name="outro_thanks">• 感谢下载和使用 Look4Sat！愿你的天空永远晴朗！
-        \n • 简体中文版翻译由 <a href="https://github.com/BA7LWN">BA7LWN</a> 于 2022.5.10 创建。
-        \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
+        \n• 简体中文版翻译由 <a href="https://github.com/BA7LWN">BA7LWN</a> 于 2022.5.10 创建。
+        \n• <a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
         under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
-        \n • <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
+        \n• <a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
         satellite tracker that inspired the creation of Look4Sat.
-        \n • <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
+        \n• <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
         <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
-        \n • <a href="https://libre.space/">Libre Space Foundation</a> for their
+        \n• <a href="https://libre.space/">Libre Space Foundation</a> for their
         <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data.
-        \n • <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
+        \n• <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
         team for their interest to the app and the interview published.
     </string>
     <string name="outro_license">该应用程序不提供任何保修.</string>

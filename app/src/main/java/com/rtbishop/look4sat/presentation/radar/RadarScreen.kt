@@ -16,13 +16,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.model.SatRadio
 
 @Composable
-fun RadarScreen(navController: NavController) {
-    val viewModel: RadarViewModel = hiltViewModel()
+fun RadarScreen(viewModel: RadarViewModel = hiltViewModel()) {
     val currentPass = viewModel.getPass().collectAsState(null)
 
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

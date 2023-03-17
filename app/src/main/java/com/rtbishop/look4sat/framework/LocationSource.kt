@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.framework
 
+import android.location.Criteria
 import android.location.Location
 import android.location.LocationManager
 import androidx.core.location.LocationListenerCompat
@@ -35,13 +36,15 @@ class LocationSource(
     private val settings: ISettingsSource,
 ) : ILocationSource, LocationListenerCompat {
 
+    private val defaultProvider = LocationManager.PASSIVE_PROVIDER
     private val _stationPosition = MutableStateFlow(settings.loadStationPosition())
     override val stationPosition: StateFlow<StationPos> = _stationPosition
 
     override fun setGpsPosition(): Boolean {
         if (!LocationManagerCompat.isLocationEnabled(manager)) return false
-        forceLocationUpdate(LocationManager.GPS_PROVIDER)
-        forceLocationUpdate(LocationManager.NETWORK_PROVIDER)
+        val criteria = Criteria().apply { isCostAllowed = true }
+        val bestProvider = manager.getBestProvider(criteria, true) ?: defaultProvider
+        forceLocationUpdate(bestProvider)
         return true
     }
 
@@ -65,7 +68,7 @@ class LocationSource(
 
     private fun forceLocationUpdate(provider: String) {
         try {
-            val location = manager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER)
+            val location = manager.getLastKnownLocation(defaultProvider)
             if (location == null || System.currentTimeMillis() - location.time > 600000) {
                 Timber.d("Requesting $provider location update")
                 manager.requestLocationUpdates(provider, 0L, 0f, this)

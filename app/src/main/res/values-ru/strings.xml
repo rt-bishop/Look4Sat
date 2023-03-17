@@ -158,24 +158,23 @@
     <string name="BTremote_output_hint">Формат данных</string>
     <string name="BTremote_perm_error">Нет разрешения использовать bluetooth</string>
 
-    <string name="other_title">Другие настройки</string>
-    <string name="other_switch_utc">Показывать время по UTC</string>
-    <string name="other_switch_update">Обновлять данные автоматически</string>
-    <string name="other_switch_sweep">Показывать анимацию радара</string>
-    <string name="other_switch_sensors">Использовать сенсоры устройства</string>
+    <string name="other_switch_utc">• Показывать время по UTC</string>
+    <string name="other_switch_update">• Обновлять данные автоматически</string>
+    <string name="other_switch_sweep">• Показывать анимацию радара</string>
+    <string name="other_switch_sensors">• Использовать сенсоры устройства</string>
 
     <string name="outro_title">Я хотел бы сказать спасибо:</string>
-    <string name="outro_thanks"> • Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
-        \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a> и
+    <string name="outro_thanks">• Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
+        \n• <a href="https://github.com/g4dpz">David A. B. Johnson</a> и
         <a href="https://github.com/davidmoten">Dave Moten</a> за работу над predict4java и доступ
         к ней по <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
-        \n • <a href="https://github.com/csete">Alexandru Csete</a> за его программу
+        \n• <a href="https://github.com/csete">Alexandru Csete</a> за его программу
         Gpredict, которая послужила для меня вдохновением.
-        \n • <a href="https://celestrak.com/webmaster.php">Доктору T.S. Kelso</a> за его сайт
+        \n• <a href="https://celestrak.com/webmaster.php">Доктору T.S. Kelso</a> за его сайт
         <a href="https://celestrak.com/">Celestrak</a> и доступ к файлам орбит Two-Line Element.
-        \n • <a href="https://libre.space/">Libre Space Foundation</a> за проект
+        \n• <a href="https://libre.space/">Libre Space Foundation</a> за проект
         <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с информацией о спутниках.
-        \n • <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
+        \n• <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
         за интерес к приложению и публикацию интервью на сайте.
     </string>
     <string name="outro_license">Это ПО поставляется без гарантий.</string>

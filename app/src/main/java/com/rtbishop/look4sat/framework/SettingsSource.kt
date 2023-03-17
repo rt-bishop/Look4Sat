@@ -50,7 +50,7 @@ class SettingsSource(private val prefs: SharedPreferences) : ISettingsSource {
     override fun loadStationPosition(): StationPos {
         val latitude = prefs.getString(keyLatitude, null) ?: "0.0"
         val longitude = prefs.getString(keyLongitude, null) ?: "0.0"
-        val qthLocator = prefs.getString(keyLocator, null) ?: ""
+        val qthLocator = prefs.getString(keyLocator, null) ?: "null"
         val timestamp = prefs.getLong(keyLocTimestamp, 0L)
         return StationPos(latitude.toDouble(), longitude.toDouble(), qthLocator, timestamp)
     }
