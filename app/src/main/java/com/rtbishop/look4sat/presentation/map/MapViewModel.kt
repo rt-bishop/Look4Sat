@@ -53,8 +53,8 @@ class MapViewModel @Inject constructor(
     private var selectedSatellite: Satellite? = null
 
     val stationPos = flow {
-        val osmLat = clipLat(stationPosition.lat)
-        val osmLon = clipLon(stationPosition.lon)
+        val osmLat = clipLat(stationPosition.latitude)
+        val osmLon = clipLon(stationPosition.longitude)
         emit(GeoPos(osmLat, osmLon))
     }
 
@@ -127,20 +127,20 @@ class MapViewModel @Inject constructor(
             val osmLat = clipLat(satPos.latitude.toDegrees())
             val osmLon = clipLon(satPos.longitude.toDegrees())
             val currentPosition = GeoPos(osmLat, osmLon)
-            if (oldLongitude < -170.0 && currentPosition.lon > 170.0) {
+            if (oldLongitude < -170.0 && currentPosition.longitude > 170.0) {
                 // adding left terminal position
                 currentTrack.add(GeoPos(osmLat, -180.0))
                 val finishedTrack = mutableListOf<GeoPos>().apply { addAll(currentTrack) }
                 satTracks.add(finishedTrack)
                 currentTrack.clear()
-            } else if (oldLongitude > 170.0 && currentPosition.lon < -170.0) {
+            } else if (oldLongitude > 170.0 && currentPosition.longitude < -170.0) {
                 // adding right terminal position
                 currentTrack.add(GeoPos(osmLat, 180.0))
                 val finishedTrack = mutableListOf<GeoPos>().apply { addAll(currentTrack) }
                 satTracks.add(finishedTrack)
                 currentTrack.clear()
             }
-            oldLongitude = currentPosition.lon
+            oldLongitude = currentPosition.longitude
             currentTrack.add(currentPosition)
         }
         satTracks.add(currentTrack)
@@ -183,7 +183,7 @@ class MapViewModel @Inject constructor(
         val osmLat = clipLat(satPos.latitude.toDegrees())
         val osmLon = clipLon(satPos.longitude.toDegrees())
         val osmPos = GeoPos(osmLat, osmLon)
-        val qthLoc = QthConverter.positionToQth(osmPos.lat, osmPos.lon) ?: "-- --"
+        val qthLoc = QthConverter.positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
         val velocity = satPos.getOrbitalVelocity()
         val phase = satPos.phase.toDegrees()
         val visibility = satPos.eclipsed

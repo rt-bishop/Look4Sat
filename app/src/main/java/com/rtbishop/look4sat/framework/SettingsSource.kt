@@ -20,7 +20,10 @@ package com.rtbishop.look4sat.framework
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.rtbishop.look4sat.domain.ISettingsSource
-import com.rtbishop.look4sat.model.StationPos
+import com.rtbishop.look4sat.model.GeoPos
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onCompletion
 
 class SettingsSource(private val prefs: SharedPreferences) : ISettingsSource {
 
@@ -42,22 +45,25 @@ class SettingsSource(private val prefs: SharedPreferences) : ISettingsSource {
         const val keyBTFormat = "BTFormat"
         const val keyLatitude = "stationLat"
         const val keyLongitude = "stationLon"
+        const val keyAltitude = "stationAlt"
         const val keyLocator = "stationQTH"
         const val keyLocTimestamp = "locTimestamp"
         const val keySelection = "selection"
     }
 
-    override fun loadStationPosition(): StationPos {
-        val latitude = prefs.getString(keyLatitude, null) ?: "0.0"
-        val longitude = prefs.getString(keyLongitude, null) ?: "0.0"
+    override fun loadStationPosition(): GeoPos {
+        val latitude = (prefs.getString(keyLatitude, null) ?: "0.0").toDouble()
+        val longitude = (prefs.getString(keyLongitude, null) ?: "0.0").toDouble()
+        val altitude = (prefs.getString(keyAltitude, null) ?: "0.0").toDouble()
         val qthLocator = prefs.getString(keyLocator, null) ?: "null"
         val timestamp = prefs.getLong(keyLocTimestamp, 0L)
-        return StationPos(latitude.toDouble(), longitude.toDouble(), qthLocator, timestamp)
+        return GeoPos(latitude, longitude, altitude, qthLocator, timestamp)
     }
 
-    override fun saveStationPosition(stationPos: StationPos) = prefs.edit {
+    override fun saveStationPosition(stationPos: GeoPos) = prefs.edit {
         putString(keyLatitude, stationPos.latitude.toString())
         putString(keyLongitude, stationPos.longitude.toString())
+        putString(keyAltitude, stationPos.altitude.toString())
         putString(keyLocator, stationPos.qthLocator)
         putLong(keyLocTimestamp, stationPos.timestamp)
     }
@@ -208,5 +214,25 @@ class SettingsSource(private val prefs: SharedPreferences) : ISettingsSource {
 
     private fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
         putLong(key, double.toRawBits())
+    }
+
+    inline fun <reified T> SharedPreferences.observeKey(key: String, default: T): Flow<T> {
+        val flow = MutableStateFlow(getItem(key, default))
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, k ->
+            if (key == k) flow.value = getItem(key, default)
+        }
+        registerOnSharedPreferenceChangeListener(listener)
+        return flow.onCompletion { unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+
+    inline fun <reified T> SharedPreferences.getItem(key: String, default: T): T {
+        return when (default) {
+            is Boolean -> getBoolean(key, default) as T
+            is Int -> getInt(key, default) as T
+            is Long -> getLong(key, default) as T
+            is Float -> getFloat(key, default) as T
+            is String -> getString(key, default) as T
+            else -> throw IllegalArgumentException("Could not handle ${T::class.java.name}")
+        }
     }
 }

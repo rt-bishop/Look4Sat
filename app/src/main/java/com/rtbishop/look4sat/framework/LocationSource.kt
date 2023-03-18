@@ -18,73 +18,67 @@
 package com.rtbishop.look4sat.framework
 
 import android.location.Criteria
-import android.location.Location
 import android.location.LocationManager
-import androidx.core.location.LocationListenerCompat
 import androidx.core.location.LocationManagerCompat
+import androidx.core.os.CancellationSignal
 import com.rtbishop.look4sat.domain.ILocationSource
 import com.rtbishop.look4sat.domain.ISettingsSource
-import com.rtbishop.look4sat.model.StationPos
+import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
+import java.util.concurrent.Executors
 
 class LocationSource(
     private val manager: LocationManager,
     private val settings: ISettingsSource,
-) : ILocationSource, LocationListenerCompat {
+) : ILocationSource {
 
-    private val defaultProvider = LocationManager.PASSIVE_PROVIDER
     private val _stationPosition = MutableStateFlow(settings.loadStationPosition())
-    override val stationPosition: StateFlow<StationPos> = _stationPosition
+    private val defaultProvider = LocationManager.PASSIVE_PROVIDER
+    private val executor = Executors.newSingleThreadExecutor()
+    private val timeoutSignal = CancellationSignal().apply {
+        setOnCancelListener { _stationPosition.value = _stationPosition.value }
+    }
+    override val stationPosition: StateFlow<GeoPos> = _stationPosition
 
     override fun setGpsPosition(): Boolean {
         if (!LocationManagerCompat.isLocationEnabled(manager)) return false
-        val criteria = Criteria().apply { isCostAllowed = true }
-        val bestProvider = manager.getBestProvider(criteria, true) ?: defaultProvider
-        forceLocationUpdate(bestProvider)
+        try {
+            val criteria = Criteria().apply { isCostAllowed = true }
+            val provider = manager.getBestProvider(criteria, true) ?: defaultProvider
+            Timber.d("Requesting location for $provider provider")
+            LocationManagerCompat.getCurrentLocation(manager, provider, timeoutSignal, executor) {
+                it?.let { setGeoPosition(it.latitude, it.longitude, it.altitude) }
+            }
+        } catch (exception: SecurityException) {
+            Timber.d("No permissions were given")
+        }
         return true
     }
 
-    override fun setGeoPosition(latitude: Double, longitude: Double): Boolean {
-        manager.removeUpdates(this)
+    override fun setGeoPosition(latitude: Double, longitude: Double, altitude: Double): Boolean {
         val newLongitude = if (longitude > 180.0) longitude - 180 else longitude
         val locator = QthConverter.positionToQth(latitude, newLongitude) ?: return false
-        saveStationPosition(latitude, newLongitude, locator)
+        saveGeoPos(latitude, newLongitude, altitude, locator)
         return true
     }
 
     override fun setQthPosition(locator: String): Boolean {
         val position = QthConverter.qthToPosition(locator) ?: return false
-        saveStationPosition(position.lat, position.lon, locator)
+        saveGeoPos(position.latitude, position.longitude, 0.0, locator)
         return true
     }
 
-    override fun onLocationChanged(location: Location) {
-        setGeoPosition(location.latitude, location.longitude)
-    }
-
-    private fun forceLocationUpdate(provider: String) {
-        try {
-            val location = manager.getLastKnownLocation(defaultProvider)
-            if (location == null || System.currentTimeMillis() - location.time > 600000) {
-                Timber.d("Requesting $provider location update")
-                manager.requestLocationUpdates(provider, 0L, 0f, this)
-            } else {
-                setGeoPosition(location.latitude, location.longitude)
-            }
-        } catch (exception: SecurityException) {
-            Timber.d("No permissions were given")
-        }
-    }
-
-    private fun saveStationPosition(latitude: Double, longitude: Double, locator: String) {
+    private fun saveGeoPos(latitude: Double, longitude: Double, altitude: Double, locator: String) {
         val newLat = latitude.round(4)
         val newLon = longitude.round(4)
-        Timber.d("Received new Position($newLat, $newLon) & Locator $locator")
-        _stationPosition.value = StationPos(newLat, newLon, locator, System.currentTimeMillis())
+        val newAlt = altitude.round(1)
+        val timestamp = System.currentTimeMillis()
+        Timber.d("Received new Position($newLat, $newLon, $newAlt) & Locator $locator")
+        _stationPosition.value = GeoPos(newLat, newLon, newAlt, locator, timestamp)
         settings.saveStationPosition(stationPosition.value)
     }
 }

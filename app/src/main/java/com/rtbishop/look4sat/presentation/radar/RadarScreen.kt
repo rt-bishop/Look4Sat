@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -94,8 +95,8 @@ private fun TransmitterItem(radio: SatRadio) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_prev),
-                        contentDescription = null
+                        painter = painterResource(id = R.drawable.ic_next),
+                        contentDescription = null, modifier = Modifier.rotate(180f)
                     )
                     Text(
                         text = radio.info,
