@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.model.StationPos
+import com.rtbishop.look4sat.model.GeoPos
 
 interface ISettingsSource {
 
@@ -51,9 +51,9 @@ interface ISettingsSource {
             "X-Comm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
         )
 
-    fun loadStationPosition(): StationPos
+    fun loadStationPosition(): GeoPos
 
-    fun saveStationPosition(stationPos: StationPos)
+    fun saveStationPosition(stationPos: GeoPos)
 
     fun getHoursAhead(): Int
 

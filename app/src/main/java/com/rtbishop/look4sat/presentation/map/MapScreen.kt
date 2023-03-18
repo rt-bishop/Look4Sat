@@ -89,7 +89,7 @@ private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
             setInfoWindow(null)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             icon = ContextCompat.getDrawable(mapView.context, R.drawable.ic_position)
-            position = GeoPoint(stationPos.lat, stationPos.lon)
+            position = GeoPoint(stationPos.latitude, stationPos.longitude)
             mapView.overlays[0] = this
             mapView.invalidate()
         }
@@ -109,7 +109,7 @@ private fun setPositions(
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                 icon = getCustomTextIcon(it.key.data.name, mapView)
                 try {
-                    position = GeoPoint(it.value.lat, it.value.lon)
+                    position = GeoPoint(it.value.latitude, it.value.longitude)
                 } catch (exception: IllegalArgumentException) {
                     println(exception.stackTraceToString())
                 }
@@ -145,7 +145,7 @@ private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
     val trackOverlay = FolderOverlay()
     try {
         satTrack.forEach { track ->
-            val trackPoints = track.map { GeoPoint(it.lat, it.lon) }
+            val trackPoints = track.map { GeoPoint(it.latitude, it.longitude) }
             Polyline().apply {
                 setPoints(trackPoints)
                 outlinePaint.set(trackPaint)
@@ -160,7 +160,7 @@ private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
 }
 
 private fun setFootprint(satPos: SatPos, mapView: MapView) {
-    val footprintPoints = satPos.getRangeCircle().map { GeoPoint(it.lat, it.lon) }
+    val footprintPoints = satPos.getRangeCircle().map { GeoPoint(it.latitude, it.longitude) }
     try {
         val footprintOverlay = Polyline().apply {
             outlinePaint.set(footprintPaint)

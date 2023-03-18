@@ -52,7 +52,7 @@ class RadarViewModel @Inject constructor(
     private val locationSource: ILocationSource
 ) : ViewModel() {
 
-    private val stationPos = locationSource.stationPosition.value.toGeoPos()
+    private val stationPos = locationSource.stationPosition.value
     private val magDeclination = getMagDeclination(stationPos)
     val transmitters = mutableStateOf<List<SatRadio>>(emptyList())
     val radarData = mutableStateOf<RadarData?>(null)
@@ -102,8 +102,8 @@ class RadarViewModel @Inject constructor(
     fun getShowSweep(): Boolean = settings.isSweepEnabled()
 
     private fun getMagDeclination(geoPos: GeoPos, time: Long = System.currentTimeMillis()): Float {
-        val latitude = geoPos.lat.toFloat()
-        val longitude = geoPos.lon.toFloat()
+        val latitude = geoPos.latitude.toFloat()
+        val longitude = geoPos.longitude.toFloat()
         return GeomagneticField(latitude, longitude, 0f, time).declination
     }
 

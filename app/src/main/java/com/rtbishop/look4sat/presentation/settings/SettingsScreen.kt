@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.model.StationPos
+import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.dialogs.LocatorDialog
@@ -164,7 +164,7 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun LocationCardPreview() = MainTheme {
-    val stationPos = StationPos(0.0, 0.0, "IO91vl", 0L)
+    val stationPos = GeoPos(0.0, 0.0, 0.0, "IO91vl", 0L)
     LocationCard(
         settings = LocationSettings(true, stationPos, {}, { _, _ -> }, { }),
         setGpsLoc = {}, togglePosDialog = {}) {}

@@ -17,16 +17,16 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.model.StationPos
+import com.rtbishop.look4sat.model.GeoPos
 import kotlinx.coroutines.flow.StateFlow
 
 interface ILocationSource {
 
-    val stationPosition: StateFlow<StationPos>
+    val stationPosition: StateFlow<GeoPos>
 
     fun setGpsPosition(): Boolean
 
-    fun setGeoPosition(latitude: Double, longitude: Double): Boolean
+    fun setGeoPosition(latitude: Double, longitude: Double, altitude: Double = 0.0): Boolean
 
     fun setQthPosition(locator: String): Boolean
 }
