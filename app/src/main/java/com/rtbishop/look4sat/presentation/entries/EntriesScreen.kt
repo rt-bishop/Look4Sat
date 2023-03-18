@@ -6,10 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -96,7 +92,8 @@ private fun TopBar(setQuery: (String) -> Unit, saveSelection: () -> Unit) {
 @Composable
 private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier) {
     val currentQuery = rememberSaveable { mutableStateOf("") }
-    OutlinedTextField(value = currentQuery.value,
+    OutlinedTextField(
+        value = currentQuery.value,
         onValueChange = { newValue ->
             currentQuery.value = newValue
             setQuery(newValue)
@@ -104,9 +101,14 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
         maxLines = 1,
 //            label = { Text(text = stringResource(id = R.string.entries_search_hint)) },
         placeholder = { Text(text = stringResource(id = R.string.entries_search_hint)) },
-        leadingIcon = { Icon(imageVector = Icons.Outlined.Search, contentDescription = null) },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_search),
+                contentDescription = null
+            )
+        },
         trailingIcon = {
-            Icon(imageVector = Icons.Outlined.Close,
+            Icon(painter = painterResource(id = R.drawable.ic_close),
                 contentDescription = null,
                 modifier = Modifier.onClick {
                     currentQuery.value = ""
@@ -150,7 +152,7 @@ private fun EntryTypeCard(type: String, onClick: () -> Unit, modifier: Modifier 
                 .height(48.dp)
                 .clickable { onClick() }) {
             Icon(
-                imageVector = Icons.Outlined.PlayArrow,
+                painter = painterResource(id = R.drawable.ic_next),
                 contentDescription = null,
                 modifier = Modifier
                     .size(36.dp)

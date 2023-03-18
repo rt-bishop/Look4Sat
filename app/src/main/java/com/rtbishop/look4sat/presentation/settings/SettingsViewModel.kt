@@ -25,7 +25,6 @@ import com.rtbishop.look4sat.domain.ILocationSource
 import com.rtbishop.look4sat.domain.ISettingsSource
 import com.rtbishop.look4sat.model.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -66,7 +65,6 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             locationSource.stationPosition.collect { stationPos ->
-                delay(125)
                 locationSettings.value = locationSettings.value.copy(
                     isUpdating = false, stationPos = stationPos
                 )

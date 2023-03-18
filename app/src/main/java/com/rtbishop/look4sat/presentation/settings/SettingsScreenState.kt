@@ -1,10 +1,10 @@
 package com.rtbishop.look4sat.presentation.settings
 
-import com.rtbishop.look4sat.model.StationPos
+import com.rtbishop.look4sat.model.GeoPos
 
 data class LocationSettings(
     val isUpdating: Boolean,
-    val stationPos: StationPos,
+    val stationPos: GeoPos,
     val setGpsLoc: () -> Unit,
     val setManualLoc: (Double, Double) -> Unit,
     val setQthLoc: (String) -> Unit

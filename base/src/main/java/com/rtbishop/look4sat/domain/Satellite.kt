@@ -60,7 +60,7 @@ abstract class Satellite(val data: OrbitalData) {
             val apogee = sma * (1.0 + data.eccn) - EARTH_RADIUS
             var lin = data.incl
             if (lin >= 90.0) lin = 180.0 - lin
-            acos(EARTH_RADIUS / (apogee + EARTH_RADIUS)) + lin * DEG2RAD > abs(pos.lat * DEG2RAD)
+            acos(EARTH_RADIUS / (apogee + EARTH_RADIUS)) + lin * DEG2RAD > abs(pos.latitude * DEG2RAD)
         }
     }
 
@@ -146,8 +146,8 @@ abstract class Satellite(val data: OrbitalData) {
             velocityVector.z - obsVel.z
         )
         magnitude(range)
-        val sinLat = sin(DEG2RAD * gsPos.lat)
-        val cosLat = cos(DEG2RAD * gsPos.lat)
+        val sinLat = sin(DEG2RAD * gsPos.latitude)
+        val cosLat = cos(DEG2RAD * gsPos.latitude)
         val sinTheta = sin(gsPosTheta)
         val cosTheta = cos(gsPosTheta)
         val topS = sinLat * cosTheta * range.x + sinLat * sinTheta * range.y - cosLat * range.z
@@ -173,13 +173,13 @@ abstract class Satellite(val data: OrbitalData) {
         obsVel: Vector4
     ) {
         val mFactor = 7.292115E-5
-        gsPosTheta = mod2PI(thetaGJD(time) + DEG2RAD * gsPos.lon)
-        val c = invert(sqrt(1.0 + FLAT_FACT * (FLAT_FACT - 2) * sqr(sin(DEG2RAD * gsPos.lat))))
+        gsPosTheta = mod2PI(thetaGJD(time) + DEG2RAD * gsPos.longitude)
+        val c = invert(sqrt(1.0 + FLAT_FACT * (FLAT_FACT - 2) * sqr(sin(DEG2RAD * gsPos.latitude))))
         val sq = sqr(1.0 - FLAT_FACT) * c
-        val achcp = (EARTH_RADIUS * c + gsPos.alt / 1000.0) * cos(DEG2RAD * gsPos.lat)
+        val achcp = (EARTH_RADIUS * c + gsPos.altitude / 1000.0) * cos(DEG2RAD * gsPos.latitude)
         obsPos.setXYZ(
             achcp * cos(gsPosTheta), achcp * sin(gsPosTheta),
-            (EARTH_RADIUS * sq + gsPos.alt / 1000.0) * sin(DEG2RAD * gsPos.lat)
+            (EARTH_RADIUS * sq + gsPos.altitude / 1000.0) * sin(DEG2RAD * gsPos.latitude)
         )
         obsVel.setXYZ(-mFactor * obsPos.y, mFactor * obsPos.x, 0.0)
         magnitude(obsPos)
