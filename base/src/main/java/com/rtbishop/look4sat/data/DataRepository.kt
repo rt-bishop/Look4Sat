@@ -18,9 +18,10 @@
 package com.rtbishop.look4sat.data
 
 import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISettingsSource
+import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatEntry
+import com.rtbishop.look4sat.model.SatItem
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +35,7 @@ class DataRepository(
     private val radioSource: IRadiosStorage,
     private val remoteSource: INetworkSource,
     private val repositoryScope: CoroutineScope,
-    private val settingsManager: ISettingsSource
+    private val settingsRepository: ISettingsRepository
 ) : IDataRepository {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
@@ -48,9 +49,16 @@ class DataRepository(
 
     override fun getRadiosTotal() = radioSource.getRadiosTotal()
 
+    override fun getSatelliteTypes() = remoteSource.satelliteSourcesMap.keys.sorted()
+
     override suspend fun getEntriesWithModes() = entrySource.getEntriesWithModes()
 
     override suspend fun getEntriesWithIds(ids: List<Int>) = entrySource.getEntriesWithIds(ids)
+
+    override suspend fun getEntriesWithSelection(): List<SatItem> {
+        val selectedIds = settingsRepository.loadEntriesSelection()
+        return getEntriesWithModes().onEach { it.isSelected = it.catnum in selectedIds }
+    }
 
     override suspend fun getRadiosWithId(id: Int) = radioSource.getRadiosWithId(id)
 
@@ -69,7 +77,7 @@ class DataRepository(
         _updateState.value = DataState.Loading
         repositoryScope.launch(exceptionHandler) {
             val importedEntries = mutableListOf<SatEntry>()
-            val sourcesMap = settingsManager.sourcesMap
+            val sourcesMap = remoteSource.satelliteSourcesMap
             val jobsMap = sourcesMap.mapValues { async { remoteSource.getDataStream(it.value) } }
             jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
                 entry.value?.let { stream ->
@@ -78,7 +86,7 @@ class DataRepository(
                             // parse tle stream
                             val satellites = importSatellites(stream)
                             val catnums = satellites.map { it.data.catnum }
-                            settingsManager.saveSatType(type, catnums)
+                            settingsRepository.saveSatType(type, catnums)
                             importedEntries.addAll(satellites)
                         }
                         "McCants", "Classified" -> {
@@ -86,7 +94,7 @@ class DataRepository(
                             val unzipped = ZipInputStream(stream).apply { nextEntry }
                             val satellites = importSatellites(unzipped)
                             val catnums = satellites.map { it.data.catnum }
-                            settingsManager.saveSatType(type, catnums)
+                            settingsRepository.saveSatType(type, catnums)
                             importedEntries.addAll(satellites)
                         }
                         else -> {
@@ -94,7 +102,7 @@ class DataRepository(
                             val parsed = dataParser.parseCSVStream(stream)
                             val satellites = parsed.map { data -> SatEntry(data) }
                             val catnums = satellites.map { it.data.catnum }
-                            settingsManager.saveSatType(type, catnums)
+                            settingsRepository.saveSatType(type, catnums)
                             importedEntries.addAll(satellites)
                         }
                     }
@@ -104,7 +112,7 @@ class DataRepository(
             setUpdateSuccessful()
         }
         repositoryScope.launch(exceptionHandler) {
-            remoteSource.getDataStream(remoteSource.radioApi)?.let { stream ->
+            remoteSource.getDataStream(remoteSource.radioSourceUrl)?.let { stream ->
                 radioSource.insertRadios(dataParser.parseJSONStream(stream))
             }
         }
@@ -125,7 +133,7 @@ class DataRepository(
     }
 
     private fun setUpdateSuccessful(updateTime: Long = System.currentTimeMillis()) {
-        settingsManager.setLastUpdateTime(updateTime)
+        settingsRepository.setLastUpdateTime(updateTime)
         _updateState.value = DataState.Success(updateTime)
     }
 

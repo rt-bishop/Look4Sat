@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -165,9 +166,8 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
 @Composable
 private fun LocationCardPreview() = MainTheme {
     val stationPos = GeoPos(0.0, 0.0, 0.0, "IO91vl", 0L)
-    LocationCard(
-        settings = LocationSettings(true, stationPos, {}, { _, _ -> }, { }),
-        setGpsLoc = {}, togglePosDialog = {}) {}
+    val settings = LocationSettings(true, stationPos, 0, {}, { _, _ -> }, {}, {})
+    LocationCard(settings = settings, setGpsLoc = {}, togglePosDialog = {}) {}
 }
 
 @Composable
@@ -231,14 +231,21 @@ private fun LocationCard(
             }
         }
     }
+    if (settings.messageResId != 0) {
+        val context = LocalContext.current
+        val errorString = stringResource(id = settings.messageResId)
+        LaunchedEffect(key1 = settings.messageResId) {
+            showToast(context, errorString)
+            settings.dismissMessage()
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DataCardPreview() = MainTheme {
-    DataCard(settings = DataSettings(
-        true, 0L, 5000, 2500, {}, { }, {})
-    ) {}
+    val settings = DataSettings(true, 0L, 5000, 2500, {}, {}, {})
+    DataCard(settings = settings) {}
 }
 
 @Composable
@@ -335,10 +342,10 @@ private fun DataCard(settings: DataSettings, updateFromFile: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun OtherCardPreview() = MainTheme {
-    OtherCard(settings = OtherSettings(
+    val settings = OtherSettings(
         getUtc = false, getUpdate = true, getSweep = true, getSensor = true,
         setUtc = {}, setUpdate = {}, setSweep = {}, setSensor = {})
-    )
+    OtherCard(settings = settings)
 }
 
 @Composable

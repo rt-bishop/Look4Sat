@@ -25,6 +25,7 @@ import android.location.LocationManager
 import androidx.room.Room
 import com.rtbishop.look4sat.data.DataParser
 import com.rtbishop.look4sat.data.DataRepository
+import com.rtbishop.look4sat.data.SatelliteRepository
 import com.rtbishop.look4sat.domain.*
 import com.rtbishop.look4sat.framework.*
 import com.rtbishop.look4sat.framework.data.*
@@ -55,12 +56,14 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideNetworkReporter(): NetworkReporter = NetworkReporter(CoroutineScope(Dispatchers.IO))
+    fun provideNetworkReporter(): NetworkReporter {
+        return NetworkReporter(CoroutineScope(Dispatchers.IO))
+    }
 
     @Provides
     @Singleton
     fun provideDataRepository(
-        @ApplicationContext context: Context, settings: ISettingsSource
+        @ApplicationContext context: Context, settings: ISettingsRepository
     ): IDataRepository {
         val db = Room.databaseBuilder(context, MainDatabase::class.java, "Look4SatDb")
             .addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration().build()
@@ -75,28 +78,23 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideLocationSource(
-        @ApplicationContext context: Context, settings: ISettingsSource
-    ): ILocationSource {
-        val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return LocationSource(manager, settings)
-    }
-
-    @Provides
-    @Singleton
-    fun provideOrientationSource(@ApplicationContext context: Context): OrientationSource {
+    fun provideSensorRepository(@ApplicationContext context: Context): ISensorRepository {
         val manager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensor = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
-        return OrientationSource(manager, sensor)
+        return SensorRepository(manager, sensor)
     }
 
     @Provides
     @Singleton
-    fun provideSatelliteManager(): ISatelliteManager = SatelliteManager(Dispatchers.Default)
+    fun provideSatelliteRepository(): ISatelliteRepository {
+        return SatelliteRepository(Dispatchers.Default)
+    }
 
     @Provides
     @Singleton
-    fun provideSettingsSource(@ApplicationContext context: Context): ISettingsSource {
-        return SettingsSource(context.getSharedPreferences("default", Context.MODE_PRIVATE))
+    fun provideSettingsRepository(@ApplicationContext context: Context): ISettingsRepository {
+        val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val preferences = context.getSharedPreferences("default", Context.MODE_PRIVATE)
+        return SettingsRepository(manager, preferences)
     }
 }

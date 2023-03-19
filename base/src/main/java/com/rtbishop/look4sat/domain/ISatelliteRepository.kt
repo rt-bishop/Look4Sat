@@ -6,7 +6,7 @@ import com.rtbishop.look4sat.model.SatPos
 import com.rtbishop.look4sat.model.SatRadio
 import kotlinx.coroutines.flow.SharedFlow
 
-interface ISatelliteManager {
+interface ISatelliteRepository {
 
     val calculatedPasses: SharedFlow<List<SatPass>>
 

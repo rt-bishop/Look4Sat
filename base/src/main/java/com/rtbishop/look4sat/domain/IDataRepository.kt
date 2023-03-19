@@ -31,9 +31,13 @@ interface IDataRepository {
 
     fun getRadiosTotal(): Flow<Int>
 
+    fun getSatelliteTypes(): List<String>
+
     suspend fun getEntriesWithModes(): List<SatItem>
 
     suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
+
+    suspend fun getEntriesWithSelection(): List<SatItem>
 
     suspend fun getRadiosWithId(id: Int): List<SatRadio>
 

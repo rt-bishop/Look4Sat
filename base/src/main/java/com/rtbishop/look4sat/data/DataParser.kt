@@ -26,55 +26,51 @@ import org.json.JSONObject
 import java.io.InputStream
 import kotlin.math.pow
 
-class DataParser(private val defaultDispatcher: CoroutineDispatcher) {
+class DataParser(private val dispatcher: CoroutineDispatcher) {
 
-    suspend fun parseCSVStream(csvStream: InputStream): List<OrbitalData> =
-        withContext(defaultDispatcher) {
-            val parsedItems = mutableListOf<OrbitalData>()
-            csvStream.bufferedReader().useLines { lines ->
-                lines.forEachIndexed { index, line ->
-                    if (index != 0) {
-                        val values = line.split(",")
-                        parseCSV(values)?.let { tle -> parsedItems.add(tle) }
-                    }
+    suspend fun parseCSVStream(stream: InputStream): List<OrbitalData> = withContext(dispatcher) {
+        val parsedItems = mutableListOf<OrbitalData>()
+        stream.bufferedReader().useLines { lines ->
+            lines.forEachIndexed { index, line ->
+                if (index != 0) {
+                    val values = line.split(",")
+                    parseCSV(values)?.let { tle -> parsedItems.add(tle) }
                 }
+            }
+        }
+        return@withContext parsedItems
+    }
+
+    suspend fun parseTLEStream(stream: InputStream): List<OrbitalData> = withContext(dispatcher) {
+        val tleStrings = mutableListOf(String(), String(), String())
+        val parsedItems = mutableListOf<OrbitalData>()
+        var lineIndex = 0
+        stream.bufferedReader().forEachLine { line ->
+            tleStrings[lineIndex] = line
+            if (lineIndex < 2) {
+                lineIndex++
+            } else {
+                val isLineOneValid = tleStrings[1].substring(0, 1) == "1"
+                val isLineTwoValid = tleStrings[2].substring(0, 1) == "2"
+                if (!isLineOneValid && !isLineTwoValid) return@forEachLine
+                parseTLE(tleStrings)?.let { tle -> parsedItems.add(tle) }
+                lineIndex = 0
+            }
+        }
+        return@withContext parsedItems
+    }
+
+    suspend fun parseJSONStream(stream: InputStream): List<SatRadio> = withContext(dispatcher) {
+        val parsedItems = mutableListOf<SatRadio>()
+        try {
+            val jsonArray = JSONArray(stream.bufferedReader().readText())
+            for (index in 0 until jsonArray.length()) {
+                val jsonObject = jsonArray.getJSONObject(index)
+                parseJSON(jsonObject)?.let { parsedItems.add(it) }
             }
             return@withContext parsedItems
-        }
-
-    suspend fun parseTLEStream(tleStream: InputStream): List<OrbitalData> =
-        withContext(defaultDispatcher) {
-            val tleStrings = mutableListOf(String(), String(), String())
-            val parsedItems = mutableListOf<OrbitalData>()
-            var lineIndex = 0
-            tleStream.bufferedReader().forEachLine { line ->
-                tleStrings[lineIndex] = line
-                if (lineIndex < 2) {
-                    lineIndex++
-                } else {
-                    val isLineOneValid = tleStrings[1].substring(0, 1) == "1"
-                    val isLineTwoValid = tleStrings[2].substring(0, 1) == "2"
-                    if (!isLineOneValid && !isLineTwoValid) return@forEachLine
-                    parseTLE(tleStrings)?.let { tle -> parsedItems.add(tle) }
-                    lineIndex = 0
-                }
-            }
+        } catch (exception: Exception) {
             return@withContext parsedItems
-        }
-
-    suspend fun parseJSONStream(jsonStream: InputStream): List<SatRadio> {
-        return withContext(defaultDispatcher) {
-            val parsedItems = mutableListOf<SatRadio>()
-            try {
-                val jsonArray = JSONArray(jsonStream.bufferedReader().readText())
-                for (index in 0 until jsonArray.length()) {
-                    val jsonObject = jsonArray.getJSONObject(index)
-                    parseJSON(jsonObject)?.let { parsedItems.add(it) }
-                }
-                return@withContext parsedItems
-            } catch (exception: Exception) {
-                return@withContext parsedItems
-            }
         }
     }
 
@@ -120,8 +116,9 @@ class DataParser(private val defaultDispatcher: CoroutineDispatcher) {
             val argper: Double = tle[2].substring(34, 42).toDouble()
             val meanan: Double = tle[2].substring(43, 51).toDouble()
             val catnum: Int = tle[1].substring(2, 7).trim().toInt()
-            val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() /
-                    10.0.pow(tle[1].substring(60, 61).toDouble())
+            val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() / 10.0.pow(
+                tle[1].substring(60, 61).toDouble()
+            )
             return OrbitalData(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
         } catch (exception: Exception) {
             return null
@@ -154,7 +151,7 @@ class DataParser(private val defaultDispatcher: CoroutineDispatcher) {
         var dayOfYear = dayOfMonth
         // If leap year increment Feb days
         if (((year / 4 == 0) && (year / 100 != 0)) || (year / 400 == 0)) daysArray[1]++
-        for (i in 0 until month - 1) { dayOfYear += daysArray[i] }
+        for (i in 0 until month - 1) dayOfYear += daysArray[i]
         return dayOfYear
     }
 }

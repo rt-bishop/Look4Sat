@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain
+package com.rtbishop.look4sat.data
 
+import com.rtbishop.look4sat.domain.ISatelliteRepository
+import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPass
 import com.rtbishop.look4sat.model.SatPos
@@ -28,7 +30,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
 
-class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISatelliteManager {
+class SatelliteRepository(private val dispatcher: CoroutineDispatcher) : ISatelliteRepository {
 
     private var passes = listOf<SatPass>()
     private val _calculatedPasses = MutableSharedFlow<List<SatPass>>(replay = 1)
@@ -37,13 +39,13 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     override fun getPasses(): List<SatPass> = passes
 
     override suspend fun getPosition(sat: Satellite, pos: GeoPos, time: Long): SatPos {
-        return withContext(defaultDispatcher) { sat.getPosition(pos, time) }
+        return withContext(dispatcher) { sat.getPosition(pos, time) }
     }
 
     override suspend fun getTrack(
         sat: Satellite, pos: GeoPos, start: Long, end: Long
     ): List<SatPos> {
-        return withContext(defaultDispatcher) {
+        return withContext(dispatcher) {
             val positions = mutableListOf<SatPos>()
             var currentTime = start
             while (currentTime < end) {
@@ -57,7 +59,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     override suspend fun processRadios(
         sat: Satellite, pos: GeoPos, radios: List<SatRadio>, time: Long
     ): List<SatRadio> {
-        return withContext(defaultDispatcher) {
+        return withContext(dispatcher) {
             val satPos = sat.getPosition(pos, time)
             val copiedList = radios.map { it.copy() }
             copiedList.forEach { transmitter ->
@@ -73,7 +75,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
     }
 
     override suspend fun processPasses(passList: List<SatPass>, time: Long): List<SatPass> {
-        return withContext(defaultDispatcher) {
+        return withContext(dispatcher) {
             passList.forEach { pass ->
                 if (!pass.isDeepSpace) {
                     val timeStart = pass.aosTime
@@ -96,7 +98,7 @@ class SatelliteManager(private val defaultDispatcher: CoroutineDispatcher) : ISa
             passes = newPasses
             _calculatedPasses.emit(newPasses)
         } else {
-            withContext(defaultDispatcher) {
+            withContext(dispatcher) {
                 val allPasses = mutableListOf<SatPass>()
                 satList.forEach { satellite ->
                     allPasses.addAll(satellite.getPasses(pos, time, hoursAhead))

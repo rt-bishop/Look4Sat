@@ -110,8 +110,8 @@ abstract class Satellite(val data: OrbitalData) {
     }
 
     private fun calculateSDP4orSGP4(tsince: Double) {
-        if (data.isDeepSpace) (this as DeepSpaceSat).calculateSDP4(tsince)
-        else (this as NearEarthSat).calculateSGP4(tsince)
+        if (data.isDeepSpace) (this as DeepSpaceSatellite).calculateSDP4(tsince)
+        else (this as NearEarthSatellite).calculateSGP4(tsince)
     }
 
     // Converts the sat position and velocity vectors to km and km/sec
