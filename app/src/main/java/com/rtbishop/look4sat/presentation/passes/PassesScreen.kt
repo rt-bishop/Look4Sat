@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.NearEarthSat
+import com.rtbishop.look4sat.domain.NearEarthSatellite
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.OrbitalData
 import com.rtbishop.look4sat.model.SatPass
@@ -100,7 +100,7 @@ private fun PassPreview() {
     val data = OrbitalData(
         "Satellite", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
     )
-    val satellite = NearEarthSat(data)
+    val satellite = NearEarthSatellite(data)
     val pass = SatPass(1L, 25.0, 10L, 75.0, 850, 45.0, satellite, 0.5f)
     MainTheme { Pass(pass = pass, { _,_ -> }) }
 }

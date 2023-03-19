@@ -20,11 +20,9 @@ package com.rtbishop.look4sat.presentation.passes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ILocationSource
-import com.rtbishop.look4sat.domain.ISatelliteManager
-import com.rtbishop.look4sat.domain.ISettingsSource
+import com.rtbishop.look4sat.domain.ISatelliteRepository
+import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
-import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPass
 import com.rtbishop.look4sat.utility.toTimerString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,10 +33,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PassesViewModel @Inject constructor(
-    private val satelliteManager: ISatelliteManager,
-    private val repository: IDataRepository,
-    private val settings: ISettingsSource,
-    private val locationSource: ILocationSource
+    private val dataRepository: IDataRepository,
+    private val satelliteRepository: ISatelliteRepository,
+    private val settingsRepository: ISettingsRepository
 ) : ViewModel() {
 
     private val _passes = MutableStateFlow<DataState<List<SatPass>>>(DataState.Loading)
@@ -48,18 +45,18 @@ class PassesViewModel @Inject constructor(
     val passes: StateFlow<DataState<List<SatPass>>> = _passes
     val timerText: StateFlow<Triple<String, String, String>?> = _timerText
 
-    fun getHoursAhead() = settings.getHoursAhead()
+    fun getHoursAhead() = settingsRepository.getHoursAhead()
 
-    fun getMinElevation() = settings.getMinElevation()
+    fun getMinElevation() = settingsRepository.getMinElevation()
 
     init {
         viewModelScope.launch {
-            satelliteManager.calculatedPasses.collect { passes ->
+            satelliteRepository.calculatedPasses.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch {
                     while (isActive) {
                         val timeNow = System.currentTimeMillis()
-                        val newPasses = satelliteManager.processPasses(passes, timeNow)
+                        val newPasses = satelliteRepository.processPasses(passes, timeNow)
 
                         if (newPasses.isNotEmpty()) {
                             try {
@@ -86,18 +83,18 @@ class PassesViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            repository.updateState.collect { updateState ->
+            dataRepository.updateState.collect { updateState ->
                 if (updateState is DataState.Success) calculatePasses()
             }
         }
         calculatePasses()
     }
 
-    fun shouldUseUTC() = settings.isUtcEnabled()
+    fun shouldUseUTC() = settingsRepository.isUtcEnabled()
 
     fun calculatePasses(
         hoursAhead: Int = 1,
-        minElevation: Double = settings.getMinElevation(),
+        minElevation: Double = settingsRepository.getMinElevation(),
         timeRef: Long = System.currentTimeMillis(),
         selection: List<Int>? = null
     ) {
@@ -105,15 +102,14 @@ class PassesViewModel @Inject constructor(
             _passes.emit(DataState.Loading)
 //            _timerText.postValue(timerDefaultText)
             passesProcessing?.cancelAndJoin()
-            selection?.let { items -> settings.saveEntriesSelection(items) }
-            settings.setHoursAhead(hoursAhead)
-            settings.setMinElevation(minElevation)
-            val stationPos = locationSource.stationPosition.value
-            val geoPos = GeoPos(stationPos.latitude, stationPos.longitude)
-            val selectedIds = settings.loadEntriesSelection()
-            val satellites = repository.getEntriesWithIds(selectedIds)
-            satelliteManager.calculatePasses(
-                satellites, geoPos, timeRef, hoursAhead, minElevation
+            selection?.let { items -> settingsRepository.saveEntriesSelection(items) }
+            settingsRepository.setHoursAhead(hoursAhead)
+            settingsRepository.setMinElevation(minElevation)
+            val stationPos = settingsRepository.stationPosition.value
+            val selectedIds = settingsRepository.loadEntriesSelection()
+            val satellites = dataRepository.getEntriesWithIds(selectedIds)
+            satelliteRepository.calculatePasses(
+                satellites, stationPos, timeRef, hoursAhead, minElevation
             )
         }
     }

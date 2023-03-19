@@ -20,9 +20,9 @@ package com.rtbishop.look4sat.presentation.settings
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ILocationSource
-import com.rtbishop.look4sat.domain.ISettingsSource
+import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
@@ -31,31 +31,32 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val locationSource: ILocationSource,
-    private val repository: IDataRepository,
-    private val settings: ISettingsSource
+    private val dataRepository: IDataRepository,
+    private val settingsRepository: ISettingsRepository
 ) : ViewModel() {
 
     private val defaultLocationSettings = LocationSettings(false,
-        locationSource.stationPosition.value,
-        { updateStationPosition() },
-        { lat, lon -> locationSource.setGeoPosition(lat, lon) },
-        { locationSource.setQthPosition(it) })
+        settingsRepository.stationPosition.value,
+        0,
+        { setGpsPosition() },
+        { latitude, longitude -> setGeoPosition(latitude, longitude) },
+        { locator -> setQthPosition(locator) },
+        { dismissLocationMessage() })
     val locationSettings = mutableStateOf(defaultLocationSettings)
 
     private val defaultDataSettings = DataSettings(false,
-        settings.getLastUpdateTime(),
+        settingsRepository.getLastUpdateTime(),
         0,
         0,
-        { repository.updateFromWeb() },
-        { repository.updateFromFile(it) },
-        { repository.clearAllData() })
+        { dataRepository.updateFromWeb() },
+        { dataRepository.updateFromFile(it) },
+        { dataRepository.clearAllData() })
     val dataSettings = mutableStateOf(defaultDataSettings)
 
-    private val defaultOtherSettings = OtherSettings(settings.isUtcEnabled(),
-        settings.isUpdateEnabled(),
-        settings.isSweepEnabled(),
-        settings.isSensorEnabled(),
+    private val defaultOtherSettings = OtherSettings(settingsRepository.isUtcEnabled(),
+        settingsRepository.isUpdateEnabled(),
+        settingsRepository.isSweepEnabled(),
+        settingsRepository.isSensorEnabled(),
         { setUtc(it) },
         { setUpdate(it) },
         { setSweep(it) },
@@ -64,49 +65,81 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            locationSource.stationPosition.collect { stationPos ->
+            settingsRepository.stationPosition.collect { stationPos ->
                 locationSettings.value = locationSettings.value.copy(
                     isUpdating = false, stationPos = stationPos
                 )
             }
         }
         viewModelScope.launch {
-            repository.updateState.collect {
+            dataRepository.updateState.collect {
                 val isUpdating = it is DataState.Loading
                 dataSettings.value = dataSettings.value.copy(
-                    isUpdating = isUpdating, lastUpdated = settings.getLastUpdateTime()
+                    isUpdating = isUpdating, lastUpdated = settingsRepository.getLastUpdateTime()
                 )
             }
         }
         viewModelScope.launch {
-            combine(repository.getEntriesTotal(), repository.getRadiosTotal()) { sats, radios ->
+            combine(
+                dataRepository.getEntriesTotal(), dataRepository.getRadiosTotal()
+            ) { sats, radios ->
                 dataSettings.value = dataSettings.value.copy(satsTotal = sats, radiosTotal = radios)
             }.collect {}
         }
     }
 
-    private fun updateStationPosition() {
-        val isSuccessful = locationSource.setGpsPosition()
-        locationSettings.value = locationSettings.value.copy(isUpdating = isSuccessful)
+    private fun setGpsPosition() {
+        if (settingsRepository.setGpsPosition()) {
+            val messageResId = R.string.location_success
+            locationSettings.value =
+                locationSettings.value.copy(isUpdating = true, messageResId = messageResId)
+        } else {
+            val errorResId = R.string.location_gps_error
+            locationSettings.value = locationSettings.value.copy(messageResId = errorResId)
+        }
+    }
+
+    private fun setGeoPosition(latitude: Double, longitude: Double) {
+        if (settingsRepository.setGeoPosition(latitude, longitude)) {
+            val messageResId = R.string.location_success
+            locationSettings.value = locationSettings.value.copy(messageResId = messageResId)
+        } else {
+            val errorResId = R.string.location_manual_error
+            locationSettings.value = locationSettings.value.copy(messageResId = errorResId)
+        }
+    }
+
+    private fun setQthPosition(locator: String) {
+        if (settingsRepository.setQthPosition(locator)) {
+            val messageResId = R.string.location_success
+            locationSettings.value = locationSettings.value.copy(messageResId = messageResId)
+        } else {
+            val errorResId = R.string.location_qth_error
+            locationSettings.value = locationSettings.value.copy(messageResId = errorResId)
+        }
+    }
+
+    private fun dismissLocationMessage() {
+        locationSettings.value = locationSettings.value.copy(messageResId = 0)
     }
 
     private fun setUtc(value: Boolean) {
-        settings.setUtcState(value)
+        settingsRepository.setUtcState(value)
         otherSettings.value = otherSettings.value.copy(getUtc = value)
     }
 
     private fun setUpdate(value: Boolean) {
-        settings.setUpdateState(value)
+        settingsRepository.setUpdateState(value)
         otherSettings.value = otherSettings.value.copy(getUpdate = value)
     }
 
     private fun setSweep(value: Boolean) {
-        settings.setSweepState(value)
+        settingsRepository.setSweepState(value)
         otherSettings.value = otherSettings.value.copy(getSweep = value)
     }
 
     private fun setSensor(value: Boolean) {
-        settings.setSensorState(value)
+        settingsRepository.setSensorState(value)
         otherSettings.value = otherSettings.value.copy(getSensor = value)
     }
 

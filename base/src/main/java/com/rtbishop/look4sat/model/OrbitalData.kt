@@ -39,5 +39,6 @@ data class OrbitalData(
     // Space objects are classified as NearEarth (period < 225 min) or DeepSpace (period >= 225 min)
     val isDeepSpace: Boolean = orbitalPeriod >= 225.0
 ) {
-    fun getSatellite(): Satellite = if (isDeepSpace) DeepSpaceSat(this) else NearEarthSat(this)
+    fun getSatellite(): Satellite =
+        if (isDeepSpace) DeepSpaceSatellite(this) else NearEarthSatellite(this)
 }

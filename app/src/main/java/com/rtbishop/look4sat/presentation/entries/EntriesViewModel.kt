@@ -20,11 +20,9 @@ package com.rtbishop.look4sat.presentation.entries
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ILocationSource
-import com.rtbishop.look4sat.domain.ISatelliteManager
-import com.rtbishop.look4sat.domain.ISettingsSource
+import com.rtbishop.look4sat.domain.ISatelliteRepository
+import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
-import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,10 +35,9 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class EntriesViewModel @Inject constructor(
-    private val satelliteManager: ISatelliteManager,
-    private val repository: IDataRepository,
-    private val settings: ISettingsSource,
-    private val locationSource: ILocationSource
+    private val dataRepository: IDataRepository,
+    private val satelliteRepository: ISatelliteRepository,
+    private val settingsRepository: ISettingsRepository
 ) : ViewModel() {
 
     private val satType = MutableStateFlow("All")
@@ -53,12 +50,12 @@ class EntriesViewModel @Inject constructor(
         itemsWithType.map { items -> filterByQuery(items, query) }
     }
     val satData = itemsWithQuery.map { items -> DataState.Success(items) }
-    val satTypes: List<String> = settings.sourcesMap.keys.sorted()
+    val satTypes = dataRepository.getSatelliteTypes()
 
     init {
         viewModelScope.launch {
             delay(250)
-            itemsFromRepo.value = loadEntriesWithSelection()
+            itemsFromRepo.value = dataRepository.getEntriesWithSelection()
         }
     }
 
@@ -78,15 +75,14 @@ class EntriesViewModel @Inject constructor(
 
     fun saveSelection() = viewModelScope.launch {
         val newSelection = itemsFromRepo.value.filter { it.isSelected }.map { it.catnum }
-        settings.saveEntriesSelection(newSelection)
-        val selectedIds = settings.loadEntriesSelection()
-        val satellites = repository.getEntriesWithIds(selectedIds)
-        val stationPos = locationSource.stationPosition.value
-        val geoPos = GeoPos(stationPos.latitude, stationPos.longitude)
+        settingsRepository.saveEntriesSelection(newSelection)
+        val selectedIds = settingsRepository.loadEntriesSelection()
+        val satellites = dataRepository.getEntriesWithIds(selectedIds)
+        val stationPos = settingsRepository.stationPosition.value
         val timeRef = System.currentTimeMillis()
-        val hoursAhead = settings.getHoursAhead()
-        val minElev = settings.getMinElevation()
-        satelliteManager.calculatePasses(satellites, geoPos, timeRef, hoursAhead, minElev)
+        val hoursAhead = settingsRepository.getHoursAhead()
+        val minElev = settingsRepository.getMinElevation()
+        satelliteRepository.calculatePasses(satellites, stationPos, timeRef, hoursAhead, minElev)
     }
 
     fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
@@ -99,14 +95,9 @@ class EntriesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadEntriesWithSelection(): List<SatItem> {
-        val selectedIds = settings.loadEntriesSelection()
-        return repository.getEntriesWithModes().onEach { it.isSelected = it.catnum in selectedIds }
-    }
-
     private fun filterByType(items: List<SatItem>, type: String): List<SatItem> {
         if (type == "All") return items
-        val catnums = settings.loadSatType(type)
+        val catnums = settingsRepository.loadSatType(type)
         if (catnums.isEmpty()) return items
         return items.filter { item -> item.catnum in catnums }
     }

@@ -20,7 +20,7 @@ package com.rtbishop.look4sat.domain
 import com.rtbishop.look4sat.model.OrbitalData
 import kotlin.math.*
 
-class DeepSpaceSat(data: OrbitalData) : Satellite(data) {
+class DeepSpaceSatellite(data: OrbitalData) : Satellite(data) {
 
     private val c1: Double
     private val c4: Double
