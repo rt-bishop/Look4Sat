@@ -19,7 +19,10 @@ package com.rtbishop.look4sat.presentation.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.domain.*
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISatelliteRepository
+import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPos
 import com.rtbishop.look4sat.utility.QthConverter
@@ -38,15 +41,14 @@ import kotlin.math.min
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val repository: IDataRepository,
-    private val satelliteManager: ISatelliteManager,
-    private val settings: ISettingsSource,
-    private val locationSource: ILocationSource
+    private val dataRepository: IDataRepository,
+    private val satelliteRepository: ISatelliteRepository,
+    private val settingsRepository: ISettingsRepository
 ) : ViewModel() {
 
-    private val stationPosNew = locationSource.stationPosition.value
+    private val stationPosNew = settingsRepository.stationPosition.value
     private val stationPosition = GeoPos(stationPosNew.latitude, stationPosNew.longitude)
-    private var allPasses = satelliteManager.getPasses()
+    private var allPasses = satelliteRepository.getPasses()
     private var allSatellites = listOf<Satellite>()
     private var dataUpdateJob: Job? = null
     private var dataUpdateRate = 1000L
@@ -85,8 +87,8 @@ class MapViewModel @Inject constructor(
 
     fun selectDefaultSatellite(catnum: Int) {
         viewModelScope.launch {
-            val selectedIds = settings.loadEntriesSelection()
-            repository.getEntriesWithIds(selectedIds).also { satellites ->
+            val selectedIds = settingsRepository.loadEntriesSelection()
+            dataRepository.getEntriesWithIds(selectedIds).also { satellites ->
                 if (satellites.isNotEmpty()) {
                     allSatellites = satellites
                     if (catnum == -1) {
@@ -123,7 +125,7 @@ class MapViewModel @Inject constructor(
         val currentTrack = mutableListOf<GeoPos>()
         val endDate = Date(date.time + (satellite.data.orbitalPeriod * 2.4 * 60000L).toLong())
         var oldLongitude = 0.0
-        satelliteManager.getTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
+        satelliteRepository.getTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
             val osmLat = clipLat(satPos.latitude.toDegrees())
             val osmLon = clipLon(satPos.longitude.toDegrees())
             val currentPosition = GeoPos(osmLat, osmLon)
@@ -150,7 +152,7 @@ class MapViewModel @Inject constructor(
     private suspend fun getPositions(satellites: List<Satellite>, pos: GeoPos, date: Date) {
         val positions = mutableMapOf<Satellite, GeoPos>()
         satellites.forEach { satellite ->
-            val satPos = satelliteManager.getPosition(satellite, pos, date.time)
+            val satPos = satelliteRepository.getPosition(satellite, pos, date.time)
             val osmLat = clipLat(satPos.latitude.toDegrees())
             val osmLon = clipLon(satPos.longitude.toDegrees())
             positions[satellite] = GeoPos(osmLat, osmLon)
@@ -159,7 +161,7 @@ class MapViewModel @Inject constructor(
     }
 
     private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
-        val satPos = satelliteManager.getPosition(satellite, pos, date.time)
+        val satPos = satelliteRepository.getPosition(satellite, pos, date.time)
         _footprint.emit(satPos)
     }
 
@@ -177,7 +179,7 @@ class MapViewModel @Inject constructor(
                     }
                 }
             }
-        val satPos = satelliteManager.getPosition(sat, pos, date.time)
+        val satPos = satelliteRepository.getPosition(sat, pos, date.time)
         val azimuth = satPos.azimuth.toDegrees()
         val elevation = satPos.elevation.toDegrees()
         val osmLat = clipLat(satPos.latitude.toDegrees())

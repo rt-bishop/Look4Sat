@@ -20,7 +20,7 @@ package com.rtbishop.look4sat.domain
 import com.rtbishop.look4sat.model.OrbitalData
 import kotlin.math.*
 
-class NearEarthSat(data: OrbitalData) : Satellite(data) {
+class NearEarthSatellite(data: OrbitalData) : Satellite(data) {
 
     private val aodp: Double
     private val aycof: Double

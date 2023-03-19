@@ -5,9 +5,11 @@ import com.rtbishop.look4sat.model.GeoPos
 data class LocationSettings(
     val isUpdating: Boolean,
     val stationPos: GeoPos,
+    val messageResId: Int,
     val setGpsLoc: () -> Unit,
     val setManualLoc: (Double, Double) -> Unit,
-    val setQthLoc: (String) -> Unit
+    val setQthLoc: (String) -> Unit,
+    val dismissMessage: () -> Unit
 )
 
 data class DataSettings(
