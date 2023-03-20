@@ -22,8 +22,17 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.rtbishop.look4sat.domain.*
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.rtbishop.look4sat.MainApplication
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISatelliteRepository
+import com.rtbishop.look4sat.domain.ISensorRepository
+import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.framework.BluetoothReporter
 import com.rtbishop.look4sat.framework.NetworkReporter
 import com.rtbishop.look4sat.model.GeoPos
@@ -32,15 +41,12 @@ import com.rtbishop.look4sat.model.SatPos
 import com.rtbishop.look4sat.model.SatRadio
 import com.rtbishop.look4sat.utility.round
 import com.rtbishop.look4sat.utility.toDegrees
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class RadarViewModel @Inject constructor(
+class RadarViewModel(
     private val bluetoothReporter: BluetoothReporter,
     private val networkReporter: NetworkReporter,
     private val savedStateHandle: SavedStateHandle,
@@ -147,6 +153,25 @@ class RadarViewModel @Inject constructor(
             delay(125)
             val list = satelliteRepository.processRadios(satellite, stationPos, radios, time)
             transmitters.value = list
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+            initializer {
+                val savedStateHandle = createSavedStateHandle()
+                val container = (this[applicationKey] as MainApplication).container
+                RadarViewModel(
+                    container.bluetoothReporter,
+                    container.networkReporter,
+                    savedStateHandle,
+                    container.dataRepository,
+                    container.satelliteRepository,
+                    container.sensorRepository,
+                    container.settingsRepository
+                )
+            }
         }
     }
 }

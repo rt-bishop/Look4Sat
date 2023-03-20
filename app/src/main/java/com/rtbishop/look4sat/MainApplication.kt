@@ -18,25 +18,18 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
-import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.*
-import javax.inject.Inject
+import java.util.Date
+import java.util.Locale
 
-@HiltAndroidApp
 class MainApplication : Application() {
 
-    @Inject
-    lateinit var dataRepository: IDataRepository
-
-    @Inject
-    lateinit var settingsRepository: ISettingsRepository
+    lateinit var container: MainContainer
 
     override fun onCreate() {
         super.onCreate()
+        container = MainContainer(this)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
@@ -44,12 +37,13 @@ class MainApplication : Application() {
     }
 
     private fun checkAutoUpdate() {
+        val settingsRepository = container.settingsRepository
         if (settingsRepository.isUpdateEnabled()) {
             val timeDelta = System.currentTimeMillis() - settingsRepository.getLastUpdateTime()
             if (timeDelta > 172800000) { // 48 hours in ms
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 Timber.d("Started periodic data update on ${sdf.format(Date())}")
-                dataRepository.updateFromWeb()
+                container.dataRepository.updateFromWeb()
             }
         }
     }

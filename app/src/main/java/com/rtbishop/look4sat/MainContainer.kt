@@ -1,20 +1,3 @@
-/*
- * Look4Sat. Amateur radio satellite tracker and pass predictor.
- * Copyright (C) 2019-2022 Arty Bishop (bishop.arty@gmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package com.rtbishop.look4sat
 
 import android.bluetooth.BluetoothManager
@@ -26,45 +9,43 @@ import androidx.room.Room
 import com.rtbishop.look4sat.data.DataParser
 import com.rtbishop.look4sat.data.DataRepository
 import com.rtbishop.look4sat.data.SatelliteRepository
-import com.rtbishop.look4sat.domain.*
-import com.rtbishop.look4sat.framework.*
-import com.rtbishop.look4sat.framework.data.*
+import com.rtbishop.look4sat.domain.IDataRepository
+import com.rtbishop.look4sat.domain.ISatelliteRepository
+import com.rtbishop.look4sat.domain.ISensorRepository
+import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.framework.BluetoothReporter
+import com.rtbishop.look4sat.framework.NetworkReporter
+import com.rtbishop.look4sat.framework.SensorRepository
+import com.rtbishop.look4sat.framework.SettingsRepository
+import com.rtbishop.look4sat.framework.data.MIGRATION_1_2
+import com.rtbishop.look4sat.framework.data.MainDatabase
 import com.rtbishop.look4sat.framework.data.local.EntriesStorage
 import com.rtbishop.look4sat.framework.data.local.RadiosStorage
 import com.rtbishop.look4sat.framework.data.remote.FileSource
 import com.rtbishop.look4sat.framework.data.remote.NetworkSource
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object MainModule {
+class MainContainer(private val context: Context) {
 
-    @Provides
-    @Singleton
-    fun provideBluetoothReporter(@ApplicationContext context: Context): BluetoothReporter {
+    val bluetoothReporter = provideBluetoothReporter()
+    val networkReporter = provideNetworkReporter()
+    val settingsRepository = provideSettingsRepository()
+    val dataRepository = provideDataRepository(settingsRepository)
+    val sensorRepository = provideSensorRepository()
+    val satelliteRepository = provideSatelliteRepository()
+
+    private fun provideBluetoothReporter(): BluetoothReporter {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         return BluetoothReporter(manager, CoroutineScope(Dispatchers.IO))
     }
 
-    @Provides
-    @Singleton
-    fun provideNetworkReporter(): NetworkReporter {
+    private fun provideNetworkReporter(): NetworkReporter {
         return NetworkReporter(CoroutineScope(Dispatchers.IO))
     }
 
-    @Provides
-    @Singleton
-    fun provideDataRepository(
-        @ApplicationContext context: Context, settings: ISettingsRepository
-    ): IDataRepository {
+    private fun provideDataRepository(settings: ISettingsRepository): IDataRepository {
         val db = Room.databaseBuilder(context, MainDatabase::class.java, "Look4SatDb")
             .addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration().build()
         val parser = DataParser(Dispatchers.Default)
@@ -76,23 +57,17 @@ object MainModule {
         return DataRepository(parser, fileSource, entries, radios, remoteSource, scope, settings)
     }
 
-    @Provides
-    @Singleton
-    fun provideSensorRepository(@ApplicationContext context: Context): ISensorRepository {
+    private fun provideSensorRepository(): ISensorRepository {
         val manager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensor = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
         return SensorRepository(manager, sensor)
     }
 
-    @Provides
-    @Singleton
-    fun provideSatelliteRepository(): ISatelliteRepository {
+    private fun provideSatelliteRepository(): ISatelliteRepository {
         return SatelliteRepository(Dispatchers.Default)
     }
 
-    @Provides
-    @Singleton
-    fun provideSettingsRepository(@ApplicationContext context: Context): ISettingsRepository {
+    private fun provideSettingsRepository(): ISettingsRepository {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val preferences = context.getSharedPreferences("default", Context.MODE_PRIVATE)
         return SettingsRepository(manager, preferences)

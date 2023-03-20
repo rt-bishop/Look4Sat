@@ -1,9 +1,9 @@
 buildscript {
     ext {
-        application_version = '7.4.2'
-        library_version = '7.1.2'
+        gradle_plugin_version = '7.4.2'
+        library_plugin_version = '7.1.2'
+        ksp_version = '1.8.10-1.0.9'
         kotlin_android_version = '1.8.10'
-        hilt_android_version = '2.45'
         // Android
         splashscreen_version = '1.0.0'
         room_version = '2.5.0'
@@ -12,28 +12,27 @@ buildscript {
         compose_version = '1.3.3'
         compose_compiler_version = '1.4.3'
         material3_version = '1.0.1'
-        hilt_compose_version = '1.0.0'
-        lifecycle_version = '2.5.1'
+        lifecycle_version = '2.6.0'
         navigation_version = '2.5.3'
         // Utility
         timber_version = '5.0.1'
         osmdroid_version = '6.1.14'
-        json_version = '20220924'
+        json_version = '20230227'
         leakcanary_version = '2.10'
         // Test
         junit_version = '4.13.2'
-        mockito_version = '5.1.1'
+        mockito_version = '5.2.0'
         coroutines_test_version = '1.6.4'
     }
 }
 
 plugins {
-    id "com.android.application" version "$application_version" apply false
-    id "com.android.library" version "$library_version" apply false
+    id "com.android.application" version "$gradle_plugin_version" apply false
+    id "com.android.library" version "$library_plugin_version" apply false
+    id "com.google.devtools.ksp" version "$ksp_version" apply false
     id "org.jetbrains.kotlin.android" version "$kotlin_android_version" apply false
-    id "com.google.dagger.hilt.android" version "$hilt_android_version" apply false
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
