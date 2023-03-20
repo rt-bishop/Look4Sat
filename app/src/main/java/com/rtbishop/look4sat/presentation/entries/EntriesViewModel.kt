@@ -18,23 +18,24 @@
 package com.rtbishop.look4sat.presentation.entries
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteRepository
 import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatItem
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class EntriesViewModel @Inject constructor(
+class EntriesViewModel(
     private val dataRepository: IDataRepository,
     private val satelliteRepository: ISatelliteRepository,
     private val settingsRepository: ISettingsRepository
@@ -110,6 +111,20 @@ class EntriesViewModel @Inject constructor(
             items.filter { item ->
                 val itemName = item.name.lowercase(Locale.getDefault())
                 itemName.contains(query.lowercase(Locale.getDefault()))
+            }
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+            initializer {
+                val container = (this[applicationKey] as MainApplication).container
+                EntriesViewModel(
+                    container.dataRepository,
+                    container.satelliteRepository,
+                    container.settingsRepository
+                )
             }
         }
     }

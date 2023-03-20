@@ -19,20 +19,20 @@ package com.rtbishop.look4sat.presentation.settings
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val dataRepository: IDataRepository,
-    private val settingsRepository: ISettingsRepository
+class SettingsViewModel(
+    private val dataRepository: IDataRepository, private val settingsRepository: ISettingsRepository
 ) : ViewModel() {
 
     private val defaultLocationSettings = LocationSettings(false,
@@ -157,4 +157,14 @@ class SettingsViewModel @Inject constructor(
 //    fun setBTDeviceName(value: String) = settings.setBTDeviceName(value)
 //    fun getBTDeviceAddr(): String = settings.getBTDeviceAddr()
 //    fun setBTDeviceAddr(value: String) = settings.setBTDeviceAddr(value)
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+            initializer {
+                val container = (this[applicationKey] as MainApplication).container
+                SettingsViewModel(container.dataRepository, container.settingsRepository)
+            }
+        }
+    }
 }

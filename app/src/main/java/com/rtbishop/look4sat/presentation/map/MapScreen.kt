@@ -1,7 +1,13 @@
 package com.rtbishop.look4sat.presentation.map
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +25,9 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
@@ -59,7 +65,8 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 private val labelRect = Rect()
 
 @Composable
-fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
+fun MapScreen() {
+    val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
     val context = LocalContext.current
     val preferences = context.getSharedPreferences("default", Context.MODE_PRIVATE)
     Configuration.getInstance().load(context, preferences)

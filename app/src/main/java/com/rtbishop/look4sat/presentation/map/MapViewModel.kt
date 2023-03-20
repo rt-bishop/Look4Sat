@@ -18,7 +18,11 @@
 package com.rtbishop.look4sat.presentation.map
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteRepository
 import com.rtbishop.look4sat.domain.ISettingsRepository
@@ -28,19 +32,20 @@ import com.rtbishop.look4sat.model.SatPos
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.toDegrees
 import com.rtbishop.look4sat.utility.toTimerString
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
-import java.util.*
-import javax.inject.Inject
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.util.Date
 import kotlin.collections.set
 import kotlin.math.max
 import kotlin.math.min
 
-@HiltViewModel
-class MapViewModel @Inject constructor(
+class MapViewModel(
     private val dataRepository: IDataRepository,
     private val satelliteRepository: ISatelliteRepository,
     private val settingsRepository: ISettingsRepository
@@ -220,5 +225,19 @@ class MapViewModel @Inject constructor(
 
     private fun clip(currentValue: Double, minValue: Double, maxValue: Double): Double {
         return min(max(currentValue, minValue), maxValue)
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+            initializer {
+                val container = (this[applicationKey] as MainApplication).container
+                MapViewModel(
+                    container.dataRepository,
+                    container.satelliteRepository,
+                    container.settingsRepository
+                )
+            }
+        }
     }
 }
