@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.NearEarthSatellite
 import com.rtbishop.look4sat.model.DataState
@@ -38,7 +38,8 @@ import java.util.*
 private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
-fun PassesScreen(navToRadar: (Int, Long) -> Unit, viewModel: PassesViewModel = hiltViewModel()) {
+fun PassesScreen(navToRadar: (Int, Long) -> Unit) {
+    val viewModel = viewModel(PassesViewModel::class.java, factory = PassesViewModel.Factory)
     val state = viewModel.passes.collectAsState(initial = null)
     val timerText = viewModel.timerText.collectAsState(initial = null)
     val isRefreshing = state.value is DataState.Loading
@@ -102,7 +103,7 @@ private fun PassPreview() {
     )
     val satellite = NearEarthSatellite(data)
     val pass = SatPass(1L, 25.0, 10L, 75.0, 850, 45.0, satellite, 0.5f)
-    MainTheme { Pass(pass = pass, { _,_ -> }) }
+    MainTheme { Pass(pass = pass, { _, _ -> }) }
 }
 
 @Composable

@@ -4,9 +4,22 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.model.GeoPos
@@ -32,7 +45,8 @@ import com.rtbishop.look4sat.presentation.dialogs.PositionDialog
 import com.rtbishop.look4sat.presentation.gotoUrl
 import com.rtbishop.look4sat.presentation.showToast
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
 private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
@@ -41,7 +55,8 @@ private const val DONATE_URL = "https://ko-fi.com/rt_bishop"
 private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen() {
+    val viewModel = viewModel(SettingsViewModel::class.java, factory = SettingsViewModel.Factory)
     val context = LocalContext.current
 
     // Permissions setup

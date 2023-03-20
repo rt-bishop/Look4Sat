@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatItem
@@ -31,7 +31,8 @@ import com.rtbishop.look4sat.presentation.dialogs.TypesDialog
 import com.rtbishop.look4sat.presentation.onClick
 
 @Composable
-fun EntriesScreen(navToPasses: () -> Unit, viewModel: EntriesViewModel = hiltViewModel()) {
+fun EntriesScreen(navToPasses: () -> Unit) {
+    val viewModel = viewModel(EntriesViewModel::class.java, factory = EntriesViewModel.Factory)
     val state = viewModel.satData.collectAsState(initial = DataState.Loading)
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
@@ -227,6 +228,7 @@ fun EntriesCard(state: DataState<List<SatItem>>, onSelected: (List<Int>, Boolean
                     }
                 }
             }
+
             else -> CardLoadingIndicator()
         }
     }

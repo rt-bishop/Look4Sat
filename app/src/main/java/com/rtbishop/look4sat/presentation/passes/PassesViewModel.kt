@@ -18,21 +18,26 @@
 package com.rtbishop.look4sat.presentation.passes
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteRepository
 import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatPass
 import com.rtbishop.look4sat.utility.toTimerString
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
-@HiltViewModel
-class PassesViewModel @Inject constructor(
+class PassesViewModel(
     private val dataRepository: IDataRepository,
     private val satelliteRepository: ISatelliteRepository,
     private val settingsRepository: ISettingsRepository
@@ -111,6 +116,20 @@ class PassesViewModel @Inject constructor(
             satelliteRepository.calculatePasses(
                 satellites, stationPos, timeRef, hoursAhead, minElevation
             )
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+            initializer {
+                val container = (this[applicationKey] as MainApplication).container
+                PassesViewModel(
+                    container.dataRepository,
+                    container.satelliteRepository,
+                    container.settingsRepository
+                )
+            }
         }
     }
 }

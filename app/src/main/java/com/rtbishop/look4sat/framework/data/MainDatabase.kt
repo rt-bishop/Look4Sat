@@ -26,7 +26,7 @@ import com.rtbishop.look4sat.framework.data.dao.RadiosDao
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatRadio
 
-@Database(entities = [SatEntry::class, SatRadio::class], version = 2, exportSchema = true)
+@Database(entities = [SatEntry::class, SatRadio::class], version = 2)
 abstract class MainDatabase : RoomDatabase() {
 
     abstract fun entriesDao(): EntriesDao
