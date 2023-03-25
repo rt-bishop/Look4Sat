@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,9 +29,6 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         container = MainContainer(this)
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
         checkAutoUpdate()
     }
 
@@ -42,7 +38,7 @@ class MainApplication : Application() {
             val timeDelta = System.currentTimeMillis() - settingsRepository.getLastUpdateTime()
             if (timeDelta > 172800000) { // 48 hours in ms
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
-                Timber.d("Started periodic data update on ${sdf.format(Date())}")
+                println("Started periodic data update on ${sdf.format(Date())}")
                 container.dataRepository.updateFromWeb()
             }
         }
