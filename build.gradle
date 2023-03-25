@@ -15,13 +15,12 @@ buildscript {
         lifecycle_version = '2.6.0'
         navigation_version = '2.5.3'
         // Utility
-        timber_version = '5.0.1'
         osmdroid_version = '6.1.14'
         json_version = '20230227'
         leakcanary_version = '2.10'
         // Test
         junit_version = '4.13.2'
-        mockito_version = '5.2.0'
+        mockk_version = '1.13.4'
         coroutines_test_version = '1.6.4'
     }
 }

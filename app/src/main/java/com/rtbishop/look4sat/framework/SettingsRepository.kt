@@ -29,7 +29,6 @@ import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import timber.log.Timber
 import java.util.concurrent.Executors
 
 class SettingsRepository(
@@ -73,12 +72,12 @@ class SettingsRepository(
         try {
             val criteria = Criteria().apply { isCostAllowed = true }
             val provider = manager.getBestProvider(criteria, true) ?: defaultProvider
-            Timber.d("Requesting location for $provider provider")
+            println("Requesting location for $provider provider")
             LocationManagerCompat.getCurrentLocation(manager, provider, timeoutSignal, executor) {
                 it?.let { setGeoPosition(it.latitude, it.longitude, it.altitude) }
             }
         } catch (exception: SecurityException) {
-            Timber.d("No permissions were given")
+            println("No permissions were given")
         }
         return true
     }
@@ -119,7 +118,7 @@ class SettingsRepository(
         val newLon = longitude.round(4)
         val newAlt = altitude.round(1)
         val timestamp = System.currentTimeMillis()
-        Timber.d("Received new Position($newLat, $newLon, $newAlt) & Locator $locator")
+        println("Received new Position($newLat, $newLon, $newAlt) & Locator $locator")
         saveStationPosition(GeoPos(newLat, newLon, newAlt, locator, timestamp))
     }
 
