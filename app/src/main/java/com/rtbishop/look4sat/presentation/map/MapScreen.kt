@@ -33,14 +33,13 @@ import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPos
 import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import timber.log.Timber
 
 private val minLat = MapView.getTileSystem().minLatitude
 private val maxLat = MapView.getTileSystem().maxLatitude
@@ -59,7 +58,7 @@ private val footprintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     textSize = 36f
     style = Paint.Style.FILL
-    color = Color.parseColor("#CCFFFFFF")
+    color = Color.parseColor("#FFE082")
     setShadowLayer(3f, 3f, 3f, Color.BLACK)
 }
 private val labelRect = Rect()
@@ -76,11 +75,9 @@ fun MapScreen() {
     val satTrack = viewModel.track.collectAsState(initial = null)
     val footprint = viewModel.footprint.collectAsState(initial = null)
     val positionClick = { satellite: Satellite -> viewModel.selectSatellite(satellite) }
-    Timber.d("MapScreen recomposition")
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
             MapView(modifier = Modifier.fillMaxSize()) { mapView ->
-                Timber.d("MapView recomposition")
                 stationPos.value?.let { setStationPosition(it, mapView) }
                 positions.value?.let { setPositions(it, mapView, positionClick) }
                 satTrack.value?.let { setSatelliteTrack(it, mapView) }
@@ -101,7 +98,7 @@ private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
             mapView.invalidate()
         }
     } catch (exception: Exception) {
-        Timber.d(exception)
+        println(exception)
     }
 }
 
@@ -130,13 +127,13 @@ private fun setPositions(
         mapView.overlays[3] = markers
         mapView.invalidate()
     } catch (exception: Exception) {
-        Timber.d(exception)
+        println(exception)
     }
 }
 
 private fun getCustomTextIcon(textLabel: String, mapView: MapView): Drawable {
     textPaint.getTextBounds(textLabel, 0, textLabel.length, labelRect)
-    val iconSize = 8f
+    val iconSize = 10f
     val width = labelRect.width() + iconSize * 2f
     val height = textPaint.textSize * 3f + iconSize * 2f
     val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
@@ -161,7 +158,7 @@ private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
         }
         mapView.overlays[1] = trackOverlay
     } catch (exception: Exception) {
-        Timber.d(exception)
+        println(exception)
     }
 //    mapView.controller.animateTo(center)
 }
@@ -175,7 +172,7 @@ private fun setFootprint(satPos: SatPos, mapView: MapView) {
         }
         mapView.overlays[2] = footprintOverlay
     } catch (exception: Exception) {
-        Timber.d(exception)
+        println(exception)
     }
 }
 
@@ -214,10 +211,10 @@ private fun rememberMapViewWithLifecycle(): MapView {
     val context = LocalContext.current
     val mapView = remember { MapView(context) }.apply {
         setMultiTouchControls(true)
-        setTileSource(TileSourceFactory.WIKIMEDIA)
+        setTileSource(tonerLiteTileSource)
         minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels) + 0.25
-        maxZoomLevel = 5.75
-        controller.setZoom(minZoomLevel + 0.25)
+        maxZoomLevel = 5.99
+        controller.setZoom(minZoomLevel + 0.5)
         zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
         overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
@@ -247,14 +244,18 @@ private fun rememberMapViewLifecycleObserver(mapView: MapView) = remember(mapVie
     }
 }
 
+private val tonerLiteTileSource = XYTileSource(
+    "Stamen", 0, 6, 256, ".png",
+    arrayOf("https://stamen-tiles.a.ssl.fastly.net/toner-lite/"),
+    "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL."
+)
+
 private fun getColorFilter(): ColorMatrixColorFilter {
-    val grayScaleMatrix = ColorMatrix().apply { setSaturation(0f) }
     val negativeMatrix = ColorMatrix(
         floatArrayOf(
-            -1f, 0f, 0f, 0f, 255f, 0f, -1f, 0f, 0f, 255f, 0f, 0f, -1f, 0f, 255f, 0f, 0f, 0f, 1f, 0f
+            -1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f
         )
     )
-    negativeMatrix.preConcat(grayScaleMatrix)
     return ColorMatrixColorFilter(negativeMatrix)
 }
 

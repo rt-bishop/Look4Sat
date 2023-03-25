@@ -13,38 +13,62 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val AccentYellow = Color(0xFFFFE082)
-private val TextWhite = Color(0xCCFFFFFF)
-private val TextGrey = Color(0x66FFFFFF)
-private val TextBlack = Color(0xFF000000)
-private val SurfaceInverse = Color(0x40FFFFFF)
-private val SurfaceBtn = Color(0xFF303030)
-private val SurfaceCard = Color(0xFF1C1C1C)
-private val SurfaceBg = Color(0xFF121212)
-private val Transparent = Color(0x00000000)
+@Composable
+fun MainTheme(
+//    darkTheme: Boolean = isSystemInDarkTheme(),
+//    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit
+) {
+//    val colorScheme = when {
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
+//        darkTheme -> DarkColorScheme
+//        else -> LightColorScheme
+//    }
+    val colors = themeColors
+//    val view = LocalView.current
+//    if (!view.isInEditMode) {
+//        SideEffect {
+//            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
+//            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
+//        }
+//    }
+    MaterialTheme(colorScheme = colors, typography = typography, content = content, shapes = shapes)
+}
 
-private val MainColors = lightColorScheme(
-    primary = AccentYellow,
-    onPrimary = TextBlack,
+private val accentYellow = Color(0xFFFFE082)
+private val textWhite = Color(0xCCFFFFFF)
+private val textGrey = Color(0x66FFFFFF)
+private val textBlack = Color(0xFF000000)
+private val surfaceInverse = Color(0x40FFFFFF)
+private val surfaceBtn = Color(0xFF303030)
+private val surfaceCard = Color(0xFF1C1C1C)
+private val surfaceBg = Color(0xFF121212)
+private val transparent = Color(0x00000000)
+private val themeColors = lightColorScheme(
+    primary = accentYellow,
+    onPrimary = textBlack,
 //    primaryContainer = primaryContainer,
 //    onPrimaryContainer = onPrimaryContainer,
 //    inversePrimary = inversePrimary,
-    secondary = AccentYellow,
-    onSecondary = TextBlack,
-    secondaryContainer = AccentYellow, // navBar indicator
-    onSecondaryContainer = TextBlack, // navBar active icon
-    tertiary = SurfaceBtn,
-    onTertiary = TextWhite,
+    secondary = accentYellow,
+    onSecondary = textBlack,
+    secondaryContainer = accentYellow, // navBar indicator
+    onSecondaryContainer = textBlack, // navBar active icon
+    tertiary = surfaceBtn,
+    onTertiary = textWhite,
 //    tertiaryContainer = tertiaryContainer,
 //    onTertiaryContainer = onTertiaryContainer,
-    background = SurfaceBg,
-    onBackground = TextWhite,
-    surface = SurfaceCard,
-    onSurface = TextWhite,
-    surfaceVariant = SurfaceCard,
-    onSurfaceVariant = TextGrey, // navBar inactive icon
-    surfaceTint = Transparent,
-    inverseSurface = SurfaceInverse,
+    background = surfaceBg,
+    onBackground = textWhite,
+    surface = surfaceCard,
+    onSurface = textWhite,
+    surfaceVariant = surfaceCard,
+    onSurfaceVariant = textGrey, // navBar inactive icon
+    surfaceTint = transparent,
+    inverseSurface = surfaceInverse,
 //    inverseOnSurface = inverseOnSurface,
 //    error = error,
 //    onError = onError,
@@ -55,7 +79,7 @@ private val MainColors = lightColorScheme(
 //    scrim = scrim,
 )
 
-private val Typography = Typography(
+private val typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
@@ -77,33 +101,8 @@ private val Typography = Typography(
     )
 )
 
-private val Shapes = Shapes(
+private val shapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp), small = RoundedCornerShape(6.dp), // buttons corners
     medium = RoundedCornerShape(8.dp), // cards corners
     large = RoundedCornerShape(12.dp), extraLarge = RoundedCornerShape(16.dp)
 )
-
-@Composable
-fun MainTheme(
-//    darkTheme: Boolean = isSystemInDarkTheme(),
-//    dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
-) {
-//    val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//        darkTheme -> DarkColorScheme
-//        else -> LightColorScheme
-//    }
-    val colors = MainColors
-//    val view = LocalView.current
-//    if (!view.isInEditMode) {
-//        SideEffect {
-//            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-//            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
-//        }
-//    }
-    MaterialTheme(colorScheme = colors, typography = Typography, content = content, shapes = Shapes)
-}
