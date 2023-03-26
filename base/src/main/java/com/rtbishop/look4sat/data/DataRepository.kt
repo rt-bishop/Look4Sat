@@ -22,9 +22,13 @@ import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatEntry
 import com.rtbishop.look4sat.model.SatItem
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 
@@ -56,7 +60,7 @@ class DataRepository(
     override suspend fun getEntriesWithIds(ids: List<Int>) = entrySource.getEntriesWithIds(ids)
 
     override suspend fun getEntriesWithSelection(): List<SatItem> {
-        val selectedIds = settingsRepository.loadEntriesSelection()
+        val selectedIds = settingsRepository.satelliteSelection.value
         return getEntriesWithModes().onEach { it.isSelected = it.catnum in selectedIds }
     }
 

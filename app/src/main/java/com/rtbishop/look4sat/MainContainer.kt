@@ -26,6 +26,7 @@ import com.rtbishop.look4sat.framework.data.remote.NetworkSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import org.osmdroid.config.Configuration
 
 class MainContainer(private val context: Context) {
 
@@ -70,6 +71,7 @@ class MainContainer(private val context: Context) {
     private fun provideSettingsRepository(): ISettingsRepository {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val preferences = context.getSharedPreferences("default", Context.MODE_PRIVATE)
+        Configuration.getInstance().load(context, preferences)
         return SettingsRepository(manager, preferences)
     }
 }

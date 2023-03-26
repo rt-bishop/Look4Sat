@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.presentation.map
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -32,7 +31,6 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPos
-import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -66,9 +64,6 @@ private val labelRect = Rect()
 @Composable
 fun MapScreen() {
     val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
-    val context = LocalContext.current
-    val preferences = context.getSharedPreferences("default", Context.MODE_PRIVATE)
-    Configuration.getInstance().load(context, preferences)
     viewModel.selectDefaultSatellite(-1)
     val stationPos = viewModel.stationPos.collectAsState(initial = null)
     val positions = viewModel.positions.collectAsState(initial = null)
