@@ -24,21 +24,23 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISatelliteRepository
 import com.rtbishop.look4sat.domain.ISettingsRepository
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatItem
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EntriesViewModel(
     private val dataRepository: IDataRepository,
-    private val satelliteRepository: ISatelliteRepository,
-    private val settingsRepository: ISettingsRepository
+    private val settingsRepository: ISettingsRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : ViewModel() {
 
     private val satType = MutableStateFlow("All")
@@ -67,7 +69,7 @@ class EntriesViewModel(
     }
 
     fun selectCurrentItems(selectAll: Boolean) = viewModelScope.launch {
-        updateSelection(itemsWithQuery.first().map { item -> item.catnum }, selectAll)
+        updateEntriesSelection(itemsWithQuery.first().map { item -> item.catnum }, selectAll)
     }
 
     fun setQuery(query: String) {
@@ -77,40 +79,40 @@ class EntriesViewModel(
     fun saveSelection() = viewModelScope.launch {
         val newSelection = itemsFromRepo.value.filter { it.isSelected }.map { it.catnum }
         settingsRepository.saveEntriesSelection(newSelection)
-        val selectedIds = settingsRepository.loadEntriesSelection()
-        val satellites = dataRepository.getEntriesWithIds(selectedIds)
-        val stationPos = settingsRepository.stationPosition.value
-        val timeRef = System.currentTimeMillis()
-        val hoursAhead = settingsRepository.getHoursAhead()
-        val minElev = settingsRepository.getMinElevation()
-        satelliteRepository.calculatePasses(satellites, stationPos, timeRef, hoursAhead, minElev)
     }
 
-    fun updateSelection(catNums: List<Int>, isSelected: Boolean) {
-        itemsFromRepo.value.let { itemsAll ->
-            val copiedList = itemsAll.map { item -> item.copy() }
-            catNums.forEach { catnum ->
-                copiedList.find { item -> item.catnum == catnum }?.isSelected = isSelected
+    fun updateSelection(catNums: List<Int>, isSelected: Boolean) = viewModelScope.launch {
+        updateEntriesSelection(catNums, isSelected)
+    }
+
+    private suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
+        withContext(dispatcher) {
+            itemsFromRepo.value.let { itemsAll ->
+                val copiedList = itemsAll.map { item -> item.copy() }
+                catNums.forEach { catnum ->
+                    copiedList.find { item -> item.catnum == catnum }?.isSelected = isSelected
+                }
+                itemsFromRepo.value = copiedList
             }
-            itemsFromRepo.value = copiedList
         }
     }
 
-    private fun filterByType(items: List<SatItem>, type: String): List<SatItem> {
-        if (type == "All") return items
-        val catnums = settingsRepository.loadSatType(type)
-        if (catnums.isEmpty()) return items
-        return items.filter { item -> item.catnum in catnums }
+    private suspend fun filterByType(items: List<SatItem>, type: String): List<SatItem> {
+        return withContext(dispatcher) {
+            if (type == "All") return@withContext items
+            val catnums = settingsRepository.loadSatType(type)
+            if (catnums.isEmpty()) return@withContext items
+            return@withContext items.filter { item -> item.catnum in catnums }
+        }
     }
 
-    private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
-        if (query.isBlank()) return items
-        return try {
-            items.filter { it.catnum == query.toInt() }
-        } catch (e: Exception) {
-            items.filter { item ->
-                val itemName = item.name.lowercase(Locale.getDefault())
-                itemName.contains(query.lowercase(Locale.getDefault()))
+    private suspend fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
+        return withContext(dispatcher) {
+            if (query.isBlank()) return@withContext items
+            return@withContext try {
+                items.filter { it.catnum == query.toInt() }
+            } catch (e: Exception) {
+                items.filter { item -> item.name.lowercase().contains(query.lowercase()) }
             }
         }
     }
@@ -122,7 +124,6 @@ class EntriesViewModel(
                 val container = (this[applicationKey] as MainApplication).container
                 EntriesViewModel(
                     container.dataRepository,
-                    container.satelliteRepository,
                     container.settingsRepository
                 )
             }

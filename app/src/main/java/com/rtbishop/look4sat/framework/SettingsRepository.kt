@@ -124,15 +124,17 @@ class SettingsRepository(
 
     //endregion
 
-    override fun saveEntriesSelection(catnums: List<Int>) {
-        val stringList = catnums.map { catnum -> catnum.toString() }
-        preferences.edit { putStringSet(keySelection, stringList.toSet()) }
+    private val _satelliteSelection = MutableStateFlow(loadEntriesSelection())
+    override val satelliteSelection: StateFlow<List<Int>> = _satelliteSelection
+
+    override fun saveEntriesSelection(catnums: List<Int>) = preferences.edit {
+        putStringSet(keySelection, catnums.map { catnum -> catnum.toString() }.toSet())
+        _satelliteSelection.value = catnums
     }
 
-    override fun loadEntriesSelection(): List<Int> {
-        val catnums =
-            preferences.getStringSet(keySelection, emptySet())?.map { catnum -> catnum.toInt() }
-        return catnums?.sorted() ?: emptyList()
+    private fun loadEntriesSelection(): List<Int> {
+        val catNums = preferences.getStringSet(keySelection, emptySet())
+        return catNums?.map { catnum -> catnum.toInt() }?.sorted() ?: emptyList()
     }
 
     override fun saveSatType(type: String, catnums: List<Int>) {

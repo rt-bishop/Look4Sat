@@ -88,11 +88,13 @@ class PassesViewModel(
             }
         }
         viewModelScope.launch {
+            settingsRepository.satelliteSelection.collect { calculatePasses() }
+        }
+        viewModelScope.launch {
             dataRepository.updateState.collect { updateState ->
                 if (updateState is DataState.Success) calculatePasses()
             }
         }
-        calculatePasses()
     }
 
     fun shouldUseUTC() = settingsRepository.isUtcEnabled()
@@ -100,18 +102,17 @@ class PassesViewModel(
     fun calculatePasses(
         hoursAhead: Int = 1,
         minElevation: Double = settingsRepository.getMinElevation(),
-        timeRef: Long = System.currentTimeMillis(),
-        selection: List<Int>? = null
+        timeRef: Long = System.currentTimeMillis()
     ) {
         viewModelScope.launch {
             _passes.emit(DataState.Loading)
 //            _timerText.postValue(timerDefaultText)
             passesProcessing?.cancelAndJoin()
-            selection?.let { items -> settingsRepository.saveEntriesSelection(items) }
+//            selection?.let { items -> settingsRepository.saveEntriesSelection(items) }
             settingsRepository.setHoursAhead(hoursAhead)
             settingsRepository.setMinElevation(minElevation)
             val stationPos = settingsRepository.stationPosition.value
-            val selectedIds = settingsRepository.loadEntriesSelection()
+            val selectedIds = settingsRepository.satelliteSelection.value
             val satellites = dataRepository.getEntriesWithIds(selectedIds)
             satelliteRepository.calculatePasses(
                 satellites, stationPos, timeRef, hoursAhead, minElevation
