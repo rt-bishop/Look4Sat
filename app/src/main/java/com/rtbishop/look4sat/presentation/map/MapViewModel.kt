@@ -92,7 +92,7 @@ class MapViewModel(
 
     fun selectDefaultSatellite(catnum: Int) {
         viewModelScope.launch {
-            val selectedIds = settingsRepository.loadEntriesSelection()
+            val selectedIds = settingsRepository.satelliteSelection.value
             dataRepository.getEntriesWithIds(selectedIds).also { satellites ->
                 if (satellites.isNotEmpty()) {
                     allSatellites = satellites

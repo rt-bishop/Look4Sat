@@ -24,6 +24,8 @@ interface ISettingsRepository {
 
     val stationPosition: StateFlow<GeoPos>
 
+    val satelliteSelection: StateFlow<List<Int>>
+
     fun setGpsPosition(): Boolean
 
     fun setGeoPosition(latitude: Double, longitude: Double, altitude: Double = 0.0): Boolean
@@ -63,8 +65,6 @@ interface ISettingsRepository {
     fun loadModesSelection(): List<String>
 
     fun saveEntriesSelection(catnums: List<Int>)
-
-    fun loadEntriesSelection(): List<Int>
 
     fun saveSatType(type: String, catnums: List<Int>)
 
