@@ -29,8 +29,8 @@ class EntriesStorage(private val entriesDao: EntriesDao) : IEntriesStorage {
 
     override fun getEntriesTotal() = entriesDao.getEntriesTotal()
 
-    override suspend fun getEntriesWithModes(): List<DomainItem> {
-        return entriesDao.getEntriesWithModes().toDomainItems()
+    override suspend fun getEntriesList(): List<DomainItem> {
+        return entriesDao.getEntriesList().toDomainItems()
     }
 
     override suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite> {
@@ -50,7 +50,7 @@ class EntriesStorage(private val entriesDao: EntriesDao) : IEntriesStorage {
 
     private fun DomainEntry.toFramework() = FrameworkEntry(this.data, this.comment)
 
-    private fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, this.modes, false)
+    private fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, false)
 
     private fun List<DomainEntry>.toFrameworkEntries() = this.map { entry -> entry.toFramework() }
 

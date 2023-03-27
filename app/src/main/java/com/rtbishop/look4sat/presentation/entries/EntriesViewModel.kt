@@ -17,115 +17,59 @@
  */
 package com.rtbishop.look4sat.presentation.entries
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
-import com.rtbishop.look4sat.model.DataState
-import com.rtbishop.look4sat.model.SatItem
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.rtbishop.look4sat.data.SelectionRepository
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class EntriesViewModel(
-    private val dataRepository: IDataRepository,
-    private val settingsRepository: ISettingsRepository,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-) : ViewModel() {
+class EntriesViewModel(private val selectionRepo: SelectionRepository) : ViewModel() {
 
-    private val satType = MutableStateFlow("All")
-    private val currentQuery = MutableStateFlow(String())
-    private val itemsFromRepo = MutableStateFlow<List<SatItem>>(emptyList())
-    private val itemsWithType = satType.flatMapLatest { type ->
-        itemsFromRepo.map { items -> filterByType(items, type) }
-    }
-    private val itemsWithQuery = currentQuery.flatMapLatest { query ->
-        itemsWithType.map { items -> filterByQuery(items, query) }
-    }
-    val satData = itemsWithQuery.map { items -> DataState.Success(items) }
-    val satTypes = dataRepository.getSatelliteTypes()
+    private val defaultUiState = EntriesScreenState(
+        isLoading = true,
+        itemsList = emptyList(),
+        currentType = selectionRepo.getCurrentType(),
+        typesList = selectionRepo.getTypesList()
+    )
+    val uiState = mutableStateOf(defaultUiState)
 
     init {
         viewModelScope.launch {
-            delay(250)
-            itemsFromRepo.value = dataRepository.getEntriesWithSelection()
+            delay(1000)
+            selectionRepo.getEntriesFlow().collect { items ->
+                uiState.value = uiState.value.copy(isLoading = false, itemsList = items)
+            }
         }
     }
 
-    fun getSatType() = satType.value
-
-    fun setSatType(type: String) {
-        satType.value = type
+    fun setType(type: String) = viewModelScope.launch {
+        selectionRepo.setType(type)
+        uiState.value = uiState.value.copy(currentType = type)
     }
 
-    fun selectCurrentItems(selectAll: Boolean) = viewModelScope.launch {
-        updateEntriesSelection(itemsWithQuery.first().map { item -> item.catnum }, selectAll)
-    }
+    fun setQuery(query: String) = viewModelScope.launch { selectionRepo.setQuery(query) }
 
-    fun setQuery(query: String) {
-        currentQuery.value = query
-    }
-
-    fun saveSelection() = viewModelScope.launch {
-        val newSelection = itemsFromRepo.value.filter { it.isSelected }.map { it.catnum }
-        settingsRepository.saveEntriesSelection(newSelection)
+    fun updateSelection(selectAll: Boolean) = viewModelScope.launch {
+        selectionRepo.updateSelection(selectAll)
     }
 
     fun updateSelection(catNums: List<Int>, isSelected: Boolean) = viewModelScope.launch {
-        updateEntriesSelection(catNums, isSelected)
+        selectionRepo.updateSelection(catNums, isSelected)
     }
 
-    private suspend fun updateEntriesSelection(catNums: List<Int>, isSelected: Boolean) {
-        withContext(dispatcher) {
-            itemsFromRepo.value.let { itemsAll ->
-                val copiedList = itemsAll.map { item -> item.copy() }
-                catNums.forEach { catnum ->
-                    copiedList.find { item -> item.catnum == catnum }?.isSelected = isSelected
-                }
-                itemsFromRepo.value = copiedList
-            }
-        }
-    }
-
-    private suspend fun filterByType(items: List<SatItem>, type: String): List<SatItem> {
-        return withContext(dispatcher) {
-            if (type == "All") return@withContext items
-            val catnums = settingsRepository.loadSatType(type)
-            if (catnums.isEmpty()) return@withContext items
-            return@withContext items.filter { item -> item.catnum in catnums }
-        }
-    }
-
-    private suspend fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
-        return withContext(dispatcher) {
-            if (query.isBlank()) return@withContext items
-            return@withContext try {
-                items.filter { it.catnum == query.toInt() }
-            } catch (e: Exception) {
-                items.filter { item -> item.name.lowercase().contains(query.lowercase()) }
-            }
-        }
-    }
+    fun saveSelection() = viewModelScope.launch { selectionRepo.saveSelection() }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                EntriesViewModel(
-                    container.dataRepository,
-                    container.settingsRepository
-                )
+                EntriesViewModel(container.provideSelectionRepository())
             }
         }
     }

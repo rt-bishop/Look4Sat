@@ -9,6 +9,7 @@ import androidx.room.Room
 import com.rtbishop.look4sat.data.DataParser
 import com.rtbishop.look4sat.data.DataRepository
 import com.rtbishop.look4sat.data.SatelliteRepository
+import com.rtbishop.look4sat.data.SelectionRepository
 import com.rtbishop.look4sat.domain.IDataRepository
 import com.rtbishop.look4sat.domain.ISatelliteRepository
 import com.rtbishop.look4sat.domain.ISensorRepository
@@ -56,6 +57,10 @@ class MainContainer(private val context: Context) {
         val remoteSource = NetworkSource(Dispatchers.IO)
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         return DataRepository(parser, fileSource, entries, radios, remoteSource, scope, settings)
+    }
+
+    fun provideSelectionRepository(): SelectionRepository {
+        return SelectionRepository(Dispatchers.Default, dataRepository, settingsRepository)
     }
 
     private fun provideSensorRepository(): ISensorRepository {
