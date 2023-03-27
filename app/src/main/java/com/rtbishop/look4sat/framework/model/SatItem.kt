@@ -17,16 +17,14 @@
  */
 package com.rtbishop.look4sat.framework.model
 
-import androidx.room.Relation
-
 data class SatItem(
     val catnum: Int,
-    val name: String,
-    @Relation(
-        parentColumn = "catnum",
-        entity = SatRadio::class,
-        entityColumn = "catnum",
-        projection = ["mode"]
-    )
-    val modes: List<String>
+    val name: String
+//    @Relation(
+//        parentColumn = "catnum",
+//        entity = SatRadio::class,
+//        entityColumn = "catnum",
+//        projection = ["mode"]
+//    )
+//    val modes: List<String>
 )

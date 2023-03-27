@@ -20,6 +20,6 @@ package com.rtbishop.look4sat.model
 data class SatItem(
     val catnum: Int,
     val name: String,
-    val modes: List<String>,
-    var isSelected: Boolean
+//    val modes: List<String>,
+    val isSelected: Boolean
 )

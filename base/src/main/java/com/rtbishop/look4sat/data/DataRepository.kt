@@ -55,14 +55,12 @@ class DataRepository(
 
     override fun getSatelliteTypes() = remoteSource.satelliteSourcesMap.keys.sorted()
 
-    override suspend fun getEntriesWithModes() = entrySource.getEntriesWithModes()
+    override suspend fun getEntriesList(): List<SatItem> {
+        val selectedIds = settingsRepository.satelliteSelection.value
+        return entrySource.getEntriesList().map { it.copy(isSelected = it.catnum in selectedIds) }
+    }
 
     override suspend fun getEntriesWithIds(ids: List<Int>) = entrySource.getEntriesWithIds(ids)
-
-    override suspend fun getEntriesWithSelection(): List<SatItem> {
-        val selectedIds = settingsRepository.satelliteSelection.value
-        return getEntriesWithModes().onEach { it.isSelected = it.catnum in selectedIds }
-    }
 
     override suspend fun getRadiosWithId(id: Int) = radioSource.getRadiosWithId(id)
 
@@ -93,6 +91,7 @@ class DataRepository(
                             settingsRepository.saveSatType(type, catnums)
                             importedEntries.addAll(satellites)
                         }
+
                         "McCants", "Classified" -> {
                             // unzip and parse tle stream
                             val unzipped = ZipInputStream(stream).apply { nextEntry }
@@ -101,6 +100,7 @@ class DataRepository(
                             settingsRepository.saveSatType(type, catnums)
                             importedEntries.addAll(satellites)
                         }
+
                         else -> {
                             // parse csv stream
                             val parsed = dataParser.parseCSVStream(stream)
