@@ -26,7 +26,7 @@ interface IEntriesStorage {
 
     fun getEntriesTotal(): Flow<Int>
 
-    suspend fun getEntriesWithModes(): List<SatItem>
+    suspend fun getEntriesList(): List<SatItem>
 
     suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
 

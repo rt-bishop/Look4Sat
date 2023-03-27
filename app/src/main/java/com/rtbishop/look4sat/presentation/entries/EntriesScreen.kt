@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatItem
 import com.rtbishop.look4sat.presentation.CardIcon
 import com.rtbishop.look4sat.presentation.CardLoadingIndicator
@@ -37,25 +35,33 @@ import com.rtbishop.look4sat.presentation.onClick
 @Composable
 fun EntriesScreen(navToPasses: () -> Unit) {
     val viewModel = viewModel(EntriesViewModel::class.java, factory = EntriesViewModel.Factory)
-    val state = viewModel.satData.collectAsState(initial = DataState.Loading)
+    val uiState = viewModel.uiState.value
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val toggleDialog = { showDialog.value = showDialog.value.not() }
     if (showDialog.value) {
-        TypesDialog(list = viewModel.satTypes, selected = viewModel.getSatType(), toggleDialog) {
-            viewModel.setSatType(it)
+        TypesDialog(list = uiState.typesList, selected = uiState.currentType, toggleDialog) {
+            viewModel.setType(it)
         }
     }
 
-    val unselectAll = { viewModel.selectCurrentItems(false) }
-    val selectAll = { viewModel.selectCurrentItems(true) }
+    val unselectAll = { viewModel.updateSelection(false) }
+    val selectAll = { viewModel.updateSelection(true) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         TopBar(setQuery = { newQuery: String -> viewModel.setQuery(newQuery) }, saveSelection = {
             viewModel.saveSelection()
             navToPasses()
         })
-        MiddleBar(viewModel.getSatType(), { toggleDialog() }, { unselectAll() }, { selectAll() })
-        EntriesCard(state = state.value) { list, value -> viewModel.updateSelection(list, value) }
+        MiddleBar(uiState.currentType, { toggleDialog() }, { unselectAll() }, { selectAll() })
+        ElevatedCard(modifier = Modifier.fillMaxSize()) {
+            if (uiState.isLoading) {
+                CardLoadingIndicator()
+            } else {
+                EntriesCard(uiState.itemsList) { list, value ->
+                    viewModel.updateSelection(list, value)
+                }
+            }
+        }
     }
 }
 
@@ -169,7 +175,7 @@ private fun EntryTypeCard(type: String, onClick: () -> Unit, modifier: Modifier 
 @Preview(showBackground = true)
 @Composable
 private fun EntryPreview() {
-    val satItem = SatItem(45555, "SatName", emptyList(), true)
+    val satItem = SatItem(45555, "Very long Satellite name", true)
     MainTheme { Entry(item = satItem, onSelected = { _, _ -> run {} }, modifier = Modifier) }
 }
 
@@ -206,23 +212,15 @@ private fun Entry(item: SatItem, onSelected: (List<Int>, Boolean) -> Unit, modif
 @Preview(showBackground = true)
 @Composable
 private fun EntriesPreview() {
-    MainTheme { EntriesCard(DataState.Loading) { _, _ -> run {} } }
+    MainTheme { EntriesCard(emptyList()) { _, _ -> run {} } }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EntriesCard(state: DataState<List<SatItem>>, onSelected: (List<Int>, Boolean) -> Unit) {
-    ElevatedCard(modifier = Modifier.fillMaxSize()) {
-        when (state) {
-            is DataState.Success -> {
-                LazyColumn {
-                    items(items = state.data, key = { item -> item.catnum }) { entry ->
-                        Entry(entry, onSelected, Modifier.animateItemPlacement())
-                    }
-                }
-            }
-
-            else -> CardLoadingIndicator()
+fun EntriesCard(items: List<SatItem>, onSelected: (List<Int>, Boolean) -> Unit) {
+    LazyColumn {
+        items(items = items, key = { item -> item.catnum }) { entry ->
+            Entry(entry, onSelected, Modifier.animateItemPlacement())
         }
     }
 }

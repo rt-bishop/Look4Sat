@@ -28,9 +28,9 @@ interface EntriesDao {
     @Query("SELECT COUNT(*) FROM entries")
     fun getEntriesTotal(): Flow<Int>
 
-    @Transaction
-    @Query("SELECT catnum, name FROM entries ORDER BY name ASC")
-    suspend fun getEntriesWithModes(): List<SatItem>
+//    @Transaction
+@Query("SELECT catnum, name FROM entries ORDER BY name ASC")
+suspend fun getEntriesList(): List<SatItem>
 
     @Transaction
     @Query("SELECT * FROM entries WHERE catnum IN (:selectedIds)")
