@@ -15,11 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.framework.data
 
+import android.content.ContentResolver
+import android.net.Uri
+import com.rtbishop.look4sat.data.IDataSource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.io.InputStream
+import java.net.URL
 
-interface IFileSource {
+class DataSource(
+    private val resolver: ContentResolver, private val dispatcher: CoroutineDispatcher
+) : IDataSource {
 
-    suspend fun getDataStream(uri: String): InputStream?
+    override suspend fun getFileStream(uri: String): InputStream? {
+        return withContext(dispatcher) { resolver.openInputStream(Uri.parse(uri)) }
+    }
+
+    override suspend fun getNetworkStream(url: String): InputStream? {
+        return withContext(dispatcher) { URL(url).openStream() }
+    }
 }

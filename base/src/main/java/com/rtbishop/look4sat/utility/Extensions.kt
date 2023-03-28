@@ -72,17 +72,3 @@ fun String.isValidPort(): Boolean {
     val port = "([1-9]|[1-9]\\d{1,3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])"
     return this.matches(port.toRegex()) && this.toInt() in 1024..65535
 }
-
-//fun ping(hostname: String, port: Int): Int {
-//    val start = System.currentTimeMillis()
-//    val socket = Socket()
-//    try {
-//        socket.connect(InetSocketAddress(hostname, port), 5000)
-//        socket.close()
-//    } catch (exception: Exception) {
-//        exception.printStackTrace()
-//        println("Failed to ping: $hostname")
-//        return Int.MAX_VALUE
-//    }
-//    return (System.currentTimeMillis() - start).toInt()
-//}

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,8 +24,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
@@ -65,10 +62,4 @@ fun gotoUrl(context: Context, url: String) {
 
 fun Modifier.onClick(onClick: () -> Unit): Modifier = composed {
     clickable(remember { MutableInteractionSource() }, null) { onClick() }
-}
-
-class NoRippleInteractionSource : MutableInteractionSource {
-    override val interactions: Flow<Interaction> = emptyFlow()
-    override suspend fun emit(interaction: Interaction) {}
-    override fun tryEmit(interaction: Interaction) = true
 }

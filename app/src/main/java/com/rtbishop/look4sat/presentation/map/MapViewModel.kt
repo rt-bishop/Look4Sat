@@ -23,9 +23,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISatelliteRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.ISatelliteRepo
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPos
@@ -46,22 +45,19 @@ import kotlin.math.max
 import kotlin.math.min
 
 class MapViewModel(
-    private val dataRepository: IDataRepository,
-    private val satelliteRepository: ISatelliteRepository,
-    private val settingsRepository: ISettingsRepository
+    private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
-    private val stationPosNew = settingsRepository.stationPosition.value
-    private val stationPosition = GeoPos(stationPosNew.latitude, stationPosNew.longitude)
-    private var allPasses = satelliteRepository.getPasses()
+    private val stationPos = settingsRepo.stationPosition.value
+    private var allPasses = satelliteRepo.getPasses()
     private var allSatellites = listOf<Satellite>()
     private var dataUpdateJob: Job? = null
     private var dataUpdateRate = 1000L
     private var selectedSatellite: Satellite? = null
 
-    val stationPos = flow {
-        val osmLat = clipLat(stationPosition.latitude)
-        val osmLon = clipLon(stationPosition.longitude)
+    val stationPosition = flow {
+        val osmLat = clipLat(stationPos.latitude)
+        val osmLon = clipLon(stationPos.longitude)
         emit(GeoPos(osmLat, osmLon))
     }
 
@@ -92,8 +88,8 @@ class MapViewModel(
 
     fun selectDefaultSatellite(catnum: Int) {
         viewModelScope.launch {
-            val selectedIds = settingsRepository.satelliteSelection.value
-            dataRepository.getEntriesWithIds(selectedIds).also { satellites ->
+            val selectedIds = settingsRepo.satelliteSelection.value
+            satelliteRepo.getEntriesWithIds(selectedIds).also { satellites ->
                 if (satellites.isNotEmpty()) {
                     allSatellites = satellites
                     if (catnum == -1) {
@@ -113,12 +109,12 @@ class MapViewModel(
             dataUpdateJob?.cancelAndJoin()
             dataUpdateJob = launch {
                 val dateNow = Date()
-                getSatTrack(satellite, stationPosition, dateNow)
+                getSatTrack(satellite, stationPos, dateNow)
                 while (isActive) {
                     dateNow.time = System.currentTimeMillis()
-                    getPositions(allSatellites, stationPosition, dateNow)
-                    getSatFootprint(satellite, stationPosition, dateNow)
-                    getSatData(satellite, stationPosition, dateNow)
+                    getPositions(allSatellites, stationPos, dateNow)
+                    getSatFootprint(satellite, stationPos, dateNow)
+                    getSatData(satellite, stationPos, dateNow)
                     delay(updateFreq)
                 }
             }
@@ -130,7 +126,7 @@ class MapViewModel(
         val currentTrack = mutableListOf<GeoPos>()
         val endDate = Date(date.time + (satellite.data.orbitalPeriod * 2.4 * 60000L).toLong())
         var oldLongitude = 0.0
-        satelliteRepository.getTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
+        satelliteRepo.getTrack(satellite, pos, date.time, endDate.time).forEach { satPos ->
             val osmLat = clipLat(satPos.latitude.toDegrees())
             val osmLon = clipLon(satPos.longitude.toDegrees())
             val currentPosition = GeoPos(osmLat, osmLon)
@@ -157,7 +153,7 @@ class MapViewModel(
     private suspend fun getPositions(satellites: List<Satellite>, pos: GeoPos, date: Date) {
         val positions = mutableMapOf<Satellite, GeoPos>()
         satellites.forEach { satellite ->
-            val satPos = satelliteRepository.getPosition(satellite, pos, date.time)
+            val satPos = satelliteRepo.getPosition(satellite, pos, date.time)
             val osmLat = clipLat(satPos.latitude.toDegrees())
             val osmLon = clipLon(satPos.longitude.toDegrees())
             positions[satellite] = GeoPos(osmLat, osmLon)
@@ -166,7 +162,7 @@ class MapViewModel(
     }
 
     private suspend fun getSatFootprint(satellite: Satellite, pos: GeoPos, date: Date) {
-        val satPos = satelliteRepository.getPosition(satellite, pos, date.time)
+        val satPos = satelliteRepo.getPosition(satellite, pos, date.time)
         _footprint.emit(satPos)
     }
 
@@ -184,7 +180,7 @@ class MapViewModel(
                     }
                 }
             }
-        val satPos = satelliteRepository.getPosition(sat, pos, date.time)
+        val satPos = satelliteRepo.getPosition(sat, pos, date.time)
         val azimuth = satPos.azimuth.toDegrees()
         val elevation = satPos.elevation.toDegrees()
         val osmLat = clipLat(satPos.latitude.toDegrees())
@@ -232,11 +228,7 @@ class MapViewModel(
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                MapViewModel(
-                    container.dataRepository,
-                    container.satelliteRepository,
-                    container.settingsRepository
-                )
+                MapViewModel(container.satelliteRepo, container.settingsRepo)
             }
         }
     }

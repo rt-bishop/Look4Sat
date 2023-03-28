@@ -6,11 +6,15 @@ import com.rtbishop.look4sat.model.SatPos
 import com.rtbishop.look4sat.model.SatRadio
 import kotlinx.coroutines.flow.SharedFlow
 
-interface ISatelliteRepository {
+interface ISatelliteRepo {
 
     val calculatedPasses: SharedFlow<List<SatPass>>
 
     fun getPasses(): List<SatPass>
+
+    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
+
+    suspend fun getRadiosWithId(id: Int): List<SatRadio>
 
     suspend fun getPosition(sat: Satellite, pos: GeoPos, time: Long): SatPos
 

@@ -17,10 +17,23 @@
  */
 package com.rtbishop.look4sat.data
 
+import com.rtbishop.look4sat.domain.Satellite
+import com.rtbishop.look4sat.model.SatEntry
+import com.rtbishop.look4sat.model.SatItem
 import com.rtbishop.look4sat.model.SatRadio
 import kotlinx.coroutines.flow.Flow
 
-interface IRadiosStorage {
+interface ILocalStorage {
+
+    fun getEntriesTotal(): Flow<Int>
+
+    suspend fun getEntriesList(): List<SatItem>
+
+    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
+
+    suspend fun insertEntries(entries: List<SatEntry>)
+
+    suspend fun deleteEntries()
 
     fun getRadiosTotal(): Flow<Int>
 
