@@ -15,17 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.data.remote
+package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.data.INetworkSource
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import java.io.InputStream
-import java.net.URL
 
-class NetworkSource(private val coroutineDispatcher: CoroutineDispatcher) : INetworkSource {
+interface IDataSource {
 
-    override suspend fun getDataStream(url: String): InputStream? {
-        return withContext(coroutineDispatcher) { URL(url).openStream() }
-    }
+    suspend fun getFileStream(uri: String): InputStream?
+
+    suspend fun getNetworkStream(url: String): InputStream?
 }

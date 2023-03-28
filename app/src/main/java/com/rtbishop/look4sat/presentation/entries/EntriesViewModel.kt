@@ -24,13 +24,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.data.SelectionRepository
+import com.rtbishop.look4sat.domain.ISelectionRepo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class EntriesViewModel(private val selectionRepo: SelectionRepository) : ViewModel() {
+class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
 
-    private val defaultUiState = EntriesScreenState(
+    private val defaultUiState = EntriesUiState(
         isLoading = true,
         itemsList = emptyList(),
         currentType = selectionRepo.getCurrentType(),
@@ -54,12 +54,12 @@ class EntriesViewModel(private val selectionRepo: SelectionRepository) : ViewMod
 
     fun setQuery(query: String) = viewModelScope.launch { selectionRepo.setQuery(query) }
 
-    fun updateSelection(selectAll: Boolean) = viewModelScope.launch {
-        selectionRepo.updateSelection(selectAll)
+    fun setSelection(selectAll: Boolean) = viewModelScope.launch {
+        selectionRepo.setSelection(selectAll)
     }
 
-    fun updateSelection(catNums: List<Int>, isSelected: Boolean) = viewModelScope.launch {
-        selectionRepo.updateSelection(catNums, isSelected)
+    fun setSelection(ids: List<Int>, isTicked: Boolean) = viewModelScope.launch {
+        selectionRepo.setSelection(ids, isTicked)
     }
 
     fun saveSelection() = viewModelScope.launch { selectionRepo.saveSelection() }
@@ -69,7 +69,7 @@ class EntriesViewModel(private val selectionRepo: SelectionRepository) : ViewMod
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                EntriesViewModel(container.provideSelectionRepository())
+                EntriesViewModel(container.provideSelectionRepo())
             }
         }
     }

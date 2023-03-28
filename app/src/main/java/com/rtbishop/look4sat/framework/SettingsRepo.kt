@@ -23,7 +23,7 @@ import android.location.LocationManager
 import androidx.core.content.edit
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.CancellationSignal
-import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
@@ -31,9 +31,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.concurrent.Executors
 
-class SettingsRepository(
+class SettingsRepo(
     private val manager: LocationManager, private val preferences: SharedPreferences
-) : ISettingsRepository {
+) : ISettingsRepo {
 
     private val keyModes = "satModes"
     private val keyCompass = "compass"

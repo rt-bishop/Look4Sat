@@ -25,18 +25,18 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.IDatabaseRepo
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.model.DataState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val dataRepository: IDataRepository, private val settingsRepository: ISettingsRepository
+    private val databaseRepo: IDatabaseRepo, private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
     private val defaultLocationSettings = LocationSettings(false,
-        settingsRepository.stationPosition.value,
+        settingsRepo.stationPosition.value,
         0,
         { setGpsPosition() },
         { latitude, longitude -> setGeoPosition(latitude, longitude) },
@@ -45,18 +45,18 @@ class SettingsViewModel(
     val locationSettings = mutableStateOf(defaultLocationSettings)
 
     private val defaultDataSettings = DataSettings(false,
-        settingsRepository.getLastUpdateTime(),
+        settingsRepo.getLastUpdateTime(),
         0,
         0,
-        { dataRepository.updateFromWeb() },
-        { dataRepository.updateFromFile(it) },
-        { dataRepository.clearAllData() })
+        { databaseRepo.updateFromWeb() },
+        { databaseRepo.updateFromFile(it) },
+        { databaseRepo.clearAllData() })
     val dataSettings = mutableStateOf(defaultDataSettings)
 
-    private val defaultOtherSettings = OtherSettings(settingsRepository.isUtcEnabled(),
-        settingsRepository.isUpdateEnabled(),
-        settingsRepository.isSweepEnabled(),
-        settingsRepository.isSensorEnabled(),
+    private val defaultOtherSettings = OtherSettings(settingsRepo.isUtcEnabled(),
+        settingsRepo.isUpdateEnabled(),
+        settingsRepo.isSweepEnabled(),
+        settingsRepo.isSensorEnabled(),
         { setUtc(it) },
         { setUpdate(it) },
         { setSweep(it) },
@@ -65,23 +65,23 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch {
-            settingsRepository.stationPosition.collect { stationPos ->
+            settingsRepo.stationPosition.collect { stationPos ->
                 locationSettings.value = locationSettings.value.copy(
                     isUpdating = false, stationPos = stationPos
                 )
             }
         }
         viewModelScope.launch {
-            dataRepository.updateState.collect {
+            databaseRepo.updateState.collect {
                 val isUpdating = it is DataState.Loading
                 dataSettings.value = dataSettings.value.copy(
-                    isUpdating = isUpdating, lastUpdated = settingsRepository.getLastUpdateTime()
+                    isUpdating = isUpdating, lastUpdated = settingsRepo.getLastUpdateTime()
                 )
             }
         }
         viewModelScope.launch {
             combine(
-                dataRepository.getEntriesTotal(), dataRepository.getRadiosTotal()
+                databaseRepo.getEntriesTotal(), databaseRepo.getRadiosTotal()
             ) { sats, radios ->
                 dataSettings.value = dataSettings.value.copy(satsTotal = sats, radiosTotal = radios)
             }.collect {}
@@ -89,7 +89,7 @@ class SettingsViewModel(
     }
 
     private fun setGpsPosition() {
-        if (settingsRepository.setGpsPosition()) {
+        if (settingsRepo.setGpsPosition()) {
             val messageResId = R.string.location_success
             locationSettings.value =
                 locationSettings.value.copy(isUpdating = true, messageResId = messageResId)
@@ -100,7 +100,7 @@ class SettingsViewModel(
     }
 
     private fun setGeoPosition(latitude: Double, longitude: Double) {
-        if (settingsRepository.setGeoPosition(latitude, longitude)) {
+        if (settingsRepo.setGeoPosition(latitude, longitude)) {
             val messageResId = R.string.location_success
             locationSettings.value = locationSettings.value.copy(messageResId = messageResId)
         } else {
@@ -110,7 +110,7 @@ class SettingsViewModel(
     }
 
     private fun setQthPosition(locator: String) {
-        if (settingsRepository.setQthPosition(locator)) {
+        if (settingsRepo.setQthPosition(locator)) {
             val messageResId = R.string.location_success
             locationSettings.value = locationSettings.value.copy(messageResId = messageResId)
         } else {
@@ -124,22 +124,22 @@ class SettingsViewModel(
     }
 
     private fun setUtc(value: Boolean) {
-        settingsRepository.setUtcState(value)
+        settingsRepo.setUtcState(value)
         otherSettings.value = otherSettings.value.copy(getUtc = value)
     }
 
     private fun setUpdate(value: Boolean) {
-        settingsRepository.setUpdateState(value)
+        settingsRepo.setUpdateState(value)
         otherSettings.value = otherSettings.value.copy(getUpdate = value)
     }
 
     private fun setSweep(value: Boolean) {
-        settingsRepository.setSweepState(value)
+        settingsRepo.setSweepState(value)
         otherSettings.value = otherSettings.value.copy(getSweep = value)
     }
 
     private fun setSensor(value: Boolean) {
-        settingsRepository.setSensorState(value)
+        settingsRepo.setSensorState(value)
         otherSettings.value = otherSettings.value.copy(getSensor = value)
     }
 
@@ -163,7 +163,7 @@ class SettingsViewModel(
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                SettingsViewModel(container.dataRepository, container.settingsRepository)
+                SettingsViewModel(container.databaseRepo, container.settingsRepo)
             }
         }
     }

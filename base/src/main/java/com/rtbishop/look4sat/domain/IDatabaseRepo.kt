@@ -18,26 +18,16 @@
 package com.rtbishop.look4sat.domain
 
 import com.rtbishop.look4sat.model.DataState
-import com.rtbishop.look4sat.model.SatItem
-import com.rtbishop.look4sat.model.SatRadio
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface IDataRepository {
+interface IDatabaseRepo {
 
     val updateState: StateFlow<DataState<Long>>
 
     fun getEntriesTotal(): Flow<Int>
 
     fun getRadiosTotal(): Flow<Int>
-
-    fun getSatelliteTypes(): List<String>
-
-    suspend fun getEntriesList(): List<SatItem>
-
-    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
-
-    suspend fun getRadiosWithId(id: Int): List<SatRadio>
 
     fun updateFromFile(uri: String)
 

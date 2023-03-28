@@ -1,7 +1,7 @@
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.ISelectionRepo
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.model.SatItem
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SelectionRepository(
+class SelectionRepo(
     private val dispatcher: CoroutineDispatcher,
-    private val dataRepository: IDataRepository,
-    private val settingsRepository: ISettingsRepository
-) {
+    private val localStorage: ILocalStorage,
+    private val settingsRepo: ISettingsRepo
+) : ISelectionRepo {
     private val currentItems = MutableStateFlow<List<SatItem>>(emptyList())
     private val currentType = MutableStateFlow("All")
     private val currentQuery = MutableStateFlow("")
@@ -27,37 +27,44 @@ class SelectionRepository(
         itemsWithType.map { items -> items.filterByQuery(query) }
     }
 
-    fun getCurrentType() = currentType.value
+    override fun getCurrentType() = currentType.value
 
-    fun getTypesList() = dataRepository.getSatelliteTypes()
+    override fun getTypesList() = settingsRepo.satelliteSourcesMap.keys.sorted()
 
-    suspend fun getEntriesFlow() = withContext(dispatcher) {
-        currentItems.value = dataRepository.getEntriesList()
+    override suspend fun getEntriesFlow() = withContext(dispatcher) {
+        val selectedIds = settingsRepo.satelliteSelection.value
+        currentItems.value = localStorage.getEntriesList().map { item ->
+            item.copy(isSelected = item.catnum in selectedIds)
+        }
         return@withContext itemsWithQuery
     }
 
-    suspend fun setType(type: String) = withContext(dispatcher) { currentType.value = type }
-
-    suspend fun setQuery(query: String) = withContext(dispatcher) { currentQuery.value = query }
-
-    suspend fun updateSelection(selectAll: Boolean) = withContext(dispatcher) {
-        updateSelection(itemsWithQuery.first().map { item -> item.catnum }, selectAll)
+    override suspend fun setType(type: String) = withContext(dispatcher) {
+        currentType.value = type
     }
 
-    suspend fun updateSelection(catNums: List<Int>, isSelected: Boolean) = withContext(dispatcher) {
+    override suspend fun setQuery(query: String) = withContext(dispatcher) {
+        currentQuery.value = query
+    }
+
+    override suspend fun setSelection(selectAll: Boolean) = withContext(dispatcher) {
+        setSelection(itemsWithQuery.first().map { item -> item.catnum }, selectAll)
+    }
+
+    override suspend fun setSelection(ids: List<Int>, isTicked: Boolean) = withContext(dispatcher) {
         currentItems.value = currentItems.value.map { item ->
-            if (item.catnum in catNums) item.copy(isSelected = isSelected) else item
+            if (item.catnum in ids) item.copy(isSelected = isTicked) else item
         }
     }
 
-    suspend fun saveSelection() = withContext(dispatcher) {
+    override suspend fun saveSelection() = withContext(dispatcher) {
         val currentSelection = currentItems.value.filter { it.isSelected }.map { it.catnum }
-        settingsRepository.saveEntriesSelection(currentSelection)
+        settingsRepo.saveEntriesSelection(currentSelection)
     }
 
     private suspend fun List<SatItem>.filterByType(type: String) = withContext(dispatcher) {
         if (type == "All") return@withContext this@filterByType
-        val catnums = settingsRepository.loadSatType(type)
+        val catnums = settingsRepo.loadSatType(type)
         if (catnums.isEmpty()) return@withContext this@filterByType
         return@withContext this@filterByType.filter { item -> item.catnum in catnums }
     }
