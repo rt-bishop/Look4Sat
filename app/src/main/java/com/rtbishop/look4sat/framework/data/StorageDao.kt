@@ -15,14 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.data.dao
+package com.rtbishop.look4sat.framework.data
 
 import androidx.room.*
+import com.rtbishop.look4sat.framework.model.SatEntry
+import com.rtbishop.look4sat.framework.model.SatItem
 import com.rtbishop.look4sat.framework.model.SatRadio
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface RadiosDao {
+interface StorageDao {
+
+    @Query("SELECT COUNT(*) FROM entries")
+    fun getEntriesTotal(): Flow<Int>
+
+    //@Transaction
+    @Query("SELECT catnum, name FROM entries ORDER BY name ASC")
+    suspend fun getEntriesList(): List<SatItem>
+
+    @Transaction
+    @Query("SELECT * FROM entries WHERE catnum IN (:selectedIds)")
+    suspend fun getEntriesWithIds(selectedIds: List<Int>): List<SatEntry>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntries(entries: List<SatEntry>)
+
+    @Query("DELETE FROM entries")
+    suspend fun deleteEntries()
 
     @Query("SELECT COUNT(*) FROM radios")
     fun getRadiosTotal(): Flow<Int>

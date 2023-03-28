@@ -15,13 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data
+package com.rtbishop.look4sat.domain
 
-import java.io.InputStream
+import com.rtbishop.look4sat.model.GeoPos
+import kotlinx.coroutines.flow.StateFlow
 
-interface INetworkSource {
+interface ISettingsRepo {
 
     val radioSourceUrl: String get() = "https://db.satnogs.org/api/transmitters/?format=json"
+
     val satelliteSourcesMap: Map<String, String>
         get() = mapOf(
             "All" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
@@ -52,5 +54,79 @@ interface INetworkSource {
             "X-Comm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
         )
 
-    suspend fun getDataStream(url: String): InputStream?
+    val stationPosition: StateFlow<GeoPos>
+
+    val satelliteSelection: StateFlow<List<Int>>
+
+    fun setGpsPosition(): Boolean
+
+    fun setGeoPosition(latitude: Double, longitude: Double, altitude: Double = 0.0): Boolean
+
+    fun setQthPosition(locator: String): Boolean
+
+    fun getHoursAhead(): Int
+
+    fun setHoursAhead(hoursAhead: Int)
+
+    fun getMinElevation(): Double
+
+    fun setMinElevation(minElevation: Double)
+
+    fun isUtcEnabled(): Boolean
+
+    fun setUtcState(value: Boolean)
+
+    fun getLastUpdateTime(): Long
+
+    fun setLastUpdateTime(updateTime: Long)
+
+    fun isUpdateEnabled(): Boolean
+
+    fun setUpdateState(value: Boolean)
+
+    fun isSensorEnabled(): Boolean
+
+    fun setSensorState(value: Boolean)
+
+    fun isSweepEnabled(): Boolean
+
+    fun setSweepState(value: Boolean)
+
+    fun saveModesSelection(modes: List<String>)
+
+    fun loadModesSelection(): List<String>
+
+    fun saveEntriesSelection(catnums: List<Int>)
+
+    fun saveSatType(type: String, catnums: List<Int>)
+
+    fun loadSatType(type: String): List<Int>
+
+    fun getRotatorEnabled(): Boolean
+
+    fun setRotatorEnabled(value: Boolean)
+
+    fun getRotatorServer(): String
+
+    fun setRotatorServer(value: String)
+
+    fun getRotatorPort(): String
+
+    fun setRotatorPort(value: String)
+
+    fun getBTEnabled(): Boolean
+
+    fun setBTEnabled(value: Boolean)
+
+    fun getBTDeviceAddr(): String
+
+    fun setBTDeviceAddr(value: String)
+
+    fun getBTDeviceName(): String
+
+    fun setBTDeviceName(value: String)
+
+    fun getBTFormat(): String
+
+    fun setBTFormat(value: String)
 }

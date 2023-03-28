@@ -65,7 +65,7 @@ private val labelRect = Rect()
 fun MapScreen() {
     val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
     viewModel.selectDefaultSatellite(-1)
-    val stationPos = viewModel.stationPos.collectAsState(initial = null)
+    val stationPos = viewModel.stationPosition.collectAsState(initial = null)
     val positions = viewModel.positions.collectAsState(initial = null)
     val satTrack = viewModel.track.collectAsState(initial = null)
     val footprint = viewModel.footprint.collectAsState(initial = null)

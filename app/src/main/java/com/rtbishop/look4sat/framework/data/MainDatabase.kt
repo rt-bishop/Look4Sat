@@ -21,17 +21,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.rtbishop.look4sat.framework.data.dao.EntriesDao
-import com.rtbishop.look4sat.framework.data.dao.RadiosDao
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatRadio
 
 @Database(entities = [SatEntry::class, SatRadio::class], version = 2)
 abstract class MainDatabase : RoomDatabase() {
 
-    abstract fun entriesDao(): EntriesDao
-
-    abstract fun radiosDao(): RadiosDao
+    abstract fun storageDao(): StorageDao
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {

@@ -33,13 +33,13 @@ class MainApplication : Application() {
     }
 
     private fun checkAutoUpdate() {
-        val settingsRepository = container.settingsRepository
-        if (settingsRepository.isUpdateEnabled()) {
-            val timeDelta = System.currentTimeMillis() - settingsRepository.getLastUpdateTime()
+        val settingsRepo = container.settingsRepo
+        if (settingsRepo.isUpdateEnabled()) {
+            val timeDelta = System.currentTimeMillis() - settingsRepo.getLastUpdateTime()
             if (timeDelta > 172800000) { // 48 hours in ms
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 println("Started periodic data update on ${sdf.format(Date())}")
-                container.dataRepository.updateFromWeb()
+                container.databaseRepo.updateFromWeb()
             }
         }
     }

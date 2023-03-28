@@ -45,8 +45,8 @@ fun EntriesScreen(navToPasses: () -> Unit) {
         }
     }
 
-    val unselectAll = { viewModel.updateSelection(false) }
-    val selectAll = { viewModel.updateSelection(true) }
+    val unselectAll = { viewModel.setSelection(false) }
+    val selectAll = { viewModel.setSelection(true) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         TopBar(setQuery = { newQuery: String -> viewModel.setQuery(newQuery) }, saveSelection = {
             viewModel.saveSelection()
@@ -58,7 +58,7 @@ fun EntriesScreen(navToPasses: () -> Unit) {
                 CardLoadingIndicator()
             } else {
                 EntriesCard(uiState.itemsList) { list, value ->
-                    viewModel.updateSelection(list, value)
+                    viewModel.setSelection(list, value)
                 }
             }
         }

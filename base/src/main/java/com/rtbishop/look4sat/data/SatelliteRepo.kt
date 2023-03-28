@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.ISatelliteRepository
+import com.rtbishop.look4sat.domain.ISatelliteRepo
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPass
@@ -30,13 +30,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
 
-class SatelliteRepository(private val dispatcher: CoroutineDispatcher) : ISatelliteRepository {
+class SatelliteRepo(
+    private val dispatcher: CoroutineDispatcher,
+    private val localStorage: ILocalStorage
+) : ISatelliteRepo {
 
     private var passes = listOf<SatPass>()
     private val _calculatedPasses = MutableSharedFlow<List<SatPass>>(replay = 1)
     override val calculatedPasses: SharedFlow<List<SatPass>> = _calculatedPasses
 
     override fun getPasses(): List<SatPass> = passes
+
+    override suspend fun getEntriesWithIds(ids: List<Int>) = localStorage.getEntriesWithIds(ids)
+
+    override suspend fun getRadiosWithId(id: Int) = localStorage.getRadiosWithId(id)
 
     override suspend fun getPosition(sat: Satellite, pos: GeoPos, time: Long): SatPos {
         return withContext(dispatcher) { sat.getPosition(pos, time) }

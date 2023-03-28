@@ -21,14 +21,14 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import com.rtbishop.look4sat.domain.ISensorRepository
+import com.rtbishop.look4sat.domain.ISensorsRepo
 import com.rtbishop.look4sat.domain.RAD2DEG
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.round
 
-class SensorRepository(private val manager: SensorManager, private val sensor: Sensor?) :
-    SensorEventListener, ISensorRepository {
+class SensorsRepo(private val sensorManager: SensorManager, private val sensor: Sensor?) :
+    SensorEventListener, ISensorsRepo {
 
     private val rotationMatrix = FloatArray(9)
     private val orientationValues = FloatArray(3)
@@ -38,10 +38,10 @@ class SensorRepository(private val manager: SensorManager, private val sensor: S
     override val orientation: StateFlow<Pair<Float, Float>> = _orientation
 
     override fun enableSensor() {
-        sensor?.let { manager.registerListener(this, it, 16000) }
+        sensor?.let { sensorManager.registerListener(this, it, 16000) }
     }
 
-    override fun disableSensor() = manager.unregisterListener(this)
+    override fun disableSensor() = sensorManager.unregisterListener(this)
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
         sensorAccuracy = accuracy

@@ -23,9 +23,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISatelliteRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.ISatelliteRepo
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatPass
 import com.rtbishop.look4sat.utility.toTimerString
@@ -38,9 +37,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class PassesViewModel(
-    private val dataRepository: IDataRepository,
-    private val satelliteRepository: ISatelliteRepository,
-    private val settingsRepository: ISettingsRepository
+    private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
     private val _passes = MutableStateFlow<DataState<List<SatPass>>>(DataState.Loading)
@@ -50,18 +47,18 @@ class PassesViewModel(
     val passes: StateFlow<DataState<List<SatPass>>> = _passes
     val timerText: StateFlow<Triple<String, String, String>?> = _timerText
 
-    fun getHoursAhead() = settingsRepository.getHoursAhead()
+    fun getHoursAhead() = settingsRepo.getHoursAhead()
 
-    fun getMinElevation() = settingsRepository.getMinElevation()
+    fun getMinElevation() = settingsRepo.getMinElevation()
 
     init {
         viewModelScope.launch {
-            satelliteRepository.calculatedPasses.collect { passes ->
+            satelliteRepo.calculatedPasses.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch {
                     while (isActive) {
                         val timeNow = System.currentTimeMillis()
-                        val newPasses = satelliteRepository.processPasses(passes, timeNow)
+                        val newPasses = satelliteRepo.processPasses(passes, timeNow)
 
                         if (newPasses.isNotEmpty()) {
                             try {
@@ -88,20 +85,15 @@ class PassesViewModel(
             }
         }
         viewModelScope.launch {
-            settingsRepository.satelliteSelection.collect { calculatePasses() }
-        }
-        viewModelScope.launch {
-            dataRepository.updateState.collect { updateState ->
-                if (updateState is DataState.Success) calculatePasses()
-            }
+            settingsRepo.satelliteSelection.collect { calculatePasses() }
         }
     }
 
-    fun shouldUseUTC() = settingsRepository.isUtcEnabled()
+    fun shouldUseUTC() = settingsRepo.isUtcEnabled()
 
     fun calculatePasses(
         hoursAhead: Int = 1,
-        minElevation: Double = settingsRepository.getMinElevation(),
+        minElevation: Double = settingsRepo.getMinElevation(),
         timeRef: Long = System.currentTimeMillis()
     ) {
         viewModelScope.launch {
@@ -109,12 +101,12 @@ class PassesViewModel(
 //            _timerText.postValue(timerDefaultText)
             passesProcessing?.cancelAndJoin()
 //            selection?.let { items -> settingsRepository.saveEntriesSelection(items) }
-            settingsRepository.setHoursAhead(hoursAhead)
-            settingsRepository.setMinElevation(minElevation)
-            val stationPos = settingsRepository.stationPosition.value
-            val selectedIds = settingsRepository.satelliteSelection.value
-            val satellites = dataRepository.getEntriesWithIds(selectedIds)
-            satelliteRepository.calculatePasses(
+            settingsRepo.setHoursAhead(hoursAhead)
+            settingsRepo.setMinElevation(minElevation)
+            val stationPos = settingsRepo.stationPosition.value
+            val selectedIds = settingsRepo.satelliteSelection.value
+            val satellites = satelliteRepo.getEntriesWithIds(selectedIds)
+            satelliteRepo.calculatePasses(
                 satellites, stationPos, timeRef, hoursAhead, minElevation
             )
         }
@@ -125,11 +117,7 @@ class PassesViewModel(
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                PassesViewModel(
-                    container.dataRepository,
-                    container.satelliteRepository,
-                    container.settingsRepository
-                )
+                PassesViewModel(container.satelliteRepo, container.settingsRepo)
             }
         }
     }

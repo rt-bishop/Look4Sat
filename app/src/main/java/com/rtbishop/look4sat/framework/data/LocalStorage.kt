@@ -15,38 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.framework.data.local
+package com.rtbishop.look4sat.framework.data
 
-import com.rtbishop.look4sat.data.IEntriesStorage
+import com.rtbishop.look4sat.data.ILocalStorage
 import com.rtbishop.look4sat.domain.Satellite
-import com.rtbishop.look4sat.framework.data.dao.EntriesDao
+import com.rtbishop.look4sat.model.SatRadio
 import com.rtbishop.look4sat.framework.model.SatEntry as FrameworkEntry
 import com.rtbishop.look4sat.framework.model.SatItem as FrameworkItem
+import com.rtbishop.look4sat.framework.model.SatRadio as FrameworkRadio
 import com.rtbishop.look4sat.model.SatEntry as DomainEntry
 import com.rtbishop.look4sat.model.SatItem as DomainItem
+import com.rtbishop.look4sat.model.SatRadio as DomainRadio
 
-class EntriesStorage(private val entriesDao: EntriesDao) : IEntriesStorage {
+class LocalStorage(private val storageDao: StorageDao) : ILocalStorage {
 
-    override fun getEntriesTotal() = entriesDao.getEntriesTotal()
+    //region # Entries region
+
+    override fun getEntriesTotal() = storageDao.getEntriesTotal()
 
     override suspend fun getEntriesList(): List<DomainItem> {
-        return entriesDao.getEntriesList().toDomainItems()
+        return storageDao.getEntriesList().toDomainItems()
     }
 
     override suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite> {
         val selectedSatellites = mutableListOf<Satellite>()
         ids.chunked(999).forEach { idsPart ->
-            val entries = entriesDao.getEntriesWithIds(idsPart)
+            val entries = storageDao.getEntriesWithIds(idsPart)
             selectedSatellites.addAll(entries.map { entry -> entry.data.getSatellite() })
         }
         return selectedSatellites
     }
 
     override suspend fun insertEntries(entries: List<DomainEntry>) {
-        entriesDao.insertEntries(entries.toFrameworkEntries())
+        storageDao.insertEntries(entries.toFrameworkEntries())
     }
 
-    override suspend fun deleteEntries() = entriesDao.deleteEntries()
+    override suspend fun deleteEntries() = storageDao.deleteEntries()
 
     private fun DomainEntry.toFramework() = FrameworkEntry(this.data, this.comment)
 
@@ -55,4 +59,36 @@ class EntriesStorage(private val entriesDao: EntriesDao) : IEntriesStorage {
     private fun List<DomainEntry>.toFrameworkEntries() = this.map { entry -> entry.toFramework() }
 
     private fun List<FrameworkItem>.toDomainItems() = this.map { item -> item.toDomain() }
+
+    //endregion
+
+    //region # Radios region
+
+    override fun getRadiosTotal() = storageDao.getRadiosTotal()
+
+    override suspend fun getRadiosWithId(id: Int): List<SatRadio> {
+        return storageDao.getRadiosWithId(id).toDomainRadios()
+    }
+
+    override suspend fun insertRadios(radios: List<SatRadio>) {
+        storageDao.insertRadios(radios.toFrameworkRadios())
+    }
+
+    override suspend fun deleteRadios() = storageDao.deleteRadios()
+
+    private fun DomainRadio.toFramework() = FrameworkRadio(
+        this.uuid, this.info, this.isAlive, this.downlink, this.uplink,
+        this.mode, this.isInverted, this.catnum, this.comment
+    )
+
+    private fun FrameworkRadio.toDomain() = DomainRadio(
+        this.uuid, this.info, this.isAlive, this.downlink, this.uplink,
+        this.mode, this.isInverted, this.catnum, this.comment
+    )
+
+    private fun List<DomainRadio>.toFrameworkRadios() = this.map { radio -> radio.toFramework() }
+
+    private fun List<FrameworkRadio>.toDomainRadios() = this.map { radio -> radio.toDomain() }
+
+    //endregion
 }

@@ -17,11 +17,10 @@
  */
 package com.rtbishop.look4sat.data
 
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.IDatabaseRepo
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.model.DataState
 import com.rtbishop.look4sat.model.SatEntry
-import com.rtbishop.look4sat.model.SatItem
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -32,15 +31,13 @@ import kotlinx.coroutines.launch
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 
-class DataRepository(
+class DatabaseRepo(
     private val dataParser: DataParser,
-    private val fileSource: IFileSource,
-    private val entrySource: IEntriesStorage,
-    private val radioSource: IRadiosStorage,
-    private val remoteSource: INetworkSource,
+    private val localStorage: ILocalStorage,
+    private val dataSource: IDataSource,
     private val repositoryScope: CoroutineScope,
-    private val settingsRepository: ISettingsRepository
-) : IDataRepository {
+    private val settingsRepository: ISettingsRepo
+) : IDatabaseRepo {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         _updateState.value = DataState.Exception(exception.message)
@@ -49,27 +46,16 @@ class DataRepository(
     private val _updateState = MutableStateFlow<DataState<Long>>(DataState.Handled)
     override val updateState: StateFlow<DataState<Long>> = _updateState
 
-    override fun getEntriesTotal() = entrySource.getEntriesTotal()
+    override fun getEntriesTotal() = localStorage.getEntriesTotal()
 
-    override fun getRadiosTotal() = radioSource.getRadiosTotal()
-
-    override fun getSatelliteTypes() = remoteSource.satelliteSourcesMap.keys.sorted()
-
-    override suspend fun getEntriesList(): List<SatItem> {
-        val selectedIds = settingsRepository.satelliteSelection.value
-        return entrySource.getEntriesList().map { it.copy(isSelected = it.catnum in selectedIds) }
-    }
-
-    override suspend fun getEntriesWithIds(ids: List<Int>) = entrySource.getEntriesWithIds(ids)
-
-    override suspend fun getRadiosWithId(id: Int) = radioSource.getRadiosWithId(id)
+    override fun getRadiosTotal() = localStorage.getRadiosTotal()
 
     override fun updateFromFile(uri: String) {
         repositoryScope.launch(exceptionHandler) {
             _updateState.value = DataState.Loading
-            fileSource.getDataStream(uri)?.let { stream ->
+            dataSource.getFileStream(uri)?.let { stream ->
                 delay(updateStateDelay)
-                entrySource.insertEntries(importSatellites(stream))
+                localStorage.insertEntries(importSatellites(stream))
             }
             setUpdateSuccessful()
         }
@@ -79,8 +65,8 @@ class DataRepository(
         _updateState.value = DataState.Loading
         repositoryScope.launch(exceptionHandler) {
             val importedEntries = mutableListOf<SatEntry>()
-            val sourcesMap = remoteSource.satelliteSourcesMap
-            val jobsMap = sourcesMap.mapValues { async { remoteSource.getDataStream(it.value) } }
+            val sourcesMap = settingsRepository.satelliteSourcesMap
+            val jobsMap = sourcesMap.mapValues { async { dataSource.getNetworkStream(it.value) } }
             jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
                 entry.value?.let { stream ->
                     when (val type = entry.key) {
@@ -112,12 +98,12 @@ class DataRepository(
                     }
                 }
             }
-            entrySource.insertEntries(importedEntries)
+            localStorage.insertEntries(importedEntries)
             setUpdateSuccessful()
         }
         repositoryScope.launch(exceptionHandler) {
-            remoteSource.getDataStream(remoteSource.radioSourceUrl)?.let { stream ->
-                radioSource.insertRadios(dataParser.parseJSONStream(stream))
+            dataSource.getNetworkStream(settingsRepository.radioSourceUrl)?.let { stream ->
+                localStorage.insertRadios(dataParser.parseJSONStream(stream))
             }
         }
     }
@@ -130,8 +116,8 @@ class DataRepository(
         repositoryScope.launch {
             _updateState.value = DataState.Loading
             delay(updateStateDelay)
-            entrySource.deleteEntries()
-            radioSource.deleteRadios()
+            localStorage.deleteEntries()
+            localStorage.deleteRadios()
             setUpdateSuccessful(0L)
         }
     }

@@ -28,10 +28,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.domain.IDataRepository
-import com.rtbishop.look4sat.domain.ISatelliteRepository
-import com.rtbishop.look4sat.domain.ISensorRepository
-import com.rtbishop.look4sat.domain.ISettingsRepository
+import com.rtbishop.look4sat.domain.ISatelliteRepo
+import com.rtbishop.look4sat.domain.ISensorsRepo
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.framework.BluetoothReporter
 import com.rtbishop.look4sat.framework.NetworkReporter
@@ -47,26 +46,25 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class RadarViewModel(
+    private val savedStateHandle: SavedStateHandle,
     private val bluetoothReporter: BluetoothReporter,
     private val networkReporter: NetworkReporter,
-    private val savedStateHandle: SavedStateHandle,
-    private val dataRepository: IDataRepository,
-    private val satelliteRepository: ISatelliteRepository,
-    private val sensorRepository: ISensorRepository,
-    private val settingsRepository: ISettingsRepository
+    private val satelliteRepo: ISatelliteRepo,
+    private val settingsRepo: ISettingsRepo,
+    private val sensorsRepo: ISensorsRepo
 ) : ViewModel() {
 
-    private val stationPos = settingsRepository.stationPosition.value
+    private val stationPos = settingsRepo.stationPosition.value
     private val magDeclination = getMagDeclination(stationPos)
     val transmitters = mutableStateOf<List<SatRadio>>(emptyList())
     val radarData = mutableStateOf<RadarData?>(null)
-    val orientation = mutableStateOf(sensorRepository.orientation.value)
+    val orientation = mutableStateOf(sensorsRepo.orientation.value)
 
     init {
-        if (settingsRepository.isSensorEnabled()) {
+        if (settingsRepo.isSensorEnabled()) {
             viewModelScope.launch {
-                sensorRepository.enableSensor()
-                sensorRepository.orientation.collect { data ->
+                sensorsRepo.enableSensor()
+                sensorsRepo.orientation.collect { data ->
                     orientation.value = Pair(data.first + magDeclination, data.second)
                 }
             }
@@ -74,24 +72,24 @@ class RadarViewModel(
     }
 
     override fun onCleared() {
-        sensorRepository.disableSensor()
+        sensorsRepo.disableSensor()
         super.onCleared()
     }
 
     fun getPass() = flow {
         val catNum = savedStateHandle.get<Int>("catNum") ?: 0
         val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
-        satelliteRepository.calculatedPasses.collect { passes ->
+        satelliteRepo.calculatedPasses.collect { passes ->
             val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
             val currentPass = pass ?: passes.firstOrNull()
             currentPass?.let { satPass ->
                 emit(satPass)
-                val transmitters = dataRepository.getRadiosWithId(satPass.catNum)
+                val transmitters = satelliteRepo.getRadiosWithId(satPass.catNum)
                 viewModelScope.launch {
                     while (isActive) {
                         val timeNow = System.currentTimeMillis()
                         val satPos =
-                            satelliteRepository.getPosition(satPass.satellite, stationPos, timeNow)
+                            satelliteRepo.getPosition(satPass.satellite, stationPos, timeNow)
                         sendPassData(satPass, satPos, satPass.satellite)
                         sendPassDataBT(satPos)
                         processRadios(transmitters, satPass.satellite, timeNow)
@@ -102,27 +100,27 @@ class RadarViewModel(
         }
     }
 
-    fun getUseCompass(): Boolean = settingsRepository.isSensorEnabled()
+    fun getUseCompass(): Boolean = settingsRepo.isSensorEnabled()
 
-    fun getShowSweep(): Boolean = settingsRepository.isSweepEnabled()
+    fun getShowSweep(): Boolean = settingsRepo.isSweepEnabled()
 
     private fun getMagDeclination(geoPos: GeoPos, time: Long = System.currentTimeMillis()): Float {
         val latitude = geoPos.latitude.toFloat()
         val longitude = geoPos.longitude.toFloat()
-        return GeomagneticField(latitude, longitude, 0f, time).declination
+        return GeomagneticField(latitude, longitude, geoPos.altitude.toFloat(), time).declination
     }
 
     private fun sendPassData(satPass: SatPass, satPos: SatPos, satellite: Satellite) {
         viewModelScope.launch {
             var track: List<SatPos> = emptyList()
             if (!satPass.isDeepSpace) {
-                track = satelliteRepository.getTrack(
+                track = satelliteRepo.getTrack(
                     satellite, stationPos, satPass.aosTime, satPass.losTime
                 )
             }
-            if (settingsRepository.getRotatorEnabled()) {
-                val server = settingsRepository.getRotatorServer()
-                val port = settingsRepository.getRotatorPort().toInt()
+            if (settingsRepo.getRotatorEnabled()) {
+                val server = settingsRepo.getRotatorServer()
+                val port = settingsRepo.getRotatorPort().toInt()
                 val azimuth = satPos.azimuth.toDegrees().round(1)
                 val elevation = satPos.elevation.toDegrees().round(1)
                 networkReporter.reportRotation(server, port, azimuth, elevation)
@@ -133,10 +131,10 @@ class RadarViewModel(
 
     private fun sendPassDataBT(satPos: SatPos) {
         viewModelScope.launch {
-            if (settingsRepository.getBTEnabled()) {
-                val btDevice = settingsRepository.getBTDeviceAddr()
+            if (settingsRepo.getBTEnabled()) {
+                val btDevice = settingsRepo.getBTDeviceAddr()
                 if (bluetoothReporter.isConnected()) {
-                    val format = settingsRepository.getBTFormat()
+                    val format = settingsRepo.getBTFormat()
                     val azimuth = satPos.azimuth.toDegrees().round(0).toInt()
                     val elevation = satPos.elevation.toDegrees().round(0).toInt()
                     bluetoothReporter.reportRotation(format, azimuth, elevation)
@@ -151,7 +149,7 @@ class RadarViewModel(
     private fun processRadios(radios: List<SatRadio>, satellite: Satellite, time: Long) {
         viewModelScope.launch {
             delay(125)
-            val list = satelliteRepository.processRadios(satellite, stationPos, radios, time)
+            val list = satelliteRepo.processRadios(satellite, stationPos, radios, time)
             transmitters.value = list
         }
     }
@@ -160,16 +158,14 @@ class RadarViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
-                val savedStateHandle = createSavedStateHandle()
                 val container = (this[applicationKey] as MainApplication).container
                 RadarViewModel(
-                    container.bluetoothReporter,
-                    container.networkReporter,
-                    savedStateHandle,
-                    container.dataRepository,
-                    container.satelliteRepository,
-                    container.sensorRepository,
-                    container.settingsRepository
+                    createSavedStateHandle(),
+                    container.provideBluetoothReporter(),
+                    container.provideNetworkReporter(),
+                    container.satelliteRepo,
+                    container.settingsRepo,
+                    container.sensorsRepo
                 )
             }
         }
