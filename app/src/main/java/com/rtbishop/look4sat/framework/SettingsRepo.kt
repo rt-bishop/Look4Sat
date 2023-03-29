@@ -24,7 +24,9 @@ import androidx.core.content.edit
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.CancellationSignal
 import com.rtbishop.look4sat.domain.ISettingsRepo
+import com.rtbishop.look4sat.model.DatabaseState
 import com.rtbishop.look4sat.model.GeoPos
+import com.rtbishop.look4sat.model.OtherSettings
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,11 +38,13 @@ class SettingsRepo(
 ) : ISettingsRepo {
 
     private val keyModes = "satModes"
-    private val keyCompass = "compass"
-    private val keyRadarSweep = "radarSweep"
-    private val keyTimeUTC = "timeUTC"
-    private val keyLastUpdateTime = "lastUpdateTime"
-    private val keyAutoUpdateEnabled = "autoUpdateEnabled"
+    private val keyUtcState = "utcState"
+    private val keyUpdateState = "updateState"
+    private val keySweepState = "sweepState"
+    private val keySensorState = "sensorState"
+    private val keyDataEntries = "dataEntries"
+    private val keyDataRadios = "dataRadios"
+    private val keyDataTimestamp = "dataTimestamp"
     private val keyHoursAhead = "hoursAhead"
     private val keyMinElevation = "minElevation"
     private val keyRotator = "isRotatorEnabled"
@@ -164,44 +168,52 @@ class SettingsRepo(
         preferences.edit { putDouble(keyMinElevation, minElevation) }
     }
 
-    override fun isUtcEnabled(): Boolean {
-        return preferences.getBoolean(keyTimeUTC, false)
+    private val _databaseState = MutableStateFlow(loadDatabaseState())
+    override val databaseState: StateFlow<DatabaseState> = _databaseState
+
+    override fun saveDatabaseState(state: DatabaseState) = preferences.edit {
+        putInt(keyDataEntries, state.entriesTotal)
+        putInt(keyDataRadios, state.radiosTotal)
+        putLong(keyDataTimestamp, state.timestamp)
+        _databaseState.value = state
     }
 
-    override fun setUtcState(value: Boolean) {
-        preferences.edit { putBoolean(keyTimeUTC, value) }
+    private fun loadDatabaseState(): DatabaseState {
+        val entriesTotal = preferences.getInt(keyDataEntries, 0)
+        val radiosTotal = preferences.getInt(keyDataRadios, 0)
+        val timestamp = preferences.getLong(keyDataTimestamp, 0L)
+        return DatabaseState(entriesTotal, radiosTotal, timestamp)
     }
 
-    override fun getLastUpdateTime(): Long {
-        return preferences.getLong(keyLastUpdateTime, 0L)
+    private val _otherSettings = MutableStateFlow(loadOtherSettings())
+    override val otherSettings: StateFlow<OtherSettings> = _otherSettings
+
+    override fun toggleUtc(value: Boolean) {
+        preferences.edit { putBoolean(keyUtcState, value) }
+        _otherSettings.value = otherSettings.value.copy(utcState = value)
     }
 
-    override fun setLastUpdateTime(updateTime: Long) {
-        preferences.edit { putLong(keyLastUpdateTime, updateTime) }
+    override fun toggleUpdate(value: Boolean) {
+        preferences.edit { putBoolean(keyUpdateState, value) }
+        _otherSettings.value = otherSettings.value.copy(updateState = value)
     }
 
-    override fun isUpdateEnabled(): Boolean {
-        return preferences.getBoolean(keyAutoUpdateEnabled, true)
+    override fun toggleSweep(value: Boolean) {
+        preferences.edit { putBoolean(keySweepState, value) }
+        _otherSettings.value = otherSettings.value.copy(sweepState = value)
     }
 
-    override fun setUpdateState(value: Boolean) {
-        preferences.edit { putBoolean(keyAutoUpdateEnabled, value) }
+    override fun toggleSensor(value: Boolean) {
+        preferences.edit { putBoolean(keySensorState, value) }
+        _otherSettings.value = otherSettings.value.copy(sensorState = value)
     }
 
-    override fun isSensorEnabled(): Boolean {
-        return preferences.getBoolean(keyCompass, true)
-    }
-
-    override fun setSensorState(value: Boolean) {
-        preferences.edit { putBoolean(keyCompass, value) }
-    }
-
-    override fun isSweepEnabled(): Boolean {
-        return preferences.getBoolean(keyRadarSweep, true)
-    }
-
-    override fun setSweepState(value: Boolean) {
-        preferences.edit { putBoolean(keyRadarSweep, value) }
+    private fun loadOtherSettings(): OtherSettings {
+        val utcState = preferences.getBoolean(keyUtcState, false)
+        val updateState = preferences.getBoolean(keyUpdateState, true)
+        val sweepState = preferences.getBoolean(keySweepState, true)
+        val sensorState = preferences.getBoolean(keySensorState, true)
+        return OtherSettings(utcState, updateState, sweepState, sensorState)
     }
 
     override fun saveModesSelection(modes: List<String>) {

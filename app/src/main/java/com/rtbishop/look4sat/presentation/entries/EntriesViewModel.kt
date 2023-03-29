@@ -69,7 +69,7 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                EntriesViewModel(container.provideSelectionRepo())
+                EntriesViewModel(container.selectionRepo)
             }
         }
     }

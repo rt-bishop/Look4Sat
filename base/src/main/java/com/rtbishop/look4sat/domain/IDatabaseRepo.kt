@@ -17,23 +17,11 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.model.DataState
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-
 interface IDatabaseRepo {
 
-    val updateState: StateFlow<DataState<Long>>
+    suspend fun updateFromFile(uri: String)
 
-    fun getEntriesTotal(): Flow<Int>
+    suspend fun updateFromWeb()
 
-    fun getRadiosTotal(): Flow<Int>
-
-    fun updateFromFile(uri: String)
-
-    fun updateFromWeb()
-
-    fun setUpdateStateHandled()
-
-    fun clearAllData()
+    suspend fun clearAllData()
 }

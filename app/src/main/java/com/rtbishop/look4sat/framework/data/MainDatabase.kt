@@ -24,7 +24,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatRadio
 
-@Database(entities = [SatEntry::class, SatRadio::class], version = 2)
+@Database(entities = [SatEntry::class, SatRadio::class], version = 2, exportSchema = false)
 abstract class MainDatabase : RoomDatabase() {
 
     abstract fun storageDao(): StorageDao

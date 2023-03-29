@@ -2,33 +2,8 @@ package com.rtbishop.look4sat.presentation.settings
 
 import com.rtbishop.look4sat.model.GeoPos
 
-data class LocationSettings(
-    val isUpdating: Boolean,
-    val stationPos: GeoPos,
-    val messageResId: Int,
-    val setGpsLoc: () -> Unit,
-    val setManualLoc: (Double, Double) -> Unit,
-    val setQthLoc: (String) -> Unit,
-    val dismissMessage: () -> Unit
-)
+data class PositionSettings(val isUpdating: Boolean, val stationPos: GeoPos, val messageResId: Int)
 
 data class DataSettings(
-    val isUpdating: Boolean,
-    val lastUpdated: Long,
-    val satsTotal: Int,
-    val radiosTotal: Int,
-    val updateFromWeb: () -> Unit,
-    val updateFromFile: (String) -> Unit,
-    val clearAllData: () -> Unit
-)
-
-data class OtherSettings(
-    val getUtc: Boolean,
-    val getUpdate: Boolean,
-    val getSweep: Boolean,
-    val getSensor: Boolean,
-    val setUtc: (Boolean) -> Unit,
-    val setUpdate: (Boolean) -> Unit,
-    val setSweep: (Boolean) -> Unit,
-    val setSensor: (Boolean) -> Unit
+    val isUpdating: Boolean, val entriesTotal: Int, val radiosTotal: Int, val timestamp: Long
 )
