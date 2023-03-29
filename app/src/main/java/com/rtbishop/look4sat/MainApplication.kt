@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,13 +30,13 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         container = MainContainer(this)
-        checkAutoUpdate()
+        container.mainScope.launch { checkAutoUpdate() }
     }
 
-    private fun checkAutoUpdate() {
+    private suspend fun checkAutoUpdate() {
         val settingsRepo = container.settingsRepo
-        if (settingsRepo.isUpdateEnabled()) {
-            val timeDelta = System.currentTimeMillis() - settingsRepo.getLastUpdateTime()
+        if (settingsRepo.otherSettings.value.updateState) {
+            val timeDelta = System.currentTimeMillis() - settingsRepo.databaseState.value.timestamp
             if (timeDelta > 172800000) { // 48 hours in ms
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 println("Started periodic data update on ${sdf.format(Date())}")

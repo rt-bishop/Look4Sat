@@ -17,7 +17,9 @@
  */
 package com.rtbishop.look4sat.domain
 
+import com.rtbishop.look4sat.model.DatabaseState
 import com.rtbishop.look4sat.model.GeoPos
+import com.rtbishop.look4sat.model.OtherSettings
 import kotlinx.coroutines.flow.StateFlow
 
 interface ISettingsRepo {
@@ -72,25 +74,19 @@ interface ISettingsRepo {
 
     fun setMinElevation(minElevation: Double)
 
-    fun isUtcEnabled(): Boolean
+    val databaseState: StateFlow<DatabaseState>
 
-    fun setUtcState(value: Boolean)
+    fun saveDatabaseState(state: DatabaseState)
 
-    fun getLastUpdateTime(): Long
+    val otherSettings: StateFlow<OtherSettings>
 
-    fun setLastUpdateTime(updateTime: Long)
+    fun toggleUtc(value: Boolean)
 
-    fun isUpdateEnabled(): Boolean
+    fun toggleUpdate(value: Boolean)
 
-    fun setUpdateState(value: Boolean)
+    fun toggleSweep(value: Boolean)
 
-    fun isSensorEnabled(): Boolean
-
-    fun setSensorState(value: Boolean)
-
-    fun isSweepEnabled(): Boolean
-
-    fun setSweepState(value: Boolean)
+    fun toggleSensor(value: Boolean)
 
     fun saveModesSelection(modes: List<String>)
 

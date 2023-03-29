@@ -19,112 +19,85 @@ package com.rtbishop.look4sat.data
 
 import com.rtbishop.look4sat.domain.IDatabaseRepo
 import com.rtbishop.look4sat.domain.ISettingsRepo
-import com.rtbishop.look4sat.model.DataState
+import com.rtbishop.look4sat.model.DatabaseState
 import com.rtbishop.look4sat.model.SatEntry
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
+import com.rtbishop.look4sat.model.SatRadio
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 class DatabaseRepo(
+    private val dispatcher: CoroutineDispatcher,
     private val dataParser: DataParser,
-    private val localStorage: ILocalStorage,
     private val dataSource: IDataSource,
-    private val repositoryScope: CoroutineScope,
+    private val localStorage: ILocalStorage,
     private val settingsRepository: ISettingsRepo
 ) : IDatabaseRepo {
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        _updateState.value = DataState.Exception(exception.message)
-    }
-    private val updateStateDelay = 875L
-    private val _updateState = MutableStateFlow<DataState<Long>>(DataState.Handled)
-    override val updateState: StateFlow<DataState<Long>> = _updateState
-
-    override fun getEntriesTotal() = localStorage.getEntriesTotal()
-
-    override fun getRadiosTotal() = localStorage.getRadiosTotal()
-
-    override fun updateFromFile(uri: String) {
-        repositoryScope.launch(exceptionHandler) {
-            _updateState.value = DataState.Loading
-            dataSource.getFileStream(uri)?.let { stream ->
-                delay(updateStateDelay)
-                localStorage.insertEntries(importSatellites(stream))
-            }
-            setUpdateSuccessful()
-        }
+    override suspend fun updateFromFile(uri: String) = withContext(dispatcher) {
+        val importedSatellites = dataSource.getFileStream(uri)?.let { importSatellites(it) }
+        importedSatellites?.let { localStorage.insertEntries(it) }
+        setUpdateSuccessful(System.currentTimeMillis())
     }
 
-    override fun updateFromWeb() {
-        _updateState.value = DataState.Loading
-        repositoryScope.launch(exceptionHandler) {
-            val importedEntries = mutableListOf<SatEntry>()
-            val sourcesMap = settingsRepository.satelliteSourcesMap
-            val jobsMap = sourcesMap.mapValues { async { dataSource.getNetworkStream(it.value) } }
-            jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
-                entry.value?.let { stream ->
-                    when (val type = entry.key) {
-                        "Amsat", "R4UAB" -> {
-                            // parse tle stream
-                            val satellites = importSatellites(stream)
-                            val catnums = satellites.map { it.data.catnum }
-                            settingsRepository.saveSatType(type, catnums)
-                            importedEntries.addAll(satellites)
-                        }
+    override suspend fun updateFromWeb() = withContext(dispatcher) {
+        val sourcesMap = settingsRepository.satelliteSourcesMap
+        val importedEntries = mutableListOf<SatEntry>()
+        val importedRadios = mutableListOf<SatRadio>()
+        // fetch
+        val jobsMap = sourcesMap.mapValues { async { dataSource.getNetworkStream(it.value) } }
+        val jobRadios = async { dataSource.getNetworkStream(settingsRepository.radioSourceUrl) }
+        // parse
+        jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
+            entry.value?.let { stream ->
+                when (val type = entry.key) {
+                    "AMSAT", "R4UAB" -> {
+                        // parse tle stream
+                        val satellites = importSatellites(stream)
+                        val catnums = satellites.map { it.data.catnum }
+                        settingsRepository.saveSatType(type, catnums)
+                        importedEntries.addAll(satellites)
+                    }
 
-                        "McCants", "Classified" -> {
-                            // unzip and parse tle stream
-                            val unzipped = ZipInputStream(stream).apply { nextEntry }
-                            val satellites = importSatellites(unzipped)
-                            val catnums = satellites.map { it.data.catnum }
-                            settingsRepository.saveSatType(type, catnums)
-                            importedEntries.addAll(satellites)
-                        }
+                    "McCants", "Classified" -> {
+                        // unzip and parse tle stream
+                        val unzipped = ZipInputStream(stream).apply { nextEntry }
+                        val satellites = importSatellites(unzipped)
+                        val catnums = satellites.map { it.data.catnum }
+                        settingsRepository.saveSatType(type, catnums)
+                        importedEntries.addAll(satellites)
+                    }
 
-                        else -> {
-                            // parse csv stream
-                            val parsed = dataParser.parseCSVStream(stream)
-                            val satellites = parsed.map { data -> SatEntry(data) }
-                            val catnums = satellites.map { it.data.catnum }
-                            settingsRepository.saveSatType(type, catnums)
-                            importedEntries.addAll(satellites)
-                        }
+                    else -> {
+                        // parse csv stream
+                        val parsed = dataParser.parseCSVStream(stream)
+                        val satellites = parsed.map { data -> SatEntry(data) }
+                        val catnums = satellites.map { it.data.catnum }
+                        settingsRepository.saveSatType(type, catnums)
+                        importedEntries.addAll(satellites)
                     }
                 }
             }
-            localStorage.insertEntries(importedEntries)
-            setUpdateSuccessful()
         }
-        repositoryScope.launch(exceptionHandler) {
-            dataSource.getNetworkStream(settingsRepository.radioSourceUrl)?.let { stream ->
-                localStorage.insertRadios(dataParser.parseJSONStream(stream))
-            }
-        }
+        jobRadios.await()?.let { importedRadios.addAll(dataParser.parseJSONStream(it)) }
+        // insert
+        localStorage.insertEntries(importedEntries)
+        localStorage.insertRadios(importedRadios)
+        setUpdateSuccessful(System.currentTimeMillis())
     }
 
-    override fun setUpdateStateHandled() {
-        _updateState.value = DataState.Handled
+    override suspend fun clearAllData() = withContext(dispatcher) {
+        localStorage.deleteEntries()
+        localStorage.deleteRadios()
+        setUpdateSuccessful(0L)
     }
 
-    override fun clearAllData() {
-        repositoryScope.launch {
-            _updateState.value = DataState.Loading
-            delay(updateStateDelay)
-            localStorage.deleteEntries()
-            localStorage.deleteRadios()
-            setUpdateSuccessful(0L)
-        }
-    }
-
-    private fun setUpdateSuccessful(updateTime: Long = System.currentTimeMillis()) {
-        settingsRepository.setLastUpdateTime(updateTime)
-        _updateState.value = DataState.Success(updateTime)
+    private suspend fun setUpdateSuccessful(timestamp: Long) = withContext(dispatcher) {
+        val satellitesTotal = localStorage.getEntriesTotal()
+        val radiosTotal = localStorage.getRadiosTotal()
+        settingsRepository.saveDatabaseState(DatabaseState(satellitesTotal, radiosTotal, timestamp))
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {

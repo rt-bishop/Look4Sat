@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.settings
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -27,121 +28,107 @@ import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.IDatabaseRepo
 import com.rtbishop.look4sat.domain.ISettingsRepo
-import com.rtbishop.look4sat.model.DataState
-import kotlinx.coroutines.flow.combine
+import com.rtbishop.look4sat.model.OtherSettings
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val databaseRepo: IDatabaseRepo, private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
-    private val defaultLocationSettings = LocationSettings(false,
-        settingsRepo.stationPosition.value,
-        0,
-        { setGpsPosition() },
-        { latitude, longitude -> setGeoPosition(latitude, longitude) },
-        { locator -> setQthPosition(locator) },
-        { dismissLocationMessage() })
-    val locationSettings = mutableStateOf(defaultLocationSettings)
+    private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
+    private val _positionSettings = mutableStateOf(defaultPosSettings)
+    val positionSettings: State<PositionSettings> = _positionSettings
 
-    private val defaultDataSettings = DataSettings(false,
-        settingsRepo.getLastUpdateTime(),
-        0,
-        0,
-        { databaseRepo.updateFromWeb() },
-        { databaseRepo.updateFromFile(it) },
-        { databaseRepo.clearAllData() })
-    val dataSettings = mutableStateOf(defaultDataSettings)
+    private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
+    private val _dataSettings = mutableStateOf(defaultDataSettings)
+    val dataSettings: State<DataSettings> = _dataSettings
 
-    private val defaultOtherSettings = OtherSettings(settingsRepo.isUtcEnabled(),
-        settingsRepo.isUpdateEnabled(),
-        settingsRepo.isSweepEnabled(),
-        settingsRepo.isSensorEnabled(),
-        { setUtc(it) },
-        { setUpdate(it) },
-        { setSweep(it) },
-        { setSensor(it) })
-    val otherSettings = mutableStateOf(defaultOtherSettings)
+    private val _otherSettings = mutableStateOf(settingsRepo.otherSettings.value)
+    val otherSettings: State<OtherSettings> = _otherSettings
 
     init {
         viewModelScope.launch {
-            settingsRepo.stationPosition.collect { stationPos ->
-                locationSettings.value = locationSettings.value.copy(
-                    isUpdating = false, stationPos = stationPos
+            settingsRepo.stationPosition.collect { geoPos ->
+                _positionSettings.value =
+                    _positionSettings.value.copy(isUpdating = false, stationPos = geoPos)
+            }
+        }
+        viewModelScope.launch {
+            settingsRepo.databaseState.collect { state ->
+                _dataSettings.value = _dataSettings.value.copy(
+                    isUpdating = false,
+                    entriesTotal = state.entriesTotal,
+                    radiosTotal = state.radiosTotal,
+                    timestamp = state.timestamp
                 )
             }
         }
         viewModelScope.launch {
-            databaseRepo.updateState.collect {
-                val isUpdating = it is DataState.Loading
-                dataSettings.value = dataSettings.value.copy(
-                    isUpdating = isUpdating, lastUpdated = settingsRepo.getLastUpdateTime()
-                )
-            }
-        }
-        viewModelScope.launch {
-            combine(
-                databaseRepo.getEntriesTotal(), databaseRepo.getRadiosTotal()
-            ) { sats, radios ->
-                dataSettings.value = dataSettings.value.copy(satsTotal = sats, radiosTotal = radios)
-            }.collect {}
+            settingsRepo.otherSettings.collect { _otherSettings.value = it }
         }
     }
 
-    private fun setGpsPosition() {
+    fun setGpsPosition() {
         if (settingsRepo.setGpsPosition()) {
             val messageResId = R.string.location_success
-            locationSettings.value =
-                locationSettings.value.copy(isUpdating = true, messageResId = messageResId)
+            _positionSettings.value =
+                _positionSettings.value.copy(isUpdating = true, messageResId = messageResId)
         } else {
             val errorResId = R.string.location_gps_error
-            locationSettings.value = locationSettings.value.copy(messageResId = errorResId)
+            _positionSettings.value = _positionSettings.value.copy(messageResId = errorResId)
         }
     }
 
-    private fun setGeoPosition(latitude: Double, longitude: Double) {
+    fun setGeoPosition(latitude: Double, longitude: Double) {
         if (settingsRepo.setGeoPosition(latitude, longitude)) {
             val messageResId = R.string.location_success
-            locationSettings.value = locationSettings.value.copy(messageResId = messageResId)
+            _positionSettings.value = _positionSettings.value.copy(messageResId = messageResId)
         } else {
             val errorResId = R.string.location_manual_error
-            locationSettings.value = locationSettings.value.copy(messageResId = errorResId)
+            _positionSettings.value = _positionSettings.value.copy(messageResId = errorResId)
         }
     }
 
-    private fun setQthPosition(locator: String) {
+    fun setQthPosition(locator: String) {
         if (settingsRepo.setQthPosition(locator)) {
             val messageResId = R.string.location_success
-            locationSettings.value = locationSettings.value.copy(messageResId = messageResId)
+            _positionSettings.value = _positionSettings.value.copy(messageResId = messageResId)
         } else {
             val errorResId = R.string.location_qth_error
-            locationSettings.value = locationSettings.value.copy(messageResId = errorResId)
+            _positionSettings.value = _positionSettings.value.copy(messageResId = errorResId)
         }
     }
 
-    private fun dismissLocationMessage() {
-        locationSettings.value = locationSettings.value.copy(messageResId = 0)
+    fun dismissPosMessage() {
+        _positionSettings.value = _positionSettings.value.copy(messageResId = 0)
     }
 
-    private fun setUtc(value: Boolean) {
-        settingsRepo.setUtcState(value)
-        otherSettings.value = otherSettings.value.copy(getUtc = value)
+    fun updateFromWeb() = viewModelScope.launch {
+        try {
+            _dataSettings.value = _dataSettings.value.copy(isUpdating = true)
+            databaseRepo.updateFromWeb()
+        } catch (exception: Exception) {
+            _dataSettings.value = _dataSettings.value.copy(isUpdating = false)
+            println(exception.printStackTrace())
+        }
     }
 
-    private fun setUpdate(value: Boolean) {
-        settingsRepo.setUpdateState(value)
-        otherSettings.value = otherSettings.value.copy(getUpdate = value)
+    fun updateFromFile(uri: String) = viewModelScope.launch {
+        try {
+            _dataSettings.value = _dataSettings.value.copy(isUpdating = true)
+            databaseRepo.updateFromFile(uri)
+        } catch (exception: Exception) {
+            _dataSettings.value = _dataSettings.value.copy(isUpdating = false)
+            println(exception.printStackTrace())
+        }
     }
 
-    private fun setSweep(value: Boolean) {
-        settingsRepo.setSweepState(value)
-        otherSettings.value = otherSettings.value.copy(getSweep = value)
-    }
+    fun clearAllData() = viewModelScope.launch { databaseRepo.clearAllData() }
 
-    private fun setSensor(value: Boolean) {
-        settingsRepo.setSensorState(value)
-        otherSettings.value = otherSettings.value.copy(getSensor = value)
-    }
+    fun toggleUtc(value: Boolean) = settingsRepo.toggleUtc(value)
+    fun toggleUpdate(value: Boolean) = settingsRepo.toggleUpdate(value)
+    fun toggleSweep(value: Boolean) = settingsRepo.toggleSweep(value)
+    fun toggleSensor(value: Boolean) = settingsRepo.toggleSensor(value)
 
 //    fun getRotatorEnabled(): Boolean = settings.getRotatorEnabled()
 //    fun setRotatorEnabled(value: Boolean) = settings.setRotatorEnabled(value)

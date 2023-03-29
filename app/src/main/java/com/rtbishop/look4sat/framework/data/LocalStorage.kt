@@ -31,7 +31,7 @@ class LocalStorage(private val storageDao: StorageDao) : ILocalStorage {
 
     //region # Entries region
 
-    override fun getEntriesTotal() = storageDao.getEntriesTotal()
+    override suspend fun getEntriesTotal() = storageDao.getEntriesTotal()
 
     override suspend fun getEntriesList(): List<DomainItem> {
         return storageDao.getEntriesList().toDomainItems()
@@ -64,7 +64,7 @@ class LocalStorage(private val storageDao: StorageDao) : ILocalStorage {
 
     //region # Radios region
 
-    override fun getRadiosTotal() = storageDao.getRadiosTotal()
+    override suspend fun getRadiosTotal() = storageDao.getRadiosTotal()
 
     override suspend fun getRadiosWithId(id: Int): List<SatRadio> {
         return storageDao.getRadiosWithId(id).toDomainRadios()

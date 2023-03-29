@@ -21,13 +21,12 @@ import androidx.room.*
 import com.rtbishop.look4sat.framework.model.SatEntry
 import com.rtbishop.look4sat.framework.model.SatItem
 import com.rtbishop.look4sat.framework.model.SatRadio
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StorageDao {
 
     @Query("SELECT COUNT(*) FROM entries")
-    fun getEntriesTotal(): Flow<Int>
+    suspend fun getEntriesTotal(): Int
 
     //@Transaction
     @Query("SELECT catnum, name FROM entries ORDER BY name ASC")
@@ -44,7 +43,7 @@ interface StorageDao {
     suspend fun deleteEntries()
 
     @Query("SELECT COUNT(*) FROM radios")
-    fun getRadiosTotal(): Flow<Int>
+    suspend fun getRadiosTotal(): Int
 
     @Transaction
     @Query("SELECT * FROM radios WHERE catnum = :id AND isAlive = 1")
