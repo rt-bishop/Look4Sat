@@ -89,7 +89,7 @@ class PassesViewModel(
         }
     }
 
-    fun shouldUseUTC() = settingsRepo.isUtcEnabled()
+    fun shouldUseUTC() = settingsRepo.otherSettings.value.utcState
 
     fun calculatePasses(
         hoursAhead: Int = 1,

@@ -61,7 +61,7 @@ class RadarViewModel(
     val orientation = mutableStateOf(sensorsRepo.orientation.value)
 
     init {
-        if (settingsRepo.isSensorEnabled()) {
+        if (settingsRepo.otherSettings.value.sensorState) {
             viewModelScope.launch {
                 sensorsRepo.enableSensor()
                 sensorsRepo.orientation.collect { data ->
@@ -100,9 +100,9 @@ class RadarViewModel(
         }
     }
 
-    fun getUseCompass(): Boolean = settingsRepo.isSensorEnabled()
+    fun getUseCompass(): Boolean = settingsRepo.otherSettings.value.sensorState
 
-    fun getShowSweep(): Boolean = settingsRepo.isSweepEnabled()
+    fun getShowSweep(): Boolean = settingsRepo.otherSettings.value.sweepState
 
     private fun getMagDeclination(geoPos: GeoPos, time: Long = System.currentTimeMillis()): Float {
         val latitude = geoPos.latitude.toFloat()

@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.model.GeoPos
+import com.rtbishop.look4sat.model.OtherSettings
 import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.dialogs.LocatorDialog
@@ -76,43 +77,55 @@ fun SettingsScreen() {
     val locationPermFine = Manifest.permission.ACCESS_FINE_LOCATION
     val locationRequest = rememberLauncherForActivityResult(locationContract) { permissions ->
         when {
-            permissions[locationPermFine] == true -> viewModel.locationSettings.value.setGpsLoc()
-            permissions[locationPermCoarse] == true -> viewModel.locationSettings.value.setGpsLoc()
+            permissions[locationPermFine] == true -> viewModel.setGpsPosition()
+            permissions[locationPermCoarse] == true -> viewModel.setGpsPosition()
             else -> showToast(context, locationError)
         }
     }
     val contentContract = ActivityResultContracts.GetContent()
     val contentRequest = rememberLauncherForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.dataSettings.value.updateFromFile(uri.toString()) }
+        uri?.let { viewModel.updateFromFile(uri.toString()) }
     }
 
-    // Location settings
-    val locSettings = viewModel.locationSettings.value
-    val setGpsLoc = { locationRequest.launch(arrayOf(locationPermCoarse, locationPermFine)) }
-    val showPosDialog = rememberSaveable { mutableStateOf(false) }
-    val togglePosDialog = { showPosDialog.value = showPosDialog.value.not() }
-    if (showPosDialog.value) {
-        PositionDialog(
-            locSettings.stationPos.latitude,
-            locSettings.stationPos.longitude,
-            togglePosDialog,
-            locSettings.setManualLoc
-        )
+    // Position settings
+    val positionSettings = viewModel.positionSettings.value
+    val stationPos = positionSettings.stationPos
+    val setGpsPos = { locationRequest.launch(arrayOf(locationPermCoarse, locationPermFine)) }
+    val setGeoPos = { lat: Double, lon: Double -> viewModel.setGeoPosition(lat, lon) }
+    val setQthPos = { locator: String -> viewModel.setQthPosition(locator) }
+    val dismissPos = { viewModel.dismissPosMessage() }
+    val posDialogState = rememberSaveable { mutableStateOf(false) }
+    val showPosDialog = { posDialogState.value = posDialogState.value.not() }
+    if (posDialogState.value) {
+        PositionDialog(stationPos.latitude, stationPos.longitude, showPosDialog, setGeoPos)
     }
-    val showLocDialog = rememberSaveable { mutableStateOf(false) }
-    val toggleLocDialog = { showLocDialog.value = showLocDialog.value.not() }
-    if (showLocDialog.value) {
-        LocatorDialog(locSettings.stationPos.qthLocator, toggleLocDialog, locSettings.setQthLoc)
+    val locDialogState = rememberSaveable { mutableStateOf(false) }
+    val showLocDialog = { locDialogState.value = locDialogState.value.not() }
+    if (locDialogState.value) {
+        LocatorDialog(positionSettings.stationPos.qthLocator, showLocDialog, setQthPos)
     }
+
+    // Data settings
+    val dataSettings = viewModel.dataSettings.value
+    val updateFromWeb: () -> Unit = { viewModel.updateFromWeb() }
+    val updateFromFile = { contentRequest.launch("*/*") }
+    val clearAllData: () -> Unit = { viewModel.clearAllData() }
+
+    // Other settings
+    val otherSettings = viewModel.otherSettings.value
+    val toggleUtc = { value: Boolean -> viewModel.toggleUtc(value) }
+    val toggleUpdate = { value: Boolean -> viewModel.toggleUpdate(value) }
+    val toggleSweep = { value: Boolean -> viewModel.toggleSweep(value) }
+    val toggleSensor = { value: Boolean -> viewModel.toggleSensor(value) }
 
     // Screen setup
     LazyColumn(
         modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         item { CardAbout(BuildConfig.VERSION_NAME) }
-        item { LocationCard(locSettings, setGpsLoc, togglePosDialog, toggleLocDialog) }
-        item { DataCard(viewModel.dataSettings.value) { contentRequest.launch("*/*") } }
-        item { OtherCard(viewModel.otherSettings.value) }
+        item { LocationCard(positionSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos) }
+        item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
+        item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
         item { CardCredits() }
     }
 }
@@ -181,16 +194,17 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
 @Composable
 private fun LocationCardPreview() = MainTheme {
     val stationPos = GeoPos(0.0, 0.0, 0.0, "IO91vl", 0L)
-    val settings = LocationSettings(true, stationPos, 0, {}, { _, _ -> }, {}, {})
-    LocationCard(settings = settings, setGpsLoc = {}, togglePosDialog = {}) {}
+    val settings = PositionSettings(true, stationPos, 0)
+    LocationCard(settings = settings, setGpsPos = {}, showPosDialog = {}, {}) {}
 }
 
 @Composable
 private fun LocationCard(
-    settings: LocationSettings,
-    setGpsLoc: () -> Unit,
-    togglePosDialog: () -> Unit,
-    toggleLocDialog: () -> Unit
+    settings: PositionSettings,
+    setGpsPos: () -> Unit,
+    showPosDialog: () -> Unit,
+    showLocDialog: () -> Unit,
+    dismissPosMessage: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -227,19 +241,19 @@ private fun LocationCard(
             Spacer(modifier = Modifier.height(1.dp))
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = setGpsLoc,
+                    onClick = setGpsPos,
                     text = stringResource(id = R.string.btn_gps),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = togglePosDialog,
+                    onClick = showPosDialog,
                     text = stringResource(id = R.string.btn_manual),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = toggleLocDialog,
+                    onClick = showLocDialog,
                     text = stringResource(id = R.string.btn_qth),
                     modifier = Modifier.weight(1f)
                 )
@@ -251,7 +265,7 @@ private fun LocationCard(
         val errorString = stringResource(id = settings.messageResId)
         LaunchedEffect(key1 = settings.messageResId) {
             showToast(context, errorString)
-            settings.dismissMessage()
+            dismissPosMessage()
         }
     }
 }
@@ -259,12 +273,17 @@ private fun LocationCard(
 @Preview(showBackground = true)
 @Composable
 private fun DataCardPreview() = MainTheme {
-    val settings = DataSettings(true, 0L, 5000, 2500, {}, {}, {})
-    DataCard(settings = settings) {}
+    val settings = DataSettings(true, 5000, 2500, 0L)
+    DataCard(settings = settings, {}, {}) {}
 }
 
 @Composable
-private fun DataCard(settings: DataSettings, updateFromFile: () -> Unit) {
+private fun DataCard(
+    settings: DataSettings,
+    updateFromWeb: () -> Unit,
+    updateFromFile: () -> Unit,
+    clearAllData: () -> Unit
+) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -278,29 +297,29 @@ private fun DataCard(settings: DataSettings, updateFromFile: () -> Unit) {
                 UpdateIndicator(isUpdating = settings.isUpdating, Modifier.weight(1f))
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = setUpdateTime(updateTime = settings.lastUpdated))
+            Text(text = setUpdateTime(updateTime = settings.timestamp))
             Spacer(modifier = Modifier.height(2.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "Satellites: ${settings.satsTotal}")
+                Text(text = "Satellites: ${settings.entriesTotal}")
                 Spacer(modifier = Modifier.weight(1f))
                 Text(text = "Transceivers: ${settings.radiosTotal}")
             }
             Spacer(modifier = Modifier.height(1.dp))
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = settings.updateFromWeb,
+                    onClick = { updateFromWeb() },
                     text = stringResource(id = R.string.btn_web),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = updateFromFile,
+                    onClick = { updateFromFile() },
                     text = stringResource(id = R.string.btn_file),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = settings.clearAllData,
+                    onClick = { clearAllData() },
                     text = stringResource(id = R.string.btn_clear),
                     modifier = Modifier.weight(1f)
                 )
@@ -357,14 +376,19 @@ private fun DataCard(settings: DataSettings, updateFromFile: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun OtherCardPreview() = MainTheme {
-    val settings = OtherSettings(
-        getUtc = false, getUpdate = true, getSweep = true, getSensor = true,
-        setUtc = {}, setUpdate = {}, setSweep = {}, setSensor = {})
-    OtherCard(settings = settings)
+    val values =
+        OtherSettings(utcState = false, updateState = true, sweepState = true, sensorState = true)
+    OtherCard(settings = values, {}, {}, {}, {})
 }
 
 @Composable
-private fun OtherCard(settings: OtherSettings) {
+private fun OtherCard(
+    settings: OtherSettings,
+    toggleUtc: (Boolean) -> Unit,
+    toggleUpdate: (Boolean) -> Unit,
+    toggleSweep: (Boolean) -> Unit,
+    toggleSensor: (Boolean) -> Unit
+) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
             Row(
@@ -373,7 +397,7 @@ private fun OtherCard(settings: OtherSettings) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_utc))
-                Switch(checked = settings.getUtc, onCheckedChange = { settings.setUtc(it) })
+                Switch(checked = settings.utcState, onCheckedChange = { toggleUtc(it) })
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -381,7 +405,7 @@ private fun OtherCard(settings: OtherSettings) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_update))
-                Switch(checked = settings.getUpdate, onCheckedChange = { settings.setUpdate(it) })
+                Switch(checked = settings.updateState, onCheckedChange = { toggleUpdate(it) })
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -389,7 +413,7 @@ private fun OtherCard(settings: OtherSettings) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sweep))
-                Switch(checked = settings.getSweep, onCheckedChange = { settings.setSweep(it) })
+                Switch(checked = settings.sweepState, onCheckedChange = { toggleSweep(it) })
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -397,7 +421,7 @@ private fun OtherCard(settings: OtherSettings) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sensors))
-                Switch(checked = settings.getSensor, onCheckedChange = { settings.setSensor(it) })
+                Switch(checked = settings.sensorState, onCheckedChange = { toggleSensor(it) })
             }
         }
     }
