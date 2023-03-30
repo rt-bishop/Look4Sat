@@ -53,10 +53,9 @@ fun PassesScreen(navToRadar: (Int, Long) -> Unit) {
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val toggleDialog = { showDialog.value = showDialog.value.not() }
     if (showDialog.value) {
-        FilterDialog(viewModel.getHoursAhead(),
-            viewModel.getMinElevation(),
-            { toggleDialog() }) { hours, elev ->
-            viewModel.calculatePasses(hours, elev)
+        val (hoursAhead, minElevation) = viewModel.getFilterSettings()
+        FilterDialog(hoursAhead, minElevation, { toggleDialog() }) { newHours, newElevation ->
+            viewModel.calculatePasses(System.currentTimeMillis(), newHours, newElevation)
         }
     }
 

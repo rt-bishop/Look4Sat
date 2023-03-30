@@ -20,12 +20,12 @@ package com.rtbishop.look4sat.domain
 import com.rtbishop.look4sat.model.DatabaseState
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.OtherSettings
+import com.rtbishop.look4sat.model.PassesSettings
 import kotlinx.coroutines.flow.StateFlow
 
 interface ISettingsRepo {
 
     val radioSourceUrl: String get() = "https://db.satnogs.org/api/transmitters/?format=json"
-
     val satelliteSourcesMap: Map<String, String>
         get() = mapOf(
             "All" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
@@ -56,9 +56,9 @@ interface ISettingsRepo {
             "X-Comm" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
         )
 
-    val stationPosition: StateFlow<GeoPos>
+    //region # Station position settings
 
-    val satelliteSelection: StateFlow<List<Int>>
+    val stationPosition: StateFlow<GeoPos>
 
     fun setGpsPosition(): Boolean
 
@@ -66,17 +66,41 @@ interface ISettingsRepo {
 
     fun setQthPosition(locator: String): Boolean
 
-    fun getHoursAhead(): Int
+    //endregion
 
-    fun setHoursAhead(hoursAhead: Int)
-
-    fun getMinElevation(): Double
-
-    fun setMinElevation(minElevation: Double)
+    //region # Database update settings
 
     val databaseState: StateFlow<DatabaseState>
 
     fun saveDatabaseState(state: DatabaseState)
+
+    fun saveSatType(type: String, catnums: List<Int>)
+
+    fun loadSatType(type: String): List<Int>
+
+    //endregion
+
+    //region # Entries selection settings
+
+    val satelliteSelection: StateFlow<List<Int>>
+
+    fun saveEntriesSelection(catnums: List<Int>)
+
+    //endregion
+
+    //region # Passes filter settings
+
+    val passesSettings: StateFlow<PassesSettings>
+
+    fun savePassesSettings(settings: PassesSettings)
+
+    fun saveModesSelection(modes: List<String>)
+
+    fun loadModesSelection(): List<String>
+
+    //endregion
+
+    //region # Other settings
 
     val otherSettings: StateFlow<OtherSettings>
 
@@ -88,15 +112,9 @@ interface ISettingsRepo {
 
     fun toggleSensor(value: Boolean)
 
-    fun saveModesSelection(modes: List<String>)
+    //endregion
 
-    fun loadModesSelection(): List<String>
-
-    fun saveEntriesSelection(catnums: List<Int>)
-
-    fun saveSatType(type: String, catnums: List<Int>)
-
-    fun loadSatType(type: String): List<Int>
+    //region # Undefined settings
 
     fun getRotatorEnabled(): Boolean
 
@@ -125,4 +143,6 @@ interface ISettingsRepo {
     fun getBTFormat(): String
 
     fun setBTFormat(value: String)
+
+    //endregion
 }

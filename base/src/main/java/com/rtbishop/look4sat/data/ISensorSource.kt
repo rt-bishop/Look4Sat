@@ -1,8 +1,8 @@
-package com.rtbishop.look4sat.domain
+package com.rtbishop.look4sat.data
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface ISensorsRepo {
+interface ISensorSource {
 
     val orientation: StateFlow<Pair<Float, Float>>
 

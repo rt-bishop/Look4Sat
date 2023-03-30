@@ -49,8 +49,8 @@ class MapViewModel(
 ) : ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
-    private var allPasses = satelliteRepo.getPasses()
-    private var allSatellites = listOf<Satellite>()
+    private var allPasses = satelliteRepo.passes.value
+    private var allSatellites = satelliteRepo.satellites.value
     private var dataUpdateJob: Job? = null
     private var dataUpdateRate = 1000L
     private var selectedSatellite: Satellite? = null
@@ -87,18 +87,12 @@ class MapViewModel(
     }
 
     fun selectDefaultSatellite(catnum: Int) {
-        viewModelScope.launch {
-            val selectedIds = settingsRepo.satelliteSelection.value
-            satelliteRepo.getEntriesWithIds(selectedIds).also { satellites ->
-                if (satellites.isNotEmpty()) {
-                    allSatellites = satellites
-                    if (catnum == -1) {
-                        allPasses.find { pass -> pass.progress < 100 && !pass.isDeepSpace }
-                            ?.let { pass -> selectSatellite(pass.satellite) }
-                    } else {
-                        satellites.find { it.data.catnum == catnum }?.let { selectSatellite(it) }
-                    }
-                }
+        if (allSatellites.isNotEmpty()) {
+            if (catnum == -1) {
+                allPasses.find { pass -> pass.progress < 100 && !pass.isDeepSpace }
+                    ?.let { pass -> selectSatellite(pass.satellite) }
+            } else {
+                allSatellites.find { it.data.catnum == catnum }?.let { selectSatellite(it) }
             }
         }
     }

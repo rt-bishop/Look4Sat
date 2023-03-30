@@ -26,6 +26,7 @@ import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.ISatelliteRepo
 import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.model.DataState
+import com.rtbishop.look4sat.model.PassesSettings
 import com.rtbishop.look4sat.model.SatPass
 import com.rtbishop.look4sat.utility.toTimerString
 import kotlinx.coroutines.Job
@@ -47,13 +48,14 @@ class PassesViewModel(
     val passes: StateFlow<DataState<List<SatPass>>> = _passes
     val timerText: StateFlow<Triple<String, String, String>?> = _timerText
 
-    fun getHoursAhead() = settingsRepo.getHoursAhead()
+    fun getFilterSettings() = settingsRepo.passesSettings.value
 
-    fun getMinElevation() = settingsRepo.getMinElevation()
+    fun shouldUseUTC() = settingsRepo.otherSettings.value.utcState
 
     init {
+        viewModelScope.launch { satelliteRepo.initRepository() }
         viewModelScope.launch {
-            satelliteRepo.calculatedPasses.collect { passes ->
+            satelliteRepo.passes.collect { passes ->
                 passesProcessing?.cancelAndJoin()
                 passesProcessing = viewModelScope.launch {
                     while (isActive) {
@@ -84,32 +86,20 @@ class PassesViewModel(
                 }
             }
         }
-        viewModelScope.launch {
-            settingsRepo.satelliteSelection.collect { calculatePasses() }
-        }
     }
 
-    fun shouldUseUTC() = settingsRepo.otherSettings.value.utcState
+    fun calculatePasses() = viewModelScope.launch {
+        _passes.emit(DataState.Loading)
+        passesProcessing?.cancelAndJoin()
+        val (hoursAhead, minElevation) = settingsRepo.passesSettings.value
+        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)
+    }
 
-    fun calculatePasses(
-        hoursAhead: Int = 1,
-        minElevation: Double = settingsRepo.getMinElevation(),
-        timeRef: Long = System.currentTimeMillis()
-    ) {
-        viewModelScope.launch {
-            _passes.emit(DataState.Loading)
-//            _timerText.postValue(timerDefaultText)
-            passesProcessing?.cancelAndJoin()
-//            selection?.let { items -> settingsRepository.saveEntriesSelection(items) }
-            settingsRepo.setHoursAhead(hoursAhead)
-            settingsRepo.setMinElevation(minElevation)
-            val stationPos = settingsRepo.stationPosition.value
-            val selectedIds = settingsRepo.satelliteSelection.value
-            val satellites = satelliteRepo.getEntriesWithIds(selectedIds)
-            satelliteRepo.calculatePasses(
-                satellites, stationPos, timeRef, hoursAhead, minElevation
-            )
-        }
+    fun calculatePasses(timeRef: Long, hoursAhead: Int, minElev: Double) = viewModelScope.launch {
+        _passes.emit(DataState.Loading)
+        passesProcessing?.cancelAndJoin()
+        settingsRepo.savePassesSettings(PassesSettings(hoursAhead, minElev))
+        satelliteRepo.calculatePasses(timeRef, hoursAhead, minElev)
     }
 
     companion object {
