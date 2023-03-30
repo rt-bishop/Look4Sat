@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.data
 
 import com.rtbishop.look4sat.domain.ISatelliteRepo
+import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.SatPass
@@ -26,24 +27,32 @@ import com.rtbishop.look4sat.model.SatRadio
 import com.rtbishop.look4sat.utility.round
 import com.rtbishop.look4sat.utility.toDegrees
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
 class SatelliteRepo(
     private val dispatcher: CoroutineDispatcher,
-    private val localStorage: ILocalStorage
+    private val localStorage: ILocalStorage,
+    private val settingsRepo: ISettingsRepo
 ) : ISatelliteRepo {
 
-    private var passes = listOf<SatPass>()
-    private val _calculatedPasses = MutableSharedFlow<List<SatPass>>(replay = 1)
-    override val calculatedPasses: SharedFlow<List<SatPass>> = _calculatedPasses
+    private val _passes = MutableStateFlow<List<SatPass>>(emptyList())
+    override val passes: StateFlow<List<SatPass>> = _passes
 
-    override fun getPasses(): List<SatPass> = passes
-
-    override suspend fun getEntriesWithIds(ids: List<Int>) = localStorage.getEntriesWithIds(ids)
+    private val _satellites = MutableStateFlow<List<Satellite>>(emptyList())
+    override val satellites: StateFlow<List<Satellite>> = _satellites
 
     override suspend fun getRadiosWithId(id: Int) = localStorage.getRadiosWithId(id)
+
+    override suspend fun initRepository() = withContext(dispatcher) {
+        settingsRepo.satelliteSelection.collect { selectedIds ->
+            _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
+            val (hoursAhead, minElevation) = settingsRepo.passesSettings.value
+            calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)
+        }
+    }
 
     override suspend fun getPosition(sat: Satellite, pos: GeoPos, time: Long): SatPos {
         return withContext(dispatcher) { sat.getPosition(pos, time) }
@@ -70,12 +79,8 @@ class SatelliteRepo(
             val satPos = sat.getPosition(pos, time)
             val copiedList = radios.map { it.copy() }
             copiedList.forEach { transmitter ->
-                transmitter.downlink?.let {
-                    transmitter.downlink = satPos.getDownlinkFreq(it)
-                }
-                transmitter.uplink?.let {
-                    transmitter.uplink = satPos.getUplinkFreq(it)
-                }
+                transmitter.downlink?.let { transmitter.downlink = satPos.getDownlinkFreq(it) }
+                transmitter.uplink?.let { transmitter.uplink = satPos.getUplinkFreq(it) }
             }
             copiedList.map { it.copy() }
         }
@@ -97,23 +102,18 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun calculatePasses(
-        satList: List<Satellite>, pos: GeoPos, time: Long, hoursAhead: Int, minElevation: Double
-    ) {
-        if (satList.isEmpty()) {
-            val newPasses = emptyList<SatPass>()
-            passes = newPasses
-            _calculatedPasses.emit(newPasses)
-        } else {
+    override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double) {
+        if (_satellites.value.isNotEmpty()) {
             withContext(dispatcher) {
                 val allPasses = mutableListOf<SatPass>()
-                satList.forEach { satellite ->
-                    allPasses.addAll(satellite.getPasses(pos, time, hoursAhead))
+                val stationPos = settingsRepo.stationPosition.value
+                _satellites.value.forEach { satellite ->
+                    allPasses.addAll(satellite.getPasses(stationPos, time, hoursAhead))
                 }
-                val newPasses = allPasses.filter(time, hoursAhead, minElevation)
-                passes = newPasses
-                _calculatedPasses.emit(newPasses)
+                _passes.update { allPasses.filter(time, hoursAhead, minElevation) }
             }
+        } else {
+            _passes.update { emptyList() }
         }
     }
 
@@ -151,8 +151,7 @@ class SatelliteRepo(
     private fun getGeoPass(sat: Satellite, pos: GeoPos, time: Long): SatPass {
         val satPos = sat.getPosition(pos, time)
         val aos = time - 24 * 60L * 60L * 1000L
-        val los = time + 24 * 60L * 60L * 1000L
-//        val tca = (aos + los) / 2
+        val los = time + 24 * 60L * 60L * 1000L // val tca = (aos + los) / 2
         val az = satPos.azimuth.toDegrees().round(1)
         val elev = satPos.elevation.toDegrees().round(1)
         val alt = satPos.altitude
@@ -164,8 +163,7 @@ class SatelliteRepo(
         var calendarTimeMillis = time
         var elevation: Double
         var maxElevation = 0.0
-        var alt = 0.0
-//        var tcaAz = 0.0
+        var alt = 0.0 // var tcaAz = 0.0
         // rewind 1/4 of an orbit
         if (rewind) calendarTimeMillis += -quarterOrbitMin * 60L * 1000L
 
@@ -187,8 +185,7 @@ class SatelliteRepo(
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude
-//                tcaAz = satPos.azimuth.toDegrees()
+                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation < 0.0)
 
@@ -200,8 +197,7 @@ class SatelliteRepo(
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude
-//                tcaAz = satPos.azimuth.toDegrees()
+                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation < 0.0)
 
@@ -215,8 +211,7 @@ class SatelliteRepo(
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude
-//                tcaAz = satPos.azimuth.toDegrees()
+                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation > 0.0)
 
@@ -228,14 +223,12 @@ class SatelliteRepo(
             elevation = satPos.elevation
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude
-//                tcaAz = satPos.azimuth.toDegrees()
+                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
         } while (satPos.elevation > 0.0)
 
-        val los = satPos.time
+        val los = satPos.time // val tca = (aos + los) / 2
         val losAz = satPos.azimuth.toDegrees().round(1)
-//        val tca = (aos + los) / 2
         val elev = maxElevation.toDegrees().round(1)
         return SatPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat)
     }
