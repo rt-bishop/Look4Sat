@@ -8,21 +8,21 @@ import android.location.LocationManager
 import androidx.room.Room
 import com.rtbishop.look4sat.data.DataParser
 import com.rtbishop.look4sat.data.DatabaseRepo
+import com.rtbishop.look4sat.data.ISensorSource
 import com.rtbishop.look4sat.data.SatelliteRepo
 import com.rtbishop.look4sat.data.SelectionRepo
 import com.rtbishop.look4sat.domain.IDatabaseRepo
 import com.rtbishop.look4sat.domain.ISatelliteRepo
 import com.rtbishop.look4sat.domain.ISelectionRepo
-import com.rtbishop.look4sat.domain.ISensorsRepo
 import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.framework.BluetoothReporter
 import com.rtbishop.look4sat.framework.NetworkReporter
-import com.rtbishop.look4sat.framework.SensorsRepo
 import com.rtbishop.look4sat.framework.SettingsRepo
 import com.rtbishop.look4sat.framework.data.DataSource
 import com.rtbishop.look4sat.framework.data.LocalStorage
 import com.rtbishop.look4sat.framework.data.MIGRATION_1_2
 import com.rtbishop.look4sat.framework.data.MainDatabase
+import com.rtbishop.look4sat.framework.data.SensorSource
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,6 @@ class MainContainer(private val context: Context) {
     val databaseRepo = provideDatabaseRepo()
     val satelliteRepo = provideSatelliteRepo()
     val selectionRepo = provideSelectionRepo()
-    val sensorsRepo = provideSensorsRepo()
 
     fun provideBluetoothReporter(): BluetoothReporter {
         val btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -51,6 +50,12 @@ class MainContainer(private val context: Context) {
         return NetworkReporter(CoroutineScope(Dispatchers.IO))
     }
 
+    fun provideSensorSource(): ISensorSource {
+        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+        return SensorSource(sensorManager, sensor)
+    }
+
     private fun provideDatabaseRepo(): IDatabaseRepo {
         val dataParser = DataParser(Dispatchers.Default)
         val dataSource = DataSource(context.contentResolver, Dispatchers.IO)
@@ -58,17 +63,11 @@ class MainContainer(private val context: Context) {
     }
 
     private fun provideSatelliteRepo(): ISatelliteRepo {
-        return SatelliteRepo(Dispatchers.Default, localStorage)
+        return SatelliteRepo(Dispatchers.Default, localStorage, settingsRepo)
     }
 
     private fun provideSelectionRepo(): ISelectionRepo {
         return SelectionRepo(Dispatchers.Default, localStorage, settingsRepo)
-    }
-
-    private fun provideSensorsRepo(): ISensorsRepo {
-        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
-        return SensorsRepo(sensorManager, sensor)
     }
 
     private fun provideSettingsRepo(): ISettingsRepo {

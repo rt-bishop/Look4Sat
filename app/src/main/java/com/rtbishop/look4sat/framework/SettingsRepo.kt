@@ -27,6 +27,7 @@ import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.model.DatabaseState
 import com.rtbishop.look4sat.model.GeoPos
 import com.rtbishop.look4sat.model.OtherSettings
+import com.rtbishop.look4sat.model.PassesSettings
 import com.rtbishop.look4sat.utility.QthConverter
 import com.rtbishop.look4sat.utility.round
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,15 +100,6 @@ class SettingsRepo(
         return true
     }
 
-    private fun loadStationPosition(): GeoPos {
-        val latitude = (preferences.getString(keyLatitude, null) ?: "0.0").toDouble()
-        val longitude = (preferences.getString(keyLongitude, null) ?: "0.0").toDouble()
-        val altitude = (preferences.getString(keyAltitude, null) ?: "0.0").toDouble()
-        val qthLocator = preferences.getString(keyLocator, null) ?: "null"
-        val timestamp = preferences.getLong(keyLocTimestamp, 0L)
-        return GeoPos(latitude, longitude, altitude, qthLocator, timestamp)
-    }
-
     private fun saveStationPosition(stationPos: GeoPos) = preferences.edit {
         putString(keyLatitude, stationPos.latitude.toString())
         putString(keyLongitude, stationPos.longitude.toString())
@@ -126,7 +118,50 @@ class SettingsRepo(
         saveStationPosition(GeoPos(newLat, newLon, newAlt, locator, timestamp))
     }
 
+    private fun loadStationPosition(): GeoPos {
+        val latitude = (preferences.getString(keyLatitude, null) ?: "0.0").toDouble()
+        val longitude = (preferences.getString(keyLongitude, null) ?: "0.0").toDouble()
+        val altitude = (preferences.getString(keyAltitude, null) ?: "0.0").toDouble()
+        val qthLocator = preferences.getString(keyLocator, null) ?: "null"
+        val timestamp = preferences.getLong(keyLocTimestamp, 0L)
+        return GeoPos(latitude, longitude, altitude, qthLocator, timestamp)
+    }
+
     //endregion
+
+    //region # Database update settings
+
+    private val _databaseState = MutableStateFlow(loadDatabaseState())
+    override val databaseState: StateFlow<DatabaseState> = _databaseState
+
+    override fun saveDatabaseState(state: DatabaseState) = preferences.edit {
+        putInt(keyDataEntries, state.entriesTotal)
+        putInt(keyDataRadios, state.radiosTotal)
+        putLong(keyDataTimestamp, state.timestamp)
+        _databaseState.value = state
+    }
+
+    override fun saveSatType(type: String, catnums: List<Int>) {
+        val stringList = catnums.map { catnum -> catnum.toString() }
+        preferences.edit { putStringSet("type$type", stringList.toSet()) }
+    }
+
+    override fun loadSatType(type: String): List<Int> {
+        val catnums =
+            preferences.getStringSet("type$type", emptySet())?.map { catnum -> catnum.toInt() }
+        return catnums ?: emptyList()
+    }
+
+    private fun loadDatabaseState(): DatabaseState {
+        val entriesTotal = preferences.getInt(keyDataEntries, 0)
+        val radiosTotal = preferences.getInt(keyDataRadios, 0)
+        val timestamp = preferences.getLong(keyDataTimestamp, 0L)
+        return DatabaseState(entriesTotal, radiosTotal, timestamp)
+    }
+
+    //endregion
+
+    //region # Entries selection settings
 
     private val _satelliteSelection = MutableStateFlow(loadEntriesSelection())
     override val satelliteSelection: StateFlow<List<Int>> = _satelliteSelection
@@ -141,49 +176,36 @@ class SettingsRepo(
         return catNums?.map { catnum -> catnum.toInt() }?.sorted() ?: emptyList()
     }
 
-    override fun saveSatType(type: String, catnums: List<Int>) {
-        val stringList = catnums.map { catnum -> catnum.toString() }
-        preferences.edit { putStringSet("type$type", stringList.toSet()) }
+    //endregion
+
+    //region # Passes filter settings
+
+    private val _passesSettings = MutableStateFlow(loadPassesSettings())
+    override val passesSettings: StateFlow<PassesSettings> = _passesSettings
+
+    override fun savePassesSettings(settings: PassesSettings) = preferences.edit {
+        putInt(keyHoursAhead, settings.hoursAhead)
+        putDouble(keyMinElevation, settings.minElevation)
+        _passesSettings.value = settings
     }
 
-    override fun loadSatType(type: String): List<Int> {
-        val catnums =
-            preferences.getStringSet("type$type", emptySet())?.map { catnum -> catnum.toInt() }
-        return catnums ?: emptyList()
+    override fun saveModesSelection(modes: List<String>) {
+        preferences.edit { putStringSet(keyModes, modes.toSet()) }
     }
 
-    override fun getHoursAhead(): Int {
-        return preferences.getInt(keyHoursAhead, 24)
+    override fun loadModesSelection(): List<String> {
+        return preferences.getStringSet(keyModes, null)?.toList()?.sorted() ?: emptyList()
     }
 
-    override fun setHoursAhead(hoursAhead: Int) {
-        preferences.edit { putInt(keyHoursAhead, hoursAhead) }
+    private fun loadPassesSettings(): PassesSettings {
+        val hoursAhead = preferences.getInt(keyHoursAhead, 24)
+        val minElevation = preferences.getDouble(keyMinElevation, 16.0)
+        return PassesSettings(hoursAhead, minElevation)
     }
 
-    override fun getMinElevation(): Double {
-        return preferences.getDouble(keyMinElevation, 16.0)
-    }
+    //endregion
 
-    override fun setMinElevation(minElevation: Double) {
-        preferences.edit { putDouble(keyMinElevation, minElevation) }
-    }
-
-    private val _databaseState = MutableStateFlow(loadDatabaseState())
-    override val databaseState: StateFlow<DatabaseState> = _databaseState
-
-    override fun saveDatabaseState(state: DatabaseState) = preferences.edit {
-        putInt(keyDataEntries, state.entriesTotal)
-        putInt(keyDataRadios, state.radiosTotal)
-        putLong(keyDataTimestamp, state.timestamp)
-        _databaseState.value = state
-    }
-
-    private fun loadDatabaseState(): DatabaseState {
-        val entriesTotal = preferences.getInt(keyDataEntries, 0)
-        val radiosTotal = preferences.getInt(keyDataRadios, 0)
-        val timestamp = preferences.getLong(keyDataTimestamp, 0L)
-        return DatabaseState(entriesTotal, radiosTotal, timestamp)
-    }
+    //region # Other settings
 
     private val _otherSettings = MutableStateFlow(loadOtherSettings())
     override val otherSettings: StateFlow<OtherSettings> = _otherSettings
@@ -216,13 +238,9 @@ class SettingsRepo(
         return OtherSettings(utcState, updateState, sweepState, sensorState)
     }
 
-    override fun saveModesSelection(modes: List<String>) {
-        preferences.edit { putStringSet(keyModes, modes.toSet()) }
-    }
+    //endregion
 
-    override fun loadModesSelection(): List<String> {
-        return preferences.getStringSet(keyModes, null)?.toList()?.sorted() ?: emptyList()
-    }
+    //region # Undefined settings
 
     override fun getRotatorEnabled(): Boolean {
         return preferences.getBoolean(keyRotator, false)
@@ -279,6 +297,8 @@ class SettingsRepo(
     override fun setBTFormat(value: String) {
         preferences.edit { putString(keyBTFormat, value) }
     }
+
+    //endregion
 
     private fun SharedPreferences.getDouble(key: String, default: Double): Double {
         return Double.fromBits(getLong(key, default.toRawBits()))

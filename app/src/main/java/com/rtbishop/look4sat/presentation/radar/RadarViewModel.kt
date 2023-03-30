@@ -28,8 +28,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
+import com.rtbishop.look4sat.data.ISensorSource
 import com.rtbishop.look4sat.domain.ISatelliteRepo
-import com.rtbishop.look4sat.domain.ISensorsRepo
 import com.rtbishop.look4sat.domain.ISettingsRepo
 import com.rtbishop.look4sat.domain.Satellite
 import com.rtbishop.look4sat.framework.BluetoothReporter
@@ -51,20 +51,20 @@ class RadarViewModel(
     private val networkReporter: NetworkReporter,
     private val satelliteRepo: ISatelliteRepo,
     private val settingsRepo: ISettingsRepo,
-    private val sensorsRepo: ISensorsRepo
+    private val sensorSource: ISensorSource
 ) : ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
     private val magDeclination = getMagDeclination(stationPos)
     val transmitters = mutableStateOf<List<SatRadio>>(emptyList())
     val radarData = mutableStateOf<RadarData?>(null)
-    val orientation = mutableStateOf(sensorsRepo.orientation.value)
+    val orientation = mutableStateOf(sensorSource.orientation.value)
 
     init {
         if (settingsRepo.otherSettings.value.sensorState) {
             viewModelScope.launch {
-                sensorsRepo.enableSensor()
-                sensorsRepo.orientation.collect { data ->
+                sensorSource.enableSensor()
+                sensorSource.orientation.collect { data ->
                     orientation.value = Pair(data.first + magDeclination, data.second)
                 }
             }
@@ -72,29 +72,28 @@ class RadarViewModel(
     }
 
     override fun onCleared() {
-        sensorsRepo.disableSensor()
+        sensorSource.disableSensor()
         super.onCleared()
     }
 
     fun getPass() = flow {
         val catNum = savedStateHandle.get<Int>("catNum") ?: 0
         val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
-        satelliteRepo.calculatedPasses.collect { passes ->
-            val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
-            val currentPass = pass ?: passes.firstOrNull()
-            currentPass?.let { satPass ->
-                emit(satPass)
-                val transmitters = satelliteRepo.getRadiosWithId(satPass.catNum)
-                viewModelScope.launch {
-                    while (isActive) {
-                        val timeNow = System.currentTimeMillis()
-                        val satPos =
-                            satelliteRepo.getPosition(satPass.satellite, stationPos, timeNow)
-                        sendPassData(satPass, satPos, satPass.satellite)
-                        sendPassDataBT(satPos)
-                        processRadios(transmitters, satPass.satellite, timeNow)
-                        delay(1000)
-                    }
+        val passes = satelliteRepo.passes.value
+        val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
+        val currentPass = pass ?: passes.firstOrNull()
+        currentPass?.let { satPass ->
+            emit(satPass)
+            val transmitters = satelliteRepo.getRadiosWithId(satPass.catNum)
+            viewModelScope.launch {
+                while (isActive) {
+                    val timeNow = System.currentTimeMillis()
+                    val satPos =
+                        satelliteRepo.getPosition(satPass.satellite, stationPos, timeNow)
+                    sendPassData(satPass, satPos, satPass.satellite)
+                    sendPassDataBT(satPos)
+                    processRadios(transmitters, satPass.satellite, timeNow)
+                    delay(1000)
                 }
             }
         }
@@ -165,7 +164,7 @@ class RadarViewModel(
                     container.provideNetworkReporter(),
                     container.satelliteRepo,
                     container.settingsRepo,
-                    container.sensorsRepo
+                    container.provideSensorSource()
                 )
             }
         }
