@@ -35,7 +35,7 @@ interface ISettingsManager {
             "GNSS" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=gnss&FORMAT=csv",
             "Intelsat" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=intelsat&FORMAT=csv",
             "Iridium" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=iridium-NEXT&FORMAT=csv",
-            "McCants" to "https://www.prismnet.com/~mmccants/tles/inttles.zip",
+            "McCants" to "https://www.mmccants.org/tles/inttles.zip",
             "Military" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=military&FORMAT=csv",
             "New" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=last-30-days&FORMAT=csv",
             "OneWeb" to "https://celestrak.com/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=csv",
