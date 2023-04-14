@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        gradle_plugin_version = '7.4.2'
+        gradle_plugin_version = '8.0.0'
         library_plugin_version = '7.1.2'
         ksp_version = '1.8.10-1.0.9'
         kotlin_android_version = '1.8.10'
@@ -9,18 +9,18 @@ buildscript {
         room_version = '2.5.1'
         // Compose
         activity_compose_version = '1.7.0'
-        compose_version = '1.4.0'
-        compose_compiler_version = '1.4.4'
+        compose_version = '1.4.1'
+        compose_compiler_version = '1.4.5'
         material3_version = '1.0.1'
         lifecycle_version = '2.6.1'
         navigation_version = '2.5.3'
         // Utility
-        osmdroid_version = '6.1.14'
+        osmdroid_version = '6.1.16'
         json_version = '20230227'
         leakcanary_version = '2.10'
         // Test
         junit_version = '4.13.2'
-        mockk_version = '1.13.4'
+        mockk_version = '1.13.5'
         coroutines_test_version = '1.6.4'
     }
 }
