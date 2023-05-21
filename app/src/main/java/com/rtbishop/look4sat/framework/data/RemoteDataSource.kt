@@ -20,13 +20,20 @@ package com.rtbishop.look4sat.framework.data
 import com.rtbishop.look4sat.domain.data.IRemoteDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.InputStream
-import java.net.URL
 
-class RemoteDataSource(private val ioDispatcher: CoroutineDispatcher) : IRemoteDataSource {
+class RemoteDataSource(
+    private val httpClient: OkHttpClient, private val ioDispatcher: CoroutineDispatcher
+) : IRemoteDataSource {
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun getDataStream(url: String): InputStream? = withContext(ioDispatcher) {
-        URL(url).openStream()
+        try {
+            val request = Request.Builder().url(url).build()
+            httpClient.newCall(request).execute().body?.byteStream()
+        } catch (exception: Exception) {
+            null
+        }
     }
 }

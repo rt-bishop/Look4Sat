@@ -40,6 +40,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 @Module
@@ -58,7 +59,7 @@ object BaseModule {
         val fileSource = FileDataSource(context.contentResolver, Dispatchers.IO)
         val entries = LocalEntrySource(db.entriesDao())
         val radios = LocalRadioSource(db.radiosDao())
-        val remoteSource = RemoteDataSource(Dispatchers.IO)
+        val remoteSource = RemoteDataSource(OkHttpClient.Builder().build(), Dispatchers.IO)
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         return DataRepository(parser, fileSource, entries, radios, remoteSource, scope, settings)
     }
