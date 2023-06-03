@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import okhttp3.OkHttpClient
 import org.osmdroid.config.Configuration
 
 class MainContainer(private val context: Context) {
@@ -57,8 +58,9 @@ class MainContainer(private val context: Context) {
     }
 
     private fun provideDatabaseRepo(): IDatabaseRepo {
+        val httpClient = OkHttpClient.Builder().build()
         val dataParser = DataParser(Dispatchers.Default)
-        val dataSource = DataSource(context.contentResolver, Dispatchers.IO)
+        val dataSource = DataSource(context.contentResolver, httpClient, Dispatchers.IO)
         return DatabaseRepo(Dispatchers.Default, dataParser, dataSource, localStorage, settingsRepo)
     }
 
