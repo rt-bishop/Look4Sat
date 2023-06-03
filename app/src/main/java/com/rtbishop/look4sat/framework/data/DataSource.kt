@@ -22,18 +22,26 @@ import android.net.Uri
 import com.rtbishop.look4sat.data.IDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.InputStream
-import java.net.URL
 
 class DataSource(
-    private val resolver: ContentResolver, private val dispatcher: CoroutineDispatcher
+    private val contentResolver: ContentResolver,
+    private val httpClient: OkHttpClient,
+    private val dispatcher: CoroutineDispatcher
 ) : IDataSource {
 
     override suspend fun getFileStream(uri: String): InputStream? {
-        return withContext(dispatcher) { resolver.openInputStream(Uri.parse(uri)) }
+        return withContext(dispatcher) { contentResolver.openInputStream(Uri.parse(uri)) }
     }
 
-    override suspend fun getNetworkStream(url: String): InputStream? {
-        return withContext(dispatcher) { URL(url).openStream() }
+    override suspend fun getNetworkStream(url: String): InputStream? = withContext(dispatcher) {
+        try {
+            val request = Request.Builder().url(url).build()
+            httpClient.newCall(request).execute().body?.byteStream()
+        } catch (exception: Exception) {
+            null
+        }
     }
 }
