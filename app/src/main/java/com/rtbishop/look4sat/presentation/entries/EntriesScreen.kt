@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.model.SatItem
+import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.CardIcon
 import com.rtbishop.look4sat.presentation.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.MainTheme

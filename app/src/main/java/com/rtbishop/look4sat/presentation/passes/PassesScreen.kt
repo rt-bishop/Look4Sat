@@ -22,10 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.NearEarthSatellite
-import com.rtbishop.look4sat.model.DataState
-import com.rtbishop.look4sat.model.OrbitalData
-import com.rtbishop.look4sat.model.SatPass
+import com.rtbishop.look4sat.domain.model.DataState
+import com.rtbishop.look4sat.domain.model.OrbitalData
+import com.rtbishop.look4sat.domain.model.SatPass
+import com.rtbishop.look4sat.domain.predict.NearEarthSatellite
 import com.rtbishop.look4sat.presentation.*
 import com.rtbishop.look4sat.presentation.dialogs.FilterDialog
 import com.rtbishop.look4sat.presentation.pullRefresh.PullRefreshIndicator

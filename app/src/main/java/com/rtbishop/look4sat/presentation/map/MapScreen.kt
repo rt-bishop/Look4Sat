@@ -28,9 +28,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.Satellite
-import com.rtbishop.look4sat.model.GeoPos
-import com.rtbishop.look4sat.model.SatPos
+import com.rtbishop.look4sat.domain.model.GeoPos
+import com.rtbishop.look4sat.domain.model.SatPos
+import com.rtbishop.look4sat.domain.predict.Satellite
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController

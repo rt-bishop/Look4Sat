@@ -17,15 +17,15 @@
  */
 package com.rtbishop.look4sat.framework.data
 
-import com.rtbishop.look4sat.data.ILocalStorage
-import com.rtbishop.look4sat.domain.Satellite
-import com.rtbishop.look4sat.model.SatRadio
+import com.rtbishop.look4sat.domain.data.ILocalStorage
+import com.rtbishop.look4sat.domain.model.SatRadio
+import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.model.SatEntry as DomainEntry
+import com.rtbishop.look4sat.domain.model.SatItem as DomainItem
+import com.rtbishop.look4sat.domain.model.SatRadio as DomainRadio
 import com.rtbishop.look4sat.framework.model.SatEntry as FrameworkEntry
 import com.rtbishop.look4sat.framework.model.SatItem as FrameworkItem
 import com.rtbishop.look4sat.framework.model.SatRadio as FrameworkRadio
-import com.rtbishop.look4sat.model.SatEntry as DomainEntry
-import com.rtbishop.look4sat.model.SatItem as DomainItem
-import com.rtbishop.look4sat.model.SatRadio as DomainRadio
 
 class LocalStorage(private val storageDao: StorageDao) : ILocalStorage {
 

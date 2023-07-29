@@ -24,7 +24,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.domain.ISelectionRepo
+import com.rtbishop.look4sat.domain.predict.ISelectionRepo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
