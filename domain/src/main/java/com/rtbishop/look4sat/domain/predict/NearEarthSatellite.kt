@@ -17,7 +17,6 @@
  */
 package com.rtbishop.look4sat.domain.predict
 
-import com.rtbishop.look4sat.domain.model.OrbitalData
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -88,7 +87,7 @@ class NearEarthSatellite(data: OrbitalData) : Satellite(data) {
         val coef1 = coef / psisq.pow(3.5)
         val bstar = data.bstar
         val c2 = coef1 * xnodp * (aodp * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq)) + 0.75
-                * CK2 * tsi / psisq * x3thm1 * (8.0 + 3.0 * etasq * (8.0 + etasq)))
+            * CK2 * tsi / psisq * x3thm1 * (8.0 + 3.0 * etasq * (8.0 + etasq)))
         c1 = bstar * c2
         sinio = sin(data.xincl)
         val a3ovk2 = -J3_HARMONIC / CK2
@@ -96,9 +95,9 @@ class NearEarthSatellite(data: OrbitalData) : Satellite(data) {
         x1mth2 = 1.0 - theta2
         val omegao = data.omegao
         c4 = 2 * xnodp * coef1 * aodp * betao2 * (eta * (2.0 + 0.5 * etasq) + eo * (0.5 + 2 * etasq)
-                - 2 * CK2 * tsi / (aodp * psisq) * (-3 * x3thm1 * (1.0 - 2 * eeta + etasq
-                * (1.5 - 0.5 * eeta)) + 0.75 * x1mth2 * (2.0 * etasq - eeta * (1.0 + etasq))
-                * cos(2.0 * omegao)))
+            - 2 * CK2 * tsi / (aodp * psisq) * (-3 * x3thm1 * (1.0 - 2 * eeta + etasq
+            * (1.5 - 0.5 * eeta)) + 0.75 * x1mth2 * (2.0 * etasq - eeta * (1.0 + etasq))
+            * cos(2.0 * omegao)))
         c5 = 2.0 * coef1 * aodp * betao2 * (1.0 + 2.75 * (etasq + eeta) + eeta * etasq)
         val theta4 = sqr(theta2)
         val temp1 = 3.0 * CK2 * pinvsq * xnodp

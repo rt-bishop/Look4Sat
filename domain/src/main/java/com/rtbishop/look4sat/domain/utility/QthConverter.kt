@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.domain.utility
 
-import com.rtbishop.look4sat.domain.model.GeoPos
+import com.rtbishop.look4sat.domain.predict.GeoPos
 
 object QthConverter {
 

@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.model.GeoPos
 import com.rtbishop.look4sat.domain.model.OtherSettings
+import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.dialogs.LocatorDialog
