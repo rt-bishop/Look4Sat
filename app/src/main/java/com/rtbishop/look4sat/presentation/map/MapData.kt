@@ -17,7 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.map
 
-import com.rtbishop.look4sat.model.GeoPos
+import com.rtbishop.look4sat.domain.model.GeoPos
 
 data class MapData(
     val catNum: Int,

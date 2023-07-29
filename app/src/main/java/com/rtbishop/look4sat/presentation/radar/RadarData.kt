@@ -17,6 +17,6 @@
  */
 package com.rtbishop.look4sat.presentation.radar
 
-import com.rtbishop.look4sat.model.SatPos
+import com.rtbishop.look4sat.domain.model.SatPos
 
 data class RadarData(val satPos: SatPos, val satTrack: List<SatPos> = emptyList())

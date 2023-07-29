@@ -19,7 +19,7 @@ package com.rtbishop.look4sat.framework.data
 
 import android.content.ContentResolver
 import android.net.Uri
-import com.rtbishop.look4sat.data.IDataSource
+import com.rtbishop.look4sat.domain.data.IDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
