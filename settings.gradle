@@ -14,4 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Look4Sat"
 include ":app"
+include ":data"
 include ":domain"

@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.sp
-import com.rtbishop.look4sat.domain.model.SatPos
 import com.rtbishop.look4sat.domain.predict.PI_2
+import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.utility.toRadians
 import kotlin.math.cos
 import kotlin.math.sin

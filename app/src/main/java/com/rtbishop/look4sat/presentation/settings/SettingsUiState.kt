@@ -1,6 +1,6 @@
 package com.rtbishop.look4sat.presentation.settings
 
-import com.rtbishop.look4sat.domain.model.GeoPos
+import com.rtbishop.look4sat.domain.predict.GeoPos
 
 data class PositionSettings(val isUpdating: Boolean, val stationPos: GeoPos, val messageResId: Int)
 

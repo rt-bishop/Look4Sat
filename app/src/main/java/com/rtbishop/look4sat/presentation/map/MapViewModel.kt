@@ -23,11 +23,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.domain.model.GeoPos
-import com.rtbishop.look4sat.domain.model.SatPos
-import com.rtbishop.look4sat.domain.predict.ISatelliteRepo
-import com.rtbishop.look4sat.domain.predict.ISettingsRepo
+import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
+import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.QthConverter
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.domain.utility.toTimerString
@@ -44,9 +44,7 @@ import kotlin.collections.set
 import kotlin.math.max
 import kotlin.math.min
 
-class MapViewModel(
-    private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo
-) : ViewModel() {
+class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISettingsRepo) : ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
     private var allPasses = satelliteRepo.passes.value
