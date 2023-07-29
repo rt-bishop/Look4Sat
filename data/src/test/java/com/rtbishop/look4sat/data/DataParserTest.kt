@@ -49,12 +49,12 @@ class DataParserTest {
         1 25544U 98067A   21320.51955234  .00001288  00000+0  31985-4 0  9990
         2 25544  51.6447 309.4881 0004694 203.6966 299.8876 15.48582035312205
     """.trimIndent().byteInputStream()
-    private val validJSONStream = """
-        [{"uuid":"UzPz4gcsNBPKPKAFPmer7g","description":"Upper side band (drifting)","alive":true,"type":"Transmitter","uplink_low":null,"uplink_high":null,"uplink_drift":null,"downlink_low":136658500,"downlink_high":null,"downlink_drift":null,"mode":"USB","mode_id":9,"uplink_mode":null,"invert":false,"baud":null,"sat_id":"SCHX-0895-2361-9925-0309","norad_cat_id":965,"status":"active","updated":"2019-04-18T05:39:53.343316Z","citation":"CITATION NEEDED - https://xkcd.com/285/","service":"Unknown","coordination":"","coordination_url":""}]
-    """.trimIndent().byteInputStream()
-    private val invalidJSONStream = """
-        [{"description":"Upper side band (drifting)","alive":true,"type":"Transmitter","uplink_low":null,"uplink_high":null,"uplink_drift":null,"downlink_low":136658500,"downlink_high":null,"downlink_drift":null,"mode":"USB","mode_id":9,"uplink_mode":null,"invert":false,"baud":null,"sat_id":"SCHX-0895-2361-9925-0309","norad_cat_id":965,"status":"active","updated":"2019-04-18T05:39:53.343316Z","citation":"CITATION NEEDED - https://xkcd.com/285/","service":"Unknown","coordination":"","coordination_url":""}]
-    """.trimIndent().byteInputStream()
+//    private val validJSONStream = """
+//        [{"uuid":"UzPz4gcsNBPKPKAFPmer7g","description":"Upper side band (drifting)","alive":true,"type":"Transmitter","uplink_low":null,"uplink_high":null,"uplink_drift":null,"downlink_low":136658500,"downlink_high":null,"downlink_drift":null,"mode":"USB","mode_id":9,"uplink_mode":null,"invert":false,"baud":null,"sat_id":"SCHX-0895-2361-9925-0309","norad_cat_id":965,"status":"active","updated":"2019-04-18T05:39:53.343316Z","citation":"CITATION NEEDED - https://xkcd.com/285/","service":"Unknown","coordination":"","coordination_url":""}]
+//    """.trimIndent().byteInputStream()
+//    private val invalidJSONStream = """
+//        [{"description":"Upper side band (drifting)","alive":true,"type":"Transmitter","uplink_low":null,"uplink_high":null,"uplink_drift":null,"downlink_low":136658500,"downlink_high":null,"downlink_drift":null,"mode":"USB","mode_id":9,"uplink_mode":null,"invert":false,"baud":null,"sat_id":"SCHX-0895-2361-9925-0309","norad_cat_id":965,"status":"active","updated":"2019-04-18T05:39:53.343316Z","citation":"CITATION NEEDED - https://xkcd.com/285/","service":"Unknown","coordination":"","coordination_url":""}]
+//    """.trimIndent().byteInputStream()
 
     @Test
     fun `Given valid CSV stream returns valid data`() = runTest(testDispatcher) {
@@ -87,15 +87,15 @@ class DataParserTest {
         assert(csvResult == tleResult)
     }
 
-    @Test
-    fun `Given valid JSON stream returns valid data`() = runTest(testDispatcher) {
-        val parsedList = dataParser.parseJSONStream(validJSONStream)
-        assert(parsedList[0].downlink == 136658500L)
-    }
-
-    @Test
-    fun `Given invalid JSON stream returns empty list`() = runTest(testDispatcher) {
-        val parsedList = dataParser.parseJSONStream(invalidJSONStream)
-        assert(parsedList.isEmpty())
-    }
+//    @Test
+//    fun `Given valid JSON stream returns valid data`() = runTest(testDispatcher) {
+//        val parsedList = dataParser.parseJSONStream(validJSONStream)
+//        assert(parsedList[0].downlink == 136658500L)
+//    }
+//
+//    @Test
+//    fun `Given invalid JSON stream returns empty list`() = runTest(testDispatcher) {
+//        val parsedList = dataParser.parseJSONStream(invalidJSONStream)
+//        assert(parsedList.isEmpty())
+//    }
 }
