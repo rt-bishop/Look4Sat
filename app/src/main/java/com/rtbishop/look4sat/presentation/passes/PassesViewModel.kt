@@ -25,9 +25,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.PassesSettings
-import com.rtbishop.look4sat.domain.model.SatPass
-import com.rtbishop.look4sat.domain.predict.ISatelliteRepo
-import com.rtbishop.look4sat.domain.predict.ISettingsRepo
+import com.rtbishop.look4sat.domain.predict.SatPass
+import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
+import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.toTimerString
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin

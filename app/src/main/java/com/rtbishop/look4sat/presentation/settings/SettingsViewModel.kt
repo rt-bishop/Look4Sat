@@ -27,8 +27,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
-import com.rtbishop.look4sat.domain.predict.IDatabaseRepo
-import com.rtbishop.look4sat.domain.predict.ISettingsRepo
+import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
+import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(

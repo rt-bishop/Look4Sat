@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.DataState
-import com.rtbishop.look4sat.domain.model.OrbitalData
-import com.rtbishop.look4sat.domain.model.SatPass
 import com.rtbishop.look4sat.domain.predict.NearEarthSatellite
+import com.rtbishop.look4sat.domain.predict.OrbitalData
+import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.presentation.*
 import com.rtbishop.look4sat.presentation.dialogs.FilterDialog
 import com.rtbishop.look4sat.presentation.pullRefresh.PullRefreshIndicator

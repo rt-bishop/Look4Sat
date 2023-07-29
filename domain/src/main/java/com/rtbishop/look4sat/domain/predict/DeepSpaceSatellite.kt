@@ -17,7 +17,6 @@
  */
 package com.rtbishop.look4sat.domain.predict
 
-import com.rtbishop.look4sat.domain.model.OrbitalData
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -67,16 +66,16 @@ class DeepSpaceSatellite(data: OrbitalData) : Satellite(data) {
         val coef = qoms24 * tsi.pow(4.0)
         val coef1 = coef / psisq.pow(3.5)
         val c2 = coef1 * dsv.xnodp * (dsv.aodp * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq))
-                + 0.75 * CK2 * tsi / psisq * x3thm1 * (8.0 + 3.0 * etasq * (8.0 + etasq)))
+            + 0.75 * CK2 * tsi / psisq * x3thm1 * (8.0 + 3.0 * etasq * (8.0 + etasq)))
         c1 = data.bstar * c2
         dsv.sinio = sin(data.xincl)
         val a3ovk2 = -J3_HARMONIC / CK2
         x1mth2 = 1.0 - dsv.theta2
         c4 =
             2 * dsv.xnodp * coef1 * dsv.aodp * dsv.betao2 * (eta * (2.0 + 0.5 * etasq) + data.eccn
-                    * (0.5 + 2 * etasq) - 2 * CK2 * tsi / (dsv.aodp * psisq)
-                    * (-3 * x3thm1 * (1.0 - 2 * eeta + etasq * (1.5 - 0.5 * eeta)) + (0.75 * x1mth2
-                    * (2.0 * etasq - eeta * (1.0 + etasq)) * cos(2.0 * data.omegao))))
+                * (0.5 + 2 * etasq) - 2 * CK2 * tsi / (dsv.aodp * psisq)
+                * (-3 * x3thm1 * (1.0 - 2 * eeta + etasq * (1.5 - 0.5 * eeta)) + (0.75 * x1mth2
+                * (2.0 * etasq - eeta * (1.0 + etasq)) * cos(2.0 * data.omegao))))
         val theta4 = dsv.theta2 * dsv.theta2
         val temp1 = 3.0 * CK2 * pinvsq * dsv.xnodp
         val temp2 = temp1 * CK2 * pinvsq
@@ -180,6 +179,7 @@ class DeepSpaceSatellite(data: OrbitalData) : Satellite(data) {
         var omgdot = 0.0
         var xnodot = 0.0
         var xnodp = 0.0
+
         // Used by dpsec and dpper parts of Deep()
         var xll = 0.0
         var omgadf = 0.0
@@ -188,6 +188,7 @@ class DeepSpaceSatellite(data: OrbitalData) : Satellite(data) {
         var xinc = 0.0
         var xn = 0.0
         var t = 0.0
+
         // Used by thetg and Deep()
         var ds50 = 0.0
     }
@@ -222,6 +223,7 @@ class DeepSpaceSatellite(data: OrbitalData) : Satellite(data) {
         private val omegaq: Double
         private var zmol = 0.0
         private var zmos = 0.0
+
         // Many fields below cannot be final because they are iteratively refined
         private var savtsn = 0.0
         private var ee2 = 0.0
@@ -796,16 +798,16 @@ class DeepSpaceSatellite(data: OrbitalData) : Satellite(data) {
                     x2li = xli + xli
                     xndot =
                         d2201 * sin(x2omi + xli - g22) + d2211 * sin(xli - g22) + (d3210
-                                * sin(xomi + xli - g32)) + d3222 * sin(-xomi + xli - g32) + (d4410
-                                * sin(x2omi + x2li - g44)) + d4422 * sin(x2li - g44) + (d5220
-                                * sin(xomi + xli - g52)) + d5232 * sin(-xomi + xli - g52) + (d5421
-                                * sin(xomi + x2li - g54)) + d5433 * sin(-xomi + x2li - g54)
+                            * sin(xomi + xli - g32)) + d3222 * sin(-xomi + xli - g32) + (d4410
+                            * sin(x2omi + x2li - g44)) + d4422 * sin(x2li - g44) + (d5220
+                            * sin(xomi + xli - g52)) + d5232 * sin(-xomi + xli - g52) + (d5421
+                            * sin(xomi + x2li - g54)) + d5433 * sin(-xomi + x2li - g54)
                     xnddt =
                         d2201 * cos(x2omi + xli - g22) + d2211 * cos(xli - g22) + (d3210
-                                * cos(xomi + xli - g32)) + d3222 * cos(-xomi + xli - g32) + (d5220
-                                * cos(xomi + xli - g52)) + d5232 * cos(-xomi + xli - g52) + (2
-                                * (d4410 * cos(x2omi + x2li - g44) + d4422 * cos(x2li - g44) + (d5421
-                                * cos(xomi + x2li - g54)) + d5433 * cos(-xomi + x2li - g54)))
+                            * cos(xomi + xli - g32)) + d3222 * cos(-xomi + xli - g32) + (d5220
+                            * cos(xomi + xli - g52)) + d5232 * cos(-xomi + xli - g52) + (2
+                            * (d4410 * cos(x2omi + x2li - g44) + d4422 * cos(x2li - g44) + (d5421
+                            * cos(xomi + x2li - g54)) + d5433 * cos(-xomi + x2li - g54)))
                 }
                 xldot = xni + xfact
                 xnddt *= xldot

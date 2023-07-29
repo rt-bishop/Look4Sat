@@ -17,9 +17,6 @@
  */
 package com.rtbishop.look4sat.domain.predict
 
-import com.rtbishop.look4sat.domain.model.GeoPos
-import com.rtbishop.look4sat.domain.model.OrbitalData
-import com.rtbishop.look4sat.domain.model.SatPos
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.asin
@@ -64,7 +61,7 @@ abstract class Satellite(val data: OrbitalData) {
     var qoms24 = 0.0
     var s4 = 0.0
 
-    internal fun willBeSeen(pos: GeoPos): Boolean {
+    fun willBeSeen(pos: GeoPos): Boolean {
         return if (data.meanmo < 1e-8) false
         else {
             val sma = 331.25 * exp(ln(MIN_PER_DAY / data.meanmo) * (2.0 / 3.0))
@@ -75,7 +72,7 @@ abstract class Satellite(val data: OrbitalData) {
         }
     }
 
-    internal fun getPosition(pos: GeoPos, time: Long): SatPos {
+    fun getPosition(pos: GeoPos, time: Long): SatPos {
         satPos = SatPos()
         // Date/time at which the position and velocity were calculated
         julUTC = calcCurrentDaynum(time) + 2444238.5
@@ -352,7 +349,7 @@ abstract class Satellite(val data: OrbitalData) {
         val e = 0.01675104 - (0.0000418 + 0.000000126 * solTime) * solTime
         val c = radians(
             ((1.919460 - (0.004789 + 0.000014 * solTime) * solTime) * sin(m))
-                    + ((0.020094 - 0.000100 * solTime) * sin(2 * m)) + 0.000293 * sin(3 * m)
+                + ((0.020094 - 0.000100 * solTime) * sin(2 * m)) + 0.000293 * sin(3 * m)
         )
         val o = radians(modulus(259.18 - 1934.142 * solTime, 360.0))
         val lsa = modulus(l + c - radians(0.00569 - 0.00479 * sin(o)), TWO_PI)
@@ -360,7 +357,7 @@ abstract class Satellite(val data: OrbitalData) {
         var r = (1.0000002 * (1.0 - sqr(e)) / (1.0 + e * cos(nu)))
         val eps = radians(
             23.452294 - (0.0130125 + (0.00000164 - 0.000000503 * solTime) * solTime)
-                    * solTime + 0.00256 * cos(o)
+                * solTime + 0.00256 * cos(o)
         )
         r *= ASTRONOMICAL_UNIT
         return Vector4(r, r * cos(lsa), r * sin(lsa) * cos(eps), r * sin(lsa) * sin(eps))

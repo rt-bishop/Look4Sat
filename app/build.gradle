@@ -53,6 +53,7 @@ kotlin {
 }
 
 dependencies {
+    implementation project(":data")
     implementation project(":domain")
     // Android
     implementation "androidx.core:core-splashscreen:$splashscreen_version"
