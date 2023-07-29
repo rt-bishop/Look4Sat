@@ -21,8 +21,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import com.rtbishop.look4sat.data.ISensorSource
-import com.rtbishop.look4sat.domain.RAD2DEG
+import com.rtbishop.look4sat.domain.data.ISensorSource
+import com.rtbishop.look4sat.domain.predict.RAD2DEG
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.round
