@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Look4Sat</string>
+    <string name="app_timer">00:00:00</string>
+    <string name="app_version">අනුවාදය: %s</string>
+    <string name="app_subtitle">චන්ද්‍රිකා tracker හා නිසැක පෙරැයින්නා</string>
+
+    <string name="menu_satellites">චන්ද්‍රිකා</string>
+    <string name="menu_passes">පසුකර යෑම්</string>
+    <string name="menu_map">ලෝක සිතියම</string>
+    <string name="menu_settings">පසුතල</string>
+    <string name="menu_about">ගැන</string>
+
+    <!--Buttons-->
+
+    <string name="btn_add">එකතු ක°</string>
+    <string name="btn_accept">පිළිගන්න</string>
+    <string name="btn_cancel">අවලංගු ක°</string>
+    <string name="btn_back">ආපසු</string>
+    <string name="btn_modes">ප්‍රාකාර</string>
+    <string name="btn_select">සියල්ල තෝරන්න</string>
+    <string name="btn_done">කළා</string>
+    <string name="btn_clear">පිරිසිදු ක°</string>
+    <string name="btn_clear_all">සියල්ල පිරිසිදු ක°</string>
+    <string name="btn_refresh">පූරණය</string>
+    <string name="btn_map">සිතියම</string>
+    <string name="btn_filter">පිරිපහදුව</string>
+    <string name="btn_satellites">චන්ද්‍රිකා</string>
+    <string name="btn_settings">පසුතල</string>
+    <string name="btn_prev">පසුපස</string>
+    <string name="btn_next">ඊළග</string>
+    <string name="btn_notify">දන්වනවා</string>
+    <string name="btn_gps">GPS</string>
+    <string name="btn_manual">අතින්</string>
+    <string name="btn_qth">QTH</string>
+    <string name="btn_web">මාර්ගගතව</string>
+    <string name="btn_file">File</string>
+    <string name="btn_github">GitHub</string>
+    <string name="btn_donate">දායකත්ව</string>
+    <string name="btn_fdroid">F-Droid</string>
+    <string name="btn_license">GPLv3 බලපත්‍රය</string>
+    <string name="btn_privacy">Privacy Policy</string>
+
+    <!--Dialogs-->
+
+    <string name="filter_title">පසුකිරිම් පිරිපහදුව</string>
+    <string name="filter_hours_hint">ඉදිරි පැය</string>
+    <string name="filter_hours_text">පැය X ඇතුළත සිදුවන අවසරපත් පෙන්වන්න</string>
+    <string name="filter_elev_hint">අවම උත්තෝලනය</string>
+    <string name="filter_elev_text">ඉහත උපරිම උත්තෝලනයක් සහිත අවසරපත් පෙන්වන්න</string>
+
+    <string name="locator_title">QTH locator පසුතල</string>
+    <string name="locator_text"> ඔබගේ locator භාවිතා කර පොළහි පිහිටීම සකසන්න</string>
+    <string name="locator_hint">QTH</string>
+
+    <string name="modes_title">මූර්ජන ආකාරය තෝරන්න</string>
+
+    <string name="position_title">පොළෙහි පිහිටීම් පසුතල</string>
+    <string name="position_lat_text">ඔබගේ පොළෙහි අක්‍ෂාංශය සකසන්න</string>
+    <string name="position_lat_hint">අක්‍ෂාංශය</string>
+    <string name="position_lon_text">ඔබගේ පොළෙහි දේශාංශය සකසන්න</string>
+    <string name="position_lon_hint">දේශාංශය</string>
+
+    <string name="sources_title">දත්ත මූලාශ්‍ර කළමනාකරණය කරන්න</string>
+    <string name="sources_hint">HTTPS මූලාශ්‍ර</string>
+
+    <string name="types_title">චන්ද්‍රිකා ආකාරය තෝරන්න</string>
+    <string name="types_message">තේරූ ආකාර: %s</string>
+
+    <!--Fragments-->
+
+    <string name="entries_search_hint">නමින් / Id මගින් සොයන්න</string>
+
+    <string name="passes_error">ප්‍රදර්ශනය කිරීමට ඉදිරියට එන චන්ද්‍රිකා පසුකර යෑම් නැත.</string>
+    <string name="passes_empty_db">පෙන්වීමට දත්ත නැත. කරුණාකර දත්ත සමුදාය යාවත්කාලීන කරන්න.</string>
+
+    <string name="pass_satName">%s</string>
+    <string name="pass_satId">Id:%d</string>
+    <string name="pass_aosAz">AOS - %.1f°</string>
+    <string name="pass_elevation">උත්තෝලනය: %.1f°</string>
+    <string name="pass_losAz">%.1f° - LOS</string>
+    <string name="pass_altitude">උන්නතාශය: %d km</string>
+    <string name="pass_placeholder"> -- : -- : -- </string>
+    <string name="pass_startTime">HH:mm:ss - EEE</string>
+    <string name="pass_endTime">EEE - HH:mm:ss</string>
+
+    <string name="radar_az_text">දිගංශය</string>
+    <string name="radar_az_value">%.1f°</string>
+    <string name="radar_el_text">උත්තෝලනය</string>
+    <string name="radar_el_value">%.1f°</string>
+    <string name="radar_alt_text">උන්නතාශය</string>
+    <string name="radar_alt_value">%.0f km</string>
+    <string name="radar_dist_text">පරතරය</string>
+    <string name="radar_dist_value">%.0f km</string>
+    <string name="radar_visible">දෘශ්‍යමාන</string>
+    <string name="radar_eclipsed">අදෘශ්‍ය</string>
+    <string name="radar_sat_name">%s</string>
+    <string name="radar_sat_id">Id:%d</string>
+
+    <string name="radio_mode">ප්‍රාකාරය: %s</string>
+    <string name="radio_inverted">Inverted: %s</string>
+    <string name="radio_info">%s</string>
+    <string name="radio_no_link">- - . - -</string>
+    <string name="radio_link_low">%.4f</string>
+    <string name="radio_link_lowHigh">%.4f - %.4f</string>
+    <string name="radio_data">චන්ද්‍රිකා සම්ප්‍රේෂණයන්:</string>
+    <string name="radio_no_data">මෙම චන්ද්‍රිකාව සම්ප්‍රෙෂණය නොකරයි</string>
+    <string name="radio_string_yes">ඔව්</string>
+    <string name="radio_string_no">නෑ</string>
+    <string name="radio_downlink">Downlink</string>
+    <string name="radio_uplink">Uplink</string>
+
+    <string name="map_title">ලෝක සිතියම</string>
+    <string name="map_sat_name">%s</string>
+    <string name="map_sat_id">Id:%d</string>
+    <string name="map_azimuth">දිගංශය: %.1f°</string>
+    <string name="map_elevation">උත්තෝලනය: %.1f°</string>
+    <string name="map_latitude">අක්‍ෂාංශ: %.1f°</string>
+    <string name="map_longitude">දේශාංශ: %.1f°</string>
+    <string name="map_qth">QTH Locator: %s</string>
+    <string name="map_visible">දෘශ්‍ය</string>
+    <string name="map_eclipsed">අදෘශ්‍ය</string>
+    <string name="map_visibility">දෘශ්‍යතාව: %s</string>
+    <string name="map_period">කාලය: %.0f min</string>
+    <string name="map_phase">අංශය: %.1f°</string>
+    <string name="map_altitude">උන්නතාශය: %.0f km</string>,
+    <string name="map_distance">පරතරය: %.0f km</string>
+    <string name="map_velocity">ප්‍රවේශය: %.2f km/s</string>
+    <string name="map_copyright">Wikimedia maps | සිතියම් දත්ත © OpenStreetMap බෙදාහැරීම</string>
+
+    <!--Cards-->
+
+    <string name="location_title">පොළෙහි පිහිටීම</string>
+    <string name="location_lat">අක්‍ෂාංශ: %.4f°</string>
+    <string name="location_lon">දේශාංශ: %.4f°</string>
+    <string name="location_null">භූ ස්ථාන දත්ත නොමැත</string>
+    <string name="location_gps_error">ඔබගේ location අවසර පරීක්ෂා ක°</string>
+    <string name="location_manual_error">ඇතුළත් කළ ස්ථානය වලංගු නොවේ</string>
+    <string name="location_qth_error">QTH locator වලංගු නොවේ</string>
+    <string name="location_success">පිහිටීම යාවත්කාලීනය සාර්ථකයි</string>
+
+    <string name="data_title">චන්ද්‍රිකා දත්ත යාවත්කාලීනයි</string>
+    <string name="data_error">දෝෂ සහිතව යාවත්කාලීනය සම්පූර්ණයි</string>
+    <string name="data_update">අවසන් යාවත්කාලීනය: %s</string>
+    <string name="data_entries">චන්ද්‍රිකා: %s</string>
+    <string name="data_radios">සම්ප්‍රෙේෂණය: %s</string>
+    <string name="data_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
+    <string name="data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
+
+    <string name="last_updated_pattern" translatable="false">d MMM yyyy - HH:mm:ss</string>
+
+    <string name="remote_title">භ්‍රමක මනාප</string>
+    <string name="remote_switch">දුරස්ථ පාලනය සබල ක°</string>
+    <string name="remote_ip_hint">IP ලිපිනය</string>
+    <string name="remote_port_hint">Port</string>
+
+    <string name="BTremote_title">Bluetooth දත්ත ප්‍රතිදානය</string>
+    <string name="BTremote_switch">ප්‍රතිදානය සබල ක°</string>
+    <string name="BTremote_device_hint">උපාංග id</string>
+    <string name="BTremote_output_hint">දත්ත අකාරය</string>
+    <string name="BTremote_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
+
+    <string name="other_switch_utc">• පසුකර වේලාවන් UTC මගින්</string>
+    <string name="other_switch_update">• ස්වයං දත්ත යාවත්කාලීනය</string>
+    <string name="other_switch_sweep">• radar sweep සජීවිකරණය සබල කරන්න</string>
+    <string name="other_switch_sensors">• Radar දර්ශනය කරකැවීමට සංවේදක භාවිතා කරන්න </string>
+
+    <string name="outro_title">මම ස්තුති කිරීමට කැමති:</string>
+    <string name="outro_thanks">• බාගෙන භාවිතා කළ ඔබට! \nඅහස සදා ඔබ වෙනුවෙන් පැහැදිලියි!
+        \n• <a href="https://github.com/g4dpz">David A. B. Johnson</a>
+        සහ <a href="https://github.com/davidmoten">Dave Moten</a>ඔවුනට ප්‍රයෝජනවත් predict4java පුස්තකාලය නිර්මාණයට.
+        \n• සහ <a href="https://github.com/csete">Alexandru Csete</a> සඳහා Gpredict නිර්මාණයට සහ
+          Look4Sat නිර්මාණය⁣ට පෙළඹවීමට.
+        \n• <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a>ට TLE දත්ත සැපයීමට, ඔහුගේ නඩත්තුවෙන් ක්‍රියාත්මක WEB අඩවිට ප්‍රවේශය සැපයීම වෙනුවෙන්
+        <a href="https://celestrak.com/"> (Celestrak)</a>.
+        \n• <a href="https://libre.space/">Libre Space Foundation</a>ට ඔවුන්ගේ
+        <a href="https://db.satnogs.org/">SatNOGS</a>Web අඩවියට API හා DB විශාල දත්ත ප්‍රමාණයක් ලබාදීම සඳහා.
+        \n• <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a> කණ්ඩායමට යෙදුම පිළිබඳ ඔවුන්ගේ උනන්දුව සහ කැපවීම ලැබිම සම්බන්ධයෙන්.</string>
+    <string name="outro_license">මෘදුකාංගය වගකීමක් සමග නොලැබේ</string>
+</resources>
