@@ -5,6 +5,12 @@
     <string name="app_version">අනුවාදය: %s</string>
     <string name="app_subtitle">චන්ද්‍රිකා tracker හා නිසැක පෙරැයින්නා</string>
 
+    <string name="menu_satellites">චන්ද්‍රිකා</string>
+    <string name="menu_passes">පසුකර යෑම්</string>
+    <string name="menu_map">ලෝක සිතියම</string>
+    <string name="menu_settings">පසුතල</string>
+    <string name="menu_about">ගැන</string>
+
     <!--Buttons-->
 
     <string name="btn_add">එකතු ක°</string>
@@ -30,8 +36,10 @@
     <string name="btn_web">මාර්ගගතව</string>
     <string name="btn_import">Import</string>
     <string name="btn_github">GitHub</string>
-    <string name="btn_support">දායකත්ව</string>
+    <string name="btn_donate">දායකත්ව</string>
     <string name="btn_fdroid">F-Droid</string>
+    <string name="btn_license">GPLv3 බලපත්‍රය</string>
+    <string name="btn_privacy">Privacy Policy</string>
 
     <!--Dialogs-->
 
@@ -70,7 +78,7 @@
     <string name="pass_satId">Id:%d</string>
     <string name="pass_aosAz">AOS - %.1f°</string>
     <string name="pass_elevation">උත්තෝලනය: %.1f°</string>
-    <string name="pass_los">%.1f° - LOS</string>
+    <string name="pass_losAz">%.1f° - LOS</string>
     <string name="pass_altitude">උන්නතාශය: %d km</string>
     <string name="pass_placeholder"> -- : -- : -- </string>
     <string name="pass_startTime">HH:mm:ss - EEE</string>
@@ -139,6 +147,8 @@
     <string name="data_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
     <string name="data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
 
+    <string name="last_updated_pattern" translatable="false">d MMM yyyy - HH:mm:ss</string>
+
     <string name="remote_title">භ්‍රමක මනාප</string>
     <string name="remote_switch">දුරස්ථ පාලනය සබල ක°</string>
     <string name="remote_ip_hint">IP ලිපිනය</string>
@@ -150,7 +160,6 @@
     <string name="BTremote_output_hint">දත්ත අකාරය</string>
     <string name="BTremote_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
 
-    <string name="other_title">වෙනත් මනාප</string>
     <string name="other_switch_utc">• පසුකර වේලාවන් UTC මගින්</string>
     <string name="other_switch_update">• ස්වයං දත්ත යාවත්කාලීනය</string>
     <string name="other_switch_sweep">• radar sweep සජීවිකරණය සබල කරන්න</string>
