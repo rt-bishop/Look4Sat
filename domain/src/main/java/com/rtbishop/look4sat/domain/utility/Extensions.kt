@@ -17,8 +17,6 @@
  */
 package com.rtbishop.look4sat.domain.utility
 
-import com.rtbishop.look4sat.domain.predict.DEG2RAD
-import com.rtbishop.look4sat.domain.predict.RAD2DEG
 import java.util.concurrent.TimeUnit
 
 fun Long.toTimerString(): String {
@@ -41,10 +39,6 @@ fun Double.round(decimals: Int): Double {
     return kotlin.math.round(this * multiplier) / multiplier
 }
 
-fun Double.toDegrees(): Double = this * RAD2DEG
-
-fun Double.toRadians(): Double = this * DEG2RAD
-
 //fun String.getHash(type: String = "SHA-256"): String {
 //    val hexChars = "0123456789ABCDEF"
 //    val bytes = MessageDigest.getInstance(type).digest(this.toByteArray())
@@ -63,12 +57,12 @@ fun Double.toRadians(): Double = this * DEG2RAD
 //    return pattern.matcher(this).matches()
 //}
 
-fun String.isValidIPv4(): Boolean {
-    val ip4 = "^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])(\\.(?!\$)|\$)){4}\$"
-    return this.matches(ip4.toRegex())
-}
+//fun String.isValidIPv4(): Boolean {
+//    val ip4 = "^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])(\\.(?!\$)|\$)){4}\$"
+//    return this.matches(ip4.toRegex())
+//}
 
-fun String.isValidPort(): Boolean {
-    val port = "([1-9]|[1-9]\\d{1,3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])"
-    return this.matches(port.toRegex()) && this.toInt() in 1024..65535
-}
+//fun String.isValidPort(): Boolean {
+//    val port = "([1-9]|[1-9]\\d{1,3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])"
+//    return this.matches(port.toRegex()) && this.toInt() in 1024..65535
+//}
