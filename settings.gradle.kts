@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         google()
@@ -12,7 +14,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
 rootProject.name = "Look4Sat"
-include ":app"
-include ":data"
-include ":domain"
+include(":app", ":data", ":domain")

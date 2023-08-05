@@ -142,7 +142,7 @@ private fun SaveButton(saveSelection: () -> Unit, modifier: Modifier = Modifier)
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
         Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(id = R.drawable.ic_checkmark), contentDescription = null)
+            Icon(painter = painterResource(id = R.drawable.ic_done), contentDescription = null)
         }
     }
 }
@@ -169,7 +169,7 @@ private fun EntryTypeCard(type: String, onClick: () -> Unit, modifier: Modifier 
                 .height(48.dp)
                 .clickable { onClick() }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_next),
+                painter = painterResource(id = R.drawable.ic_arrow),
                 contentDescription = null,
                 modifier = Modifier
                     .size(36.dp)

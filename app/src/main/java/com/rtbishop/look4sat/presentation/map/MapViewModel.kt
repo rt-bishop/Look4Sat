@@ -29,12 +29,12 @@ import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.QthConverter
+import com.rtbishop.look4sat.domain.utility.clipLat
+import com.rtbishop.look4sat.domain.utility.clipLon
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.domain.utility.toTimerString
 import java.util.Date
 import kotlin.collections.set
-import kotlin.math.max
-import kotlin.math.min
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -198,21 +198,6 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
             visibility
         )
         _mapData.emit(satData)
-    }
-
-    private fun clipLat(latitude: Double): Double {
-        return clip(latitude, -85.05, 85.05)
-    }
-
-    private fun clipLon(longitude: Double): Double {
-        var result = longitude
-        while (result < -180.0) result += 360.0
-        while (result > 180.0) result -= 360.0
-        return clip(result, -180.0, 180.0)
-    }
-
-    private fun clip(currentValue: Double, minValue: Double, maxValue: Double): Double {
-        return min(max(currentValue, minValue), maxValue)
     }
 
     companion object {

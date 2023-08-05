@@ -144,7 +144,7 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
         ) {
             Row(horizontalArrangement = Arrangement.Center) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_entries),
+                    painter = painterResource(id = R.drawable.ic_sputnik),
                     tint = MaterialTheme.colorScheme.secondary,
                     contentDescription = null,
                     modifier = Modifier

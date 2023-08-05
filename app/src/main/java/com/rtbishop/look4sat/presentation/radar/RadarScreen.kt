@@ -114,7 +114,7 @@ private fun TransmitterItem(radio: SatRadio) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_next),
+                        painter = painterResource(id = R.drawable.ic_arrow),
                         contentDescription = null, modifier = Modifier.rotate(180f)
                     )
                     Text(
@@ -123,7 +123,7 @@ private fun TransmitterItem(radio: SatRadio) {
                         textAlign = TextAlign.Center
                     )
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_next),
+                        painter = painterResource(id = R.drawable.ic_arrow),
                         contentDescription = null
                     )
                 }
