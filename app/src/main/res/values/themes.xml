@@ -7,7 +7,7 @@
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
         <item name="windowSplashScreenBackground">@color/background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/launcher_fg</item>
     </style>
 
     <style name="Theme.Look4Sat.Main" parent="android:Theme.Material.Light.NoActionBar">
