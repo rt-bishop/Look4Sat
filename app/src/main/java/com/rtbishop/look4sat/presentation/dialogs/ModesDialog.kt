@@ -2,11 +2,19 @@ package com.rtbishop.look4sat.presentation.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.*
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,7 +34,7 @@ private val allModes = listOf(
     "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
     "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
 )
-private val selectedModes = mutableListOf<String>("AFSK", "AFSK S-Net")
+private val selectedModes = mutableListOf("AFSK", "AFSK S-Net")
 
 @Preview(showBackground = true)
 @Composable
@@ -41,12 +49,7 @@ private fun ModesDialogPreview() {
 }
 
 @Composable
-fun ModesDialog(
-    list: List<String>,
-    selected: List<String>,
-    toggle: () -> Unit,
-    click: (String) -> Unit
-) {
+fun ModesDialog(list: List<String>, selected: List<String>, toggle: () -> Unit, click: (String) -> Unit) {
     Dialog(onDismissRequest = { toggle() }) {
         ElevatedCard(modifier = Modifier.fillMaxHeight(0.9f)) {
             LazyVerticalGrid(

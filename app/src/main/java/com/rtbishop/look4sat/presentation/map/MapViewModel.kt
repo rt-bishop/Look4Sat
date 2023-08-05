@@ -31,6 +31,10 @@ import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.QthConverter
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.domain.utility.toTimerString
+import java.util.Date
+import kotlin.collections.set
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -39,10 +43,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.Date
-import kotlin.collections.set
-import kotlin.math.max
-import kotlin.math.min
 
 class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISettingsRepo) : ViewModel() {
 

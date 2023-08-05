@@ -21,6 +21,6 @@ sealed class DataState<out T> {
     data class Success<out T>(val data: T) : DataState<T>()
     data class Error(val resId: Int?) : DataState<Nothing>()
     data class Exception(val message: String?) : DataState<Nothing>()
-    object Handled : DataState<Nothing>()
-    object Loading : DataState<Nothing>()
+    data object Handled : DataState<Nothing>()
+    data object Loading : DataState<Nothing>()
 }
