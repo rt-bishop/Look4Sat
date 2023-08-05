@@ -15,6 +15,7 @@ android {
         targetSdk = 33
         versionCode = 313
         versionName = "3.1.3"
+        resourceConfigurations.addAll(listOf("en", "ru", "si", "zh-rCN", "anydpi"))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {

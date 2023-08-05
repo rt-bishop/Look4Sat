@@ -26,9 +26,9 @@ import com.rtbishop.look4sat.presentation.radar.RadarScreen
 import com.rtbishop.look4sat.presentation.settings.SettingsScreen
 
 sealed class Screen(var title: String, var icon: Int, var route: String) {
-    data object Entries : Screen("Entries", R.drawable.ic_entries, "entries")
+    data object Entries : Screen("Entries", R.drawable.ic_sputnik, "entries")
     data object Passes : Screen("Passes", R.drawable.ic_passes, "passes")
-    data object Radar : Screen("Radar", R.drawable.ic_radar, "radar")
+    data object Radar : Screen("Radar", R.drawable.ic_settings, "radar")
     data object Map : Screen("World Map", R.drawable.ic_world_map, "world_map")
     data object Settings : Screen("Settings", R.drawable.ic_settings, "settings")
 }
