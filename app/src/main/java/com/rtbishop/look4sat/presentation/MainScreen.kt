@@ -3,7 +3,10 @@ package com.rtbishop.look4sat.presentation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -23,14 +26,13 @@ import com.rtbishop.look4sat.presentation.radar.RadarScreen
 import com.rtbishop.look4sat.presentation.settings.SettingsScreen
 
 sealed class Screen(var title: String, var icon: Int, var route: String) {
-    object Entries : Screen("Entries", R.drawable.ic_entries, "entries")
-    object Passes : Screen("Passes", R.drawable.ic_passes, "passes")
-    object Radar : Screen("Radar", R.drawable.ic_radar, "radar")
-    object Map : Screen("World Map", R.drawable.ic_world_map, "world_map")
-    object Settings : Screen("Settings", R.drawable.ic_settings, "settings")
+    data object Entries : Screen("Entries", R.drawable.ic_entries, "entries")
+    data object Passes : Screen("Passes", R.drawable.ic_passes, "passes")
+    data object Radar : Screen("Radar", R.drawable.ic_radar, "radar")
+    data object Map : Screen("World Map", R.drawable.ic_world_map, "world_map")
+    data object Settings : Screen("Settings", R.drawable.ic_settings, "settings")
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController = rememberNavController()) {
     Scaffold(bottomBar = { MainNavBar(navController = navController) }) { innerPadding ->

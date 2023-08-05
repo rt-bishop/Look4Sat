@@ -21,7 +21,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.*
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,17 +41,13 @@ private fun FilterDialogPreview() {
     MainTheme { FilterDialog(8, 16.0, {}) { _, _ -> } }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterDialog(hours: Int, elevation: Double, toggle: () -> Unit, save: (Int, Double) -> Unit) {
     val hoursValue = rememberSaveable { mutableStateOf(hours) }
     val elevValue = rememberSaveable { mutableStateOf(elevation) }
     Dialog(onDismissRequest = { toggle() }) {
         ElevatedCard {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth(1f)
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(1f)) {
                 Text(text = "Filter passes", color = MaterialTheme.colorScheme.primary)
                 Text(text = "Show passes that occur within X hours")
                 OutlinedTextField(value = hoursValue.value.toString(), onValueChange = { newValue ->
@@ -68,10 +67,7 @@ fun FilterDialog(hours: Int, elevation: Double, toggle: () -> Unit, save: (Int, 
                     }
                     elevValue.value = maxElevation
                 })
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                     CardButton(onClick = { toggle() }, text = "Cancel")
                     CardButton(
                         onClick = {

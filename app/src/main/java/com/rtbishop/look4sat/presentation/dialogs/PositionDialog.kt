@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.*
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,32 +26,22 @@ private fun PositionDialogPreview() {
     MainTheme { PositionDialog(0.0, 0.0, {}) { _, _ -> } }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PositionDialog(lat: Double, lon: Double, hide: () -> Unit, save: (Double, Double) -> Unit) {
     val latValue = rememberSaveable { mutableStateOf(lat.toString()) }
     val lonValue = rememberSaveable { mutableStateOf(lon.toString()) }
     Dialog(onDismissRequest = { hide() }) {
         ElevatedCard {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth(1f)
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(1f)) {
                 Text(
-                    text = stringResource(id = R.string.position_title),
-                    color = MaterialTheme.colorScheme.primary
+                    text = stringResource(id = R.string.position_title), color = MaterialTheme.colorScheme.primary
                 )
                 Text(text = stringResource(id = R.string.position_lat_text))
                 OutlinedTextField(value = latValue.value, onValueChange = { latValue.value = it })
                 Text(text = stringResource(id = R.string.position_lon_text))
                 OutlinedTextField(value = lonValue.value, onValueChange = { lonValue.value = it })
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    CardButton(
-                        onClick = { hide() }, text = stringResource(id = R.string.btn_cancel)
-                    )
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    CardButton(onClick = { hide() }, text = stringResource(id = R.string.btn_cancel))
                     CardButton(
                         onClick = { saveValues(latValue.value, lonValue.value, hide, save) },
                         text = stringResource(id = R.string.btn_accept)

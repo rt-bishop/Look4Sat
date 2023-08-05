@@ -18,10 +18,10 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 class MainApplication : Application() {
 

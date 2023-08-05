@@ -17,7 +17,11 @@
  */
 package com.rtbishop.look4sat.data.database.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.rtbishop.look4sat.data.database.entity.SatEntry
 import com.rtbishop.look4sat.data.database.entity.SatItem
 import com.rtbishop.look4sat.data.database.entity.SatRadio
