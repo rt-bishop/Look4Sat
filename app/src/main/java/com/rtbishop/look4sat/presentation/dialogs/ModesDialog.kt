@@ -16,8 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -34,18 +32,11 @@ private val allModes = listOf(
     "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
     "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
 )
-private val selectedModes = mutableListOf("AFSK", "AFSK S-Net")
 
 @Preview(showBackground = true)
 @Composable
 private fun ModesDialogPreview() {
-    val modesList = remember { mutableStateOf(selectedModes) }
-    MainTheme {
-        ModesDialog(allModes, modesList.value, {}) {
-            if (modesList.value.contains(it)) modesList.value.remove(it)
-            else modesList.value.add(it)
-        }
-    }
+    MainTheme { ModesDialog(allModes, listOf("AFSK", "AFSK S-Net"), {}) {} }
 }
 
 @Composable

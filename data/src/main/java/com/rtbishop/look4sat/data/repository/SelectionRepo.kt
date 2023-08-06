@@ -3,7 +3,7 @@ package com.rtbishop.look4sat.data.repository
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.repository.ISelectionRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.source.ILocalStorage
+import com.rtbishop.look4sat.domain.source.ILocalSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalCoroutinesApi::class)
 class SelectionRepo(
     private val dispatcher: CoroutineDispatcher,
-    private val localStorage: ILocalStorage,
+    private val localSource: ILocalSource,
     private val settingsRepo: ISettingsRepo
 ) : ISelectionRepo {
     private val currentItems = MutableStateFlow<List<SatItem>>(emptyList())
@@ -34,7 +34,7 @@ class SelectionRepo(
 
     override suspend fun getEntriesFlow() = withContext(dispatcher) {
         val selectedIds = settingsRepo.satelliteSelection.value
-        currentItems.value = localStorage.getEntriesList().map { item ->
+        currentItems.value = localSource.getEntriesList().map { item ->
             item.copy(isSelected = item.catnum in selectedIds)
         }
         return@withContext itemsWithQuery

@@ -106,7 +106,7 @@ class SettingsViewModel(
     fun updateFromWeb() = viewModelScope.launch {
         try {
             _dataSettings.value = _dataSettings.value.copy(isUpdating = true)
-            databaseRepo.updateFromWeb()
+            databaseRepo.updateFromRemote()
         } catch (exception: Exception) {
             _dataSettings.value = _dataSettings.value.copy(isUpdating = false)
             println(exception.printStackTrace())

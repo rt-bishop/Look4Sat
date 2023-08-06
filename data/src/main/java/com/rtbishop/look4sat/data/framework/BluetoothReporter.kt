@@ -2,15 +2,15 @@ package com.rtbishop.look4sat.data.framework
 
 import android.bluetooth.BluetoothManager
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.io.OutputStream
 import java.util.*
 import kotlin.math.abs
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class BluetoothReporter(
-    private val manager: BluetoothManager,
+    private val bluetoothManager: BluetoothManager,
     private val reporterScope: CoroutineScope
 ) {
 
@@ -30,7 +30,7 @@ class BluetoothReporter(
         if (!connected) {
             rotationConnectionJob = reporterScope.launch {
                 try {
-                    manager.adapter.getRemoteDevice(deviceId)?.let { device ->
+                    bluetoothManager.adapter.getRemoteDevice(deviceId)?.let { device ->
                         device.createInsecureRfcommSocketToServiceRecord(sppid)?.let { socket ->
                             connecting = true
                             socket.connect()

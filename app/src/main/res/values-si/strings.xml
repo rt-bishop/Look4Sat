@@ -147,8 +147,6 @@
     <string name="data_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
     <string name="data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
 
-    <string name="last_updated_pattern" translatable="false">d MMM yyyy - HH:mm:ss</string>
-
     <string name="remote_title">භ්‍රමක මනාප</string>
     <string name="remote_switch">දුරස්ථ පාලනය සබල ක°</string>
     <string name="remote_ip_hint">IP ලිපිනය</string>

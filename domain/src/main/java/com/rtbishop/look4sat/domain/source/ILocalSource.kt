@@ -17,11 +17,28 @@
  */
 package com.rtbishop.look4sat.domain.source
 
-import java.io.InputStream
+import com.rtbishop.look4sat.domain.model.SatEntry
+import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.domain.model.SatRadio
+import com.rtbishop.look4sat.domain.predict.Satellite
 
-interface IDataSource {
+interface ILocalSource {
 
-    suspend fun getFileStream(uri: String): InputStream?
+    suspend fun getEntriesTotal(): Int
 
-    suspend fun getNetworkStream(url: String): InputStream?
+    suspend fun getEntriesList(): List<SatItem>
+
+    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
+
+    suspend fun insertEntries(entries: List<SatEntry>)
+
+    suspend fun deleteEntries()
+
+    suspend fun getRadiosTotal(): Int
+
+    suspend fun getRadiosWithId(id: Int): List<SatRadio>
+
+    suspend fun insertRadios(radios: List<SatRadio>)
+
+    suspend fun deleteRadios()
 }

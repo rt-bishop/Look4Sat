@@ -97,9 +97,7 @@ private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
     }
 }
 
-private fun setPositions(
-    posMap: Map<Satellite, GeoPos>, mapView: MapView, action: (Satellite) -> Unit
-) {
+private fun setPositions(posMap: Map<Satellite, GeoPos>, mapView: MapView, action: (Satellite) -> Unit) {
     val markers = FolderOverlay()
     try {
         posMap.entries.forEach {
@@ -247,9 +245,7 @@ private val tonerLiteTileSource = XYTileSource(
 
 private fun getColorFilter(): ColorMatrixColorFilter {
     val negativeMatrix = ColorMatrix(
-        floatArrayOf(
-            -1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f
-        )
+        floatArrayOf(-1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f)
     )
     return ColorMatrixColorFilter(negativeMatrix)
 }

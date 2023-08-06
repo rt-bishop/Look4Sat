@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data.framework
+package com.rtbishop.look4sat.data.repository
 
 import android.content.SharedPreferences
 import android.location.Criteria
@@ -28,14 +28,15 @@ import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.PassesSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.utility.QthConverter
+import com.rtbishop.look4sat.domain.utility.positionToQth
+import com.rtbishop.look4sat.domain.utility.qthToPosition
 import com.rtbishop.look4sat.domain.utility.round
+import java.util.concurrent.Executors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.concurrent.Executors
 
 class SettingsRepo(
-    private val manager: LocationManager, private val preferences: SharedPreferences
+    private val locationManager: LocationManager, private val preferences: SharedPreferences
 ) : ISettingsRepo {
 
     private val keyModes = "satModes"
@@ -73,12 +74,12 @@ class SettingsRepo(
     override val stationPosition: StateFlow<GeoPos> = _stationPosition
 
     override fun setGpsPosition(): Boolean {
-        if (!LocationManagerCompat.isLocationEnabled(manager)) return false
+        if (!LocationManagerCompat.isLocationEnabled(locationManager)) return false
         try {
             val criteria = Criteria().apply { isCostAllowed = true }
-            val provider = manager.getBestProvider(criteria, true) ?: defaultProvider
+            val provider = locationManager.getBestProvider(criteria, true) ?: defaultProvider
             println("Requesting location for $provider provider")
-            LocationManagerCompat.getCurrentLocation(manager, provider, timeoutSignal, executor) {
+            LocationManagerCompat.getCurrentLocation(locationManager, provider, timeoutSignal, executor) {
                 it?.let { setGeoPosition(it.latitude, it.longitude, it.altitude) }
             }
         } catch (exception: SecurityException) {
@@ -89,13 +90,13 @@ class SettingsRepo(
 
     override fun setGeoPosition(latitude: Double, longitude: Double, altitude: Double): Boolean {
         val newLongitude = if (longitude > 180.0) longitude - 180 else longitude
-        val locator = QthConverter.positionToQth(latitude, newLongitude) ?: return false
+        val locator = positionToQth(latitude, newLongitude) ?: return false
         saveGeoPos(latitude, newLongitude, altitude, locator)
         return true
     }
 
     override fun setQthPosition(locator: String): Boolean {
-        val position = QthConverter.qthToPosition(locator) ?: return false
+        val position = qthToPosition(locator) ?: return false
         saveGeoPos(position.latitude, position.longitude, 0.0, locator)
         return true
     }

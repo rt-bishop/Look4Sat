@@ -1,7 +1,6 @@
 package com.rtbishop.look4sat.presentation.settings
 
 import android.Manifest
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -61,16 +60,16 @@ fun SettingsScreen() {
     val context = LocalContext.current
 
     // Permissions setup
-    val bluetoothContract = ActivityResultContracts.RequestPermission()
-    val bluetoothError = stringResource(R.string.BTremote_perm_error)
-    val bluetoothPerm = when {
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
-        else -> Manifest.permission.BLUETOOTH_CONNECT
-    }
-    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
+//    val bluetoothContract = ActivityResultContracts.RequestPermission()
+//    val bluetoothError = stringResource(R.string.BTremote_perm_error)
+//    val bluetoothPerm = when {
+//        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
+//        else -> Manifest.permission.BLUETOOTH_CONNECT
+//    }
+//    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
 //        viewModel.setBTEnabled(isGranted)
-        if (!isGranted) showToast(context, bluetoothError)
-    }
+//        if (!isGranted) showToast(context, bluetoothError)
+//    }
     val locationContract = ActivityResultContracts.RequestMultiplePermissions()
     val locationError = stringResource(R.string.location_gps_error)
     val locationPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
@@ -119,9 +118,7 @@ fun SettingsScreen() {
     val toggleSensor = { value: Boolean -> viewModel.toggleSensor(value) }
 
     // Screen setup
-    LazyColumn(
-        modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
+    LazyColumn(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         item { CardAbout(BuildConfig.VERSION_NAME) }
         item { LocationCard(positionSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos) }
         item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
@@ -376,8 +373,7 @@ private fun DataCard(
 @Preview(showBackground = true)
 @Composable
 private fun OtherCardPreview() = MainTheme {
-    val values =
-        OtherSettings(utcState = false, updateState = true, sweepState = true, sensorState = true)
+    val values = OtherSettings(utcState = false, updateState = true, sweepState = true, sensorState = true)
     OtherCard(settings = values, {}, {}, {}, {})
 }
 
