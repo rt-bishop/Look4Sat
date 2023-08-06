@@ -44,14 +44,9 @@ fun RadarScreen() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_filter),
-                        contentDescription = null
-                    )
+                    Icon(painter = painterResource(id = R.drawable.ic_filter), contentDescription = null)
                 }
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.weight(1f)
-                ) {
+                Column(verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.weight(1f)) {
                     Text(text = "Null")
                     Text(text = "Null")
                 }
@@ -109,10 +104,7 @@ private fun TransmitterItem(radio: SatRadio) {
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(6.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow),
                         contentDescription = null, modifier = Modifier.rotate(180f)
@@ -127,10 +119,7 @@ private fun TransmitterItem(radio: SatRadio) {
                         contentDescription = null
                     )
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(id = R.string.radio_downlink, radio.downlink ?: 0L),
                         textAlign = TextAlign.Center,

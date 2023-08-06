@@ -17,26 +17,18 @@
  */
 package com.rtbishop.look4sat.data.source
 
-import android.content.ContentResolver
-import android.net.Uri
-import com.rtbishop.look4sat.domain.source.IDataSource
+import com.rtbishop.look4sat.domain.source.IRemoteSource
+import java.io.InputStream
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.InputStream
 
-class DataSource(
-    private val contentResolver: ContentResolver,
-    private val httpClient: OkHttpClient,
-    private val dispatcher: CoroutineDispatcher
-) : IDataSource {
+class RemoteSource(
+    private val httpClient: OkHttpClient, private val dispatcher: CoroutineDispatcher
+) : IRemoteSource {
 
-    override suspend fun getFileStream(uri: String): InputStream? {
-        return withContext(dispatcher) { contentResolver.openInputStream(Uri.parse(uri)) }
-    }
-
-    override suspend fun getNetworkStream(url: String): InputStream? = withContext(dispatcher) {
+    override suspend fun getRemoteStream(url: String): InputStream? = withContext(dispatcher) {
         try {
             val request = Request.Builder().url(url).build()
             httpClient.newCall(request).execute().body?.byteStream()

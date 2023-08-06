@@ -99,9 +99,9 @@ class RadarViewModel(
         }
     }
 
-    fun getUseCompass(): Boolean = settingsRepo.otherSettings.value.sensorState
-
-    fun getShowSweep(): Boolean = settingsRepo.otherSettings.value.sweepState
+//    fun getUseCompass(): Boolean = settingsRepo.otherSettings.value.sensorState
+//
+//    fun getShowSweep(): Boolean = settingsRepo.otherSettings.value.sweepState
 
     private fun getMagDeclination(geoPos: GeoPos, time: Long = System.currentTimeMillis()): Float {
         val latitude = geoPos.latitude.toFloat()

@@ -40,7 +40,7 @@ class MainApplication : Application() {
             if (timeDelta > 172800000) { // 48 hours in ms
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 println("Started periodic data update on ${sdf.format(Date())}")
-                container.databaseRepo.updateFromWeb()
+                container.databaseRepo.updateFromRemote()
             }
         }
     }

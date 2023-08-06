@@ -53,27 +53,18 @@ fun rememberPullRefreshState(
     refreshingOffset: Dp = PullRefreshDefaults.RefreshingOffset,
 ): PullRefreshState {
     require(refreshThreshold > 0.dp) { "The refresh trigger must be greater than zero!" }
-
     val scope = rememberCoroutineScope()
     val onRefreshState = rememberUpdatedState(onRefresh)
     val thresholdPx: Float
     val refreshingOffsetPx: Float
-
     with(LocalDensity.current) {
         thresholdPx = refreshThreshold.toPx()
         refreshingOffsetPx = refreshingOffset.toPx()
     }
-
     // refreshThreshold and refreshingOffset should not be changed after instantiation, so any
     // changes to these values are ignored.
-    val state = remember(scope) {
-        PullRefreshState(scope, onRefreshState, refreshingOffsetPx, thresholdPx)
-    }
-
-    SideEffect {
-        state.setRefreshing(refreshing)
-    }
-
+    val state = remember(scope) { PullRefreshState(scope, onRefreshState, refreshingOffsetPx, thresholdPx) }
+    SideEffect { state.setRefreshing(refreshing) }
     return state
 }
 
@@ -109,7 +100,7 @@ class PullRefreshState internal constructor(
     internal val refreshing get() = _refreshing
     internal val position get() = _position
 
-    private val adjustedDistancePulled by derivedStateOf { distancePulled * DragMultiplier }
+    private val adjustedDistancePulled by derivedStateOf { distancePulled * DRAG_MULTIPLIER }
 
     private var _refreshing by mutableStateOf(false)
     private var _position by mutableStateOf(0f)
@@ -189,4 +180,4 @@ object PullRefreshDefaults {
  * the refresh threshold, it is the indicator position, otherwise the indicator position is
  * derived from the progress).
  */
-private const val DragMultiplier = 0.5f
+private const val DRAG_MULTIPLIER = 0.5f
