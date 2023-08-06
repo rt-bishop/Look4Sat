@@ -43,9 +43,9 @@ fun RadarViewCompose(item: SatPos, items: List<SatPos>, azimElev: Pair<Float, Fl
     val primaryColor = Color(0xFFFFE082)
     val secondaryColor = Color(0xFFDC0000)
     val strokeWidth = 4f
-    val animTransition = rememberInfiniteTransition()
+    val animTransition = rememberInfiniteTransition(label = "animScale")
     val animSpec = infiniteRepeatable<Float>(tween(1000))
-    val animScale = animTransition.animateFloat(16f, 64f, animSpec)
+    val animScale = animTransition.animateFloat(16f, 64f, animSpec, label = "animScale")
     val measurer = rememberTextMeasurer()
     val sweepDegrees = remember { mutableStateOf(0f) }
     val trackCreated = remember { mutableStateOf(false) }

@@ -73,27 +73,25 @@ fun PullRefreshIndicator(
     val showElevation by remember(refreshing, state) {
         derivedStateOf { refreshing || state.position > 0.5f }
     }
-
     Surface(
         modifier = modifier
-            .size(IndicatorSize)
+            .size(indicatorSize)
             .pullRefreshIndicatorTransform(state, scale),
-        shape = SpinnerShape,
+        shape = spinnerShape,
         color = backgroundColor,
-        shadowElevation = if (showElevation) Elevation else 0.dp,
+        shadowElevation = if (showElevation) elevation else 0.dp,
     ) {
         Crossfade(
-            targetState = refreshing, animationSpec = tween(durationMillis = CrossfadeDurationMs)
+            targetState = refreshing,
+            animationSpec = tween(durationMillis = CROSSFADE_DURATION_MS),
+            label = "pullToRefresh"
         ) { refreshing ->
-            Box(
-                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-            ) {
-                val spinnerSize = (ArcRadius + StrokeWidth).times(2)
-
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                val spinnerSize = (arcRadius + strokeWidth).times(2)
                 if (refreshing) {
                     CircularProgressIndicator(
                         color = contentColor,
-                        strokeWidth = StrokeWidth,
+                        strokeWidth = strokeWidth,
                         modifier = Modifier.size(spinnerSize),
                     )
                 } else {
@@ -108,18 +106,12 @@ fun PullRefreshIndicator(
  * Modifier.size MUST be specified.
  */
 @Composable
-private fun CircularArrowIndicator(
-    state: PullRefreshState,
-    color: Color,
-    modifier: Modifier,
-) {
+private fun CircularArrowIndicator(state: PullRefreshState, color: Color, modifier: Modifier) {
     val path = remember { Path().apply { fillType = PathFillType.EvenOdd } }
-
     Canvas(modifier.semantics { contentDescription = "Refreshing" }) {
         val values = ArrowValues(state.progress)
-
         rotate(degrees = values.rotation) {
-            val arcRadius = ArcRadius.toPx() + StrokeWidth.toPx() / 2f
+            val arcRadius = arcRadius.toPx() + strokeWidth.toPx() / 2f
             val arcBounds = Rect(
                 size.center.x - arcRadius,
                 size.center.y - arcRadius,
@@ -134,9 +126,7 @@ private fun CircularArrowIndicator(
                 useCenter = false,
                 topLeft = arcBounds.topLeft,
                 size = arcBounds.size,
-                style = Stroke(
-                    width = StrokeWidth.toPx(), cap = StrokeCap.Square
-                )
+                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Square)
             )
             drawArrow(path, arcBounds, color, values)
         }
@@ -145,11 +135,7 @@ private fun CircularArrowIndicator(
 
 @Immutable
 private class ArrowValues(
-    val alpha: Float,
-    val rotation: Float,
-    val startAngle: Float,
-    val endAngle: Float,
-    val scale: Float
+    val alpha: Float, val rotation: Float, val startAngle: Float, val endAngle: Float, val scale: Float
 )
 
 private fun ArrowValues(progress: Float): ArrowValues {
@@ -164,7 +150,7 @@ private fun ArrowValues(progress: Float): ArrowValues {
 
     // Calculations based on SwipeRefreshLayout specification.
     val alpha = progress.coerceIn(0f, 1f)
-    val endTrim = adjustedPercent * MaxProgressArc
+    val endTrim = adjustedPercent * MAX_PROGRESS_ARC
     val rotation = (-0.25f + 0.4f * adjustedPercent + tensionPercent) * 0.5f
     val startAngle = rotation * 360
     val endAngle = (rotation + endTrim) * 360
@@ -176,33 +162,26 @@ private fun ArrowValues(progress: Float): ArrowValues {
 private fun DrawScope.drawArrow(arrow: Path, bounds: Rect, color: Color, values: ArrowValues) {
     arrow.reset()
     arrow.moveTo(0f, 0f) // Move to left corner
-    arrow.lineTo(x = ArrowWidth.toPx() * values.scale, y = 0f) // Line to right corner
+    arrow.lineTo(x = arrowWidth.toPx() * values.scale, y = 0f) // Line to right corner
 
     // Line to tip of arrow
-    arrow.lineTo(
-        x = ArrowWidth.toPx() * values.scale / 2, y = ArrowHeight.toPx() * values.scale
-    )
+    arrow.lineTo(x = arrowWidth.toPx() * values.scale / 2, y = arrowHeight.toPx() * values.scale)
 
     val radius = min(bounds.width, bounds.height) / 2f
-    val inset = ArrowWidth.toPx() * values.scale / 2f
-    arrow.translate(
-        Offset(
-            x = radius + bounds.center.x - inset, y = bounds.center.y + StrokeWidth.toPx() / 2f
-        )
-    )
+    val inset = arrowWidth.toPx() * values.scale / 2f
+    arrow.translate(Offset(x = radius + bounds.center.x - inset, y = bounds.center.y + strokeWidth.toPx() / 2f))
     arrow.close()
     rotate(degrees = values.endAngle) {
         drawPath(path = arrow, color = color, alpha = values.alpha)
     }
 }
 
-private const val CrossfadeDurationMs = 100
-private const val MaxProgressArc = 0.8f
-
-private val IndicatorSize = 40.dp
-private val SpinnerShape = CircleShape
-private val ArcRadius = 7.5.dp
-private val StrokeWidth = 2.5.dp
-private val ArrowWidth = 10.dp
-private val ArrowHeight = 5.dp
-private val Elevation = 6.dp
+private const val CROSSFADE_DURATION_MS = 100
+private const val MAX_PROGRESS_ARC = 0.8f
+private val indicatorSize = 40.dp
+private val spinnerShape = CircleShape
+private val arcRadius = 7.5.dp
+private val strokeWidth = 2.5.dp
+private val arrowWidth = 10.dp
+private val arrowHeight = 5.dp
+private val elevation = 6.dp

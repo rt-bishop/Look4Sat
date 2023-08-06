@@ -24,7 +24,7 @@ import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.source.ILocalStorage
+import com.rtbishop.look4sat.domain.source.ILocalSource
 import com.rtbishop.look4sat.domain.utility.round
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,7 +35,7 @@ import kotlinx.coroutines.withContext
 
 class SatelliteRepo(
     private val dispatcher: CoroutineDispatcher,
-    private val localStorage: ILocalStorage,
+    private val localStorage: ILocalSource,
     private val settingsRepo: ISettingsRepo
 ) : ISatelliteRepo {
 

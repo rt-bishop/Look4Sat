@@ -15,13 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.domain.repository
+package com.rtbishop.look4sat.domain.source
 
-interface IDatabaseRepo {
+import java.io.InputStream
 
-    suspend fun updateFromFile(uri: String)
-
-    suspend fun updateFromRemote()
-
-    suspend fun clearAllData()
+interface IRemoteSource {
+    suspend fun getRemoteStream(url: String): InputStream?
 }

@@ -50,7 +50,7 @@ class PassesViewModel(
 
     fun getFilterSettings() = settingsRepo.passesSettings.value
 
-    fun shouldUseUTC() = settingsRepo.otherSettings.value.utcState
+//    fun shouldUseUTC() = settingsRepo.otherSettings.value.utcState
 
     init {
         viewModelScope.launch { satelliteRepo.initRepository() }

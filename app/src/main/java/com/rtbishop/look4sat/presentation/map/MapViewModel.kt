@@ -28,9 +28,9 @@ import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.predict.Satellite
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.utility.QthConverter
 import com.rtbishop.look4sat.domain.utility.clipLat
 import com.rtbishop.look4sat.domain.utility.clipLon
+import com.rtbishop.look4sat.domain.utility.positionToQth
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.domain.utility.toTimerString
 import java.util.Date
@@ -66,23 +66,23 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
     val footprint: SharedFlow<SatPos> = _footprint
 
     private val _mapData = MutableSharedFlow<MapData>()
-    val mapData: SharedFlow<MapData> = _mapData
+//    val mapData: SharedFlow<MapData> = _mapData
 
     private val _positions = MutableSharedFlow<Map<Satellite, GeoPos>>()
     val positions: SharedFlow<Map<Satellite, GeoPos>> = _positions
 
-    fun scrollSelection(decrement: Boolean) {
-        if (allSatellites.isNotEmpty()) {
-            val index = allSatellites.indexOf(selectedSatellite)
-            if (decrement) {
-                if (index > 0) selectSatellite(allSatellites[index - 1])
-                else selectSatellite(allSatellites[allSatellites.size - 1])
-            } else {
-                if (index < allSatellites.size - 1) selectSatellite(allSatellites[index + 1])
-                else selectSatellite(allSatellites[0])
-            }
-        }
-    }
+//    fun scrollSelection(decrement: Boolean) {
+//        if (allSatellites.isNotEmpty()) {
+//            val index = allSatellites.indexOf(selectedSatellite)
+//            if (decrement) {
+//                if (index > 0) selectSatellite(allSatellites[index - 1])
+//                else selectSatellite(allSatellites[allSatellites.size - 1])
+//            } else {
+//                if (index < allSatellites.size - 1) selectSatellite(allSatellites[index + 1])
+//                else selectSatellite(allSatellites[0])
+//            }
+//        }
+//    }
 
     fun selectDefaultSatellite(catnum: Int) {
         if (allSatellites.isNotEmpty()) {
@@ -178,7 +178,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
         val osmLat = clipLat(satPos.latitude.toDegrees())
         val osmLon = clipLon(satPos.longitude.toDegrees())
         val osmPos = GeoPos(osmLat, osmLon)
-        val qthLoc = QthConverter.positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
+        val qthLoc = positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
         val velocity = satPos.getOrbitalVelocity()
         val phase = satPos.phase.toDegrees()
         val visibility = satPos.eclipsed

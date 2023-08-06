@@ -22,36 +22,38 @@ import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.source.IDataSource
-import com.rtbishop.look4sat.domain.source.ILocalStorage
+import com.rtbishop.look4sat.domain.source.IFileSource
+import com.rtbishop.look4sat.domain.source.ILocalSource
+import com.rtbishop.look4sat.domain.source.IRemoteSource
 import com.rtbishop.look4sat.domain.utility.DataParser
+import java.io.InputStream
+import java.util.zip.ZipInputStream
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import java.io.InputStream
-import java.util.zip.ZipInputStream
 
 class DatabaseRepo(
     private val dispatcher: CoroutineDispatcher,
     private val dataParser: DataParser,
-    private val dataSource: IDataSource,
-    private val localStorage: ILocalStorage,
-    private val settingsRepository: ISettingsRepo
+    private val fileSource: IFileSource,
+    private val localSource: ILocalSource,
+    private val remoteSource: IRemoteSource,
+    private val settingsRepo: ISettingsRepo
 ) : IDatabaseRepo {
 
     override suspend fun updateFromFile(uri: String) = withContext(dispatcher) {
-        val importedSatellites = dataSource.getFileStream(uri)?.let { importSatellites(it) }
-        importedSatellites?.let { localStorage.insertEntries(it) }
+        val importedSatellites = fileSource.getFileStream(uri)?.let { importSatellites(it) }
+        importedSatellites?.let { localSource.insertEntries(it) }
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
-    override suspend fun updateFromWeb() = withContext(dispatcher) {
-        val sourcesMap = settingsRepository.satelliteSourcesMap
+    override suspend fun updateFromRemote() = withContext(dispatcher) {
+        val sourcesMap = settingsRepo.satelliteSourcesMap
         val importedEntries = mutableListOf<SatEntry>()
         val importedRadios = mutableListOf<SatRadio>()
         // fetch
-        val jobsMap = sourcesMap.mapValues { async { dataSource.getNetworkStream(it.value) } }
-        val jobRadios = async { dataSource.getNetworkStream(settingsRepository.radioSourceUrl) }
+        val jobsMap = sourcesMap.mapValues { async { remoteSource.getRemoteStream(it.value) } }
+        val jobRadios = async { remoteSource.getRemoteStream(settingsRepo.radioSourceUrl) }
         // parse
         jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
             entry.value?.let { stream ->
@@ -60,7 +62,7 @@ class DatabaseRepo(
                         // parse tle stream
                         val satellites = importSatellites(stream)
                         val catnums = satellites.map { it.data.catnum }
-                        settingsRepository.saveSatType(type, catnums)
+                        settingsRepo.saveSatType(type, catnums)
                         importedEntries.addAll(satellites)
                     }
 
@@ -69,7 +71,7 @@ class DatabaseRepo(
                         val unzipped = ZipInputStream(stream).apply { nextEntry }
                         val satellites = importSatellites(unzipped)
                         val catnums = satellites.map { it.data.catnum }
-                        settingsRepository.saveSatType(type, catnums)
+                        settingsRepo.saveSatType(type, catnums)
                         importedEntries.addAll(satellites)
                     }
 
@@ -78,7 +80,7 @@ class DatabaseRepo(
                         val parsed = dataParser.parseCSVStream(stream)
                         val satellites = parsed.map { data -> SatEntry(data) }
                         val catnums = satellites.map { it.data.catnum }
-                        settingsRepository.saveSatType(type, catnums)
+                        settingsRepo.saveSatType(type, catnums)
                         importedEntries.addAll(satellites)
                     }
                 }
@@ -86,21 +88,21 @@ class DatabaseRepo(
         }
         jobRadios.await()?.let { importedRadios.addAll(dataParser.parseJSONStream(it)) }
         // insert
-        localStorage.insertEntries(importedEntries)
-        localStorage.insertRadios(importedRadios)
+        localSource.insertEntries(importedEntries)
+        localSource.insertRadios(importedRadios)
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
     override suspend fun clearAllData() = withContext(dispatcher) {
-        localStorage.deleteEntries()
-        localStorage.deleteRadios()
+        localSource.deleteEntries()
+        localSource.deleteRadios()
         setUpdateSuccessful(0L)
     }
 
     private suspend fun setUpdateSuccessful(timestamp: Long) = withContext(dispatcher) {
-        val satellitesTotal = localStorage.getEntriesTotal()
-        val radiosTotal = localStorage.getRadiosTotal()
-        settingsRepository.saveDatabaseState(DatabaseState(satellitesTotal, radiosTotal, timestamp))
+        val satellitesTotal = localSource.getEntriesTotal()
+        val radiosTotal = localSource.getRadiosTotal()
+        settingsRepo.saveDatabaseState(DatabaseState(satellitesTotal, radiosTotal, timestamp))
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {

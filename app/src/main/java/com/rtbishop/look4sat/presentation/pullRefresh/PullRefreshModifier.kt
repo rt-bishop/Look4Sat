@@ -49,12 +49,10 @@ fun Modifier.pullRefreshIndicatorTransform(
     properties["scale"] = scale
 }) {
     var height by remember { mutableStateOf(0) }
-
     Modifier
         .onSizeChanged { height = it.height }
         .graphicsLayer {
             translationY = state.position - height
-
             if (scale && !state.refreshing) {
                 val scaleFraction = LinearOutSlowInEasing
                     .transform(state.position / state.threshold)
@@ -95,9 +93,7 @@ fun Modifier.pullRefresh(
  * [onPull] nor [onRelease] will be invoked.
  */
 fun Modifier.pullRefresh(
-    onPull: (pullDelta: Float) -> Float,
-    onRelease: suspend (flingVelocity: Float) -> Unit,
-    enabled: Boolean = true
+    onPull: (pullDelta: Float) -> Float, onRelease: suspend (flingVelocity: Float) -> Unit, enabled: Boolean = true
 ) = inspectable(inspectorInfo = debugInspectorInfo {
     name = "pullRefresh"
     properties["onPull"] = onPull
@@ -113,17 +109,13 @@ private class PullRefreshNestedScrollConnection(
     private val enabled: Boolean
 ) : NestedScrollConnection {
 
-    override fun onPreScroll(
-        available: Offset, source: NestedScrollSource
-    ): Offset = when {
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset = when {
         !enabled -> Offset.Zero
         source == Drag && available.y < 0 -> Offset(0f, onPull(available.y)) // Swiping up
         else -> Offset.Zero
     }
 
-    override fun onPostScroll(
-        consumed: Offset, available: Offset, source: NestedScrollSource
-    ): Offset = when {
+    override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset = when {
         !enabled -> Offset.Zero
         source == Drag && available.y > 0 -> Offset(0f, onPull(available.y)) // Pulling down
         else -> Offset.Zero

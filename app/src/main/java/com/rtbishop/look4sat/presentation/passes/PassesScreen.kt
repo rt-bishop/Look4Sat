@@ -88,9 +88,7 @@ fun PassesScreen(navToRadar: (Int, Long) -> Unit) {
                         contentDescription = null
                     )
                 }
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.weight(1f)
-                ) {
+                Column(verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.weight(1f)) {
                     Text(text = timerText.value?.first ?: "Null")
                     Text(text = timerText.value?.second ?: "Null")
                 }

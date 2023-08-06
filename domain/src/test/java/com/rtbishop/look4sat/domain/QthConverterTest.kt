@@ -17,37 +17,38 @@
  */
 package com.rtbishop.look4sat.domain
 
-import com.rtbishop.look4sat.domain.utility.QthConverter
+import com.rtbishop.look4sat.domain.utility.positionToQth
+import com.rtbishop.look4sat.domain.utility.qthToPosition
 import org.junit.Test
 
 class QthConverterTest {
 
     @Test
     fun `Given valid QTH returns correct POS`() {
-        var result = QthConverter.qthToPosition("io91VL39FX")
+        var result = qthToPosition("io91VL39FX")
         assert(result?.latitude == 51.4792 && result.longitude == -0.2083)
-        result = QthConverter.qthToPosition("JN58TD")
+        result = qthToPosition("JN58TD")
         assert(result?.latitude == 48.1458 && result.longitude == 11.6250)
-        result = QthConverter.qthToPosition("gf15vc")
+        result = qthToPosition("gf15vc")
         assert(result?.latitude == -34.8958 && result.longitude == -56.2083)
     }
 
     @Test
     fun `Given invalid QTH returns null`() {
-        assert(QthConverter.qthToPosition("ZZ00zz") == null)
-        assert(QthConverter.qthToPosition("JN58") == null)
+        assert(qthToPosition("ZZ00zz") == null)
+        assert(qthToPosition("JN58") == null)
     }
 
     @Test
     fun `Given valid POS returns correct QTH`() {
-        assert(QthConverter.positionToQth(51.4878, -0.2146) == "IO91vl")
-        assert(QthConverter.positionToQth(48.1466, 11.6083) == "JN58td")
-        assert(QthConverter.positionToQth(-34.91, -56.2116) == "GF15vc")
+        assert(positionToQth(51.4878, -0.2146) == "IO91vl")
+        assert(positionToQth(48.1466, 11.6083) == "JN58td")
+        assert(positionToQth(-34.91, -56.2116) == "GF15vc")
     }
 
     @Test
     fun `Given invalid POS returns null`() {
-        assert(QthConverter.positionToQth(91.0542, -170.1142) == null)
-        assert(QthConverter.positionToQth(89.0542, -240.1142) == null)
+        assert(positionToQth(91.0542, -170.1142) == null)
+        assert(positionToQth(89.0542, -240.1142) == null)
     }
 }
