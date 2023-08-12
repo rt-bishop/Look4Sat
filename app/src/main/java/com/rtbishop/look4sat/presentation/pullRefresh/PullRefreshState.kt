@@ -22,6 +22,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -103,8 +104,8 @@ class PullRefreshState internal constructor(
     private val adjustedDistancePulled by derivedStateOf { distancePulled * DRAG_MULTIPLIER }
 
     private var _refreshing by mutableStateOf(false)
-    private var _position by mutableStateOf(0f)
-    private var distancePulled by mutableStateOf(0f)
+    private var _position by mutableFloatStateOf(0f)
+    private var distancePulled by mutableFloatStateOf(0f)
 
     internal fun onPull(pullDelta: Float): Float {
         if (this._refreshing) return 0f // Already refreshing, do nothing.

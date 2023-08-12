@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTextApi::class)
-
 package com.rtbishop.look4sat.presentation.radar
 
 import androidx.compose.animation.core.animateFloat
@@ -9,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -25,7 +24,6 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -47,7 +45,7 @@ fun RadarViewCompose(item: SatPos, items: List<SatPos>, azimElev: Pair<Float, Fl
     val animSpec = infiniteRepeatable<Float>(tween(1000))
     val animScale = animTransition.animateFloat(16f, 64f, animSpec, label = "animScale")
     val measurer = rememberTextMeasurer()
-    val sweepDegrees = remember { mutableStateOf(0f) }
+    val sweepDegrees = remember { mutableFloatStateOf(0f) }
     val trackCreated = remember { mutableStateOf(false) }
     val trackPath = remember { mutableStateOf(Path()) }
     val trackEffect = remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
@@ -59,7 +57,7 @@ fun RadarViewCompose(item: SatPos, items: List<SatPos>, azimElev: Pair<Float, Fl
             trackCreated.value = true
         }
         rotate(-azimElev.first) {
-            drawSweep(center, sweepDegrees.value, radius, primaryColor)
+            drawSweep(center, sweepDegrees.floatValue, radius, primaryColor)
             drawRadar(radius, radarColor, strokeWidth, 3)
             drawInfo(radius, primaryColor, measurer, 3)
             translate(center.x, center.y) {
@@ -67,7 +65,7 @@ fun RadarViewCompose(item: SatPos, items: List<SatPos>, azimElev: Pair<Float, Fl
                 if (item.elevation > 0) drawPosition(item, radius, animScale.value, primaryColor)
                 drawAim(azimElev.first, azimElev.second, radius, strokeWidth, secondaryColor)
             }
-            sweepDegrees.value = (sweepDegrees.value + 360 / 12.0f / 60) % 360
+            sweepDegrees.floatValue = (sweepDegrees.floatValue + 360 / 12.0f / 60) % 360
         }
     }
 }
@@ -113,7 +111,7 @@ private fun DrawScope.drawAim(azim: Float, elev: Float, radius: Float, width: Fl
         drawLine(color, center.copy(aimX, -aimY - size), center.copy(aimX, -aimY + size), width)
         drawCircle(color, size / 2, center.copy(aimX, -aimY), style = Stroke(width))
     } catch (exception: Exception) {
-//        Timber.d(exception)
+        println(exception)
     }
 }
 
