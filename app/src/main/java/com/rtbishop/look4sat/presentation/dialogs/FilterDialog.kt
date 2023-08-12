@@ -26,7 +26,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,35 +44,35 @@ private fun FilterDialogPreview() {
 
 @Composable
 fun FilterDialog(hours: Int, elevation: Double, toggle: () -> Unit, save: (Int, Double) -> Unit) {
-    val hoursValue = rememberSaveable { mutableStateOf(hours) }
-    val elevValue = rememberSaveable { mutableStateOf(elevation) }
+    val hoursValue = rememberSaveable { mutableIntStateOf(hours) }
+    val elevValue = rememberSaveable { mutableDoubleStateOf(elevation) }
     Dialog(onDismissRequest = { toggle() }) {
         ElevatedCard {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(1f)) {
                 Text(text = "Filter passes", color = MaterialTheme.colorScheme.primary)
                 Text(text = "Show passes that occur within X hours")
-                OutlinedTextField(value = hoursValue.value.toString(), onValueChange = { newValue ->
+                OutlinedTextField(value = hoursValue.intValue.toString(), onValueChange = { newValue ->
                     val hoursAhead = try {
                         newValue.toInt()
                     } catch (exception: Exception) {
                         12
                     }
-                    hoursValue.value = hoursAhead
+                    hoursValue.intValue = hoursAhead
                 })
                 Text(text = "Show passes with max elevation above")
-                OutlinedTextField(value = elevValue.value.toString(), onValueChange = { newValue ->
+                OutlinedTextField(value = elevValue.doubleValue.toString(), onValueChange = { newValue ->
                     val maxElevation = try {
                         newValue.toDouble()
                     } catch (exception: Exception) {
                         16.0
                     }
-                    elevValue.value = maxElevation
+                    elevValue.doubleValue = maxElevation
                 })
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                     CardButton(onClick = { toggle() }, text = "Cancel")
                     CardButton(
                         onClick = {
-                            save(hoursValue.value, elevValue.value)
+                            save(hoursValue.intValue, elevValue.doubleValue)
                             toggle()
                         }, text = "Accept"
                     )

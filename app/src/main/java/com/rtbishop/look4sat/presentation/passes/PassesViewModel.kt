@@ -70,7 +70,7 @@ class PassesViewModel(
                                 val millisBeforeStart = nextPass.aosTime.minus(timeNow)
                                 val timerString = millisBeforeStart.toTimerString()
                                 _timerText.emit(Triple("Next - Id:$catNum", name, timerString))
-                            } catch (e: NoSuchElementException) {
+                            } catch (exception: NoSuchElementException) {
                                 val lastPass = newPasses.last()
                                 val catNum = lastPass.catNum
                                 val name = lastPass.name

@@ -18,6 +18,9 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
+import android.os.StrictMode.VmPolicy
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -28,6 +31,7 @@ class MainApplication : Application() {
     lateinit var container: MainContainer
 
     override fun onCreate() {
+        if (BuildConfig.DEBUG) enableStrictMode()
         super.onCreate()
         container = MainContainer(this)
         container.mainScope.launch { checkAutoUpdate() }
@@ -37,11 +41,21 @@ class MainApplication : Application() {
         val settingsRepo = container.settingsRepo
         if (settingsRepo.otherSettings.value.updateState) {
             val timeDelta = System.currentTimeMillis() - settingsRepo.databaseState.value.timestamp
-            if (timeDelta > 172800000) { // 48 hours in ms
+            if (timeDelta > AUTO_UPDATE_DELTA_MS) {
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 println("Started periodic data update on ${sdf.format(Date())}")
                 container.databaseRepo.updateFromRemote()
             }
         }
+    }
+
+    private fun enableStrictMode() {
+        StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyLog().build())
+        StrictMode.setVmPolicy(VmPolicy.Builder().detectAll().penaltyLog().build())
+    }
+
+    companion object {
+        private const val AUTO_UPDATE_DELTA_MS = 172_800_000L // 48 hours in ms
+        const val MAX_OKHTTP_CACHE_SIZE = 10_000_000L // 10 Megabytes
     }
 }
