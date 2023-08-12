@@ -18,7 +18,7 @@ package com.rtbishop.look4sat.presentation.pullRefresh
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -48,7 +48,7 @@ fun Modifier.pullRefreshIndicatorTransform(
     properties["state"] = state
     properties["scale"] = scale
 }) {
-    var height by remember { mutableStateOf(0) }
+    var height by remember { mutableIntStateOf(0) }
     Modifier
         .onSizeChanged { height = it.height }
         .graphicsLayer {

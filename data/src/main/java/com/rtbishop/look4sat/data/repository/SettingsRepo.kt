@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.data.repository
 
 import android.content.SharedPreferences
-import android.location.Criteria
 import android.location.LocationManager
 import androidx.core.content.edit
 import androidx.core.location.LocationManagerCompat
@@ -66,7 +65,9 @@ class SettingsRepo(
     //region # Station position settings
 
     private val _stationPosition = MutableStateFlow(loadStationPosition())
-    private val defaultProvider = LocationManager.PASSIVE_PROVIDER
+    private val providerDef = LocationManager.PASSIVE_PROVIDER
+    private val providerGps = LocationManager.GPS_PROVIDER
+    private val providerNet = LocationManager.NETWORK_PROVIDER
     private val executor = Executors.newSingleThreadExecutor()
     private val timeoutSignal = CancellationSignal().apply {
         setOnCancelListener { _stationPosition.value = loadStationPosition() }
@@ -76,14 +77,15 @@ class SettingsRepo(
     override fun setGpsPosition(): Boolean {
         if (!LocationManagerCompat.isLocationEnabled(locationManager)) return false
         try {
-            val criteria = Criteria().apply { isCostAllowed = true }
-            val provider = locationManager.getBestProvider(criteria, true) ?: defaultProvider
+            val hasGps = LocationManagerCompat.hasProvider(locationManager, providerGps)
+            val hasNet = LocationManagerCompat.hasProvider(locationManager, providerNet)
+            val provider = if (hasGps) providerGps else if (hasNet) providerNet else providerDef
             println("Requesting location for $provider provider")
             LocationManagerCompat.getCurrentLocation(locationManager, provider, timeoutSignal, executor) {
                 it?.let { setGeoPosition(it.latitude, it.longitude, it.altitude) }
             }
         } catch (exception: SecurityException) {
-            println("No permissions were given")
+            println("No permissions were given - $exception")
         }
         return true
     }

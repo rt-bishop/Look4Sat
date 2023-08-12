@@ -84,7 +84,7 @@ class MainContainer(private val context: Context) {
     }
 
     private fun provideRemoteSource(): IRemoteSource {
-        val cache = Cache(context.cacheDir, 1000 * 1000 * 10L)
+        val cache = Cache(context.cacheDir, MainApplication.MAX_OKHTTP_CACHE_SIZE)
         val httpClient = OkHttpClient.Builder().cache(cache).build()
         return RemoteSource(httpClient, Dispatchers.IO)
     }

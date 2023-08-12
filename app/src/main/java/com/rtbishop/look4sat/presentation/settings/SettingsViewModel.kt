@@ -109,7 +109,7 @@ class SettingsViewModel(
             databaseRepo.updateFromRemote()
         } catch (exception: Exception) {
             _dataSettings.value = _dataSettings.value.copy(isUpdating = false)
-            println(exception.printStackTrace())
+            println(exception)
         }
     }
 
@@ -119,7 +119,7 @@ class SettingsViewModel(
             databaseRepo.updateFromFile(uri)
         } catch (exception: Exception) {
             _dataSettings.value = _dataSettings.value.copy(isUpdating = false)
-            println(exception.printStackTrace())
+            println(exception)
         }
     }
 
