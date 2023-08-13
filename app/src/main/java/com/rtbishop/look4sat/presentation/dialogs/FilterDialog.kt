@@ -21,60 +21,102 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
 
 @Preview(showBackground = true)
 @Composable
 private fun FilterDialogPreview() {
-    MainTheme { FilterDialog(8, 16.0, {}) { _, _ -> } }
+    MainTheme { FilterDialog(24, 16.0, {}) { _, _ -> } }
 }
 
 @Composable
-fun FilterDialog(hours: Int, elevation: Double, toggle: () -> Unit, save: (Int, Double) -> Unit) {
+fun FilterDialog(hours: Int, elevation: Double, dismiss: () -> Unit, save: (Int, Double) -> Unit) {
     val hoursValue = rememberSaveable { mutableIntStateOf(hours) }
-    val elevValue = rememberSaveable { mutableDoubleStateOf(elevation) }
-    Dialog(onDismissRequest = { toggle() }) {
+    val elevationValue = rememberSaveable { mutableIntStateOf(elevation.toInt()) }
+    val maxWidthModifier = Modifier.fillMaxWidth(1f)
+    Dialog(onDismissRequest = { dismiss() }) {
         ElevatedCard {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(1f)) {
-                Text(text = "Filter passes", color = MaterialTheme.colorScheme.primary)
-                Text(text = "Show passes that occur within X hours")
-                OutlinedTextField(value = hoursValue.intValue.toString(), onValueChange = { newValue ->
-                    val hoursAhead = try {
-                        newValue.toInt()
-                    } catch (exception: Exception) {
-                        12
-                    }
-                    hoursValue.intValue = hoursAhead
-                })
-                Text(text = "Show passes with max elevation above")
-                OutlinedTextField(value = elevValue.doubleValue.toString(), onValueChange = { newValue ->
-                    val maxElevation = try {
-                        newValue.toDouble()
-                    } catch (exception: Exception) {
-                        16.0
-                    }
-                    elevValue.doubleValue = maxElevation
-                })
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = maxWidthModifier.padding(12.dp)
+            ) {
+                Text(text = "Filter passes", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
+                    Text(text = "Show passes within", fontSize = 18.sp, modifier = Modifier.weight(1f))
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_time),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = "${hoursValue.intValue}h",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Slider(
+                    value = hoursValue.intValue.toFloat(),
+                    onValueChange = { hoursValue.intValue = it.toInt() },
+                    valueRange = 1f..168f,
+                    colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
+                    Text(text = "Show passes above", fontSize = 18.sp, modifier = Modifier.weight(1f))
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_elevation),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = "${elevationValue.intValue}°",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Slider(
+                    value = elevationValue.intValue.toFloat(),
+                    onValueChange = { elevationValue.intValue = it.toInt() },
+                    valueRange = 0f..90f,
+                    colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                )
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    CardButton(onClick = { toggle() }, text = "Cancel")
+                    CardButton(onClick = { dismiss() }, text = stringResource(id = R.string.btn_cancel))
                     CardButton(
                         onClick = {
-                            save(hoursValue.intValue, elevValue.doubleValue)
-                            toggle()
-                        }, text = "Accept"
+                            save(hoursValue.intValue, elevationValue.intValue.toDouble())
+                            dismiss()
+                        }, text = stringResource(id = R.string.btn_accept)
                     )
                 }
             }
