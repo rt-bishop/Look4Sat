@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,8 +47,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
-private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
 private const val GITHUB_URL = "https://github.com/rt-bishop/Look4Sat/"
 private const val DONATE_URL = "https://ko-fi.com/rt_bishop"
 private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
@@ -123,7 +120,6 @@ fun SettingsScreen() {
         item { LocationCard(positionSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos) }
         item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
         item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
-        item { CardCredits() }
     }
 }
 
@@ -418,54 +414,6 @@ private fun OtherCard(
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sensors))
                 Switch(checked = settings.sensorState, onCheckedChange = { toggleSensor(it) })
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CardCreditsPreview() = MainTheme { CardCredits() }
-
-@Composable
-private fun CardCredits(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    ElevatedCard(modifier = modifier.fillMaxWidth()) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            Text(
-                text = stringResource(id = R.string.outro_title),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = modifier.padding(6.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.outro_thanks),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = stringResource(id = R.string.outro_license),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = modifier.padding(6.dp)
-            )
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                CardButton(
-                    onClick = { gotoUrl(context, LICENSE_URL) },
-                    text = stringResource(id = R.string.btn_license),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                CardButton(
-                    onClick = { gotoUrl(context, POLICY_URL) },
-                    text = stringResource(id = R.string.btn_privacy),
-                    modifier = Modifier.weight(1f)
-                )
             }
         }
     }

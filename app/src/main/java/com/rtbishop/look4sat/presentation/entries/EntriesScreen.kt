@@ -151,8 +151,8 @@ private fun MiddleBarPreview() = MainTheme { MiddleBar("Amateur", {}, {}, {}) }
 private fun MiddleBar(type: String, navigate: () -> Unit, uncheck: () -> Unit, check: () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
         EntryTypeCard(type = type, { navigate() }, modifier = Modifier.weight(1f))
-        CardIcon(onClick = { uncheck() }, iconId = R.drawable.ic_checkbox_off)
-        CardIcon(onClick = { check() }, iconId = R.drawable.ic_checkbox_on)
+        CardIcon(onClick = { uncheck() }, iconId = R.drawable.ic_check_off)
+        CardIcon(onClick = { check() }, iconId = R.drawable.ic_check_on)
     }
 }
 
