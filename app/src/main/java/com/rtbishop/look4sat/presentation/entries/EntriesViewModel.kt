@@ -34,7 +34,8 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
         isLoading = true,
         itemsList = emptyList(),
         currentType = selectionRepo.getCurrentType(),
-        typesList = selectionRepo.getTypesList()
+        typesList = selectionRepo.getTypesList(),
+        takeAction = ::handleAction
     )
     val uiState = mutableStateOf(defaultUiState)
 
@@ -47,22 +48,33 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
         }
     }
 
-    fun setType(type: String) = viewModelScope.launch {
-        selectionRepo.setType(type)
-        uiState.value = uiState.value.copy(currentType = type)
+    private fun handleAction(action: EntriesUiAction) {
+        when (action) {
+            EntriesUiAction.SaveSelection -> saveSelection()
+            is EntriesUiAction.SearchFor -> searchFor(action.query)
+            EntriesUiAction.SelectAll -> selectAll(true)
+            is EntriesUiAction.SelectSingle -> selectSingle(action.id, action.isTicked)
+            is EntriesUiAction.SelectType -> selectType(action.type)
+            EntriesUiAction.UnselectAll -> selectAll(false)
+        }
     }
 
-    fun setQuery(query: String) = viewModelScope.launch { selectionRepo.setQuery(query) }
+    private fun saveSelection() = viewModelScope.launch { selectionRepo.saveSelection() }
 
-    fun setSelection(selectAll: Boolean) = viewModelScope.launch {
+    private fun searchFor(query: String) = viewModelScope.launch { selectionRepo.setQuery(query) }
+
+    private fun selectAll(selectAll: Boolean) = viewModelScope.launch {
         selectionRepo.setSelection(selectAll)
     }
 
-    fun setSelection(ids: List<Int>, isTicked: Boolean) = viewModelScope.launch {
-        selectionRepo.setSelection(ids, isTicked)
+    private fun selectSingle(id: Int, isTicked: Boolean) = viewModelScope.launch {
+        selectionRepo.setSelection(listOf(id), isTicked.not())
     }
 
-    fun saveSelection() = viewModelScope.launch { selectionRepo.saveSelection() }
+    private fun selectType(type: String) = viewModelScope.launch {
+        selectionRepo.setType(type)
+        uiState.value = uiState.value.copy(currentType = type)
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

@@ -5,10 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -33,31 +32,36 @@ private fun TypeDialogPreview() {
 
 @Composable
 fun TypesDialog(list: List<String>, selected: String, toggle: () -> Unit, click: (String) -> Unit) {
+    val clickAction = { type: String ->
+        click(type)
+        toggle()
+    }
     Dialog(onDismissRequest = { toggle() }) {
-        ElevatedCard(modifier = Modifier.fillMaxHeight(0.9f)) {
+        ElevatedCard(modifier = Modifier.fillMaxHeight(0.75f)) {
             LazyColumn(
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
-                items(list) { type ->
+                itemsIndexed(list) { index, type ->
                     Surface {
                         Row(verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .background(MaterialTheme.colorScheme.surface)
-                                .clickable {
-                                    click(type)
-                                    toggle()
-                                }) {
-                            RadioButton(selected = type == selected, onClick = {})
+                                .clickable { clickAction(type) }) {
+                            Text(
+                                text = "$index).",
+                                modifier = Modifier.padding(start = 12.dp, end = 6.dp),
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
                             Text(
                                 text = type,
-                                modifier = Modifier
-                                    .padding(end = 6.dp)
-                                    .fillMaxWidth(),
-                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier.weight(1f),
+                                fontWeight = FontWeight.Medium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
+                            RadioButton(selected = type == selected, onClick = { clickAction(type) })
                         }
                     }
                 }
