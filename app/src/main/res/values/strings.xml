@@ -50,7 +50,7 @@
     <string name="filter_elev_text">Show passes with max elevation above</string>
 
     <string name="locator_title">QTH locator settings</string>
-    <string name="locator_text">Set station\'s position using your locator</string>
+    <string name="locator_text">Set station\'s position using locator</string>
     <string name="locator_hint">QTH</string>
 
     <string name="modes_title">Select modulation type</string>

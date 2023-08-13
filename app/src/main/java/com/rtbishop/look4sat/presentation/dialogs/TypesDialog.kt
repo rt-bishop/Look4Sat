@@ -6,8 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -31,23 +32,25 @@ private fun TypeDialogPreview() {
 }
 
 @Composable
-fun TypesDialog(list: List<String>, selected: String, toggle: () -> Unit, click: (String) -> Unit) {
+fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, select: (String) -> Unit) {
     val clickAction = { type: String ->
-        click(type)
-        toggle()
+        select(type)
+        dismiss()
     }
-    Dialog(onDismissRequest = { toggle() }) {
+    Dialog(onDismissRequest = { dismiss() }) {
         ElevatedCard(modifier = Modifier.fillMaxHeight(0.75f)) {
-            LazyColumn(
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(160.dp),
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                horizontalArrangement = Arrangement.spacedBy(1.dp),
                 verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
-                itemsIndexed(list) { index, type ->
+                itemsIndexed(items) { index, item ->
                     Surface {
                         Row(verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .background(MaterialTheme.colorScheme.surface)
-                                .clickable { clickAction(type) }) {
+                                .clickable { clickAction(item) }) {
                             Text(
                                 text = "$index).",
                                 modifier = Modifier.padding(start = 12.dp, end = 6.dp),
@@ -55,13 +58,13 @@ fun TypesDialog(list: List<String>, selected: String, toggle: () -> Unit, click:
                                 color = MaterialTheme.colorScheme.secondary
                             )
                             Text(
-                                text = type,
+                                text = item,
                                 modifier = Modifier.weight(1f),
                                 fontWeight = FontWeight.Medium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            RadioButton(selected = type == selected, onClick = { clickAction(type) })
+                            RadioButton(selected = item == selected, onClick = { clickAction(item) })
                         }
                     }
                 }

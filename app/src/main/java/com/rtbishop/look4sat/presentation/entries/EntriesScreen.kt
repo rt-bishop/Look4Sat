@@ -50,7 +50,7 @@ fun EntriesScreen(uiState: EntriesUiState, navToPasses: () -> Unit) {
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val toggleDialog = { showDialog.value = showDialog.value.not() }
     if (showDialog.value) {
-        TypesDialog(list = uiState.typesList, selected = uiState.currentType, toggleDialog) {
+        TypesDialog(items = uiState.typesList, selected = uiState.currentType, toggleDialog) {
             uiState.takeAction(EntriesUiAction.SelectType(it))
         }
     }
