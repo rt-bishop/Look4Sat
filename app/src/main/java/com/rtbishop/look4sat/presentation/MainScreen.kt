@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.entries.EntriesScreen
+import com.rtbishop.look4sat.presentation.entries.EntriesViewModel
 import com.rtbishop.look4sat.presentation.map.MapScreen
 import com.rtbishop.look4sat.presentation.passes.PassesScreen
 import com.rtbishop.look4sat.presentation.radar.RadarScreen
@@ -62,16 +64,20 @@ private fun MainNavBar(navController: NavController) {
 
 @Composable
 private fun MainNavGraph(navController: NavHostController) {
-    val navToPasses = { navController.navigate(Screen.Passes.route) }
-    val navToRadar = { catNum: Int, aosTime: Long ->
-        navController.navigate("${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}")
-    }
     val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
-    val radarArgs = listOf(navArgument("catNum") { defaultValue = 0 },
-        navArgument("aosTime") { defaultValue = 0L })
+    val radarArgs = listOf(navArgument("catNum") { defaultValue = 0 }, navArgument("aosTime") { defaultValue = 0L })
     NavHost(navController, startDestination = Screen.Passes.route) {
-        composable(Screen.Entries.route) { EntriesScreen(navToPasses) }
-        composable(Screen.Passes.route) { PassesScreen(navToRadar) }
+        composable(Screen.Entries.route) {
+            val viewModel = viewModel(EntriesViewModel::class.java, factory = EntriesViewModel.Factory)
+            val navToPasses = { navController.navigate(Screen.Passes.route) }
+            EntriesScreen(viewModel.uiState.value, navToPasses)
+        }
+        composable(Screen.Passes.route) {
+            val navToRadar = { catNum: Int, aosTime: Long ->
+                navController.navigate("${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}")
+            }
+            PassesScreen(navToRadar)
+        }
         composable(radarRoute, radarArgs) { RadarScreen() }
         composable(Screen.Map.route) { MapScreen() }
         composable(Screen.Settings.route) { SettingsScreen() }

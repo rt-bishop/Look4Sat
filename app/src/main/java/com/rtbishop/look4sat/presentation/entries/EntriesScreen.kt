@@ -38,42 +38,38 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.CardIcon
 import com.rtbishop.look4sat.presentation.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.dialogs.TypesDialog
-import com.rtbishop.look4sat.presentation.onClick
 
 @Composable
-fun EntriesScreen(navToPasses: () -> Unit) {
-    val viewModel = viewModel(EntriesViewModel::class.java, factory = EntriesViewModel.Factory)
-    val uiState = viewModel.uiState.value
-
+fun EntriesScreen(uiState: EntriesUiState, navToPasses: () -> Unit) {
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val toggleDialog = { showDialog.value = showDialog.value.not() }
     if (showDialog.value) {
         TypesDialog(list = uiState.typesList, selected = uiState.currentType, toggleDialog) {
-            viewModel.setType(it)
+            uiState.takeAction(EntriesUiAction.SelectType(it))
         }
     }
 
-    val unselectAll = { viewModel.setSelection(false) }
-    val selectAll = { viewModel.setSelection(true) }
+    val unselectAll = { uiState.takeAction(EntriesUiAction.UnselectAll) }
+    val selectAll = { uiState.takeAction(EntriesUiAction.SelectAll) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TopBar(setQuery = { newQuery: String -> viewModel.setQuery(newQuery) }, saveSelection = {
-            viewModel.saveSelection()
-            navToPasses()
-        })
+        TopBar(setQuery = { newQuery: String -> uiState.takeAction(EntriesUiAction.SearchFor(newQuery)) },
+            saveSelection = {
+                uiState.takeAction(EntriesUiAction.SaveSelection)
+                navToPasses()
+            })
         MiddleBar(uiState.currentType, { toggleDialog() }, { unselectAll() }, { selectAll() })
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
             if (uiState.isLoading) {
                 CardLoadingIndicator()
             } else {
-                EntriesCard(uiState.itemsList) { list, value ->
-                    viewModel.setSelection(list, value)
+                EntriesCard(uiState.itemsList) { id, isTicked ->
+                    uiState.takeAction(EntriesUiAction.SelectSingle(id, isTicked))
                 }
             }
         }
@@ -188,19 +184,21 @@ private fun EntryTypeCard(type: String, onClick: () -> Unit, modifier: Modifier 
 @Preview(showBackground = true)
 @Composable
 private fun EntryPreview() {
-    val satItem = SatItem(45555, "Very long Satellite name", true)
+    val satItem = SatItem(44444, "Ultra Super Mega long satellite name", true)
     MainTheme { Entry(item = satItem, onSelected = { _, _ -> run {} }, modifier = Modifier) }
 }
 
 @Composable
-private fun Entry(item: SatItem, onSelected: (List<Int>, Boolean) -> Unit, modifier: Modifier) {
-    Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
+private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: Modifier) {
+    Surface(color = MaterialTheme.colorScheme.background,
+        modifier = modifier.clickable { onSelected(item.catnum, item.isSelected) }) {
         Surface(modifier = Modifier.padding(bottom = 1.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(start = 0.dp, top = 8.dp, end = 12.dp, bottom = 8.dp)
-                    .onClick { onSelected(listOf(item.catnum), item.isSelected.not()) }) {
+            ) {
                 Text(
                     text = "Id:${item.catnum}  -  ",
                     modifier = Modifier.width(104.dp),
@@ -209,14 +207,12 @@ private fun Entry(item: SatItem, onSelected: (List<Int>, Boolean) -> Unit, modif
                 )
                 Text(
                     text = item.name,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 6.dp),
+                    modifier = Modifier.weight(1f),
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Checkbox(checked = item.isSelected, onCheckedChange = null)
+                Checkbox(checked = item.isSelected, onCheckedChange = null, modifier = Modifier.padding(start = 6.dp))
             }
         }
     }
@@ -225,12 +221,17 @@ private fun Entry(item: SatItem, onSelected: (List<Int>, Boolean) -> Unit, modif
 @Preview(showBackground = true)
 @Composable
 private fun EntriesPreview() {
-    MainTheme { EntriesCard(emptyList()) { _, _ -> run {} } }
+    val entries = listOf(
+        SatItem(8888, "Meteor", false),
+        SatItem(44444, "ISS", true),
+        SatItem(88888, "Starlink", false)
+    )
+    MainTheme { EntriesCard(entries) { _, _ -> run {} } }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EntriesCard(items: List<SatItem>, onSelected: (List<Int>, Boolean) -> Unit) {
+fun EntriesCard(items: List<SatItem>, onSelected: (Int, Boolean) -> Unit) {
     LazyColumn {
         items(items = items, key = { item -> item.catnum }) { entry ->
             Entry(entry, onSelected, Modifier.animateItemPlacement())

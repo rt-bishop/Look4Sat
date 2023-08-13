@@ -7,4 +7,14 @@ data class EntriesUiState(
     val itemsList: List<SatItem>,
     val currentType: String,
     val typesList: List<String>,
+    val takeAction: (EntriesUiAction) -> Unit
 )
+
+sealed class EntriesUiAction {
+    data object SaveSelection : EntriesUiAction()
+    data class SearchFor(val query: String) : EntriesUiAction()
+    data object SelectAll : EntriesUiAction()
+    data class SelectSingle(val id: Int, val isTicked: Boolean) : EntriesUiAction()
+    data class SelectType(val type: String) : EntriesUiAction()
+    data object UnselectAll : EntriesUiAction()
+}
