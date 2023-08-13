@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.entries.EntriesScreen
 import com.rtbishop.look4sat.presentation.entries.EntriesViewModel
+import com.rtbishop.look4sat.presentation.info.InfoScreen
 import com.rtbishop.look4sat.presentation.map.MapScreen
 import com.rtbishop.look4sat.presentation.passes.PassesScreen
 import com.rtbishop.look4sat.presentation.radar.RadarScreen
@@ -30,9 +31,10 @@ import com.rtbishop.look4sat.presentation.settings.SettingsScreen
 sealed class Screen(var title: String, var icon: Int, var route: String) {
     data object Entries : Screen("Entries", R.drawable.ic_sputnik, "entries")
     data object Passes : Screen("Passes", R.drawable.ic_passes, "passes")
-    data object Radar : Screen("Radar", R.drawable.ic_settings, "radar")
+    data object Radar : Screen("Radar", R.drawable.ic_passes, "passes.radar")
     data object Map : Screen("World Map", R.drawable.ic_world_map, "world_map")
     data object Settings : Screen("Settings", R.drawable.ic_settings, "settings")
+    data object Info : Screen("Info", R.drawable.ic_info, "info")
 }
 
 @Composable
@@ -44,20 +46,18 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
 
 @Composable
 private fun MainNavBar(navController: NavController) {
-    val items = listOf(Screen.Entries, Screen.Passes, Screen.Radar, Screen.Map, Screen.Settings)
+    val items = listOf(Screen.Entries, Screen.Passes, Screen.Map, Screen.Settings, Screen.Info)
     NavigationBar(modifier = Modifier.height(48.dp)) {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry.value?.destination?.route
-        items.forEach { item ->
-            NavigationBarItem(selected = currentRoute?.contains(item.route) ?: false, onClick = {
-                navController.navigate(item.route) {
-                    navController.graph.startDestinationRoute?.let { route ->
-                        popUpTo(route) { saveState = false }
-                    }
+        items.forEach { screen ->
+            NavigationBarItem(selected = currentRoute?.contains(screen.route) ?: false, onClick = {
+                navController.navigate(screen.route) {
+                    navController.graph.startDestinationRoute?.let { popUpTo(it) { saveState = false } }
                     launchSingleTop = true
                     restoreState = false
                 }
-            }, icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) })
+            }, icon = { Icon(painterResource(id = screen.icon), contentDescription = screen.title) })
         }
     }
 }
@@ -81,5 +81,6 @@ private fun MainNavGraph(navController: NavHostController) {
         composable(radarRoute, radarArgs) { RadarScreen() }
         composable(Screen.Map.route) { MapScreen() }
         composable(Screen.Settings.route) { SettingsScreen() }
+        composable(Screen.Info.route) { InfoScreen() }
     }
 }
