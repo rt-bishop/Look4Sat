@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.presentation.dialogs
+package com.rtbishop.look4sat.presentation.entries
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,19 +26,17 @@ import com.rtbishop.look4sat.presentation.MainTheme
 
 @Preview(showBackground = true)
 @Composable
-private fun ModesDialogPreview() {
-    val allModes = listOf(
-        "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
-        "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
-        "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
-        "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
-        "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
-    )
-    MainTheme { ModesDialog(allModes, listOf("AFSK", "AFSK S-Net"), {}) {} }
+private fun TypeDialogPreview() {
+    val types = listOf("All", "Amateur", "Geostationary", "Military", "Weather")
+    MainTheme { TypesDialog(types, "All", {}) {} }
 }
 
 @Composable
-fun ModesDialog(items: List<String>, selected: List<String>, dismiss: () -> Unit, select: (String) -> Unit) {
+fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, select: (String) -> Unit) {
+    val clickAction = { type: String ->
+        select(type)
+        dismiss()
+    }
     Dialog(onDismissRequest = { dismiss() }) {
         ElevatedCard(modifier = Modifier.fillMaxHeight(0.75f)) {
             LazyVerticalGrid(
@@ -52,7 +50,7 @@ fun ModesDialog(items: List<String>, selected: List<String>, dismiss: () -> Unit
                         Row(verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .background(MaterialTheme.colorScheme.surface)
-                                .clickable { select(item) }) {
+                                .clickable { clickAction(item) }) {
                             Text(
                                 text = "$index).",
                                 modifier = Modifier.padding(start = 12.dp, end = 6.dp),
@@ -66,7 +64,7 @@ fun ModesDialog(items: List<String>, selected: List<String>, dismiss: () -> Unit
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            Checkbox(checked = selected.contains(item), onCheckedChange = { select(item) })
+                            RadioButton(selected = item == selected, onClick = { clickAction(item) })
                         }
                     }
                 }

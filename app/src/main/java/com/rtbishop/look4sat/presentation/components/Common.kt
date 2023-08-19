@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.presentation
+package com.rtbishop.look4sat.presentation.components
 
 import android.content.Context
 import android.content.Intent
