@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
 
-    private val defaultUiState = EntriesUiState(
+    private val defaultUiState = EntriesState(
         isLoading = true,
         itemsList = emptyList(),
         currentType = selectionRepo.getCurrentType(),
@@ -48,14 +48,14 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
         }
     }
 
-    private fun handleAction(action: EntriesUiAction) {
+    private fun handleAction(action: EntriesAction) {
         when (action) {
-            EntriesUiAction.SaveSelection -> saveSelection()
-            is EntriesUiAction.SearchFor -> searchFor(action.query)
-            EntriesUiAction.SelectAll -> selectAll(true)
-            is EntriesUiAction.SelectSingle -> selectSingle(action.id, action.isTicked)
-            is EntriesUiAction.SelectType -> selectType(action.type)
-            EntriesUiAction.UnselectAll -> selectAll(false)
+            EntriesAction.SaveSelection -> saveSelection()
+            is EntriesAction.SearchFor -> searchFor(action.query)
+            EntriesAction.SelectAll -> selectAll(true)
+            is EntriesAction.SelectSingle -> selectSingle(action.id, action.isTicked)
+            is EntriesAction.SelectType -> selectType(action.type)
+            EntriesAction.UnselectAll -> selectAll(false)
         }
     }
 

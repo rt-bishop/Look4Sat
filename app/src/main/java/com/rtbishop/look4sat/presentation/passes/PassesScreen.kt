@@ -43,11 +43,10 @@ import com.rtbishop.look4sat.domain.predict.NearEarthSatellite
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.dialogs.FilterDialog
-import com.rtbishop.look4sat.presentation.pullRefresh.PullRefreshIndicator
-import com.rtbishop.look4sat.presentation.pullRefresh.PullRefreshState
-import com.rtbishop.look4sat.presentation.pullRefresh.pullRefresh
-import com.rtbishop.look4sat.presentation.pullRefresh.rememberPullRefreshState
+import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
+import com.rtbishop.look4sat.presentation.components.PullRefreshState
+import com.rtbishop.look4sat.presentation.components.pullRefresh
+import com.rtbishop.look4sat.presentation.components.rememberPullRefreshState
 import java.text.SimpleDateFormat
 import java.util.*
 

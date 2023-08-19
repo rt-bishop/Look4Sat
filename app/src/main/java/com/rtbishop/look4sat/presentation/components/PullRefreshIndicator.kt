@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.rtbishop.look4sat.presentation.pullRefresh
+package com.rtbishop.look4sat.presentation.components
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
