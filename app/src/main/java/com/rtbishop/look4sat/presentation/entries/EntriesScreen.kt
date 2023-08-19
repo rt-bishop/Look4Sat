@@ -40,27 +40,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.presentation.CardIcon
-import com.rtbishop.look4sat.presentation.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.dialogs.TypesDialog
+import com.rtbishop.look4sat.presentation.components.CardIcon
+import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
 
 @Composable
-fun EntriesScreen(uiState: EntriesUiState, navToPasses: () -> Unit) {
+fun EntriesScreen(uiState: EntriesState, navToPasses: () -> Unit) {
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val toggleDialog = { showDialog.value = showDialog.value.not() }
     if (showDialog.value) {
         TypesDialog(items = uiState.typesList, selected = uiState.currentType, toggleDialog) {
-            uiState.takeAction(EntriesUiAction.SelectType(it))
+            uiState.takeAction(EntriesAction.SelectType(it))
         }
     }
 
-    val unselectAll = { uiState.takeAction(EntriesUiAction.UnselectAll) }
-    val selectAll = { uiState.takeAction(EntriesUiAction.SelectAll) }
+    val unselectAll = { uiState.takeAction(EntriesAction.UnselectAll) }
+    val selectAll = { uiState.takeAction(EntriesAction.SelectAll) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TopBar(setQuery = { newQuery: String -> uiState.takeAction(EntriesUiAction.SearchFor(newQuery)) },
+        TopBar(setQuery = { newQuery: String -> uiState.takeAction(EntriesAction.SearchFor(newQuery)) },
             saveSelection = {
-                uiState.takeAction(EntriesUiAction.SaveSelection)
+                uiState.takeAction(EntriesAction.SaveSelection)
                 navToPasses()
             })
         MiddleBar(uiState.currentType, { toggleDialog() }, { unselectAll() }, { selectAll() })
@@ -69,7 +68,7 @@ fun EntriesScreen(uiState: EntriesUiState, navToPasses: () -> Unit) {
                 CardLoadingIndicator()
             } else {
                 EntriesCard(uiState.itemsList) { id, isTicked ->
-                    uiState.takeAction(EntriesUiAction.SelectSingle(id, isTicked))
+                    uiState.takeAction(EntriesAction.SelectSingle(id, isTicked))
                 }
             }
         }

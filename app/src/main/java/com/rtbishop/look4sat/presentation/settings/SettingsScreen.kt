@@ -37,12 +37,10 @@ import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.presentation.CardButton
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.dialogs.LocatorDialog
-import com.rtbishop.look4sat.presentation.dialogs.PositionDialog
-import com.rtbishop.look4sat.presentation.gotoUrl
-import com.rtbishop.look4sat.presentation.showToast
+import com.rtbishop.look4sat.presentation.components.CardButton
+import com.rtbishop.look4sat.presentation.components.gotoUrl
+import com.rtbishop.look4sat.presentation.components.showToast
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
