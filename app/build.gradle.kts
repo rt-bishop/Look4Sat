@@ -54,6 +54,7 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("org.osmdroid:osmdroid-android:6.1.17")
+    implementation("ovh.plrapps:mapcompose:2.9.2")
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.2")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.2")
 

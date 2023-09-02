@@ -18,9 +18,12 @@
 package com.rtbishop.look4sat.domain.utility
 
 import com.rtbishop.look4sat.domain.predict.DEG2RAD
+import com.rtbishop.look4sat.domain.predict.PI
 import com.rtbishop.look4sat.domain.predict.RAD2DEG
+import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sin
 
 private const val MIN_LATITUDE = -85.05112877980658
 private const val MAX_LATITUDE = 85.05112877980658
@@ -31,14 +34,14 @@ fun Double.toDegrees(): Double = this * RAD2DEG
 
 fun Double.toRadians(): Double = this * DEG2RAD
 
-//fun Double.latToY01(): Double {
-//    val sinus = sin(clipLat(this) * PI / MAX_LONGITUDE)
-//    return 0.5 - ln((1 + sinus) / (1 - sinus)) / (4 * PI)
-//}
+fun Double.latToY01(): Double {
+    val sinus = sin(clipLat(this) * PI / MAX_LONGITUDE)
+    return 0.5 - ln((1 + sinus) / (1 - sinus)) / (4 * PI)
+}
 
-//fun Double.lonToX01(): Double {
-//    return (clipLon(this) - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE)
-//}
+fun Double.lonToX01(): Double {
+    return (clipLon(this) - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE)
+}
 
 //fun Double.y01ToLat(): Double {
 //    return 90 - 360 * atan(exp((this - 0.5) * 2 * PI)) / PI

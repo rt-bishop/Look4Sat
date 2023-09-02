@@ -17,19 +17,37 @@
  */
 package com.rtbishop.look4sat.presentation.map
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.domain.source.IRemoteSource
 import com.rtbishop.look4sat.domain.utility.clipLat
 import com.rtbishop.look4sat.domain.utility.clipLon
+import com.rtbishop.look4sat.domain.utility.latToY01
+import com.rtbishop.look4sat.domain.utility.lonToX01
 import com.rtbishop.look4sat.domain.utility.positionToQth
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.domain.utility.toTimerString
@@ -43,8 +61,25 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
+import ovh.plrapps.mapcompose.api.addLayer
+import ovh.plrapps.mapcompose.api.addMarker
+import ovh.plrapps.mapcompose.api.addPath
+import ovh.plrapps.mapcompose.api.minimumScaleMode
+import ovh.plrapps.mapcompose.api.onMarkerClick
+import ovh.plrapps.mapcompose.api.removeAllMarkers
+import ovh.plrapps.mapcompose.api.removePath
+import ovh.plrapps.mapcompose.api.scale
+import ovh.plrapps.mapcompose.api.setColorFilterProvider
+import ovh.plrapps.mapcompose.api.shouldLoopScale
+import ovh.plrapps.mapcompose.core.ColorFilterProvider
+import ovh.plrapps.mapcompose.core.TileStreamProvider
+import ovh.plrapps.mapcompose.ui.layout.Fill
+import ovh.plrapps.mapcompose.ui.state.MapState
 
-class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISettingsRepo) : ViewModel() {
+class MapViewModel(
+    private val remoteSource: IRemoteSource, private val satelliteRepo: ISatelliteRepo, settingsRepo: ISettingsRepo
+) : ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
     private var allPasses = satelliteRepo.passes.value
@@ -66,23 +101,85 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
     val footprint: SharedFlow<OrbitalPos> = _footprint
 
     private val _mapData = MutableSharedFlow<MapData>()
-//    val mapData: SharedFlow<MapData> = _mapData
+    val mapData: SharedFlow<MapData> = _mapData
 
     private val _positions = MutableSharedFlow<Map<OrbitalObject, GeoPos>>()
     val positions: SharedFlow<Map<OrbitalObject, GeoPos>> = _positions
 
-//    fun scrollSelection(decrement: Boolean) {
-//        if (allSatellites.isNotEmpty()) {
-//            val index = allSatellites.indexOf(selectedSatellite)
-//            if (decrement) {
-//                if (index > 0) selectSatellite(allSatellites[index - 1])
-//                else selectSatellite(allSatellites[allSatellites.size - 1])
-//            } else {
-//                if (index < allSatellites.size - 1) selectSatellite(allSatellites[index + 1])
-//                else selectSatellite(allSatellites[0])
-//            }
-//        }
-//    }
+    private val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
+        val mapUrl = "https://stamen-tiles.a.ssl.fastly.net/toner-lite/$zoomLvl/$col/$row.jpg"
+        remoteSource.getNetworkStream(mapUrl)
+    }
+
+    private val tileColorFiler = ColorFilterProvider { _, _, _ ->
+        val mtrx = floatArrayOf(-1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f)
+        ColorFilter.colorMatrix(ColorMatrix(mtrx))
+    }
+
+    val mapState = mutableStateOf(MapState(6, 8192, 8192, workerCount = 6).apply {
+        minimumScaleMode = Fill
+        scale = 0.5f
+        shouldLoopScale = true
+        addLayer(tileStreamProvider)
+        setColorFilterProvider(tileColorFiler)
+        addStationMarker()
+    }).value
+
+    private fun MapState.addStationMarker() {
+        addMarker(id = "stationPos", x = stationPos.longitude.lonToX01(), y = stationPos.latitude.latToY01()) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_position),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+
+    private fun addSatelliteMarkers(positions: Map<OrbitalObject, GeoPos>) {
+        mapState.removeAllMarkers()
+        positions.forEach { entry ->
+            val satelliteName = entry.key.data.name
+            val latitude = entry.value.latitude.latToY01()
+            val longitude = entry.value.longitude.lonToX01()
+            mapState.addMarker(satelliteName, x = longitude, y = latitude) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_close),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(text = satelliteName, fontSize = 12.sp)
+                }
+            }
+            mapState.onMarkerClick { _, _, _ ->
+                selectSatellite(entry.key)
+            }
+        }
+    }
+
+    private fun addFootprint(footprintPoints: List<GeoPoint>) {
+        mapState.removePath("footprint")
+        mapState.addPath("footprint", color = Color(0xFFFFD600)) {
+            footprintPoints.forEach {
+                addPoint(x = it.longitude.lonToX01(), y = it.latitude.latToY01())
+            }
+        }
+    }
+
+    fun scrollSelection(decrement: Boolean) {
+        if (allSatellites.isNotEmpty()) {
+            val index = allSatellites.indexOf(selectedOrbitalObject)
+            if (decrement) {
+                if (index > 0) selectSatellite(allSatellites[index - 1])
+                else selectSatellite(allSatellites[allSatellites.size - 1])
+            } else {
+                if (index < allSatellites.size - 1) selectSatellite(allSatellites[index + 1])
+                else selectSatellite(allSatellites[0])
+            }
+        }
+    }
 
     fun selectDefaultSatellite(catnum: Int) {
         if (allSatellites.isNotEmpty()) {
@@ -151,6 +248,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
             positions[satellite] = GeoPos(osmLat, osmLon)
         }
         _positions.emit(positions)
+        addSatelliteMarkers(positions)
     }
 
     private suspend fun getSatFootprint(orbitalObject: OrbitalObject, pos: GeoPos, date: Date) {
@@ -160,18 +258,17 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
 
     private suspend fun getSatData(sat: OrbitalObject, pos: GeoPos, date: Date) {
         var aosTime = 0L.toTimerString()
-        allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 100 }
-            ?.let { satPass ->
-                if (!satPass.isDeepSpace) {
-                    aosTime = if (date.time < satPass.aosTime) {
-                        val millisBeforeStart = satPass.aosTime.minus(date.time)
-                        millisBeforeStart.toTimerString()
-                    } else {
-                        val millisBeforeEnd = satPass.losTime.minus(date.time)
-                        millisBeforeEnd.toTimerString()
-                    }
+        allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 100 }?.let { satPass ->
+            if (!satPass.isDeepSpace) {
+                aosTime = if (date.time < satPass.aosTime) {
+                    val millisBeforeStart = satPass.aosTime.minus(date.time)
+                    millisBeforeStart.toTimerString()
+                } else {
+                    val millisBeforeEnd = satPass.losTime.minus(date.time)
+                    millisBeforeEnd.toTimerString()
                 }
             }
+        }
         val satPos = satelliteRepo.getPosition(sat, pos, date.time)
         val azimuth = satPos.azimuth.toDegrees()
         val elevation = satPos.elevation.toDegrees()
@@ -205,7 +302,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                MapViewModel(container.satelliteRepo, container.settingsRepo)
+                MapViewModel(container.remoteSource, container.satelliteRepo, container.settingsRepo)
             }
         }
     }

@@ -38,6 +38,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import ovh.plrapps.mapcompose.ui.MapUI
 
 private val minLat = MapView.getTileSystem().minLatitude
 private val maxLat = MapView.getTileSystem().maxLatitude
@@ -72,12 +73,13 @@ fun MapScreen() {
     val positionClick = { orbitalObject: OrbitalObject -> viewModel.selectSatellite(orbitalObject) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
-            MapView(modifier = Modifier.fillMaxSize()) { mapView ->
-                stationPos.value?.let { setStationPosition(it, mapView) }
-                positions.value?.let { setPositions(it, mapView, positionClick) }
-                satTrack.value?.let { setSatelliteTrack(it, mapView) }
-                footprint.value?.let { setFootprint(it, mapView) }
-            }
+            MapUI(modifier = Modifier.fillMaxSize(), viewModel.mapState)
+//            MapView(modifier = Modifier.fillMaxSize()) { mapView ->
+//                stationPos.value?.let { setStationPosition(it, mapView) }
+//                positions.value?.let { setPositions(it, mapView, positionClick) }
+//                satTrack.value?.let { setSatelliteTrack(it, mapView) }
+//                footprint.value?.let { setFootprint(it, mapView) }
+//            }
         }
     }
 }

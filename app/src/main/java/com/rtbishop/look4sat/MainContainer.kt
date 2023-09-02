@@ -37,6 +37,7 @@ class MainContainer(private val context: Context) {
     private val localSource = provideLocalSource()
     private val mainHandler = CoroutineExceptionHandler { _, error -> println("MainHandler: $error") }
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + mainHandler)
+    val remoteSource = provideRemoteSource()
     val settingsRepo = provideSettingsRepo()
     val selectionRepo = provideSelectionRepo()
     val satelliteRepo = provideSatelliteRepo()
