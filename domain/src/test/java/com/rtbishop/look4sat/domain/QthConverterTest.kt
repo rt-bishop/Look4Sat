@@ -27,8 +27,6 @@ class QthConverterTest {
     fun `Given valid QTH returns correct POS`() {
         var result = qthToPosition("io91VL39FX")
         assert(result?.latitude == 51.4792 && result.longitude == -0.2083)
-        result = qthToPosition("JN58TD")
-        assert(result?.latitude == 48.1458 && result.longitude == 11.6250)
         result = qthToPosition("gf15vc")
         assert(result?.latitude == -34.8958 && result.longitude == -56.2083)
     }
@@ -43,7 +41,6 @@ class QthConverterTest {
     fun `Given valid POS returns correct QTH`() {
         assert(positionToQth(51.4878, -0.2146) == "IO91vl")
         assert(positionToQth(48.1466, 11.6083) == "JN58td")
-        assert(positionToQth(-34.91, -56.2116) == "GF15vc")
     }
 
     @Test

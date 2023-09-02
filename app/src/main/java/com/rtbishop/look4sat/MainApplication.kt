@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
+import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
@@ -31,7 +32,7 @@ class MainApplication : Application() {
     lateinit var container: MainContainer
 
     override fun onCreate() {
-        if (BuildConfig.DEBUG) enableStrictMode()
+        enableStrictMode()
         super.onCreate()
         container = MainContainer(this)
         container.mainScope.launch { checkAutoUpdate() }
@@ -50,8 +51,11 @@ class MainApplication : Application() {
     }
 
     private fun enableStrictMode() {
-        StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyLog().build())
-        StrictMode.setVmPolicy(VmPolicy.Builder().detectAll().penaltyLog().build())
+        val isDebuggable = 0 != applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
+        if (isDebuggable) {
+            StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyLog().build())
+            StrictMode.setVmPolicy(VmPolicy.Builder().detectAll().penaltyLog().build())
+        }
     }
 
     companion object {
