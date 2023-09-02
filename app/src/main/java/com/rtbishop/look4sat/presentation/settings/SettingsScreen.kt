@@ -33,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.rtbishop.look4sat.BuildConfig
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
@@ -113,8 +112,9 @@ fun SettingsScreen() {
     val toggleSensor = { value: Boolean -> viewModel.toggleSensor(value) }
 
     // Screen setup
+    val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.0"
     LazyColumn(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        item { CardAbout(BuildConfig.VERSION_NAME) }
+        item { CardAbout(versionName) }
         item { LocationCard(positionSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos) }
         item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
         item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }

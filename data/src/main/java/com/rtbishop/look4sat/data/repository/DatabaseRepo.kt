@@ -48,11 +48,10 @@ class DatabaseRepo(
     }
 
     override suspend fun updateFromRemote() = withContext(dispatcher) {
-        val sourcesMap = settingsRepo.satelliteSourcesMap
         val importedEntries = mutableListOf<SatEntry>()
         val importedRadios = mutableListOf<SatRadio>()
         // fetch
-        val jobsMap = sourcesMap.mapValues { async { remoteSource.getRemoteStream(it.value) } }
+        val jobsMap = settingsRepo.satelliteSourcesMap.mapValues { async { remoteSource.getRemoteStream(it.value) } }
         val jobRadios = async { remoteSource.getRemoteStream(settingsRepo.radioSourceUrl) }
         // parse
         jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
