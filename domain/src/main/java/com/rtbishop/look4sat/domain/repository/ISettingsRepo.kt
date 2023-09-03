@@ -56,93 +56,54 @@ interface ISettingsRepo {
             "X-Comm" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
         )
 
-    //region # Station position settings
-
-    val stationPosition: StateFlow<GeoPos>
-
-    fun setGpsPosition(): Boolean
-
-    fun setGeoPosition(latitude: Double, longitude: Double, altitude: Double = 0.0): Boolean
-
-    fun setQthPosition(locator: String): Boolean
-
-    //endregion
-
-    //region # Database update settings
-
-    val databaseState: StateFlow<DatabaseState>
-
-    fun saveDatabaseState(state: DatabaseState)
-
-    fun saveSatType(type: String, catnums: List<Int>)
-
-    fun loadSatType(type: String): List<Int>
-
-    //endregion
-
-    //region # Entries selection settings
-
-    val satelliteSelection: StateFlow<List<Int>>
-
-    fun saveEntriesSelection(catnums: List<Int>)
-
+    //region # Satellites selection settings
+    val selectedIds: StateFlow<List<Int>>
+    fun setSelectedIds(ids: List<Int>)
     //endregion
 
     //region # Passes filter settings
-
     val passesSettings: StateFlow<PassesSettings>
+    fun getSelectedModes(): List<String>
+    fun setSelectedModes(modes: List<String>)
+    fun updatePassesSettings(settings: PassesSettings)
+    //endregion
 
-    fun savePassesSettings(settings: PassesSettings)
+    //region # Station position settings
+    val stationPosition: StateFlow<GeoPos>
+    fun setStationPositionGeo(latitude: Double, longitude: Double, altitude: Double): Boolean
+    fun setStationPositionGps(): Boolean
+    fun setStationPositionQth(locator: String): Boolean
+    //endregion
 
-    fun saveModesSelection(modes: List<String>)
-
-    fun loadModesSelection(): List<String>
-
+    //region # Database update settings
+    val databaseState: StateFlow<DatabaseState>
+    fun getSatelliteTypeIds(type: String): List<Int>
+    fun setSatelliteTypeIds(type: String, ids: List<Int>)
+    fun updateDatabaseState(state: DatabaseState)
     //endregion
 
     //region # Other settings
-
     val otherSettings: StateFlow<OtherSettings>
-
-    fun toggleUtc(value: Boolean)
-
-    fun toggleUpdate(value: Boolean)
-
-    fun toggleSweep(value: Boolean)
-
-    fun toggleSensor(value: Boolean)
-
+    fun setStateOfAutoUpdate(value: Boolean)
+    fun setStateOfSensors(value: Boolean)
+    fun setStateOfSweep(value: Boolean)
+    fun setStateOfUtc(value: Boolean)
     //endregion
 
     //region # Undefined settings
-
-    fun getRotatorEnabled(): Boolean
-
-    fun setRotatorEnabled(value: Boolean)
-
-    fun getRotatorServer(): String
-
-    fun setRotatorServer(value: String)
-
+    fun getBluetoothAddress(): String
+    fun setBluetoothAddress(value: String)
+    fun getBluetoothFormat(): String
+    fun setBluetoothFormat(value: String)
+    fun getBluetoothName(): String
+    fun setBluetoothName(value: String)
+    fun getBluetoothState(): Boolean
+    fun setBluetoothState(value: Boolean)
+    fun getRotatorAddress(): String
+    fun setRotatorAddress(value: String)
     fun getRotatorPort(): String
-
     fun setRotatorPort(value: String)
-
-    fun getBTEnabled(): Boolean
-
-    fun setBTEnabled(value: Boolean)
-
-    fun getBTDeviceAddr(): String
-
-    fun setBTDeviceAddr(value: String)
-
-    fun getBTDeviceName(): String
-
-    fun setBTDeviceName(value: String)
-
-    fun getBTFormat(): String
-
-    fun setBTFormat(value: String)
-
+    fun getRotatorState(): Boolean
+    fun setRotatorState(value: Boolean)
     //endregion
 }

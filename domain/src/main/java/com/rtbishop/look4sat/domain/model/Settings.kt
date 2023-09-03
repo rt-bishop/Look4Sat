@@ -1,12 +1,12 @@
 package com.rtbishop.look4sat.domain.model
 
-data class DatabaseState(val entriesTotal: Int, val radiosTotal: Int, val timestamp: Long)
+data class DatabaseState(val numberOfRadios: Int, val numberOfSatellites: Int, val updateTimestamp: Long)
 
-data class PassesSettings(val hoursAhead: Int, val minElevation: Double)
+data class PassesSettings(val filterHoursAhead: Int, val filterMinElevation: Double)
 
 data class OtherSettings(
-    val utcState: Boolean,
-    val updateState: Boolean,
-    val sweepState: Boolean,
-    val sensorState: Boolean
+    val stateOfAutoUpdate: Boolean,
+    val stateOfSensors: Boolean,
+    val stateOfSweep: Boolean,
+    val stateOfUtc: Boolean
 )

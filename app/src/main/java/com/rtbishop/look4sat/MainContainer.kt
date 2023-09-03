@@ -99,8 +99,11 @@ class MainContainer(private val context: Context) {
 
     private fun provideSettingsRepo(): ISettingsRepo {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val preferences = context.getSharedPreferences("default", Context.MODE_PRIVATE)
-        Configuration.getInstance().load(context, preferences)
-        return SettingsRepo(manager, preferences)
+        val appPrefsFileName = "${context.packageName}_preferences"
+        val appPreferences = context.getSharedPreferences(appPrefsFileName, Context.MODE_PRIVATE)
+        val mapPrefsFileName = "${context.packageName}_osmdroid"
+        val mapPreferences = context.getSharedPreferences(mapPrefsFileName, Context.MODE_PRIVATE)
+        Configuration.getInstance().load(context, mapPreferences)
+        return SettingsRepo(manager, appPreferences)
     }
 }

@@ -33,7 +33,7 @@ class SelectionRepo(
     override fun getTypesList() = settingsRepo.satelliteSourcesMap.keys.sorted()
 
     override suspend fun getEntriesFlow() = withContext(dispatcher) {
-        val selectedIds = settingsRepo.satelliteSelection.value
+        val selectedIds = settingsRepo.selectedIds.value
         currentItems.value = localSource.getEntriesList().map { item ->
             item.copy(isSelected = item.catnum in selectedIds)
         }
@@ -60,12 +60,12 @@ class SelectionRepo(
 
     override suspend fun saveSelection() = withContext(dispatcher) {
         val currentSelection = currentItems.value.filter { it.isSelected }.map { it.catnum }
-        settingsRepo.saveEntriesSelection(currentSelection)
+        settingsRepo.setSelectedIds(currentSelection)
     }
 
     private suspend fun List<SatItem>.filterByType(type: String) = withContext(dispatcher) {
         if (type == "All") return@withContext this@filterByType
-        val catnums = settingsRepo.loadSatType(type)
+        val catnums = settingsRepo.getSatelliteTypeIds(type)
         if (catnums.isEmpty()) return@withContext this@filterByType
         return@withContext this@filterByType.filter { item -> item.catnum in catnums }
     }

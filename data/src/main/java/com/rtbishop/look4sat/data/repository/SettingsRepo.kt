@@ -34,55 +34,104 @@ import java.util.concurrent.Executors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class SettingsRepo(
-    private val locationManager: LocationManager, private val preferences: SharedPreferences
-) : ISettingsRepo {
+class SettingsRepo(private val manager: LocationManager, private val preferences: SharedPreferences) : ISettingsRepo {
 
-    private val keyModes = "satModes"
-    private val keyUtcState = "utcState"
-    private val keyUpdateState = "updateState"
-    private val keySweepState = "sweepState"
-    private val keySensorState = "sensorState"
-    private val keyDataEntries = "dataEntries"
-    private val keyDataRadios = "dataRadios"
-    private val keyDataTimestamp = "dataTimestamp"
-    private val keyHoursAhead = "hoursAhead"
-    private val keyMinElevation = "minElevation"
-    private val keyRotator = "isRotatorEnabled"
+    private val keyBluetoothAddress = "bluetoothAddress"
+    private val keyBluetoothName = "bluetoothName"
+    private val keyBluetoothFormat = "bluetoothFormat"
+    private val keyBluetoothState = "bluetoothState"
+    private val keyFilterHoursAhead = "filterHoursAhead"
+    private val keyFilterMinElevation = "filterMinElevation"
+    private val keyNumberOfRadios = "numberOfRadios"
+    private val keyNumberOfSatellites = "numberOfSatellites"
     private val keyRotatorAddress = "rotatorAddress"
     private val keyRotatorPort = "rotatorPort"
-    private val keyBTEnabled = "isBTEnabled"
-    private val keyBTDeviceName = "BTDeviceName"
-    private val keyBTDeviceAddr = "BTDeviceAddr"
-    private val keyBTFormat = "BTFormat"
-    private val keyLatitude = "stationLat"
-    private val keyLongitude = "stationLon"
-    private val keyAltitude = "stationAlt"
-    private val keyLocator = "stationQTH"
-    private val keyLocTimestamp = "locTimestamp"
-    private val keySelection = "selection"
+    private val keyRotatorState = "rotatorState"
+    private val keySelectedIds = "selectedIds"
+    private val keySelectedModes = "selectedModes"
+    private val keyStateOfAutoUpdate = "stateOfAutoUpdate"
+    private val keyStateOfSensors = "stateOfSensors"
+    private val keyStateOfSweep = "stateOfSweep"
+    private val keyStateOfUtc = "stateOfUtc"
+    private val keyStationAltitude = "stationAltitude"
+    private val keyStationLatitude = "stationLatitude"
+    private val keyStationLongitude = "stationLongitude"
+    private val keyStationQth = "stationQth"
+    private val keyStationTimestamp = "stationTimestamp"
+    private val keyUpdateTimestamp = "updateTimestamp"
+    private val separatorComma = ","
+
+    //region # Satellites selection settings
+    private val _satelliteSelection = MutableStateFlow(getSelectedIds())
+    override val selectedIds: StateFlow<List<Int>> = _satelliteSelection
+
+    override fun setSelectedIds(ids: List<Int>) {
+        val selectionString = ids.joinToString(separatorComma)
+        preferences.edit { putString(keySelectedIds, selectionString) }
+        _satelliteSelection.value = ids
+    }
+
+    private fun getSelectedIds(): List<Int> {
+        val selectionString = preferences.getString(keySelectedIds, null)
+        val selectionList = selectionString?.split(separatorComma)?.map { it.toInt() }
+        return selectionList ?: emptyList()
+    }
+    //endregion
+
+    //region # Passes filter settings
+    private val _passesSettings = MutableStateFlow(getPassesSettings())
+    override val passesSettings: StateFlow<PassesSettings> = _passesSettings
+
+    override fun getSelectedModes(): List<String> {
+        val selectedModesString = preferences.getString(keySelectedModes, null)
+        return selectedModesString?.split(separatorComma)?.sorted() ?: emptyList()
+    }
+
+    override fun setSelectedModes(modes: List<String>) {
+        val selectedModes = modes.joinToString(separatorComma)
+        preferences.edit { putString(keySelectedModes, selectedModes) }
+    }
+
+    override fun updatePassesSettings(settings: PassesSettings) = preferences.edit {
+        putInt(keyFilterHoursAhead, settings.filterHoursAhead)
+        putLong(keyFilterMinElevation, settings.filterMinElevation.toRawBits())
+        _passesSettings.value = settings
+    }
+
+    private fun getPassesSettings(): PassesSettings {
+        val hoursAhead = preferences.getInt(keyFilterHoursAhead, 24)
+        val minElevation = Double.fromBits(preferences.getLong(keyFilterMinElevation, 16.0.toRawBits()))
+        return PassesSettings(hoursAhead, minElevation)
+    }
+    //endregion
 
     //region # Station position settings
-
-    private val _stationPosition = MutableStateFlow(loadStationPosition())
+    private val _stationPosition = MutableStateFlow(getStationPosition())
+    private val executor = Executors.newSingleThreadExecutor()
     private val providerDef = LocationManager.PASSIVE_PROVIDER
     private val providerGps = LocationManager.GPS_PROVIDER
     private val providerNet = LocationManager.NETWORK_PROVIDER
-    private val executor = Executors.newSingleThreadExecutor()
     private val timeoutSignal = CancellationSignal().apply {
-        setOnCancelListener { _stationPosition.value = loadStationPosition() }
+        setOnCancelListener { _stationPosition.value = getStationPosition() }
     }
     override val stationPosition: StateFlow<GeoPos> = _stationPosition
 
-    override fun setGpsPosition(): Boolean {
-        if (!LocationManagerCompat.isLocationEnabled(locationManager)) return false
+    override fun setStationPositionGeo(latitude: Double, longitude: Double, altitude: Double): Boolean {
+        val newLongitude = if (longitude > 180.0) longitude - 180 else longitude
+        val locator = positionToQth(latitude, newLongitude) ?: return false
+        setStationPosition(latitude, newLongitude, altitude, locator)
+        return true
+    }
+
+    override fun setStationPositionGps(): Boolean {
+        if (!LocationManagerCompat.isLocationEnabled(manager)) return false
         try {
-            val hasGps = LocationManagerCompat.hasProvider(locationManager, providerGps)
-            val hasNet = LocationManagerCompat.hasProvider(locationManager, providerNet)
-            val provider = if (hasGps) providerGps else if (hasNet) providerNet else providerDef
+            val hasProviderGps = LocationManagerCompat.hasProvider(manager, providerGps)
+            val hasProviderNet = LocationManagerCompat.hasProvider(manager, providerNet)
+            val provider = if (hasProviderGps) providerGps else if (hasProviderNet) providerNet else providerDef
             println("Requesting location for $provider provider")
-            LocationManagerCompat.getCurrentLocation(locationManager, provider, timeoutSignal, executor) {
-                it?.let { setGeoPosition(it.latitude, it.longitude, it.altitude) }
+            LocationManagerCompat.getCurrentLocation(manager, provider, timeoutSignal, executor) {
+                it?.let { setStationPositionGeo(it.latitude, it.longitude, it.altitude) }
             }
         } catch (exception: SecurityException) {
             println("No permissions were given - $exception")
@@ -90,224 +139,124 @@ class SettingsRepo(
         return true
     }
 
-    override fun setGeoPosition(latitude: Double, longitude: Double, altitude: Double): Boolean {
-        val newLongitude = if (longitude > 180.0) longitude - 180 else longitude
-        val locator = positionToQth(latitude, newLongitude) ?: return false
-        saveGeoPos(latitude, newLongitude, altitude, locator)
-        return true
-    }
-
-    override fun setQthPosition(locator: String): Boolean {
+    override fun setStationPositionQth(locator: String): Boolean {
         val position = qthToPosition(locator) ?: return false
-        saveGeoPos(position.latitude, position.longitude, 0.0, locator)
+        setStationPosition(position.latitude, position.longitude, 0.0, locator)
         return true
     }
 
-    private fun saveStationPosition(stationPos: GeoPos) = preferences.edit {
-        putString(keyLatitude, stationPos.latitude.toString())
-        putString(keyLongitude, stationPos.longitude.toString())
-        putString(keyAltitude, stationPos.altitude.toString())
-        putString(keyLocator, stationPos.qthLocator)
-        putLong(keyLocTimestamp, stationPos.timestamp)
-        _stationPosition.value = stationPos
+    private fun getStationPosition(): GeoPos {
+        val latitude = (preferences.getString(keyStationLatitude, null) ?: "0.0").toDouble()
+        val longitude = (preferences.getString(keyStationLongitude, null) ?: "0.0").toDouble()
+        val altitude = (preferences.getString(keyStationAltitude, null) ?: "0.0").toDouble()
+        val qthLocator = preferences.getString(keyStationQth, null) ?: "JJ00aa"
+        val timestamp = preferences.getLong(keyStationTimestamp, 0L)
+        return GeoPos(latitude, longitude, altitude, qthLocator, timestamp)
     }
 
-    private fun saveGeoPos(latitude: Double, longitude: Double, altitude: Double, locator: String) {
+    private fun setStationPosition(latitude: Double, longitude: Double, altitude: Double, locator: String) {
         val newLat = latitude.round(4)
         val newLon = longitude.round(4)
         val newAlt = altitude.round(1)
         val timestamp = System.currentTimeMillis()
         println("Received new Position($newLat, $newLon, $newAlt) & Locator $locator")
-        saveStationPosition(GeoPos(newLat, newLon, newAlt, locator, timestamp))
+        setStationPosition(GeoPos(newLat, newLon, newAlt, locator, timestamp))
     }
 
-    private fun loadStationPosition(): GeoPos {
-        val latitude = (preferences.getString(keyLatitude, null) ?: "0.0").toDouble()
-        val longitude = (preferences.getString(keyLongitude, null) ?: "0.0").toDouble()
-        val altitude = (preferences.getString(keyAltitude, null) ?: "0.0").toDouble()
-        val qthLocator = preferences.getString(keyLocator, null) ?: "null"
-        val timestamp = preferences.getLong(keyLocTimestamp, 0L)
-        return GeoPos(latitude, longitude, altitude, qthLocator, timestamp)
+    private fun setStationPosition(stationPos: GeoPos) = preferences.edit {
+        putString(keyStationLatitude, stationPos.latitude.toString())
+        putString(keyStationLongitude, stationPos.longitude.toString())
+        putString(keyStationAltitude, stationPos.altitude.toString())
+        putString(keyStationQth, stationPos.qthLocator)
+        putLong(keyStationTimestamp, stationPos.timestamp)
+        _stationPosition.value = stationPos
     }
-
     //endregion
 
     //region # Database update settings
-
-    private val _databaseState = MutableStateFlow(loadDatabaseState())
+    private val _databaseState = MutableStateFlow(getDatabaseState())
     override val databaseState: StateFlow<DatabaseState> = _databaseState
 
-    override fun saveDatabaseState(state: DatabaseState) = preferences.edit {
-        putInt(keyDataEntries, state.entriesTotal)
-        putInt(keyDataRadios, state.radiosTotal)
-        putLong(keyDataTimestamp, state.timestamp)
+    override fun getSatelliteTypeIds(type: String): List<Int> {
+        val typesString = preferences.getString("type$type", null)
+        if (typesString.isNullOrBlank()) return emptyList()
+        return typesString.split(separatorComma).map { it.toInt() }
+    }
+
+    override fun setSatelliteTypeIds(type: String, ids: List<Int>) {
+        if (type == "All") return
+        val typesString = ids.joinToString(separatorComma)
+        preferences.edit { putString("type$type", typesString) }
+    }
+
+    override fun updateDatabaseState(state: DatabaseState) = preferences.edit {
+        putInt(keyNumberOfSatellites, state.numberOfSatellites)
+        putInt(keyNumberOfRadios, state.numberOfRadios)
+        putLong(keyUpdateTimestamp, state.updateTimestamp)
         _databaseState.value = state
     }
 
-    override fun saveSatType(type: String, catnums: List<Int>) {
-        val stringList = catnums.map { catnum -> catnum.toString() }
-        preferences.edit { putStringSet("type$type", stringList.toSet()) }
+    private fun getDatabaseState(): DatabaseState {
+        val numberOfRadios = preferences.getInt(keyNumberOfRadios, 0)
+        val numberOfSatellites = preferences.getInt(keyNumberOfSatellites, 0)
+        val updateTimestamp = preferences.getLong(keyUpdateTimestamp, 0L)
+        return DatabaseState(numberOfRadios, numberOfSatellites, updateTimestamp)
     }
-
-    override fun loadSatType(type: String): List<Int> {
-        val catnums =
-            preferences.getStringSet("type$type", emptySet())?.map { catnum -> catnum.toInt() }
-        return catnums ?: emptyList()
-    }
-
-    private fun loadDatabaseState(): DatabaseState {
-        val entriesTotal = preferences.getInt(keyDataEntries, 0)
-        val radiosTotal = preferences.getInt(keyDataRadios, 0)
-        val timestamp = preferences.getLong(keyDataTimestamp, 0L)
-        return DatabaseState(entriesTotal, radiosTotal, timestamp)
-    }
-
-    //endregion
-
-    //region # Entries selection settings
-
-    private val _satelliteSelection = MutableStateFlow(loadEntriesSelection())
-    override val satelliteSelection: StateFlow<List<Int>> = _satelliteSelection
-
-    override fun saveEntriesSelection(catnums: List<Int>) = preferences.edit {
-        putStringSet(keySelection, catnums.map { catnum -> catnum.toString() }.toSet())
-        _satelliteSelection.value = catnums
-    }
-
-    private fun loadEntriesSelection(): List<Int> {
-        val catNums = preferences.getStringSet(keySelection, emptySet())
-        return catNums?.map { catnum -> catnum.toInt() }?.sorted() ?: emptyList()
-    }
-
-    //endregion
-
-    //region # Passes filter settings
-
-    private val _passesSettings = MutableStateFlow(loadPassesSettings())
-    override val passesSettings: StateFlow<PassesSettings> = _passesSettings
-
-    override fun savePassesSettings(settings: PassesSettings) = preferences.edit {
-        putInt(keyHoursAhead, settings.hoursAhead)
-        putDouble(keyMinElevation, settings.minElevation)
-        _passesSettings.value = settings
-    }
-
-    override fun saveModesSelection(modes: List<String>) {
-        preferences.edit { putStringSet(keyModes, modes.toSet()) }
-    }
-
-    override fun loadModesSelection(): List<String> {
-        return preferences.getStringSet(keyModes, null)?.toList()?.sorted() ?: emptyList()
-    }
-
-    private fun loadPassesSettings(): PassesSettings {
-        val hoursAhead = preferences.getInt(keyHoursAhead, 24)
-        val minElevation = preferences.getDouble(keyMinElevation, 16.0)
-        return PassesSettings(hoursAhead, minElevation)
-    }
-
     //endregion
 
     //region # Other settings
-
-    private val _otherSettings = MutableStateFlow(loadOtherSettings())
+    private val _otherSettings = MutableStateFlow(getOtherSettings())
     override val otherSettings: StateFlow<OtherSettings> = _otherSettings
 
-    override fun toggleUtc(value: Boolean) {
-        preferences.edit { putBoolean(keyUtcState, value) }
-        _otherSettings.value = otherSettings.value.copy(utcState = value)
+    override fun setStateOfAutoUpdate(value: Boolean) {
+        preferences.edit { putBoolean(keyStateOfAutoUpdate, value) }
+        _otherSettings.value = otherSettings.value.copy(stateOfAutoUpdate = value)
     }
 
-    override fun toggleUpdate(value: Boolean) {
-        preferences.edit { putBoolean(keyUpdateState, value) }
-        _otherSettings.value = otherSettings.value.copy(updateState = value)
+    override fun setStateOfSensors(value: Boolean) {
+        preferences.edit { putBoolean(keyStateOfSensors, value) }
+        _otherSettings.value = otherSettings.value.copy(stateOfSensors = value)
     }
 
-    override fun toggleSweep(value: Boolean) {
-        preferences.edit { putBoolean(keySweepState, value) }
-        _otherSettings.value = otherSettings.value.copy(sweepState = value)
+    override fun setStateOfSweep(value: Boolean) {
+        preferences.edit { putBoolean(keyStateOfSweep, value) }
+        _otherSettings.value = otherSettings.value.copy(stateOfSweep = value)
     }
 
-    override fun toggleSensor(value: Boolean) {
-        preferences.edit { putBoolean(keySensorState, value) }
-        _otherSettings.value = otherSettings.value.copy(sensorState = value)
+    override fun setStateOfUtc(value: Boolean) {
+        preferences.edit { putBoolean(keyStateOfUtc, value) }
+        _otherSettings.value = otherSettings.value.copy(stateOfUtc = value)
     }
 
-    private fun loadOtherSettings(): OtherSettings {
-        val utcState = preferences.getBoolean(keyUtcState, false)
-        val updateState = preferences.getBoolean(keyUpdateState, true)
-        val sweepState = preferences.getBoolean(keySweepState, true)
-        val sensorState = preferences.getBoolean(keySensorState, true)
-        return OtherSettings(utcState, updateState, sweepState, sensorState)
+    private fun getOtherSettings(): OtherSettings {
+        val stateOfAutoUpdate = preferences.getBoolean(keyStateOfAutoUpdate, true)
+        val stateOfSensors = preferences.getBoolean(keyStateOfSensors, true)
+        val stateOfSweep = preferences.getBoolean(keyStateOfSweep, true)
+        val stateOfUtc = preferences.getBoolean(keyStateOfUtc, false)
+        return OtherSettings(stateOfAutoUpdate, stateOfSensors, stateOfSweep, stateOfUtc)
     }
-
     //endregion
 
     //region # Undefined settings
+    override fun getBluetoothAddress(): String = preferences.getString(keyBluetoothAddress, null) ?: "00:0C:BF:13:80:5D"
+    override fun setBluetoothAddress(value: String) = preferences.edit { putString(keyBluetoothAddress, value) }
 
-    override fun getRotatorEnabled(): Boolean {
-        return preferences.getBoolean(keyRotator, false)
-    }
+    override fun getBluetoothFormat(): String = preferences.getString(keyBluetoothFormat, null) ?: "W\$AZ \$EL"
+    override fun setBluetoothFormat(value: String) = preferences.edit { putString(keyBluetoothFormat, value) }
 
-    override fun setRotatorEnabled(value: Boolean) {
-        preferences.edit { putBoolean(keyRotator, value) }
-    }
+    override fun getBluetoothName(): String = preferences.getString(keyBluetoothName, null) ?: "Default"
+    override fun setBluetoothName(value: String) = preferences.edit { putString(keyBluetoothName, value) }
 
-    override fun getRotatorServer(): String {
-        return preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
-    }
+    override fun getBluetoothState(): Boolean = preferences.getBoolean(keyBluetoothState, false)
+    override fun setBluetoothState(value: Boolean) = preferences.edit { putBoolean(keyBluetoothState, value) }
 
-    override fun setRotatorServer(value: String) {
-        preferences.edit { putString(keyRotatorAddress, value) }
-    }
+    override fun getRotatorAddress(): String = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
+    override fun setRotatorAddress(value: String) = preferences.edit { putString(keyRotatorAddress, value) }
 
-    override fun getRotatorPort(): String {
-        return preferences.getString(keyRotatorPort, null) ?: "4533"
-    }
+    override fun getRotatorPort(): String = preferences.getString(keyRotatorPort, null) ?: "4533"
+    override fun setRotatorPort(value: String) = preferences.edit { putString(keyRotatorPort, value) }
 
-    override fun setRotatorPort(value: String) {
-        preferences.edit { putString(keyRotatorPort, value) }
-    }
-
-    override fun getBTEnabled(): Boolean {
-        return preferences.getBoolean(keyBTEnabled, false)
-    }
-
-    override fun setBTEnabled(value: Boolean) {
-        preferences.edit { putBoolean(keyBTEnabled, value) }
-    }
-
-    override fun getBTDeviceAddr(): String {
-        return preferences.getString(keyBTDeviceAddr, null) ?: "00:0C:BF:13:80:5D"
-    }
-
-    override fun setBTDeviceAddr(value: String) {
-        preferences.edit { putString(keyBTDeviceAddr, value) }
-    }
-
-    override fun getBTDeviceName(): String {
-        return preferences.getString(keyBTDeviceName, null) ?: "Default"
-    }
-
-    override fun setBTDeviceName(value: String) {
-        preferences.edit { putString(keyBTDeviceName, value) }
-    }
-
-    override fun getBTFormat(): String {
-        return preferences.getString(keyBTFormat, null) ?: "W\$AZ \$EL"
-    }
-
-    override fun setBTFormat(value: String) {
-        preferences.edit { putString(keyBTFormat, value) }
-    }
-
+    override fun getRotatorState(): Boolean = preferences.getBoolean(keyRotatorState, false)
+    override fun setRotatorState(value: Boolean) = preferences.edit { putBoolean(keyRotatorState, value) }
     //endregion
-
-    private fun SharedPreferences.getDouble(key: String, default: Double): Double {
-        return Double.fromBits(getLong(key, default.toRawBits()))
-    }
-
-    private fun SharedPreferences.Editor.putDouble(key: String, double: Double) {
-        putLong(key, double.toRawBits())
-    }
 }

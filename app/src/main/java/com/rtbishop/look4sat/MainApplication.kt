@@ -40,8 +40,8 @@ class MainApplication : Application() {
 
     private suspend fun checkAutoUpdate() {
         val settingsRepo = container.settingsRepo
-        if (settingsRepo.otherSettings.value.updateState) {
-            val timeDelta = System.currentTimeMillis() - settingsRepo.databaseState.value.timestamp
+        if (settingsRepo.otherSettings.value.stateOfAutoUpdate) {
+            val timeDelta = System.currentTimeMillis() - settingsRepo.databaseState.value.updateTimestamp
             if (timeDelta > AUTO_UPDATE_DELTA_MS) {
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 println("Started periodic data update on ${sdf.format(Date())}")

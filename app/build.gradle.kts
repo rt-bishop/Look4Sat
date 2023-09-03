@@ -55,7 +55,6 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.16")
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.0")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.7")
