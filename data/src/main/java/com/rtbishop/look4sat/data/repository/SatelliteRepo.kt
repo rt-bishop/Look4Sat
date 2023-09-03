@@ -48,7 +48,7 @@ class SatelliteRepo(
     override suspend fun getRadiosWithId(id: Int) = localStorage.getRadiosWithId(id)
 
     override suspend fun initRepository() = withContext(dispatcher) {
-        settingsRepo.satelliteSelection.collect { selectedIds ->
+        settingsRepo.selectedIds.collect { selectedIds ->
             _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
             val (hoursAhead, minElevation) = settingsRepo.passesSettings.value
             calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)

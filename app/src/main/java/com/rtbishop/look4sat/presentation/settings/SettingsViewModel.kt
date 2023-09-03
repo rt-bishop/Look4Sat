@@ -57,9 +57,9 @@ class SettingsViewModel(
             settingsRepo.databaseState.collect { state ->
                 _dataSettings.value = _dataSettings.value.copy(
                     isUpdating = false,
-                    entriesTotal = state.entriesTotal,
-                    radiosTotal = state.radiosTotal,
-                    timestamp = state.timestamp
+                    entriesTotal = state.numberOfSatellites,
+                    radiosTotal = state.numberOfRadios,
+                    timestamp = state.updateTimestamp
                 )
             }
         }
@@ -69,7 +69,7 @@ class SettingsViewModel(
     }
 
     fun setGpsPosition() {
-        if (settingsRepo.setGpsPosition()) {
+        if (settingsRepo.setStationPositionGps()) {
             val messageResId = R.string.location_success
             _positionSettings.value =
                 _positionSettings.value.copy(isUpdating = true, messageResId = messageResId)
@@ -80,7 +80,7 @@ class SettingsViewModel(
     }
 
     fun setGeoPosition(latitude: Double, longitude: Double) {
-        if (settingsRepo.setGeoPosition(latitude, longitude)) {
+        if (settingsRepo.setStationPositionGeo(latitude, longitude, 0.0)) {
             val messageResId = R.string.location_success
             _positionSettings.value = _positionSettings.value.copy(messageResId = messageResId)
         } else {
@@ -90,7 +90,7 @@ class SettingsViewModel(
     }
 
     fun setQthPosition(locator: String) {
-        if (settingsRepo.setQthPosition(locator)) {
+        if (settingsRepo.setStationPositionQth(locator)) {
             val messageResId = R.string.location_success
             _positionSettings.value = _positionSettings.value.copy(messageResId = messageResId)
         } else {
@@ -125,10 +125,10 @@ class SettingsViewModel(
 
     fun clearAllData() = viewModelScope.launch { databaseRepo.clearAllData() }
 
-    fun toggleUtc(value: Boolean) = settingsRepo.toggleUtc(value)
-    fun toggleUpdate(value: Boolean) = settingsRepo.toggleUpdate(value)
-    fun toggleSweep(value: Boolean) = settingsRepo.toggleSweep(value)
-    fun toggleSensor(value: Boolean) = settingsRepo.toggleSensor(value)
+    fun toggleUtc(value: Boolean) = settingsRepo.setStateOfUtc(value)
+    fun toggleUpdate(value: Boolean) = settingsRepo.setStateOfAutoUpdate(value)
+    fun toggleSweep(value: Boolean) = settingsRepo.setStateOfSweep(value)
+    fun toggleSensor(value: Boolean) = settingsRepo.setStateOfSensors(value)
 
 //    fun getRotatorEnabled(): Boolean = settings.getRotatorEnabled()
 //    fun setRotatorEnabled(value: Boolean) = settings.setRotatorEnabled(value)

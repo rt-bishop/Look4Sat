@@ -61,7 +61,7 @@ class RadarViewModel(
     val orientation = mutableStateOf(sensorSource.orientation.value)
 
     init {
-        if (settingsRepo.otherSettings.value.sensorState) {
+        if (settingsRepo.otherSettings.value.stateOfSensors) {
             viewModelScope.launch {
                 sensorSource.enableSensor()
                 sensorSource.orientation.collect { data ->
@@ -117,8 +117,8 @@ class RadarViewModel(
                     satellite, stationPos, satPass.aosTime, satPass.losTime
                 )
             }
-            if (settingsRepo.getRotatorEnabled()) {
-                val server = settingsRepo.getRotatorServer()
+            if (settingsRepo.getRotatorState()) {
+                val server = settingsRepo.getRotatorAddress()
                 val port = settingsRepo.getRotatorPort().toInt()
                 val azimuth = satPos.azimuth.toDegrees().round(1)
                 val elevation = satPos.elevation.toDegrees().round(1)
@@ -130,10 +130,10 @@ class RadarViewModel(
 
     private fun sendPassDataBT(satPos: SatPos) {
         viewModelScope.launch {
-            if (settingsRepo.getBTEnabled()) {
-                val btDevice = settingsRepo.getBTDeviceAddr()
+            if (settingsRepo.getBluetoothState()) {
+                val btDevice = settingsRepo.getBluetoothAddress()
                 if (bluetoothReporter.isConnected()) {
-                    val format = settingsRepo.getBTFormat()
+                    val format = settingsRepo.getBluetoothFormat()
                     val azimuth = satPos.azimuth.toDegrees().round(0).toInt()
                     val elevation = satPos.elevation.toDegrees().round(0).toInt()
                     bluetoothReporter.reportRotation(format, azimuth, elevation)

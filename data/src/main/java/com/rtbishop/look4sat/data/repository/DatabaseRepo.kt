@@ -57,11 +57,11 @@ class DatabaseRepo(
         jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
             entry.value?.let { stream ->
                 when (val type = entry.key) {
-                    "AMSAT", "R4UAB" -> {
+                    "Amsat", "R4UAB" -> {
                         // parse tle stream
                         val satellites = importSatellites(stream)
                         val catnums = satellites.map { it.data.catnum }
-                        settingsRepo.saveSatType(type, catnums)
+                        settingsRepo.setSatelliteTypeIds(type, catnums)
                         importedEntries.addAll(satellites)
                     }
 
@@ -70,7 +70,7 @@ class DatabaseRepo(
                         val unzipped = ZipInputStream(stream).apply { nextEntry }
                         val satellites = importSatellites(unzipped)
                         val catnums = satellites.map { it.data.catnum }
-                        settingsRepo.saveSatType(type, catnums)
+                        settingsRepo.setSatelliteTypeIds(type, catnums)
                         importedEntries.addAll(satellites)
                     }
 
@@ -79,7 +79,7 @@ class DatabaseRepo(
                         val parsed = dataParser.parseCSVStream(stream)
                         val satellites = parsed.map { data -> SatEntry(data) }
                         val catnums = satellites.map { it.data.catnum }
-                        settingsRepo.saveSatType(type, catnums)
+                        settingsRepo.setSatelliteTypeIds(type, catnums)
                         importedEntries.addAll(satellites)
                     }
                 }
@@ -99,9 +99,9 @@ class DatabaseRepo(
     }
 
     private suspend fun setUpdateSuccessful(timestamp: Long) = withContext(dispatcher) {
-        val satellitesTotal = localSource.getEntriesTotal()
-        val radiosTotal = localSource.getRadiosTotal()
-        settingsRepo.saveDatabaseState(DatabaseState(satellitesTotal, radiosTotal, timestamp))
+        val numberOfRadios = localSource.getRadiosTotal()
+        val numberOfSatellites = localSource.getEntriesTotal()
+        settingsRepo.updateDatabaseState(DatabaseState(numberOfRadios, numberOfSatellites, timestamp))
     }
 
     private suspend fun importSatellites(stream: InputStream): List<SatEntry> {

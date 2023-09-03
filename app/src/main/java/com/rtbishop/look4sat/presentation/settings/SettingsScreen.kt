@@ -367,7 +367,7 @@ private fun DataCard(
 @Preview(showBackground = true)
 @Composable
 private fun OtherCardPreview() = MainTheme {
-    val values = OtherSettings(utcState = false, updateState = true, sweepState = true, sensorState = true)
+    val values = OtherSettings(stateOfAutoUpdate = true, stateOfSensors = true, stateOfSweep = true, stateOfUtc = false)
     OtherCard(settings = values, {}, {}, {}, {})
 }
 
@@ -387,7 +387,7 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_utc))
-                Switch(checked = settings.utcState, onCheckedChange = { toggleUtc(it) })
+                Switch(checked = settings.stateOfUtc, onCheckedChange = { toggleUtc(it) })
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -395,7 +395,7 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_update))
-                Switch(checked = settings.updateState, onCheckedChange = { toggleUpdate(it) })
+                Switch(checked = settings.stateOfAutoUpdate, onCheckedChange = { toggleUpdate(it) })
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -403,7 +403,7 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sweep))
-                Switch(checked = settings.sweepState, onCheckedChange = { toggleSweep(it) })
+                Switch(checked = settings.stateOfSweep, onCheckedChange = { toggleSweep(it) })
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -411,7 +411,7 @@ private fun OtherCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(id = R.string.other_switch_sensors))
-                Switch(checked = settings.sensorState, onCheckedChange = { toggleSensor(it) })
+                Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
             }
         }
     }
