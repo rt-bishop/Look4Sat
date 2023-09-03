@@ -98,7 +98,7 @@ class PassesViewModel(
     fun calculatePasses(timeRef: Long, hoursAhead: Int, minElev: Double) = viewModelScope.launch {
         _passes.emit(DataState.Loading)
         passesProcessing?.cancelAndJoin()
-        settingsRepo.savePassesSettings(PassesSettings(hoursAhead, minElev))
+        settingsRepo.updatePassesSettings(PassesSettings(hoursAhead, minElev))
         satelliteRepo.calculatePasses(timeRef, hoursAhead, minElev)
     }
 

@@ -33,6 +33,7 @@ class RemoteSource(
             val request = Request.Builder().url(url).build()
             httpClient.newCall(request).execute().body?.byteStream()
         } catch (exception: Exception) {
+            println("RemoteSource fetching stream exception: $exception")
             null
         }
     }
