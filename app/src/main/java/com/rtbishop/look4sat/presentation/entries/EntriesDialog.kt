@@ -38,7 +38,7 @@ fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, sele
         dismiss()
     }
     Dialog(onDismissRequest = { dismiss() }) {
-        ElevatedCard(modifier = Modifier.fillMaxHeight(0.75f)) {
+        ElevatedCard(modifier = Modifier.fillMaxHeight(0.80f)) {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(160.dp),
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
@@ -47,7 +47,8 @@ fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, sele
             ) {
                 itemsIndexed(items) { index, item ->
                     Surface {
-                        Row(verticalAlignment = Alignment.CenterVertically,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .background(MaterialTheme.colorScheme.surface)
                                 .clickable { clickAction(item) }) {
@@ -64,7 +65,7 @@ fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, sele
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            RadioButton(selected = item == selected, onClick = { clickAction(item) })
+                            RadioButton(selected = item == selected, onClick = null, modifier = Modifier.padding(8.dp))
                         }
                     }
                 }

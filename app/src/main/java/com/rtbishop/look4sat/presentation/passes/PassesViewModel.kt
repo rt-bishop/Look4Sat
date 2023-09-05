@@ -17,13 +17,14 @@
  */
 package com.rtbishop.look4sat.presentation.passes
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
-import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.model.PassesSettings
 import com.rtbishop.look4sat.domain.predict.SatPass
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
@@ -32,8 +33,6 @@ import com.rtbishop.look4sat.domain.utility.toTimerString
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -41,46 +40,35 @@ class PassesViewModel(
     private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
-    private val _passes = MutableStateFlow<DataState<List<SatPass>>>(DataState.Loading)
-    private val timerData = Triple("Next - Id:Null", "Name: Null", "00:00:00")
-    private val _timerText = MutableStateFlow(timerData)
-    private var passesProcessing: Job? = null
-    val passes: StateFlow<DataState<List<SatPass>>> = _passes
-    val timerText: StateFlow<Triple<String, String, String>?> = _timerText
-
-    fun getFilterSettings() = settingsRepo.passesSettings.value
-
-//    fun shouldUseUTC() = settingsRepo.otherSettings.value.utcState
+    private val _uiState = mutableStateOf(
+        PassesState(
+            isDialogShown = false,
+            isRefreshing = true,
+            isUtc = settingsRepo.otherSettings.value.stateOfUtc,
+            nextId = 0,
+            nextName = "...",
+            nextTime = "00:00:00",
+            hours = settingsRepo.passesSettings.value.hoursAhead,
+            elevation = settingsRepo.passesSettings.value.minElevation,
+            modes = settingsRepo.passesSettings.value.selectedModes,
+            itemsList = emptyList(),
+            takeAction = ::handleAction
+        )
+    )
+    private var processing: Job? = null
+    val uiState: State<PassesState> = _uiState
 
     init {
         viewModelScope.launch { satelliteRepo.initRepository() }
         viewModelScope.launch {
             satelliteRepo.passes.collect { passes ->
-                passesProcessing?.cancelAndJoin()
-                passesProcessing = viewModelScope.launch {
+                processing?.cancelAndJoin()
+                processing = viewModelScope.launch {
                     while (isActive) {
                         val timeNow = System.currentTimeMillis()
                         val newPasses = satelliteRepo.processPasses(passes, timeNow)
-
-                        if (newPasses.isNotEmpty()) {
-                            try {
-                                val nextPass = newPasses.first { it.aosTime.minus(timeNow) > 0 }
-                                val catNum = nextPass.catNum
-                                val name = nextPass.name
-                                val millisBeforeStart = nextPass.aosTime.minus(timeNow)
-                                val timerString = millisBeforeStart.toTimerString()
-                                _timerText.emit(Triple("Next - Id:$catNum", name, timerString))
-                            } catch (exception: NoSuchElementException) {
-                                val lastPass = newPasses.last()
-                                val catNum = lastPass.catNum
-                                val name = lastPass.name
-                                val millisBeforeEnd = lastPass.losTime.minus(timeNow)
-                                val timerString = millisBeforeEnd.toTimerString()
-                                _timerText.emit(Triple("Next - Id:$catNum", name, timerString))
-                            }
-                        } else _timerText.emit(timerData)
-
-                        _passes.emit(DataState.Success(newPasses))
+                        setPassInfo(newPasses, timeNow)
+                        _uiState.value = _uiState.value.copy(isRefreshing = false, itemsList = newPasses)
                         delay(1000)
                     }
                 }
@@ -88,18 +76,45 @@ class PassesViewModel(
         }
     }
 
-    fun calculatePasses() = viewModelScope.launch {
-        _passes.emit(DataState.Loading)
-        passesProcessing?.cancelAndJoin()
+    private fun handleAction(action: PassesAction) {
+        when (action) {
+            is PassesAction.ApplyFilter -> applyFilter(action.hoursAhead, action.minElevation, action.modes)
+            PassesAction.RefreshPasses -> refreshPasses()
+            PassesAction.ToggleFilterDialog -> toggleFilterDialog()
+        }
+    }
+
+    private fun applyFilter(hoursAhead: Int, minElevation: Double, modes: List<String>) = viewModelScope.launch {
+        _uiState.value = _uiState.value.copy(isRefreshing = true)
+        processing?.cancelAndJoin()
+        settingsRepo.setPassesSettings(PassesSettings(hoursAhead, minElevation, modes))
+        _uiState.value = _uiState.value.copy(hours = hoursAhead, elevation = minElevation, modes = modes)
+        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)
+    }
+
+    private fun refreshPasses() = viewModelScope.launch {
+        _uiState.value = _uiState.value.copy(isRefreshing = true)
+        processing?.cancelAndJoin()
         val (hoursAhead, minElevation) = settingsRepo.passesSettings.value
         satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)
     }
 
-    fun calculatePasses(timeRef: Long, hoursAhead: Int, minElev: Double) = viewModelScope.launch {
-        _passes.emit(DataState.Loading)
-        passesProcessing?.cancelAndJoin()
-        settingsRepo.updatePassesSettings(PassesSettings(hoursAhead, minElev))
-        satelliteRepo.calculatePasses(timeRef, hoursAhead, minElev)
+    private fun setPassInfo(passes: List<SatPass>, timeNow: Long) {
+        if (passes.isEmpty()) return
+        try {
+            val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
+            val time = nextPass.aosTime.minus(timeNow).toTimerString()
+            _uiState.value = _uiState.value.copy(nextId = nextPass.catNum, nextName = nextPass.name, nextTime = time)
+        } catch (exception: NoSuchElementException) {
+            val lastPass = passes.last()
+            val time = lastPass.losTime.minus(timeNow).toTimerString()
+            _uiState.value = _uiState.value.copy(nextId = lastPass.catNum, nextName = lastPass.name, nextTime = time)
+        }
+    }
+
+    private fun toggleFilterDialog() {
+        val currentDialogState = _uiState.value.isDialogShown
+        _uiState.value = _uiState.value.copy(isDialogShown = currentDialogState.not())
     }
 
     companion object {

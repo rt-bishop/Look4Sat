@@ -148,7 +148,7 @@ class RadarViewModel(
     private fun processRadios(radios: List<SatRadio>, satellite: Satellite, time: Long) {
         viewModelScope.launch {
             delay(125)
-            val list = satelliteRepo.processRadios(satellite, stationPos, radios, time)
+            val list = satelliteRepo.getRadios(satellite, stationPos, radios, time)
             transmitters.value = list
         }
     }

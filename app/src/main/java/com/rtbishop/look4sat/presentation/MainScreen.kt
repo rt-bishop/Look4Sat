@@ -25,6 +25,7 @@ import com.rtbishop.look4sat.presentation.entries.EntriesViewModel
 import com.rtbishop.look4sat.presentation.info.InfoScreen
 import com.rtbishop.look4sat.presentation.map.MapScreen
 import com.rtbishop.look4sat.presentation.passes.PassesScreen
+import com.rtbishop.look4sat.presentation.passes.PassesViewModel
 import com.rtbishop.look4sat.presentation.radar.RadarScreen
 import com.rtbishop.look4sat.presentation.settings.SettingsScreen
 
@@ -73,10 +74,11 @@ private fun MainNavGraph(navController: NavHostController) {
             EntriesScreen(viewModel.uiState.value, navToPasses)
         }
         composable(Screen.Passes.route) {
+            val viewModel = viewModel(PassesViewModel::class.java, factory = PassesViewModel.Factory)
             val navToRadar = { catNum: Int, aosTime: Long ->
                 navController.navigate("${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}")
             }
-            PassesScreen(navToRadar)
+            PassesScreen(viewModel.uiState.value, navToRadar)
         }
         composable(radarRoute, radarArgs) { RadarScreen() }
         composable(Screen.Map.route) { MapScreen() }
