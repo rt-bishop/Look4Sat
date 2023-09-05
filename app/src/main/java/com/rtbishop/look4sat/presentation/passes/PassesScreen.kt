@@ -23,9 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,9 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.model.DataState
 import com.rtbishop.look4sat.domain.predict.NearEarthSatellite
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.SatPass
@@ -53,27 +48,16 @@ import java.util.*
 private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
-fun PassesScreen(navToRadar: (Int, Long) -> Unit) {
-    val viewModel = viewModel(PassesViewModel::class.java, factory = PassesViewModel.Factory)
-    val state = viewModel.passes.collectAsState(initial = null)
-    val timerText = viewModel.timerText.collectAsState(initial = null)
-    val isRefreshing = state.value is DataState.Loading
-    val refreshState = rememberPullRefreshState(refreshing = isRefreshing,
-        onRefresh = { viewModel.calculatePasses() })
-
-    val value = state.value
-    var passes = emptyList<SatPass>()
-    if (value is DataState.Success) passes = value.data
-
-    val showDialog = rememberSaveable { mutableStateOf(false) }
-    val toggleDialog = { showDialog.value = showDialog.value.not() }
-    if (showDialog.value) {
-        val (hoursAhead, minElevation) = viewModel.getFilterSettings()
-        FilterDialog(hoursAhead, minElevation, { toggleDialog() }) { newHours, newElevation ->
-            viewModel.calculatePasses(System.currentTimeMillis(), newHours, newElevation)
+fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
+    val refreshState = rememberPullRefreshState(refreshing = uiState.isRefreshing, onRefresh = {
+        uiState.takeAction(PassesAction.RefreshPasses)
+    })
+    val toggleDialog = { uiState.takeAction(PassesAction.ToggleFilterDialog) }
+    if (uiState.isDialogShown) {
+        FilterDialog(uiState.hours, uiState.elevation, uiState.modes, toggleDialog) { hours, elevation, modes ->
+            uiState.takeAction(PassesAction.ApplyFilter(hours, elevation, modes))
         }
     }
-
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         ElevatedCard(modifier = Modifier.height(52.dp)) {
             Row(
@@ -88,11 +72,11 @@ fun PassesScreen(navToRadar: (Int, Long) -> Unit) {
                     )
                 }
                 Column(verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.weight(1f)) {
-                    Text(text = timerText.value?.first ?: "Null")
-                    Text(text = timerText.value?.second ?: "Null")
+                    Text(text = "Next - Id:${uiState.nextId}", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = uiState.nextName, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 Text(
-                    text = timerText.value?.third ?: "00:00:00",
+                    text = uiState.nextTime,
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -103,7 +87,7 @@ fun PassesScreen(navToRadar: (Int, Long) -> Unit) {
                 )
             }
         }
-        PassesCard(refreshState, isRefreshing, passes, navToRadar)
+        PassesCard(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
     }
 }
 

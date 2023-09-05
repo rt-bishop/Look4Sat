@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.presentation.entries
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -30,20 +31,23 @@ import kotlinx.coroutines.launch
 
 class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
 
-    private val defaultUiState = EntriesState(
-        isLoading = true,
-        itemsList = emptyList(),
-        currentType = selectionRepo.getCurrentType(),
-        typesList = selectionRepo.getTypesList(),
-        takeAction = ::handleAction
+    private val _uiState = mutableStateOf(
+        EntriesState(
+            isDialogShown = false,
+            isLoading = true,
+            itemsList = emptyList(),
+            currentType = selectionRepo.getCurrentType(),
+            typesList = selectionRepo.getTypesList(),
+            takeAction = ::handleAction
+        )
     )
-    val uiState = mutableStateOf(defaultUiState)
+    val uiState: State<EntriesState> = _uiState
 
     init {
         viewModelScope.launch {
             delay(1000)
             selectionRepo.getEntriesFlow().collect { items ->
-                uiState.value = uiState.value.copy(isLoading = false, itemsList = items)
+                _uiState.value = _uiState.value.copy(isLoading = false, itemsList = items)
             }
         }
     }
@@ -55,6 +59,7 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
             EntriesAction.SelectAll -> selectAll(true)
             is EntriesAction.SelectSingle -> selectSingle(action.id, action.isTicked)
             is EntriesAction.SelectType -> selectType(action.type)
+            EntriesAction.ToggleTypesDialog -> toggleTypesDialog()
             EntriesAction.UnselectAll -> selectAll(false)
         }
     }
@@ -73,7 +78,12 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
 
     private fun selectType(type: String) = viewModelScope.launch {
         selectionRepo.setType(type)
-        uiState.value = uiState.value.copy(currentType = type)
+        _uiState.value = _uiState.value.copy(currentType = type)
+    }
+
+    private fun toggleTypesDialog() {
+        val currentDialogState = _uiState.value.isDialogShown
+        _uiState.value = _uiState.value.copy(isDialogShown = currentDialogState.not())
     }
 
     companion object {

@@ -59,9 +59,7 @@ class SatelliteRepo(
         return withContext(dispatcher) { sat.getPosition(pos, time) }
     }
 
-    override suspend fun getTrack(
-        sat: Satellite, pos: GeoPos, start: Long, end: Long
-    ): List<SatPos> {
+    override suspend fun getTrack(sat: Satellite, pos: GeoPos, start: Long, end: Long): List<SatPos> {
         return withContext(dispatcher) {
             val positions = mutableListOf<SatPos>()
             var currentTime = start
@@ -73,9 +71,7 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun processRadios(
-        sat: Satellite, pos: GeoPos, radios: List<SatRadio>, time: Long
-    ): List<SatRadio> {
+    override suspend fun getRadios(sat: Satellite, pos: GeoPos, radios: List<SatRadio>, time: Long): List<SatRadio> {
         return withContext(dispatcher) {
             val satPos = sat.getPosition(pos, time)
             val copiedList = radios.map { it.copy() }

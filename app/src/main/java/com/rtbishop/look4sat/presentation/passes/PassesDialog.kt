@@ -39,7 +39,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -54,27 +55,43 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardButton
 
+private val allModes = listOf(
+    "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
+    "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
+    "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
+    "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
+    "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
+)
+
 @Preview(showBackground = true)
 @Composable
 private fun FilterDialogPreview() {
-    MainTheme { FilterDialog(24, 16.0, {}) { _, _ -> } }
+    MainTheme { FilterDialog(24, 16.0, emptyList(), {}) { _, _, _ -> } }
 }
 
 @Composable
-fun FilterDialog(hours: Int, elevation: Double, dismiss: () -> Unit, save: (Int, Double) -> Unit) {
-    val hoursValue = rememberSaveable { mutableIntStateOf(hours) }
-    val elevationValue = rememberSaveable { mutableIntStateOf(elevation.toInt()) }
+fun FilterDialog(
+    hours: Int,
+    elev: Double,
+    modes: List<String>,
+    dismiss: () -> Unit,
+    save: (Int, Double, List<String>) -> Unit
+) {
     val maxWidthModifier = Modifier.fillMaxWidth(1f)
+    val hoursValue = remember { mutableIntStateOf(hours) }
+    val elevationValue = remember { mutableIntStateOf(elev.toInt()) }
+    val selected = remember { mutableStateListOf<String>().apply { addAll(modes) } }
+    val select = { mode: String -> if (selected.contains(mode)) selected.remove(mode) else selected.add(mode) }
     Dialog(onDismissRequest = { dismiss() }) {
-        ElevatedCard {
+        ElevatedCard(modifier = Modifier.fillMaxHeight(0.80f)) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = maxWidthModifier.padding(12.dp)
             ) {
-                Text(text = "Filter passes", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
+                Text(text = "Filter passes", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
-                    Text(text = "Show passes within", fontSize = 18.sp, modifier = Modifier.weight(1f))
+                    Text(text = "Show passes within", fontSize = 16.sp, modifier = Modifier.weight(1f))
                     Icon(
                         painter = painterResource(id = R.drawable.ic_time),
                         contentDescription = null,
@@ -85,7 +102,7 @@ fun FilterDialog(hours: Int, elevation: Double, dismiss: () -> Unit, save: (Int,
                     )
                     Text(
                         text = "${hoursValue.intValue}h",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -97,7 +114,7 @@ fun FilterDialog(hours: Int, elevation: Double, dismiss: () -> Unit, save: (Int,
                     colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
-                    Text(text = "Show passes above", fontSize = 18.sp, modifier = Modifier.weight(1f))
+                    Text(text = "Show passes above", fontSize = 16.sp, modifier = Modifier.weight(1f))
                     Icon(
                         painter = painterResource(id = R.drawable.ic_elevation),
                         contentDescription = null,
@@ -108,7 +125,7 @@ fun FilterDialog(hours: Int, elevation: Double, dismiss: () -> Unit, save: (Int,
                     )
                     Text(
                         text = "${elevationValue.intValue}°",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -119,65 +136,50 @@ fun FilterDialog(hours: Int, elevation: Double, dismiss: () -> Unit, save: (Int,
                     valueRange = 0f..90f,
                     colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(160.dp),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(1.dp),
+                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+                    itemsIndexed(allModes) { index, item ->
+                        Surface {
+                            Row(verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .clickable { select(item) }) {
+                                Text(
+                                    text = "$index).",
+                                    modifier = Modifier.padding(start = 8.dp, end = 6.dp),
+                                    fontWeight = FontWeight.Normal,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                Text(
+                                    text = item,
+                                    modifier = Modifier.weight(1f),
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Checkbox(
+                                    checked = selected.contains(item),
+                                    onCheckedChange = null,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            }
+                        }
+                    }
+                }
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                     CardButton(onClick = { dismiss() }, text = stringResource(id = R.string.btn_cancel))
                     CardButton(
                         onClick = {
-                            save(hoursValue.intValue, elevationValue.intValue.toDouble())
+                            save(hoursValue.intValue, elevationValue.intValue.toDouble(), selected)
                             dismiss()
                         }, text = stringResource(id = R.string.btn_accept)
                     )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ModesDialogPreview() {
-    val allModes = listOf(
-        "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
-        "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
-        "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
-        "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
-        "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
-    )
-    MainTheme { ModesDialog(allModes, listOf("AFSK", "AFSK S-Net"), {}) {} }
-}
-
-@Composable
-fun ModesDialog(items: List<String>, selected: List<String>, dismiss: () -> Unit, select: (String) -> Unit) {
-    Dialog(onDismissRequest = { dismiss() }) {
-        ElevatedCard(modifier = Modifier.fillMaxHeight(0.75f)) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(160.dp),
-                modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                horizontalArrangement = Arrangement.spacedBy(1.dp),
-                verticalArrangement = Arrangement.spacedBy(1.dp)
-            ) {
-                itemsIndexed(items) { index, item ->
-                    Surface {
-                        Row(verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.surface)
-                                .clickable { select(item) }) {
-                            Text(
-                                text = "$index).",
-                                modifier = Modifier.padding(start = 12.dp, end = 6.dp),
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            Text(
-                                text = item,
-                                modifier = Modifier.weight(1f),
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Checkbox(checked = selected.contains(item), onCheckedChange = { select(item) })
-                        }
-                    }
                 }
             }
         }
