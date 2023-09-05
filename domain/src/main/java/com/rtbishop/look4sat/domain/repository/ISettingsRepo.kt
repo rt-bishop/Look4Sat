@@ -63,9 +63,7 @@ interface ISettingsRepo {
 
     //region # Passes filter settings
     val passesSettings: StateFlow<PassesSettings>
-    fun getSelectedModes(): List<String>
-    fun setSelectedModes(modes: List<String>)
-    fun updatePassesSettings(settings: PassesSettings)
+    fun setPassesSettings(settings: PassesSettings)
     //endregion
 
     //region # Station position settings

@@ -82,26 +82,19 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
     private val _passesSettings = MutableStateFlow(getPassesSettings())
     override val passesSettings: StateFlow<PassesSettings> = _passesSettings
 
-    override fun getSelectedModes(): List<String> {
-        val selectedModesString = preferences.getString(keySelectedModes, null)
-        return selectedModesString?.split(separatorComma)?.sorted() ?: emptyList()
-    }
-
-    override fun setSelectedModes(modes: List<String>) {
-        val selectedModes = modes.joinToString(separatorComma)
-        preferences.edit { putString(keySelectedModes, selectedModes) }
-    }
-
-    override fun updatePassesSettings(settings: PassesSettings) = preferences.edit {
-        putInt(keyFilterHoursAhead, settings.filterHoursAhead)
-        putLong(keyFilterMinElevation, settings.filterMinElevation.toRawBits())
+    override fun setPassesSettings(settings: PassesSettings) = preferences.edit {
+        putInt(keyFilterHoursAhead, settings.hoursAhead)
+        putLong(keyFilterMinElevation, settings.minElevation.toRawBits())
+        putString(keySelectedModes, settings.selectedModes.joinToString(separatorComma))
         _passesSettings.value = settings
     }
 
     private fun getPassesSettings(): PassesSettings {
         val hoursAhead = preferences.getInt(keyFilterHoursAhead, 24)
         val minElevation = Double.fromBits(preferences.getLong(keyFilterMinElevation, 16.0.toRawBits()))
-        return PassesSettings(hoursAhead, minElevation)
+        val selectedModesString = preferences.getString(keySelectedModes, null)
+        val selectedModes = selectedModesString?.split(separatorComma)?.sorted() ?: emptyList()
+        return PassesSettings(hoursAhead, minElevation, selectedModes)
     }
     //endregion
 

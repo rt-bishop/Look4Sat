@@ -23,22 +23,13 @@ import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.Satellite
 
 interface ILocalSource {
-
     suspend fun getEntriesTotal(): Int
-
     suspend fun getEntriesList(): List<SatItem>
-
     suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
-
     suspend fun insertEntries(entries: List<SatEntry>)
-
     suspend fun deleteEntries()
-
     suspend fun getRadiosTotal(): Int
-
     suspend fun getRadiosWithId(id: Int): List<SatRadio>
-
     suspend fun insertRadios(radios: List<SatRadio>)
-
     suspend fun deleteRadios()
 }

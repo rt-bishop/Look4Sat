@@ -18,10 +18,7 @@
 package com.rtbishop.look4sat.domain.repository
 
 interface IDatabaseRepo {
-
     suspend fun updateFromFile(uri: String)
-
     suspend fun updateFromRemote()
-
     suspend fun clearAllData()
 }
