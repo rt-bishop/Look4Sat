@@ -89,14 +89,14 @@ class PassesViewModel(
         processing?.cancelAndJoin()
         settingsRepo.setPassesSettings(PassesSettings(hoursAhead, minElevation, modes))
         _uiState.value = _uiState.value.copy(hours = hoursAhead, elevation = minElevation, modes = modes)
-        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)
+        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
     }
 
     private fun refreshPasses() = viewModelScope.launch {
         _uiState.value = _uiState.value.copy(isRefreshing = true)
         processing?.cancelAndJoin()
-        val (hoursAhead, minElevation) = settingsRepo.passesSettings.value
-        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)
+        val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
+        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
     }
 
     private fun setPassInfo(passes: List<SatPass>, timeNow: Long) {

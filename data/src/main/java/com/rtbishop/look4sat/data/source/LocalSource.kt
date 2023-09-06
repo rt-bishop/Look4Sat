@@ -53,6 +53,8 @@ class LocalSource(private val storageDao: StorageDao) : ILocalSource {
 
     override suspend fun deleteEntries() = storageDao.deleteEntries()
 
+    override suspend fun getIdsWithModes(modes: List<String>) = storageDao.getIdsWithModes(modes)
+
     private fun DomainEntry.toFramework() = FrameworkEntry(this.data, this.comment)
 
     private fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, false)

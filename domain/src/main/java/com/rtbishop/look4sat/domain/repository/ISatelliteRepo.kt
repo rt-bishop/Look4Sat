@@ -16,5 +16,5 @@ interface ISatelliteRepo {
     suspend fun getTrack(sat: Satellite, pos: GeoPos, start: Long, end: Long): List<SatPos>
     suspend fun getRadios(sat: Satellite, pos: GeoPos, radios: List<SatRadio>, time: Long): List<SatRadio>
     suspend fun processPasses(passList: List<SatPass>, time: Long): List<SatPass>
-    suspend fun calculatePasses(time: Long, hoursAhead: Int = 8, minElevation: Double = 16.0)
+    suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>)
 }
