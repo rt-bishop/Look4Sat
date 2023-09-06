@@ -46,6 +46,9 @@ interface StorageDao {
     @Query("DELETE FROM entries")
     suspend fun deleteEntries()
 
+    @Query("SELECT catnum FROM radios WHERE mode IN (:modes)")
+    suspend fun getIdsWithModes(modes: List<String>): List<Int>
+
     @Query("SELECT COUNT(*) FROM radios")
     suspend fun getRadiosTotal(): Int
 
