@@ -50,8 +50,8 @@ class SatelliteRepo(
     override suspend fun initRepository() = withContext(dispatcher) {
         settingsRepo.selectedIds.collect { selectedIds ->
             _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
-            val (hoursAhead, minElevation) = settingsRepo.passesSettings.value
-            calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation)
+            val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
+            calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
         }
     }
 
@@ -99,15 +99,17 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double) {
+    override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>) {
         if (_satellites.value.isNotEmpty()) {
             withContext(dispatcher) {
-                val allPasses = mutableListOf<SatPass>()
-                val stationPos = settingsRepo.stationPosition.value
+                val newPasses = mutableListOf<SatPass>()
+                val idsWithModes = localStorage.getIdsWithModes(modes)
                 _satellites.value.forEach { satellite ->
-                    allPasses.addAll(satellite.getPasses(stationPos, time, hoursAhead))
+                    if (idsWithModes.isEmpty() || satellite.data.catnum in idsWithModes) {
+                        newPasses.addAll(satellite.getPasses(settingsRepo.stationPosition.value, time, hoursAhead))
+                    }
                 }
-                _passes.update { allPasses.filter(time, hoursAhead, minElevation) }
+                _passes.update { newPasses.filter(time, hoursAhead, minElevation) }
             }
         } else {
             _passes.update { emptyList() }
