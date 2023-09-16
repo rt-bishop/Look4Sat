@@ -30,7 +30,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.2" }
+    composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
 }
 
 dependencies {
@@ -43,21 +43,21 @@ dependencies {
     ksp("androidx.room:room-compiler:2.5.2")
 
     implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.compose.animation:animation:1.5.0")
-    implementation("androidx.compose.compiler:compiler:1.5.2")
+    implementation("androidx.compose.animation:animation:1.5.1")
+    implementation("androidx.compose.compiler:compiler:1.5.3")
     implementation("androidx.compose.material3:material3:1.1.1")
-    implementation("androidx.compose.runtime:runtime:1.5.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.5.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-    implementation("androidx.navigation:navigation-compose:2.7.1")
+    implementation("androidx.compose.runtime:runtime:1.5.1")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("androidx.navigation:navigation-compose:2.7.2")
 
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("org.osmdroid:osmdroid-android:6.1.16")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.0")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.0")
+    implementation("org.osmdroid:osmdroid-android:6.1.17")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.5.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.7")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.1")
 }

@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -59,35 +61,50 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
         }
     }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        ElevatedCard(modifier = Modifier.height(52.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                IconButton(onClick = { toggleDialog() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_filter),
-                        contentDescription = null
-                    )
-                }
-                Column(verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.weight(1f)) {
-                    Text(text = "Next - Id:${uiState.nextId}", maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(text = uiState.nextName, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+        TopBar(nextId = uiState.nextId, nextName = uiState.nextName, nextTime = uiState.nextTime, toggleDialog)
+        PassesCard(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun TopBarPreview() {
+    MainTheme { TopBar(nextId = 45555, nextName = "Stuff", nextTime = "88:88:88") {} }
+}
+
+@Composable
+private fun TopBar(nextId: Int, nextName: String, nextTime: String, toggleDialog: () -> Unit) {
+    ElevatedCard(modifier = Modifier.height(48.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_sputnik),
+                contentDescription = null,
+                modifier = Modifier.padding(12.dp)
+            )
+            Column(verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.weight(1f)) {
                 Text(
-                    text = uiState.nextTime,
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold,
+                    text = "AOS - Id:$nextId",
                     color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(bottom = 2.dp, end = 8.dp)
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+                Text(text = nextName, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Text(
+                text = nextTime,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false))
+            )
+            IconButton(onClick = { toggleDialog() }) {
+                Icon(painter = painterResource(id = R.drawable.ic_filter), contentDescription = null)
             }
         }
-        PassesCard(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
     }
 }
 
@@ -98,7 +115,7 @@ private fun PassPreview() {
         "Satellite", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
     )
     val satellite = NearEarthSatellite(data)
-    val pass = SatPass(1L, 25.0, 10L, 75.0, 850, 45.0, satellite, 0.5f)
+    val pass = SatPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
     MainTheme { Pass(pass = pass, { _, _ -> }) }
 }
 
@@ -149,17 +166,21 @@ private fun Pass(pass: SatPass, navToRadar: (Int, Long) -> Unit, modifier: Modif
                 ) {
                     Text(
                         text = stringResource(id = R.string.pass_aosAz, pass.aosAzimuth),
-                        fontSize = 15.sp
+                        textAlign = TextAlign.Start,
+                        fontSize = 15.sp,
+                        modifier = Modifier.weight(1f)
                     )
                     Text(
                         text = stringResource(id = R.string.pass_altitude, pass.altitude),
                         textAlign = TextAlign.Center,
                         fontSize = 15.sp,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(2f)
                     )
                     Text(
                         text = stringResource(id = R.string.pass_losAz, pass.losAzimuth),
-                        fontSize = 15.sp
+                        textAlign = TextAlign.End,
+                        fontSize = 15.sp,
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 Row(
@@ -168,10 +189,7 @@ private fun Pass(pass: SatPass, navToRadar: (Int, Long) -> Unit, modifier: Modif
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val deepTime = stringResource(id = R.string.pass_placeholder)
-                    Text(
-                        text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.aosTime)),
-                        fontSize = 15.sp
-                    )
+                    Text(text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.aosTime)), fontSize = 15.sp)
                     LinearProgressIndicator(
                         progress = if (pass.isDeepSpace) 1f else pass.progress,
                         modifier = modifier
@@ -179,10 +197,7 @@ private fun Pass(pass: SatPass, navToRadar: (Int, Long) -> Unit, modifier: Modif
                             .padding(top = 3.dp),
                         trackColor = MaterialTheme.colorScheme.inverseSurface
                     )
-                    Text(
-                        text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.losTime)),
-                        fontSize = 15.sp
-                    )
+                    Text(text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.losTime)), fontSize = 15.sp)
                 }
             }
         }
@@ -192,10 +207,7 @@ private fun Pass(pass: SatPass, navToRadar: (Int, Long) -> Unit, modifier: Modif
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PassesCard(
-    refreshState: PullRefreshState,
-    isRefreshing: Boolean,
-    passes: List<SatPass>,
-    navToRadar: (Int, Long) -> Unit
+    refreshState: PullRefreshState, isRefreshing: Boolean, passes: List<SatPass>, navToRadar: (Int, Long) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
         Box(Modifier.pullRefresh(refreshState)) {
