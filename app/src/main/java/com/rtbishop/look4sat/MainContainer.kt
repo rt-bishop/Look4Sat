@@ -6,7 +6,6 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.location.LocationManager
 import androidx.room.Room
-import com.rtbishop.look4sat.data.database.MIGRATION_1_2
 import com.rtbishop.look4sat.data.database.MainDatabase
 import com.rtbishop.look4sat.data.framework.BluetoothReporter
 import com.rtbishop.look4sat.data.framework.NetworkReporter
@@ -71,8 +70,8 @@ class MainContainer(private val context: Context) {
     }
 
     private fun provideLocalSource(): ILocalSource {
-        val database = Room.databaseBuilder(context, MainDatabase::class.java, "Look4SatDb").apply {
-            addMigrations(MIGRATION_1_2)
+        val database = Room.databaseBuilder(context, MainDatabase::class.java, "Look4SatDBv313").apply {
+//            addMigrations(MIGRATION_1_2)
             fallbackToDestructiveMigration()
         }.build()
         return LocalSource(database.storageDao())

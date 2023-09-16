@@ -17,9 +17,4 @@
  */
 package com.rtbishop.look4sat.domain.model
 
-data class SatItem(
-    val catnum: Int,
-    val name: String,
-//    val modes: List<String>,
-    val isSelected: Boolean
-)
+data class SatItem(val catnum: Int, val name: String, val isSelected: Boolean)

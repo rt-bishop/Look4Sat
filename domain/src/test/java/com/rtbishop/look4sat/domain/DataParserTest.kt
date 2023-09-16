@@ -74,7 +74,7 @@ class DataParserTest {
 
     @Test
     fun `Given valid JSON stream returns valid data`() = runTest(testDispatcher) {
-        assert(dataParser.parseJSONStream(validJSONStream)[0].downlink == 136658500L)
+        assert(dataParser.parseJSONStream(validJSONStream)[0].downlinkLow == 136658500L)
     }
 
     @Test

@@ -80,13 +80,13 @@ class LocalSource(private val storageDao: StorageDao) : ILocalSource {
     override suspend fun deleteRadios() = storageDao.deleteRadios()
 
     private fun DomainRadio.toFramework() = FrameworkRadio(
-        this.uuid, this.info, this.isAlive, this.downlink, this.uplink,
-        this.mode, this.isInverted, this.catnum, this.comment
+        this.uuid, this.info, this.isAlive, this.downlinkLow, this.downlinkHigh, this.downlinkMode,
+        this.uplinkLow, this.uplinkHigh, this.uplinkMode, this.isInverted, this.catnum, this.comment
     )
 
     private fun FrameworkRadio.toDomain() = DomainRadio(
-        this.uuid, this.info, this.isAlive, this.downlink, this.uplink,
-        this.mode, this.isInverted, this.catnum, this.comment
+        this.uuid, this.info, this.isAlive, this.downlinkLow, this.downlinkHigh, this.downlinkMode,
+        this.uplinkLow, this.uplinkHigh, this.uplinkMode, this.isInverted, this.catnum, this.comment
     )
 
     private fun List<DomainRadio>.toFrameworkRadios() = this.map { radio -> radio.toFramework() }
