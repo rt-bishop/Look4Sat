@@ -121,13 +121,13 @@ private fun TransmitterItem(radio: SatRadio) {
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = stringResource(id = R.string.radio_downlink, radio.downlink ?: 0L),
+                        text = stringResource(id = R.string.radio_downlink, radio.downlinkLow ?: 0L),
                         textAlign = TextAlign.Center,
                         fontSize = 15.sp,
                         modifier = Modifier.weight(0.5f)
                     )
                     Text(
-                        text = stringResource(id = R.string.radio_uplink, radio.uplink ?: 0L),
+                        text = stringResource(id = R.string.radio_uplink, radio.uplinkLow ?: 0L),
                         textAlign = TextAlign.Center,
                         fontSize = 15.sp,
                         modifier = Modifier.weight(0.5f)
@@ -139,7 +139,7 @@ private fun TransmitterItem(radio: SatRadio) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = radio.mode ?: "",
+                        text = radio.downlinkMode ?: "",
                         fontSize = 15.sp
                     )
                     Text(

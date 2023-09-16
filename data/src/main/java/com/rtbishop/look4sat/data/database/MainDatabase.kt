@@ -19,23 +19,20 @@ package com.rtbishop.look4sat.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rtbishop.look4sat.data.database.dao.StorageDao
 import com.rtbishop.look4sat.data.database.entity.SatEntry
 import com.rtbishop.look4sat.data.database.entity.SatRadio
 
-@Database(entities = [SatEntry::class, SatRadio::class], version = 2, exportSchema = false)
+@Database(entities = [SatEntry::class, SatRadio::class], version = 1, exportSchema = false)
 abstract class MainDatabase : RoomDatabase() {
-
     abstract fun storageDao(): StorageDao
 }
 
-val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE entries_backup (name TEXT NOT NULL, epoch REAL NOT NULL, meanmo REAL NOT NULL, eccn REAL NOT NULL, incl REAL NOT NULL, raan REAL NOT NULL, argper REAL NOT NULL, meanan REAL NOT NULL, catnum INTEGER NOT NULL, bstar REAL NOT NULL, xincl REAL NOT NULL, xnodeo REAL NOT NULL, omegao REAL NOT NULL, xmo REAL NOT NULL, xno REAL NOT NULL, orbitalPeriod REAL NOT NULL, isDeepSpace INTEGER NOT NULL, comment TEXT, PRIMARY KEY(catnum))")
-        database.execSQL("INSERT INTO entries_backup (name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar, xincl, xnodeo, omegao, xmo, xno, orbitalPeriod, isDeepSpace, comment) SELECT name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar, xincl, xnodeo, omegao, xmo, xno, 1440 / meanmo, 1440 / meanmo >= 225.0, comment FROM entries")
-        database.execSQL("DROP TABLE entries")
-        database.execSQL("ALTER TABLE entries_backup RENAME TO entries")
-    }
-}
+//val MIGRATION_1_2 = object : Migration(1, 2) {
+//    override fun migrate(database: SupportSQLiteDatabase) {
+//        database.execSQL("CREATE TABLE entries_backup (name TEXT NOT NULL, epoch REAL NOT NULL, meanmo REAL NOT NULL, eccn REAL NOT NULL, incl REAL NOT NULL, raan REAL NOT NULL, argper REAL NOT NULL, meanan REAL NOT NULL, catnum INTEGER NOT NULL, bstar REAL NOT NULL, xincl REAL NOT NULL, xnodeo REAL NOT NULL, omegao REAL NOT NULL, xmo REAL NOT NULL, xno REAL NOT NULL, orbitalPeriod REAL NOT NULL, isDeepSpace INTEGER NOT NULL, comment TEXT, PRIMARY KEY(catnum))")
+//        database.execSQL("INSERT INTO entries_backup (name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar, xincl, xnodeo, omegao, xmo, xno, orbitalPeriod, isDeepSpace, comment) SELECT name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar, xincl, xnodeo, omegao, xmo, xno, 1440 / meanmo, 1440 / meanmo >= 225.0, comment FROM entries")
+//        database.execSQL("DROP TABLE entries")
+//        database.execSQL("ALTER TABLE entries_backup RENAME TO entries")
+//    }
+//}

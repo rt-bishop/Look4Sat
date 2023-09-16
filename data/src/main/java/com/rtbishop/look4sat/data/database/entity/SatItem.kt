@@ -17,14 +17,4 @@
  */
 package com.rtbishop.look4sat.data.database.entity
 
-data class SatItem(
-    val catnum: Int,
-    val name: String
-//    @Relation(
-//        parentColumn = "catnum",
-//        entity = SatRadio::class,
-//        entityColumn = "catnum",
-//        projection = ["mode"]
-//    )
-//    val modes: List<String>
-)
+data class SatItem(val catnum: Int, val name: String)

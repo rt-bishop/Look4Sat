@@ -76,8 +76,8 @@ class SatelliteRepo(
             val satPos = sat.getPosition(pos, time)
             val copiedList = radios.map { it.copy() }
             copiedList.forEach { transmitter ->
-                transmitter.downlink?.let { transmitter.downlink = satPos.getDownlinkFreq(it) }
-                transmitter.uplink?.let { transmitter.uplink = satPos.getUplinkFreq(it) }
+                transmitter.downlinkLow?.let { transmitter.downlinkLow = satPos.getDownlinkFreq(it) }
+                transmitter.uplinkLow?.let { transmitter.uplinkLow = satPos.getUplinkFreq(it) }
             }
             copiedList.map { it.copy() }
         }

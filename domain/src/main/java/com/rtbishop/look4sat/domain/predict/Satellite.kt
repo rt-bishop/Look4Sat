@@ -383,6 +383,16 @@ abstract class Satellite(val data: OrbitalData) {
         return acos(dot(v1, v2) / (v1.w * v2.w))
     }
 
+    /**
+     * The function Delta_ET has been added to allow calculations on the
+     * position of the sun. It provides the difference between UT (approximately
+     * the same as UTC) and ET (now referred to as TDT) This function is based
+     * on a least squares fit of data from 1950 to 1991 and will need to be
+     * updated periodically.
+     *
+     * Values determined using data from 1950-1991 in the 1990 Astronomical
+     * Almanac. See DELTA_ET.WQ1 for details.
+     */
     private fun deltaEt(year: Double): Double {
         return 26.465 + 0.747622 * (year - 1950) + (1.886913 * sin(TWO_PI * (year - 1975) / 33))
     }
