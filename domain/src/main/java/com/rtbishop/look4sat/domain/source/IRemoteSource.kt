@@ -20,5 +20,6 @@ package com.rtbishop.look4sat.domain.source
 import java.io.InputStream
 
 interface IRemoteSource {
-    suspend fun getRemoteStream(url: String): InputStream?
+    suspend fun getFileStream(uri: String): InputStream?
+    suspend fun getNetworkStream(url: String): InputStream?
 }

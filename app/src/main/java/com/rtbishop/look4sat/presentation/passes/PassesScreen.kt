@@ -36,9 +36,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.predict.NearEarthSatellite
+import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
-import com.rtbishop.look4sat.domain.predict.SatPass
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
 import com.rtbishop.look4sat.presentation.components.PullRefreshState
@@ -114,13 +114,13 @@ private fun PassPreview() {
     val data = OrbitalData(
         "Satellite", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
     )
-    val satellite = NearEarthSatellite(data)
-    val pass = SatPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
+    val satellite = NearEarthObject(data)
+    val pass = OrbitalPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
     MainTheme { Pass(pass = pass, { _, _ -> }) }
 }
 
 @Composable
-private fun Pass(pass: SatPass, navToRadar: (Int, Long) -> Unit, modifier: Modifier = Modifier) {
+private fun Pass(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifier: Modifier = Modifier) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
             .padding(bottom = 2.dp)
@@ -207,7 +207,7 @@ private fun Pass(pass: SatPass, navToRadar: (Int, Long) -> Unit, modifier: Modif
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PassesCard(
-    refreshState: PullRefreshState, isRefreshing: Boolean, passes: List<SatPass>, navToRadar: (Int, Long) -> Unit
+    refreshState: PullRefreshState, isRefreshing: Boolean, passes: List<OrbitalPass>, navToRadar: (Int, Long) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
         Box(Modifier.pullRefresh(refreshState)) {

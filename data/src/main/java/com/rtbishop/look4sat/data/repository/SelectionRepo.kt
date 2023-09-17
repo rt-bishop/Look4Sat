@@ -4,6 +4,7 @@ import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.repository.ISelectionRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.source.ILocalSource
+import com.rtbishop.look4sat.domain.source.Sources
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +31,7 @@ class SelectionRepo(
 
     override fun getCurrentType() = currentType.value
 
-    override fun getTypesList() = settingsRepo.satelliteSourcesMap.keys.sorted()
+    override fun getTypesList() = Sources.satelliteDataUrls.keys.sorted()
 
     override suspend fun getEntriesFlow() = withContext(dispatcher) {
         val selectedIds = settingsRepo.selectedIds.value

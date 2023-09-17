@@ -1,6 +1,6 @@
 package com.rtbishop.look4sat.presentation.passes
 
-import com.rtbishop.look4sat.domain.predict.SatPass
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
 
 data class PassesState(
     val isDialogShown: Boolean,
@@ -12,7 +12,7 @@ data class PassesState(
     val hours: Int,
     val elevation: Double,
     val modes: List<String>,
-    val itemsList: List<SatPass>,
+    val itemsList: List<OrbitalPass>,
     val takeAction: (PassesAction) -> Unit
 )
 

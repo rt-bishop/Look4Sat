@@ -29,8 +29,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.predict.OrbitalObject
+import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -69,7 +69,7 @@ fun MapScreen() {
     val positions = viewModel.positions.collectAsState(initial = null)
     val satTrack = viewModel.track.collectAsState(initial = null)
     val footprint = viewModel.footprint.collectAsState(initial = null)
-    val positionClick = { satellite: Satellite -> viewModel.selectSatellite(satellite) }
+    val positionClick = { orbitalObject: OrbitalObject -> viewModel.selectSatellite(orbitalObject) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
             MapView(modifier = Modifier.fillMaxSize()) { mapView ->
@@ -97,7 +97,7 @@ private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
     }
 }
 
-private fun setPositions(posMap: Map<Satellite, GeoPos>, mapView: MapView, action: (Satellite) -> Unit) {
+private fun setPositions(posMap: Map<OrbitalObject, GeoPos>, mapView: MapView, action: (OrbitalObject) -> Unit) {
     val markers = FolderOverlay()
     try {
         posMap.entries.forEach {
@@ -156,8 +156,8 @@ private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
 //    mapView.controller.animateTo(center)
 }
 
-private fun setFootprint(satPos: SatPos, mapView: MapView) {
-    val footprintPoints = satPos.getRangeCircle().map { GeoPoint(it.latitude, it.longitude) }
+private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
+    val footprintPoints = orbitalPos.getRangeCircle().map { GeoPoint(it.latitude, it.longitude) }
     try {
         val footprintOverlay = Polyline().apply {
             outlinePaint.set(footprintPaint)

@@ -15,20 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data.source
+package com.rtbishop.look4sat.data.repository
 
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import com.rtbishop.look4sat.domain.predict.RAD2DEG
-import com.rtbishop.look4sat.domain.source.ISensorSource
+import com.rtbishop.look4sat.domain.repository.ISensorsRepo
+import kotlin.math.round
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.math.round
 
-class SensorSource(private val sensorManager: SensorManager, private val sensor: Sensor?) :
-    SensorEventListener, ISensorSource {
+class SensorsRepo(private val sensorManager: SensorManager, private val sensor: Sensor?) :
+    SensorEventListener, ISensorsRepo {
 
     private val _orientation = MutableStateFlow(Pair(0f, 0f))
     private val rotationMatrix = FloatArray(9)

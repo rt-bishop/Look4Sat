@@ -24,7 +24,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class NearEarthSatellite(data: OrbitalData) : Satellite(data) {
+class NearEarthObject(data: OrbitalData) : OrbitalObject(data) {
 
     private val aodp: Double
     private val aycof: Double

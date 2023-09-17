@@ -19,9 +19,9 @@ package com.rtbishop.look4sat.data.repository
 
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.predict.OrbitalObject
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
+import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.source.ILocalSource
@@ -39,11 +39,11 @@ class SatelliteRepo(
     private val settingsRepo: ISettingsRepo
 ) : ISatelliteRepo {
 
-    private val _passes = MutableStateFlow<List<SatPass>>(emptyList())
-    override val passes: StateFlow<List<SatPass>> = _passes
+    private val _passes = MutableStateFlow<List<OrbitalPass>>(emptyList())
+    override val passes: StateFlow<List<OrbitalPass>> = _passes
 
-    private val _satellites = MutableStateFlow<List<Satellite>>(emptyList())
-    override val satellites: StateFlow<List<Satellite>> = _satellites
+    private val _satellites = MutableStateFlow<List<OrbitalObject>>(emptyList())
+    override val satellites: StateFlow<List<OrbitalObject>> = _satellites
 
     override suspend fun getRadiosWithId(id: Int) = localStorage.getRadiosWithId(id)
 
@@ -55,13 +55,13 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun getPosition(sat: Satellite, pos: GeoPos, time: Long): SatPos {
+    override suspend fun getPosition(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPos {
         return withContext(dispatcher) { sat.getPosition(pos, time) }
     }
 
-    override suspend fun getTrack(sat: Satellite, pos: GeoPos, start: Long, end: Long): List<SatPos> {
+    override suspend fun getTrack(sat: OrbitalObject, pos: GeoPos, start: Long, end: Long): List<OrbitalPos> {
         return withContext(dispatcher) {
-            val positions = mutableListOf<SatPos>()
+            val positions = mutableListOf<OrbitalPos>()
             var currentTime = start
             while (currentTime < end) {
                 positions.add(sat.getPosition(pos, currentTime))
@@ -71,7 +71,12 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun getRadios(sat: Satellite, pos: GeoPos, radios: List<SatRadio>, time: Long): List<SatRadio> {
+    override suspend fun getRadios(
+        sat: OrbitalObject,
+        pos: GeoPos,
+        radios: List<SatRadio>,
+        time: Long
+    ): List<SatRadio> {
         return withContext(dispatcher) {
             val satPos = sat.getPosition(pos, time)
             val copiedList = radios.map { it.copy() }
@@ -83,7 +88,7 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun processPasses(passList: List<SatPass>, time: Long): List<SatPass> {
+    override suspend fun processPasses(passList: List<OrbitalPass>, time: Long): List<OrbitalPass> {
         return withContext(dispatcher) {
             passList.forEach { pass ->
                 if (!pass.isDeepSpace) {
@@ -102,7 +107,7 @@ class SatelliteRepo(
     override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>) {
         if (_satellites.value.isNotEmpty()) {
             withContext(dispatcher) {
-                val newPasses = mutableListOf<SatPass>()
+                val newPasses = mutableListOf<OrbitalPass>()
                 val idsWithModes = localStorage.getIdsWithModes(modes)
                 _satellites.value.forEach { satellite ->
                     if (idsWithModes.isEmpty() || satellite.data.catnum in idsWithModes) {
@@ -116,8 +121,8 @@ class SatelliteRepo(
         }
     }
 
-    private fun Satellite.getPasses(pos: GeoPos, time: Long, hours: Int): List<SatPass> {
-        val passes = mutableListOf<SatPass>()
+    private fun OrbitalObject.getPasses(pos: GeoPos, time: Long, hours: Int): List<OrbitalPass> {
+        val passes = mutableListOf<OrbitalPass>()
         val endDate = time + hours * 60L * 60L * 1000L
         val quarterOrbitMin = (this.data.orbitalPeriod / 4.0).toInt()
         var startDate = time
@@ -141,23 +146,23 @@ class SatelliteRepo(
         return passes
     }
 
-    private fun List<SatPass>.filter(time: Long, hoursAhead: Int, minElev: Double): List<SatPass> {
+    private fun List<OrbitalPass>.filter(time: Long, hoursAhead: Int, minElev: Double): List<OrbitalPass> {
         val timeFuture = time + (hoursAhead * 60L * 60L * 1000L)
         return this.filter { it.losTime > time }.filter { it.aosTime < timeFuture }
             .filter { it.maxElevation > minElev }.sortedBy { it.aosTime }
     }
 
-    private fun getGeoPass(sat: Satellite, pos: GeoPos, time: Long): SatPass {
+    private fun getGeoPass(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPass {
         val satPos = sat.getPosition(pos, time)
         val aos = time - 24 * 60L * 60L * 1000L
         val los = time + 24 * 60L * 60L * 1000L // val tca = (aos + los) / 2
         val az = satPos.azimuth.toDegrees().round(1)
         val elev = satPos.elevation.toDegrees().round(1)
         val alt = satPos.altitude
-        return SatPass(aos, az, los, az, alt.toInt(), elev, sat)
+        return OrbitalPass(aos, az, los, az, alt.toInt(), elev, sat)
     }
 
-    private fun getLeoPass(sat: Satellite, pos: GeoPos, time: Long, rewind: Boolean): SatPass {
+    private fun getLeoPass(sat: OrbitalObject, pos: GeoPos, time: Long, rewind: Boolean): OrbitalPass {
         val quarterOrbitMin = (sat.data.orbitalPeriod / 4.0).toInt()
         var calendarTimeMillis = time
         var elevation: Double
@@ -229,6 +234,6 @@ class SatelliteRepo(
         val los = satPos.time // val tca = (aos + los) / 2
         val losAz = satPos.azimuth.toDegrees().round(1)
         val elev = maxElevation.toDegrees().round(1)
-        return SatPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat)
+        return OrbitalPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat)
     }
 }
