@@ -30,30 +30,11 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-const val ASTRONOMICAL_UNIT = 1.49597870691E8
-const val DEG2RAD = 0.017453292519943295
-const val RAD2DEG = 57.29577951308232
-const val EARTH_RADIUS = 6378.137
-const val EPSILON = 1.0E-12
-const val FLAT_FACT = 3.35281066474748E-3
-const val J3_HARMONIC = -2.53881E-6
-const val MIN_PER_DAY = 1.44E3
-const val SEC_PER_DAY = 8.6400E4
-const val SOLAR_RADIUS = 6.96000E5
-const val SPEED_OF_LIGHT = 2.99792458E8
-const val PI = 3.141592653589793
-const val PI_2 = PI / 2.0
-const val TWO_PI = PI * 2.0
-const val TWO_THIRDS = 2.0 / 3.0
-const val CK2 = 5.413079E-4
-const val CK4 = 6.209887E-7
-const val XKE = 7.43669161E-2
-
-abstract class Satellite(val data: OrbitalData) {
+abstract class OrbitalObject(val data: OrbitalData) {
 
     private val position = Vector4()
     private val velocity = Vector4()
-    private var satPos = SatPos()
+    private var orbitalPos = OrbitalPos()
     private var eclipseDepth = 0.0
     private var gsPosTheta = 0.0
     private var julUTC = 0.0
@@ -72,8 +53,8 @@ abstract class Satellite(val data: OrbitalData) {
         }
     }
 
-    fun getPosition(pos: GeoPos, time: Long): SatPos {
-        satPos = SatPos()
+    fun getPosition(pos: GeoPos, time: Long): OrbitalPos {
+        orbitalPos = OrbitalPos()
         // Date/time at which the position and velocity were calculated
         julUTC = calcCurrentDaynum(time) + 2444238.5
         // Convert satellite's epoch time to Julian and calculate time since epoch in minutes
@@ -88,10 +69,10 @@ abstract class Satellite(val data: OrbitalData) {
         // Angles in rads, dist in km, vel in km/S. Calculate sat Az, El, Range and Range-rate.
         calculateObs(julUTC, position, velocity, pos, squintVector)
         calculateLatLonAlt(julUTC)
-        satPos.time = time
-        satPos.eclipsed = isEclipsed()
-        satPos.eclipseDepth = eclipseDepth
-        return satPos
+        orbitalPos.time = time
+        orbitalPos.eclipsed = isEclipsed()
+        orbitalPos.eclipseDepth = eclipseDepth
+        return orbitalPos
     }
 
     private fun calcCurrentDaynum(now: Long): Double {
@@ -118,8 +99,8 @@ abstract class Satellite(val data: OrbitalData) {
     }
 
     private fun calculateSDP4orSGP4(tsince: Double) {
-        if (data.isDeepSpace) (this as DeepSpaceSatellite).calculateSDP4(tsince)
-        else (this as NearEarthSatellite).calculateSGP4(tsince)
+        if (data.isDeepSpace) (this as DeepSpaceObject).calculateSDP4(tsince)
+        else (this as NearEarthObject).calculateSGP4(tsince)
     }
 
     // Converts the sat position and velocity vectors to km and km/sec
@@ -164,13 +145,13 @@ abstract class Satellite(val data: OrbitalData) {
         var azim = atan(-topE / topS)
         if (topS > 0.0) azim += PI
         if (azim < 0.0) azim += TWO_PI
-        satPos.azimuth = azim
-        satPos.elevation = asin(topZ / range.w)
-        satPos.distance = range.w
-        satPos.distanceRate = dot(range, rgvel) / range.w
-        var elevation = satPos.elevation / TWO_PI * 360.0
+        orbitalPos.azimuth = azim
+        orbitalPos.elevation = asin(topZ / range.w)
+        orbitalPos.distance = range.w
+        orbitalPos.distanceRate = dot(range, rgvel) / range.w
+        var elevation = orbitalPos.elevation / TWO_PI * 360.0
         if (elevation > 90) elevation = 180 - elevation
-        satPos.aboveHorizon = elevation - 0 > EPSILON
+        orbitalPos.aboveHorizon = elevation - 0 > EPSILON
     }
 
     // Returns the ECI position and velocity of the observer
@@ -196,26 +177,26 @@ abstract class Satellite(val data: OrbitalData) {
 
     // Calculate the geodetic position of an object given its ECI pos and time
     private fun calculateLatLonAlt(time: Double) {
-        satPos.theta = atan2(position.y, position.x)
-        satPos.longitude = mod2PI(satPos.theta - thetaGJD(time))
+        orbitalPos.theta = atan2(position.y, position.x)
+        orbitalPos.longitude = mod2PI(orbitalPos.theta - thetaGJD(time))
         val r = sqrt(sqr(position.x) + sqr(position.y))
         val e2 = FLAT_FACT * (2.0 - FLAT_FACT)
-        satPos.latitude = atan2(position.z, r)
+        orbitalPos.latitude = atan2(position.z, r)
         var phi: Double
         var c: Double
         var i = 0
         var converged: Boolean
         do {
-            phi = satPos.latitude
+            phi = orbitalPos.latitude
             c = invert(sqrt(1.0 - e2 * sqr(sin(phi))))
-            satPos.latitude = atan2(position.z + EARTH_RADIUS * c * e2 * sin(phi), r)
-            converged = abs(satPos.latitude - phi) < EPSILON
+            orbitalPos.latitude = atan2(position.z + EARTH_RADIUS * c * e2 * sin(phi), r)
+            converged = abs(orbitalPos.latitude - phi) < EPSILON
         } while (i++ < 10 && !converged)
-        satPos.altitude = r / cos(satPos.latitude) - EARTH_RADIUS * c
-        var temp = satPos.latitude
+        orbitalPos.altitude = r / cos(orbitalPos.latitude) - EARTH_RADIUS * c
+        var temp = orbitalPos.latitude
         if (temp > PI_2) {
             temp -= TWO_PI
-            satPos.latitude = temp
+            orbitalPos.latitude = temp
         }
     }
 
@@ -302,7 +283,7 @@ abstract class Satellite(val data: OrbitalData) {
     internal fun calculatePhase(xlt: Double, xnode: Double, omgadf: Double) {
         var phaseValue = xlt - xnode - omgadf + TWO_PI
         if (phaseValue < 0.0) phaseValue += TWO_PI
-        satPos.phase = mod2PI(phaseValue)
+        orbitalPos.phase = mod2PI(phaseValue)
     }
 
     // Sets perigee and checks and adjusts the calculation if the perigee is less tan 156KM

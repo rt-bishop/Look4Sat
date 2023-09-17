@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.data.database.dao
+package com.rtbishop.look4sat.data.database
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -23,17 +23,16 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.rtbishop.look4sat.data.database.entity.SatEntry
-import com.rtbishop.look4sat.data.database.entity.SatItem
 import com.rtbishop.look4sat.data.database.entity.SatRadio
+import com.rtbishop.look4sat.domain.model.SatItem
 
 @Dao
-interface StorageDao {
+interface Look4SatDao {
 
     @Query("SELECT COUNT(*) FROM entries")
     suspend fun getEntriesTotal(): Int
 
-    //@Transaction
-    @Query("SELECT catnum, name FROM entries ORDER BY name ASC")
+    @Query("SELECT catnum, name, 0 as isSelected FROM entries ORDER BY name ASC")
     suspend fun getEntriesList(): List<SatItem>
 
     @Transaction

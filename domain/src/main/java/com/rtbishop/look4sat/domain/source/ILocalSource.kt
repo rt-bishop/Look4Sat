@@ -17,16 +17,16 @@
  */
 package com.rtbishop.look4sat.domain.source
 
-import com.rtbishop.look4sat.domain.model.SatEntry
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.domain.model.SatRadio
-import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.predict.OrbitalData
+import com.rtbishop.look4sat.domain.predict.OrbitalObject
 
 interface ILocalSource {
     suspend fun getEntriesTotal(): Int
     suspend fun getEntriesList(): List<SatItem>
-    suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite>
-    suspend fun insertEntries(entries: List<SatEntry>)
+    suspend fun getEntriesWithIds(ids: List<Int>): List<OrbitalObject>
+    suspend fun insertEntries(entries: List<OrbitalData>)
     suspend fun deleteEntries()
     suspend fun getIdsWithModes(modes: List<String>): List<Int>
     suspend fun getRadiosTotal(): Int

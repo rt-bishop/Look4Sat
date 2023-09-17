@@ -69,7 +69,7 @@ fun RadarScreen() {
         ) {
             viewModel.radarData.value?.let { data ->
                 RadarViewCompose(
-                    item = data.satPos,
+                    item = data.orbitalPos,
                     items = data.satTrack,
                     azimElev = viewModel.orientation.value
                 )

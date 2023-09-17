@@ -25,7 +25,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-data class SatPos(
+data class OrbitalPos(
     var azimuth: Double = 0.0,
     var elevation: Double = 0.0,
     var latitude: Double = 0.0,

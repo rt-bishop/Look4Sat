@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.model.PassesSettings
-import com.rtbishop.look4sat.domain.predict.SatPass
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.toTimerString
@@ -99,7 +99,7 @@ class PassesViewModel(
         satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
     }
 
-    private fun setPassInfo(passes: List<SatPass>, timeNow: Long) {
+    private fun setPassInfo(passes: List<OrbitalPass>, timeNow: Long) {
         if (passes.isEmpty()) return
         try {
             val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }

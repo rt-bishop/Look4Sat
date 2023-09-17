@@ -25,7 +25,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class DeepSpaceSatellite(data: OrbitalData) : Satellite(data) {
+class DeepSpaceObject(data: OrbitalData) : OrbitalObject(data) {
 
     private val c1: Double
     private val c4: Double
