@@ -6,25 +6,23 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.location.LocationManager
 import androidx.room.Room
-import com.rtbishop.look4sat.data.database.MainDatabase
+import com.rtbishop.look4sat.data.database.Look4SatDb
 import com.rtbishop.look4sat.data.framework.BluetoothReporter
 import com.rtbishop.look4sat.data.framework.NetworkReporter
 import com.rtbishop.look4sat.data.repository.DatabaseRepo
 import com.rtbishop.look4sat.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.data.repository.SelectionRepo
+import com.rtbishop.look4sat.data.repository.SensorsRepo
 import com.rtbishop.look4sat.data.repository.SettingsRepo
-import com.rtbishop.look4sat.data.source.FileSource
 import com.rtbishop.look4sat.data.source.LocalSource
 import com.rtbishop.look4sat.data.source.RemoteSource
-import com.rtbishop.look4sat.data.source.SensorSource
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISelectionRepo
+import com.rtbishop.look4sat.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.source.IFileSource
 import com.rtbishop.look4sat.domain.source.ILocalSource
 import com.rtbishop.look4sat.domain.source.IRemoteSource
-import com.rtbishop.look4sat.domain.source.ISensorSource
 import com.rtbishop.look4sat.domain.utility.DataParser
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +35,8 @@ import org.osmdroid.config.Configuration
 class MainContainer(private val context: Context) {
 
     private val localSource = provideLocalSource()
-    val mainScope = provideMainScope()
+    private val mainHandler = CoroutineExceptionHandler { _, error -> println("MainHandler: $error") }
+    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + mainHandler)
     val settingsRepo = provideSettingsRepo()
     val selectionRepo = provideSelectionRepo()
     val satelliteRepo = provideSatelliteRepo()
@@ -52,40 +51,30 @@ class MainContainer(private val context: Context) {
         return NetworkReporter(CoroutineScope(Dispatchers.IO))
     }
 
-    fun provideSensorSource(): ISensorSource {
+    fun provideSensorsRepo(): ISensorsRepo {
         val manager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensor = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
-        return SensorSource(manager, sensor)
+        return SensorsRepo(manager, sensor)
     }
 
     private fun provideDatabaseRepo(): IDatabaseRepo {
         val dataParser = DataParser(Dispatchers.Default)
-        val fileSource = provideFileSource()
         val remoteSource = provideRemoteSource()
-        return DatabaseRepo(Dispatchers.Default, dataParser, fileSource, localSource, remoteSource, settingsRepo)
-    }
-
-    private fun provideFileSource(): IFileSource {
-        return FileSource(context.contentResolver, Dispatchers.IO)
+        return DatabaseRepo(Dispatchers.Default, dataParser, localSource, remoteSource, settingsRepo)
     }
 
     private fun provideLocalSource(): ILocalSource {
-        val database = Room.databaseBuilder(context, MainDatabase::class.java, "Look4SatDBv313").apply {
+        val database = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDBv313").apply {
 //            addMigrations(MIGRATION_1_2)
             fallbackToDestructiveMigration()
         }.build()
-        return LocalSource(database.storageDao())
-    }
-
-    private fun provideMainScope(): CoroutineScope {
-        val mainHandler = CoroutineExceptionHandler { _, error -> println("Look4Sat: $error") }
-        return CoroutineScope(SupervisorJob() + Dispatchers.Default + mainHandler)
+        return LocalSource(database.look4SatDao())
     }
 
     private fun provideRemoteSource(): IRemoteSource {
         val cache = Cache(context.cacheDir, MainApplication.MAX_OKHTTP_CACHE_SIZE)
         val httpClient = OkHttpClient.Builder().cache(cache).build()
-        return RemoteSource(httpClient, Dispatchers.IO)
+        return RemoteSource(context.contentResolver, httpClient, Dispatchers.IO)
     }
 
     private fun provideSatelliteRepo(): ISatelliteRepo {

@@ -35,7 +35,7 @@ class MainApplication : Application() {
         enableStrictMode()
         super.onCreate()
         container = MainContainer(this)
-        container.mainScope.launch { checkAutoUpdate() }
+        container.appScope.launch { checkAutoUpdate() }
     }
 
     private suspend fun checkAutoUpdate() {

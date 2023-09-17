@@ -18,75 +18,75 @@
 package com.rtbishop.look4sat.data.source
 
 import com.rtbishop.look4sat.data.database.entity.SatEntry as FrameworkEntry
-import com.rtbishop.look4sat.data.database.entity.SatItem as FrameworkItem
 import com.rtbishop.look4sat.data.database.entity.SatRadio as FrameworkRadio
-import com.rtbishop.look4sat.domain.model.SatEntry as DomainEntry
-import com.rtbishop.look4sat.domain.model.SatItem as DomainItem
 import com.rtbishop.look4sat.domain.model.SatRadio as DomainRadio
-import com.rtbishop.look4sat.data.database.dao.StorageDao
+import com.rtbishop.look4sat.data.database.Look4SatDao
 import com.rtbishop.look4sat.domain.model.SatRadio
-import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.predict.OrbitalData
+import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.source.ILocalSource
 
-class LocalSource(private val storageDao: StorageDao) : ILocalSource {
+class LocalSource(private val look4SatDao: Look4SatDao) : ILocalSource {
 
     //region # Entries region
 
-    override suspend fun getEntriesTotal() = storageDao.getEntriesTotal()
+    override suspend fun getEntriesTotal() = look4SatDao.getEntriesTotal()
 
-    override suspend fun getEntriesList(): List<DomainItem> {
-        return storageDao.getEntriesList().toDomainItems()
-    }
+    override suspend fun getEntriesList() = look4SatDao.getEntriesList()
 
-    override suspend fun getEntriesWithIds(ids: List<Int>): List<Satellite> {
-        val selectedSatellites = mutableListOf<Satellite>()
+    override suspend fun getEntriesWithIds(ids: List<Int>): List<OrbitalObject> {
+        val selectedOrbitalObjects = mutableListOf<OrbitalObject>()
         ids.chunked(999).forEach { idsPart ->
-            val entries = storageDao.getEntriesWithIds(idsPart)
-            selectedSatellites.addAll(entries.map { entry -> entry.data.getSatellite() })
+            val entries = look4SatDao.getEntriesWithIds(idsPart)
+            selectedOrbitalObjects.addAll(entries.toDomain().map { entry -> entry.getObject() })
         }
-        return selectedSatellites
+        return selectedOrbitalObjects
     }
 
-    override suspend fun insertEntries(entries: List<DomainEntry>) {
-        storageDao.insertEntries(entries.toFrameworkEntries())
-    }
+    override suspend fun insertEntries(entries: List<OrbitalData>) = look4SatDao.insertEntries(entries.toEntity())
 
-    override suspend fun deleteEntries() = storageDao.deleteEntries()
+    override suspend fun deleteEntries() = look4SatDao.deleteEntries()
 
-    override suspend fun getIdsWithModes(modes: List<String>) = storageDao.getIdsWithModes(modes)
+    override suspend fun getIdsWithModes(modes: List<String>) = look4SatDao.getIdsWithModes(modes)
 
-    private fun DomainEntry.toFramework() = FrameworkEntry(this.data, this.comment)
+    private fun FrameworkEntry.toDomain() = OrbitalData(
+        this.name, this.epoch, this.meanmo, this.eccn, this.incl,
+        this.raan, this.argper, this.meanan, this.catnum, this.bstar
+    )
 
-    private fun FrameworkItem.toDomain() = DomainItem(this.catnum, this.name, false)
+    private fun OrbitalData.toEntity() = FrameworkEntry(
+        this.name, this.epoch, this.meanmo, this.eccn, this.incl,
+        this.raan, this.argper, this.meanan, this.catnum, this.bstar
+    )
 
-    private fun List<DomainEntry>.toFrameworkEntries() = this.map { entry -> entry.toFramework() }
+    private fun List<OrbitalData>.toEntity() = this.map { item -> item.toEntity() }
 
-    private fun List<FrameworkItem>.toDomainItems() = this.map { item -> item.toDomain() }
+    private fun List<FrameworkEntry>.toDomain() = this.map { item -> item.toDomain() }
 
     //endregion
 
     //region # Radios region
 
-    override suspend fun getRadiosTotal() = storageDao.getRadiosTotal()
+    override suspend fun getRadiosTotal() = look4SatDao.getRadiosTotal()
 
     override suspend fun getRadiosWithId(id: Int): List<SatRadio> {
-        return storageDao.getRadiosWithId(id).toDomainRadios()
+        return look4SatDao.getRadiosWithId(id).toDomainRadios()
     }
 
     override suspend fun insertRadios(radios: List<SatRadio>) {
-        storageDao.insertRadios(radios.toFrameworkRadios())
+        look4SatDao.insertRadios(radios.toFrameworkRadios())
     }
 
-    override suspend fun deleteRadios() = storageDao.deleteRadios()
+    override suspend fun deleteRadios() = look4SatDao.deleteRadios()
 
     private fun DomainRadio.toFramework() = FrameworkRadio(
         this.uuid, this.info, this.isAlive, this.downlinkLow, this.downlinkHigh, this.downlinkMode,
-        this.uplinkLow, this.uplinkHigh, this.uplinkMode, this.isInverted, this.catnum, this.comment
+        this.uplinkLow, this.uplinkHigh, this.uplinkMode, this.isInverted, this.catnum
     )
 
     private fun FrameworkRadio.toDomain() = DomainRadio(
         this.uuid, this.info, this.isAlive, this.downlinkLow, this.downlinkHigh, this.downlinkMode,
-        this.uplinkLow, this.uplinkHigh, this.uplinkMode, this.isInverted, this.catnum, this.comment
+        this.uplinkLow, this.uplinkHigh, this.uplinkMode, this.isInverted, this.catnum
     )
 
     private fun List<DomainRadio>.toFrameworkRadios() = this.map { radio -> radio.toFramework() }

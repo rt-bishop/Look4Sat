@@ -32,12 +32,12 @@ import com.rtbishop.look4sat.data.framework.BluetoothReporter
 import com.rtbishop.look4sat.data.framework.NetworkReporter
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.domain.predict.SatPass
-import com.rtbishop.look4sat.domain.predict.SatPos
-import com.rtbishop.look4sat.domain.predict.Satellite
+import com.rtbishop.look4sat.domain.predict.OrbitalObject
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
+import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
+import com.rtbishop.look4sat.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.source.ISensorSource
 import com.rtbishop.look4sat.domain.utility.round
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import kotlinx.coroutines.delay
@@ -51,20 +51,20 @@ class RadarViewModel(
     private val networkReporter: NetworkReporter,
     private val satelliteRepo: ISatelliteRepo,
     private val settingsRepo: ISettingsRepo,
-    private val sensorSource: ISensorSource
+    private val sensorsRepo: ISensorsRepo
 ) : ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
     private val magDeclination = getMagDeclination(stationPos)
     val transmitters = mutableStateOf<List<SatRadio>>(emptyList())
     val radarData = mutableStateOf<RadarData?>(null)
-    val orientation = mutableStateOf(sensorSource.orientation.value)
+    val orientation = mutableStateOf(sensorsRepo.orientation.value)
 
     init {
         if (settingsRepo.otherSettings.value.stateOfSensors) {
             viewModelScope.launch {
-                sensorSource.enableSensor()
-                sensorSource.orientation.collect { data ->
+                sensorsRepo.enableSensor()
+                sensorsRepo.orientation.collect { data ->
                     orientation.value = Pair(data.first + magDeclination, data.second)
                 }
             }
@@ -72,7 +72,7 @@ class RadarViewModel(
     }
 
     override fun onCleared() {
-        sensorSource.disableSensor()
+        sensorsRepo.disableSensor()
         super.onCleared()
     }
 
@@ -89,10 +89,10 @@ class RadarViewModel(
                 while (isActive) {
                     val timeNow = System.currentTimeMillis()
                     val satPos =
-                        satelliteRepo.getPosition(satPass.satellite, stationPos, timeNow)
-                    sendPassData(satPass, satPos, satPass.satellite)
+                        satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
+                    sendPassData(satPass, satPos, satPass.orbitalObject)
                     sendPassDataBT(satPos)
-                    processRadios(transmitters, satPass.satellite, timeNow)
+                    processRadios(transmitters, satPass.orbitalObject, timeNow)
                     delay(1000)
                 }
             }
@@ -109,33 +109,33 @@ class RadarViewModel(
         return GeomagneticField(latitude, longitude, geoPos.altitude.toFloat(), time).declination
     }
 
-    private fun sendPassData(satPass: SatPass, satPos: SatPos, satellite: Satellite) {
+    private fun sendPassData(orbitalPass: OrbitalPass, orbitalPos: OrbitalPos, orbitalObject: OrbitalObject) {
         viewModelScope.launch {
-            var track: List<SatPos> = emptyList()
-            if (!satPass.isDeepSpace) {
+            var track: List<OrbitalPos> = emptyList()
+            if (!orbitalPass.isDeepSpace) {
                 track = satelliteRepo.getTrack(
-                    satellite, stationPos, satPass.aosTime, satPass.losTime
+                    orbitalObject, stationPos, orbitalPass.aosTime, orbitalPass.losTime
                 )
             }
             if (settingsRepo.getRotatorState()) {
                 val server = settingsRepo.getRotatorAddress()
                 val port = settingsRepo.getRotatorPort().toInt()
-                val azimuth = satPos.azimuth.toDegrees().round(1)
-                val elevation = satPos.elevation.toDegrees().round(1)
+                val azimuth = orbitalPos.azimuth.toDegrees().round(1)
+                val elevation = orbitalPos.elevation.toDegrees().round(1)
                 networkReporter.reportRotation(server, port, azimuth, elevation)
             }
-            radarData.value = RadarData(satPos, track)
+            radarData.value = RadarData(orbitalPos, track)
         }
     }
 
-    private fun sendPassDataBT(satPos: SatPos) {
+    private fun sendPassDataBT(orbitalPos: OrbitalPos) {
         viewModelScope.launch {
             if (settingsRepo.getBluetoothState()) {
                 val btDevice = settingsRepo.getBluetoothAddress()
                 if (bluetoothReporter.isConnected()) {
                     val format = settingsRepo.getBluetoothFormat()
-                    val azimuth = satPos.azimuth.toDegrees().round(0).toInt()
-                    val elevation = satPos.elevation.toDegrees().round(0).toInt()
+                    val azimuth = orbitalPos.azimuth.toDegrees().round(0).toInt()
+                    val elevation = orbitalPos.elevation.toDegrees().round(0).toInt()
                     bluetoothReporter.reportRotation(format, azimuth, elevation)
                 } else if (!bluetoothReporter.isConnecting()) {
                     Log.i("BTReporter", "BTReporter: Attempting to connect...")
@@ -145,10 +145,10 @@ class RadarViewModel(
         }
     }
 
-    private fun processRadios(radios: List<SatRadio>, satellite: Satellite, time: Long) {
+    private fun processRadios(radios: List<SatRadio>, orbitalObject: OrbitalObject, time: Long) {
         viewModelScope.launch {
             delay(125)
-            val list = satelliteRepo.getRadios(satellite, stationPos, radios, time)
+            val list = satelliteRepo.getRadios(orbitalObject, stationPos, radios, time)
             transmitters.value = list
         }
     }
@@ -164,7 +164,7 @@ class RadarViewModel(
                     container.provideNetworkReporter(),
                     container.satelliteRepo,
                     container.settingsRepo,
-                    container.provideSensorSource()
+                    container.provideSensorsRepo()
                 )
             }
         }

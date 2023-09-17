@@ -29,14 +29,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
+import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.predict.PI_2
-import com.rtbishop.look4sat.domain.predict.SatPos
 import com.rtbishop.look4sat.domain.utility.toRadians
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun RadarViewCompose(item: SatPos, items: List<SatPos>, azimElev: Pair<Float, Float>) {
+fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<Float, Float>) {
     val radarColor = Color(0xFFDCDCDC)
     val primaryColor = Color(0xFFFFE082)
     val secondaryColor = Color(0xFFDC0000)
@@ -92,7 +92,7 @@ private fun DrawScope.drawTrack(path: Path, effect: PathEffect, color: Color, ef
     drawPath(path, effectColor, style = Stroke(pathEffect = effect))
 }
 
-private fun DrawScope.drawPosition(item: SatPos, radius: Float, posRadius: Float, color: Color) {
+private fun DrawScope.drawPosition(item: OrbitalPos, radius: Float, posRadius: Float, color: Color) {
     val satX = sph2CartX(item.azimuth, item.elevation, radius.toDouble())
     val satY = sph2CartY(item.azimuth, item.elevation, radius.toDouble())
     drawCircle(color, 16f, center.copy(satX, -satY))
@@ -122,7 +122,7 @@ private fun DrawScope.drawSweep(center: Offset, degrees: Float, radius: Float, c
     rotate(-90 + degrees, center) { drawCircle(brush, radius, style = Fill) }
 }
 
-private fun createTrackPath(positions: List<SatPos>, radius: Float): Path {
+private fun createTrackPath(positions: List<OrbitalPos>, radius: Float): Path {
     val trackPath = Path()
     positions.forEachIndexed { index, satPos ->
         val passX = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())

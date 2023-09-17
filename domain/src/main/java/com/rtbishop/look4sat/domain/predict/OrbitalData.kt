@@ -27,15 +27,14 @@ data class OrbitalData(
     val argper: Double,
     val meanan: Double,
     val catnum: Int,
-    val bstar: Double,
-    val xincl: Double = incl * DEG2RAD,
-    val xnodeo: Double = raan * DEG2RAD,
-    val omegao: Double = argper * DEG2RAD,
-    val xmo: Double = meanan * DEG2RAD,
-    val xno: Double = meanmo * TWO_PI / MIN_PER_DAY,
-    val orbitalPeriod: Double = MIN_PER_DAY / meanmo,
-    // Space objects are classified as NearEarth (period < 225 min) or DeepSpace (period >= 225 min)
-    val isDeepSpace: Boolean = orbitalPeriod >= 225.0
+    val bstar: Double
 ) {
-    fun getSatellite(): Satellite = if (isDeepSpace) DeepSpaceSatellite(this) else NearEarthSatellite(this)
+    val xincl: Double = incl * DEG2RAD
+    val xnodeo: Double = raan * DEG2RAD
+    val omegao: Double = argper * DEG2RAD
+    val xmo: Double = meanan * DEG2RAD
+    val xno: Double = meanmo * TWO_PI / MIN_PER_DAY
+    val orbitalPeriod: Double = MIN_PER_DAY / meanmo
+    val isDeepSpace: Boolean = orbitalPeriod >= 225.0 // NearEarth (period < 225 min) or DeepSpace (period >= 225 min)
+    fun getObject(): OrbitalObject = if (isDeepSpace) DeepSpaceObject(this) else NearEarthObject(this)
 }

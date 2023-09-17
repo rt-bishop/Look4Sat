@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat.data.source
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.rtbishop.look4sat.domain.source.IRemoteSource
 import java.io.InputStream
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,15 +27,27 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class RemoteSource(
-    private val httpClient: OkHttpClient, private val dispatcher: CoroutineDispatcher
+    private val contentResolver: ContentResolver,
+    private val httpClient: OkHttpClient,
+    private val dispatcher: CoroutineDispatcher
 ) : IRemoteSource {
 
-    override suspend fun getRemoteStream(url: String): InputStream? = withContext(dispatcher) {
+    override suspend fun getFileStream(uri: String): InputStream? = withContext(dispatcher) {
         try {
-            val request = Request.Builder().url(url).build()
-            httpClient.newCall(request).execute().body?.byteStream()
+            val fileUri = Uri.parse(uri)
+            contentResolver.openInputStream(fileUri)
         } catch (exception: Exception) {
-            println("RemoteSource fetching stream exception: $exception")
+            println("RemoteSource file stream exception: $exception")
+            null
+        }
+    }
+
+    override suspend fun getNetworkStream(url: String): InputStream? = withContext(dispatcher) {
+        try {
+            val networkRequest = Request.Builder().url(url).build()
+            httpClient.newCall(networkRequest).execute().body?.byteStream()
+        } catch (exception: Exception) {
+            println("RemoteSource network stream exception: $exception")
             null
         }
     }

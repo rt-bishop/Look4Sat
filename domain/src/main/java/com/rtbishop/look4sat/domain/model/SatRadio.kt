@@ -28,6 +28,5 @@ data class SatRadio(
     var uplinkHigh: Long?,
     val uplinkMode: String?,
     val isInverted: Boolean,
-    val catnum: Int?,
-    var comment: String? = null
+    val catnum: Int?
 )

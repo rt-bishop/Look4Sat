@@ -19,13 +19,12 @@ package com.rtbishop.look4sat.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.rtbishop.look4sat.data.database.dao.StorageDao
 import com.rtbishop.look4sat.data.database.entity.SatEntry
 import com.rtbishop.look4sat.data.database.entity.SatRadio
 
 @Database(entities = [SatEntry::class, SatRadio::class], version = 1, exportSchema = false)
-abstract class MainDatabase : RoomDatabase() {
-    abstract fun storageDao(): StorageDao
+abstract class Look4SatDb : RoomDatabase() {
+    abstract fun look4SatDao(): Look4SatDao
 }
 
 //val MIGRATION_1_2 = object : Migration(1, 2) {
