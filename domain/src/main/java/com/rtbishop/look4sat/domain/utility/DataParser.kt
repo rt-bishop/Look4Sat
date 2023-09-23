@@ -97,6 +97,7 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         val bstar = values[14].toDouble()
         OrbitalData(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
     } catch (exception: Exception) {
+        println("CSV parsing exception: $exception")
         null
     }
 
@@ -123,6 +124,7 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() / 10.0.pow(tle[1].substring(60, 61).toDouble())
         OrbitalData(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
     } catch (exception: Exception) {
+        println("TLE parsing exception: $exception")
         null
     }
 
@@ -140,6 +142,7 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         val catnum = if (json.isNull("norad_cat_id")) null else json.getInt("norad_cat_id")
         SatRadio(uuid, info, alive, dlinkLow, dlinkHigh, dlinkMode, ulinkLow, ulinkHigh, ulinkMode, inverted, catnum)
     } catch (exception: Exception) {
+        println("JSON parsing exception: $exception")
         null
     }
 }
