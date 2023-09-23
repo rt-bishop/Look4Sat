@@ -19,7 +19,9 @@ package com.rtbishop.look4sat
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -35,7 +37,12 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        val newConfig = Configuration(newBase?.resources?.configuration).apply { fontScale = 1.0f }
+        val newConfig = Configuration(newBase?.resources?.configuration).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                densityDpi = DisplayMetrics.DENSITY_DEVICE_STABLE
+            }
+            fontScale = 1.0f
+        }
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
     }
