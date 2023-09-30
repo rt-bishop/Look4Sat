@@ -17,6 +17,11 @@
  */
 package com.rtbishop.look4sat.presentation.radar
 
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 
-data class RadarData(val orbitalPos: OrbitalPos, val satTrack: List<OrbitalPos> = emptyList())
+data class RadarData(
+    val orbitalPass: OrbitalPass,
+    val orbitalPos: OrbitalPos,
+    val satTrack: List<OrbitalPos> = emptyList()
+)
