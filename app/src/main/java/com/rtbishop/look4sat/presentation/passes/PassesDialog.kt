@@ -110,7 +110,7 @@ fun FilterDialog(
                 Slider(
                     value = hoursValue.intValue.toFloat(),
                     onValueChange = { hoursValue.intValue = it.toInt() },
-                    valueRange = 1f..168f,
+                    valueRange = 1f..96f,
                     colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
@@ -133,7 +133,7 @@ fun FilterDialog(
                 Slider(
                     value = elevationValue.intValue.toFloat(),
                     onValueChange = { elevationValue.intValue = it.toInt() },
-                    valueRange = 0f..90f,
+                    valueRange = 0f..60f,
                     colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
                 LazyVerticalGrid(

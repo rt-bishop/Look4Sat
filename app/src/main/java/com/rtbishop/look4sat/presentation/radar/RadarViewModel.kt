@@ -124,7 +124,7 @@ class RadarViewModel(
                 val elevation = orbitalPos.elevation.toDegrees().round(1)
                 networkReporter.reportRotation(server, port, azimuth, elevation)
             }
-            radarData.value = RadarData(orbitalPos, track)
+            radarData.value = RadarData(orbitalPass, orbitalPos, track)
         }
     }
 
