@@ -19,6 +19,7 @@ class SelectionRepo(
     private val localSource: ILocalSource,
     private val settingsRepo: ISettingsRepo
 ) : ISelectionRepo {
+
     private val currentItems = MutableStateFlow<List<SatItem>>(emptyList())
     private val currentType = MutableStateFlow("All")
     private val currentQuery = MutableStateFlow("")
