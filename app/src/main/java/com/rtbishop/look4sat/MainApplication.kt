@@ -35,13 +35,16 @@ class MainApplication : Application() {
         enableStrictMode()
         super.onCreate()
         container = MainContainer(this)
+        // trigger automatic update every 48 hours
         container.appScope.launch { checkAutoUpdate() }
+        // load satellite data on every app start
+        container.appScope.launch { container.satelliteRepo.initRepository() }
     }
 
-    private suspend fun checkAutoUpdate() {
+    private suspend fun checkAutoUpdate(timeNow: Long = System.currentTimeMillis()) {
         val settingsRepo = container.settingsRepo
         if (settingsRepo.otherSettings.value.stateOfAutoUpdate) {
-            val timeDelta = System.currentTimeMillis() - settingsRepo.databaseState.value.updateTimestamp
+            val timeDelta = timeNow - settingsRepo.databaseState.value.updateTimestamp
             if (timeDelta > AUTO_UPDATE_DELTA_MS) {
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 println("Started periodic data update on ${sdf.format(Date())}")

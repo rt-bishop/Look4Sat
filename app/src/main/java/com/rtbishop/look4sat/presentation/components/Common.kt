@@ -25,7 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -98,7 +99,7 @@ fun CardIcon(onClick: () -> Unit, iconId: Int, description: String? = null) {
     val clickableModifier = Modifier.clickable { onClick() }
     ElevatedCard(modifier = Modifier.size(48.dp)) {
         Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(id = iconId), contentDescription = description)
+            Icon(imageVector = ImageVector.vectorResource(iconId), contentDescription = description)
         }
     }
 }

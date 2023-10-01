@@ -59,7 +59,6 @@ class PassesViewModel(
     val uiState: State<PassesState> = _uiState
 
     init {
-        viewModelScope.launch { satelliteRepo.initRepository() }
         viewModelScope.launch {
             satelliteRepo.passes.collect { passes ->
                 processing?.cancelAndJoin()

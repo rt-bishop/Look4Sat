@@ -31,12 +31,13 @@ import kotlinx.coroutines.launch
 
 class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
 
+    private val defaultType = "All"
     private val _uiState = mutableStateOf(
         EntriesState(
             isDialogShown = false,
             isLoading = true,
             itemsList = emptyList(),
-            currentType = selectionRepo.getCurrentType(),
+            currentType = defaultType,
             typesList = selectionRepo.getTypesList(),
             takeAction = ::handleAction
         )
@@ -46,6 +47,7 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
     init {
         viewModelScope.launch {
             delay(1000)
+            selectionRepo.setType(defaultType)
             selectionRepo.getEntriesFlow().collect { items ->
                 _uiState.value = _uiState.value.copy(isLoading = false, itemsList = items)
             }
