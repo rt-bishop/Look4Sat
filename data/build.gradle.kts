@@ -12,7 +12,7 @@ android {
     namespace = "com.rtbishop.look4sat.data"
     compileSdk = 34
     defaultConfig {
-        minSdk = 21
+        minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }
