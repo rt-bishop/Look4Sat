@@ -31,7 +31,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
-import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -204,7 +204,7 @@ private fun rememberMapViewWithLifecycle(): MapView {
     val context = LocalContext.current
     val mapView = remember { MapView(context) }.apply {
         setMultiTouchControls(true)
-        setTileSource(tonerLiteTileSource)
+        setTileSource(TileSourceFactory.WIKIMEDIA)
         minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels) + 0.25
         maxZoomLevel = 5.99
         controller.setZoom(minZoomLevel + 0.5)
@@ -237,16 +237,12 @@ private fun rememberMapViewLifecycleObserver(mapView: MapView) = remember(mapVie
     }
 }
 
-private val tonerLiteTileSource = XYTileSource(
-    "Stamen", 0, 6, 256, ".png",
-    arrayOf("https://stamen-tiles.a.ssl.fastly.net/toner-lite/"),
-    "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL."
-)
-
 private fun getColorFilter(): ColorMatrixColorFilter {
+    val grayScaleMatrix = ColorMatrix().apply { setSaturation(0f) }
     val negativeMatrix = ColorMatrix(
         floatArrayOf(-1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f)
     )
+    negativeMatrix.preConcat(grayScaleMatrix)
     return ColorMatrixColorFilter(negativeMatrix)
 }
 
