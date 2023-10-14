@@ -1,22 +1,22 @@
 plugins {
-    id("com.android.application")
-    id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.google.ksp)
+    alias(libs.plugins.kotlin.android)
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(libs.versions.jvmToolchain.get().toInt())
 }
 
 android {
     namespace = "com.rtbishop.look4sat"
-    compileSdk = 34
+    compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
         applicationId = "com.rtbishop.look4sat"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 313
-        versionName = "3.1.3"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = libs.versions.versionCode.get().toInt()
+        versionName = libs.versions.versionName.get()
         resourceConfigurations.addAll(listOf("en", "ru", "si", "zh-rCN", "anydpi"))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,35 +30,24 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
+    composeOptions { kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get() }
 }
 
 dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
 
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.room:room-runtime:2.5.2")
-    implementation("androidx.room:room-ktx:2.5.2")
-    ksp("androidx.room:room-compiler:2.5.2")
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.room)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 
-    implementation("androidx.activity:activity-compose:1.8.0")
-    implementation("androidx.compose.animation:animation:1.5.3")
-    implementation("androidx.compose.compiler:compiler:1.5.3")
-    implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("androidx.compose.runtime:runtime:1.5.3")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.5.3")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation(libs.bundles.composeAll)
 
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("org.osmdroid:osmdroid-android:6.1.17")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.3")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.3")
+    implementation(libs.other.okhttp)
+    implementation(libs.other.osmdroid)
 
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.8")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.3")
+    debugImplementation(libs.bundles.composeDebug)
+    testImplementation(libs.bundles.unitTest)
+    androidTestImplementation(libs.bundles.androidTest)
 }
