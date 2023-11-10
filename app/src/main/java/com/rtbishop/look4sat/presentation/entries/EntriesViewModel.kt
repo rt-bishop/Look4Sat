@@ -17,8 +17,6 @@
  */
 package com.rtbishop.look4sat.presentation.entries
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -27,12 +25,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.repository.ISelectionRepo
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
 
     private val defaultType = "All"
-    private val _uiState = mutableStateOf(
+    private val _uiState = MutableStateFlow(
         EntriesState(
             isDialogShown = false,
             isLoading = true,
@@ -42,7 +42,7 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
             takeAction = ::handleAction
         )
     )
-    val uiState: State<EntriesState> = _uiState
+    val uiState: StateFlow<EntriesState> = _uiState
 
     init {
         viewModelScope.launch {
@@ -80,7 +80,7 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
 
     private fun selectType(type: String) = viewModelScope.launch {
         selectionRepo.setType(type)
-        _uiState.value = _uiState.value.copy(currentType = type)
+        _uiState.value = _uiState.value.copy(currentType = type, isDialogShown = false)
     }
 
     private fun toggleTypesDialog() {

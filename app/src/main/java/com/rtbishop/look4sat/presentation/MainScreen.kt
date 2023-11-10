@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -71,7 +72,7 @@ private fun MainNavGraph(navController: NavHostController) {
         composable(Screen.Entries.route) {
             val viewModel = viewModel(EntriesViewModel::class.java, factory = EntriesViewModel.Factory)
             val navToPasses = { navController.navigate(Screen.Passes.route) }
-            EntriesScreen(viewModel.uiState.value, navToPasses)
+            EntriesScreen(viewModel.uiState.collectAsStateWithLifecycle().value, navToPasses)
         }
         composable(Screen.Passes.route) {
             val viewModel = viewModel(PassesViewModel::class.java, factory = PassesViewModel.Factory)

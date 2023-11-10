@@ -1,11 +1,14 @@
 package com.rtbishop.look4sat.presentation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -13,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainTheme(
 //    darkTheme: Boolean = isSystemInDarkTheme(),
@@ -35,7 +39,9 @@ fun MainTheme(
 //            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
 //        }
 //    }
-    MaterialTheme(colorScheme = colors, typography = typography, content = content, shapes = shapes)
+    MaterialTheme(colorScheme = colors, typography = typography, shapes = shapes) {
+        CompositionLocalProvider(LocalOverscrollConfiguration.provides(null), content = content)
+    }
 }
 
 private val accentYellow = Color(0xFFFFE082)
