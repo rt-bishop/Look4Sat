@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.domain.predict.DeepSpaceObject
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
@@ -53,8 +54,7 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
     })
     val toggleDialog = { uiState.takeAction(PassesAction.ToggleFilterDialog) }
     if (uiState.isDialogShown) {
-        FilterDialog(uiState.hours, uiState.elevation, uiState.modes, toggleDialog
-        ) { hours, elevation, modes ->
+        FilterDialog(uiState.hours, uiState.elevation, uiState.modes, toggleDialog) { hours, elevation, modes ->
             uiState.takeAction(PassesAction.ApplyFilter(hours, elevation, modes))
         }
     }
@@ -71,9 +71,20 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-private fun PassPreview() {
+private fun DeepSpacePassPreview() {
     val data = OrbitalData(
-        "Satellite", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
+        "Satellite", 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
+    )
+    val satellite = DeepSpaceObject(data)
+    val pass = OrbitalPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
+    MainTheme { Pass(pass = pass, { _, _ -> }) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NearEarthPassPreview() {
+    val data = OrbitalData(
+        "Satellite", 0.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
     )
     val satellite = NearEarthObject(data)
     val pass = OrbitalPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
@@ -146,27 +157,28 @@ private fun Pass(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    val deepTime = stringResource(id = R.string.pass_placeholder)
-                    Text(
-                        text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.aosTime)),
-                        fontSize = 15.sp
-                    )
-                    LinearProgressIndicator(
-                        progress = if (pass.isDeepSpace) 1f else pass.progress,
-                        modifier = modifier
-                            .fillMaxWidth(0.75f)
-                            .padding(top = 3.dp),
-                        trackColor = MaterialTheme.colorScheme.inverseSurface
-                    )
-                    Text(
-                        text = if (pass.isDeepSpace) deepTime else sdf.format(Date(pass.losTime)),
-                        fontSize = 15.sp
-                    )
+                if (!pass.isDeepSpace) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = sdf.format(Date(pass.aosTime)),
+                            fontSize = 15.sp
+                        )
+                        LinearProgressIndicator(
+                            progress = pass.progress,
+                            modifier = modifier
+                                .fillMaxWidth(0.75f)
+                                .padding(top = 3.dp),
+                            trackColor = MaterialTheme.colorScheme.inverseSurface
+                        )
+                        Text(
+                            text = sdf.format(Date(pass.losTime)),
+                            fontSize = 15.sp
+                        )
+                    }
                 }
             }
         }
