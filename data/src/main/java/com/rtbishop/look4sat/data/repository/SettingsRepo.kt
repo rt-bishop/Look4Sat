@@ -73,8 +73,8 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
 
     private fun getSelectedIds(): List<Int> {
         val selectionString = preferences.getString(keySelectedIds, null)
-        val selectionList = selectionString?.split(separatorComma)?.map { it.toInt() }
-        return selectionList ?: emptyList()
+        if (selectionString.isNullOrEmpty()) return emptyList()
+        return selectionString.split(separatorComma).map { it.toInt() }
     }
     //endregion
 
