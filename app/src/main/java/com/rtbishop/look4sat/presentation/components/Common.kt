@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
@@ -23,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,6 +39,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.MainTheme
+
+@Composable
+@Preview(showBackground = true)
+private fun TimerBarNewPreview() {
+    MainTheme { TimerBarNew("88:88:88", "88:88:88") }
+}
+
+@Composable
+fun TimerBarNew(aosTime: String, losTime: String) {
+    val isAosSelected = remember { mutableStateOf(true) }
+    val barHeightMod = Modifier.height(48.dp)
+    val timerText = if (isAosSelected.value) aosTime else losTime
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        CardAosLos(onClick = { isAosSelected.value = true }, iconId = R.drawable.ic_aos, isAosSelected.value)
+        ElevatedCard(modifier = barHeightMod.weight(1f)) {
+            Text(
+                text = "T- $timerText",
+                textAlign = TextAlign.Center,
+                fontSize = 42.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                style = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = false)),
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        CardAosLos(onClick = { isAosSelected.value = false }, iconId = R.drawable.ic_los, isAosSelected.value.not())
+    }
+}
 
 @Composable
 @Preview(showBackground = true)
@@ -100,6 +131,22 @@ fun CardIcon(onClick: () -> Unit, iconId: Int, description: String? = null) {
     ElevatedCard(modifier = Modifier.size(48.dp)) {
         Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(imageVector = ImageVector.vectorResource(iconId), contentDescription = description)
+        }
+    }
+}
+
+@Composable
+fun CardAosLos(onClick: () -> Unit, iconId: Int, isAos: Boolean = true, description: String? = null) {
+    val cardColors = if (isAos) {
+        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+    } else {
+        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    }
+    val iconTint = if (isAos) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface
+    val clickableModifier = Modifier.clickable { onClick() }
+    ElevatedCard(modifier = Modifier.size(48.dp), colors = cardColors) {
+        Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(imageVector = ImageVector.vectorResource(iconId), tint = iconTint, contentDescription = description)
         }
     }
 }
