@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -37,18 +35,18 @@ import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
+import com.rtbishop.look4sat.presentation.components.CardButton
 import com.rtbishop.look4sat.presentation.components.PullRefreshState
 import com.rtbishop.look4sat.presentation.components.TimerBar
-import com.rtbishop.look4sat.presentation.components.pullRefresh
 import com.rtbishop.look4sat.presentation.components.rememberPullRefreshState
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
-fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
+fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit, onSignOutClicked: () -> Unit = {}) {
     val refreshState = rememberPullRefreshState(refreshing = uiState.isRefreshing, onRefresh = {
         uiState.takeAction(PassesAction.RefreshPasses)
     })
@@ -65,7 +63,7 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
             time = uiState.nextTime,
             iconId = R.drawable.ic_filter
         ) { toggleDialog() }
-        PassesCard(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
+        PassesCard(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar, onSignOutClicked)
     }
 }
 
@@ -191,21 +189,25 @@ private fun PassesCard(
     refreshState: PullRefreshState,
     isRefreshing: Boolean,
     passes: List<OrbitalPass>,
-    navToRadar: (Int, Long) -> Unit
+    navToRadar: (Int, Long) -> Unit,
+    onSignOutClicked: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
-        Box(Modifier.pullRefresh(refreshState)) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    Pass(pass, navToRadar, Modifier.animateItemPlacement())
-                }
-            }
-            PullRefreshIndicator(
-                refreshing = isRefreshing,
-                state = refreshState,
-                modifier = Modifier.align(Alignment.TopCenter),
-                backgroundColor = MaterialTheme.colorScheme.primary
-            )
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CardButton(onClick = onSignOutClicked, text = "Sign Out")
         }
+//        Box(Modifier.pullRefresh(refreshState)) {
+//            LazyColumn(modifier = Modifier.fillMaxSize()) {
+//                items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
+//                    Pass(pass, navToRadar, Modifier.animateItemPlacement())
+//                }
+//            }
+//            PullRefreshIndicator(
+//                refreshing = isRefreshing,
+//                state = refreshState,
+//                modifier = Modifier.align(Alignment.TopCenter),
+//                backgroundColor = MaterialTheme.colorScheme.primary
+//            )
+//        }
     }
 }

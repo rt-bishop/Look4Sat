@@ -40,9 +40,9 @@ sealed class Screen(var title: String, var icon: Int, var route: String) {
 }
 
 @Composable
-fun MainScreen(navController: NavHostController = rememberNavController()) {
+fun MainScreen(navController: NavHostController = rememberNavController(), onSignOutClicked: () -> Unit = {}) {
     Scaffold(bottomBar = { MainNavBar(navController = navController) }) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) { MainNavGraph(navController) }
+        Box(modifier = Modifier.padding(innerPadding)) { MainNavGraph(navController, onSignOutClicked) }
     }
 }
 
@@ -65,7 +65,7 @@ private fun MainNavBar(navController: NavController) {
 }
 
 @Composable
-private fun MainNavGraph(navController: NavHostController) {
+private fun MainNavGraph(navController: NavHostController, onSignOutClicked: () -> Unit = {}) {
     val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
     val radarArgs = listOf(navArgument("catNum") { defaultValue = 0 }, navArgument("aosTime") { defaultValue = 0L })
     NavHost(navController, startDestination = Screen.Passes.route) {
@@ -79,7 +79,7 @@ private fun MainNavGraph(navController: NavHostController) {
             val navToRadar = { catNum: Int, aosTime: Long ->
                 navController.navigate("${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}")
             }
-            PassesScreen(viewModel.uiState.value, navToRadar)
+            PassesScreen(viewModel.uiState.value, navToRadar, onSignOutClicked)
         }
         composable(radarRoute, radarArgs) { RadarScreen() }
         composable(Screen.Map.route) { MapScreen() }

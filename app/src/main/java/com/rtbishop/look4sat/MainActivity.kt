@@ -23,16 +23,28 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.rtbishop.look4sat.presentation.LoginScreen
 import com.rtbishop.look4sat.presentation.MainScreen
 import com.rtbishop.look4sat.presentation.MainTheme
 
 class MainActivity : ComponentActivity() {
 
+    private val isUserSignedIn = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        setContent { MainTheme { MainScreen() } }
+        setContent {
+            MainTheme {
+                if (isUserSignedIn.value) {
+                    MainScreen { changeSignInState(false) }
+                } else {
+                    LoginScreen { changeSignInState(true) }
+                }
+            }
+        }
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -42,5 +54,9 @@ class MainActivity : ComponentActivity() {
         }
         applyOverrideConfiguration(newConfig)
         super.attachBaseContext(newBase)
+    }
+
+    private fun changeSignInState(isSignedIn: Boolean) {
+        isUserSignedIn.value = isSignedIn
     }
 }
