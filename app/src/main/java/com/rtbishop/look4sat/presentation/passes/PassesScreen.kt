@@ -40,10 +40,12 @@ import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
 import com.rtbishop.look4sat.presentation.components.PullRefreshState
 import com.rtbishop.look4sat.presentation.components.TimerBar
+import com.rtbishop.look4sat.presentation.components.TimerBarNew
 import com.rtbishop.look4sat.presentation.components.pullRefresh
 import com.rtbishop.look4sat.presentation.components.rememberPullRefreshState
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
@@ -59,6 +61,7 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
         }
     }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        TimerBarNew(aosTime = uiState.nextTime, losTime = uiState.nextTime)
         TimerBar(
             id = uiState.nextId,
             name = uiState.nextName,
