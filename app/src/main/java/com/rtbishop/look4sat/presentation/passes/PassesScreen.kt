@@ -37,10 +37,12 @@ import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.components.CardIcon
+import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
 import com.rtbishop.look4sat.presentation.components.PullRefreshState
 import com.rtbishop.look4sat.presentation.components.TimerBar
-import com.rtbishop.look4sat.presentation.components.TimerBarNew
+import com.rtbishop.look4sat.presentation.components.TimerRow
 import com.rtbishop.look4sat.presentation.components.pullRefresh
 import com.rtbishop.look4sat.presentation.components.rememberPullRefreshState
 import java.text.SimpleDateFormat
@@ -51,9 +53,8 @@ private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
 fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
-    val refreshState = rememberPullRefreshState(refreshing = uiState.isRefreshing, onRefresh = {
-        uiState.takeAction(PassesAction.RefreshPasses)
-    })
+    val refreshPasses = { uiState.takeAction(PassesAction.RefreshPasses) }
+    val refreshState = rememberPullRefreshState(refreshing = uiState.isRefreshing, onRefresh = refreshPasses)
     val toggleDialog = { uiState.takeAction(PassesAction.ToggleFilterDialog) }
     if (uiState.isDialogShown) {
         FilterDialog(uiState.hours, uiState.elevation, uiState.modes, toggleDialog) { hours, elevation, modes ->
@@ -61,16 +62,37 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
         }
     }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TimerBarNew(aosTime = uiState.nextTime, losTime = uiState.nextTime)
-        TimerBar(
-            id = uiState.nextId,
-            name = uiState.nextName,
-            time = uiState.nextTime,
-            iconId = R.drawable.ic_filter
-        ) { toggleDialog() }
-        PassesCard(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
+        TimerRow {
+            CardIcon(onClick = { toggleDialog() }, iconId = R.drawable.ic_filter)
+            TimerBar(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
+            CardIcon(onClick = { toggleDialog() }, iconId = R.drawable.ic_satellite)
+        }
+        NextPassRow(pass = uiState.nextPass)
+        PassesList(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun PassesList(
+    refreshState: PullRefreshState,
+    isRefreshing: Boolean,
+    passes: List<OrbitalPass>,
+    navToRadar: (Int, Long) -> Unit
+) {
+    val backgroundColor = MaterialTheme.colorScheme.primary
+    ElevatedCard(modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.pullRefresh(refreshState), contentAlignment = Alignment.TopCenter) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
+                    PassItem(pass = pass, navToRadar = navToRadar, modifier = Modifier.animateItemPlacement())
+                }
+            }
+            PullRefreshIndicator(refreshing = isRefreshing, state = refreshState, backgroundColor = backgroundColor)
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -80,7 +102,7 @@ private fun DeepSpacePassPreview() {
     )
     val satellite = DeepSpaceObject(data)
     val pass = OrbitalPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
-    MainTheme { Pass(pass = pass, { _, _ -> }) }
+    MainTheme { PassItem(pass = pass, { _, _ -> }) }
 }
 
 @Preview(showBackground = true)
@@ -91,13 +113,11 @@ private fun NearEarthPassPreview() {
     )
     val satellite = NearEarthObject(data)
     val pass = OrbitalPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
-    MainTheme { Pass(pass = pass, { _, _ -> }) }
+    MainTheme { PassItem(pass = pass, { _, _ -> }) }
 }
 
 @Composable
-private fun Pass(
-    pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifier: Modifier = Modifier
-) {
+private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifier: Modifier = Modifier) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
             .padding(bottom = 2.dp)
@@ -105,8 +125,8 @@ private fun Pass(
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(6.dp)
+                    .background(color = MaterialTheme.colorScheme.surface)
+                    .padding(horizontal = 6.dp, vertical = 4.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -160,55 +180,23 @@ private fun Pass(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                if (!pass.isDeepSpace) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = sdf.format(Date(pass.aosTime)),
-                            fontSize = 15.sp
-                        )
-                        LinearProgressIndicator(
-                            progress = pass.progress,
-                            modifier = modifier
-                                .fillMaxWidth(0.75f)
-                                .padding(top = 3.dp),
-                            trackColor = MaterialTheme.colorScheme.inverseSurface
-                        )
-                        Text(
-                            text = sdf.format(Date(pass.losTime)),
-                            fontSize = 15.sp
-                        )
-                    }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val defaultTime = "   - - : - -   "
+                    Text(text = if (pass.isDeepSpace) defaultTime else sdf.format(Date(pass.aosTime)), fontSize = 15.sp)
+                    LinearProgressIndicator(
+                        progress = { if (pass.isDeepSpace) 100f else pass.progress },
+                        modifier = modifier
+                            .fillMaxWidth(0.75f)
+                            .padding(top = 2.dp),
+                        trackColor = MaterialTheme.colorScheme.inverseSurface
+                    )
+                    Text(text = if (pass.isDeepSpace) defaultTime else sdf.format(Date(pass.losTime)), fontSize = 15.sp)
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun PassesCard(
-    refreshState: PullRefreshState,
-    isRefreshing: Boolean,
-    passes: List<OrbitalPass>,
-    navToRadar: (Int, Long) -> Unit
-) {
-    ElevatedCard(modifier = Modifier.fillMaxSize()) {
-        Box(Modifier.pullRefresh(refreshState)) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    Pass(pass, navToRadar, Modifier.animateItemPlacement())
-                }
-            }
-            PullRefreshIndicator(
-                refreshing = isRefreshing,
-                state = refreshState,
-                modifier = Modifier.align(Alignment.TopCenter),
-                backgroundColor = MaterialTheme.colorScheme.primary
-            )
         }
     }
 }

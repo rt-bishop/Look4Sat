@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatRadio
-import com.rtbishop.look4sat.presentation.components.TimerBar
 
 @Composable
 fun RadarScreen() {
@@ -36,7 +35,7 @@ fun RadarScreen() {
     val id = currentPass?.catNum ?: 99999
     val name = currentPass?.name ?: "Satellite"
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TimerBar(id, name, "88:88:88", R.drawable.ic_notifications) {}
+//        TimerBarNew(id, name, "88:88:88", R.drawable.ic_notifications) {}
         ElevatedCard(
             modifier = Modifier
                 .fillMaxSize()
