@@ -30,6 +30,7 @@ import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.toTimerString
+import com.rtbishop.look4sat.presentation.components.getDefaultPass
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -45,9 +46,9 @@ class PassesViewModel(
             isDialogShown = false,
             isRefreshing = true,
             isUtc = settingsRepo.otherSettings.value.stateOfUtc,
-            nextId = 0,
-            nextName = "...",
             nextTime = "00:00:00",
+            isNextTimeAos = true,
+            nextPass = getDefaultPass(),
             hours = settingsRepo.passesSettings.value.hoursAhead,
             elevation = settingsRepo.passesSettings.value.minElevation,
             modes = settingsRepo.passesSettings.value.selectedModes,
@@ -103,11 +104,11 @@ class PassesViewModel(
         try {
             val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
             val time = nextPass.aosTime.minus(timeNow).toTimerString()
-            _uiState.value = _uiState.value.copy(nextId = nextPass.catNum, nextName = nextPass.name, nextTime = time)
+            _uiState.value = _uiState.value.copy(nextPass = nextPass, nextTime = time, isNextTimeAos = true)
         } catch (exception: NoSuchElementException) {
             val lastPass = passes.last()
             val time = lastPass.losTime.minus(timeNow).toTimerString()
-            _uiState.value = _uiState.value.copy(nextId = lastPass.catNum, nextName = lastPass.name, nextTime = time)
+            _uiState.value = _uiState.value.copy(nextPass = lastPass, nextTime = time, isNextTimeAos = false)
         }
     }
 
