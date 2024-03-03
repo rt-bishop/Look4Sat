@@ -43,7 +43,8 @@ class PassesViewModel(
 
     private val _uiState = mutableStateOf(
         PassesState(
-            isDialogShown = false,
+            isPassesDialogShown = false,
+            isRadiosDialogShown = false,
             isRefreshing = true,
             isUtc = settingsRepo.otherSettings.value.stateOfUtc,
             nextTime = "00:00:00",
@@ -78,9 +79,11 @@ class PassesViewModel(
 
     private fun handleAction(action: PassesAction) {
         when (action) {
-            is PassesAction.ApplyFilter -> applyFilter(action.hoursAhead, action.minElevation, action.modes)
+            is PassesAction.FilterPasses -> applyFilter(action.hoursAhead, action.minElevation, uiState.value.modes)
+            is PassesAction.FilterRadios -> applyFilter(uiState.value.hours, uiState.value.elevation, action.modes)
             PassesAction.RefreshPasses -> refreshPasses()
-            PassesAction.ToggleFilterDialog -> toggleFilterDialog()
+            PassesAction.TogglePassesDialog -> toggleFilterDialog()
+            PassesAction.ToggleRadiosDialog -> toggleRadiosDialog()
         }
     }
 
@@ -113,8 +116,13 @@ class PassesViewModel(
     }
 
     private fun toggleFilterDialog() {
-        val currentDialogState = _uiState.value.isDialogShown
-        _uiState.value = _uiState.value.copy(isDialogShown = currentDialogState.not())
+        val currentDialogState = _uiState.value.isPassesDialogShown
+        _uiState.value = _uiState.value.copy(isPassesDialogShown = currentDialogState.not())
+    }
+
+    private fun toggleRadiosDialog() {
+        val currentDialogState = _uiState.value.isRadiosDialogShown
+        _uiState.value = _uiState.value.copy(isRadiosDialogShown = currentDialogState.not())
     }
 
     companion object {
