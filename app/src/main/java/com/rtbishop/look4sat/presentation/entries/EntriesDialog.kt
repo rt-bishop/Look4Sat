@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -39,11 +38,10 @@ fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, sele
     ModalBottomSheet(
         onDismissRequest = { dismiss() },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = { BottomSheetDefaults.DragHandle() },
         modifier = Modifier.fillMaxHeight(0.80f)
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(240.dp),
+            columns = GridCells.Fixed(1),
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
             horizontalArrangement = Arrangement.spacedBy(1.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp)
