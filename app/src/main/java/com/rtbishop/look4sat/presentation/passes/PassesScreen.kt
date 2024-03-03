@@ -55,17 +55,23 @@ private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
     val refreshPasses = { uiState.takeAction(PassesAction.RefreshPasses) }
     val refreshState = rememberPullRefreshState(refreshing = uiState.isRefreshing, onRefresh = refreshPasses)
-    val toggleDialog = { uiState.takeAction(PassesAction.ToggleFilterDialog) }
-    if (uiState.isDialogShown) {
-        FilterDialog(uiState.hours, uiState.elevation, uiState.modes, toggleDialog) { hours, elevation, modes ->
-            uiState.takeAction(PassesAction.ApplyFilter(hours, elevation, modes))
+    val showPassesDialog = { uiState.takeAction(PassesAction.TogglePassesDialog) }
+    val showRadiosDialog = { uiState.takeAction(PassesAction.ToggleRadiosDialog) }
+    if (uiState.isPassesDialogShown) {
+        PassesDialog(hours = uiState.hours, elev = uiState.elevation, dismiss = showPassesDialog) { hours, elevation ->
+            uiState.takeAction(PassesAction.FilterPasses(hours, elevation))
+        }
+    }
+    if (uiState.isRadiosDialogShown) {
+        RadiosDialog(modes = uiState.modes, dismiss = showRadiosDialog) { modes ->
+            uiState.takeAction(PassesAction.FilterRadios(modes))
         }
     }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         TimerRow {
-            CardIcon(onClick = { toggleDialog() }, iconId = R.drawable.ic_filter)
+            CardIcon(onClick = { showPassesDialog() }, iconId = R.drawable.ic_filter)
             TimerBar(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
-            CardIcon(onClick = { toggleDialog() }, iconId = R.drawable.ic_satellite)
+            CardIcon(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
         }
         NextPassRow(pass = uiState.nextPass)
         PassesList(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
@@ -82,7 +88,7 @@ private fun PassesList(
 ) {
     val backgroundColor = MaterialTheme.colorScheme.primary
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
-        Box(Modifier.pullRefresh(refreshState), contentAlignment = Alignment.TopCenter) {
+        Box(modifier = Modifier.pullRefresh(refreshState), contentAlignment = Alignment.TopCenter) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
                     PassItem(pass = pass, navToRadar = navToRadar, modifier = Modifier.animateItemPlacement())

@@ -23,7 +23,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +44,6 @@ import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
@@ -99,12 +97,13 @@ private fun NextPassRowPreview() = MainTheme {
 
 @Composable
 fun NextPassRow(pass: OrbitalPass) {
-    ElevatedCard {
+    ElevatedCard(modifier = Modifier.height(48.dp)) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy((-2).dp),
             modifier = Modifier
+                .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 6.dp, vertical = 4.dp)
+                .padding(start = 6.dp, top = 1.dp, end = 6.dp, bottom = 0.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -157,22 +156,6 @@ fun NextPassRow(pass: OrbitalPass) {
                     fontSize = 15.sp,
                     modifier = Modifier.weight(1f)
                 )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                val defaultTime = "   - - : - -   "
-                Text(text = if (pass.isDeepSpace) defaultTime else sdf.format(Date(pass.aosTime)), fontSize = 15.sp)
-                LinearProgressIndicator(
-                    progress = { if (pass.isDeepSpace) 100f else pass.progress },
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .padding(top = 2.dp),
-                    trackColor = MaterialTheme.colorScheme.inverseSurface
-                )
-                Text(text = if (pass.isDeepSpace) defaultTime else sdf.format(Date(pass.losTime)), fontSize = 15.sp)
             }
         }
     }
