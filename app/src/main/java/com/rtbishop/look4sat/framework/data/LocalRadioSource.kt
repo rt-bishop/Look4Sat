@@ -17,10 +17,10 @@
  */
 package com.rtbishop.look4sat.framework.data
 
-import com.rtbishop.look4sat.domain.data.ILocalRadioSource
-import com.rtbishop.look4sat.framework.data.dao.RadiosDao
 import com.rtbishop.look4sat.domain.model.SatRadio as DomainRadio
 import com.rtbishop.look4sat.framework.model.SatRadio as FrameworkRadio
+import com.rtbishop.look4sat.domain.data.ILocalRadioSource
+import com.rtbishop.look4sat.framework.data.dao.RadiosDao
 
 class LocalRadioSource(private val radiosDao: RadiosDao) : ILocalRadioSource {
 
@@ -31,6 +31,7 @@ class LocalRadioSource(private val radiosDao: RadiosDao) : ILocalRadioSource {
     }
 
     override suspend fun insertRadios(radios: List<DomainRadio>) {
+        radiosDao.deleteRadios()
         radiosDao.insertRadios(radios.toFrameworkRadios())
     }
 

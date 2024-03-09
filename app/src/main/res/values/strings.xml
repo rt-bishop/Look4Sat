@@ -69,12 +69,12 @@
     <string name="pass_satName">%s</string>
     <string name="pass_satId">Id:%d</string>
     <string name="pass_aosAz">AOS - %.1f°</string>
-    <string name="pass_elevation">Elevation: %.1f°</string>
+    <string name="pass_elevation">ELEV: %.1f°</string>
     <string name="pass_los">%.1f° - LOS</string>
-    <string name="pass_altitude">Altitude: %.0f km</string>
+    <string name="pass_altitude">ALT: %.0f km</string>
     <string name="pass_placeholder"> - - : - - </string>
-    <string name="pass_startTime">HH:mm:ss - EEE</string>
-    <string name="pass_endTime">EEE - HH:mm:ss</string>
+    <string name="pass_startTime">HH:mm:ss - MMM dd</string>
+    <string name="pass_endTime">dd MMM - HH:mm:ss</string>
 
     <string name="radar_az_text">Azimuth</string>
     <string name="radar_az_value">%.1f°</string>

@@ -7,16 +7,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion '33.0.0'
     namespace 'com.rtbishop.look4sat'
-
+    compileSdk 34
     defaultConfig {
         applicationId "com.rtbishop.look4sat"
         minSdk 21
-        targetSdk 33
-        versionCode 313
-        versionName '3.1.3'
+        targetSdk 34
+        versionCode 314
+        versionName '3.1.4'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -43,11 +41,11 @@ android {
         kotlinCompilerExtensionVersion compose_compiler_version
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
     testOptions {
         animationsDisabled true
@@ -56,7 +54,7 @@ android {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 dependencies {

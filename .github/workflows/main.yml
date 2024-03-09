@@ -3,20 +3,20 @@ name: Look4Sat CI
 on:
   push:
     tags:
-      - '*'
+      - v**
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout latest commit
-        uses: actions/checkout@v3
+      - name: Checkout Latest Commit
+        uses: actions/checkout@v4
 
       - name: Setup java environment
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
 
       - name: Assemble APK and Bundle
         run: |
@@ -34,7 +34,7 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "33.0.0"
+          BUILD_TOOLS_VERSION: "34.0.0"
 
       - name: Sign Bundle
         uses: r0adkll/sign-android-release@v1
@@ -46,25 +46,25 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "33.0.0"
+          BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Rename APK
+      - name: Rename APK and Bundle
         run: |
           mv ${{steps.sign_apk.outputs.signedReleaseFile}} app/build/outputs/apk/release/look4sat.apk
+          mv ${{steps.sign_bundle.outputs.signedReleaseFile}} app/build/outputs/apk/release/look4sat.aab
 
       - name: Deploy Bundle to Play Store
-        uses: r0adkll/upload-google-play@v1.0.17
+        uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
           packageName: com.rtbishop.look4sat
+          releaseFiles: app/build/outputs/apk/release/look4sat.aab
           track: production
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
           whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
-          releaseFiles: ${{steps.sign_bundle.outputs.signedReleaseFile}}
 
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: app/build/outputs/apk/release/look4sat.apk
+          artifacts: "app/build/outputs/apk/release/look4sat.apk,app/build/outputs/apk/release/look4sat.aab"
           bodyFile: fastlane/metadata/android/en-US/whatsnew/whatsnew-en-US
           token: ${{ secrets.RELEASE_TOKEN }}

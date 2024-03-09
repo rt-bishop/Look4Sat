@@ -28,7 +28,12 @@ import com.rtbishop.look4sat.domain.data.DataRepository
 import com.rtbishop.look4sat.domain.predict.SatelliteManager
 import com.rtbishop.look4sat.framework.LocationManager
 import com.rtbishop.look4sat.framework.SettingsManager
-import com.rtbishop.look4sat.framework.data.*
+import com.rtbishop.look4sat.framework.data.FileDataSource
+import com.rtbishop.look4sat.framework.data.LocalDatabase
+import com.rtbishop.look4sat.framework.data.LocalEntrySource
+import com.rtbishop.look4sat.framework.data.LocalRadioSource
+import com.rtbishop.look4sat.framework.data.MIGRATION_1_2
+import com.rtbishop.look4sat.framework.data.RemoteDataSource
 import com.rtbishop.look4sat.presentation.radarScreen.BTReporter
 import com.rtbishop.look4sat.utility.DataParser
 import com.rtbishop.look4sat.utility.DataReporter
@@ -37,11 +42,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
