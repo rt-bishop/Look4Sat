@@ -144,7 +144,7 @@ fun PassesDialog(hours: Int, elev: Double, dismiss: () -> Unit, save: (Int, Doub
             Slider(
                 value = hoursValue.intValue.toFloat(),
                 onValueChange = { hoursValue.intValue = it.toInt() },
-                valueRange = 1f..96f,
+                valueRange = 1f..240f,
                 colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant)
             )
         }

@@ -1,7 +1,7 @@
 package com.rtbishop.look4sat.domain.source
 
 object Sources {
-    const val radioDataUrl = "https://db.satnogs.org/api/transmitters/?format=json"
+    const val radioDataUrl = "https://db.satnogs.org/api/transmitters/?format=json&status=active"
     val satelliteDataUrls = mapOf(
         "All" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
         "Amsat" to "https://amsat.org/tle/current/nasabare.txt",

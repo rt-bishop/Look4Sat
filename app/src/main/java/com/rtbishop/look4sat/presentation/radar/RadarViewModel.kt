@@ -120,8 +120,8 @@ class RadarViewModel(
             if (settingsRepo.getRotatorState()) {
                 val server = settingsRepo.getRotatorAddress()
                 val port = settingsRepo.getRotatorPort().toInt()
-                val azimuth = orbitalPos.azimuth.toDegrees().round(1)
-                val elevation = orbitalPos.elevation.toDegrees().round(1)
+                val azimuth = orbitalPos.azimuth.toDegrees().round(2)
+                val elevation = orbitalPos.elevation.toDegrees().round(2)
                 networkReporter.reportRotation(server, port, azimuth, elevation)
             }
             radarData.value = RadarData(orbitalPass, orbitalPos, track)
