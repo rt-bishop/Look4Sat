@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
@@ -49,7 +48,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+private val sdfDate = SimpleDateFormat("EEE, dd MMM", Locale.ENGLISH)
+private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
 fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
@@ -107,7 +107,7 @@ private fun DeepSpacePassPreview() {
         "Satellite", 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
     )
     val satellite = DeepSpaceObject(data)
-    val pass = OrbitalPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
+    val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
     MainTheme { PassItem(pass = pass, { _, _ -> }) }
 }
 
@@ -118,27 +118,26 @@ private fun NearEarthPassPreview() {
         "Satellite", 0.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
     )
     val satellite = NearEarthObject(data)
-    val pass = OrbitalPass(1L, 0.0, 10L, 180.0, 850, 45.0, satellite, 0.5f)
+    val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
     MainTheme { PassItem(pass = pass, { _, _ -> }) }
 }
 
 @Composable
 private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifier: Modifier = Modifier) {
+    val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
             .padding(bottom = 2.dp)
             .clickable { navToRadar(pass.catNum, pass.aosTime) }) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
                 modifier = Modifier
                     .background(color = MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 6.dp, vertical = 4.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Id:${pass.catNum} - ",
-                        modifier = Modifier.width(82.dp),
-                        textAlign = TextAlign.End,
+                        text = "$passSatId - ",
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
@@ -168,23 +167,37 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = stringResource(id = R.string.pass_aosAz, pass.aosAzimuth),
+                        text = sdfDate.format(Date(pass.aosTime)),
                         textAlign = TextAlign.Start,
                         fontSize = 15.sp,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = stringResource(id = R.string.pass_altitude, pass.altitude),
+                        text = stringResource(
+                            id = R.string.pass_aosLos,
+                            pass.aosAzimuth.toInt(),
+                            pass.losAzimuth.toInt()
+                        ),
                         textAlign = TextAlign.Center,
                         fontSize = 15.sp,
-                        modifier = Modifier.weight(2f)
+                        modifier = Modifier.weight(1.5f)
                     )
-                    Text(
-                        text = stringResource(id = R.string.pass_losAz, pass.losAzimuth),
-                        textAlign = TextAlign.End,
-                        fontSize = 15.sp,
-                        modifier = Modifier.weight(1f)
-                    )
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_altitude),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = " ${pass.altitude} km",
+                            textAlign = TextAlign.Start,
+                            fontSize = 15.sp
+                        )
+                    }
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -192,7 +205,10 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val defaultTime = "   - - : - -   "
-                    Text(text = if (pass.isDeepSpace) defaultTime else sdf.format(Date(pass.aosTime)), fontSize = 15.sp)
+                    Text(
+                        text = if (pass.isDeepSpace) defaultTime else sdfTime.format(Date(pass.aosTime)),
+                        fontSize = 15.sp
+                    )
                     LinearProgressIndicator(
                         progress = { if (pass.isDeepSpace) 100f else pass.progress },
                         modifier = modifier
@@ -200,7 +216,10 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                             .padding(top = 2.dp),
                         trackColor = MaterialTheme.colorScheme.inverseSurface
                     )
-                    Text(text = if (pass.isDeepSpace) defaultTime else sdf.format(Date(pass.losTime)), fontSize = 15.sp)
+                    Text(
+                        text = if (pass.isDeepSpace) defaultTime else sdfTime.format(Date(pass.losTime)),
+                        fontSize = 15.sp
+                    )
                 }
             }
         }

@@ -53,8 +53,8 @@ fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, sele
                         .background(MaterialTheme.colorScheme.surface)
                         .clickable { select(item) }) {
                     Text(
-                        text = "$index  -  ",
-                        modifier = Modifier.padding(start = 12.dp),
+                        text = "$index).",
+                        modifier = Modifier.padding(start = 12.dp, end = 6.dp),
                         fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.secondary
                     )

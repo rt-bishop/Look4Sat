@@ -74,6 +74,10 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         }
     }
 
+    fun isLeapYear(year: Int): Boolean {
+        return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)
+    }
+
     private fun parseCSV(values: List<String>): OrbitalData? = try {
         val name = values[0]
         val year = values[2].substring(0, 4)
@@ -99,16 +103,6 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
     } catch (exception: Exception) {
         println("CSV parsing exception: $exception")
         null
-    }
-
-    private fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
-        if (month == 1) return dayOfMonth
-        val daysArray = arrayOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-        var dayOfYear = dayOfMonth
-        // If leap year increment Feb days
-        if (((year / 4 == 0) && (year / 100 != 0)) || (year / 400 == 0)) daysArray[1]++
-        for (i in 0 until month - 1) dayOfYear += daysArray[i]
-        return dayOfYear
     }
 
     private fun parseTLE(tle: List<String>): OrbitalData? = try {
@@ -144,5 +138,17 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
     } catch (exception: Exception) {
         println("JSON parsing exception: $exception")
         null
+    }
+
+    private fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
+        if (month == 1) return dayOfMonth
+        val daysArray = arrayOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        var dayOfYear = dayOfMonth
+        // If leap year increment Feb days
+        if (isLeapYear(year)) daysArray[1]++
+        for (i in 0 until month - 1) {
+            dayOfYear += daysArray[i]
+        }
+        return dayOfYear
     }
 }

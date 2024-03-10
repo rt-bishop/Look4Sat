@@ -31,6 +31,7 @@ class DataParserTest {
     private val validCSVStream = """
         OBJECT_NAME,OBJECT_ID,EPOCH,MEAN_MOTION,ECCENTRICITY,INCLINATION,RA_OF_ASC_NODE,ARG_OF_PERICENTER,MEAN_ANOMALY,EPHEMERIS_TYPE,CLASSIFICATION_TYPE,NORAD_CAT_ID,ELEMENT_SET_NO,REV_AT_EPOCH,BSTAR,MEAN_MOTION_DOT,MEAN_MOTION_DDOT
         ISS (ZARYA),1998-067A,2021-11-16T12:28:09.322176,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876,0,U,25544,999,31220,.31985E-4,.1288E-4,0
+        ISS (ZARYA),1998-067A,2024-03-09T05:45:04.737024,15.49756209,.0005741,51.6418,90.7424,343.9724,92.8274,0,U,25544,999,44305,.25016E-3,.1373E-3,0
     """.trimIndent().byteInputStream()
     private val invalidCSVStream = """
         ISS (ZARYA),1998-067A,2021-11-16T12:28:09.322176,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876,0,U,25544,999,31220,.31985E-4,.1288E-4,0
@@ -40,6 +41,9 @@ class DataParserTest {
         ISS (ZARYA)
         1 25544U 98067A   21320.51955234  .00001288  00000+0  31985-4 0  9990
         2 25544  51.6447 309.4881 0004694 203.6966 299.8876 15.48582035312205
+        ISS (ZARYA)
+        1 25544U 98067A   24069.23963816  .00013730  00000+0  25016-3 0  9999
+        2 25544  51.6418  90.7424 0005741 343.9724  92.8274 15.49756209443058
     """.trimIndent().byteInputStream()
     private val invalidTLEStream = """
         1 25544U 98067A   21320.51955234  .00001288  00000+0  31985-4 0  9990
@@ -54,7 +58,9 @@ class DataParserTest {
 
     @Test
     fun `Given valid CSV stream returns valid data`() = runTest(testDispatcher) {
-        assert(dataParser.parseCSVStream(validCSVStream)[0].epoch == 21320.51955234)
+        val parsedList = dataParser.parseCSVStream(validCSVStream)
+        assert(parsedList[0].epoch == 21320.51955234)
+        assert(parsedList[1].epoch == 24069.23963816)
     }
 
     @Test
@@ -64,7 +70,9 @@ class DataParserTest {
 
     @Test
     fun `Given valid TLE stream returns valid data`() = runTest(testDispatcher) {
-        assert(dataParser.parseTLEStream(validTLEStream)[0].epoch == 21320.51955234)
+        val parsedList = dataParser.parseTLEStream(validTLEStream)
+        assert(parsedList[0].epoch == 21320.51955234)
+        assert(parsedList[1].epoch == 24069.23963816)
     }
 
     @Test
@@ -85,5 +93,13 @@ class DataParserTest {
     @Test
     fun `Given valid data streams parsed results match`() = runTest(testDispatcher) {
         assert(dataParser.parseCSVStream(validCSVStream) == dataParser.parseTLEStream(validTLEStream))
+    }
+
+    @Test
+    fun `Function isLeapYear returns correct data`() = runTest(testDispatcher) {
+        val years = listOf(1900, 1984, 1994, 2016, 2022, 2024, 2042, 2048)
+        val answers = listOf(false, true, false, true, false, true, false, true)
+        val results = years.map { dataParser.isLeapYear(it) }
+        assert(results == answers)
     }
 }
