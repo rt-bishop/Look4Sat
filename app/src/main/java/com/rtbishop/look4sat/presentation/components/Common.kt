@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,9 +43,10 @@ import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
-private val sdf = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
 @Preview(showBackground = true)
@@ -105,11 +105,10 @@ fun NextPassRow(pass: OrbitalPass) {
                 .background(color = MaterialTheme.colorScheme.surface)
                 .padding(start = 6.dp, top = 1.dp, end = 6.dp, bottom = 0.dp)
         ) {
+            val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Id:${pass.catNum} - ",
-                    modifier = Modifier.width(82.dp),
-                    textAlign = TextAlign.End,
+                    text = "$passSatId - ",
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
@@ -139,23 +138,33 @@ fun NextPassRow(pass: OrbitalPass) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(id = R.string.pass_aosAz, pass.aosAzimuth),
+                    text = sdfTime.format(Date(pass.aosTime)),
                     textAlign = TextAlign.Start,
                     fontSize = 15.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = stringResource(id = R.string.pass_altitude, pass.altitude),
+                    text = stringResource(id = R.string.pass_aosLos, pass.aosAzimuth.toInt(), pass.losAzimuth.toInt()),
                     textAlign = TextAlign.Center,
                     fontSize = 15.sp,
-                    modifier = Modifier.weight(2f)
+                    modifier = Modifier.weight(1.5f)
                 )
-                Text(
-                    text = stringResource(id = R.string.pass_losAz, pass.losAzimuth),
-                    textAlign = TextAlign.End,
-                    fontSize = 15.sp,
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_altitude),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = " ${pass.altitude} km",
+                        textAlign = TextAlign.Start,
+                        fontSize = 15.sp
+                    )
+                }
             }
         }
     }

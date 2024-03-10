@@ -17,13 +17,13 @@
  */
 package com.rtbishop.look4sat.data.framework
 
+import java.net.InetSocketAddress
+import java.nio.ByteBuffer
+import java.nio.channels.SocketChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import java.net.InetSocketAddress
-import java.nio.ByteBuffer
-import java.nio.channels.SocketChannel
 
 class NetworkReporter(private val reporterScope: CoroutineScope) {
 
@@ -56,7 +56,7 @@ class NetworkReporter(private val reporterScope: CoroutineScope) {
                 if (rotationSocketChannel == null) {
                     rotationSocketChannel = SocketChannel.open(InetSocketAddress(server, port))
                 } else {
-                    val buffer = ByteBuffer.wrap("\\set_pos $azimuth $elevation\n".toByteArray())
+                    val buffer = ByteBuffer.wrap("\\P $azimuth $elevation\n".toByteArray())
                     rotationSocketChannel?.write(buffer)
                 }
             }.onFailure { error ->

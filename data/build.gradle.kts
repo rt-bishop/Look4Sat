@@ -5,14 +5,14 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(libs.versions.jvmToolchain.get().toInt())
+    jvmToolchain(17)
 }
 
 android {
     namespace = "com.rtbishop.look4sat.data"
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdk = 34
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
+        minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }

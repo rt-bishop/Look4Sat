@@ -133,14 +133,15 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
-            Row(horizontalArrangement = Arrangement.Center) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_sputnik),
                     tint = MaterialTheme.colorScheme.secondary,
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(96.dp)
-                        .padding(top = 8.dp, end = 8.dp)
+                    modifier = Modifier.size(72.dp)
                 )
                 Column {
                     Text(
@@ -436,8 +437,8 @@ private fun UpdateIndicator(isUpdating: Boolean, modifier: Modifier = Modifier) 
     )
 } else {
     LinearProgressIndicator(
-        progress = 0f,
+        progress = { 0f },
         modifier = modifier.padding(start = 6.dp),
-        trackColor = MaterialTheme.colorScheme.inverseSurface
+        trackColor = MaterialTheme.colorScheme.inverseSurface,
     )
 }

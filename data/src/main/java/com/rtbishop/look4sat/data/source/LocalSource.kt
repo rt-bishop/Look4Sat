@@ -74,6 +74,7 @@ class LocalSource(private val look4SatDao: Look4SatDao) : ILocalSource {
     }
 
     override suspend fun insertRadios(radios: List<SatRadio>) {
+        look4SatDao.deleteRadios()
         look4SatDao.insertRadios(radios.toFrameworkRadios())
     }
 

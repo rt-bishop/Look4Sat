@@ -5,18 +5,18 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(libs.versions.jvmToolchain.get().toInt())
+    jvmToolchain(17)
 }
 
 android {
     namespace = "com.rtbishop.look4sat"
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdk = 34
     defaultConfig {
         applicationId = "com.rtbishop.look4sat"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = libs.versions.versionCode.get().toInt()
-        versionName = libs.versions.versionName.get()
+        minSdk = 26
+        targetSdk = 34
+        versionCode = 314
+        versionName = "3.1.4"
         resourceConfigurations.addAll(listOf("en", "ru", "si", "zh-rCN", "anydpi"))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

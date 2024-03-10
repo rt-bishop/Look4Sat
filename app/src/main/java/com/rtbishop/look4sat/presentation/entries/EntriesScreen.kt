@@ -33,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -188,6 +187,7 @@ private fun EntryPreview() {
 
 @Composable
 private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: Modifier) {
+    val passSatId = stringResource(id = R.string.pass_satId, item.catnum)
     Surface(color = MaterialTheme.colorScheme.background,
         modifier = modifier.clickable { onSelected(item.catnum, item.isSelected) }) {
         Surface(modifier = Modifier.padding(bottom = 1.dp)) {
@@ -195,12 +195,10 @@ private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: M
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(start = 0.dp, top = 8.dp, end = 12.dp, bottom = 8.dp)
+                    .padding(start = 14.dp, top = 8.dp, end = 12.dp, bottom = 8.dp)
             ) {
                 Text(
-                    text = "Id:${item.catnum}  -  ",
-                    modifier = Modifier.width(104.dp),
-                    textAlign = TextAlign.End,
+                    text = "$passSatId - ",
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
