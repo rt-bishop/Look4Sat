@@ -6,6 +6,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.predict.PI_2
 import com.rtbishop.look4sat.domain.utility.toRadians
@@ -37,9 +39,10 @@ import kotlin.math.sin
 
 @Composable
 fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<Float, Float>) {
-    val radarColor = Color(0xFFDCDCDC)
-    val primaryColor = Color(0xFFFFE082)
-    val secondaryColor = Color(0xFFDC0000)
+    val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
+    val radarColor: Color = if (viewModel.stateOfOldScheme) Color(0xFFDCDCDC) else MaterialTheme.colorScheme.tertiary
+    val primaryColor: Color = if (viewModel.stateOfOldScheme) Color(0xFFFFE082) else MaterialTheme.colorScheme.primary
+    val secondaryColor: Color = if (viewModel.stateOfOldScheme) Color(0xFFDC0000) else MaterialTheme.colorScheme.onSurface
     val strokeWidth = 4f
     val animTransition = rememberInfiniteTransition(label = "animScale")
     val animSpec = infiniteRepeatable<Float>(tween(1000))
