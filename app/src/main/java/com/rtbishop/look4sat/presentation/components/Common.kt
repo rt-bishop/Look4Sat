@@ -41,7 +41,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.theme.MainTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

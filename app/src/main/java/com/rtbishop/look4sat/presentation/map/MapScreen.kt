@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -237,13 +238,18 @@ private fun rememberMapViewLifecycleObserver(mapView: MapView) = remember(mapVie
     }
 }
 
+@Composable
 private fun getColorFilter(): ColorMatrixColorFilter {
+    val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
     val grayScaleMatrix = ColorMatrix().apply { setSaturation(0f) }
     val negativeMatrix = ColorMatrix(
         floatArrayOf(-1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f)
     )
     negativeMatrix.preConcat(grayScaleMatrix)
-    return ColorMatrixColorFilter(negativeMatrix)
+    return when {
+        isSystemInDarkTheme() || viewModel.stateOfOldScheme -> ColorMatrixColorFilter(negativeMatrix)
+        else -> ColorMatrixColorFilter(grayScaleMatrix)
+    }
 }
 
 private fun getMinZoom(screenHeight: Int): Double {
