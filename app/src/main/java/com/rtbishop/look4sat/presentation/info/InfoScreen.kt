@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.theme.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardButton
 import com.rtbishop.look4sat.presentation.components.gotoUrl
 

@@ -129,7 +129,7 @@ class SettingsViewModel(
     fun toggleUpdate(value: Boolean) = settingsRepo.setStateOfAutoUpdate(value)
     fun toggleSweep(value: Boolean) = settingsRepo.setStateOfSweep(value)
     fun toggleSensor(value: Boolean) = settingsRepo.setStateOfSensors(value)
-
+    fun toggleOldScheme(value: Boolean) = settingsRepo.setStateOfOldScheme(value)
 //    fun getRotatorEnabled(): Boolean = settings.getRotatorEnabled()
 //    fun setRotatorEnabled(value: Boolean) = settings.setRotatorEnabled(value)
 //    fun getRotatorServer(): String = settings.getRotatorServer()
