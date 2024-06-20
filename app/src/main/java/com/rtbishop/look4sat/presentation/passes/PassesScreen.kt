@@ -35,7 +35,7 @@ import com.rtbishop.look4sat.domain.predict.DeepSpaceObject
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.theme.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
@@ -214,7 +214,8 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                         modifier = modifier
                             .fillMaxWidth(0.75f)
                             .padding(top = 2.dp),
-                        trackColor = MaterialTheme.colorScheme.inverseSurface
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                     Text(
                         text = if (pass.isDeepSpace) defaultTime else sdfTime.format(Date(pass.losTime)),

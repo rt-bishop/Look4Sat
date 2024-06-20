@@ -55,6 +55,7 @@ interface ISettingsRepo {
     fun setStateOfSensors(value: Boolean)
     fun setStateOfSweep(value: Boolean)
     fun setStateOfUtc(value: Boolean)
+    fun setStateOfOldScheme(value: Boolean)
     //endregion
 
     //region # Undefined settings

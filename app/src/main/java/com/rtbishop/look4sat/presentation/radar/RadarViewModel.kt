@@ -56,6 +56,7 @@ class RadarViewModel(
 
     private val stationPos = settingsRepo.stationPosition.value
     private val magDeclination = getMagDeclination(stationPos)
+    val stateOfOldScheme = settingsRepo.otherSettings.value.stateOfOldScheme
     val transmitters = mutableStateOf<List<SatRadio>>(emptyList())
     val radarData = mutableStateOf<RadarData?>(null)
     val orientation = mutableStateOf(sensorsRepo.orientation.value)
