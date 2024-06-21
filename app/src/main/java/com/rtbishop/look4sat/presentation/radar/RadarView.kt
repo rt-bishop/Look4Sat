@@ -1,5 +1,7 @@
 package com.rtbishop.look4sat.presentation.radar
 
+import android.media.AudioAttributes
+import android.media.SoundPool
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -7,7 +9,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,19 +29,29 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
+import androidx.core.view.HapticFeedbackConstantsCompat
+import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.predict.PI_2
 import com.rtbishop.look4sat.domain.utility.toRadians
+import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 @Composable
 fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<Float, Float>) {
+    val context = LocalContext.current
+    val view = LocalView.current
     val radarColor = Color(0xFFDCDCDC)
     val primaryColor = Color(0xFFFFE082)
     val secondaryColor = Color(0xFFDC0000)
@@ -44,11 +59,77 @@ fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<F
     val animTransition = rememberInfiniteTransition(label = "animScale")
     val animSpec = infiniteRepeatable<Float>(tween(1000))
     val animScale = animTransition.animateFloat(16f, 64f, animSpec, label = "animScale")
+    val aimThreshold = 0.05f
     val measurer = rememberTextMeasurer()
     val sweepDegrees = remember { mutableFloatStateOf(0f) }
     val trackCreated = remember { mutableStateOf(false) }
     val trackPath = remember { mutableStateOf(Path()) }
     val trackEffect = remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
+    val soundPool = remember { mutableStateOf<SoundPool?>(null) }
+    val beepSoundId = remember { mutableIntStateOf(0) }
+    val aimTargetDifference = remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(item.azimuth, item.elevation, azimElev.first, azimElev.second) {
+        val aimAzimuthRadians = azimElev.first.toDouble().toRadians()
+        val aimElevationRadians = abs(min(azimElev.second, 0f)).toDouble().toRadians()
+        // radius of 0.5 makes the aimTargetDifference range 0.0 to 1.0
+        val radius = 0.5
+        val aimX = sph2CartX(aimAzimuthRadians, aimElevationRadians, radius)
+        val aimY = sph2CartY(aimAzimuthRadians, aimElevationRadians, radius)
+        val satX = sph2CartX(item.azimuth, item.elevation, radius)
+        val satY = sph2CartY(item.azimuth, item.elevation, radius)
+        aimTargetDifference.floatValue = sqrt((satX - aimX).pow(2) + (satY - aimY).pow(2))
+
+
+        val minPlaybackRate = 0.5f
+        val maxPlaybackRate = 2.0f
+        val playbackRate =
+            maxPlaybackRate - (aimTargetDifference.floatValue / (maxPlaybackRate - minPlaybackRate))
+
+        soundPool.value?.setRate(beepSoundId.intValue, playbackRate)
+    }
+
+    LaunchedEffect(aimTargetDifference.floatValue < aimThreshold) {
+        if (aimTargetDifference.floatValue < aimThreshold) {
+            view.performHapticFeedback(HapticFeedbackConstantsCompat.VIRTUAL_KEY)
+            soundPool.value?.pause(beepSoundId.intValue)
+        } else {
+            soundPool.value?.resume(beepSoundId.intValue)
+        }
+    }
+
+    LaunchedEffect(item.elevation > 0) {
+        if(item.elevation > 0) {
+            soundPool.value?.resume(beepSoundId.intValue)
+        } else {
+            soundPool.value?.pause(beepSoundId.intValue)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+
+        soundPool.value = SoundPool.Builder()
+            .setMaxStreams(1)
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+        beepSoundId.intValue = soundPool.value?.load(context, R.raw.beep, 1) ?: 0
+
+        soundPool.value?.setOnLoadCompleteListener { soundPool, _, status ->
+            if (status == 0) {
+                soundPool.play(beepSoundId.intValue, 0.5f, 0.5f, 0, -1, 1f)
+            }
+        }
+
+        onDispose {
+            soundPool.value?.release()
+        }
+    }
+
     Canvas(modifier = Modifier.fillMaxSize()) {
         val radius = (size.minDimension / 2f) * 0.95f
         if (!trackCreated.value) {
