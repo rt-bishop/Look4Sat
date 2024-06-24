@@ -8,5 +8,6 @@ data class OtherSettings(
     val stateOfAutoUpdate: Boolean,
     val stateOfSensors: Boolean,
     val stateOfSweep: Boolean,
-    val stateOfUtc: Boolean
+    val stateOfUtc: Boolean,
+    val stateOfOldScheme: Boolean
 )

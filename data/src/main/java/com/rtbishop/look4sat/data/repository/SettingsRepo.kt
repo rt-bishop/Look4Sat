@@ -53,6 +53,7 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
     private val keyStateOfSensors = "stateOfSensors"
     private val keyStateOfSweep = "stateOfSweep"
     private val keyStateOfUtc = "stateOfUtc"
+    private val keyStateOfOldScheme = "stateOfOldScheme"
     private val keyStationAltitude = "stationAltitude"
     private val keyStationLatitude = "stationLatitude"
     private val keyStationLongitude = "stationLongitude"
@@ -221,12 +222,18 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
         _otherSettings.value = otherSettings.value.copy(stateOfUtc = value)
     }
 
+    override fun setStateOfOldScheme(value: Boolean){
+        preferences.edit { putBoolean(keyStateOfOldScheme, value) }
+        _otherSettings.value = otherSettings.value.copy(stateOfOldScheme = value)
+    }
+
     private fun getOtherSettings(): OtherSettings {
         val stateOfAutoUpdate = preferences.getBoolean(keyStateOfAutoUpdate, true)
         val stateOfSensors = preferences.getBoolean(keyStateOfSensors, true)
         val stateOfSweep = preferences.getBoolean(keyStateOfSweep, true)
         val stateOfUtc = preferences.getBoolean(keyStateOfUtc, false)
-        return OtherSettings(stateOfAutoUpdate, stateOfSensors, stateOfSweep, stateOfUtc)
+        val stateOfOldScheme = preferences.getBoolean(keyStateOfOldScheme,false)
+        return OtherSettings(stateOfAutoUpdate, stateOfSensors, stateOfSweep, stateOfUtc,stateOfOldScheme)
     }
     //endregion
 

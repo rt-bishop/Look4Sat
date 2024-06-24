@@ -36,7 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.theme.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardButton
 import com.rtbishop.look4sat.presentation.components.gotoUrl
 import com.rtbishop.look4sat.presentation.components.showToast
@@ -110,6 +110,7 @@ fun SettingsScreen() {
     val toggleUpdate = { value: Boolean -> viewModel.toggleUpdate(value) }
     val toggleSweep = { value: Boolean -> viewModel.toggleSweep(value) }
     val toggleSensor = { value: Boolean -> viewModel.toggleSensor(value) }
+    val toggleOldScheme = { value: Boolean -> viewModel.toggleOldScheme(value)}
 
     // Screen setup
     val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.0"
@@ -117,7 +118,7 @@ fun SettingsScreen() {
         item { CardAbout(versionName) }
         item { LocationCard(positionSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos) }
         item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
-        item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
+        item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor,toggleOldScheme) }
     }
 }
 
@@ -368,8 +369,13 @@ private fun DataCard(
 @Preview(showBackground = true)
 @Composable
 private fun OtherCardPreview() = MainTheme {
-    val values = OtherSettings(stateOfAutoUpdate = true, stateOfSensors = true, stateOfSweep = true, stateOfUtc = false)
-    OtherCard(settings = values, {}, {}, {}, {})
+    val values = OtherSettings(
+        stateOfAutoUpdate = true,
+        stateOfSensors = true,
+        stateOfSweep = true,
+        stateOfUtc = false,
+        stateOfOldScheme = false)
+    OtherCard(settings = values, {}, {}, {}, {},{})
 }
 
 @Composable
@@ -378,7 +384,8 @@ private fun OtherCard(
     toggleUtc: (Boolean) -> Unit,
     toggleUpdate: (Boolean) -> Unit,
     toggleSweep: (Boolean) -> Unit,
-    toggleSensor: (Boolean) -> Unit
+    toggleSensor: (Boolean) -> Unit,
+    toggleOldScheme: (Boolean) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
@@ -414,6 +421,14 @@ private fun OtherCard(
                 Text(text = stringResource(id = R.string.other_switch_sensors))
                 Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
             }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.other_switch_old_scheme))
+                Switch(checked = settings.stateOfOldScheme, onCheckedChange = { toggleOldScheme(it) })
+            }
         }
     }
 }
@@ -433,12 +448,14 @@ private fun setUpdateTime(updateTime: Long): String {
 private fun UpdateIndicator(isUpdating: Boolean, modifier: Modifier = Modifier) = if (isUpdating) {
     LinearProgressIndicator(
         modifier = modifier.padding(start = 6.dp),
-        trackColor = MaterialTheme.colorScheme.inverseSurface
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.secondaryContainer
     )
 } else {
     LinearProgressIndicator(
         progress = { 0f },
         modifier = modifier.padding(start = 6.dp),
-        trackColor = MaterialTheme.colorScheme.inverseSurface,
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.secondaryContainer
     )
 }
