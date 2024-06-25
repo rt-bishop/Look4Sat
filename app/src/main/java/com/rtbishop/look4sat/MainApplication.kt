@@ -18,10 +18,6 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import android.content.pm.ApplicationInfo
-import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
-import android.os.StrictMode.VmPolicy
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -32,7 +28,6 @@ class MainApplication : Application() {
     lateinit var container: MainContainer
 
     override fun onCreate() {
-        enableStrictMode()
         super.onCreate()
         container = MainContainer(this)
         // trigger automatic update every 48 hours
@@ -50,14 +45,6 @@ class MainApplication : Application() {
                 println("Started periodic data update on ${sdf.format(Date())}")
                 container.databaseRepo.updateFromRemote()
             }
-        }
-    }
-
-    private fun enableStrictMode() {
-        val isDebuggable = 0 != applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
-        if (isDebuggable) {
-            StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyLog().build())
-            StrictMode.setVmPolicy(VmPolicy.Builder().detectAll().penaltyLog().build())
         }
     }
 

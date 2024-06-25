@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,7 +43,7 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.presentation.theme.MainTheme
+import com.rtbishop.look4sat.presentation.MainTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -126,9 +128,9 @@ fun NextPassRow(pass: OrbitalPass) {
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(16.dp)
                 )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = " ${pass.maxElevation}°",
-                    textAlign = TextAlign.End,
+                    text = "${pass.maxElevation}°",
                     color = MaterialTheme.colorScheme.primary
                 )
             }
@@ -137,21 +139,26 @@ fun NextPassRow(pass: OrbitalPass) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = sdfTime.format(Date(pass.aosTime)),
-                    textAlign = TextAlign.Start,
-                    fontSize = 15.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = stringResource(id = R.string.pass_aosLos, pass.aosAzimuth.toInt(), pass.losAzimuth.toInt()),
-                    textAlign = TextAlign.Center,
-                    fontSize = 15.sp,
-                    modifier = Modifier.weight(1.5f)
-                )
                 Row(
                     modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_time),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = sdfTime.format(Date(pass.aosTime)),
+                        fontSize = 15.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -159,9 +166,29 @@ fun NextPassRow(pass: OrbitalPass) {
                         contentDescription = null,
                         modifier = Modifier.size(16.dp)
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = " ${pass.altitude} km",
-                        textAlign = TextAlign.Start,
+                        text = "${pass.altitude} km",
+                        fontSize = 15.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_direction),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(
+                            id = R.string.pass_aosLos,
+                            pass.aosAzimuth.toInt(),
+                            pass.losAzimuth.toInt()
+                        ),
                         fontSize = 15.sp
                     )
                 }
@@ -174,8 +201,8 @@ fun NextPassRow(pass: OrbitalPass) {
 fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
     ElevatedButton(
         onClick = { onClick() }, colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.tertiary,
-            contentColor = MaterialTheme.colorScheme.onTertiary
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ), shape = MaterialTheme.shapes.small, modifier = modifier
     ) { Text(text = text, fontSize = 17.sp) }
 }

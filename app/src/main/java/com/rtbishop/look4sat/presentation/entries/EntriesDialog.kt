@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.rtbishop.look4sat.presentation.theme.MainTheme
+import com.rtbishop.look4sat.presentation.MainTheme
 
 @Preview(showBackground = true)
 @Composable
@@ -56,7 +56,7 @@ fun TypesDialog(items: List<String>, selected: String, dismiss: () -> Unit, sele
                         text = "$index).",
                         modifier = Modifier.padding(start = 12.dp, end = 6.dp),
                         fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = item,
