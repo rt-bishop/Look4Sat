@@ -49,7 +49,7 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
 @Composable
 private fun MainNavBar(navController: NavController) {
     val items = listOf(Screen.Entries, Screen.Passes, Screen.Map, Screen.Settings, Screen.Info)
-    NavigationBar(modifier = Modifier.height(48.dp)) {
+    NavigationBar(modifier = Modifier.height(48.dp), tonalElevation = 0.dp) {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry.value?.destination?.route
         items.forEach { screen ->

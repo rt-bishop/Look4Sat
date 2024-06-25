@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
-import com.rtbishop.look4sat.presentation.theme.MainTheme
+import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
 
@@ -199,7 +199,7 @@ private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: M
             ) {
                 Text(
                     text = "$passSatId - ",
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = item.name,

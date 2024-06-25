@@ -162,6 +162,7 @@
     <string name="other_switch_update">• ස්වයං දත්ත යාවත්කාලීනය</string>
     <string name="other_switch_sweep">• radar sweep සජීවිකරණය සබල කරන්න</string>
     <string name="other_switch_sensors">• Radar දර්ශනය කරකැවීමට සංවේදක භාවිතා කරන්න </string>
+    <string name="other_switch_light_theme">• සැහැල්ලු තේමාව භාවිතා කරන්න</string>
 
     <string name="outro_title">මම ස්තුති කිරීමට කැමති:</string>
     <string name="outro_thanks">• බාගෙන භාවිතා කළ ඔබට! \nඅහස සදා ඔබ වෙනුවෙන් පැහැදිලියි!
@@ -175,5 +176,4 @@
         <a href="https://db.satnogs.org/">SatNOGS</a>Web අඩවියට API හා DB විශාල දත්ත ප්‍රමාණයක් ලබාදීම සඳහා.
         \n• <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a> කණ්ඩායමට යෙදුම පිළිබඳ ඔවුන්ගේ උනන්දුව සහ කැපවීම ලැබිම සම්බන්ධයෙන්.</string>
     <string name="outro_license">මෘදුකාංගය වගකීමක් සමග නොලැබේ</string>
-    <string name="other_switch_old_scheme">• පැරණි වර්ණ පටිපාටිය භාවිතා කරන්න</string>
 </resources>

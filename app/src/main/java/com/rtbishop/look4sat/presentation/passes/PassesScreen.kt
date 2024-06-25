@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
@@ -35,7 +37,7 @@ import com.rtbishop.look4sat.domain.predict.DeepSpaceObject
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.presentation.theme.MainTheme
+import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
@@ -48,7 +50,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val sdfDate = SimpleDateFormat("EEE, dd MMM", Locale.ENGLISH)
+private val sdfDate = SimpleDateFormat("EEE dd MMM", Locale.ENGLISH)
 private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
@@ -155,9 +157,9 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = " ${pass.maxElevation}°",
-                        textAlign = TextAlign.End,
+                        text = "${pass.maxElevation}°",
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -166,25 +168,25 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = sdfDate.format(Date(pass.aosTime)),
-                        textAlign = TextAlign.Start,
-                        fontSize = 15.sp,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = stringResource(
-                            id = R.string.pass_aosLos,
-                            pass.aosAzimuth.toInt(),
-                            pass.losAzimuth.toInt()
-                        ),
-                        textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
-                        modifier = Modifier.weight(1.5f)
-                    )
                     Row(
                         modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.End,
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_calendar),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = sdfDate.format(Date(pass.aosTime)),
+                            fontSize = 15.sp
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -192,9 +194,29 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                             contentDescription = null,
                             modifier = Modifier.size(16.dp)
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = " ${pass.altitude} km",
-                            textAlign = TextAlign.Start,
+                            text = "${pass.altitude} km",
+                            fontSize = 15.sp
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_direction),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(
+                                id = R.string.pass_aosLos,
+                                pass.aosAzimuth.toInt(),
+                                pass.losAzimuth.toInt()
+                            ),
                             fontSize = 15.sp
                         )
                     }
@@ -211,11 +233,7 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                     )
                     LinearProgressIndicator(
                         progress = { if (pass.isDeepSpace) 100f else pass.progress },
-                        modifier = modifier
-                            .fillMaxWidth(0.75f)
-                            .padding(top = 2.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.secondaryContainer
+                        modifier = modifier.fillMaxWidth(0.75f)
                     )
                     Text(
                         text = if (pass.isDeepSpace) defaultTime else sdfTime.format(Date(pass.losTime)),

@@ -1,29 +1,29 @@
 [versions]
-android-gradle-plugin = "8.3.0"
-google-ksp = "1.9.22-1.0.17"
-kotlin = "1.9.22"
+android-gradle-plugin = "8.5.0"
+google-ksp = "1.9.24-1.0.20"
+kotlin = "1.9.24"
 
-androidx-core-ktx = "1.12.0"
+androidx-core-ktx = "1.13.1"
 androidx-core-splashscreen = "1.0.1"
 androidx-room = "2.6.1"
 
-compose = "1.6.3"
-compose-activity = "1.8.2"
-compose-compiler = "1.5.10"
-compose-lifecycle = "2.7.0"
+compose = "1.6.8"
+compose-activity = "1.9.0"
+compose-compiler = "1.5.14"
+compose-lifecycle = "2.8.2"
 compose-material3 = "1.2.1"
 compose-navigation = "2.7.7"
 
-other-coroutines = "1.7.3"
-other-json = "20231013"
+other-coroutines = "1.8.1"
+other-json = "20240303"
 other-okhttp = "4.12.0"
-other-osmdroid = "6.1.17"
+other-osmdroid = "6.1.18"
 
 test-junit4 = "4.13.2"
-test-mockk = "1.13.9"
+test-mockk = "1.13.11"
 
-androidTest-junit = "1.1.5"
-androidTest-espresso = "3.5.1"
+androidTest-junit = "1.2.0"
+androidTest-espresso = "3.6.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
