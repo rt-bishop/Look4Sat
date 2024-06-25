@@ -17,30 +17,24 @@
  */
 package com.rtbishop.look4sat
 
-import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
-import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.rtbishop.look4sat.presentation.MainScreen
-import com.rtbishop.look4sat.presentation.theme.MainTheme
+import com.rtbishop.look4sat.presentation.MainTheme
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        setContent { MainTheme { MainScreen() } }
-    }
-
-    override fun attachBaseContext(newBase: Context?) {
-        val newConfig = Configuration(newBase?.resources?.configuration).apply {
-            densityDpi = DisplayMetrics.DENSITY_DEVICE_STABLE
-            fontScale = 1.0f
+        setContent {
+            val container = (LocalContext.current.applicationContext as MainApplication).container
+            val otherSettings = container.settingsRepo.otherSettings.collectAsState().value
+            MainTheme(isLightTheme = otherSettings.stateOfLightTheme) { MainScreen() }
         }
-        applyOverrideConfiguration(newConfig)
-        super.attachBaseContext(newBase)
     }
 }

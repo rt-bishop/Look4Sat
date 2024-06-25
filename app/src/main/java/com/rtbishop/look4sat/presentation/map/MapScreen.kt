@@ -9,7 +9,6 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +31,6 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -73,7 +71,7 @@ fun MapScreen() {
     val positionClick = { orbitalObject: OrbitalObject -> viewModel.selectSatellite(orbitalObject) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
-            MapView(modifier = Modifier.fillMaxSize()) { mapView ->
+            MapView(modifier = Modifier.fillMaxSize(), isLightTheme = viewModel.stateOfLightTheme) { mapView ->
                 stationPos.value?.let { setStationPosition(it, mapView) }
                 positions.value?.let { setPositions(it, mapView, positionClick) }
                 satTrack.value?.let { setSatelliteTrack(it, mapView) }
@@ -98,7 +96,11 @@ private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
     }
 }
 
-private fun setPositions(posMap: Map<OrbitalObject, GeoPos>, mapView: MapView, action: (OrbitalObject) -> Unit) {
+private fun setPositions(
+    posMap: Map<OrbitalObject, GeoPos>,
+    mapView: MapView,
+    action: (OrbitalObject) -> Unit
+) {
     val markers = FolderOverlay()
     try {
         posMap.entries.forEach {
@@ -195,24 +197,27 @@ private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
 //}
 
 @Composable
-private fun MapView(modifier: Modifier = Modifier, update: ((map: MapView) -> Unit)? = null) {
-    val mapView = rememberMapViewWithLifecycle()
+private fun MapView(
+    modifier: Modifier = Modifier,
+    isLightTheme: Boolean,
+    update: ((map: MapView) -> Unit)? = null
+) {
+    val mapView = rememberMapViewWithLifecycle(isLightTheme)
     AndroidView({ mapView }, modifier) { update?.invoke(it) }
 }
 
 @Composable
-private fun rememberMapViewWithLifecycle(): MapView {
+private fun rememberMapViewWithLifecycle(isLightTheme: Boolean): MapView {
     val context = LocalContext.current
     val mapView = remember { MapView(context) }.apply {
         setMultiTouchControls(true)
-        setTileSource(TileSourceFactory.WIKIMEDIA)
         minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels) + 0.25
         maxZoomLevel = 5.99
         controller.setZoom(minZoomLevel + 0.5)
         zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
         overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
-        overlayManager.tilesOverlay.setColorFilter(getColorFilter())
+        overlayManager.tilesOverlay.setColorFilter(getColorFilter(isLightTheme))
         setScrollableAreaLimitLatitude(maxLat, minLat, 0)
         // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
         overlays.addAll(Array(4) { FolderOverlay() })
@@ -239,17 +244,13 @@ private fun rememberMapViewLifecycleObserver(mapView: MapView) = remember(mapVie
 }
 
 @Composable
-private fun getColorFilter(): ColorMatrixColorFilter {
-    val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
-    val grayScaleMatrix = ColorMatrix().apply { setSaturation(0f) }
-    val negativeMatrix = ColorMatrix(
+private fun getColorFilter(isLightTheme: Boolean): ColorMatrixColorFilter {
+    val grayScale = ColorMatrix().apply { setSaturation(0f) }
+    val negative = ColorMatrix(
         floatArrayOf(-1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f)
     )
-    negativeMatrix.preConcat(grayScaleMatrix)
-    return when {
-        isSystemInDarkTheme() || viewModel.stateOfOldScheme -> ColorMatrixColorFilter(negativeMatrix)
-        else -> ColorMatrixColorFilter(grayScaleMatrix)
-    }
+    negative.preConcat(grayScale)
+    return if (isLightTheme) ColorMatrixColorFilter(grayScale) else ColorMatrixColorFilter(negative)
 }
 
 private fun getMinZoom(screenHeight: Int): Double {

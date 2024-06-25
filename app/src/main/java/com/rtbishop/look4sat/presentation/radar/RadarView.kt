@@ -38,7 +38,6 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
 import androidx.core.view.HapticFeedbackConstantsCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.predict.PI_2
@@ -54,10 +53,9 @@ import kotlin.math.sqrt
 fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<Float, Float>) {
     val context = LocalContext.current
     val view = LocalView.current
-    val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
-    val radarColor: Color = if (viewModel.stateOfOldScheme) Color(0xFFDCDCDC) else MaterialTheme.colorScheme.tertiary
-    val primaryColor: Color = if (viewModel.stateOfOldScheme) Color(0xFFFFE082) else MaterialTheme.colorScheme.primary
-    val secondaryColor: Color = if (viewModel.stateOfOldScheme) Color(0xFFDC0000) else MaterialTheme.colorScheme.onSurface
+    val radarColor = MaterialTheme.colorScheme.secondary
+    val trackColor = MaterialTheme.colorScheme.primary
+    val aimColor = MaterialTheme.colorScheme.error
     val strokeWidth = 4f
     val animTransition = rememberInfiniteTransition(label = "animScale")
     val animSpec = infiniteRepeatable<Float>(tween(1000))
@@ -141,13 +139,13 @@ fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<F
             trackCreated.value = true
         }
         rotate(-azimElev.first) {
-            drawSweep(center, sweepDegrees.floatValue, radius, primaryColor)
+            drawSweep(center, sweepDegrees.floatValue, radius, trackColor)
             drawRadar(radius, radarColor, strokeWidth, 3)
-            drawInfo(radius, primaryColor, measurer, 3)
+            drawInfo(radius, trackColor, measurer, 3)
             translate(center.x, center.y) {
-                drawTrack(trackPath.value, trackEffect.value, secondaryColor, primaryColor)
-                if (item.elevation > 0) drawPosition(item, radius, animScale.value, primaryColor)
-                drawAim(azimElev.first, azimElev.second, radius, strokeWidth, secondaryColor)
+                drawTrack(trackPath.value, trackEffect.value, aimColor, trackColor)
+                if (item.elevation > 0) drawPosition(item, radius, animScale.value, trackColor)
+                drawAim(azimElev.first, azimElev.second, radius, strokeWidth, aimColor)
             }
             sweepDegrees.floatValue = (sweepDegrees.floatValue + 360 / 12.0f / 60) % 360
         }

@@ -162,6 +162,7 @@
     <string name="other_switch_update">• Обновлять данные автоматически</string>
     <string name="other_switch_sweep">• Показывать анимацию радара</string>
     <string name="other_switch_sensors">• Использовать сенсоры устройства</string>
+    <string name="other_switch_light_theme">• Использовать светлую тему</string>
 
     <string name="outro_title">Я хотел бы сказать спасибо:</string>
     <string name="outro_thanks">• Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
@@ -178,5 +179,4 @@
         за интерес к приложению и публикацию интервью на сайте.
     </string>
     <string name="outro_license">Это ПО поставляется без гарантий.</string>
-    <string name="other_switch_old_scheme">• Используйте старую цветовую схему.</string>
 </resources>

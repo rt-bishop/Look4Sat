@@ -162,6 +162,7 @@
     <string name="other_switch_update">• 启用卫星数据自动更新</string>
     <string name="other_switch_sweep">• 启用雷达扫描动画</string>
     <string name="other_switch_sensors">• 使用传感器旋转雷达视图</string>
+    <string name="other_switch_light_theme">• 使用旧版配色方案</string>
 
     <string name="outro_title">我要感谢：</string>
     <string name="outro_thanks">• 感谢下载和使用 Look4Sat！愿你的天空永远晴朗！
@@ -179,5 +180,4 @@
         team for their interest to the app and the interview published.
     </string>
     <string name="outro_license">该应用程序不提供任何保修.</string>
-    <string name="other_switch_old_scheme">• 使用旧版配色方案</string>
 </resources>

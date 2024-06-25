@@ -77,7 +77,7 @@
     <string name="pass_satName">%s</string>
     <string name="pass_satId">Id:%05d</string>
     <string name="pass_aosAz">AOS - %.1f°</string>
-    <string name="pass_aosLos" translatable="false">Az: %03d° -> Az: %03d°</string>
+    <string name="pass_aosLos" translatable="false">%03d° -> %03d°</string>
     <string name="pass_elevation">Elevation: %.1f°</string>
     <string name="pass_losAz">%.1f° - LOS</string>
     <string name="pass_altitude">Altitude: %d km</string>
@@ -165,6 +165,7 @@
     <string name="other_switch_update">• Enable automatic data update</string>
     <string name="other_switch_sweep">• Enable radar sweep animation</string>
     <string name="other_switch_sensors">• Use sensors to rotate radar view</string>
+    <string name="other_switch_light_theme">• Use light theme</string>
 
     <string name="outro_title">I would like to say thanks to:</string>
     <string name="outro_thanks">• You for downloading and using Look4Sat! \nMay your sky always be clear!
@@ -180,5 +181,4 @@
         team for their interest to the app and the interview published.
     </string>
     <string name="outro_license">The app comes with no warranty.</string>
-    <string name="other_switch_old_scheme">• Use the old color scheme</string>
 </resources>

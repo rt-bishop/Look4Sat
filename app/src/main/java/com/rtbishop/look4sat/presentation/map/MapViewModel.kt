@@ -53,7 +53,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
     private var dataUpdateRate = 1000L
     private var selectedOrbitalObject: OrbitalObject? = null
 
-    val stateOfOldScheme = settingsRepo.otherSettings.value.stateOfOldScheme
+    val stateOfLightTheme = settingsRepo.otherSettings.value.stateOfLightTheme
 
     val stationPosition = flow {
         val osmLat = clipLat(stationPos.latitude)

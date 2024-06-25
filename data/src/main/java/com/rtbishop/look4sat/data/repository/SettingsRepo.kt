@@ -19,9 +19,9 @@ package com.rtbishop.look4sat.data.repository
 
 import android.content.SharedPreferences
 import android.location.LocationManager
+import android.os.CancellationSignal
 import androidx.core.content.edit
 import androidx.core.location.LocationManagerCompat
-import androidx.core.os.CancellationSignal
 import com.rtbishop.look4sat.domain.model.DatabaseState
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.PassesSettings
@@ -53,7 +53,7 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
     private val keyStateOfSensors = "stateOfSensors"
     private val keyStateOfSweep = "stateOfSweep"
     private val keyStateOfUtc = "stateOfUtc"
-    private val keyStateOfOldScheme = "stateOfOldScheme"
+    private val keyStateOfLightTheme = "stateOfLightTheme"
     private val keyStationAltitude = "stationAltitude"
     private val keyStationLatitude = "stationLatitude"
     private val keyStationLongitude = "stationLongitude"
@@ -222,9 +222,9 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
         _otherSettings.value = otherSettings.value.copy(stateOfUtc = value)
     }
 
-    override fun setStateOfOldScheme(value: Boolean){
-        preferences.edit { putBoolean(keyStateOfOldScheme, value) }
-        _otherSettings.value = otherSettings.value.copy(stateOfOldScheme = value)
+    override fun setStateOfLightTheme(value: Boolean){
+        preferences.edit { putBoolean(keyStateOfLightTheme, value) }
+        _otherSettings.value = otherSettings.value.copy(stateOfLightTheme = value)
     }
 
     private fun getOtherSettings(): OtherSettings {
@@ -232,8 +232,8 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
         val stateOfSensors = preferences.getBoolean(keyStateOfSensors, true)
         val stateOfSweep = preferences.getBoolean(keyStateOfSweep, true)
         val stateOfUtc = preferences.getBoolean(keyStateOfUtc, false)
-        val stateOfOldScheme = preferences.getBoolean(keyStateOfOldScheme,false)
-        return OtherSettings(stateOfAutoUpdate, stateOfSensors, stateOfSweep, stateOfUtc,stateOfOldScheme)
+        val stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme,false)
+        return OtherSettings(stateOfAutoUpdate, stateOfSensors, stateOfSweep, stateOfUtc, stateOfLightTheme)
     }
     //endregion
 

@@ -56,7 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.presentation.theme.MainTheme
+import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardButton
 
 private val allModes = listOf(
@@ -206,7 +206,7 @@ fun RadiosDialog(modes: List<String>, dismiss: () -> Unit, save: (List<String>) 
                                 text = "$index).",
                                 modifier = Modifier.padding(start = 8.dp, end = 6.dp),
                                 fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = item,

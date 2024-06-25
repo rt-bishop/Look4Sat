@@ -36,7 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.presentation.theme.MainTheme
+import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardButton
 import com.rtbishop.look4sat.presentation.components.gotoUrl
 import com.rtbishop.look4sat.presentation.components.showToast
@@ -110,7 +110,7 @@ fun SettingsScreen() {
     val toggleUpdate = { value: Boolean -> viewModel.toggleUpdate(value) }
     val toggleSweep = { value: Boolean -> viewModel.toggleSweep(value) }
     val toggleSensor = { value: Boolean -> viewModel.toggleSensor(value) }
-    val toggleOldScheme = { value: Boolean -> viewModel.toggleOldScheme(value)}
+    val toggleLightTheme = { value: Boolean -> viewModel.toggleLightTheme(value)}
 
     // Screen setup
     val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.0"
@@ -118,7 +118,7 @@ fun SettingsScreen() {
         item { CardAbout(versionName) }
         item { LocationCard(positionSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos) }
         item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
-        item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor,toggleOldScheme) }
+        item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor,toggleLightTheme) }
     }
 }
 
@@ -140,7 +140,7 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_sputnik),
-                    tint = MaterialTheme.colorScheme.secondary,
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = null,
                     modifier = Modifier.size(72.dp)
                 )
@@ -148,7 +148,7 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
                     Text(
                         text = stringResource(id = R.string.app_name),
                         fontSize = 48.sp,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = stringResource(id = R.string.app_version, version), fontSize = 20.sp
@@ -374,7 +374,7 @@ private fun OtherCardPreview() = MainTheme {
         stateOfSensors = true,
         stateOfSweep = true,
         stateOfUtc = false,
-        stateOfOldScheme = false)
+        stateOfLightTheme = false)
     OtherCard(settings = values, {}, {}, {}, {},{})
 }
 
@@ -385,7 +385,7 @@ private fun OtherCard(
     toggleUpdate: (Boolean) -> Unit,
     toggleSweep: (Boolean) -> Unit,
     toggleSensor: (Boolean) -> Unit,
-    toggleOldScheme: (Boolean) -> Unit
+    toggleLightTheme: (Boolean) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
@@ -426,8 +426,8 @@ private fun OtherCard(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = stringResource(id = R.string.other_switch_old_scheme))
-                Switch(checked = settings.stateOfOldScheme, onCheckedChange = { toggleOldScheme(it) })
+                Text(text = stringResource(id = R.string.other_switch_light_theme))
+                Switch(checked = settings.stateOfLightTheme, onCheckedChange = { toggleLightTheme(it) })
             }
         }
     }
@@ -448,14 +448,14 @@ private fun setUpdateTime(updateTime: Long): String {
 private fun UpdateIndicator(isUpdating: Boolean, modifier: Modifier = Modifier) = if (isUpdating) {
     LinearProgressIndicator(
         modifier = modifier.padding(start = 6.dp),
-        color = MaterialTheme.colorScheme.primary,
-        trackColor = MaterialTheme.colorScheme.secondaryContainer
+//        color = MaterialTheme.colorScheme.primary,
+//        trackColor = MaterialTheme.colorScheme.secondaryContainer
     )
 } else {
     LinearProgressIndicator(
         progress = { 0f },
         modifier = modifier.padding(start = 6.dp),
-        color = MaterialTheme.colorScheme.primary,
-        trackColor = MaterialTheme.colorScheme.secondaryContainer
+//        color = MaterialTheme.colorScheme.primary,
+//        trackColor = MaterialTheme.colorScheme.secondaryContainer
     )
 }
