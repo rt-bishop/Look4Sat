@@ -199,7 +199,6 @@
         android:layout_width="0dp"
         android:layout_marginStart="@dimen/button_margin_side"
         android:text="@string/btn_notify"
-        android:textColor="@color/textDisabled"
         app:layout_constraintBottom_toBottomOf="@+id/radar_coordinator"
         app:layout_constraintEnd_toStartOf="@+id/radar_visibility"
         app:layout_constraintHorizontal_bias="0.5"
