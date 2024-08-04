@@ -17,7 +17,9 @@
  */
 package com.rtbishop.look4sat.presentation.radarScreen
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -106,7 +108,15 @@ class RadarFragment : Fragment(R.layout.fragment_radar) {
                     val direction = RadarFragmentDirections.globalToMap(pass.catNum)
                     findNavController().navigate(direction)
                 }
-                radarBtnNotify.isEnabled = false
+                radarBtnNotify.clickWithDebounce {
+                    val intent = Intent(Intent.ACTION_INSERT)
+                        .setData(CalendarContract.Events.CONTENT_URI)
+                        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, pass.aosTime)
+                        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, pass.losTime)
+                        .putExtra(CalendarContract.Events.TITLE, pass.name)
+                        .putExtra(CalendarContract.Events.DESCRIPTION, "Look4Sat")
+                    startActivity(intent)
+                }
                 radarBtnSettings.clickWithDebounce {
                     val direction = RadarFragmentDirections.globalToSettings()
                     findNavController().navigate(direction)
