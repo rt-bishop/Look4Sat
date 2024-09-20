@@ -1,18 +1,17 @@
 [versions]
-android-gradle-plugin = "8.5.0"
-google-ksp = "1.9.24-1.0.20"
-kotlin = "1.9.24"
+android-gradle-plugin = "8.6.1"
+google-ksp = "2.0.20-1.0.25"
+kotlin = "2.0.20"
 
 androidx-core-ktx = "1.13.1"
 androidx-core-splashscreen = "1.0.1"
 androidx-room = "2.6.1"
 
-compose = "1.6.8"
-compose-activity = "1.9.0"
-compose-compiler = "1.5.14"
-compose-lifecycle = "2.8.2"
-compose-material3 = "1.2.1"
-compose-navigation = "2.7.7"
+composeBom = "2024.09.02"
+compose-activity = "1.9.2"
+compose-lifecycle = "2.8.6"
+compose-material3 = "1.3.0"
+compose-navigation = "2.8.1"
 
 other-coroutines = "1.8.1"
 other-json = "20240303"
@@ -22,8 +21,8 @@ other-osmdroid = "6.1.18"
 test-junit4 = "4.13.2"
 test-mockk = "1.13.11"
 
-androidTest-junit = "1.2.0"
-androidTest-espresso = "3.6.0"
+androidTest-junit = "1.2.1"
+androidTest-espresso = "3.6.1"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
@@ -32,18 +31,19 @@ androidx-room = { module = "androidx.room:room-ktx", version.ref = "androidx-roo
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
 
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-animation = { group = "androidx.compose.animation", name = "animation" }
+compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
 compose-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "compose-lifecycle" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
-compose-tooling = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-lifecycle" }
 
-compose-debug-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
-compose-debug-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-debug-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+compose-debug-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 
 other-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "other-coroutines" }
 other-json = { module = "org.json:json", version.ref = "other-json" }
@@ -60,15 +60,16 @@ androidTest-espresso = { module = "androidx.test.espresso:espresso-core", versio
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "google-ksp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 [bundles]
 composeAll = [
-    "compose-activity", "compose-animation", "compose-compiler", "compose-lifecycle", "compose-material3",
-    "compose-navigation", "compose-runtime", "compose-tooling", "compose-viewmodel"
+    "compose-bom", "compose-animation", "compose-runtime", "compose-tooling", "compose-activity",
+    "compose-lifecycle", "compose-material3", "compose-navigation", "compose-viewmodel"
 ]
-composeDebug = ["compose-debug-manifest", "compose-debug-tooling"]
+composeDebug = ["compose-bom", "compose-debug-manifest", "compose-debug-tooling"]
 unitTest = ["test-coroutines", "test-junit4", "test-mockk"]
 androidTest = ["androidTest-junit", "androidTest-espresso"]

@@ -63,3 +63,4 @@ fastlane/readme.md
 /app/release/app-release.apk
 /app/release/output-metadata.json
 /app/release/
+/.kotlin/sessions/
