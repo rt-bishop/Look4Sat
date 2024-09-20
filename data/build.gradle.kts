@@ -10,7 +10,7 @@ kotlin {
 
 android {
     namespace = "com.rtbishop.look4sat.data"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

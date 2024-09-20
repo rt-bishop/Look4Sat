@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.kotlin.android)
 }
@@ -10,11 +11,11 @@ kotlin {
 
 android {
     namespace = "com.rtbishop.look4sat"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.rtbishop.look4sat"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 314
         versionName = "3.1.4"
         resourceConfigurations.addAll(listOf("en", "ru", "si", "zh-rCN", "anydpi"))
@@ -33,9 +34,6 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 }
 
