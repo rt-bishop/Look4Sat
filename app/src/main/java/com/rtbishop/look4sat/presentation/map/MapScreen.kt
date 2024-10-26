@@ -20,17 +20,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
+import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -208,12 +209,15 @@ private fun MapView(
 
 @Composable
 private fun rememberMapViewWithLifecycle(isLightTheme: Boolean): MapView {
+    val tileSource = XYTileSource("tiles", 0, 6, 256, ".webp", emptyArray<String>())
     val context = LocalContext.current
     val mapView = remember { MapView(context) }.apply {
         setMultiTouchControls(true)
+        setUseDataConnection(false)
+        setTileSource(tileSource)
         minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels) + 0.25
-        maxZoomLevel = 5.99
-        controller.setZoom(minZoomLevel + 0.5)
+        maxZoomLevel = 8.0
+        controller.setZoom(minZoomLevel + 1)
         zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
         overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
