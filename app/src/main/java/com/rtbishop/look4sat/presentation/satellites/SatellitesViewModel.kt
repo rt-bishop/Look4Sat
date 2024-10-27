@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.rtbishop.look4sat.presentation.entries
+package com.rtbishop.look4sat.presentation.satellites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -29,11 +29,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
+class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
 
     private val defaultType = "All"
     private val _uiState = MutableStateFlow(
-        EntriesState(
+        SatellitesState(
             isDialogShown = false,
             isLoading = true,
             itemsList = emptyList(),
@@ -42,7 +42,7 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
             takeAction = ::handleAction
         )
     )
-    val uiState: StateFlow<EntriesState> = _uiState
+    val uiState: StateFlow<SatellitesState> = _uiState
 
     init {
         viewModelScope.launch {
@@ -54,15 +54,15 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
         }
     }
 
-    private fun handleAction(action: EntriesAction) {
+    private fun handleAction(action: SatellitesAction) {
         when (action) {
-            EntriesAction.SaveSelection -> saveSelection()
-            is EntriesAction.SearchFor -> searchFor(action.query)
-            EntriesAction.SelectAll -> selectAll(true)
-            is EntriesAction.SelectSingle -> selectSingle(action.id, action.isTicked)
-            is EntriesAction.SelectType -> selectType(action.type)
-            EntriesAction.ToggleTypesDialog -> toggleTypesDialog()
-            EntriesAction.UnselectAll -> selectAll(false)
+            SatellitesAction.SaveSelection -> saveSelection()
+            is SatellitesAction.SearchFor -> searchFor(action.query)
+            SatellitesAction.SelectAll -> selectAll(true)
+            is SatellitesAction.SelectSingle -> selectSingle(action.id, action.isTicked)
+            is SatellitesAction.SelectType -> selectType(action.type)
+            SatellitesAction.ToggleTypesDialog -> toggleTypesDialog()
+            SatellitesAction.UnselectAll -> selectAll(false)
         }
     }
 
@@ -93,7 +93,7 @@ class EntriesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() 
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                EntriesViewModel(container.selectionRepo)
+                SatellitesViewModel(container.selectionRepo)
             }
         }
     }

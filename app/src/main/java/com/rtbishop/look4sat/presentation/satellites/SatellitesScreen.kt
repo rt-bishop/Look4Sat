@@ -1,6 +1,5 @@
-package com.rtbishop.look4sat.presentation.entries
+package com.rtbishop.look4sat.presentation.satellites
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,29 +43,29 @@ import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
 
 @Composable
-fun EntriesScreen(uiState: EntriesState, navToPasses: () -> Unit) {
-    val toggleDialog = { uiState.takeAction(EntriesAction.ToggleTypesDialog) }
+fun SatellitesScreen(uiState: SatellitesState, navToPasses: () -> Unit) {
+    val toggleDialog = { uiState.takeAction(SatellitesAction.ToggleTypesDialog) }
     if (uiState.isDialogShown) {
         TypesDialog(items = uiState.typesList, selected = uiState.currentType, toggleDialog) {
-            uiState.takeAction(EntriesAction.SelectType(it))
+            uiState.takeAction(SatellitesAction.SelectType(it))
         }
     }
-    val unselectAll = { uiState.takeAction(EntriesAction.UnselectAll) }
-    val selectAll = { uiState.takeAction(EntriesAction.SelectAll) }
+    val unselectAll = { uiState.takeAction(SatellitesAction.UnselectAll) }
+    val selectAll = { uiState.takeAction(SatellitesAction.SelectAll) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TopBar(
-            setQuery = { newQuery: String -> uiState.takeAction(EntriesAction.SearchFor(newQuery)) },
-            saveSelection = {
-                uiState.takeAction(EntriesAction.SaveSelection)
-                navToPasses()
-            })
+        TopBar(setQuery = { newQuery: String ->
+            uiState.takeAction(SatellitesAction.SearchFor(newQuery))
+        }, saveSelection = {
+            uiState.takeAction(SatellitesAction.SaveSelection)
+            navToPasses()
+        })
         MiddleBar(uiState.currentType, { toggleDialog() }, { unselectAll() }, { selectAll() })
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
             if (uiState.isLoading) {
                 CardLoadingIndicator()
             } else {
-                EntriesCard(uiState.itemsList) { id, isTicked ->
-                    uiState.takeAction(EntriesAction.SelectSingle(id, isTicked))
+                SatellitesCard(uiState.itemsList) { id, isTicked ->
+                    uiState.takeAction(SatellitesAction.SelectSingle(id, isTicked))
                 }
             }
         }
@@ -105,7 +104,9 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
                 singleLine = true,
                 modifier = modifier.padding(start = 12.dp),
                 textStyle = TextStyle(
-                    fontSize = 16.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 ),
                 decorationBox = { innerTextField ->
                     if (currentQuery.value.isEmpty()) {
@@ -147,14 +148,14 @@ private fun MiddleBarPreview() = MainTheme { MiddleBar("Amateur", {}, {}, {}) }
 @Composable
 private fun MiddleBar(type: String, navigate: () -> Unit, uncheck: () -> Unit, check: () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
-        EntryTypeCard(type = type, { navigate() }, modifier = Modifier.weight(1f))
+        TypeCard(type = type, { navigate() }, modifier = Modifier.weight(1f))
         CardIcon(onClick = { uncheck() }, iconId = R.drawable.ic_check_off)
         CardIcon(onClick = { check() }, iconId = R.drawable.ic_check_on)
     }
 }
 
 @Composable
-private fun EntryTypeCard(type: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun TypeCard(type: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ElevatedCard(modifier = modifier) {
         Row(horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
@@ -180,13 +181,13 @@ private fun EntryTypeCard(type: String, onClick: () -> Unit, modifier: Modifier 
 
 @Preview(showBackground = true)
 @Composable
-private fun EntryPreview() {
+private fun SatellitePreview() {
     val satItem = SatItem(44444, "Ultra Super Mega long satellite name", true)
-    MainTheme { Entry(item = satItem, onSelected = { _, _ -> run {} }, modifier = Modifier) }
+    MainTheme { Satellite(item = satItem, onSelected = { _, _ -> run {} }, modifier = Modifier) }
 }
 
 @Composable
-private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: Modifier) {
+private fun Satellite(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: Modifier) {
     val passSatId = stringResource(id = R.string.pass_satId, item.catnum)
     Surface(color = MaterialTheme.colorScheme.background,
         modifier = modifier.clickable { onSelected(item.catnum, item.isSelected) }) {
@@ -198,8 +199,7 @@ private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: M
                     .padding(start = 14.dp, top = 8.dp, end = 12.dp, bottom = 8.dp)
             ) {
                 Text(
-                    text = "$passSatId - ",
-                    color = MaterialTheme.colorScheme.primary
+                    text = "$passSatId - ", color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = item.name,
@@ -208,7 +208,11 @@ private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: M
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Checkbox(checked = item.isSelected, onCheckedChange = null, modifier = Modifier.padding(start = 6.dp))
+                Checkbox(
+                    checked = item.isSelected,
+                    onCheckedChange = null,
+                    modifier = Modifier.padding(start = 6.dp)
+                )
             }
         }
     }
@@ -216,21 +220,20 @@ private fun Entry(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: M
 
 @Preview(showBackground = true)
 @Composable
-private fun EntriesPreview() {
+private fun SatellitesPreview() {
     val entries = listOf(
         SatItem(8888, "Meteor", false),
         SatItem(44444, "ISS", true),
         SatItem(88888, "Starlink", false)
     )
-    MainTheme { EntriesCard(entries) { _, _ -> run {} } }
+    MainTheme { SatellitesCard(entries) { _, _ -> run {} } }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EntriesCard(items: List<SatItem>, onSelected: (Int, Boolean) -> Unit) {
+fun SatellitesCard(items: List<SatItem>, onSelected: (Int, Boolean) -> Unit) {
     LazyColumn {
         items(items = items, key = { item -> item.catnum }) { entry ->
-            Entry(entry, onSelected, Modifier.animateItemPlacement())
+            Satellite(entry, onSelected, Modifier.animateItem())
         }
     }
 }

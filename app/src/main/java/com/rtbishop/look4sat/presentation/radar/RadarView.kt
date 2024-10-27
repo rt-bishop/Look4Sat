@@ -70,66 +70,66 @@ fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<F
     val beepSoundId = remember { mutableIntStateOf(0) }
     val aimTargetDifference = remember { mutableFloatStateOf(0f) }
 
-    LaunchedEffect(item.azimuth, item.elevation, azimElev.first, azimElev.second) {
-        val aimAzimuthRadians = azimElev.first.toDouble().toRadians()
-        val aimElevationRadians = abs(min(azimElev.second, 0f)).toDouble().toRadians()
-        // radius of 0.5 makes the aimTargetDifference range 0.0 to 1.0
-        val radius = 0.5
-        val aimX = sph2CartX(aimAzimuthRadians, aimElevationRadians, radius)
-        val aimY = sph2CartY(aimAzimuthRadians, aimElevationRadians, radius)
-        val satX = sph2CartX(item.azimuth, item.elevation, radius)
-        val satY = sph2CartY(item.azimuth, item.elevation, radius)
-        aimTargetDifference.floatValue = sqrt((satX - aimX).pow(2) + (satY - aimY).pow(2))
-
-
-        val minPlaybackRate = 0.5f
-        val maxPlaybackRate = 2.0f
-        val playbackRate =
-            maxPlaybackRate - (aimTargetDifference.floatValue / (maxPlaybackRate - minPlaybackRate))
-
-        soundPool.value?.setRate(beepSoundId.intValue, playbackRate)
-    }
-
-    LaunchedEffect(aimTargetDifference.floatValue < aimThreshold) {
-        if (aimTargetDifference.floatValue < aimThreshold) {
-            view.performHapticFeedback(HapticFeedbackConstantsCompat.VIRTUAL_KEY)
-            soundPool.value?.pause(beepSoundId.intValue)
-        } else {
-            soundPool.value?.resume(beepSoundId.intValue)
-        }
-    }
-
-    LaunchedEffect(item.elevation > 0) {
-        if(item.elevation > 0) {
-            soundPool.value?.resume(beepSoundId.intValue)
-        } else {
-            soundPool.value?.pause(beepSoundId.intValue)
-        }
-    }
-
-    DisposableEffect(Unit) {
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
-
-        soundPool.value = SoundPool.Builder()
-            .setMaxStreams(1)
-            .setAudioAttributes(audioAttributes)
-            .build()
-
-        beepSoundId.intValue = soundPool.value?.load(context, R.raw.beep, 1) ?: 0
-
-        soundPool.value?.setOnLoadCompleteListener { soundPool, _, status ->
-            if (status == 0) {
-                soundPool.play(beepSoundId.intValue, 0.5f, 0.5f, 0, -1, 1f)
-            }
-        }
-
-        onDispose {
-            soundPool.value?.release()
-        }
-    }
+//    LaunchedEffect(item.azimuth, item.elevation, azimElev.first, azimElev.second) {
+//        val aimAzimuthRadians = azimElev.first.toDouble().toRadians()
+//        val aimElevationRadians = abs(min(azimElev.second, 0f)).toDouble().toRadians()
+//        // radius of 0.5 makes the aimTargetDifference range 0.0 to 1.0
+//        val radius = 0.5
+//        val aimX = sph2CartX(aimAzimuthRadians, aimElevationRadians, radius)
+//        val aimY = sph2CartY(aimAzimuthRadians, aimElevationRadians, radius)
+//        val satX = sph2CartX(item.azimuth, item.elevation, radius)
+//        val satY = sph2CartY(item.azimuth, item.elevation, radius)
+//        aimTargetDifference.floatValue = sqrt((satX - aimX).pow(2) + (satY - aimY).pow(2))
+//
+//
+//        val minPlaybackRate = 0.5f
+//        val maxPlaybackRate = 2.0f
+//        val playbackRate =
+//            maxPlaybackRate - (aimTargetDifference.floatValue / (maxPlaybackRate - minPlaybackRate))
+//
+//        soundPool.value?.setRate(beepSoundId.intValue, playbackRate)
+//    }
+//
+//    LaunchedEffect(aimTargetDifference.floatValue < aimThreshold) {
+//        if (aimTargetDifference.floatValue < aimThreshold) {
+//            view.performHapticFeedback(HapticFeedbackConstantsCompat.VIRTUAL_KEY)
+//            soundPool.value?.pause(beepSoundId.intValue)
+//        } else {
+//            soundPool.value?.resume(beepSoundId.intValue)
+//        }
+//    }
+//
+//    LaunchedEffect(item.elevation > 0) {
+//        if(item.elevation > 0) {
+//            soundPool.value?.resume(beepSoundId.intValue)
+//        } else {
+//            soundPool.value?.pause(beepSoundId.intValue)
+//        }
+//    }
+//
+//    DisposableEffect(Unit) {
+//        val audioAttributes = AudioAttributes.Builder()
+//            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+//            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+//            .build()
+//
+//        soundPool.value = SoundPool.Builder()
+//            .setMaxStreams(1)
+//            .setAudioAttributes(audioAttributes)
+//            .build()
+//
+//        beepSoundId.intValue = soundPool.value?.load(context, R.raw.beep, 1) ?: 0
+//
+//        soundPool.value?.setOnLoadCompleteListener { soundPool, _, status ->
+//            if (status == 0) {
+//                soundPool.play(beepSoundId.intValue, 0.5f, 0.5f, 0, -1, 1f)
+//            }
+//        }
+//
+//        onDispose {
+//            soundPool.value?.release()
+//        }
+//    }
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         val radius = (size.minDimension / 2f) * 0.95f

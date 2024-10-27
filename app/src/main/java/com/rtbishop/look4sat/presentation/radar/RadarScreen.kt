@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,27 +35,32 @@ fun RadarScreen() {
     val currentPass = viewModel.getPass().collectAsState(null).value
     val id = currentPass?.catNum ?: 99999
     val name = currentPass?.name ?: "Satellite"
-    Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Scaffold { innerPadding ->
+        Column(
+            modifier = Modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
 //        TimerBarNew(id, name, "88:88:88", R.drawable.ic_notifications) {}
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-        ) {
-            viewModel.radarData.value?.let { data ->
-                RadarViewCompose(
-                    item = data.orbitalPos,
-                    items = data.satTrack,
-                    azimElev = viewModel.orientation.value
-                )
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ) {
+                viewModel.radarData.value?.let { data ->
+                    RadarViewCompose(
+                        item = data.orbitalPos,
+                        items = data.satTrack,
+                        azimElev = viewModel.orientation.value
+                    )
+                }
             }
-        }
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-        ) {
-            TransmittersList(transmitters = viewModel.transmitters.value)
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ) {
+                TransmittersList(transmitters = viewModel.transmitters.value)
+            }
         }
     }
 }
@@ -78,7 +84,10 @@ private fun TransmitterItem(radio: SatRadio) {
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(6.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow),
                         contentDescription = null, modifier = Modifier.rotate(180f)
@@ -93,7 +102,10 @@ private fun TransmitterItem(radio: SatRadio) {
                         contentDescription = null
                     )
                 }
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(
                         text = stringResource(id = R.string.radio_downlink, radio.downlinkLow ?: 0L),
                         textAlign = TextAlign.Center,
