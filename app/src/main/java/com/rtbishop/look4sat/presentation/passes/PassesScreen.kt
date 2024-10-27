@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.presentation.passes
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -80,7 +78,6 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PassesList(
     refreshState: PullRefreshState,
@@ -93,7 +90,7 @@ private fun PassesList(
         Box(modifier = Modifier.pullRefresh(refreshState), contentAlignment = Alignment.TopCenter) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    PassItem(pass = pass, navToRadar = navToRadar, modifier = Modifier.animateItemPlacement())
+                    PassItem(pass = pass, navToRadar = navToRadar, modifier = Modifier.animateItem())
                 }
             }
             PullRefreshIndicator(refreshing = isRefreshing, state = refreshState, backgroundColor = backgroundColor)

@@ -28,7 +28,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.osmdroid.config.Configuration
 
@@ -65,16 +64,13 @@ class MainContainer(private val context: Context) {
 
     private fun provideLocalSource(): ILocalSource {
         val database = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDBv313").apply {
-//            addMigrations(MIGRATION_1_2)
             fallbackToDestructiveMigration()
         }.build()
         return LocalSource(database.look4SatDao())
     }
 
     private fun provideRemoteSource(): IRemoteSource {
-        val cache = Cache(context.cacheDir, MainApplication.MAX_OKHTTP_CACHE_SIZE)
-        val httpClient = OkHttpClient.Builder().cache(cache).build()
-        return RemoteSource(context.contentResolver, httpClient, Dispatchers.IO)
+        return RemoteSource(Dispatchers.IO, context.contentResolver, OkHttpClient.Builder().build())
     }
 
     private fun provideSatelliteRepo(): ISatelliteRepo {

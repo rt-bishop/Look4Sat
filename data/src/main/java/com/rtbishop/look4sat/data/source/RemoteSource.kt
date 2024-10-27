@@ -27,9 +27,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class RemoteSource(
+    private val dispatcher: CoroutineDispatcher,
     private val contentResolver: ContentResolver,
-    private val httpClient: OkHttpClient,
-    private val dispatcher: CoroutineDispatcher
+    private val httpClient: OkHttpClient
 ) : IRemoteSource {
 
     override suspend fun getFileStream(uri: String): InputStream? = withContext(dispatcher) {

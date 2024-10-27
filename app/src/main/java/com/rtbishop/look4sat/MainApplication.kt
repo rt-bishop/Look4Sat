@@ -37,19 +37,13 @@ class MainApplication : Application() {
     }
 
     private suspend fun checkAutoUpdate(timeNow: Long = System.currentTimeMillis()) {
-        val settingsRepo = container.settingsRepo
-        if (settingsRepo.otherSettings.value.stateOfAutoUpdate) {
-            val timeDelta = timeNow - settingsRepo.databaseState.value.updateTimestamp
-            if (timeDelta > AUTO_UPDATE_DELTA_MS) {
+        if (container.settingsRepo.otherSettings.value.stateOfAutoUpdate) {
+            val timeDelta = timeNow - container.settingsRepo.databaseState.value.updateTimestamp
+            if (timeDelta > 172_800_000L) { // 48 hours in ms
                 val sdf = SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.getDefault())
                 println("Started periodic data update on ${sdf.format(Date())}")
                 container.databaseRepo.updateFromRemote()
             }
         }
-    }
-
-    companion object {
-        private const val AUTO_UPDATE_DELTA_MS = 172_800_000L // 48 hours in ms
-        const val MAX_OKHTTP_CACHE_SIZE = 10_000_000L // 10 Megabytes
     }
 }

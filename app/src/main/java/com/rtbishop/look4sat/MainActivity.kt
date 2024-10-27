@@ -20,21 +20,23 @@ package com.rtbishop.look4sat
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.rtbishop.look4sat.presentation.MainScreen
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.MainScreen
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             val container = (LocalContext.current.applicationContext as MainApplication).container
             val otherSettings = container.settingsRepo.otherSettings.collectAsState().value
-            MainTheme(isLightTheme = otherSettings.stateOfLightTheme) { MainScreen() }
+            MainTheme(isDarkTheme = !otherSettings.stateOfLightTheme) { MainScreen() }
         }
     }
 }
