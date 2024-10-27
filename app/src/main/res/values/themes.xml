@@ -1,20 +1,12 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <color name="accent">#FFE082</color>
     <color name="background">#121212</color>
 
     <style name="Theme.Look4Sat.SplashScreen" parent="Theme.SplashScreen">
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <item name="postSplashScreenTheme">@style/Theme.Look4Sat.Main</item>
+        <item name="postSplashScreenTheme">@android:style/Theme.Material.NoActionBar</item>
         <item name="windowSplashScreenBackground">@color/background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/launcher_fg</item>
-    </style>
-
-    <style name="Theme.Look4Sat.Main" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <item name="android:navigationBarColor">@color/background</item>
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:windowBackground">@color/background</item>
     </style>
 
 </resources>
