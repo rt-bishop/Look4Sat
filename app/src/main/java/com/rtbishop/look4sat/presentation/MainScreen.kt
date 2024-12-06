@@ -29,7 +29,7 @@ import com.rtbishop.look4sat.presentation.satellites.SatellitesScreen
 import com.rtbishop.look4sat.presentation.satellites.SatellitesViewModel
 import com.rtbishop.look4sat.presentation.settings.SettingsScreen
 
-sealed class Screen(var title: String, var icon: Int, var route: String) {
+private sealed class Screen(var title: String, var icon: Int, var route: String) {
     data object Main : Screen("Main", R.drawable.ic_sputnik, "main")
     data object Radar : Screen("Radar", R.drawable.ic_sputnik, "radar")
     data object Satellites : Screen("Satellites", R.drawable.ic_sputnik, "satellites")
@@ -61,17 +61,19 @@ private fun NavBarScreen(navToRadar: (Int, Long) -> Unit) {
     val navToPasses = { innerNavController.navigate(Screen.Passes.route) }
     Scaffold(bottomBar = { MainNavBar(navController = innerNavController) }) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            NavHost(innerNavController, startDestination = Screen.Passes.route) {
+            NavHost(navController = innerNavController, startDestination = Screen.Passes.route) {
                 composable(Screen.Satellites.route) {
                     val viewModel = viewModel(
-                        SatellitesViewModel::class.java, factory = SatellitesViewModel.Factory
+                        modelClass = SatellitesViewModel::class.java,
+                        factory = SatellitesViewModel.Factory
                     )
                     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
                     SatellitesScreen(uiState, navToPasses)
                 }
                 composable(Screen.Passes.route) {
                     val viewModel = viewModel(
-                        PassesViewModel::class.java, factory = PassesViewModel.Factory
+                        modelClass = PassesViewModel::class.java,
+                        factory = PassesViewModel.Factory
                     )
                     val uiState = viewModel.uiState.value
                     PassesScreen(uiState, navToRadar)
@@ -91,18 +93,18 @@ private fun MainNavBar(navController: NavController) {
     val currentRoute = currentBackStackEntry.value?.destination?.route
     NavigationBar {
         items.forEach { item ->
-            NavigationBarItem(selected = currentRoute?.contains(item.route) ?: false,
+            NavigationBarItem(
+                icon = { Icon(painterResource(item.icon), item.title) },
+                label = { Text(item.title) },
+                selected = currentRoute?.contains(item.route) ?: false,
                 onClick = {
                     navController.navigate(item.route) {
-                        navController.graph.startDestinationRoute?.let {
-                            popUpTo(it) { saveState = false }
-                        }
+                        popUpTo(navController.graph.startDestinationId) { saveState = false }
                         launchSingleTop = true
                         restoreState = false
                     }
-                },
-                icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
-                label = { Text(item.title) })
+                }
+            )
         }
     }
 }

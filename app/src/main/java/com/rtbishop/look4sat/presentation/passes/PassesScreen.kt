@@ -3,7 +3,6 @@ package com.rtbishop.look4sat.presentation.passes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,11 +14,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,12 +41,8 @@ import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.NextPassRow
-import com.rtbishop.look4sat.presentation.components.PullRefreshIndicator
-import com.rtbishop.look4sat.presentation.components.PullRefreshState
 import com.rtbishop.look4sat.presentation.components.TimerBar
 import com.rtbishop.look4sat.presentation.components.TimerRow
-import com.rtbishop.look4sat.presentation.components.pullRefresh
-import com.rtbishop.look4sat.presentation.components.rememberPullRefreshState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -54,7 +53,6 @@ private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 @Composable
 fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
     val refreshPasses = { uiState.takeAction(PassesAction.RefreshPasses) }
-    val refreshState = rememberPullRefreshState(refreshing = uiState.isRefreshing, onRefresh = refreshPasses)
     val showPassesDialog = { uiState.takeAction(PassesAction.TogglePassesDialog) }
     val showRadiosDialog = { uiState.takeAction(PassesAction.ToggleRadiosDialog) }
     if (uiState.isPassesDialogShown) {
@@ -74,30 +72,46 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
             CardIcon(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
         }
         NextPassRow(pass = uiState.nextPass)
-        PassesList(refreshState, uiState.isRefreshing, uiState.itemsList, navToRadar)
+        PassesList(uiState.isRefreshing, uiState.itemsList, navToRadar, refreshPasses)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PassesList(
-    refreshState: PullRefreshState,
     isRefreshing: Boolean,
     passes: List<OrbitalPass>,
-    navToRadar: (Int, Long) -> Unit
+    navToRadar: (Int, Long) -> Unit,
+    refreshPasses: () -> Unit
 ) {
-    val backgroundColor = MaterialTheme.colorScheme.primary
+    val refreshState = rememberPullToRefreshState()
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.pullRefresh(refreshState), contentAlignment = Alignment.TopCenter) {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            state = refreshState,
+            onRefresh = refreshPasses,
+            indicator = {
+                PullToRefreshDefaults.Indicator(
+                    state = refreshState,
+                    isRefreshing = isRefreshing,
+                    color = MaterialTheme.colorScheme.background,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
+            }
+        ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    PassItem(pass = pass, navToRadar = navToRadar, modifier = Modifier.animateItem())
+                    PassItem(
+                        pass = pass,
+                        navToRadar = navToRadar,
+                        modifier = Modifier.animateItem()
+                    )
                 }
             }
-            PullRefreshIndicator(refreshing = isRefreshing, state = refreshState, backgroundColor = backgroundColor)
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -230,6 +244,7 @@ private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifie
                     )
                     LinearProgressIndicator(
                         progress = { if (pass.isDeepSpace) 100f else pass.progress },
+                        drawStopIndicator = {},
                         modifier = modifier.fillMaxWidth(0.75f)
                     )
                     Text(
