@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
 
+    implementation(platform(libs.compose.bom))
     implementation(libs.bundles.composeAll)
 
     implementation(libs.other.okhttp)
