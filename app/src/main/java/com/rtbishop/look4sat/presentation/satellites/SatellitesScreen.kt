@@ -36,14 +36,30 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
 
+fun NavGraphBuilder.satellitesDestination(navigateToPasses: () -> Unit) {
+    composable(Screen.Satellites.route) {
+        val viewModel = viewModel(
+            modelClass = SatellitesViewModel::class.java,
+            factory = SatellitesViewModel.Factory
+        )
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+        SatellitesScreen(uiState, navigateToPasses)
+    }
+}
+
 @Composable
-fun SatellitesScreen(uiState: SatellitesState, navToPasses: () -> Unit) {
+private fun SatellitesScreen(uiState: SatellitesState, navigateToPasses: () -> Unit) {
     val toggleDialog = { uiState.takeAction(SatellitesAction.ToggleTypesDialog) }
     if (uiState.isDialogShown) {
         TypesDialog(items = uiState.typesList, selected = uiState.currentType, toggleDialog) {
@@ -57,7 +73,7 @@ fun SatellitesScreen(uiState: SatellitesState, navToPasses: () -> Unit) {
             uiState.takeAction(SatellitesAction.SearchFor(newQuery))
         }, saveSelection = {
             uiState.takeAction(SatellitesAction.SaveSelection)
-            navToPasses()
+            navigateToPasses()
         })
         MiddleBar(uiState.currentType, { toggleDialog() }, { unselectAll() }, { selectAll() })
         ElevatedCard(modifier = Modifier.fillMaxSize()) {

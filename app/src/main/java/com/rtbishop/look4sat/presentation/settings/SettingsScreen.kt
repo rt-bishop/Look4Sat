@@ -33,10 +33,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardButton
 import com.rtbishop.look4sat.presentation.components.gotoUrl
 import com.rtbishop.look4sat.presentation.components.showToast
@@ -48,8 +51,12 @@ private const val GITHUB_URL = "https://github.com/rt-bishop/Look4Sat/"
 private const val DONATE_URL = "https://ko-fi.com/rt_bishop"
 private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
 
+fun NavGraphBuilder.settingsDestination() {
+    composable(Screen.Settings.route) { SettingsScreen() }
+}
+
 @Composable
-fun SettingsScreen() {
+private fun SettingsScreen() {
     val viewModel = viewModel(SettingsViewModel::class.java, factory = SettingsViewModel.Factory)
     val context = LocalContext.current
 
@@ -446,16 +453,11 @@ private fun setUpdateTime(updateTime: Long): String {
 
 @Composable
 private fun UpdateIndicator(isUpdating: Boolean, modifier: Modifier = Modifier) = if (isUpdating) {
-    LinearProgressIndicator(
-        modifier = modifier.padding(start = 6.dp),
-//        color = MaterialTheme.colorScheme.primary,
-//        trackColor = MaterialTheme.colorScheme.secondaryContainer
-    )
+    LinearProgressIndicator(modifier = modifier.padding(start = 6.dp))
 } else {
     LinearProgressIndicator(
         progress = { 0f },
-        modifier = modifier.padding(start = 6.dp),
-//        color = MaterialTheme.colorScheme.primary,
-//        trackColor = MaterialTheme.colorScheme.secondaryContainer
+        drawStopIndicator = {},
+        modifier = modifier.padding(start = 6.dp)
     )
 }
