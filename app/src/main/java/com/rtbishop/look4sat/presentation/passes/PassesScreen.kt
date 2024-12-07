@@ -33,12 +33,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.DeepSpaceObject
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.TimerBar
@@ -50,8 +54,19 @@ import java.util.Locale
 private val sdfDate = SimpleDateFormat("EEE dd MMM", Locale.ENGLISH)
 private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
+fun NavGraphBuilder.passesDestination(navigateToRadar: (Int, Long) -> Unit) {
+    composable(Screen.Passes.route) {
+        val viewModel = viewModel(
+            modelClass = PassesViewModel::class.java,
+            factory = PassesViewModel.Factory
+        )
+        val uiState = viewModel.uiState.value
+        PassesScreen(uiState, navigateToRadar)
+    }
+}
+
 @Composable
-fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
+private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> Unit) {
     val refreshPasses = { uiState.takeAction(PassesAction.RefreshPasses) }
     val showPassesDialog = { uiState.takeAction(PassesAction.TogglePassesDialog) }
     val showRadiosDialog = { uiState.takeAction(PassesAction.ToggleRadiosDialog) }
@@ -72,7 +87,7 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
             CardIcon(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
         }
         NextPassRow(pass = uiState.nextPass)
-        PassesList(uiState.isRefreshing, uiState.itemsList, navToRadar, refreshPasses)
+        PassesList(uiState.isRefreshing, uiState.itemsList, navigateToRadar, refreshPasses)
     }
 }
 
@@ -81,7 +96,7 @@ fun PassesScreen(uiState: PassesState, navToRadar: (Int, Long) -> Unit) {
 private fun PassesList(
     isRefreshing: Boolean,
     passes: List<OrbitalPass>,
-    navToRadar: (Int, Long) -> Unit,
+    navigateToRadar: (Int, Long) -> Unit,
     refreshPasses: () -> Unit
 ) {
     val refreshState = rememberPullToRefreshState()
@@ -102,11 +117,19 @@ private fun PassesList(
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    PassItem(
-                        pass = pass,
-                        navToRadar = navToRadar,
-                        modifier = Modifier.animateItem()
-                    )
+                    if (pass.isDeepSpace) {
+                        DeepSpacePass(
+                            pass = pass,
+                            navigateToRadar = navigateToRadar,
+                            modifier = Modifier.animateItem()
+                        )
+                    } else {
+                        NearEarthPass(
+                            pass = pass,
+                            navigateToRadar = navigateToRadar,
+                            modifier = Modifier.animateItem()
+                        )
+                    }
                 }
             }
         }
@@ -121,7 +144,113 @@ private fun DeepSpacePassPreview() {
     )
     val satellite = DeepSpaceObject(data)
     val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
-    MainTheme { PassItem(pass = pass, { _, _ -> }) }
+    MainTheme { DeepSpacePass(pass = pass, { _, _ -> }) }
+}
+
+@Composable
+private fun DeepSpacePass(
+    pass: OrbitalPass,
+    navigateToRadar: (Int, Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
+    Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
+        Surface(modifier = Modifier
+            .padding(bottom = 2.dp)
+            .clickable { navigateToRadar(pass.catNum, pass.aosTime) }) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.surface)
+                    .padding(horizontal = 6.dp, vertical = 4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "$passSatId - ",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = pass.name,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 6.dp),
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_elevation),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${pass.maxElevation}°",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "DeepSpace",
+                            fontSize = 15.sp
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_altitude),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${pass.altitude} km",
+                            fontSize = 15.sp
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_direction),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(
+                                id = R.string.pass_aosLos,
+                                pass.aosAzimuth.toInt(),
+                                pass.losAzimuth.toInt()
+                            ),
+                            fontSize = 15.sp
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -132,16 +261,20 @@ private fun NearEarthPassPreview() {
     )
     val satellite = NearEarthObject(data)
     val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
-    MainTheme { PassItem(pass = pass, { _, _ -> }) }
+    MainTheme { NearEarthPass(pass = pass, { _, _ -> }) }
 }
 
 @Composable
-private fun PassItem(pass: OrbitalPass, navToRadar: (Int, Long) -> Unit, modifier: Modifier = Modifier) {
+private fun NearEarthPass(
+    pass: OrbitalPass,
+    navigateToRadar: (Int, Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
             .padding(bottom = 2.dp)
-            .clickable { navToRadar(pass.catNum, pass.aosTime) }) {
+            .clickable { navigateToRadar(pass.catNum, pass.aosTime) }) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
                 modifier = Modifier

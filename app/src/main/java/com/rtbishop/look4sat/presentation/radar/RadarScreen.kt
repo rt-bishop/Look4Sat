@@ -26,11 +26,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatRadio
 
+fun NavGraphBuilder.radarDestination(radarRoute: String, radarArgs: List<NamedNavArgument>) {
+    composable(radarRoute, radarArgs) { RadarScreen() }
+}
+
 @Composable
-fun RadarScreen() {
+private fun RadarScreen() {
     val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
     val currentPass = viewModel.getPass().collectAsState(null).value
     val id = currentPass?.catNum ?: 99999
