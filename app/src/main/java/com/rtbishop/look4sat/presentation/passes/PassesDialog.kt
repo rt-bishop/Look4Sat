@@ -22,16 +22,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,22 +36,22 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.presentation.LocalSpacing
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.components.CardButton
+import com.rtbishop.look4sat.presentation.components.SharedDialog
 
 private val allModes = listOf(
     "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
@@ -64,86 +61,75 @@ private val allModes = listOf(
     "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
 )
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun PassesDialogPreview() {
     MainTheme { PassesDialog(24, 16.0, {}) { _, _ -> } }
 }
 
 @Composable
-fun PassesDialog(hours: Int, elev: Double, dismiss: () -> Unit, save: (Int, Double) -> Unit) {
-    val maxWidthModifier = Modifier.fillMaxWidth()
+fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, accept: (Int, Double) -> Unit) {
     val hoursValue = remember { mutableIntStateOf(hours) }
-    val elevationValue = remember { mutableIntStateOf(elev.toInt()) }
-    Dialog(onDismissRequest = { dismiss() }) {
-        ElevatedCard {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = maxWidthModifier.padding(16.dp)
-            ) {
-                Text(text = "Passes", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
-                    Text(text = "Show passes above", fontSize = 16.sp, modifier = Modifier.weight(1f))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_elevation),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "${elevationValue.intValue}°",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Slider(
-                    value = elevationValue.intValue.toFloat(),
-                    onValueChange = { elevationValue.intValue = it.toInt() },
-                    valueRange = 0f..60f
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
-                    Text(text = "Show passes within", fontSize = 16.sp, modifier = Modifier.weight(1f))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_time),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "${hoursValue.intValue}h",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Slider(
-                    value = hoursValue.intValue.toFloat(),
-                    onValueChange = { hoursValue.intValue = it.toInt() },
-                    valueRange = 1f..240f
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = maxWidthModifier
-                ) {
-                    CardButton(onClick = { dismiss() }, text = stringResource(id = R.string.btn_cancel))
-                    CardButton(
-                        onClick = {
-                            save(hoursValue.intValue, elevationValue.intValue.toDouble())
-                            dismiss()
-                        }, text = stringResource(id = R.string.btn_accept)
-                    )
-                }
-            }
+    val elevationValueNew = remember { mutableDoubleStateOf(elevation) }
+    val onAccept = {
+        accept(hoursValue.intValue, elevationValueNew.doubleValue).also { cancel() }
+    }
+    SharedDialog(title = "Passes", onCancel = cancel, onAccept = onAccept) {
+        SliderRow(
+            title = "Show passes above",
+            value = elevationValueNew.doubleValue,
+            valuePostfix = "°",
+            valueResId = R.drawable.ic_elevation,
+            valueRange = 0f..60f
+        ) { elevationValueNew.doubleValue = it.toDouble() }
+        SliderRow(
+            title = "Show passes within",
+            value = hoursValue.intValue.toDouble(),
+            valuePostfix = "h",
+            valueResId = R.drawable.ic_time,
+            valueRange = 1f..240f
+        ) { hoursValue.intValue = it.toInt() }
+    }
+}
+
+@Composable
+private fun SliderRow(
+    title: String,
+    value: Double,
+    valuePostfix: String,
+    valueResId: Int,
+    valueRange: ClosedFloatingPointRange<Float>,
+    onChange: (Float) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium),
+        modifier = Modifier.padding(horizontal = LocalSpacing.current.extraLarge)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Icon(
+                painter = painterResource(id = valueResId),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = "${value.toInt()}$valuePostfix",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
+        Slider(value = value.toFloat(), onValueChange = onChange, valueRange = valueRange)
     }
 }
 
@@ -154,69 +140,52 @@ private fun RadiosDialogPreview() {
 }
 
 @Composable
-fun RadiosDialog(modes: List<String>, dismiss: () -> Unit, save: (List<String>) -> Unit) {
-    val maxWidthModifier = Modifier.fillMaxWidth(1f)
+fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List<String>) -> Unit) {
     val selected = remember { mutableStateListOf<String>().apply { addAll(modes) } }
-    val select = { mode: String -> if (selected.contains(mode)) selected.remove(mode) else selected.add(mode) }
-    Dialog(onDismissRequest = { dismiss() }) {
-        ElevatedCard {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = maxWidthModifier.padding(vertical = 16.dp)
-            ) {
-                Text(text = "Radios", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(1),
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background)
-                        .weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(1.dp),
-                    verticalArrangement = Arrangement.spacedBy(1.dp)
-                ) {
-                    item { HorizontalDivider(thickness = 0.dp, color = MaterialTheme.colorScheme.surface) }
-                    itemsIndexed(allModes) { index, item ->
-                        Surface {
-                            Row(verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .clickable { select(item) }) {
-                                Text(
-                                    text = "$index).",
-                                    modifier = Modifier.padding(start = 8.dp, end = 6.dp),
-                                    fontWeight = FontWeight.Normal,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = item,
-                                    modifier = Modifier.weight(1f),
-                                    fontWeight = FontWeight.Medium,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Checkbox(
-                                    checked = selected.contains(item),
-                                    onCheckedChange = null,
-                                    modifier = Modifier.padding(8.dp)
-                                )
-                            }
-                        }
+    val select = { mode: String ->
+        if (selected.contains(mode)) selected.remove(mode) else selected.add(mode)
+    }
+    val onAccept = { accept(selected.toList()).also { cancel() } }
+    SharedDialog(title = "Radios", onCancel = cancel, onAccept = onAccept) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            modifier = Modifier
+                .fillMaxHeight(0.69f)
+                .background(MaterialTheme.colorScheme.background),
+            horizontalArrangement = Arrangement.spacedBy(1.dp),
+            verticalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            item { HorizontalDivider(color = MaterialTheme.colorScheme.surface) }
+            itemsIndexed(allModes) { index, item ->
+                Surface {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .clickable { select(item) }
+                    ) {
+                        Text(
+                            text = "${index + 1}).",
+                            modifier = Modifier.padding(start = 16.dp, end = 8.dp),
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = item,
+                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Checkbox(
+                            checked = selected.contains(item),
+                            onCheckedChange = null,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
                     }
-                    item { HorizontalDivider(thickness = 24.dp, color = MaterialTheme.colorScheme.surface) }
-                }
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = maxWidthModifier.padding(horizontal = 16.dp)
-                ) {
-                    CardButton(onClick = { dismiss() }, text = stringResource(id = R.string.btn_cancel))
-                    CardButton(
-                        onClick = {
-                            save(selected.toList())
-                            dismiss()
-                        }, text = stringResource(id = R.string.btn_accept)
-                    )
                 }
             }
+            item { HorizontalDivider(color = MaterialTheme.colorScheme.surface) }
         }
     }
 }
