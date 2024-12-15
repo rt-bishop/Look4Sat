@@ -38,10 +38,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
+import com.rtbishop.look4sat.presentation.LocalSpacing
 import com.rtbishop.look4sat.presentation.MainTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -251,6 +253,34 @@ fun getDefaultPass(): OrbitalPass {
     val orbitalData = OrbitalData("Next Satellite", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
     val satellite = NearEarthObject(orbitalData)
     return OrbitalPass(0L, 0.0, 0L, 0.0, 0, 0.0, satellite, 0f)
+}
+
+@Composable
+fun SharedDialog(
+    title: String, onCancel: () -> Unit, onAccept: () -> Unit, content: @Composable () -> Unit
+) {
+    val padding = LocalSpacing.current.extraLarge
+    Dialog(onDismissRequest = { onCancel() }) {
+        ElevatedCard {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(padding)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = padding, top = padding, end = padding)
+                )
+                content()
+                Row(modifier = Modifier.padding(start = padding, bottom = padding, end = padding)) {
+                    CardButton(onClick = onCancel, text = stringResource(id = R.string.btn_cancel))
+                    Spacer(modifier = Modifier.weight(1f))
+                    CardButton(onClick = onAccept, text = stringResource(id = R.string.btn_accept))
+                }
+            }
+        }
+    }
 }
 
 //fun Modifier.onClick(onClick: () -> Unit): Modifier = composed {
