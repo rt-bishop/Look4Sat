@@ -9,7 +9,9 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
@@ -19,19 +21,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 
+val LocalSpacing = compositionLocalOf { Spacing }
+//val MaterialTheme.spacing: Spacing
+//    @Composable @ReadOnlyComposable get() = Spacing
+
+data object SpacingDefaults {
+    internal const val EXTRA_SMALL = 4
+    internal const val SMALL = 6
+    internal const val MEDIUM = 8
+    internal const val LARGE = 12
+    internal const val EXTRA_LARGE = 16
+}
+
+data object Spacing {
+    val extraSmall = SpacingDefaults.EXTRA_SMALL.dp
+    val small = SpacingDefaults.SMALL.dp
+    val medium = SpacingDefaults.MEDIUM.dp
+    val large = SpacingDefaults.LARGE.dp
+    val extraLarge = SpacingDefaults.EXTRA_LARGE.dp
+}
+
 @Composable
 fun MainTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val view = LocalView.current
     if (view.isInEditMode) {
         MaterialTheme(darkScheme, shapes, typography, content)
     } else {
-        val colorScheme = if (isDarkTheme) darkScheme else lightScheme
-        SideEffect {
-            val window = (view.context as ComponentActivity).window
-            val insetsController = WindowCompat.getInsetsController(window, view)
-            insetsController.isAppearanceLightStatusBars = false
+        CompositionLocalProvider(LocalSpacing provides Spacing) {
+            val colorScheme = if (isDarkTheme) darkScheme else lightScheme
+            SideEffect {
+                val window = (view.context as ComponentActivity).window
+                val insetsController = WindowCompat.getInsetsController(window, view)
+                insetsController.isAppearanceLightStatusBars = false
+            }
+            MaterialTheme(colorScheme, shapes, typography, content)
         }
-        MaterialTheme(colorScheme, shapes, typography, content)
     }
 }
 

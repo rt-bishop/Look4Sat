@@ -71,12 +71,12 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
     val showPassesDialog = { uiState.takeAction(PassesAction.TogglePassesDialog) }
     val showRadiosDialog = { uiState.takeAction(PassesAction.ToggleRadiosDialog) }
     if (uiState.isPassesDialogShown) {
-        PassesDialog(hours = uiState.hours, elev = uiState.elevation, dismiss = showPassesDialog) { hours, elevation ->
+        PassesDialog(hours = uiState.hours, elevation = uiState.elevation, cancel = showPassesDialog) { hours, elevation ->
             uiState.takeAction(PassesAction.FilterPasses(hours, elevation))
         }
     }
     if (uiState.isRadiosDialogShown) {
-        RadiosDialog(modes = uiState.modes, dismiss = showRadiosDialog) { modes ->
+        RadiosDialog(modes = uiState.modes, cancel = showRadiosDialog) { modes ->
             uiState.takeAction(PassesAction.FilterRadios(modes))
         }
     }
