@@ -6,7 +6,7 @@ data class SatellitesState(
     val isDialogShown: Boolean,
     val isLoading: Boolean,
     val itemsList: List<SatItem>,
-    val currentType: String,
+    val currentTypes: List<String>,
     val typesList: List<String>,
     val takeAction: (SatellitesAction) -> Unit
 )
@@ -16,7 +16,7 @@ sealed class SatellitesAction {
     data class SearchFor(val query: String) : SatellitesAction()
     data object SelectAll : SatellitesAction()
     data class SelectSingle(val id: Int, val isTicked: Boolean) : SatellitesAction()
-    data class SelectType(val type: String) : SatellitesAction()
+    data class SelectTypes(val types: List<String>) : SatellitesAction()
     data object ToggleTypesDialog : SatellitesAction()
     data object UnselectAll : SatellitesAction()
 }

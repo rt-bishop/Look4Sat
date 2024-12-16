@@ -1,6 +1,8 @@
 package com.rtbishop.look4sat.presentation.satellites
 
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,8 +64,8 @@ fun NavGraphBuilder.satellitesDestination(navigateToPasses: () -> Unit) {
 private fun SatellitesScreen(uiState: SatellitesState, navigateToPasses: () -> Unit) {
     val toggleDialog = { uiState.takeAction(SatellitesAction.ToggleTypesDialog) }
     if (uiState.isDialogShown) {
-        TypesDialog(items = uiState.typesList, selected = uiState.currentType, toggleDialog) {
-            uiState.takeAction(SatellitesAction.SelectType(it))
+        MultiTypesDialog(allTypes = uiState.typesList, types = uiState.currentTypes, toggleDialog) {
+            uiState.takeAction(SatellitesAction.SelectTypes(it))
         }
     }
     val unselectAll = { uiState.takeAction(SatellitesAction.UnselectAll) }
@@ -75,7 +77,7 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateToPasses: () -> U
             uiState.takeAction(SatellitesAction.SaveSelection)
             navigateToPasses()
         })
-        MiddleBar(uiState.currentType, { toggleDialog() }, { unselectAll() }, { selectAll() })
+        MiddleBar(uiState.currentTypes, { toggleDialog() }, { unselectAll() }, { selectAll() })
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
             if (uiState.isLoading) {
                 CardLoadingIndicator()
@@ -159,19 +161,22 @@ private fun SaveButton(saveSelection: () -> Unit, modifier: Modifier = Modifier)
 
 @Preview(showBackground = true)
 @Composable
-private fun MiddleBarPreview() = MainTheme { MiddleBar("Amateur", {}, {}, {}) }
+private fun MiddleBarPreview() = MainTheme { MiddleBar(listOf("Amateur"), {}, {}, {}) }
 
 @Composable
-private fun MiddleBar(type: String, navigate: () -> Unit, uncheck: () -> Unit, check: () -> Unit) {
+private fun MiddleBar(
+    types: List<String>, navigate: () -> Unit, uncheck: () -> Unit, check: () -> Unit
+) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
-        TypeCard(type = type, { navigate() }, modifier = Modifier.weight(1f))
+        TypeCard(types = types, { navigate() }, modifier = Modifier.weight(1f))
         CardIcon(onClick = { uncheck() }, iconId = R.drawable.ic_check_off)
         CardIcon(onClick = { check() }, iconId = R.drawable.ic_check_on)
     }
 }
 
 @Composable
-private fun TypeCard(type: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val typesText = if (types.isEmpty()) "All" else types.joinToString(", ")
     ElevatedCard(modifier = modifier) {
         Row(horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
@@ -186,10 +191,12 @@ private fun TypeCard(type: String, onClick: () -> Unit, modifier: Modifier = Mod
                     .padding(start = 6.dp)
             )
             Text(
-                text = "Type: $type",
+                text = "Types: $typesText",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                modifier = modifier.padding(start = 12.dp, end = 6.dp, bottom = 2.dp)
+                modifier = modifier
+                    .basicMarquee(iterations = Int.MAX_VALUE, spacing = MarqueeSpacing(0.dp))
+                    .padding(start = 12.dp, end = 6.dp, bottom = 2.dp)
             )
         }
     }

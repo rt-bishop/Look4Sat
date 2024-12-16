@@ -21,18 +21,20 @@ class SelectionRepo(
 ) : ISelectionRepo {
 
     private val currentItems = MutableStateFlow<List<SatItem>>(emptyList())
-    private val currentType = MutableStateFlow("All")
+    private val currentTypes = MutableStateFlow(settingsRepo.selectedTypes.value)
     private val currentQuery = MutableStateFlow("")
-    private val itemsWithType = currentType.flatMapLatest { type ->
-        currentItems.map { items -> items.filterByType(type) }
+    private val itemsWithTypes = currentTypes.flatMapLatest { types: List<String> ->
+        currentItems.map { items -> items.filterByTypes(types) }
     }
     private val itemsWithQuery = currentQuery.flatMapLatest { query ->
-        itemsWithType.map { items -> items.filterByQuery(query) }
+        itemsWithTypes.map { items -> items.filterByQuery(query) }
     }
 
-    override fun getCurrentType() = currentType.value
+    override fun getCurrentTypes() = currentTypes.value
 
-    override fun getTypesList() = Sources.satelliteDataUrls.keys.sorted()
+    override fun getTypesList() = Sources.satelliteDataUrls.keys.sorted().toMutableList().apply {
+        removeAt(0)
+    }
 
     override suspend fun getEntriesFlow() = withContext(dispatcher) {
         val selectedIds = settingsRepo.selectedIds.value
@@ -42,8 +44,9 @@ class SelectionRepo(
         return@withContext itemsWithQuery
     }
 
-    override suspend fun setType(type: String) = withContext(dispatcher) {
-        currentType.value = type
+    override suspend fun setTypes(types: List<String>) {
+        currentTypes.value = types
+        settingsRepo.setSelectedTypes(types)
     }
 
     override suspend fun setQuery(query: String) = withContext(dispatcher) {
@@ -65,11 +68,11 @@ class SelectionRepo(
         settingsRepo.setSelectedIds(currentSelection)
     }
 
-    private suspend fun List<SatItem>.filterByType(type: String) = withContext(dispatcher) {
-        if (type == "All") return@withContext this@filterByType
-        val catnums = settingsRepo.getSatelliteTypeIds(type)
-        if (catnums.isEmpty()) return@withContext this@filterByType
-        return@withContext this@filterByType.filter { item -> item.catnum in catnums }
+    private suspend fun List<SatItem>.filterByTypes(types: List<String>) = withContext(dispatcher) {
+        if (types.isEmpty()) return@withContext this@filterByTypes
+        val catnums = settingsRepo.getSatelliteTypesIds(types)
+        if (catnums.isEmpty()) return@withContext this@filterByTypes
+        return@withContext this@filterByTypes.filter { item -> item.catnum in catnums }
     }
 
     private suspend fun List<SatItem>.filterByQuery(query: String) = withContext(dispatcher) {
