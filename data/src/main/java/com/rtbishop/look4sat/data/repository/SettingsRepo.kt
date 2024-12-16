@@ -48,6 +48,7 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
     private val keyRotatorPort = "rotatorPort"
     private val keyRotatorState = "rotatorState"
     private val keySelectedIds = "selectedIds"
+    private val keySelectedTypes = "selectedTypes"
     private val keySelectedModes = "selectedModes"
     private val keyStateOfAutoUpdate = "stateOfAutoUpdate"
     private val keyStateOfSensors = "stateOfSensors"
@@ -64,7 +65,9 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
 
     //region # Satellites selection settings
     private val _satelliteSelection = MutableStateFlow(getSelectedIds())
+    private val _typesSelection = MutableStateFlow(getSelectedTypes())
     override val selectedIds: StateFlow<List<Int>> = _satelliteSelection
+    override val selectedTypes: StateFlow<List<String>> = _typesSelection
 
     override fun setSelectedIds(ids: List<Int>) {
         val selectionString = ids.joinToString(separatorComma)
@@ -72,10 +75,22 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
         _satelliteSelection.value = ids
     }
 
+    override fun setSelectedTypes(types: List<String>) {
+        val typesString = types.joinToString(separatorComma)
+        preferences.edit { putString(keySelectedTypes, typesString) }
+        _typesSelection.value = types
+    }
+
     private fun getSelectedIds(): List<Int> {
         val selectionString = preferences.getString(keySelectedIds, null)
         if (selectionString.isNullOrEmpty()) return emptyList()
         return selectionString.split(separatorComma).map { it.toInt() }
+    }
+
+    private fun getSelectedTypes(): List<String> {
+        val typesString = preferences.getString(keySelectedTypes, null)
+        if (typesString.isNullOrEmpty()) return emptyList()
+        return typesString.split(separatorComma)
     }
     //endregion
 
@@ -171,10 +186,18 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
     private val _databaseState = MutableStateFlow(getDatabaseState())
     override val databaseState: StateFlow<DatabaseState> = _databaseState
 
-    override fun getSatelliteTypeIds(type: String): List<Int> {
-        val typesString = preferences.getString("type$type", null)
-        if (typesString.isNullOrBlank()) return emptyList()
-        return typesString.split(separatorComma).map { it.toInt() }
+    override fun getSatelliteTypesIds(types: List<String>): List<Int> {
+        val idsSet = mutableSetOf<Int>()
+        types.forEach { type ->
+            val typeString = preferences.getString("type$type", null)
+            val typeIds = if (typeString.isNullOrBlank()) {
+                emptyList()
+            } else {
+                typeString.split(separatorComma).map { it.toInt() }
+            }
+            idsSet.addAll(typeIds)
+        }
+        return idsSet.toList()
     }
 
     override fun setSatelliteTypeIds(type: String, ids: List<Int>) {

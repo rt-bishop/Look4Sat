@@ -31,13 +31,13 @@ import kotlinx.coroutines.launch
 
 class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
 
-    private val defaultType = "All"
+    private val defaultTypes = selectionRepo.getCurrentTypes()
     private val _uiState = MutableStateFlow(
         SatellitesState(
             isDialogShown = false,
             isLoading = true,
             itemsList = emptyList(),
-            currentType = defaultType,
+            currentTypes = defaultTypes,
             typesList = selectionRepo.getTypesList(),
             takeAction = ::handleAction
         )
@@ -47,7 +47,7 @@ class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel
     init {
         viewModelScope.launch {
             delay(1000)
-            selectionRepo.setType(defaultType)
+            selectionRepo.setTypes(defaultTypes)
             selectionRepo.getEntriesFlow().collect { items ->
                 _uiState.value = _uiState.value.copy(isLoading = false, itemsList = items)
             }
@@ -60,7 +60,7 @@ class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel
             is SatellitesAction.SearchFor -> searchFor(action.query)
             SatellitesAction.SelectAll -> selectAll(true)
             is SatellitesAction.SelectSingle -> selectSingle(action.id, action.isTicked)
-            is SatellitesAction.SelectType -> selectType(action.type)
+            is SatellitesAction.SelectTypes -> selectTypes(action.types)
             SatellitesAction.ToggleTypesDialog -> toggleTypesDialog()
             SatellitesAction.UnselectAll -> selectAll(false)
         }
@@ -78,9 +78,9 @@ class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel
         selectionRepo.setSelection(listOf(id), isTicked.not())
     }
 
-    private fun selectType(type: String) = viewModelScope.launch {
-        selectionRepo.setType(type)
-        _uiState.value = _uiState.value.copy(currentType = type, isDialogShown = false)
+    private fun selectTypes(types: List<String>) = viewModelScope.launch {
+        selectionRepo.setTypes(types)
+        _uiState.value = _uiState.value.copy(currentTypes = types, isDialogShown = false)
     }
 
     private fun toggleTypesDialog() {
