@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.domain.utility
 
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 fun Long.toTimerString(): String {
@@ -24,7 +25,7 @@ fun Long.toTimerString(): String {
     val hours = TimeUnit.MILLISECONDS.toHours(this)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(this) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(this) % 60
-    return String.format(format, hours, minutes, seconds)
+    return String.format(Locale.ENGLISH, format, hours, minutes, seconds)
 }
 
 fun Float.round(decimals: Int): Float {

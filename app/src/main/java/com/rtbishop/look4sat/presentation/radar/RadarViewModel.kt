@@ -17,9 +17,6 @@
  */
 package com.rtbishop.look4sat.presentation.radar
 
-import android.hardware.GeomagneticField
-import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -31,17 +28,20 @@ import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.data.framework.BluetoothReporter
 import com.rtbishop.look4sat.data.framework.NetworkReporter
 import com.rtbishop.look4sat.domain.model.SatRadio
-import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.domain.usecase.IAddToCalendar
 import com.rtbishop.look4sat.domain.utility.round
 import com.rtbishop.look4sat.domain.utility.toDegrees
+import com.rtbishop.look4sat.domain.utility.toTimerString
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -51,22 +51,61 @@ class RadarViewModel(
     private val networkReporter: NetworkReporter,
     private val satelliteRepo: ISatelliteRepo,
     private val settingsRepo: ISettingsRepo,
-    private val sensorsRepo: ISensorsRepo
+    private val sensorsRepo: ISensorsRepo,
+    private val addToCalendar: IAddToCalendar
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(
+        RadarState(
+            currentPass = null,
+            currentTime = "00:00:00",
+            isCurrentTimeAos = true,
+            orientationValues = sensorsRepo.orientation.value,
+            orbitalPos = null,
+            satTrack = emptyList(),
+            shouldShowSweep = settingsRepo.otherSettings.value.stateOfSweep,
+            shouldUseCompass = settingsRepo.otherSettings.value.stateOfSensors,
+            transmitters = emptyList(),
+            sendAction = ::handleAction,
+        )
+    )
     private val stationPos = settingsRepo.stationPosition.value
-    private val magDeclination = getMagDeclination(stationPos)
-    val stateOfLightTheme = settingsRepo.otherSettings.value.stateOfLightTheme
-    val transmitters = mutableStateOf<List<SatRadio>>(emptyList())
-    val radarData = mutableStateOf<RadarData?>(null)
-    val orientation = mutableStateOf(sensorsRepo.orientation.value)
+    private val magDeclination = sensorsRepo.getMagDeclination(stationPos)
+    val uiState: StateFlow<RadarState> = _uiState
 
     init {
         if (settingsRepo.otherSettings.value.stateOfSensors) {
             viewModelScope.launch {
                 sensorsRepo.enableSensor()
                 sensorsRepo.orientation.collect { data ->
-                    orientation.value = Pair(data.first + magDeclination, data.second)
+                    val orientationValues = Pair(data.first + magDeclination, data.second)
+                    _uiState.update { it.copy(orientationValues = orientationValues) }
+                }
+            }
+        }
+        viewModelScope.launch {
+            val catNum = savedStateHandle.get<Int>("catNum") ?: 0
+            val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
+            val passes = satelliteRepo.passes.value
+            val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
+            val currentPass = pass ?: passes.firstOrNull()
+            currentPass?.let { satPass ->
+                _uiState.update { it.copy(currentPass = satPass) }
+                val transmitters = satelliteRepo.getRadiosWithId(satPass.catNum)
+                while (isActive) {
+                    val timeNow = System.currentTimeMillis()
+                    val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
+                    if (satPass.aosTime > timeNow) {
+                        val time = satPass.aosTime.minus(timeNow).toTimerString()
+                        _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = true) }
+                    } else {
+                        val time = satPass.losTime.minus(timeNow).toTimerString()
+                        _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false) }
+                    }
+                    sendPassData(satPass, pos, satPass.orbitalObject)
+                    sendPassDataBT(pos)
+                    processRadios(transmitters, satPass.orbitalObject, timeNow)
+                    delay(1000)
                 }
             }
         }
@@ -77,56 +116,29 @@ class RadarViewModel(
         super.onCleared()
     }
 
-    fun getPass() = flow {
-        val catNum = savedStateHandle.get<Int>("catNum") ?: 0
-        val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
-        val passes = satelliteRepo.passes.value
-        val pass = passes.find { pass -> pass.catNum == catNum && pass.aosTime == aosTime }
-        val currentPass = pass ?: passes.firstOrNull()
-        currentPass?.let { satPass ->
-            emit(satPass)
-            val transmitters = satelliteRepo.getRadiosWithId(satPass.catNum)
-            viewModelScope.launch {
-                while (isActive) {
-                    val timeNow = System.currentTimeMillis()
-                    val satPos =
-                        satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
-                    sendPassData(satPass, satPos, satPass.orbitalObject)
-                    sendPassDataBT(satPos)
-                    processRadios(transmitters, satPass.orbitalObject, timeNow)
-                    delay(1000)
-                }
-            }
+    private fun handleAction(action: RadarAction) {
+        when (action) {
+            is RadarAction.AddToCalendar -> addToCalendar(action.name, action.aosTime, action.losTime)
         }
     }
 
-//    fun getUseCompass(): Boolean = settingsRepo.otherSettings.value.sensorState
-//
-//    fun getShowSweep(): Boolean = settingsRepo.otherSettings.value.sweepState
-
-    private fun getMagDeclination(geoPos: GeoPos, time: Long = System.currentTimeMillis()): Float {
-        val latitude = geoPos.latitude.toFloat()
-        val longitude = geoPos.longitude.toFloat()
-        return GeomagneticField(latitude, longitude, geoPos.altitude.toFloat(), time).declination
-    }
-
-    private fun sendPassData(orbitalPass: OrbitalPass, orbitalPos: OrbitalPos, orbitalObject: OrbitalObject) {
-        viewModelScope.launch {
-            var track: List<OrbitalPos> = emptyList()
-            if (!orbitalPass.isDeepSpace) {
-                track = satelliteRepo.getTrack(
-                    orbitalObject, stationPos, orbitalPass.aosTime, orbitalPass.losTime
-                )
-            }
-            if (settingsRepo.getRotatorState()) {
-                val server = settingsRepo.getRotatorAddress()
-                val port = settingsRepo.getRotatorPort().toInt()
-                val azimuth = orbitalPos.azimuth.toDegrees().round(2)
-                val elevation = orbitalPos.elevation.toDegrees().round(2)
-                networkReporter.reportRotation(server, port, azimuth, elevation)
-            }
-            radarData.value = RadarData(orbitalPass, orbitalPos, track)
+    private suspend fun sendPassData(orbitalPass: OrbitalPass, orbitalPos: OrbitalPos, orbitalObject: OrbitalObject) {
+        var track: List<OrbitalPos> = emptyList()
+        if (!orbitalPass.isDeepSpace) {
+            track = satelliteRepo.getTrack(
+                orbitalObject, stationPos, orbitalPass.aosTime, orbitalPass.losTime
+            )
         }
+        _uiState.update { it.copy(orbitalPos = orbitalPos, satTrack = track) }
+//        viewModelScope.launch {
+//            if (settingsRepo.getRotatorState()) {
+//                val server = settingsRepo.getRotatorAddress()
+//                val port = settingsRepo.getRotatorPort().toInt()
+//                val azimuth = orbitalPos.azimuth.toDegrees().round(2)
+//                val elevation = orbitalPos.elevation.toDegrees().round(2)
+//                networkReporter.reportRotation(server, port, azimuth, elevation)
+//            }
+//        }
     }
 
     private fun sendPassDataBT(orbitalPos: OrbitalPos) {
@@ -139,19 +151,16 @@ class RadarViewModel(
                     val elevation = orbitalPos.elevation.toDegrees().round(0).toInt()
                     bluetoothReporter.reportRotation(format, azimuth, elevation)
                 } else if (!bluetoothReporter.isConnecting()) {
-                    Log.i("BTReporter", "BTReporter: Attempting to connect...")
+//                    Log.i("BTReporter", "BTReporter: Attempting to connect...")
                     bluetoothReporter.connectBTDevice(btDevice)
                 }
             }
         }
     }
 
-    private fun processRadios(radios: List<SatRadio>, orbitalObject: OrbitalObject, time: Long) {
-        viewModelScope.launch {
-            delay(125)
-            val list = satelliteRepo.getRadios(orbitalObject, stationPos, radios, time)
-            transmitters.value = list
-        }
+    private suspend fun processRadios(radios: List<SatRadio>, orbitalObject: OrbitalObject, time: Long) {
+        val transmitters = satelliteRepo.getRadios(orbitalObject, stationPos, radios, time)
+        _uiState.update { it.copy(transmitters = transmitters) }
     }
 
     companion object {
@@ -165,7 +174,8 @@ class RadarViewModel(
                     container.provideNetworkReporter(),
                     container.satelliteRepo,
                     container.settingsRepo,
-                    container.provideSensorsRepo()
+                    container.provideSensorsRepo(),
+                    container.provideAddToCalendar()
                 )
             }
         }

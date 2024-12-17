@@ -1,9 +1,13 @@
 package com.rtbishop.look4sat.presentation.radar
 
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,57 +20,77 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatRadio
+import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.Screen
+import com.rtbishop.look4sat.presentation.components.CardIcon
+import com.rtbishop.look4sat.presentation.components.NextPassRow
+import com.rtbishop.look4sat.presentation.components.TimerBar
+import com.rtbishop.look4sat.presentation.components.TimerRow
+import com.rtbishop.look4sat.presentation.components.getDefaultPass
 
-fun NavGraphBuilder.radarDestination(radarRoute: String, radarArgs: List<NamedNavArgument>) {
-    composable(radarRoute, radarArgs) { RadarScreen() }
+fun NavGraphBuilder.radarDestination(navigateBack: () -> Unit) {
+    val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
+    val radarArgs = listOf(
+        navArgument("catNum") { defaultValue = 0 },
+        navArgument("aosTime") { defaultValue = 0L }
+    )
+    composable(radarRoute, radarArgs) {
+        val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+        RadarScreen(uiState, navigateBack)
+    }
 }
 
 @Composable
-private fun RadarScreen() {
-    val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
-    val currentPass = viewModel.getPass().collectAsState(null).value
-    val id = currentPass?.catNum ?: 99999
-    val name = currentPass?.name ?: "Satellite"
+private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
+    val addToCalendar: () -> Unit = {
+        uiState.currentPass?.let { pass ->
+            uiState.sendAction(RadarAction.AddToCalendar(pass.name, pass.aosTime, pass.losTime))
+        }
+    }
     Scaffold { innerPadding ->
+        val paddingMod = Modifier.padding(innerPadding)
         Column(
-            modifier = Modifier.padding(innerPadding),
+            modifier = paddingMod.padding(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-//        TimerBarNew(id, name, "88:88:88", R.drawable.ic_notifications) {}
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-            ) {
-                viewModel.radarData.value?.let { data ->
+            TimerRow {
+                CardIcon(onClick = navigateBack, iconId = R.drawable.ic_back)
+                TimerBar(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
+                CardIcon(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
+            }
+            NextPassRow(pass = uiState.currentPass ?: getDefaultPass())
+            ElevatedCard(modifier = Modifier.aspectRatio(1f)) {
+                uiState.orbitalPos?.let { item ->
                     RadarViewCompose(
-                        item = data.orbitalPos,
-                        items = data.satTrack,
-                        azimElev = viewModel.orientation.value
+                        item = item,
+                        items = uiState.satTrack,
+                        azimElev = uiState.orientationValues,
+                        shouldShowSweep = uiState.shouldShowSweep,
+                        shouldUseCompass = uiState.shouldUseCompass
                     )
                 }
             }
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-            ) {
-                TransmittersList(transmitters = viewModel.transmitters.value)
+            ElevatedCard(modifier = Modifier.fillMaxSize()) {
+                TransmittersList(transmitters = uiState.transmitters)
             }
         }
     }
@@ -79,6 +103,16 @@ private fun TransmittersList(transmitters: List<SatRadio>) {
             TransmitterItem(radio)
         }
     }
+}
+
+@Preview
+@Composable
+private fun TransmitterItemPreview() {
+    val transmitter = SatRadio(
+        "", "Extremely powerful transmitter", true, 10000000000L, 10000000000L,
+        null, 10000000000L, 10000000000L, "FSK AX.100 Mode 5", true, 0
+    )
+    MainTheme { TransmitterItem(transmitter) }
 }
 
 @Composable
@@ -96,53 +130,78 @@ private fun TransmitterItem(radio: SatRadio) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow),
-                        contentDescription = null, modifier = Modifier.rotate(180f)
+                        painter = painterResource(id = R.drawable.ic_back),
+                        tint = Color.Green,
+                        contentDescription = null, modifier = Modifier.rotate(-90f)
                     )
                     Text(
-                        text = radio.info,
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center
+                        text = if (radio.isInverted) "INVERTED: ${radio.info} " else "${radio.info} ",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .basicMarquee(
+                                iterations = Int.MAX_VALUE,
+                                spacing = MarqueeSpacing(0.dp)
+                            )
+                            .weight(1f)
                     )
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow),
-                        contentDescription = null
+                        painter = painterResource(id = R.drawable.ic_back),
+                        tint = Color.Red,
+                        contentDescription = null, modifier = Modifier.rotate(90f)
                     )
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.radio_downlink, radio.downlinkLow ?: 0L),
-                        textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
-                        modifier = Modifier.weight(0.5f)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.radio_uplink, radio.uplinkLow ?: 0L),
-                        textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
-                        modifier = Modifier.weight(0.5f)
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = radio.downlinkMode ?: "",
-                        fontSize = 15.sp
-                    )
-                    Text(
-                        text = radio.isInverted.toString(),
-                        fontSize = 15.sp
-                    )
-                }
+                FrequencyRow(satRadio = radio)
             }
         }
     }
+}
+
+@Composable
+private fun FrequencyRow(satRadio: SatRadio) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        ModeText(satRadio.downlinkMode)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.weight(0.35f)
+        ) {
+            FrequencyText(satRadio.downlinkHigh)
+            FrequencyText(satRadio.downlinkLow)
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.weight(0.35f)
+        ) {
+            FrequencyText(satRadio.uplinkHigh)
+            FrequencyText(satRadio.uplinkLow)
+        }
+        ModeText(satRadio.uplinkMode)
+    }
+}
+
+@Composable
+private fun RowScope.ModeText(mode: String?) {
+    Text(
+        text = mode ?: "- - : - -",
+        textAlign = TextAlign.Center,
+        fontSize = 15.sp,
+        modifier = Modifier.weight(0.15f)
+    )
+}
+
+@Composable
+private fun FrequencyText(frequency: Long?) {
+    val noLinkText = stringResource(R.string.radio_no_link)
+    val freqValue = frequency?.let { it / 1000000f }
+    val freqText = freqValue?.let { stringResource(id = R.string.radio_link_low, it) } ?: noLinkText
+    Text(
+        text = freqText,
+        textAlign = TextAlign.Center,
+        fontSize = 21.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary
+    )
 }
 
 //private val divider = 1000000f
