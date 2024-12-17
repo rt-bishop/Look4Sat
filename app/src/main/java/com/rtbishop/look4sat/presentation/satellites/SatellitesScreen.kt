@@ -178,7 +178,7 @@ private fun MiddleBar(
 private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val typesText = if (types.isEmpty()) "All" else types.joinToString(", ")
     ElevatedCard(modifier = modifier) {
-        Row(horizontalArrangement = Arrangement.Start,
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .height(48.dp)
@@ -194,9 +194,8 @@ private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifie
                 text = "Types: $typesText",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                modifier = modifier
-                    .basicMarquee(iterations = Int.MAX_VALUE, spacing = MarqueeSpacing(0.dp))
-                    .padding(start = 12.dp, end = 6.dp, bottom = 2.dp)
+                modifier = Modifier
+                    .basicMarquee(iterations = Int.MAX_VALUE, spacing = MarqueeSpacing(16.dp))
             )
         }
     }

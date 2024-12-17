@@ -80,14 +80,14 @@ fun RowScope.TimerBar(timeString: String, isTimeAos: Boolean) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxSize()
         ) {
-            Text(text = "AOS", fontSize = 16.sp, color = aosColor)
+            Text(text = "AOS", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = aosColor)
             Text(
                 text = timeString,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
-            Text(text = "LOS", fontSize = 16.sp, color = losColor)
+            Text(text = "LOS", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = losColor)
         }
     }
 }

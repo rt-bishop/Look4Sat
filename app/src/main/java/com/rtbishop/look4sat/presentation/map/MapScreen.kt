@@ -34,6 +34,11 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.presentation.Screen
+import com.rtbishop.look4sat.presentation.components.CardIcon
+import com.rtbishop.look4sat.presentation.components.NextPassRow
+import com.rtbishop.look4sat.presentation.components.TimerBar
+import com.rtbishop.look4sat.presentation.components.TimerRow
+import com.rtbishop.look4sat.presentation.components.getDefaultPass
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -78,6 +83,12 @@ private fun MapScreen() {
     val footprint = viewModel.footprint.collectAsState(initial = null)
     val positionClick = { orbitalObject: OrbitalObject -> viewModel.selectSatellite(orbitalObject) }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        TimerRow {
+            CardIcon(onClick = {}, iconId = R.drawable.ic_filter)
+            TimerBar(timeString = "88:88:88", isTimeAos = true)
+            CardIcon(onClick = {}, iconId = R.drawable.ic_satellite)
+        }
+        NextPassRow(pass = getDefaultPass())
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
             MapView(modifier = Modifier.fillMaxSize(), isLightTheme = viewModel.stateOfLightTheme) { mapView ->
                 stationPos.value?.let { setStationPosition(it, mapView) }
