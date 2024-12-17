@@ -17,15 +17,17 @@
  */
 package com.rtbishop.look4sat.data.repository
 
+import android.hardware.GeomagneticField
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.RAD2DEG
 import com.rtbishop.look4sat.domain.repository.ISensorsRepo
-import kotlin.math.round
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.round
 
 class SensorsRepo(private val sensorManager: SensorManager, private val sensor: Sensor?) :
     SensorEventListener, ISensorsRepo {
@@ -36,6 +38,12 @@ class SensorsRepo(private val sensorManager: SensorManager, private val sensor: 
     private var sensorAccuracy = SensorManager.SENSOR_STATUS_UNRELIABLE
 
     override val orientation: StateFlow<Pair<Float, Float>> = _orientation
+
+    override fun getMagDeclination(geoPos: GeoPos, time: Long): Float {
+        val latitude = geoPos.latitude.toFloat()
+        val longitude = geoPos.longitude.toFloat()
+        return GeomagneticField(latitude, longitude, geoPos.altitude.toFloat(), time).declination
+    }
 
     override fun enableSensor() {
         sensor?.let { sensorManager.registerListener(this, it, 8000) }

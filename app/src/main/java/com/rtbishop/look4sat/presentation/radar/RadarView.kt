@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.presentation.radar
 
-import android.media.AudioAttributes
 import android.media.SoundPool
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -10,8 +9,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,20 +34,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
-import androidx.core.view.HapticFeedbackConstantsCompat
-import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.predict.PI_2
 import com.rtbishop.look4sat.domain.utility.toRadians
-import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.min
-import kotlin.math.pow
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 @Composable
-fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<Float, Float>) {
+fun RadarViewCompose(
+    item: OrbitalPos,
+    items: List<OrbitalPos>,
+    azimElev: Pair<Float, Float>,
+    shouldShowSweep: Boolean,
+    shouldUseCompass: Boolean
+) {
     val context = LocalContext.current
     val view = LocalView.current
     val radarColor = MaterialTheme.colorScheme.secondary
@@ -138,8 +135,8 @@ fun RadarViewCompose(item: OrbitalPos, items: List<OrbitalPos>, azimElev: Pair<F
             trackEffect.value = createTrackEffect(trackPath.value)
             trackCreated.value = true
         }
-        rotate(-azimElev.first) {
-            drawSweep(center, sweepDegrees.floatValue, radius, trackColor)
+        rotate(if (shouldUseCompass) -azimElev.first else 0f) {
+            if (shouldShowSweep) drawSweep(center, sweepDegrees.floatValue, radius, trackColor)
             drawRadar(radius, radarColor, strokeWidth, 3)
             drawInfo(radius, trackColor, measurer, 3)
             translate(center.x, center.y) {

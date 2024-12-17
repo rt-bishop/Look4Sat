@@ -16,6 +16,7 @@ import com.rtbishop.look4sat.data.repository.SensorsRepo
 import com.rtbishop.look4sat.data.repository.SettingsRepo
 import com.rtbishop.look4sat.data.source.LocalSource
 import com.rtbishop.look4sat.data.source.RemoteSource
+import com.rtbishop.look4sat.data.usecase.AddToCalendar
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISelectionRepo
@@ -23,6 +24,7 @@ import com.rtbishop.look4sat.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.source.ILocalSource
 import com.rtbishop.look4sat.domain.source.IRemoteSource
+import com.rtbishop.look4sat.domain.usecase.IAddToCalendar
 import com.rtbishop.look4sat.domain.utility.DataParser
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +42,10 @@ class MainContainer(private val context: Context) {
     val selectionRepo = provideSelectionRepo()
     val satelliteRepo = provideSatelliteRepo()
     val databaseRepo = provideDatabaseRepo()
+
+    fun provideAddToCalendar(): IAddToCalendar {
+        return AddToCalendar(context)
+    }
 
     fun provideBluetoothReporter(): BluetoothReporter {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager

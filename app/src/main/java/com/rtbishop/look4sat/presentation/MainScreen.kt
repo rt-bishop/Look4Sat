@@ -16,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.info.infoDestination
 import com.rtbishop.look4sat.presentation.map.mapDestination
@@ -42,14 +41,9 @@ fun MainScreen() {
         val routeWithParams = "${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}"
         outerNavController.navigate(routeWithParams)
     }
-    val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
-    val radarArgs = listOf(
-        navArgument("catNum") { defaultValue = 0 },
-        navArgument("aosTime") { defaultValue = 0L }
-    )
     NavHost(navController = outerNavController, startDestination = Screen.Main.route) {
         mainDestination(navigateToRadar)
-        radarDestination(radarRoute, radarArgs)
+        radarDestination { outerNavController.navigateUp() }
     }
 }
 
