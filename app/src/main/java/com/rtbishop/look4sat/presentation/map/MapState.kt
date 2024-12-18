@@ -18,11 +18,33 @@
 package com.rtbishop.look4sat.presentation.map
 
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.domain.predict.OrbitalObject
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
+import com.rtbishop.look4sat.domain.predict.OrbitalPos
+
+data class MapState(
+    val mapData: MapData?,
+    val isLightUi: Boolean,
+    val stationPosition: GeoPos?,
+    val orbitalPass: OrbitalPass,
+    val track: List<List<GeoPos>>?,
+    val footprint: OrbitalPos?,
+    val positions: Map<OrbitalObject, GeoPos>?,
+    val sendAction: (MapAction) -> Unit
+)
+
+sealed class MapAction {
+    data object SelectPrev: MapAction()
+    data object SelectNext: MapAction()
+    data class SelectItem(val item: OrbitalObject): MapAction()
+    data class SelectDefaultItem(val catnum: Int): MapAction()
+}
 
 data class MapData(
     val catNum: Int,
     val name: String,
     val aosTime: String,
+    val isTimeAos: Boolean,
     val azimuth: Double,
     val elevation: Double,
     val range: Double,

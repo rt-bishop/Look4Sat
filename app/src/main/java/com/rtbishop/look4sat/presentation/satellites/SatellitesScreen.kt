@@ -195,6 +195,7 @@ private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifie
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
+                    .weight(1f)
                     .basicMarquee(iterations = Int.MAX_VALUE, spacing = MarqueeSpacing(16.dp))
             )
         }

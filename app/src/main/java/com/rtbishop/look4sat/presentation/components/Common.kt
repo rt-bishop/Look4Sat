@@ -209,11 +209,12 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun CardIcon(onClick: () -> Unit, iconId: Int, description: String? = null) {
+fun CardIcon(onClick: () -> Unit, iconId: Int, modifier: Modifier = Modifier) {
     val clickableModifier = Modifier.clickable { onClick() }
+    val iconRes = ImageVector.vectorResource(iconId)
     ElevatedCard(modifier = Modifier.size(48.dp)) {
         Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(imageVector = ImageVector.vectorResource(iconId), contentDescription = description)
+            Icon(imageVector = iconRes, contentDescription = null, modifier = modifier)
         }
     }
 }
