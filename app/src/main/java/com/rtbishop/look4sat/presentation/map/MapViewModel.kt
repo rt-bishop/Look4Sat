@@ -25,7 +25,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
-import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.clipLat
@@ -33,60 +32,62 @@ import com.rtbishop.look4sat.domain.utility.clipLon
 import com.rtbishop.look4sat.domain.utility.positionToQth
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.domain.utility.toTimerString
-import java.util.Date
-import kotlin.collections.set
+import com.rtbishop.look4sat.presentation.components.getDefaultPass
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.util.Date
+import kotlin.collections.set
 
-class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISettingsRepo) : ViewModel() {
+class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISettingsRepo) :
+    ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
+    private val defaultPass = getDefaultPass()
+    private val _uiState = MutableStateFlow(
+        MapState(
+            mapData = null,
+            isLightUi = settingsRepo.otherSettings.value.stateOfLightTheme,
+            stationPosition = null,
+            orbitalPass = defaultPass,
+            track = null,
+            footprint = null,
+            positions = null,
+            sendAction = ::handleAction
+        )
+    )
     private var allPasses = satelliteRepo.passes.value
     private var allSatellites = satelliteRepo.satellites.value
     private var dataUpdateJob: Job? = null
     private var dataUpdateRate = 1000L
     private var selectedOrbitalObject: OrbitalObject? = null
+    val uiState: StateFlow<MapState> = _uiState
 
-    val stateOfLightTheme = settingsRepo.otherSettings.value.stateOfLightTheme
-
-    val stationPosition = flow {
-        val osmLat = clipLat(stationPos.latitude)
-        val osmLon = clipLon(stationPos.longitude)
-        emit(GeoPos(osmLat, osmLon))
+    init {
+        selectDefaultSatellite(-1)
     }
 
-    private val _track = MutableSharedFlow<List<List<GeoPos>>>()
-    val track: SharedFlow<List<List<GeoPos>>> = _track
+    private fun handleAction(action: MapAction) {
+        when (action) {
+            MapAction.SelectPrev -> scrollSelection(true)
+            MapAction.SelectNext -> scrollSelection(false)
+            is MapAction.SelectItem -> selectSatellite(action.item)
+            is MapAction.SelectDefaultItem -> selectDefaultSatellite(action.catnum)
+        }
+    }
 
-    private val _footprint = MutableSharedFlow<OrbitalPos>()
-    val footprint: SharedFlow<OrbitalPos> = _footprint
+    private fun getStationPosition() {
+        val osmLat = clipLat(stationPos.latitude)
+        val osmLon = clipLon(stationPos.longitude)
+        _uiState.update { it.copy(stationPosition = GeoPos(osmLat, osmLon)) }
+    }
 
-    private val _mapData = MutableSharedFlow<MapData>()
-//    val mapData: SharedFlow<MapData> = _mapData
-
-    private val _positions = MutableSharedFlow<Map<OrbitalObject, GeoPos>>()
-    val positions: SharedFlow<Map<OrbitalObject, GeoPos>> = _positions
-
-//    fun scrollSelection(decrement: Boolean) {
-//        if (allSatellites.isNotEmpty()) {
-//            val index = allSatellites.indexOf(selectedSatellite)
-//            if (decrement) {
-//                if (index > 0) selectSatellite(allSatellites[index - 1])
-//                else selectSatellite(allSatellites[allSatellites.size - 1])
-//            } else {
-//                if (index < allSatellites.size - 1) selectSatellite(allSatellites[index + 1])
-//                else selectSatellite(allSatellites[0])
-//            }
-//        }
-//    }
-
-    fun selectDefaultSatellite(catnum: Int) {
+    private fun selectDefaultSatellite(catnum: Int) {
         if (allSatellites.isNotEmpty()) {
             if (catnum == -1) {
                 allPasses.find { pass -> pass.progress < 100 && !pass.isDeepSpace }
@@ -97,12 +98,26 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
         }
     }
 
-    fun selectSatellite(orbitalObject: OrbitalObject, updateFreq: Long = dataUpdateRate) {
+    private fun scrollSelection(decrement: Boolean) {
+        if (allSatellites.isNotEmpty()) {
+            val index = allSatellites.indexOf(selectedOrbitalObject)
+            if (decrement) {
+                if (index > 0) selectSatellite(allSatellites[index - 1])
+                else selectSatellite(allSatellites[allSatellites.size - 1])
+            } else {
+                if (index < allSatellites.size - 1) selectSatellite(allSatellites[index + 1])
+                else selectSatellite(allSatellites[0])
+            }
+        }
+    }
+
+    private fun selectSatellite(orbitalObject: OrbitalObject, updateFreq: Long = dataUpdateRate) {
         selectedOrbitalObject = orbitalObject
         viewModelScope.launch {
             dataUpdateJob?.cancelAndJoin()
             dataUpdateJob = launch {
                 val dateNow = Date()
+                getStationPosition()
                 getSatTrack(orbitalObject, stationPos, dateNow)
                 while (isActive) {
                     dateNow.time = System.currentTimeMillis()
@@ -141,7 +156,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
             currentTrack.add(currentPosition)
         }
         satTracks.add(currentTrack)
-        _track.emit(satTracks)
+        _uiState.update { it.copy(track = satTracks) }
     }
 
     private suspend fun getPositions(orbitalObjects: List<OrbitalObject>, pos: GeoPos, date: Date) {
@@ -152,24 +167,29 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
             val osmLon = clipLon(satPos.longitude.toDegrees())
             positions[satellite] = GeoPos(osmLat, osmLon)
         }
-        _positions.emit(positions)
+        _uiState.update { it.copy(positions = positions) }
     }
 
     private suspend fun getSatFootprint(orbitalObject: OrbitalObject, pos: GeoPos, date: Date) {
         val satPos = satelliteRepo.getPosition(orbitalObject, pos, date.time)
-        _footprint.emit(satPos)
+        _uiState.update { it.copy(footprint = satPos) }
     }
 
     private suspend fun getSatData(sat: OrbitalObject, pos: GeoPos, date: Date) {
+        var orbitalPass = defaultPass
         var aosTime = 0L.toTimerString()
+        var isTimeAos = true
         allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 100 }
             ?.let { satPass ->
+                orbitalPass = satPass
                 if (!satPass.isDeepSpace) {
                     aosTime = if (date.time < satPass.aosTime) {
                         val millisBeforeStart = satPass.aosTime.minus(date.time)
+                        isTimeAos = true
                         millisBeforeStart.toTimerString()
                     } else {
                         val millisBeforeEnd = satPass.losTime.minus(date.time)
+                        isTimeAos = false
                         millisBeforeEnd.toTimerString()
                     }
                 }
@@ -188,6 +208,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
             sat.data.catnum,
             sat.data.name,
             aosTime,
+            isTimeAos,
             azimuth,
             elevation,
             satPos.distance,
@@ -199,7 +220,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
             phase,
             visibility
         )
-        _mapData.emit(satData)
+        _uiState.update { it.copy(mapData = satData, orbitalPass = orbitalPass) }
     }
 
     companion object {
