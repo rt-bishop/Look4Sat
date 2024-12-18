@@ -4,6 +4,7 @@ import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -38,6 +39,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatRadio
+import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
@@ -78,21 +80,79 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
                 CardIcon(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
             }
             NextPassRow(pass = uiState.currentPass ?: getDefaultPass())
-            ElevatedCard(modifier = Modifier.aspectRatio(1f)) {
-                uiState.orbitalPos?.let { item ->
-                    RadarViewCompose(
-                        item = item,
-                        items = uiState.satTrack,
-                        azimElev = uiState.orientationValues,
-                        shouldShowSweep = uiState.shouldShowSweep,
-                        shouldUseCompass = uiState.shouldUseCompass
-                    )
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.aspectRatio(1f)) {
+                uiState.orbitalPos?.let { position ->
+                    ElevatedCard {
+                        RadarViewCompose(
+                            item = position,
+                            items = uiState.satTrack,
+                            azimElev = uiState.orientationValues,
+                            shouldShowSweep = uiState.shouldShowSweep,
+                            shouldUseCompass = uiState.shouldUseCompass
+                        )
+                    }
+                    Column(
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxSize()
+                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            RadarTextTop(
+                                position.azimuth,
+                                stringResource(R.string.radar_az_text),
+                                true
+                            )
+                            RadarTextTop(
+                                position.elevation,
+                                stringResource(R.string.radar_el_text),
+                                false
+                            )
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            RadarTextBottom(
+                                position.altitude,
+                                stringResource(R.string.radar_alt_text),
+                                true
+                            )
+                            RadarTextBottom(
+                                position.distance,
+                                stringResource(R.string.radar_dist_text),
+                                false
+                            )
+                        }
+                    }
                 }
             }
             ElevatedCard(modifier = Modifier.fillMaxSize()) {
                 TransmittersList(transmitters = uiState.transmitters)
             }
         }
+    }
+}
+
+@Composable
+private fun RadarTextTop(value: Double, text: String, isLeft: Boolean) {
+    val alignment = if (isLeft) Alignment.Start else Alignment.End
+    val degValue = stringResource(R.string.radar_az_value, value.toDegrees())
+    Column(horizontalAlignment = alignment) {
+        Text(text = degValue, fontSize = 18.sp)
+        Text(text = text, fontSize = 15.sp)
+    }
+}
+
+@Composable
+private fun RadarTextBottom(value: Double, text: String, isLeft: Boolean) {
+    val alignment = if (isLeft) Alignment.Start else Alignment.End
+    val degValue = stringResource(R.string.radar_alt_value, value)
+    Column(horizontalAlignment = alignment) {
+        Text(text = text, fontSize = 15.sp)
+        Text(text = degValue, fontSize = 18.sp)
     }
 }
 
@@ -120,19 +180,19 @@ private fun TransmitterItem(radio: SatRadio) {
     Surface(color = MaterialTheme.colorScheme.background) {
         Surface(modifier = Modifier.padding(bottom = 2.dp)) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(6.dp)
+                    .padding(horizontal = 6.dp, vertical = 8.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_back),
+                        painter = painterResource(id = R.drawable.ic_arrow),
                         tint = Color.Green,
-                        contentDescription = null, modifier = Modifier.rotate(-90f)
+                        contentDescription = null, modifier = Modifier.rotate(90f).weight(0.15f)
                     )
                     Text(
                         text = if (radio.isInverted) "INVERTED: ${radio.info} " else "${radio.info} ",
@@ -140,14 +200,14 @@ private fun TransmitterItem(radio: SatRadio) {
                         modifier = Modifier
                             .basicMarquee(
                                 iterations = Int.MAX_VALUE,
-                                spacing = MarqueeSpacing(0.dp)
+                                spacing = MarqueeSpacing(16.dp)
                             )
-                            .weight(1f)
+                            .weight(0.7f)
                     )
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_back),
+                        painter = painterResource(id = R.drawable.ic_arrow),
                         tint = Color.Red,
-                        contentDescription = null, modifier = Modifier.rotate(90f)
+                        contentDescription = null, modifier = Modifier.rotate(-90f).weight(0.15f)
                     )
                 }
                 FrequencyRow(satRadio = radio)
@@ -185,7 +245,6 @@ private fun RowScope.ModeText(mode: String?) {
     Text(
         text = mode ?: "- - : - -",
         textAlign = TextAlign.Center,
-        fontSize = 15.sp,
         modifier = Modifier.weight(0.15f)
     )
 }
@@ -203,53 +262,3 @@ private fun FrequencyText(frequency: Long?) {
         color = MaterialTheme.colorScheme.primary
     )
 }
-
-//private val divider = 1000000f
-//radioDownlink.text = String.format(Locale.ENGLISH, link, downlink / divider)
-//radioUplink.text = String.format(Locale.ENGLISH, link, uplink / divider)
-
-//private fun setupObservers() {
-//    viewModel.getPass(45000, System.currentTimeMillis()).observe(viewLifecycleOwner) { pass ->
-//        binding?.run {
-//            radarView = RadarView(requireContext()).apply {
-//                setShowAim(viewModel.getUseCompass())
-//                setScanning(viewModel.getShowSweep())
-//            }
-//            viewModel.radarData.observe(viewLifecycleOwner) { passData ->
-//                setPassText(pass, passData.satPos)
-//            }
-//        }
-//    }
-//}
-//
-//private fun setPassText(satPass: SatPass, satPos: SatPos) {
-//    binding?.run {
-//        val timeNow = System.currentTimeMillis()
-//        val radarAzim = getString(R.string.radar_az_value)
-//        val radarElev = getString(R.string.radar_el_value)
-//        val radarAlt = getString(R.string.radar_alt_value)
-//        val radarDist = getString(R.string.radar_dist_value)
-//        radarAzValue.text = String.format(radarAzim, satPos.azimuth.toDegrees())
-//        radarElValue.text = String.format(radarElev, satPos.elevation.toDegrees())
-//        radarAltValue.text = String.format(radarAlt, satPos.altitude)
-//        radarDstValue.text = String.format(radarDist, satPos.distance)
-//        if (satPos.eclipsed) {
-//            radarVisibility.text = getText(R.string.radar_eclipsed)
-//        } else {
-//            radarVisibility.text = getText(R.string.radar_visible)
-//        }
-//        if (!satPass.isDeepSpace) {
-//            if (timeNow < satPass.aosTime) {
-//                val millisBeforeStart = satPass.aosTime.minus(timeNow)
-//                radarTimer.text = millisBeforeStart.toTimerString()
-//            } else {
-//                val millisBeforeEnd = satPass.losTime.minus(timeNow)
-//                radarTimer.text = millisBeforeEnd.toTimerString()
-//                if (timeNow > satPass.losTime) {
-//                    radarTimer.text = 0L.toTimerString()
-////                        findNavController().navigateUp()
-//                }
-//            }
-//        } else radarTimer.text = 0L.toTimerString()
-//    }
-//}

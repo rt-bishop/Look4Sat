@@ -16,9 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -26,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -38,7 +40,6 @@ import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.TimerBar
 import com.rtbishop.look4sat.presentation.components.TimerRow
-import com.rtbishop.look4sat.presentation.components.getDefaultPass
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -70,31 +71,34 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 private val labelRect = Rect()
 
 fun NavGraphBuilder.mapDestination() {
-    composable(Screen.Map.route) { MapScreen() }
+    composable(Screen.Map.route) {
+        val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+        MapScreen(uiState)
+    }
 }
 
 @Composable
-private fun MapScreen() {
-    val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
-    viewModel.selectDefaultSatellite(-1)
-    val stationPos = viewModel.stationPosition.collectAsState(initial = null)
-    val positions = viewModel.positions.collectAsState(initial = null)
-    val satTrack = viewModel.track.collectAsState(initial = null)
-    val footprint = viewModel.footprint.collectAsState(initial = null)
-    val positionClick = { orbitalObject: OrbitalObject -> viewModel.selectSatellite(orbitalObject) }
+private fun MapScreen(uiState: State<MapState>) {
+    val onItemClick = { item: OrbitalObject -> uiState.value.sendAction(MapAction.SelectItem(item)) }
+    val selectPrev = { uiState.value.sendAction(MapAction.SelectPrev) }
+    val selectNext = { uiState.value.sendAction(MapAction.SelectNext) }
+    val rotateMod = Modifier.rotate(180f)
+    val timeString = uiState.value.mapData?.aosTime ?: "00:00:00"
+    val isTimeAos = uiState.value.mapData?.isTimeAos ?: true
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         TimerRow {
-            CardIcon(onClick = {}, iconId = R.drawable.ic_filter)
-            TimerBar(timeString = "88:88:88", isTimeAos = true)
-            CardIcon(onClick = {}, iconId = R.drawable.ic_satellite)
+            CardIcon(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
+            TimerBar(timeString = timeString, isTimeAos = isTimeAos)
+            CardIcon(onClick = selectNext, iconId = R.drawable.ic_arrow)
         }
-        NextPassRow(pass = getDefaultPass())
+        NextPassRow(pass = uiState.value.orbitalPass)
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
-            MapView(modifier = Modifier.fillMaxSize(), isLightTheme = viewModel.stateOfLightTheme) { mapView ->
-                stationPos.value?.let { setStationPosition(it, mapView) }
-                positions.value?.let { setPositions(it, mapView, positionClick) }
-                satTrack.value?.let { setSatelliteTrack(it, mapView) }
-                footprint.value?.let { setFootprint(it, mapView) }
+            MapView(modifier = Modifier.fillMaxSize(), isLightUi = uiState.value.isLightUi) { mapView ->
+                uiState.value.stationPosition?.let { setStationPosition(it, mapView) }
+                uiState.value.positions?.let { setPositions(it, mapView, onItemClick) }
+                uiState.value.track?.let { setSatelliteTrack(it, mapView) }
+                uiState.value.footprint?.let { setFootprint(it, mapView) }
             }
         }
     }
@@ -218,10 +222,10 @@ private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
 @Composable
 private fun MapView(
     modifier: Modifier = Modifier,
-    isLightTheme: Boolean,
+    isLightUi: Boolean,
     update: ((map: MapView) -> Unit)? = null
 ) {
-    val mapView = rememberMapViewWithLifecycle(isLightTheme)
+    val mapView = rememberMapViewWithLifecycle(isLightUi)
     AndroidView({ mapView }, modifier) { update?.invoke(it) }
 }
 
