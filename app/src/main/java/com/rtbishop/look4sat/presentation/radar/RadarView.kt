@@ -53,7 +53,7 @@ fun RadarViewCompose(
     val radarColor = MaterialTheme.colorScheme.secondary
     val trackColor = MaterialTheme.colorScheme.primary
     val aimColor = MaterialTheme.colorScheme.error
-    val strokeWidth = 4f
+    val strokeWidth = 6f
     val animTransition = rememberInfiniteTransition(label = "animScale")
     val animSpec = infiniteRepeatable<Float>(tween(1000))
     val animScale = animTransition.animateFloat(16f, 64f, animSpec, label = "animScale")
@@ -167,7 +167,7 @@ private fun DrawScope.drawInfo(radius: Float, color: Color, measurer: TextMeasur
 }
 
 private fun DrawScope.drawTrack(path: Path, effect: PathEffect, color: Color, effectColor: Color) {
-    drawPath(path, color, style = Stroke(4f))
+    drawPath(path, color, style = Stroke(6f))
     drawPath(path, effectColor, style = Stroke(pathEffect = effect))
 }
 
@@ -213,7 +213,7 @@ private fun createTrackPath(positions: List<OrbitalPos>, radius: Float): Path {
 
 private fun createTrackEffect(trackPath: Path): PathEffect {
     val shape = Path()
-    val shapeRadius = 16f
+    val shapeRadius = 24f
     val angle = 120.0.toRadians()
     shape.moveTo((shapeRadius * cos(angle)).toFloat(), (shapeRadius * sin(angle)).toFloat())
     for (i in 1 until 3) {

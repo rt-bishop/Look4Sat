@@ -1,5 +1,5 @@
 [versions]
-android-gradle-plugin = "8.7.3"
+android-gradle-plugin = "8.8.0"
 google-ksp = "2.0.21-1.0.26"
 kotlin = "2.0.21"
 
@@ -7,18 +7,18 @@ androidx-core-ktx = "1.15.0"
 androidx-core-splashscreen = "1.0.1"
 androidx-room = "2.6.1"
 
-compose-bom = "2024.11.00"
-compose-activity = "1.9.3"
+compose-bom = "2025.01.00"
+compose-activity = "1.10.0"
 compose-lifecycle = "2.8.7"
-compose-navigation = "2.8.4"
+compose-navigation = "2.8.5"
 
-other-coroutines = "1.9.0"
+other-coroutines = "1.10.1"
 other-json = "20240303"
 other-okhttp = "4.12.0"
 other-osmdroid = "6.1.20"
 
 test-junit4 = "4.13.2"
-test-mockk = "1.13.13"
+test-mockk = "1.13.14"
 
 androidTest-junit = "1.2.1"
 androidTest-espresso = "3.6.1"

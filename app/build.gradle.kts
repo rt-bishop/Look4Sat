@@ -14,11 +14,10 @@ android {
     compileSdk = 35
     defaultConfig {
         applicationId = "com.rtbishop.look4sat"
-        minSdk = 26
+        minSdk = 24
         targetSdk = 35
-        versionCode = 314
-        versionName = "3.1.4"
-        resourceConfigurations.addAll(listOf("en", "ru", "si", "zh-rCN", "anydpi"))
+        versionCode = 400
+        versionName = "4.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
