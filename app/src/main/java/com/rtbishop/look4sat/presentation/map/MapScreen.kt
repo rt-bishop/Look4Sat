@@ -10,18 +10,26 @@ import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -86,6 +94,7 @@ private fun MapScreen(uiState: State<MapState>) {
     val rotateMod = Modifier.rotate(180f)
     val timeString = uiState.value.mapData?.aosTime ?: "00:00:00"
     val isTimeAos = uiState.value.mapData?.isTimeAos ?: true
+    val osmInfo = "Wikimedia maps | Map data © OpenStreetMap contributors"
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         TimerRow {
             CardIcon(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
@@ -93,13 +102,47 @@ private fun MapScreen(uiState: State<MapState>) {
             CardIcon(onClick = selectNext, iconId = R.drawable.ic_arrow)
         }
         NextPassRow(pass = uiState.value.orbitalPass)
-        ElevatedCard(modifier = Modifier.fillMaxSize()) {
-            MapView(modifier = Modifier.fillMaxSize(), isLightUi = uiState.value.isLightUi) { mapView ->
-                uiState.value.stationPosition?.let { setStationPosition(it, mapView) }
-                uiState.value.positions?.let { setPositions(it, mapView, onItemClick) }
-                uiState.value.track?.let { setSatelliteTrack(it, mapView) }
-                uiState.value.footprint?.let { setFootprint(it, mapView) }
+        ElevatedCard(modifier = Modifier.weight(1f)) {
+            Box(contentAlignment = Alignment.BottomCenter) {
+                MapView(isLightUi = uiState.value.isLightUi) { mapView ->
+                    uiState.value.stationPosition?.let { setStationPosition(it, mapView) }
+                    uiState.value.positions?.let { setPositions(it, mapView, onItemClick) }
+                    uiState.value.track?.let { setSatelliteTrack(it, mapView) }
+                    uiState.value.footprint?.let { setFootprint(it, mapView) }
+                }
+                Text(text = osmInfo, textAlign = TextAlign.Center, fontSize = 14.sp)
             }
+        }
+        uiState.value.mapData?.let { mapData ->
+            ElevatedCard {
+                MapDataCard(mapData)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MapDataCard(mapData: MapData) {
+    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(R.string.map_period, mapData.period), color = MaterialTheme.colorScheme.primary)
+            Text(text = stringResource(R.string.map_phase, mapData.phase), color = MaterialTheme.colorScheme.primary)
+        }
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(R.string.map_azimuth, mapData.azimuth))
+            Text(text = stringResource(R.string.map_elevation, mapData.elevation))
+        }
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(R.string.map_altitude, mapData.altitude), color = MaterialTheme.colorScheme.primary)
+            Text(text = stringResource(R.string.map_distance, mapData.range), color = MaterialTheme.colorScheme.primary)
+        }
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(R.string.map_latitude, mapData.osmPos.latitude))
+            Text(text = stringResource(R.string.map_longitude, mapData.osmPos.longitude))
+        }
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(R.string.map_qth, mapData.qthLoc), color = MaterialTheme.colorScheme.primary)
+            Text(text = stringResource(R.string.map_velocity, mapData.velocity), color = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -195,30 +238,6 @@ private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
     }
 }
 
-//private fun handleMapData(mapData: MapData) {
-//    binding.apply {
-//        mapTimer.text = mapData.aosTime
-//        mapDataPeriod.text = String.format(getString(R.string.map_period, mapData.period))
-//        mapDataPhase.text = String.format(getString(R.string.map_phase), mapData.phase)
-//        mapAzimuth.text = String.format(getString(R.string.map_azimuth), mapData.azimuth)
-//        mapElevation.text = String.format(getString(R.string.map_elevation), mapData.elevation)
-//        mapDataAlt.text = String.format(getString(R.string.map_altitude), mapData.altitude)
-//        mapDataDst.text = String.format(getString(R.string.map_distance), mapData.range)
-//        mapDataLat.text =
-//            String.format(getString(R.string.map_latitude), mapData.osmPos.lat)
-//        mapDataLon.text =
-//            String.format(getString(R.string.map_longitude), mapData.osmPos.lon)
-//        mapDataQth.text = String.format(getString(R.string.map_qth), mapData.qthLoc)
-//        mapDataVel.text = String.format(getString(R.string.map_velocity), mapData.velocity)
-//        if (mapData.eclipsed) {
-//            mapDataVisibility.text = getString(R.string.map_eclipsed)
-//        } else {
-//            mapDataVisibility.text = getString(R.string.map_visible)
-//        }
-//    }
-//    binding.mapView.invalidate()
-//}
-
 @Composable
 private fun MapView(
     modifier: Modifier = Modifier,
@@ -237,9 +256,10 @@ private fun rememberMapViewWithLifecycle(isLightTheme: Boolean): MapView {
         setMultiTouchControls(true)
         setUseDataConnection(false)
         setTileSource(tileSource)
-        minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels) + 0.25
-        maxZoomLevel = 8.0
-        controller.setZoom(minZoomLevel + 1)
+        minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels)
+        maxZoomLevel = 7.0
+        controller.setCenter(GeoPoint(48.8575, 6.3514))
+        controller.setZoom(minZoomLevel + 2)
         zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
         overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT

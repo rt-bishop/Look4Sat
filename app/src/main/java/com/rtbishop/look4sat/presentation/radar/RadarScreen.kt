@@ -1,8 +1,15 @@
 package com.rtbishop.look4sat.presentation.radar
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -80,7 +88,7 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
                 CardIcon(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
             }
             NextPassRow(pass = uiState.currentPass ?: getDefaultPass())
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.aspectRatio(1f)) {
+            Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.aspectRatio(1f)) {
                 uiState.orbitalPos?.let { position ->
                     ElevatedCard {
                         RadarViewCompose(
@@ -126,6 +134,30 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
                                 false
                             )
                         }
+                    }
+                    if (uiState.orbitalPos.eclipsed) {
+                        val infiniteTransition = rememberInfiniteTransition()
+                        val textAlpha = infiniteTransition.animateFloat(
+                            initialValue = 1.0f,
+                            targetValue = 0.0f,
+                            animationSpec = infiniteRepeatable(
+                            animation = tween(
+                                durationMillis = 500,
+                                delayMillis = 25,
+                                easing = LinearEasing
+                            ),
+                            repeatMode = RepeatMode.Reverse
+                        ))
+                        Text(
+                            text = "Eclipsed!",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .alpha(textAlpha.value)
+                                .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+                                .padding(16.dp)
+                        )
                     }
                 }
             }
