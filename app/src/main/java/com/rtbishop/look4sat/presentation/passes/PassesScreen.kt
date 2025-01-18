@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -60,7 +61,7 @@ fun NavGraphBuilder.passesDestination(navigateToRadar: (Int, Long) -> Unit) {
             modelClass = PassesViewModel::class.java,
             factory = PassesViewModel.Factory
         )
-        val uiState = viewModel.uiState.value
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
         PassesScreen(uiState, navigateToRadar)
     }
 }
