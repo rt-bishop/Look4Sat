@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -43,6 +44,7 @@ import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardButton
 import com.rtbishop.look4sat.presentation.components.gotoUrl
 import com.rtbishop.look4sat.presentation.components.showToast
+import org.osmdroid.library.BuildConfig
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -88,7 +90,7 @@ private fun SettingsScreen() {
     }
 
     // Position settings
-    val positionSettings = viewModel.positionSettings.value
+    val positionSettings = viewModel.positionSettings.collectAsStateWithLifecycle().value
     val stationPos = positionSettings.stationPos
     val setGpsPos = { locationRequest.launch(arrayOf(locationPermCoarse, locationPermFine)) }
     val setGeoPos = { lat: Double, lon: Double -> viewModel.setGeoPosition(lat, lon) }
@@ -106,13 +108,13 @@ private fun SettingsScreen() {
     }
 
     // Data settings
-    val dataSettings = viewModel.dataSettings.value
+    val dataSettings = viewModel.dataSettings.collectAsStateWithLifecycle().value
     val updateFromWeb: () -> Unit = { viewModel.updateFromWeb() }
     val updateFromFile = { contentRequest.launch("*/*") }
     val clearAllData: () -> Unit = { viewModel.clearAllData() }
 
     // Other settings
-    val otherSettings = viewModel.otherSettings.value
+    val otherSettings = viewModel.otherSettings.collectAsStateWithLifecycle().value
     val toggleUtc = { value: Boolean -> viewModel.toggleUtc(value) }
     val toggleUpdate = { value: Boolean -> viewModel.toggleUpdate(value) }
     val toggleSweep = { value: Boolean -> viewModel.toggleSweep(value) }
@@ -428,13 +430,15 @@ private fun OtherCard(
                 Text(text = stringResource(id = R.string.other_switch_sensors))
                 Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.other_switch_light_theme))
-                Switch(checked = settings.stateOfLightTheme, onCheckedChange = { toggleLightTheme(it) })
+            if (BuildConfig.DEBUG) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = stringResource(id = R.string.other_switch_light_theme))
+                    Switch(checked = settings.stateOfLightTheme, onCheckedChange = { toggleLightTheme(it) })
+                }
             }
         }
     }

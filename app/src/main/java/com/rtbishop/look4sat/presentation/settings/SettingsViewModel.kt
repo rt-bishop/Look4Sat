@@ -17,8 +17,6 @@
  */
 package com.rtbishop.look4sat.presentation.settings
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -29,6 +27,9 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -36,89 +37,89 @@ class SettingsViewModel(
 ) : ViewModel() {
 
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
-    private val _positionSettings = mutableStateOf(defaultPosSettings)
-    val positionSettings: State<PositionSettings> = _positionSettings
+    private val _positionSettings = MutableStateFlow(defaultPosSettings)
+    val positionSettings: StateFlow<PositionSettings> = _positionSettings
 
     private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
-    private val _dataSettings = mutableStateOf(defaultDataSettings)
-    val dataSettings: State<DataSettings> = _dataSettings
+    private val _dataSettings = MutableStateFlow(defaultDataSettings)
+    val dataSettings: StateFlow<DataSettings> = _dataSettings
 
-    private val _otherSettings = mutableStateOf(settingsRepo.otherSettings.value)
-    val otherSettings: State<OtherSettings> = _otherSettings
+    private val _otherSettings = MutableStateFlow(settingsRepo.otherSettings.value)
+    val otherSettings: StateFlow<OtherSettings> = _otherSettings
 
     init {
         viewModelScope.launch {
             settingsRepo.stationPosition.collect { geoPos ->
-                _positionSettings.value =
-                    _positionSettings.value.copy(isUpdating = false, stationPos = geoPos)
+                _positionSettings.update { it.copy(isUpdating = false, stationPos = geoPos) }
             }
         }
         viewModelScope.launch {
             settingsRepo.databaseState.collect { state ->
-                _dataSettings.value = _dataSettings.value.copy(
-                    isUpdating = false,
-                    entriesTotal = state.numberOfSatellites,
-                    radiosTotal = state.numberOfRadios,
-                    timestamp = state.updateTimestamp
-                )
+                _dataSettings.update {
+                    it.copy(
+                        isUpdating = false,
+                        entriesTotal = state.numberOfSatellites,
+                        radiosTotal = state.numberOfRadios,
+                        timestamp = state.updateTimestamp
+                    )
+                }
             }
         }
         viewModelScope.launch {
-            settingsRepo.otherSettings.collect { _otherSettings.value = it }
+            settingsRepo.otherSettings.collect { settings -> _otherSettings.update { settings } }
         }
     }
 
     fun setGpsPosition() {
         if (settingsRepo.setStationPositionGps()) {
             val messageResId = R.string.location_success
-            _positionSettings.value =
-                _positionSettings.value.copy(isUpdating = true, messageResId = messageResId)
+            _positionSettings.update { it.copy(isUpdating = true, messageResId = messageResId) }
         } else {
             val errorResId = R.string.location_gps_error
-            _positionSettings.value = _positionSettings.value.copy(messageResId = errorResId)
+            _positionSettings.update { it.copy(messageResId = errorResId) }
         }
     }
 
     fun setGeoPosition(latitude: Double, longitude: Double) {
         if (settingsRepo.setStationPositionGeo(latitude, longitude, 0.0)) {
             val messageResId = R.string.location_success
-            _positionSettings.value = _positionSettings.value.copy(messageResId = messageResId)
+            _positionSettings.update { it.copy(messageResId = messageResId) }
         } else {
             val errorResId = R.string.location_manual_error
-            _positionSettings.value = _positionSettings.value.copy(messageResId = errorResId)
+            _positionSettings.update { it.copy(messageResId = errorResId) }
         }
     }
 
     fun setQthPosition(locator: String) {
         if (settingsRepo.setStationPositionQth(locator)) {
             val messageResId = R.string.location_success
-            _positionSettings.value = _positionSettings.value.copy(messageResId = messageResId)
+            _positionSettings.update { it.copy(messageResId = messageResId) }
         } else {
             val errorResId = R.string.location_qth_error
-            _positionSettings.value = _positionSettings.value.copy(messageResId = errorResId)
+            _positionSettings.update { it.copy(messageResId = errorResId) }
         }
     }
 
     fun dismissPosMessage() {
-        _positionSettings.value = _positionSettings.value.copy(messageResId = 0)
+        _positionSettings.update { it.copy(messageResId = 0) }
     }
 
     fun updateFromWeb() = viewModelScope.launch {
         try {
-            _dataSettings.value = _dataSettings.value.copy(isUpdating = true)
+            _dataSettings.update { it.copy(isUpdating = true) }
             databaseRepo.updateFromRemote()
         } catch (exception: Exception) {
-            _dataSettings.value = _dataSettings.value.copy(isUpdating = false)
+            _dataSettings.update { it.copy(isUpdating = false) }
             println(exception)
         }
     }
 
     fun updateFromFile(uri: String) = viewModelScope.launch {
         try {
-            _dataSettings.value = _dataSettings.value.copy(isUpdating = true)
+            _dataSettings.update { it.copy(isUpdating = true) }
             databaseRepo.updateFromFile(uri)
         } catch (exception: Exception) {
-            _dataSettings.value = _dataSettings.value.copy(isUpdating = false)
+            _dataSettings.update { it.copy(isUpdating = false) }
             println(exception)
         }
     }

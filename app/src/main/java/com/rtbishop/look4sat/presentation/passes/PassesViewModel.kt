@@ -17,8 +17,6 @@
  */
 package com.rtbishop.look4sat.presentation.passes
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -34,6 +32,9 @@ import com.rtbishop.look4sat.presentation.components.getDefaultPass
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -41,7 +42,7 @@ class PassesViewModel(
     private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
-    private val _uiState = mutableStateOf(
+    private val _uiState = MutableStateFlow(
         PassesState(
             isPassesDialogShown = false,
             isRadiosDialogShown = false,
@@ -58,7 +59,7 @@ class PassesViewModel(
         )
     )
     private var processing: Job? = null
-    val uiState: State<PassesState> = _uiState
+    val uiState: StateFlow<PassesState> = _uiState
 
     init {
         viewModelScope.launch {
@@ -69,7 +70,7 @@ class PassesViewModel(
                         val timeNow = System.currentTimeMillis()
                         val newPasses = satelliteRepo.processPasses(passes, timeNow)
                         setPassInfo(newPasses, timeNow)
-                        _uiState.value = _uiState.value.copy(isRefreshing = false, itemsList = newPasses)
+                        _uiState.update { it.copy(isRefreshing = false, itemsList = newPasses) }
                         delay(1000)
                     }
                 }
@@ -88,15 +89,15 @@ class PassesViewModel(
     }
 
     private fun applyFilter(hoursAhead: Int, minElevation: Double, modes: List<String>) = viewModelScope.launch {
-        _uiState.value = _uiState.value.copy(isRefreshing = true)
+        _uiState.update { it.copy(isRefreshing = true) }
         processing?.cancelAndJoin()
         settingsRepo.setPassesSettings(PassesSettings(hoursAhead, minElevation, modes))
-        _uiState.value = _uiState.value.copy(hours = hoursAhead, elevation = minElevation, modes = modes)
+        _uiState.update { it.copy(hours = hoursAhead, elevation = minElevation, modes = modes) }
         satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
     }
 
     private fun refreshPasses() = viewModelScope.launch {
-        _uiState.value = _uiState.value.copy(isRefreshing = true)
+        _uiState.update { it.copy(isRefreshing = true) }
         processing?.cancelAndJoin()
         val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
         satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
@@ -107,22 +108,22 @@ class PassesViewModel(
         try {
             val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
             val time = nextPass.aosTime.minus(timeNow).toTimerString()
-            _uiState.value = _uiState.value.copy(nextPass = nextPass, nextTime = time, isNextTimeAos = true)
+            _uiState.update { it.copy(nextPass = nextPass, nextTime = time, isNextTimeAos = true) }
         } catch (exception: NoSuchElementException) {
             val lastPass = passes.last()
             val time = lastPass.losTime.minus(timeNow).toTimerString()
-            _uiState.value = _uiState.value.copy(nextPass = lastPass, nextTime = time, isNextTimeAos = false)
+            _uiState.update { it.copy(nextPass = lastPass, nextTime = time, isNextTimeAos = false) }
         }
     }
 
     private fun toggleFilterDialog() {
         val currentDialogState = _uiState.value.isPassesDialogShown
-        _uiState.value = _uiState.value.copy(isPassesDialogShown = currentDialogState.not())
+        _uiState.update { it.copy(isPassesDialogShown = currentDialogState.not()) }
     }
 
     private fun toggleRadiosDialog() {
         val currentDialogState = _uiState.value.isRadiosDialogShown
-        _uiState.value = _uiState.value.copy(isRadiosDialogShown = currentDialogState.not())
+        _uiState.update { it.copy(isRadiosDialogShown = currentDialogState.not()) }
     }
 
     companion object {
