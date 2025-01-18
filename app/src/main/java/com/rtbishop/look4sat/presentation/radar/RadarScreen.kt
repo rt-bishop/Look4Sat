@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
@@ -101,7 +104,8 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
                     }
                     Column(
                         verticalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(horizontal = 6.dp, vertical = 4.dp)
                     ) {
                         Row(
@@ -135,34 +139,35 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
                             )
                         }
                     }
-                    if (uiState.orbitalPos.eclipsed) {
-                        val infiniteTransition = rememberInfiniteTransition()
-                        val textAlpha = infiniteTransition.animateFloat(
-                            initialValue = 1.0f,
-                            targetValue = 0.0f,
-                            animationSpec = infiniteRepeatable(
-                            animation = tween(
-                                durationMillis = 500,
-                                delayMillis = 25,
-                                easing = LinearEasing
-                            ),
-                            repeatMode = RepeatMode.Reverse
-                        ))
-                        Text(
-                            text = "Eclipsed!",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .alpha(textAlpha.value)
-                                .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
-                                .padding(16.dp)
-                        )
-                    }
                 }
             }
             ElevatedCard(modifier = Modifier.fillMaxSize()) {
-                TransmittersList(transmitters = uiState.transmitters)
+                if (uiState.transmitters.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_satellite),
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "This satellite doesn't have any known transcievers...",
+                            textAlign = TextAlign.Center,
+                            fontSize = 18.sp
+                        )
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        TransmittersList(transmitters = uiState.transmitters)
+                        if (uiState.orbitalPos?.eclipsed == true) {
+                            EclipsedIndicator()
+                        }
+                    }
+                }
             }
         }
     }
@@ -208,6 +213,42 @@ private fun TransmitterItemPreview() {
 }
 
 @Composable
+private fun EclipsedIndicator() {
+    val bgColor = MaterialTheme.colorScheme.primary
+    val bgShape = MaterialTheme.shapes.medium
+    val infiniteTransition = rememberInfiniteTransition()
+    val textAlpha = infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 0.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1000,
+                delayMillis = 25,
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .alpha(textAlpha.value)
+            .border(width = 2.dp, color = bgColor, shape = bgShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Eclipsed!",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier
+                .background(color = bgColor, shape = bgShape)
+                .padding(12.dp)
+        )
+    }
+}
+
+@Composable
 private fun TransmitterItem(radio: SatRadio) {
     Surface(color = MaterialTheme.colorScheme.background) {
         Surface(modifier = Modifier.padding(bottom = 2.dp)) {
@@ -224,7 +265,9 @@ private fun TransmitterItem(radio: SatRadio) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow),
                         tint = Color.Green,
-                        contentDescription = null, modifier = Modifier.rotate(90f).weight(0.15f)
+                        contentDescription = null, modifier = Modifier
+                            .rotate(90f)
+                            .weight(0.15f)
                     )
                     Text(
                         text = if (radio.isInverted) "INVERTED: ${radio.info} " else "${radio.info} ",
@@ -239,7 +282,9 @@ private fun TransmitterItem(radio: SatRadio) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow),
                         tint = Color.Red,
-                        contentDescription = null, modifier = Modifier.rotate(-90f).weight(0.15f)
+                        contentDescription = null, modifier = Modifier
+                            .rotate(-90f)
+                            .weight(0.15f)
                     )
                 }
                 FrequencyRow(satRadio = radio)

@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -82,19 +83,20 @@ fun NavGraphBuilder.mapDestination() {
     composable(Screen.Map.route) {
         val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-        MapScreen(uiState)
+        val mapView = rememberMapViewWithLifecycle()
+        MapScreen(uiState, mapView)
     }
 }
 
 @Composable
-private fun MapScreen(uiState: State<MapState>) {
+private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
     val onItemClick = { item: OrbitalObject -> uiState.value.sendAction(MapAction.SelectItem(item)) }
     val selectPrev = { uiState.value.sendAction(MapAction.SelectPrev) }
     val selectNext = { uiState.value.sendAction(MapAction.SelectNext) }
     val rotateMod = Modifier.rotate(180f)
     val timeString = uiState.value.mapData?.aosTime ?: "00:00:00"
     val isTimeAos = uiState.value.mapData?.isTimeAos ?: true
-    val osmInfo = "Wikimedia maps | Map data © OpenStreetMap contributors"
+    val osmInfo = "© OpenStreetMap contributors"
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         TimerRow {
             CardIcon(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
@@ -104,7 +106,12 @@ private fun MapScreen(uiState: State<MapState>) {
         NextPassRow(pass = uiState.value.orbitalPass)
         ElevatedCard(modifier = Modifier.weight(1f)) {
             Box(contentAlignment = Alignment.BottomCenter) {
-                MapView(isLightUi = uiState.value.isLightUi) { mapView ->
+                LaunchedEffect(uiState.value.track) {
+                    val latitude = uiState.value.track?.get(0)?.get(0)?.latitude ?: 0.0
+                    val longitude = uiState.value.track?.get(0)?.get(0)?.longitude ?: 0.0
+                    mapView.controller.animateTo(GeoPoint(latitude, longitude))
+                }
+                AndroidView({ mapView }) { mapView ->
                     uiState.value.stationPosition?.let { setStationPosition(it, mapView) }
                     uiState.value.positions?.let { setPositions(it, mapView, onItemClick) }
                     uiState.value.track?.let { setSatelliteTrack(it, mapView) }
@@ -207,7 +214,6 @@ private fun getCustomTextIcon(textLabel: String, mapView: MapView): Drawable {
 }
 
 private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
-//    val center = GeoPoint(satTrack[0][0].lat, satTrack[0][0].lon)
     val trackOverlay = FolderOverlay()
     try {
         satTrack.forEach { track ->
@@ -222,7 +228,6 @@ private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
     } catch (exception: Exception) {
         println(exception)
     }
-//    mapView.controller.animateTo(center)
 }
 
 private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
@@ -239,17 +244,7 @@ private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
 }
 
 @Composable
-private fun MapView(
-    modifier: Modifier = Modifier,
-    isLightUi: Boolean,
-    update: ((map: MapView) -> Unit)? = null
-) {
-    val mapView = rememberMapViewWithLifecycle(isLightUi)
-    AndroidView({ mapView }, modifier) { update?.invoke(it) }
-}
-
-@Composable
-private fun rememberMapViewWithLifecycle(isLightTheme: Boolean): MapView {
+private fun rememberMapViewWithLifecycle(): MapView {
     val tileSource = XYTileSource("tiles", 0, 6, 256, ".webp", emptyArray<String>())
     val context = LocalContext.current
     val mapView = remember { MapView(context) }.apply {
@@ -263,7 +258,7 @@ private fun rememberMapViewWithLifecycle(isLightTheme: Boolean): MapView {
         zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
         overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
-        overlayManager.tilesOverlay.setColorFilter(getColorFilter(isLightTheme))
+        overlayManager.tilesOverlay.setColorFilter(getColorFilter())
         setScrollableAreaLimitLatitude(maxLat, minLat, 0)
         // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
         overlays.addAll(Array(4) { FolderOverlay() })
@@ -290,13 +285,13 @@ private fun rememberMapViewLifecycleObserver(mapView: MapView) = remember(mapVie
 }
 
 @Composable
-private fun getColorFilter(isLightTheme: Boolean): ColorMatrixColorFilter {
+private fun getColorFilter(): ColorMatrixColorFilter {
     val grayScale = ColorMatrix().apply { setSaturation(0f) }
     val negative = ColorMatrix(
         floatArrayOf(-1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f)
     )
     negative.preConcat(grayScale)
-    return if (isLightTheme) ColorMatrixColorFilter(grayScale) else ColorMatrixColorFilter(negative)
+    return ColorMatrixColorFilter(negative)
 }
 
 private fun getMinZoom(screenHeight: Int): Double {
