@@ -17,6 +17,8 @@ import com.rtbishop.look4sat.data.repository.SettingsRepo
 import com.rtbishop.look4sat.data.source.LocalSource
 import com.rtbishop.look4sat.data.source.RemoteSource
 import com.rtbishop.look4sat.data.usecase.AddToCalendar
+import com.rtbishop.look4sat.data.usecase.OpenWebUrl
+import com.rtbishop.look4sat.data.usecase.ShowToast
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISelectionRepo
@@ -25,6 +27,8 @@ import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.source.ILocalSource
 import com.rtbishop.look4sat.domain.source.IRemoteSource
 import com.rtbishop.look4sat.domain.usecase.IAddToCalendar
+import com.rtbishop.look4sat.domain.usecase.IOpenWebUrl
+import com.rtbishop.look4sat.domain.usecase.IShowToast
 import com.rtbishop.look4sat.domain.utility.DataParser
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -36,15 +40,30 @@ import org.osmdroid.config.Configuration
 class MainContainer(private val context: Context) {
 
     private val localSource = provideLocalSource()
-    private val mainHandler = CoroutineExceptionHandler { _, error -> println("MainHandler: $error") }
+    private val mainHandler = CoroutineExceptionHandler { _, error ->
+        println("MainHandler: $error")
+    }
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + mainHandler)
     val settingsRepo = provideSettingsRepo()
     val selectionRepo = provideSelectionRepo()
     val satelliteRepo = provideSatelliteRepo()
     val databaseRepo = provideDatabaseRepo()
 
+    fun provideAppVersionName(): String {
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        return packageInfo.versionName ?: "4.0.0"
+    }
+
     fun provideAddToCalendar(): IAddToCalendar {
         return AddToCalendar(context)
+    }
+
+    fun provideOpenWebUrl(): IOpenWebUrl {
+        return OpenWebUrl(context)
+    }
+
+    fun provideShowToast(): IShowToast {
+        return ShowToast(context)
     }
 
     fun provideBluetoothReporter(): BluetoothReporter {
@@ -63,15 +82,15 @@ class MainContainer(private val context: Context) {
     }
 
     private fun provideDatabaseRepo(): IDatabaseRepo {
-        val dataParser = DataParser(Dispatchers.Default)
+        val dbDispatcher = Dispatchers.Default
+        val dataParser = DataParser(dbDispatcher)
         val remoteSource = provideRemoteSource()
-        return DatabaseRepo(Dispatchers.Default, dataParser, localSource, remoteSource, settingsRepo)
+        return DatabaseRepo(dbDispatcher, dataParser, localSource, remoteSource, settingsRepo)
     }
 
     private fun provideLocalSource(): ILocalSource {
-        val database = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDBv313").apply {
-            fallbackToDestructiveMigration()
-        }.build()
+        val builder = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDBv313")
+        val database = builder.apply { fallbackToDestructiveMigration() }.build()
         return LocalSource(database.look4SatDao())
     }
 
