@@ -1,6 +1,7 @@
 package com.rtbishop.look4sat.presentation.settings
 
 import android.Manifest
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -42,60 +42,62 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardButton
-import com.rtbishop.look4sat.presentation.components.gotoUrl
-import com.rtbishop.look4sat.presentation.components.showToast
 import org.osmdroid.library.BuildConfig
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private const val GITHUB_URL = "https://github.com/rt-bishop/Look4Sat/"
-private const val DONATE_URL = "https://ko-fi.com/rt_bishop"
-private const val FDROID_URL = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
-
 fun NavGraphBuilder.settingsDestination() {
-    composable(Screen.Settings.route) { SettingsScreen() }
+    composable(Screen.Settings.route) {
+        val viewModel = viewModel(
+            modelClass = SettingsViewModel::class.java,
+            factory = SettingsViewModel.Factory
+        )
+        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+        SettingsScreen(uiState)
+    }
 }
 
 @Composable
-private fun SettingsScreen() {
-    val viewModel = viewModel(SettingsViewModel::class.java, factory = SettingsViewModel.Factory)
-    val context = LocalContext.current
-
+private fun SettingsScreen(uiState: SettingsState) {
     // Permissions setup
-//    val bluetoothContract = ActivityResultContracts.RequestPermission()
-//    val bluetoothError = stringResource(R.string.BTremote_perm_error)
-//    val bluetoothPerm = when {
-//        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
-//        else -> Manifest.permission.BLUETOOTH_CONNECT
-//    }
-//    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
-//        viewModel.setBTEnabled(isGranted)
-//        if (!isGranted) showToast(context, bluetoothError)
-//    }
+    val bluetoothContract = ActivityResultContracts.RequestPermission()
+    val bluetoothError = stringResource(R.string.BTremote_perm_error)
+    val bluetoothPerm = when {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
+        else -> Manifest.permission.BLUETOOTH_CONNECT
+    }
+    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
+        uiState.sendRCAction(RCAction.SetBluetoothState(isGranted))
+        if (!isGranted) uiState.sendSystemAction(SystemAction.ShowToast(bluetoothError))
+    }
     val locationContract = ActivityResultContracts.RequestMultiplePermissions()
     val locationError = stringResource(R.string.location_gps_error)
     val locationPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
     val locationPermFine = Manifest.permission.ACCESS_FINE_LOCATION
     val locationRequest = rememberLauncherForActivityResult(locationContract) { permissions ->
         when {
-            permissions[locationPermFine] == true -> viewModel.setGpsPosition()
-            permissions[locationPermCoarse] == true -> viewModel.setGpsPosition()
-            else -> showToast(context, locationError)
+            permissions[locationPermFine] == true -> uiState.sendAction(SettingsAction.SetGpsPosition)
+            permissions[locationPermCoarse] == true -> uiState.sendAction(SettingsAction.SetGpsPosition)
+            else -> uiState.sendSystemAction(SystemAction.ShowToast(locationError))
         }
     }
     val contentContract = ActivityResultContracts.GetContent()
     val contentRequest = rememberLauncherForActivityResult(contentContract) { uri ->
-        uri?.let { viewModel.updateFromFile(uri.toString()) }
+        uri?.let { uiState.sendAction(SettingsAction.UpdateFromFile(uri.toString())) }
     }
 
     // Position settings
-    val positionSettings = viewModel.positionSettings.collectAsStateWithLifecycle().value
+    val positionSettings = uiState.positionSettings
     val stationPos = positionSettings.stationPos
     val setGpsPos = { locationRequest.launch(arrayOf(locationPermCoarse, locationPermFine)) }
-    val setGeoPos = { lat: Double, lon: Double -> viewModel.setGeoPosition(lat, lon) }
-    val setQthPos = { locator: String -> viewModel.setQthPosition(locator) }
-    val dismissPos = { viewModel.dismissPosMessage() }
+    val setGeoPos = { lat: Double, lon: Double ->
+        uiState.sendAction(SettingsAction.SetGeoPosition(lat, lon))
+    }
+    val setQthPos = { locator: String ->
+        uiState.sendAction(SettingsAction.SetQthPosition(locator))
+    }
+    val dismissPos = { uiState.sendAction(SettingsAction.DismissPosMessages) }
     val posDialogState = rememberSaveable { mutableStateOf(false) }
     val showPosDialog = { posDialogState.value = posDialogState.value.not() }
     if (posDialogState.value) {
@@ -108,26 +110,48 @@ private fun SettingsScreen() {
     }
 
     // Data settings
-    val dataSettings = viewModel.dataSettings.collectAsStateWithLifecycle().value
-    val updateFromWeb: () -> Unit = { viewModel.updateFromWeb() }
+    val dataSettings = uiState.dataSettings
+    val updateFromWeb: () -> Unit = { uiState.sendAction(SettingsAction.UpdateFromWeb) }
     val updateFromFile = { contentRequest.launch("*/*") }
-    val clearAllData: () -> Unit = { viewModel.clearAllData() }
+    val clearAllData: () -> Unit = { uiState.sendAction(SettingsAction.ClearAllData) }
 
     // Other settings
-    val otherSettings = viewModel.otherSettings.collectAsStateWithLifecycle().value
-    val toggleUtc = { value: Boolean -> viewModel.toggleUtc(value) }
-    val toggleUpdate = { value: Boolean -> viewModel.toggleUpdate(value) }
-    val toggleSweep = { value: Boolean -> viewModel.toggleSweep(value) }
-    val toggleSensor = { value: Boolean -> viewModel.toggleSensor(value) }
-    val toggleLightTheme = { value: Boolean -> viewModel.toggleLightTheme(value)}
+    val otherSettings = uiState.otherSettings
+    val toggleUtc = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleUtc(value)) }
+    val toggleUpdate = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleUpdate(value)) }
+    val toggleSweep = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSweep(value)) }
+    val toggleSensor = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSensor(value)) }
+    val toggleLightTheme = { value: Boolean ->
+        uiState.sendAction(SettingsAction.ToggleLightTheme(value))
+    }
 
     // Screen setup
-    val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.0"
-    LazyColumn(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        item { CardAbout(versionName) }
-        item { LocationCard(positionSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos) }
+    LazyColumn(
+        modifier = Modifier.padding(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        item { CardAbout(uiState.appVersionName, uiState.sendSystemAction) }
+        item {
+            LocationCard(
+                positionSettings,
+                setGpsPos,
+                showPosDialog,
+                showLocDialog,
+                dismissPos,
+                uiState.sendSystemAction
+            )
+        }
         item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
-        item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor,toggleLightTheme) }
+        item {
+            OtherCard(
+                otherSettings,
+                toggleUtc,
+                toggleUpdate,
+                toggleSweep,
+                toggleSensor,
+                toggleLightTheme
+            )
+        }
     }
 }
 
@@ -136,9 +160,8 @@ private fun SettingsScreen() {
 private fun CardAboutPreview() = MainTheme { CardAbout(version = "4.0.0") }
 
 @Composable
-private fun CardAbout(version: String, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    ElevatedCard(modifier = modifier.fillMaxWidth()) {
+private fun CardAbout(version: String, sendUrlAction: (SystemAction) -> Unit = {}) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -167,23 +190,23 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(id = R.string.app_subtitle),
                 fontSize = 20.sp,
-                modifier = modifier.padding(top = 4.dp, bottom = 2.dp)
+                modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
             )
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = { gotoUrl(context, GITHUB_URL) },
+                    onClick = { sendUrlAction(SystemAction.OpenGitHub) },
                     text = stringResource(id = R.string.btn_github),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = { gotoUrl(context, DONATE_URL) },
+                    onClick = { sendUrlAction(SystemAction.OpenDonate) },
                     text = stringResource(id = R.string.btn_donate),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = { gotoUrl(context, FDROID_URL) },
+                    onClick = { sendUrlAction(SystemAction.OpenFDroid) },
                     text = stringResource(id = R.string.btn_fdroid),
                     modifier = Modifier.weight(1f)
                 )
@@ -197,7 +220,7 @@ private fun CardAbout(version: String, modifier: Modifier = Modifier) {
 private fun LocationCardPreview() = MainTheme {
     val stationPos = GeoPos(0.0, 0.0, 0.0, "IO91vl", 0L)
     val settings = PositionSettings(true, stationPos, 0)
-    LocationCard(settings = settings, setGpsPos = {}, showPosDialog = {}, {}) {}
+    LocationCard(settings = settings, setGpsPos = {}, showPosDialog = {}, {}, {}) {}
 }
 
 @Composable
@@ -206,7 +229,8 @@ private fun LocationCard(
     setGpsPos: () -> Unit,
     showPosDialog: () -> Unit,
     showLocDialog: () -> Unit,
-    dismissPosMessage: () -> Unit
+    dismissPosMessage: () -> Unit,
+    sendSystemAction: (SystemAction) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -263,10 +287,9 @@ private fun LocationCard(
         }
     }
     if (settings.messageResId != 0) {
-        val context = LocalContext.current
         val errorString = stringResource(id = settings.messageResId)
         LaunchedEffect(key1 = settings.messageResId) {
-            showToast(context, errorString)
+            sendSystemAction(SystemAction.ShowToast(errorString))
             dismissPosMessage()
         }
     }
@@ -383,8 +406,9 @@ private fun OtherCardPreview() = MainTheme {
         stateOfSensors = true,
         stateOfSweep = true,
         stateOfUtc = false,
-        stateOfLightTheme = false)
-    OtherCard(settings = values, {}, {}, {}, {},{})
+        stateOfLightTheme = false
+    )
+    OtherCard(settings = values, {}, {}, {}, {}, {})
 }
 
 @Composable
@@ -437,7 +461,10 @@ private fun OtherCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = stringResource(id = R.string.other_switch_light_theme))
-                    Switch(checked = settings.stateOfLightTheme, onCheckedChange = { toggleLightTheme(it) })
+                    Switch(
+                        checked = settings.stateOfLightTheme,
+                        onCheckedChange = { toggleLightTheme(it) }
+                    )
                 }
             }
         }

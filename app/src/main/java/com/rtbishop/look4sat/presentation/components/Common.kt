@@ -3,7 +3,6 @@ package com.rtbishop.look4sat.presentation.components
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
@@ -220,30 +218,10 @@ fun CardIcon(onClick: () -> Unit, iconId: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StatusIcon(iconResId: Int, isEnabled: Boolean = false, description: String? = null, onClick: (() -> Unit)? = null) {
-    val cardColors = if (isEnabled) {
-        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-    } else {
-        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    }
-    val clickableModifier = if (onClick != null) Modifier.clickable { onClick.invoke() } else Modifier
-    val iconTint = if (isEnabled) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface
-    ElevatedCard(modifier = Modifier.size(48.dp), colors = cardColors) {
-        Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(imageVector = ImageVector.vectorResource(iconResId), tint = iconTint, contentDescription = description)
-        }
-    }
-}
-
-@Composable
 fun CardLoadingIndicator() {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator(modifier = Modifier.size(80.dp))
     }
-}
-
-fun showToast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 fun gotoUrl(context: Context, url: String) {

@@ -24,134 +24,209 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.domain.usecase.IOpenWebUrl
+import com.rtbishop.look4sat.domain.usecase.IShowToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val databaseRepo: IDatabaseRepo, private val settingsRepo: ISettingsRepo
+    private val databaseRepo: IDatabaseRepo,
+    private val settingsRepo: ISettingsRepo,
+    private val openWebUrl: IOpenWebUrl,
+    private val showToast: IShowToast,
+    appVersionName: String
 ) : ViewModel() {
 
+    private val githubUrl = "https://github.com/rt-bishop/Look4Sat/"
+    private val donateUrl = "https://ko-fi.com/rt_bishop"
+    private val fdroidUrl = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
-    private val _positionSettings = MutableStateFlow(defaultPosSettings)
-    val positionSettings: StateFlow<PositionSettings> = _positionSettings
-
     private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
-    private val _dataSettings = MutableStateFlow(defaultDataSettings)
-    val dataSettings: StateFlow<DataSettings> = _dataSettings
-
-    private val _otherSettings = MutableStateFlow(settingsRepo.otherSettings.value)
-    val otherSettings: StateFlow<OtherSettings> = _otherSettings
+    private val defaultRCSettings = RCSettings(
+        rotatorState = settingsRepo.getRotatorState(),
+        rotatorAddress = settingsRepo.getRotatorAddress(),
+        rotatorPort = settingsRepo.getRotatorPort(),
+        bluetoothState = settingsRepo.getBluetoothState(),
+        bluetoothFormat = settingsRepo.getBluetoothFormat(),
+        bluetoothName = settingsRepo.getBluetoothName(),
+        bluetoothAddress = settingsRepo.getBluetoothAddress()
+    )
+    private val _uiState = MutableStateFlow(
+        SettingsState(
+            appVersionName = appVersionName,
+            positionSettings = defaultPosSettings,
+            dataSettings = defaultDataSettings,
+            otherSettings = settingsRepo.otherSettings.value,
+            rcSettings = defaultRCSettings,
+            sendAction = ::handleAction,
+            sendRCAction = ::handleAction,
+            sendSystemAction = ::handleAction
+        )
+    )
+    val uiState: StateFlow<SettingsState> = _uiState
 
     init {
         viewModelScope.launch {
             settingsRepo.stationPosition.collect { geoPos ->
-                _positionSettings.update { it.copy(isUpdating = false, stationPos = geoPos) }
+                val newPosSettings = _uiState.value.positionSettings.copy(
+                    isUpdating = false, stationPos = geoPos
+                )
+                _uiState.update { it.copy(positionSettings = newPosSettings) }
             }
         }
         viewModelScope.launch {
             settingsRepo.databaseState.collect { state ->
-                _dataSettings.update {
-                    it.copy(
-                        isUpdating = false,
-                        entriesTotal = state.numberOfSatellites,
-                        radiosTotal = state.numberOfRadios,
-                        timestamp = state.updateTimestamp
-                    )
-                }
+                val newDataSettings = _uiState.value.dataSettings.copy(
+                    isUpdating = false,
+                    entriesTotal = state.numberOfSatellites,
+                    radiosTotal = state.numberOfRadios,
+                    timestamp = state.updateTimestamp
+                )
+                _uiState.update { it.copy(dataSettings = newDataSettings) }
             }
         }
         viewModelScope.launch {
-            settingsRepo.otherSettings.collect { settings -> _otherSettings.update { settings } }
+            settingsRepo.otherSettings.collect { settings ->
+                _uiState.update { it.copy(otherSettings = settings) }
+            }
         }
     }
 
-    fun setGpsPosition() {
+    private fun handleAction(action: SettingsAction) {
+        when (action) {
+            SettingsAction.SetGpsPosition -> setGpsPosition()
+            is SettingsAction.SetGeoPosition -> setGeoPosition(action.latitude, action.longitude)
+            is SettingsAction.SetQthPosition -> setQthPosition(action.locator)
+            SettingsAction.DismissPosMessages -> dismissPosMessage()
+            SettingsAction.UpdateFromWeb -> updateFromWeb()
+            is SettingsAction.UpdateFromFile -> updateFromFile(action.uri)
+            SettingsAction.ClearAllData -> clearAllData()
+            is SettingsAction.ToggleUtc -> settingsRepo.setStateOfUtc(action.value)
+            is SettingsAction.ToggleUpdate -> settingsRepo.setStateOfAutoUpdate(action.value)
+            is SettingsAction.ToggleSweep -> settingsRepo.setStateOfSweep(action.value)
+            is SettingsAction.ToggleSensor -> settingsRepo.setStateOfSensors(action.value)
+            is SettingsAction.ToggleLightTheme -> settingsRepo.setStateOfLightTheme(action.value)
+        }
+    }
+
+    private fun handleAction(action: RCAction) {
+        when (action) {
+            is RCAction.SetRotatorState -> settingsRepo.setRotatorState(action.value)
+            is RCAction.SetRotatorAddress -> settingsRepo.setRotatorAddress(action.value)
+            is RCAction.SetRotatorPort -> settingsRepo.setRotatorPort(action.value)
+            is RCAction.SetBluetoothState -> settingsRepo.setBluetoothState(action.value)
+            is RCAction.SetBluetoothAddress -> settingsRepo.setBluetoothAddress(action.value)
+            is RCAction.SetBluetoothFormat -> settingsRepo.setBluetoothFormat(action.value)
+            is RCAction.SetBluetoothName -> settingsRepo.setBluetoothName(action.value)
+        }
+    }
+
+    private fun handleAction(action: SystemAction) {
+        when (action) {
+            SystemAction.OpenGitHub -> openWebUrl(githubUrl)
+            SystemAction.OpenDonate -> openWebUrl(donateUrl)
+            SystemAction.OpenFDroid -> openWebUrl(fdroidUrl)
+            is SystemAction.ShowToast -> showToast(action.message)
+        }
+    }
+
+    private fun setGpsPosition() {
         if (settingsRepo.setStationPositionGps()) {
             val messageResId = R.string.location_success
-            _positionSettings.update { it.copy(isUpdating = true, messageResId = messageResId) }
+            val newPosSettings = _uiState.value.positionSettings.copy(
+                isUpdating = true, messageResId = messageResId
+            )
+            _uiState.update { it.copy(positionSettings = newPosSettings) }
         } else {
             val errorResId = R.string.location_gps_error
-            _positionSettings.update { it.copy(messageResId = errorResId) }
+            val newPosSettings = _uiState.value.positionSettings.copy(
+                isUpdating = false, messageResId = errorResId
+            )
+            _uiState.update { it.copy(positionSettings = newPosSettings) }
         }
     }
 
-    fun setGeoPosition(latitude: Double, longitude: Double) {
+    private fun setGeoPosition(latitude: Double, longitude: Double) {
         if (settingsRepo.setStationPositionGeo(latitude, longitude, 0.0)) {
             val messageResId = R.string.location_success
-            _positionSettings.update { it.copy(messageResId = messageResId) }
+            val newPosSettings = _uiState.value.positionSettings.copy(
+                isUpdating = false, messageResId = messageResId
+            )
+            _uiState.update { it.copy(positionSettings = newPosSettings) }
         } else {
             val errorResId = R.string.location_manual_error
-            _positionSettings.update { it.copy(messageResId = errorResId) }
+            val newPosSettings = _uiState.value.positionSettings.copy(
+                isUpdating = false, messageResId = errorResId
+            )
+            _uiState.update { it.copy(positionSettings = newPosSettings) }
         }
     }
 
-    fun setQthPosition(locator: String) {
+    private fun setQthPosition(locator: String) {
         if (settingsRepo.setStationPositionQth(locator)) {
             val messageResId = R.string.location_success
-            _positionSettings.update { it.copy(messageResId = messageResId) }
+            val newPosSettings = _uiState.value.positionSettings.copy(
+                isUpdating = false, messageResId = messageResId
+            )
+            _uiState.update { it.copy(positionSettings = newPosSettings) }
         } else {
             val errorResId = R.string.location_qth_error
-            _positionSettings.update { it.copy(messageResId = errorResId) }
+            val newPosSettings = _uiState.value.positionSettings.copy(
+                isUpdating = false, messageResId = errorResId
+            )
+            _uiState.update { it.copy(positionSettings = newPosSettings) }
         }
     }
 
-    fun dismissPosMessage() {
-        _positionSettings.update { it.copy(messageResId = 0) }
+    private fun dismissPosMessage() {
+        val newPosSettings = _uiState.value.positionSettings.copy(
+            isUpdating = false, messageResId = 0
+        )
+        _uiState.update { it.copy(positionSettings = newPosSettings) }
     }
 
-    fun updateFromWeb() = viewModelScope.launch {
+    private fun updateFromWeb() = viewModelScope.launch {
         try {
-            _dataSettings.update { it.copy(isUpdating = true) }
+            val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = true)
+            _uiState.update { it.copy(dataSettings = newDataSettings) }
             databaseRepo.updateFromRemote()
         } catch (exception: Exception) {
-            _dataSettings.update { it.copy(isUpdating = false) }
+            val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = false)
+            _uiState.update { it.copy(dataSettings = newDataSettings) }
             println(exception)
         }
     }
 
-    fun updateFromFile(uri: String) = viewModelScope.launch {
+    private fun updateFromFile(uri: String) = viewModelScope.launch {
         try {
-            _dataSettings.update { it.copy(isUpdating = true) }
+            val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = true)
+            _uiState.update { it.copy(dataSettings = newDataSettings) }
             databaseRepo.updateFromFile(uri)
         } catch (exception: Exception) {
-            _dataSettings.update { it.copy(isUpdating = false) }
+            val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = false)
+            _uiState.update { it.copy(dataSettings = newDataSettings) }
             println(exception)
         }
     }
 
-    fun clearAllData() = viewModelScope.launch { databaseRepo.clearAllData() }
-
-    fun toggleUtc(value: Boolean) = settingsRepo.setStateOfUtc(value)
-    fun toggleUpdate(value: Boolean) = settingsRepo.setStateOfAutoUpdate(value)
-    fun toggleSweep(value: Boolean) = settingsRepo.setStateOfSweep(value)
-    fun toggleSensor(value: Boolean) = settingsRepo.setStateOfSensors(value)
-    fun toggleLightTheme(value: Boolean) = settingsRepo.setStateOfLightTheme(value)
-//    fun getRotatorEnabled(): Boolean = settings.getRotatorEnabled()
-//    fun setRotatorEnabled(value: Boolean) = settings.setRotatorEnabled(value)
-//    fun getRotatorServer(): String = settings.getRotatorServer()
-//    fun setRotatorServer(value: String) = settings.setRotatorServer(value)
-//    fun getRotatorPort(): String = settings.getRotatorPort()
-//    fun setRotatorPort(value: String) = settings.setRotatorPort(value)
-//    fun getBTEnabled(): Boolean = settings.getBTEnabled()
-//    fun setBTEnabled(value: Boolean) = settings.setBTEnabled(value)
-//    fun getBTFormat(): String = settings.getBTFormat()
-//    fun setBTFormat(value: String) = settings.setBTFormat(value)
-//    fun getBTDeviceName(): String = settings.getBTDeviceName()
-//    fun setBTDeviceName(value: String) = settings.setBTDeviceName(value)
-//    fun getBTDeviceAddr(): String = settings.getBTDeviceAddr()
-//    fun setBTDeviceAddr(value: String) = settings.setBTDeviceAddr(value)
+    private fun clearAllData() = viewModelScope.launch { databaseRepo.clearAllData() }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                SettingsViewModel(container.databaseRepo, container.settingsRepo)
+                SettingsViewModel(
+                    container.databaseRepo,
+                    container.settingsRepo,
+                    container.provideOpenWebUrl(),
+                    container.provideShowToast(),
+                    container.provideAppVersionName()
+                )
             }
         }
     }
