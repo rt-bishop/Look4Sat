@@ -105,7 +105,7 @@ class RadarViewModel(
                     sendPassData(satPass, pos, satPass.orbitalObject)
                     sendPassDataBT(pos)
                     processRadios(transmitters, satPass.orbitalObject, timeNow)
-                    delay(1000)
+                    delay(1000) //TODO: Change me maybe if smaller freq steps are better?? maybe dynamically?
                 }
             }
         }
