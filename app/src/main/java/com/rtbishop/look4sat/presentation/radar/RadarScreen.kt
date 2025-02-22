@@ -1,6 +1,5 @@
 package com.rtbishop.look4sat.presentation.radar
 
-import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -11,7 +10,6 @@ import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,13 +31,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,7 +51,6 @@ import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.utility.toDegrees
-import com.rtbishop.look4sat.framework.BluetoothCIV
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
@@ -79,7 +74,7 @@ fun NavGraphBuilder.radarDestination(navigateBack: () -> Unit) {
 
 @Composable
 private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
-    BluetoothCIV.init(LocalContext.current)
+//    BluetoothCIV.init(LocalContext.current)
 
     val addToCalendar: () -> Unit = {
         uiState.currentPass?.let { pass ->
@@ -257,19 +252,19 @@ private fun EclipsedIndicator() {
 
 @Composable
 private fun TransmitterItem(radio: SatRadio) {
-    LaunchedEffect(radio) {
-        BluetoothCIV.updateOnce(radio)
-    }
+//    LaunchedEffect(radio) {
+//        BluetoothCIV.updateOnce(radio)
+//    }
 
     Surface(color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.clickable(onClick = {
-            Log.d("BluetoothCivManager", radio.toString())
-            if(radio.uuid == BluetoothCIV.selected) BluetoothCIV.selected = "NONE" else
-            {
-                BluetoothCIV.connect(radio)
-                BluetoothCIV.updateOnce(radio)
-            }
-        })
+//        modifier = Modifier.clickable(onClick = {
+//            Log.d("BluetoothCivManager", radio.toString())
+//            if(radio.uuid == BluetoothCIV.selected) BluetoothCIV.selected = "NONE" else
+//            {
+//                BluetoothCIV.connect(radio)
+//                BluetoothCIV.updateOnce(radio)
+//            }
+//        })
         ) {
         Surface(modifier = Modifier.padding(bottom = 2.dp)) {
             Column(

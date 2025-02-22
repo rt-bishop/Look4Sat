@@ -28,6 +28,7 @@ import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.MainScreen
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         enableEdgeToEdge()
@@ -39,5 +40,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-// Check and Request BT Permission?

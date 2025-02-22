@@ -28,7 +28,7 @@ import com.rtbishop.look4sat.presentation.components.SharedDialog
 @Preview(showBackground = true)
 @Composable
 private fun MultiTypesDialogPreview() {
-    val types = listOf("All", "Amateur", "Geostationary", "Military", "Weather")
+    val types = listOf("Amateur", "Geostationary", "Military", "Weather")
     MainTheme { MultiTypesDialog(types, emptyList(), {}) {} }
 }
 

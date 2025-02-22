@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.framework
+package com.rtbishop.look4sat.data.framework
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothSocket
@@ -46,7 +46,7 @@ public object BluetoothCIV {
     private var inputStream: InputStream? = null
 
     public fun init(context: Context) {
-		bluetoothAdapter= getBluetoothAdapter(context)
+		bluetoothAdapter = getBluetoothAdapter(context)
     }
 
     private fun ensureConnected():Boolean {
@@ -100,7 +100,7 @@ public object BluetoothCIV {
     }
 
     data class RMsg(val broadcast: Boolean, val cmd: Int, val payload: ByteArray)
-    private fun receiveCommand():RMsg? {
+    private fun receiveCommand(): RMsg? {
         if (inputStream!!.read()!=0xFE) {
             return null;
         }
@@ -124,7 +124,7 @@ public object BluetoothCIV {
         return RMsg(to==0x00, cmd, buffer.toByteArray())
     }
 
-    private fun receiveSpecificCommand():RMsg? {
+    private fun receiveSpecificCommand(): RMsg? {
         while (true) {
             val msg = receiveCommand() ?: return null
             if (!msg.broadcast) {
@@ -144,7 +144,7 @@ public object BluetoothCIV {
     }
 
     data class Result(val subcmd: Int?, val data: ByteArray)
-    private fun callFunction(cmd: Int, sub: Int? = null, retsub: Boolean): Result{
+    private fun callFunction(cmd: Int, sub: Int? = null, retsub: Boolean): Result {
         if(ensureConnected()){
             sendCommand(cmd, sub)
             val res = receiveSpecificCommand();

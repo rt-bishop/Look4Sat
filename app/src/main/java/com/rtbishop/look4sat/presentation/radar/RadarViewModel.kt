@@ -95,17 +95,24 @@ class RadarViewModel(
                 while (isActive) {
                     val timeNow = System.currentTimeMillis()
                     val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
-                    if (satPass.aosTime > timeNow) {
-                        val time = satPass.aosTime.minus(timeNow).toTimerString()
-                        _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = true) }
-                    } else {
-                        val time = satPass.losTime.minus(timeNow).toTimerString()
-                        _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false) }
+                    when {
+                        satPass.isDeepSpace -> {
+                            val time = 0L.toTimerString()
+                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false) }
+                        }
+                        satPass.aosTime > timeNow -> {
+                            val time = satPass.aosTime.minus(timeNow).toTimerString()
+                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = true) }
+                        }
+                        else -> {
+                            val time = satPass.losTime.minus(timeNow).toTimerString()
+                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false) }
+                        }
                     }
                     sendPassData(satPass, pos, satPass.orbitalObject)
                     sendPassDataBT(pos)
                     processRadios(transmitters, satPass.orbitalObject, timeNow)
-                    delay(1000) //TODO: Change me maybe if smaller freq steps are better?? maybe dynamically?
+                    delay(1000)
                 }
             }
         }
