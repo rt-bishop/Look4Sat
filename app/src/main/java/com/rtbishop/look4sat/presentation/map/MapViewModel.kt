@@ -179,7 +179,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
         var orbitalPass = defaultPass
         var aosTime = 0L.toTimerString()
         var isTimeAos = true
-        allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 100 }
+        allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 1 }
             ?.let { satPass ->
                 orbitalPass = satPass
                 if (!satPass.isDeepSpace) {
