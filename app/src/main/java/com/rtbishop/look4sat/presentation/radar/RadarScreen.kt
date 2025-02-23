@@ -159,7 +159,8 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
                         Text(
                             text = "This satellite doesn't have any known transcievers...",
                             textAlign = TextAlign.Center,
-                            fontSize = 18.sp
+                            fontSize = 18.sp,
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
                 } else {

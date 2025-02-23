@@ -15,6 +15,7 @@
 
     <string name="btn_add">Add</string>
     <string name="btn_accept">Accept</string>
+    <string name="btn_understand" translatable="false">I Understand</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_back">Back</string>
     <string name="btn_modes">Modes</string>
@@ -42,6 +43,17 @@
     <string name="btn_privacy">Privacy Policy</string>
 
     <!--Dialogs-->
+
+    <string name="satellites_warning_title" translatable="false">Warning\!</string>
+    <string name="satellites_warning_message" translatable="false">
+        There are over 9000 satellites listed in this app.
+        It makes no sense to track them all at the same time.
+        \n\nAlways try to narrow down the list to only the ones
+        you\'re interested in via search and types selector.</string>
+    <string name="passes_welcome_title" translatable="false">Welcome to Look4Sat\!</string>
+    <string name="passes_welcome_message" translatable="false">
+        Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
+        \n\nPlease update the database at least weekly to get accurate predictions.</string>
 
     <string name="filter_title">Filter passes</string>
     <string name="filter_hours_hint">Hours ahead</string>

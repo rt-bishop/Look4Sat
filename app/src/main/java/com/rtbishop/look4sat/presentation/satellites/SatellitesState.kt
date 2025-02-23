@@ -5,6 +5,7 @@ import com.rtbishop.look4sat.domain.model.SatItem
 data class SatellitesState(
     val isDialogShown: Boolean,
     val isLoading: Boolean,
+    val shouldSeeWarning: Boolean,
     val itemsList: List<SatItem>,
     val currentTypes: List<String>,
     val typesList: List<String>,
@@ -12,6 +13,7 @@ data class SatellitesState(
 )
 
 sealed class SatellitesAction {
+    data object DismissWarning : SatellitesAction()
     data object SaveSelection : SatellitesAction()
     data class SearchFor(val query: String) : SatellitesAction()
     data object SelectAll : SatellitesAction()

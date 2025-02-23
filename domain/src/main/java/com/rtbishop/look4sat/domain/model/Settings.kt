@@ -17,5 +17,7 @@ data class OtherSettings(
     val stateOfSensors: Boolean,
     val stateOfSweep: Boolean,
     val stateOfUtc: Boolean,
-    val stateOfLightTheme: Boolean
+    val stateOfLightTheme: Boolean,
+    val shouldSeeWarning: Boolean,
+    val shouldSeeWelcome: Boolean
 )

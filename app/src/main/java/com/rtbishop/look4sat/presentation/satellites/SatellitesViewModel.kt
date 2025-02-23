@@ -24,18 +24,25 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.domain.repository.ISelectionRepo
+import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel() {
+class SatellitesViewModel(
+    private val selectionRepo: ISelectionRepo,
+    private val settingsRepo: ISettingsRepo
+) : ViewModel() {
 
     private val defaultTypes = selectionRepo.getCurrentTypes()
     private val _uiState = MutableStateFlow(
         SatellitesState(
             isDialogShown = false,
             isLoading = true,
+            shouldSeeWarning = settingsRepo.otherSettings.value.shouldSeeWarning,
             itemsList = emptyList(),
             currentTypes = defaultTypes,
             typesList = selectionRepo.getTypesList(),
@@ -48,14 +55,20 @@ class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel
         viewModelScope.launch {
             delay(1000)
             selectionRepo.setTypes(defaultTypes)
-            selectionRepo.getEntriesFlow().collect { items ->
-                _uiState.value = _uiState.value.copy(isLoading = false, itemsList = items)
+            selectionRepo.getEntriesFlow().collectLatest { items ->
+                _uiState.update { it.copy(isLoading = false, itemsList = items) }
+            }
+        }
+        viewModelScope.launch {
+            settingsRepo.otherSettings.collectLatest { settings ->
+                _uiState.update { it.copy(shouldSeeWarning = settings.shouldSeeWarning) }
             }
         }
     }
 
     private fun handleAction(action: SatellitesAction) {
         when (action) {
+            SatellitesAction.DismissWarning -> settingsRepo.setWarningDismissed()
             SatellitesAction.SaveSelection -> saveSelection()
             is SatellitesAction.SearchFor -> searchFor(action.query)
             SatellitesAction.SelectAll -> selectAll(true)
@@ -93,7 +106,7 @@ class SatellitesViewModel(private val selectionRepo: ISelectionRepo) : ViewModel
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as MainApplication).container
-                SatellitesViewModel(container.selectionRepo)
+                SatellitesViewModel(container.selectionRepo, container.settingsRepo)
             }
         }
     }

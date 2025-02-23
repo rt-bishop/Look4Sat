@@ -48,6 +48,7 @@ import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
+import com.rtbishop.look4sat.presentation.components.InfoDialog
 
 fun NavGraphBuilder.satellitesDestination(navigateToPasses: () -> Unit) {
     composable(Screen.Satellites.route) {
@@ -66,6 +67,14 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateToPasses: () -> U
     if (uiState.isDialogShown) {
         MultiTypesDialog(allTypes = uiState.typesList, types = uiState.currentTypes, toggleDialog) {
             uiState.takeAction(SatellitesAction.SelectTypes(it))
+        }
+    }
+    if (uiState.shouldSeeWarning) {
+        InfoDialog(
+            stringResource(R.string.satellites_warning_title),
+            stringResource(R.string.satellites_warning_message)
+        ) {
+            uiState.takeAction(SatellitesAction.DismissWarning)
         }
     }
     val unselectAll = { uiState.takeAction(SatellitesAction.UnselectAll) }

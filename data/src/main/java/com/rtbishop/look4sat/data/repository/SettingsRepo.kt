@@ -61,6 +61,8 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
     private val keyStationQth = "stationQth"
     private val keyStationTimestamp = "stationTimestamp"
     private val keyUpdateTimestamp = "updateTimestamp"
+    private val keyShouldSeeWarning = "shouldSeeWarning"
+    private val keyShouldSeeWelcome = "shouldSeeWelcome"
     private val separatorComma = ","
 
     //region # Satellites selection settings
@@ -250,14 +252,25 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
         _otherSettings.value = otherSettings.value.copy(stateOfLightTheme = value)
     }
 
-    private fun getOtherSettings(): OtherSettings {
-        val stateOfAutoUpdate = preferences.getBoolean(keyStateOfAutoUpdate, true)
-        val stateOfSensors = preferences.getBoolean(keyStateOfSensors, true)
-        val stateOfSweep = preferences.getBoolean(keyStateOfSweep, true)
-        val stateOfUtc = preferences.getBoolean(keyStateOfUtc, false)
-        val stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme,false)
-        return OtherSettings(stateOfAutoUpdate, stateOfSensors, stateOfSweep, stateOfUtc, stateOfLightTheme)
+    override fun setWarningDismissed() {
+        preferences.edit { putBoolean(keyShouldSeeWarning, false) }
+        _otherSettings.value = otherSettings.value.copy(shouldSeeWarning = false)
     }
+
+    override fun setWelcomeDismissed() {
+        preferences.edit { putBoolean(keyShouldSeeWelcome, false) }
+        _otherSettings.value = otherSettings.value.copy(shouldSeeWelcome = false)
+    }
+
+    private fun getOtherSettings(): OtherSettings = OtherSettings(
+        stateOfAutoUpdate = preferences.getBoolean(keyStateOfAutoUpdate, true),
+        stateOfSensors = preferences.getBoolean(keyStateOfSensors, true),
+        stateOfSweep = preferences.getBoolean(keyStateOfSweep, true),
+        stateOfUtc = preferences.getBoolean(keyStateOfUtc, false),
+        stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme, false),
+        shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
+        shouldSeeWelcome = preferences.getBoolean(keyShouldSeeWelcome, true)
+    )
     //endregion
 
     //region # Undefined settings
