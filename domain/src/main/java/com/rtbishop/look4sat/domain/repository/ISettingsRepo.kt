@@ -58,6 +58,8 @@ interface ISettingsRepo {
     fun setStateOfSweep(value: Boolean)
     fun setStateOfUtc(value: Boolean)
     fun setStateOfLightTheme(value: Boolean)
+    fun setWarningDismissed()
+    fun setWelcomeDismissed()
     //endregion
 
     //region # Undefined settings

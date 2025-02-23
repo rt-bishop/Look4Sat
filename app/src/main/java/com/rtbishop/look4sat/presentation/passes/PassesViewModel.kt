@@ -34,6 +34,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -55,6 +56,7 @@ class PassesViewModel(
             elevation = settingsRepo.passesSettings.value.minElevation,
             modes = settingsRepo.passesSettings.value.selectedModes,
             itemsList = emptyList(),
+            shouldSeeWelcome = settingsRepo.otherSettings.value.shouldSeeWelcome,
             takeAction = ::handleAction
         )
     )
@@ -63,7 +65,7 @@ class PassesViewModel(
 
     init {
         viewModelScope.launch {
-            satelliteRepo.passes.collect { passes ->
+            satelliteRepo.passes.collectLatest { passes ->
                 processing?.cancelAndJoin()
                 processing = viewModelScope.launch {
                     while (isActive) {
@@ -76,10 +78,16 @@ class PassesViewModel(
                 }
             }
         }
+        viewModelScope.launch {
+            settingsRepo.otherSettings.collectLatest { settings ->
+                _uiState.update { it.copy(shouldSeeWelcome = settings.shouldSeeWelcome) }
+            }
+        }
     }
 
     private fun handleAction(action: PassesAction) {
         when (action) {
+            PassesAction.DismissWelcome -> settingsRepo.setWelcomeDismissed()
             is PassesAction.FilterPasses -> applyFilter(action.hoursAhead, action.minElevation, uiState.value.modes)
             is PassesAction.FilterRadios -> applyFilter(uiState.value.hours, uiState.value.elevation, action.modes)
             PassesAction.RefreshPasses -> refreshPasses()

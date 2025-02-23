@@ -45,6 +45,7 @@ import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
+import com.rtbishop.look4sat.presentation.components.InfoDialog
 import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.TimerBar
 import com.rtbishop.look4sat.presentation.components.TimerRow
@@ -79,6 +80,14 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
     if (uiState.isRadiosDialogShown) {
         RadiosDialog(modes = uiState.modes, cancel = showRadiosDialog) { modes ->
             uiState.takeAction(PassesAction.FilterRadios(modes))
+        }
+    }
+    if (uiState.shouldSeeWelcome) {
+        InfoDialog(
+            stringResource(R.string.passes_welcome_title),
+            stringResource(R.string.passes_welcome_message)
+        ) {
+            uiState.takeAction(PassesAction.DismissWelcome)
         }
     }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

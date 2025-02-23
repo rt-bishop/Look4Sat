@@ -229,7 +229,7 @@ fun gotoUrl(context: Context, url: String) {
 }
 
 fun getDefaultPass(): OrbitalPass {
-    val orbitalData = OrbitalData("Next Satellite", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
+    val orbitalData = OrbitalData("No Future Passes", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
     val satellite = NearEarthObject(orbitalData)
     return OrbitalPass(0L, 0.0, 0L, 0.0, 0, 0.0, satellite, 0f)
 }
@@ -248,6 +248,7 @@ fun SharedDialog(
                 Text(
                     text = title,
                     fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(start = padding, top = padding, end = padding)
                 )
@@ -262,6 +263,33 @@ fun SharedDialog(
     }
 }
 
-//fun Modifier.onClick(onClick: () -> Unit): Modifier = composed {
-//    clickable(remember { MutableInteractionSource() }, null) { onClick() }
-//}
+@Composable
+fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
+    val padding = LocalSpacing.current.extraLarge
+    Dialog(onDismissRequest = onDismiss) {
+        ElevatedCard {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(padding)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = padding, top = padding, end = padding)
+                )
+                Text(
+                    text = text,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = padding)
+                )
+                Row(modifier = Modifier.padding(start = padding, bottom = padding, end = padding)) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    CardButton(onClick = onDismiss, text = stringResource(id = R.string.btn_understand))
+                }
+            }
+        }
+    }
+}

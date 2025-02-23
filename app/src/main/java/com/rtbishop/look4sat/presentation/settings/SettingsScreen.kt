@@ -406,7 +406,9 @@ private fun OtherCardPreview() = MainTheme {
         stateOfSensors = true,
         stateOfSweep = true,
         stateOfUtc = false,
-        stateOfLightTheme = false
+        stateOfLightTheme = false,
+        shouldSeeWarning = false,
+        shouldSeeWelcome = false
     )
     OtherCard(settings = values, {}, {}, {}, {}, {})
 }
