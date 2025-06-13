@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -37,11 +39,14 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
+import com.rtbishop.look4sat.presentation.LocalNavAnimatedVisibilityScope
+import com.rtbishop.look4sat.presentation.MainNavBar
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.NextPassRow
@@ -80,12 +85,18 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 }
 private val labelRect = Rect()
 
-fun NavGraphBuilder.mapDestination() {
+fun NavGraphBuilder.mapDestination(navController: NavHostController) {
     composable(Screen.Map.route) {
         val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
         val mapView = rememberMapViewWithLifecycle()
-        MapScreen(uiState, mapView)
+        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this@composable) {
+            Scaffold(bottomBar = { MainNavBar(navController) }) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    MapScreen(uiState, mapView)
+                }
+            }
+        }
     }
 }
 

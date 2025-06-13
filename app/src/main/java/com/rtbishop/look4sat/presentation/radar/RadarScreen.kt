@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -51,6 +52,7 @@ import androidx.navigation.navArgument
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.utility.toDegrees
+import com.rtbishop.look4sat.presentation.LocalNavAnimatedVisibilityScope
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
@@ -68,7 +70,9 @@ fun NavGraphBuilder.radarDestination(navigateBack: () -> Unit) {
     composable(radarRoute, radarArgs) {
         val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        RadarScreen(uiState, navigateBack)
+        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this@composable) {
+            RadarScreen(uiState, navigateBack)
+        }
     }
 }
 
