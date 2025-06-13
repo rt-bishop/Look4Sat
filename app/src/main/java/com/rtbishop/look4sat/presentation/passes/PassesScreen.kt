@@ -3,6 +3,7 @@ package com.rtbishop.look4sat.presentation.passes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,12 +19,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,12 +39,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.DeepSpaceObject
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
+import com.rtbishop.look4sat.presentation.LocalNavAnimatedVisibilityScope
+import com.rtbishop.look4sat.presentation.MainNavBar
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
@@ -56,14 +62,20 @@ import java.util.Locale
 private val sdfDate = SimpleDateFormat("EEE dd MMM", Locale.ENGLISH)
 private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
-fun NavGraphBuilder.passesDestination(navigateToRadar: (Int, Long) -> Unit) {
+fun NavGraphBuilder.passesDestination(navController: NavHostController, navigateToRadar: (Int, Long) -> Unit) {
     composable(Screen.Passes.route) {
         val viewModel = viewModel(
             modelClass = PassesViewModel::class.java,
             factory = PassesViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        PassesScreen(uiState, navigateToRadar)
+        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this@composable) {
+            Scaffold(bottomBar = { MainNavBar(navController) }) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    PassesScreen(uiState, navigateToRadar)
+                }
+            }
+        }
     }
 }
 

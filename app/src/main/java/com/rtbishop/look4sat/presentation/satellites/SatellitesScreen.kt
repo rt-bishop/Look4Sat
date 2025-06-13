@@ -22,9 +22,11 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -41,23 +43,32 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
+import com.rtbishop.look4sat.presentation.LocalNavAnimatedVisibilityScope
+import com.rtbishop.look4sat.presentation.MainNavBar
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.components.InfoDialog
 
-fun NavGraphBuilder.satellitesDestination(navigateToPasses: () -> Unit) {
+fun NavGraphBuilder.satellitesDestination(navController: NavHostController, navigateToPasses: () -> Unit) {
     composable(Screen.Satellites.route) {
         val viewModel = viewModel(
             modelClass = SatellitesViewModel::class.java,
             factory = SatellitesViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        SatellitesScreen(uiState, navigateToPasses)
+        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this@composable) {
+            Scaffold(bottomBar = { MainNavBar(navController) }) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    SatellitesScreen(uiState, navigateToPasses)
+                }
+            }
+        }
     }
 }
 

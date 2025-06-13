@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +19,11 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -35,10 +38,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.presentation.LocalNavAnimatedVisibilityScope
+import com.rtbishop.look4sat.presentation.MainNavBar
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardButton
@@ -47,14 +53,20 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-fun NavGraphBuilder.settingsDestination() {
+fun NavGraphBuilder.settingsDestination(navController: NavHostController) {
     composable(Screen.Settings.route) {
         val viewModel = viewModel(
             modelClass = SettingsViewModel::class.java,
             factory = SettingsViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        SettingsScreen(uiState)
+        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this@composable) {
+            Scaffold(bottomBar = { MainNavBar(navController) }) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    SettingsScreen(uiState)
+                }
+            }
+        }
     }
 }
 
