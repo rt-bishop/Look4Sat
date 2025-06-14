@@ -50,7 +50,7 @@ class DatabaseRepo(
         val importedRadios = mutableListOf<SatRadio>()
         // fetch
         val jobsMap = Sources.satelliteDataUrls.mapValues { async { remoteSource.getNetworkStream(it.value) } }
-        val jobRadios = async { remoteSource.getNetworkStream(Sources.radioDataUrl) }
+        val jobRadios = async { remoteSource.getNetworkStream(Sources.RADIO_DATA_URL) }
         // parse
         jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
             entry.value?.let { stream ->

@@ -90,7 +90,7 @@ class MainContainer(private val context: Context) {
 
     private fun provideLocalSource(): ILocalSource {
         val builder = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDBv313")
-        val database = builder.apply { fallbackToDestructiveMigration() }.build()
+        val database = builder.apply { fallbackToDestructiveMigration(false) }.build()
         return LocalSource(database.look4SatDao())
     }
 
