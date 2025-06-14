@@ -2,7 +2,6 @@ package com.rtbishop.look4sat.presentation.components
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +45,7 @@ import com.rtbishop.look4sat.presentation.MainTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.net.toUri
 
 private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
@@ -225,7 +225,7 @@ fun CardLoadingIndicator() {
 }
 
 fun gotoUrl(context: Context, url: String) {
-    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
 }
 
 fun getDefaultPass(): OrbitalPass {

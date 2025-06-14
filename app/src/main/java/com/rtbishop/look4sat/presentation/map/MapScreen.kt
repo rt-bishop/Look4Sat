@@ -1,13 +1,11 @@
 package com.rtbishop.look4sat.presentation.map
 
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,6 +54,9 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import androidx.core.graphics.toColorInt
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
 
 private val minLat = MapView.getTileSystem().minLatitude
 private val maxLat = MapView.getTileSystem().maxLatitude
@@ -69,12 +70,12 @@ private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 private val footprintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     strokeWidth = 3f
     style = Paint.Style.FILL_AND_STROKE
-    color = Color.parseColor("#FFE082")
+    color = "#FFE082".toColorInt()
 }
 private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     textSize = 36f
     style = Paint.Style.FILL
-    color = Color.parseColor("#FFE082")
+    color = "#FFE082".toColorInt()
     setShadowLayer(3f, 3f, 3f, Color.BLACK)
 }
 private val labelRect = Rect()
@@ -205,12 +206,12 @@ private fun getCustomTextIcon(textLabel: String, mapView: MapView): Drawable {
     val iconSize = 10f
     val width = labelRect.width() + iconSize * 2f
     val height = textPaint.textSize * 3f + iconSize * 2f
-    val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(width.toInt(), height.toInt())
     Canvas(bitmap).run {
         drawCircle(width / 2f, height / 2f, iconSize, textPaint)
         drawText(textLabel, iconSize / 2f, height - iconSize, textPaint)
     }
-    return BitmapDrawable(mapView.context.resources, bitmap)
+    return bitmap.toDrawable(mapView.context.resources)
 }
 
 private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {

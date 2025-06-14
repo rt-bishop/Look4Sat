@@ -112,7 +112,7 @@ class DeepSpaceObject(data: OrbitalData) : OrbitalObject(data) {
             dsv.t = tSince
             deep.dpsec(data)
             val a = (XKE / dsv.xn).pow(TWO_THIRDS) * tempa * tempa
-            dsv.em = dsv.em - tempe
+            dsv.em -= tempe
             deep.dpper()
             val xl = dsv.xll + dsv.omgadf + dsv.xnode
             val beta = sqrt(1.0 - dsv.em * dsv.em)
@@ -606,37 +606,37 @@ class DeepSpaceObject(data: OrbitalData) : OrbitalObject(data) {
             }
             pgh = sghs + sghl
             ph = shs + sh1
-            dsv.xinc = dsv.xinc + pinc
-            dsv.em = dsv.em + pe
+            dsv.xinc += pinc
+            dsv.em += pe
             if (xqncl >= 0.2) {
                 /* Apply periodics directly */
                 ph /= dsv.sinio
                 pgh -= dsv.cosio * ph
-                dsv.omgadf = dsv.omgadf + pgh
-                dsv.xnode = dsv.xnode + ph
-                dsv.xll = dsv.xll + pl
+                dsv.omgadf += pgh
+                dsv.xnode += ph
+                dsv.xll += pl
             } else {
                 applyPeriodics()
                 // This is a patch to Lyddane modification suggested by Rob Matson
                 if (abs(xnoh - dsv.xnode) > PI) {
                     if (dsv.xnode < xnoh) dsv.xnode += TWO_PI else dsv.xnode -= TWO_PI
                 }
-                dsv.xll = dsv.xll + pl
+                dsv.xll += pl
                 dsv.omgadf = xls - dsv.xll - cos(dsv.xinc) * dsv.xnode
             }
         }
 
         // Entrance for deep space secular effects
         fun dpsec(params: OrbitalData) {
-            dsv.xll = dsv.xll + ssl * dsv.t
-            dsv.omgadf = dsv.omgadf + ssg * dsv.t
-            dsv.xnode = dsv.xnode + ssh * dsv.t
+            dsv.xll += ssl * dsv.t
+            dsv.omgadf += ssg * dsv.t
+            dsv.xnode += ssh * dsv.t
             dsv.em = params.eccn + sse * dsv.t
             dsv.xinc = params.xincl + ssi * dsv.t
             if (dsv.xinc < 0) {
                 dsv.xinc = -dsv.xinc
-                dsv.xnode = dsv.xnode + PI
-                dsv.omgadf = dsv.omgadf - PI
+                dsv.xnode += PI
+                dsv.omgadf -= PI
             }
             if (!resonance) return
             do processEpochRestartLoop() while (doLoop && epochRestart)
@@ -788,10 +788,10 @@ class DeepSpaceObject(data: OrbitalData) : OrbitalObject(data) {
                     doLoop = doLoop or epochRestart
                 }
                 if (synchronous) {
-                    xndot = del1 * sin(xli - fasx2) + del2 * sin(2.0 * (xli - fasx4))
-                    +del3 * sin(3.0 * (xli - fasx6))
-                    xnddt = del1 * cos(xli - fasx2) + 2 * del2 * cos(2.0 * (xli - fasx4))
-                    +3.0 * del3 * cos(3.0 * (xli - fasx6))
+                    xndot = del1 * sin(xli - fasx2) + del2 * sin(2.0 * (xli - fasx4)) +
+                        del3 * sin(3.0 * (xli - fasx6))
+                    xnddt = del1 * cos(xli - fasx2) + 2 * del2 * cos(2.0 * (xli - fasx4)) +
+                        3.0 * del3 * cos(3.0 * (xli - fasx6))
                 } else {
                     xomi = omegaq + dsv.omgdot * atime
                     x2omi = xomi + xomi
