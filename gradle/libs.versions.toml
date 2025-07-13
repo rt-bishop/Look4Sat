@@ -1,24 +1,24 @@
 [versions]
-android-gradle-plugin = "8.10.1"
-google-ksp = "2.1.21-2.0.2"
-kotlin = "2.1.21"
+android-gradle-plugin = "8.11.1"
+google-ksp = "2.2.0-2.0.2"
+kotlin = "2.2.0"
 
 androidx-core-ktx = "1.16.0"
 androidx-core-splashscreen = "1.0.1"
-androidx-room = "2.7.1"
+androidx-room = "2.7.2"
 
-compose-bom = "2025.06.00"
+compose-bom = "2025.06.01"
 compose-activity = "1.10.1"
 compose-lifecycle = "2.9.1"
-compose-navigation = "2.9.0"
+compose-navigation = "2.9.1"
 
 other-coroutines = "1.10.2"
 other-json = "20250517"
-other-okhttp = "4.12.0"
+other-okhttp = "5.1.0"
 other-osmdroid = "6.1.20"
 
 test-junit4 = "4.13.2"
-test-mockk = "1.14.2"
+test-mockk = "1.14.4"
 
 androidTest-junit = "1.2.1"
 androidTest-espresso = "3.6.1"

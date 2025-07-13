@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,7 +33,6 @@ import com.rtbishop.look4sat.presentation.MainNavBar
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardButton
-import com.rtbishop.look4sat.presentation.components.gotoUrl
 
 private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
 private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
@@ -63,7 +62,7 @@ private fun CardCreditsPreview() = MainTheme { CardCredits() }
 
 @Composable
 private fun CardCredits(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     ElevatedCard(modifier = modifier.fillMaxWidth()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -90,13 +89,13 @@ private fun CardCredits(modifier: Modifier = Modifier) {
             )
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 CardButton(
-                    onClick = { gotoUrl(context, LICENSE_URL) },
+                    onClick = { uriHandler.openUri(LICENSE_URL) },
                     text = stringResource(id = R.string.btn_license),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
-                    onClick = { gotoUrl(context, POLICY_URL) },
+                    onClick = { uriHandler.openUri(POLICY_URL) },
                     text = stringResource(id = R.string.btn_privacy),
                     modifier = Modifier.weight(1f)
                 )
