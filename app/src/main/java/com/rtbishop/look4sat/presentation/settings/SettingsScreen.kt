@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,18 +18,18 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,30 +42,23 @@ import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
-import com.rtbishop.look4sat.presentation.LocalNavAnimatedVisibilityScope
-import com.rtbishop.look4sat.presentation.MainNavBar
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardButton
-import org.osmdroid.library.BuildConfig
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
+private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
+
 fun NavGraphBuilder.settingsDestination(navController: NavHostController) {
-    composable(Screen.Settings.route) {
+    composable("settings") {
         val viewModel = viewModel(
             modelClass = SettingsViewModel::class.java,
             factory = SettingsViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this@composable) {
-            Scaffold(bottomBar = { MainNavBar(navController) }) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    SettingsScreen(uiState)
-                }
-            }
-        }
+        SettingsScreen(uiState)
     }
 }
 
@@ -164,6 +156,7 @@ private fun SettingsScreen(uiState: SettingsState) {
                 toggleLightTheme
             )
         }
+        item { CardCredits() }
     }
 }
 
@@ -468,18 +461,16 @@ private fun OtherCard(
                 Text(text = stringResource(id = R.string.other_switch_sensors))
                 Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
             }
-            if (BuildConfig.DEBUG) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(id = R.string.other_switch_light_theme))
-                    Switch(
-                        checked = settings.stateOfLightTheme,
-                        onCheckedChange = { toggleLightTheme(it) }
-                    )
-                }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.other_switch_light_theme))
+                Switch(
+                    checked = settings.stateOfLightTheme,
+                    onCheckedChange = { toggleLightTheme(it) }
+                )
             }
         }
     }
@@ -505,4 +496,52 @@ private fun UpdateIndicator(isUpdating: Boolean, modifier: Modifier = Modifier) 
         drawStopIndicator = {},
         modifier = modifier.padding(start = 6.dp)
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CardCreditsPreview() = MainTheme { CardCredits() }
+
+@Composable
+private fun CardCredits(modifier: Modifier = Modifier) {
+    val uriHandler = LocalUriHandler.current
+    ElevatedCard(modifier = modifier.fillMaxWidth()) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.outro_title),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = modifier.padding(6.dp)
+            )
+            Text(
+                text = stringResource(
+                    id = R.string.outro_thanks
+                ), fontSize = 16.sp, textAlign = TextAlign.Center
+            )
+            Text(
+                text = stringResource(id = R.string.outro_license),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = modifier.padding(6.dp)
+            )
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                CardButton(
+                    onClick = { uriHandler.openUri(LICENSE_URL) },
+                    text = stringResource(id = R.string.btn_license),
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                CardButton(
+                    onClick = { uriHandler.openUri(POLICY_URL) },
+                    text = stringResource(id = R.string.btn_privacy),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
 }
