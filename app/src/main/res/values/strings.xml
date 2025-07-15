@@ -89,7 +89,7 @@
     <string name="pass_satName">%s</string>
     <string name="pass_satId">Id:%05d</string>
     <string name="pass_aosAz">AOS - %.1f°</string>
-    <string name="pass_aosLos" translatable="false">%03d° -> %03d°</string>
+    <string name="pass_aosLos" translatable="false">%03d° - %03d°</string>
     <string name="pass_elevation">Elevation: %.1f°</string>
     <string name="pass_losAz">%.1f° - LOS</string>
     <string name="pass_altitude">Altitude: %d km</string>

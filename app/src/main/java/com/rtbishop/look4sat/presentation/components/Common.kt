@@ -140,12 +140,6 @@ fun NextPassRow(pass: OrbitalPass) {
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_time),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = sdfTime.format(Date(pass.aosTime)),
                         fontSize = 15.sp,
@@ -173,12 +167,6 @@ fun NextPassRow(pass: OrbitalPass) {
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_direction),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(
                             id = R.string.pass_aosLos,

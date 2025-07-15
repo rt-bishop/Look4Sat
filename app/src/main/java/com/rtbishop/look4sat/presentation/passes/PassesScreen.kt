@@ -3,7 +3,6 @@ package com.rtbishop.look4sat.presentation.passes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,14 +18,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -46,15 +43,13 @@ import com.rtbishop.look4sat.domain.predict.DeepSpaceObject
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.presentation.LocalNavAnimatedVisibilityScope
-import com.rtbishop.look4sat.presentation.MainNavBar
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.InfoDialog
 import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.TimerBar
 import com.rtbishop.look4sat.presentation.components.TimerRow
+import com.rtbishop.look4sat.presentation.radar.navigateToRadar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -62,20 +57,17 @@ import java.util.Locale
 private val sdfDate = SimpleDateFormat("EEE dd MMM", Locale.ENGLISH)
 private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
-fun NavGraphBuilder.passesDestination(navController: NavHostController, navigateToRadar: (Int, Long) -> Unit) {
-    composable(Screen.Passes.route) {
+fun NavGraphBuilder.passesDestination(navController: NavHostController) {
+    composable("passes") {
         val viewModel = viewModel(
             modelClass = PassesViewModel::class.java,
             factory = PassesViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this@composable) {
-            Scaffold(bottomBar = { MainNavBar(navController) }) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    PassesScreen(uiState, navigateToRadar)
-                }
-            }
+        val navigateToRadar = { catNum: Int, aosTime: Long ->
+            navController.navigateToRadar(catNum, aosTime)
         }
+        PassesScreen(uiState, navigateToRadar)
     }
 }
 
@@ -222,12 +214,6 @@ private fun DeepSpacePass(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "DeepSpace",
                             fontSize = 15.sp
@@ -254,12 +240,6 @@ private fun DeepSpacePass(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_direction),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(
                                 id = R.string.pass_aosLos,
@@ -339,12 +319,6 @@ private fun NearEarthPass(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_calendar),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = sdfDate.format(Date(pass.aosTime)),
                             fontSize = 15.sp
@@ -371,12 +345,6 @@ private fun NearEarthPass(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_direction),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(
                                 id = R.string.pass_aosLos,
