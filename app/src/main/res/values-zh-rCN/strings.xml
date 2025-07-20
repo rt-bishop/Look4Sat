@@ -69,7 +69,7 @@
 
     <!--Fragments-->
 
-    <string name="entries_search_hint">按名称或 ID 搜索</string>
+    <string name="entries_search_hint">Name / Id</string>
 
     <string name="passes_error">没有即将过境的卫星</string>
     <string name="passes_empty_db">没有数据可显示，请通过设置菜单更新卫星数据。</string>

@@ -41,23 +41,23 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.components.InfoDialog
 
-fun NavGraphBuilder.satellitesDestination(navController: NavHostController) {
-    composable("satellites") {
+fun NavGraphBuilder.satellitesDestination(navigateToPasses: () -> Unit) {
+    composable(Screen.Satellites.route) {
         val viewModel = viewModel(
             modelClass = SatellitesViewModel::class.java,
             factory = SatellitesViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        SatellitesScreen(uiState) { navController.navigateUp() }
+        SatellitesScreen(uiState, navigateToPasses)
     }
 }
 

@@ -37,22 +37,19 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
-private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
-
-fun NavGraphBuilder.settingsDestination(navController: NavHostController) {
-    composable("settings") {
+fun NavGraphBuilder.settingsDestination() {
+    composable(Screen.Settings.route) {
         val viewModel = viewModel(
             modelClass = SettingsViewModel::class.java,
             factory = SettingsViewModel.Factory
@@ -61,6 +58,9 @@ fun NavGraphBuilder.settingsDestination(navController: NavHostController) {
         SettingsScreen(uiState)
     }
 }
+
+private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
+private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
 
 @Composable
 private fun SettingsScreen(uiState: SettingsState) {

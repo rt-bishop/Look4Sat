@@ -69,7 +69,7 @@
 
     <!--Fragments-->
 
-    <string name="entries_search_hint">නමින් / Id මගින් සොයන්න</string>
+    <string name="entries_search_hint">Name / Id</string>
 
     <string name="passes_error">ප්‍රදර්ශනය කිරීමට ඉදිරියට එන චන්ද්‍රිකා පසුකර යෑම් නැත.</string>
     <string name="passes_empty_db">පෙන්වීමට දත්ත නැත. කරුණාකර දත්ත සමුදාය යාවත්කාලීන කරන්න.</string>

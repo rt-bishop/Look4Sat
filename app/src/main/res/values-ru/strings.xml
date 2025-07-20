@@ -69,7 +69,7 @@
 
     <!--Fragments-->
 
-    <string name="entries_search_hint">Поиск по Имени / Id</string>
+    <string name="entries_search_hint">Имя / Id</string>
 
     <string name="passes_error">Нет предстоящих пролётов спутников</string>
     <string name="passes_empty_db">Пожалуйста, обновите базу данных спутников через меню Настроек</string>

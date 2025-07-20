@@ -37,12 +37,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
+import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.components.CardIcon
 import com.rtbishop.look4sat.presentation.components.NextPassRow
 import com.rtbishop.look4sat.presentation.components.TimerBar
@@ -80,8 +80,8 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 }
 private val labelRect = Rect()
 
-fun NavGraphBuilder.mapDestination(navController: NavHostController) {
-    composable("map") {
+fun NavGraphBuilder.mapDestination() {
+    composable(Screen.Map.route) {
         val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
         val mapView = rememberMapViewWithLifecycle()
