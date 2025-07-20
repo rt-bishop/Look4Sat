@@ -81,7 +81,7 @@
 
     <!--Fragments-->
 
-    <string name="entries_search_hint">Search by Name / Id</string>
+    <string name="entries_search_hint">Name / Id</string>
 
     <string name="passes_error">There are no upcoming satellite passes to display</string>
     <string name="passes_empty_db">No data to show. Please update the database via Settings menu.</string>
