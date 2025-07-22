@@ -44,11 +44,12 @@ import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
-import com.rtbishop.look4sat.presentation.components.CardIcon
-import com.rtbishop.look4sat.presentation.components.InfoDialog
-import com.rtbishop.look4sat.presentation.components.NextPassRow
-import com.rtbishop.look4sat.presentation.components.TimerBar
-import com.rtbishop.look4sat.presentation.components.TimerRow
+import com.rtbishop.look4sat.presentation.common.IconCard
+import com.rtbishop.look4sat.presentation.common.InfoDialog
+import com.rtbishop.look4sat.presentation.common.NextPassRow
+import com.rtbishop.look4sat.presentation.common.TimerRow
+import com.rtbishop.look4sat.presentation.common.TopBar
+import com.rtbishop.look4sat.presentation.common.isVerticalLayout
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -84,19 +85,28 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
     }
     if (uiState.shouldSeeWelcome) {
         InfoDialog(
-            stringResource(R.string.passes_welcome_title),
-            stringResource(R.string.passes_welcome_message)
+            title = stringResource(R.string.passes_welcome_title),
+            text = stringResource(R.string.passes_welcome_message)
         ) {
             uiState.takeAction(PassesAction.DismissWelcome)
         }
     }
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TimerRow {
-            CardIcon(onClick = { showPassesDialog() }, iconId = R.drawable.ic_filter)
-            TimerBar(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
-            CardIcon(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
+        if (isVerticalLayout()) {
+            TopBar {
+                IconCard(onClick = { showPassesDialog() }, iconId = R.drawable.ic_filter)
+                TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
+                IconCard(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
+            }
+            NextPassRow(pass = uiState.nextPass)
+        } else {
+            TopBar {
+                IconCard(onClick = { showPassesDialog() }, iconId = R.drawable.ic_filter)
+                TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
+                NextPassRow(pass = uiState.nextPass, modifier = Modifier.weight(1f))
+                IconCard(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
+            }
         }
-        NextPassRow(pass = uiState.nextPass)
         PassesList(uiState.isRefreshing, uiState.itemsList, navigateToRadar, refreshPasses)
     }
 }

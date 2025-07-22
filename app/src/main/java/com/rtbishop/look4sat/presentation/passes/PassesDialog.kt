@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.LocalSpacing
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.components.SharedDialog
+import com.rtbishop.look4sat.presentation.common.SharedDialog
 
 private val allModes = listOf(
     "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",

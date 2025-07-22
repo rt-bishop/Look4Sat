@@ -43,7 +43,7 @@ import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
-import com.rtbishop.look4sat.presentation.components.CardButton
+import com.rtbishop.look4sat.presentation.common.CardButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

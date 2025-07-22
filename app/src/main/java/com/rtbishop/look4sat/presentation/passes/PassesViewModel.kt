@@ -28,7 +28,7 @@ import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.toTimerString
-import com.rtbishop.look4sat.presentation.components.getDefaultPass
+import com.rtbishop.look4sat.presentation.common.getDefaultPass
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay

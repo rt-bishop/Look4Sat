@@ -53,11 +53,11 @@ import com.rtbishop.look4sat.domain.model.SatRadio
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
-import com.rtbishop.look4sat.presentation.components.CardIcon
-import com.rtbishop.look4sat.presentation.components.NextPassRow
-import com.rtbishop.look4sat.presentation.components.TimerBar
-import com.rtbishop.look4sat.presentation.components.TimerRow
-import com.rtbishop.look4sat.presentation.components.getDefaultPass
+import com.rtbishop.look4sat.presentation.common.IconCard
+import com.rtbishop.look4sat.presentation.common.NextPassRow
+import com.rtbishop.look4sat.presentation.common.TimerRow
+import com.rtbishop.look4sat.presentation.common.TopBar
+import com.rtbishop.look4sat.presentation.common.getDefaultPass
 
 fun NavGraphBuilder.radarDestination(navigateBack: () -> Unit) {
     val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
@@ -87,10 +87,10 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
             modifier = paddingMod.padding(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            TimerRow {
-                CardIcon(onClick = navigateBack, iconId = R.drawable.ic_back)
-                TimerBar(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
-                CardIcon(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
+            TopBar {
+                IconCard(onClick = navigateBack, iconId = R.drawable.ic_back)
+                TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
+                IconCard(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
             }
             NextPassRow(pass = uiState.currentPass ?: getDefaultPass())
             Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.aspectRatio(1f)) {

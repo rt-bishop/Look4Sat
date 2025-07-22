@@ -17,7 +17,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.presentation.info.infoDestination
 import com.rtbishop.look4sat.presentation.map.mapDestination
 import com.rtbishop.look4sat.presentation.passes.passesDestination
 import com.rtbishop.look4sat.presentation.radar.radarDestination
@@ -31,7 +30,6 @@ sealed class Screen(var title: String, var icon: Int, var route: String) {
     data object Passes : Screen("Passes", R.drawable.ic_passes, "passes")
     data object Map : Screen("Map", R.drawable.ic_map, "map")
     data object Settings : Screen("Settings", R.drawable.ic_settings, "settings")
-    data object Info : Screen("Info", R.drawable.ic_info, "info")
 }
 
 @Composable
@@ -65,14 +63,13 @@ private fun NavBarScreen(navigateToRadar: (Int, Long) -> Unit) {
             passesDestination(navigateToRadar)
             mapDestination()
             settingsDestination()
-            infoDestination()
         }
     }
 }
 
 @Composable
 private fun MainNavBar(navController: NavController) {
-    val items = listOf(Screen.Satellites, Screen.Passes, Screen.Map, Screen.Settings, Screen.Info)
+    val items = listOf(Screen.Satellites, Screen.Passes, Screen.Map, Screen.Settings)
     val destinationRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     NavigationBar {
         items.forEach { item ->

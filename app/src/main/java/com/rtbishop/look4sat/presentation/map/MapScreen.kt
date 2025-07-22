@@ -43,10 +43,10 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.presentation.Screen
-import com.rtbishop.look4sat.presentation.components.CardIcon
-import com.rtbishop.look4sat.presentation.components.NextPassRow
-import com.rtbishop.look4sat.presentation.components.TimerBar
-import com.rtbishop.look4sat.presentation.components.TimerRow
+import com.rtbishop.look4sat.presentation.common.IconCard
+import com.rtbishop.look4sat.presentation.common.NextPassRow
+import com.rtbishop.look4sat.presentation.common.TimerRow
+import com.rtbishop.look4sat.presentation.common.TopBar
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -99,10 +99,10 @@ private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
     val isTimeAos = uiState.value.mapData?.isTimeAos ?: true
     val osmInfo = "© OpenStreetMap contributors"
     Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TimerRow {
-            CardIcon(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
-            TimerBar(timeString = timeString, isTimeAos = isTimeAos)
-            CardIcon(onClick = selectNext, iconId = R.drawable.ic_arrow)
+        TopBar {
+            IconCard(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
+            TimerRow(timeString = timeString, isTimeAos = isTimeAos)
+            IconCard(onClick = selectNext, iconId = R.drawable.ic_arrow)
         }
         NextPassRow(pass = uiState.value.orbitalPass)
         ElevatedCard(modifier = Modifier.weight(1f)) {
