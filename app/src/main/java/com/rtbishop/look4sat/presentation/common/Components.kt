@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat.presentation.components
+package com.rtbishop.look4sat.presentation.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +21,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
@@ -48,16 +50,16 @@ private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
 @Composable
 @Preview(showBackground = true)
-private fun TimerRowPreview() = MainTheme {
-    TimerRow {
-        CardIcon(onClick = {}, iconId = R.drawable.ic_filter)
-        TimerBar(timeString = "88:88:88", isTimeAos = true)
-        CardIcon(onClick = {}, iconId = R.drawable.ic_satellite)
+private fun TopBarPreview() = MainTheme {
+    TopBar {
+        IconCard(onClick = {}, iconId = R.drawable.ic_filter)
+        TimerRow(timeString = "88:88:88", isTimeAos = true)
+        IconCard(onClick = {}, iconId = R.drawable.ic_satellite)
     }
 }
 
 @Composable
-fun TimerRow(content: @Composable (RowScope.() -> Unit)) {
+fun TopBar(content: @Composable (RowScope.() -> Unit)) {
     Row(
         modifier = Modifier.height(48.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -66,9 +68,10 @@ fun TimerRow(content: @Composable (RowScope.() -> Unit)) {
 }
 
 @Composable
-fun RowScope.TimerBar(timeString: String, isTimeAos: Boolean) {
-    val aosColor = if (isTimeAos) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-    val losColor = if (!isTimeAos) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+fun RowScope.TimerRow(timeString: String, isTimeAos: Boolean) {
+    val colorScheme = MaterialTheme.colorScheme
+    val aosColor = if (isTimeAos) colorScheme.primary else colorScheme.onSurface
+    val losColor = if (!isTimeAos) colorScheme.primary else colorScheme.onSurface
     ElevatedCard(modifier = Modifier.weight(1f)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -94,8 +97,8 @@ private fun NextPassRowPreview() = MainTheme {
 }
 
 @Composable
-fun NextPassRow(pass: OrbitalPass) {
-    ElevatedCard(modifier = Modifier.height(48.dp)) {
+fun NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
+    ElevatedCard(modifier = modifier.height(48.dp)) {
         Column(
             verticalArrangement = Arrangement.spacedBy((-2).dp),
             modifier = Modifier
@@ -192,7 +195,7 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun CardIcon(onClick: () -> Unit, iconId: Int, modifier: Modifier = Modifier) {
+fun IconCard(onClick: () -> Unit, iconId: Int, modifier: Modifier = Modifier) {
     val clickableModifier = Modifier.clickable { onClick() }
     val iconRes = ImageVector.vectorResource(iconId)
     ElevatedCard(modifier = Modifier.size(48.dp)) {
@@ -273,4 +276,10 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun isVerticalLayout(): Boolean {
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    return windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
 }

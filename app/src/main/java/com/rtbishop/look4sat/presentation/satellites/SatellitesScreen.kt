@@ -46,9 +46,9 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
-import com.rtbishop.look4sat.presentation.components.CardIcon
-import com.rtbishop.look4sat.presentation.components.CardLoadingIndicator
-import com.rtbishop.look4sat.presentation.components.InfoDialog
+import com.rtbishop.look4sat.presentation.common.IconCard
+import com.rtbishop.look4sat.presentation.common.CardLoadingIndicator
+import com.rtbishop.look4sat.presentation.common.InfoDialog
 
 fun NavGraphBuilder.satellitesDestination(navigateToPasses: () -> Unit) {
     composable(Screen.Satellites.route) {
@@ -178,8 +178,8 @@ private fun MiddleBar(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
         TypeCard(types = types, { navigate() }, modifier = Modifier.weight(1f))
-        CardIcon(onClick = { uncheck() }, iconId = R.drawable.ic_check_off)
-        CardIcon(onClick = { check() }, iconId = R.drawable.ic_check_on)
+        IconCard(onClick = { uncheck() }, iconId = R.drawable.ic_check_off)
+        IconCard(onClick = { check() }, iconId = R.drawable.ic_check_on)
     }
 }
 

@@ -32,7 +32,7 @@ import com.rtbishop.look4sat.domain.utility.clipLon
 import com.rtbishop.look4sat.domain.utility.positionToQth
 import com.rtbishop.look4sat.domain.utility.toDegrees
 import com.rtbishop.look4sat.domain.utility.toTimerString
-import com.rtbishop.look4sat.presentation.components.getDefaultPass
+import com.rtbishop.look4sat.presentation.common.getDefaultPass
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay

@@ -7,10 +7,10 @@ androidx-core-ktx = "1.16.0"
 androidx-core-splashscreen = "1.0.1"
 androidx-room = "2.7.2"
 
-compose-bom = "2025.06.01"
+compose-bom = "2025.07.00"
 compose-activity = "1.10.1"
-compose-lifecycle = "2.9.1"
-compose-navigation = "2.9.1"
+compose-lifecycle = "2.9.2"
+compose-navigation = "2.9.2"
 
 other-coroutines = "1.10.2"
 other-json = "20250517"
@@ -18,7 +18,7 @@ other-okhttp = "5.1.0"
 other-osmdroid = "6.1.20"
 
 test-junit4 = "4.13.2"
-test-mockk = "1.14.4"
+test-mockk = "1.14.5"
 
 androidTest-junit = "1.2.1"
 androidTest-espresso = "3.6.1"
@@ -33,6 +33,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-animation = { group = "androidx.compose.animation", name = "animation" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 
@@ -67,7 +68,8 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 [bundles]
 composeAll = [
     "compose-animation", "compose-runtime", "compose-tooling", "compose-activity",
-    "compose-lifecycle", "compose-material3", "compose-navigation", "compose-viewmodel"
+    "compose-lifecycle", "compose-material3", "compose-material3-adaptive",
+    "compose-navigation", "compose-viewmodel"
 ]
 composeDebug = ["compose-debug-manifest", "compose-debug-tooling"]
 unitTest = ["test-coroutines", "test-junit4", "test-mockk"]

@@ -9,7 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.MainTheme
-import com.rtbishop.look4sat.presentation.components.SharedDialog
+import com.rtbishop.look4sat.presentation.common.SharedDialog
 
 @Preview(showBackground = true)
 @Composable
