@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CardDefaults
@@ -46,23 +49,25 @@ import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
-import com.rtbishop.look4sat.presentation.common.IconCard
 import com.rtbishop.look4sat.presentation.common.CardLoadingIndicator
+import com.rtbishop.look4sat.presentation.common.IconCard
 import com.rtbishop.look4sat.presentation.common.InfoDialog
+import com.rtbishop.look4sat.presentation.common.TopBar
+import com.rtbishop.look4sat.presentation.common.isVerticalLayout
+import com.rtbishop.look4sat.presentation.common.layoutPadding
 
-fun NavGraphBuilder.satellitesDestination(navigateToPasses: () -> Unit) {
+fun NavGraphBuilder.satellitesDestination(navigateUp: () -> Unit) {
     composable(Screen.Satellites.route) {
         val viewModel = viewModel(
-            modelClass = SatellitesViewModel::class.java,
-            factory = SatellitesViewModel.Factory
+            modelClass = SatellitesViewModel::class.java, factory = SatellitesViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        SatellitesScreen(uiState, navigateToPasses)
+        SatellitesScreen(uiState, navigateUp)
     }
 }
 
 @Composable
-private fun SatellitesScreen(uiState: SatellitesState, navigateToPasses: () -> Unit) {
+private fun SatellitesScreen(uiState: SatellitesState, navigateUp: () -> Unit) {
     val toggleDialog = { uiState.takeAction(SatellitesAction.ToggleTypesDialog) }
     if (uiState.isDialogShown) {
         MultiTypesDialog(allTypes = uiState.typesList, types = uiState.currentTypes, toggleDialog) {
@@ -79,14 +84,28 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateToPasses: () -> U
     }
     val unselectAll = { uiState.takeAction(SatellitesAction.UnselectAll) }
     val selectAll = { uiState.takeAction(SatellitesAction.SelectAll) }
-    Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TopBar(setQuery = { newQuery: String ->
-            uiState.takeAction(SatellitesAction.SearchFor(newQuery))
-        }, saveSelection = {
-            uiState.takeAction(SatellitesAction.SaveSelection)
-            navigateToPasses()
-        })
-        MiddleBar(uiState.currentTypes, { toggleDialog() }, { unselectAll() }, { selectAll() })
+    val setQuery = { newQuery: String -> uiState.takeAction(SatellitesAction.SearchFor(newQuery)) }
+    val saveSelection = { uiState.takeAction(SatellitesAction.SaveSelection).also { navigateUp() } }
+    Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (isVerticalLayout()) {
+            TopBar {
+                TypeCard(types = uiState.currentTypes, toggleDialog, modifier = Modifier.weight(1f))
+                SaveButton(saveSelection = saveSelection, modifier = Modifier.height(48.dp))
+            }
+            TopBar {
+                SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
+                IconCard(onClick = unselectAll, iconId = R.drawable.ic_check_off)
+                IconCard(onClick = selectAll, iconId = R.drawable.ic_check_on)
+            }
+        } else {
+            TopBar {
+                SaveButton(saveSelection = saveSelection, modifier = Modifier.height(48.dp))
+                TypeCard(types = uiState.currentTypes, toggleDialog, modifier = Modifier.weight(1f))
+                SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
+                IconCard(onClick = unselectAll, iconId = R.drawable.ic_check_off)
+                IconCard(onClick = selectAll, iconId = R.drawable.ic_check_on)
+            }
+        }
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
             if (uiState.isLoading) {
                 CardLoadingIndicator()
@@ -96,18 +115,6 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateToPasses: () -> U
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TopBarPreview() = MainTheme { TopBar({}, {}) }
-
-@Composable
-private fun TopBar(setQuery: (String) -> Unit, saveSelection: () -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
-        SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
-        SaveButton(saveSelection = { saveSelection() }, modifier = Modifier.height(48.dp))
     }
 }
 
@@ -168,26 +175,12 @@ private fun SaveButton(saveSelection: () -> Unit, modifier: Modifier = Modifier)
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun MiddleBarPreview() = MainTheme { MiddleBar(listOf("Amateur"), {}, {}, {}) }
-
-@Composable
-private fun MiddleBar(
-    types: List<String>, navigate: () -> Unit, uncheck: () -> Unit, check: () -> Unit
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.height(48.dp)) {
-        TypeCard(types = types, { navigate() }, modifier = Modifier.weight(1f))
-        IconCard(onClick = { uncheck() }, iconId = R.drawable.ic_check_off)
-        IconCard(onClick = { check() }, iconId = R.drawable.ic_check_on)
-    }
-}
-
 @Composable
 private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val typesText = if (types.isEmpty()) "All" else types.joinToString(", ")
     ElevatedCard(modifier = modifier) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .height(48.dp)
@@ -221,7 +214,8 @@ private fun SatellitePreview() {
 @Composable
 private fun Satellite(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: Modifier) {
     val passSatId = stringResource(id = R.string.pass_satId, item.catnum)
-    Surface(color = MaterialTheme.colorScheme.background,
+    Surface(
+        color = MaterialTheme.colorScheme.background,
         modifier = modifier.clickable { onSelected(item.catnum, item.isSelected) }) {
         Surface(modifier = Modifier.padding(bottom = 1.dp)) {
             Row(
@@ -263,7 +257,7 @@ private fun SatellitesPreview() {
 
 @Composable
 fun SatellitesCard(items: List<SatItem>, onSelected: (Int, Boolean) -> Unit) {
-    LazyColumn {
+    LazyVerticalGrid(columns = GridCells.Adaptive(320.dp)) {
         items(items = items, key = { item -> item.catnum }) { entry ->
             Satellite(entry, onSelected, Modifier.animateItem())
         }

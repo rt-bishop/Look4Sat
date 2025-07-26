@@ -11,8 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ import com.rtbishop.look4sat.presentation.common.NextPassRow
 import com.rtbishop.look4sat.presentation.common.TimerRow
 import com.rtbishop.look4sat.presentation.common.TopBar
 import com.rtbishop.look4sat.presentation.common.isVerticalLayout
+import com.rtbishop.look4sat.presentation.common.layoutPadding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -91,7 +93,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
             uiState.takeAction(PassesAction.DismissWelcome)
         }
     }
-    Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {
                 IconCard(onClick = { showPassesDialog() }, iconId = R.drawable.ic_filter)
@@ -135,21 +137,16 @@ private fun PassesList(
                 )
             }
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(320.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
                 items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    if (pass.isDeepSpace) {
-                        DeepSpacePass(
-                            pass = pass,
-                            navigateToRadar = navigateToRadar,
-                            modifier = Modifier.animateItem()
-                        )
-                    } else {
-                        NearEarthPass(
-                            pass = pass,
-                            navigateToRadar = navigateToRadar,
-                            modifier = Modifier.animateItem()
-                        )
-                    }
+                    NearEarthPass(
+                        pass = pass,
+                        navigateToRadar = navigateToRadar,
+                        modifier = Modifier.animateItem()
+                    )
                 }
             }
         }
@@ -159,114 +156,16 @@ private fun PassesList(
 @Preview(showBackground = true)
 @Composable
 private fun DeepSpacePassPreview() {
-    val data = OrbitalData(
-        "Satellite", 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
-    )
+    val data = OrbitalData("Satellite", 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0)
     val satellite = DeepSpaceObject(data)
     val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
-    MainTheme { DeepSpacePass(pass = pass, { _, _ -> }) }
-}
-
-@Composable
-private fun DeepSpacePass(
-    pass: OrbitalPass,
-    navigateToRadar: (Int, Long) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
-    Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
-        Surface(modifier = Modifier
-            .padding(bottom = 2.dp)
-            .clickable { navigateToRadar(pass.catNum, pass.aosTime) }) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(1.dp),
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 6.dp, vertical = 4.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "$passSatId - ",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = pass.name,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 6.dp),
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_elevation),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${pass.maxElevation}°",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "DeepSpace",
-                            fontSize = 15.sp
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_altitude),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${pass.altitude} km",
-                            fontSize = 15.sp
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(
-                                id = R.string.pass_aosLos,
-                                pass.aosAzimuth.toInt(),
-                                pass.losAzimuth.toInt()
-                            ),
-                            fontSize = 15.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
+    MainTheme { NearEarthPass(pass = pass, { _, _ -> }) }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun NearEarthPassPreview() {
-    val data = OrbitalData(
-        "Satellite", 0.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0
-    )
+    val data = OrbitalData("Satellite", 0.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0)
     val satellite = NearEarthObject(data)
     val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
     MainTheme { NearEarthPass(pass = pass, { _, _ -> }) }
@@ -281,7 +180,7 @@ private fun NearEarthPass(
     val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
-            .padding(bottom = 2.dp)
+            .padding(bottom = 2.dp, start = 1.dp, end = 1.dp)
             .clickable { navigateToRadar(pass.catNum, pass.aosTime) }) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
@@ -325,10 +224,14 @@ private fun NearEarthPass(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = sdfDate.format(Date(pass.aosTime)),
-                            fontSize = 15.sp
-                        )
+                        if (pass.isDeepSpace) {
+                            Text(text = "DeepSpace", fontSize = 15.sp)
+                        } else {
+                            Text(
+                                text = sdfDate.format(Date(pass.aosTime)),
+                                fontSize = 15.sp
+                            )
+                        }
                     }
                     Row(
                         modifier = Modifier.weight(1f),

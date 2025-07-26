@@ -27,7 +27,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,8 +57,10 @@ import com.rtbishop.look4sat.presentation.common.NextPassRow
 import com.rtbishop.look4sat.presentation.common.TimerRow
 import com.rtbishop.look4sat.presentation.common.TopBar
 import com.rtbishop.look4sat.presentation.common.getDefaultPass
+import com.rtbishop.look4sat.presentation.common.isVerticalLayout
+import com.rtbishop.look4sat.presentation.common.layoutPadding
 
-fun NavGraphBuilder.radarDestination(navigateBack: () -> Unit) {
+fun NavGraphBuilder.radarDestination(navigateUp: () -> Unit) {
     val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
     val radarArgs = listOf(
         navArgument("catNum") { defaultValue = 0 },
@@ -68,31 +69,36 @@ fun NavGraphBuilder.radarDestination(navigateBack: () -> Unit) {
     composable(radarRoute, radarArgs) {
         val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        RadarScreen(uiState, navigateBack)
+        RadarScreen(uiState, navigateUp)
     }
 }
 
 @Composable
-private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
+private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
 //    BluetoothCIV.init(LocalContext.current)
-
     val addToCalendar: () -> Unit = {
         uiState.currentPass?.let { pass ->
             uiState.sendAction(RadarAction.AddToCalendar(pass.name, pass.aosTime, pass.losTime))
         }
     }
-    Scaffold { innerPadding ->
-        val paddingMod = Modifier.padding(innerPadding)
-        Column(
-            modifier = paddingMod.padding(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
+    val upcomingPass = uiState.currentPass ?: getDefaultPass()
+    Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (isVerticalLayout()) {
             TopBar {
-                IconCard(onClick = navigateBack, iconId = R.drawable.ic_back)
+                IconCard(onClick = navigateUp, iconId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
                 IconCard(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
             }
-            NextPassRow(pass = uiState.currentPass ?: getDefaultPass())
+            NextPassRow(pass = upcomingPass)
+        } else {
+            TopBar {
+                IconCard(onClick = navigateUp, iconId = R.drawable.ic_back)
+                TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
+                NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f))
+                IconCard(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
+            }
+        }
+        if(isVerticalLayout()) {
             Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.aspectRatio(1f)) {
                 uiState.orbitalPos?.let { position ->
                     ElevatedCard {
@@ -168,6 +174,88 @@ private fun RadarScreen(uiState: RadarState, navigateBack: () -> Unit) {
                         TransmittersList(transmitters = uiState.transmitters)
                         if (uiState.orbitalPos?.eclipsed == true) {
                             EclipsedIndicator()
+                        }
+                    }
+                }
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.weight(1f)) {
+                    uiState.orbitalPos?.let { position ->
+                        ElevatedCard {
+                            RadarViewCompose(
+                                item = position,
+                                items = uiState.satTrack,
+                                azimElev = uiState.orientationValues,
+                                shouldShowSweep = uiState.shouldShowSweep,
+                                shouldUseCompass = false
+                            )
+                        }
+                        Column(
+                            verticalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 6.dp, vertical = 4.dp)
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                RadarTextTop(
+                                    position.azimuth,
+                                    stringResource(R.string.radar_az_text),
+                                    true
+                                )
+                                RadarTextTop(
+                                    position.elevation,
+                                    stringResource(R.string.radar_el_text),
+                                    false
+                                )
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                RadarTextBottom(
+                                    position.altitude,
+                                    stringResource(R.string.radar_alt_text),
+                                    true
+                                )
+                                RadarTextBottom(
+                                    position.distance,
+                                    stringResource(R.string.radar_dist_text),
+                                    false
+                                )
+                            }
+                        }
+                    }
+                }
+                ElevatedCard(modifier = Modifier.fillMaxSize().weight(1f)) {
+                    if (uiState.transmitters.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_satellite),
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "This satellite doesn't have any known transcievers...",
+                                textAlign = TextAlign.Center,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            TransmittersList(transmitters = uiState.transmitters)
+                            if (uiState.orbitalPos?.eclipsed == true) {
+                                EclipsedIndicator()
+                            }
                         }
                     }
                 }

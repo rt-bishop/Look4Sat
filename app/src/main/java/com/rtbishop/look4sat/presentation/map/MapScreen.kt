@@ -57,6 +57,8 @@ import org.osmdroid.views.overlay.Polyline
 import androidx.core.graphics.toColorInt
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toDrawable
+import com.rtbishop.look4sat.presentation.common.isVerticalLayout
+import com.rtbishop.look4sat.presentation.common.layoutPadding
 
 private val minLat = MapView.getTileSystem().minLatitude
 private val maxLat = MapView.getTileSystem().maxLatitude
@@ -98,13 +100,22 @@ private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
     val timeString = uiState.value.mapData?.aosTime ?: "00:00:00"
     val isTimeAos = uiState.value.mapData?.isTimeAos ?: true
     val osmInfo = "© OpenStreetMap contributors"
-    Column(modifier = Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TopBar {
-            IconCard(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
-            TimerRow(timeString = timeString, isTimeAos = isTimeAos)
-            IconCard(onClick = selectNext, iconId = R.drawable.ic_arrow)
+    Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (isVerticalLayout()) {
+            TopBar {
+                IconCard(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
+                TimerRow(timeString = timeString, isTimeAos = isTimeAos)
+                IconCard(onClick = selectNext, iconId = R.drawable.ic_arrow)
+            }
+            NextPassRow(pass = uiState.value.orbitalPass)
+        } else {
+            TopBar {
+                IconCard(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
+                TimerRow(timeString = timeString, isTimeAos = isTimeAos)
+                NextPassRow(pass = uiState.value.orbitalPass, modifier = Modifier.weight(1f))
+                IconCard(onClick = selectNext, iconId = R.drawable.ic_arrow)
+            }
         }
-        NextPassRow(pass = uiState.value.orbitalPass)
         ElevatedCard(modifier = Modifier.weight(1f)) {
             Box(contentAlignment = Alignment.BottomCenter) {
                 LaunchedEffect(uiState.value.track) {
