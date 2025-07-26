@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -44,6 +46,7 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.common.CardButton
+import com.rtbishop.look4sat.presentation.common.layoutPadding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -130,8 +133,10 @@ private fun SettingsScreen(uiState: SettingsState) {
     }
 
     // Screen setup
-    LazyColumn(
-        modifier = Modifier.padding(6.dp),
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(320.dp),
+        modifier = Modifier.layoutPadding(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         item { CardAbout(uiState.appVersionName, uiState.sendSystemAction) }
@@ -461,17 +466,17 @@ private fun OtherCard(
                 Text(text = stringResource(id = R.string.other_switch_sensors))
                 Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.other_switch_light_theme))
-                Switch(
-                    checked = settings.stateOfLightTheme,
-                    onCheckedChange = { toggleLightTheme(it) }
-                )
-            }
+//            Row(
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text(text = stringResource(id = R.string.other_switch_light_theme))
+//                Switch(
+//                    checked = settings.stateOfLightTheme,
+//                    onCheckedChange = { toggleLightTheme(it) }
+//                )
+//            }
         }
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -282,4 +283,14 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
 fun isVerticalLayout(): Boolean {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     return windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+}
+
+@Composable
+fun Modifier.layoutPadding(): Modifier {
+    val statusBarMod = this.statusBarsPadding()
+    val spacing = LocalSpacing.current.small
+    return when {
+        isVerticalLayout() -> statusBarMod.padding(horizontal = spacing)
+        else -> statusBarMod.padding(start = 0.dp, top = 0.dp, end = spacing, bottom = spacing)
+    }
 }
