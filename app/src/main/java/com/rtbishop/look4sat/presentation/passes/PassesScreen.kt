@@ -121,6 +121,7 @@ private fun PassesList(
     navigateToRadar: (Int, Long) -> Unit,
     refreshPasses: () -> Unit
 ) {
+    val isVerticalLayout = isVerticalLayout()
     val refreshState = rememberPullToRefreshState()
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
         PullToRefreshBox(
@@ -145,7 +146,8 @@ private fun PassesList(
                     NearEarthPass(
                         pass = pass,
                         navigateToRadar = navigateToRadar,
-                        modifier = Modifier.animateItem()
+                        modifier = Modifier.animateItem(),
+                        isVerticalLayout = isVerticalLayout
                     )
                 }
             }
@@ -175,18 +177,20 @@ private fun NearEarthPassPreview() {
 private fun NearEarthPass(
     pass: OrbitalPass,
     navigateToRadar: (Int, Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isVerticalLayout: Boolean = true
 ) {
     val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
+    val horizontalPadding = if (isVerticalLayout) 6.dp else 10.dp
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
-            .padding(bottom = 2.dp, start = 1.dp, end = 1.dp)
+            .padding(bottom = 2.dp)
             .clickable { navigateToRadar(pass.catNum, pass.aosTime) }) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
                 modifier = Modifier
                     .background(color = MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 6.dp, vertical = 4.dp)
+                    .padding(horizontal = horizontalPadding, vertical = 4.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(

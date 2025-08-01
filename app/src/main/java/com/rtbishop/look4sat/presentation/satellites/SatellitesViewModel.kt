@@ -54,6 +54,7 @@ class SatellitesViewModel(
     init {
         viewModelScope.launch {
             delay(1000)
+            selectionRepo.setQuery(String())
             selectionRepo.setTypes(defaultTypes)
             selectionRepo.getEntriesFlow().collectLatest { items ->
                 _uiState.update { it.copy(isLoading = false, itemsList = items) }

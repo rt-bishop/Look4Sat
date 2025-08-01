@@ -139,6 +139,7 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
                 modifier = modifier.padding(start = 12.dp),
                 textStyle = TextStyle(
                     fontSize = 16.sp,
+                    lineHeight = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 ),
@@ -147,8 +148,9 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
                         Text(
                             text = stringResource(id = R.string.entries_search_hint),
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            lineHeight = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     innerTextField()
