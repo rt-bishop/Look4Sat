@@ -136,13 +136,19 @@ fun RadarViewCompose(
             trackCreated.value = true
         }
         rotate(if (shouldUseCompass) -azimElev.first else 0f) {
-            if (shouldShowSweep) drawSweep(center, sweepDegrees.floatValue, radius, trackColor)
+            if (shouldShowSweep) {
+                drawSweep(center, sweepDegrees.floatValue, radius, trackColor)
+            }
             drawRadar(radius, radarColor, strokeWidth, 3)
             drawInfo(radius, trackColor, measurer, 3)
             translate(center.x, center.y) {
                 drawTrack(trackPath.value, trackEffect.value, aimColor, trackColor)
-                if (item.elevation > 0) drawPosition(item, radius, animScale.value, trackColor)
-                drawAim(azimElev.first, azimElev.second, radius, strokeWidth, aimColor)
+                if (item.elevation > 0) {
+                    drawPosition(item, radius, animScale.value, trackColor)
+                }
+                if (shouldUseCompass) {
+                    drawAim(azimElev.first, azimElev.second, radius, strokeWidth, aimColor)
+                }
             }
             sweepDegrees.floatValue = (sweepDegrees.floatValue + 360 / 12.0f / 60) % 360
         }
