@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -99,7 +102,11 @@ private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
     val rotateMod = Modifier.rotate(180f)
     val timeString = uiState.value.mapData?.aosTime ?: "00:00:00"
     val isTimeAos = uiState.value.mapData?.isTimeAos ?: true
-    val osmInfo = "© OpenStreetMap contributors"
+    LaunchedEffect(uiState.value.track) {
+        val latitude = uiState.value.track?.get(0)?.get(0)?.latitude ?: 0.0
+        val longitude = uiState.value.track?.get(0)?.get(0)?.longitude ?: 0.0
+        mapView.controller.animateTo(GeoPoint(latitude, longitude))
+    }
     Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {
@@ -118,50 +125,80 @@ private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
         }
         ElevatedCard(modifier = Modifier.weight(1f)) {
             Box(contentAlignment = Alignment.BottomCenter) {
-                LaunchedEffect(uiState.value.track) {
-                    val latitude = uiState.value.track?.get(0)?.get(0)?.latitude ?: 0.0
-                    val longitude = uiState.value.track?.get(0)?.get(0)?.longitude ?: 0.0
-                    mapView.controller.animateTo(GeoPoint(latitude, longitude))
-                }
                 AndroidView({ mapView }) { mapView ->
                     uiState.value.stationPosition?.let { setStationPosition(it, mapView) }
                     uiState.value.positions?.let { setPositions(it, mapView, onItemClick) }
                     uiState.value.track?.let { setSatelliteTrack(it, mapView) }
                     uiState.value.footprint?.let { setFootprint(it, mapView) }
                 }
-                Text(text = osmInfo, textAlign = TextAlign.Center, fontSize = 14.sp)
-            }
-        }
-        uiState.value.mapData?.let { mapData ->
-            ElevatedCard {
-                MapDataCard(mapData)
+                uiState.value.mapData?.let { mapData ->
+                    if (isVerticalLayout()) MapDataCard(mapData) else MapDataCards(mapData)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun MapDataCard(mapData: MapData) {
-    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.map_period, mapData.period), color = MaterialTheme.colorScheme.primary)
-            Text(text = stringResource(R.string.map_phase, mapData.phase), color = MaterialTheme.colorScheme.primary)
+private fun MapDataCard(data: MapData) {
+    val textColor = MaterialTheme.colorScheme.primary
+    val cardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
+        Text(text = "© OpenStreetMap contributors", fontSize = 14.sp)
+        Card(colors = cardColors) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = stringResource(R.string.map_azimuth, data.azimuth))
+                    Text(text = stringResource(R.string.map_elevation, data.elevation))
+                }
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = stringResource(R.string.map_altitude, data.altitude), color = textColor)
+                    Text(text = stringResource(R.string.map_distance, data.range), color = textColor)
+                }
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude))
+                    Text(text = stringResource(R.string.map_longitude, data.osmPos.longitude))
+                }
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = stringResource(R.string.map_qth, data.qthLoc), color = textColor)
+                    Text(text = stringResource(R.string.map_phase, data.phase), color = textColor)
+                }
+            }
         }
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.map_azimuth, mapData.azimuth))
-            Text(text = stringResource(R.string.map_elevation, mapData.elevation))
+    }
+}
+
+@Composable
+private fun MapDataCards(data: MapData) {
+    val cardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
+    val paddingMod = Modifier.padding(horizontal = 8.dp, vertical = 4.dp).width(160.dp)
+    val osmText = "© OpenStreetMap contributors"
+    val textColor = MaterialTheme.colorScheme.primary
+    Box(modifier = Modifier.fillMaxSize()) {
+        Card(colors = cardColors, modifier = Modifier.align(Alignment.TopStart)) {
+            Column(horizontalAlignment = Alignment.Start, modifier = paddingMod) {
+                Text(text = stringResource(R.string.map_azimuth, data.azimuth))
+                Text(text = stringResource(R.string.map_elevation, data.elevation), color = textColor)
+            }
         }
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.map_altitude, mapData.altitude), color = MaterialTheme.colorScheme.primary)
-            Text(text = stringResource(R.string.map_distance, mapData.range), color = MaterialTheme.colorScheme.primary)
+        Card(colors = cardColors, modifier = Modifier.align(Alignment.TopEnd)) {
+            Column(horizontalAlignment = Alignment.End, modifier = paddingMod) {
+                Text(text = stringResource(R.string.map_altitude, data.altitude))
+                Text(text = stringResource(R.string.map_distance, data.range), color = textColor)
+            }
         }
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.map_latitude, mapData.osmPos.latitude))
-            Text(text = stringResource(R.string.map_longitude, mapData.osmPos.longitude))
+        Card(colors = cardColors, modifier = Modifier.align(Alignment.BottomStart)) {
+            Column(horizontalAlignment = Alignment.Start, modifier = paddingMod) {
+                Text(text = stringResource(R.string.map_phase, data.phase))
+                Text(text = stringResource(R.string.map_qth, data.qthLoc), color = textColor)
+            }
         }
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.map_qth, mapData.qthLoc), color = MaterialTheme.colorScheme.primary)
-            Text(text = stringResource(R.string.map_velocity, mapData.velocity), color = MaterialTheme.colorScheme.primary)
+        Text(text = osmText, fontSize = 14.sp, modifier = Modifier.align(Alignment.BottomCenter))
+        Card(colors = cardColors, modifier = Modifier.align(Alignment.BottomEnd)) {
+            Column(horizontalAlignment = Alignment.End, modifier = paddingMod) {
+                Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude))
+                Text(text = stringResource(R.string.map_longitude, data.osmPos.longitude), color = textColor)
+            }
         }
     }
 }
@@ -306,6 +343,8 @@ private fun getColorFilter(): ColorMatrixColorFilter {
     return ColorMatrixColorFilter(negative)
 }
 
+@Composable
 private fun getMinZoom(screenHeight: Int): Double {
+    if (!isVerticalLayout()) return 3.5
     return MapView.getTileSystem().getLatitudeZoom(maxLat, minLat, screenHeight)
 }

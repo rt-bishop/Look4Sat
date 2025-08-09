@@ -130,7 +130,7 @@
     <string name="map_elevation">Elevation: %.1f°</string>
     <string name="map_latitude">Latitude: %.1f°</string>
     <string name="map_longitude">Longitude: %.1f°</string>
-    <string name="map_qth">QTH Locator: %s</string>
+    <string name="map_qth" translatable="false">QTH: %s</string>
     <string name="map_visible">Visible</string>
     <string name="map_eclipsed">Eclipsed</string>
     <string name="map_visibility">Visibility: %s</string>
