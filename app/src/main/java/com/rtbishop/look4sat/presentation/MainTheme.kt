@@ -113,7 +113,7 @@ private val darkScheme = darkColorScheme(
 //    surfaceContainerHigh = Color(0xFF121212),
     surfaceContainerHighest = Color(0xFF242424), // filled card background
     surfaceContainerLow = Color(0xFF202020), // elevated card background
-//    surfaceContainerLowest = Color(0xFF121212),
+    surfaceContainerLowest = Color(0xCC121212),
 //    surfaceDim = Color(0xFF121212),
 )
 

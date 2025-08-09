@@ -117,7 +117,6 @@
     <string name="map_elevation">仰角：%.1f°</string>
     <string name="map_latitude">纬度：%.1f°</string>
     <string name="map_longitude">经度：%.1f°</string>
-    <string name="map_qth">QTH 网格：%s</string>
     <string name="map_visible">日照中</string>
     <string name="map_eclipsed">地影中</string>
     <string name="map_visibility">能见度：%s</string>

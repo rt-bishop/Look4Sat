@@ -148,7 +148,7 @@ fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List<String>)
     val onAccept = { accept(selected.toList()).also { cancel() } }
     SharedDialog(title = "Radios", onCancel = cancel, onAccept = onAccept) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
+            columns = GridCells.Adaptive(240.dp),
             modifier = Modifier
                 .fillMaxHeight(0.69f)
                 .background(MaterialTheme.colorScheme.background),

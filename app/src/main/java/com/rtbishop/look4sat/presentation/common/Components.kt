@@ -1,6 +1,7 @@
 package com.rtbishop.look4sat.presentation.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -117,7 +118,8 @@ fun NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
                     text = pass.name,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 6.dp),
+                        .padding(end = 6.dp)
+                        .basicMarquee(),
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

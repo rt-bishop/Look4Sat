@@ -82,6 +82,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
         }
     }
     val upcomingPass = uiState.currentPass ?: getDefaultPass()
+    if (upcomingPass.losTime < System.currentTimeMillis()) navigateUp()
     Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {

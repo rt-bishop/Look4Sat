@@ -51,7 +51,8 @@ class SatelliteRepo(
         settingsRepo.selectedIds.collect { selectedIds ->
             _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
             val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
-            calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
+            val timeNow = 1000 * ((System.currentTimeMillis() + 500) / 1000)
+            calculatePasses(timeNow, hoursAhead, minElevation, modes)
         }
     }
 
@@ -195,10 +196,10 @@ class SatelliteRepo(
             }
         } while (satPos.elevation < 0.0)
 
-        // refine to 3 seconds
+        // refine to 1 second
         calendarTimeMillis += -60L * 1000L
         do {
-            calendarTimeMillis += 3L * 1000L
+            calendarTimeMillis += 1L * 500L
             satPos = sat.getPosition(pos, calendarTimeMillis)
             elevation = satPos.elevation
             if (elevation > maxElevation) {
@@ -207,7 +208,7 @@ class SatelliteRepo(
             }
         } while (satPos.elevation < 0.0)
 
-        val aos = satPos.time
+        val aos = 1000 * ((satPos.time + 500) / 1000)
         val aosAz = satPos.azimuth.toDegrees().round(1)
 
         // find when sat goes below
@@ -221,10 +222,10 @@ class SatelliteRepo(
             }
         } while (satPos.elevation > 0.0)
 
-        // refine to 3 seconds
+        // refine to 1 second
         calendarTimeMillis += -30L * 1000L
         do {
-            calendarTimeMillis += 3L * 1000L
+            calendarTimeMillis += 1L * 500L
             satPos = sat.getPosition(pos, calendarTimeMillis)
             elevation = satPos.elevation
             if (elevation > maxElevation) {
@@ -233,7 +234,7 @@ class SatelliteRepo(
             }
         } while (satPos.elevation > 0.0)
 
-        val los = satPos.time // val tca = (aos + los) / 2
+        val los = 1000 * ((satPos.time + 500) / 1000) // val tca = (aos + los) / 2
         val losAz = satPos.azimuth.toDegrees().round(1)
         val elev = maxElevation.toDegrees().round(1)
         return OrbitalPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat)
