@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +49,6 @@ fun MultiTypesDialog(
             horizontalArrangement = Arrangement.spacedBy(1.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
-            item { HorizontalDivider(color = MaterialTheme.colorScheme.surface) }
             itemsIndexed(allTypes) { index, item ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -78,7 +76,6 @@ fun MultiTypesDialog(
                     )
                 }
             }
-            item { HorizontalDivider(color = MaterialTheme.colorScheme.surface) }
         }
     }
 }

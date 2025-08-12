@@ -1,7 +1,6 @@
 package com.rtbishop.look4sat.presentation.passes
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,6 +50,7 @@ import com.rtbishop.look4sat.presentation.common.InfoDialog
 import com.rtbishop.look4sat.presentation.common.NextPassRow
 import com.rtbishop.look4sat.presentation.common.TimerRow
 import com.rtbishop.look4sat.presentation.common.TopBar
+import com.rtbishop.look4sat.presentation.common.infiniteMarquee
 import com.rtbishop.look4sat.presentation.common.isVerticalLayout
 import com.rtbishop.look4sat.presentation.common.layoutPadding
 import java.text.SimpleDateFormat
@@ -203,7 +203,7 @@ private fun NearEarthPass(
                         modifier = Modifier
                             .weight(1f)
                             .padding(end = 6.dp)
-                            .basicMarquee(),
+                            .infiniteMarquee(),
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

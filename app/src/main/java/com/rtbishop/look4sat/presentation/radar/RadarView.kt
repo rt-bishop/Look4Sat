@@ -6,7 +6,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
@@ -46,7 +46,8 @@ fun RadarViewCompose(
     items: List<OrbitalPos>,
     azimElev: Pair<Float, Float>,
     shouldShowSweep: Boolean,
-    shouldUseCompass: Boolean
+    shouldUseCompass: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -128,7 +129,7 @@ fun RadarViewCompose(
 //        }
 //    }
 
-    Canvas(modifier = Modifier.fillMaxSize()) {
+    Canvas(modifier = modifier.aspectRatio(1f)) {
         val radius = (size.minDimension / 2f) * 0.95f
         if (!trackCreated.value) {
             trackPath.value = createTrackPath(items, radius)
