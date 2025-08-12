@@ -6,9 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57,6 +54,7 @@ import com.rtbishop.look4sat.presentation.common.NextPassRow
 import com.rtbishop.look4sat.presentation.common.TimerRow
 import com.rtbishop.look4sat.presentation.common.TopBar
 import com.rtbishop.look4sat.presentation.common.getDefaultPass
+import com.rtbishop.look4sat.presentation.common.infiniteMarquee
 import com.rtbishop.look4sat.presentation.common.isVerticalLayout
 import com.rtbishop.look4sat.presentation.common.layoutPadding
 
@@ -100,98 +98,17 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
             }
         }
         if(isVerticalLayout()) {
-            Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.aspectRatio(1f)) {
-                uiState.orbitalPos?.let { position ->
-                    ElevatedCard {
+            ElevatedCard(modifier = Modifier.weight(1f)) {
+                Box(contentAlignment = Alignment.Center) {
+                    uiState.orbitalPos?.let { position ->
                         RadarViewCompose(
                             item = position,
                             items = uiState.satTrack,
                             azimElev = uiState.orientationValues,
                             shouldShowSweep = uiState.shouldShowSweep,
-                            shouldUseCompass = uiState.shouldUseCompass
+                            shouldUseCompass = uiState.shouldUseCompass,
+                            modifier = Modifier.align(Alignment.Center)
                         )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 6.dp, vertical = 4.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            RadarTextTop(
-                                position.azimuth,
-                                stringResource(R.string.radar_az_text),
-                                true
-                            )
-                            RadarTextTop(
-                                position.elevation,
-                                stringResource(R.string.radar_el_text),
-                                false
-                            )
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            RadarTextBottom(
-                                position.altitude,
-                                stringResource(R.string.radar_alt_text),
-                                true
-                            )
-                            RadarTextBottom(
-                                position.distance,
-                                stringResource(R.string.radar_dist_text),
-                                false
-                            )
-                        }
-                    }
-                }
-            }
-            ElevatedCard(modifier = Modifier.fillMaxSize()) {
-                if (uiState.transmitters.isEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_satellite),
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "This satellite doesn't have any known transcievers...",
-                            textAlign = TextAlign.Center,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        TransmittersList(transmitters = uiState.transmitters)
-                        if (uiState.orbitalPos?.eclipsed == true) {
-                            EclipsedIndicator()
-                        }
-                    }
-                }
-            }
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.weight(1f)) {
-                    uiState.orbitalPos?.let { position ->
-                        ElevatedCard {
-                            RadarViewCompose(
-                                item = position,
-                                items = uiState.satTrack,
-                                azimElev = uiState.orientationValues,
-                                shouldShowSweep = uiState.shouldShowSweep,
-                                shouldUseCompass = false
-                            )
-                        }
                         Column(
                             verticalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier
@@ -231,7 +148,90 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                         }
                     }
                 }
-                ElevatedCard(modifier = Modifier.fillMaxSize().weight(1f)) {
+            }
+            ElevatedCard(modifier = Modifier.weight(1f)) {
+                if (uiState.transmitters.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_satellite),
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "This satellite doesn't have any known transcievers...",
+                            textAlign = TextAlign.Center,
+                            fontSize = 18.sp,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        TransmittersList(transmitters = uiState.transmitters)
+                        if (uiState.orbitalPos?.eclipsed == true) {
+                            EclipsedIndicator()
+                        }
+                    }
+                }
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                ElevatedCard(modifier = Modifier.weight(1f)) {
+                    Box(contentAlignment = Alignment.Center) {
+                        uiState.orbitalPos?.let { position ->
+                            RadarViewCompose(
+                                item = position,
+                                items = uiState.satTrack,
+                                azimElev = uiState.orientationValues,
+                                shouldShowSweep = uiState.shouldShowSweep,
+                                shouldUseCompass = false,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                            Column(
+                                verticalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 6.dp, vertical = 4.dp)
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    RadarTextTop(
+                                        position.azimuth,
+                                        stringResource(R.string.radar_az_text),
+                                        true
+                                    )
+                                    RadarTextTop(
+                                        position.elevation,
+                                        stringResource(R.string.radar_el_text),
+                                        false
+                                    )
+                                }
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    RadarTextBottom(
+                                        position.altitude,
+                                        stringResource(R.string.radar_alt_text),
+                                        true
+                                    )
+                                    RadarTextBottom(
+                                        position.distance,
+                                        stringResource(R.string.radar_dist_text),
+                                        false
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                ElevatedCard(modifier = Modifier.weight(1f)) {
                     if (uiState.transmitters.isEmpty()) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -378,10 +378,7 @@ private fun TransmitterItem(radio: SatRadio) {
                         text = if (radio.isInverted) "INVERTED: ${radio.info} " else "${radio.info} ",
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .basicMarquee(
-                                iterations = Int.MAX_VALUE,
-                                spacing = MarqueeSpacing(16.dp)
-                            )
+                            .infiniteMarquee()
                             .weight(0.7f)
                     )
                     Icon(

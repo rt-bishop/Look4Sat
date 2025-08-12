@@ -1,5 +1,6 @@
 package com.rtbishop.look4sat.presentation.common
 
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -119,7 +120,7 @@ fun NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 6.dp)
-                        .basicMarquee(),
+                        .infiniteMarquee(),
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -285,6 +286,11 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
 fun isVerticalLayout(): Boolean {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     return windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+}
+
+@Composable
+fun Modifier.infiniteMarquee(): Modifier {
+    return basicMarquee(iterations = Int.MAX_VALUE, spacing = MarqueeSpacing(16.dp))
 }
 
 @Composable

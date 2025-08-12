@@ -6,6 +6,7 @@ object Sources {
         "All" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
         "Amsat" to "https://amsat.org/tle/current/nasabare.txt",
         "Amateur" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=csv",
+        "Brightest" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=csv",
         "Classified" to "https://www.mmccants.org/tles/classfd.zip",
         "Cubesat" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=cubesat&FORMAT=csv",
         "Education" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=education&FORMAT=csv",
