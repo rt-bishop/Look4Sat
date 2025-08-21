@@ -65,6 +65,7 @@ class PassesViewModel(
 
     init {
         viewModelScope.launch {
+            delay(1000)
             satelliteRepo.passes.collectLatest { passes ->
                 processing?.cancelAndJoin()
                 processing = viewModelScope.launch {
@@ -117,7 +118,7 @@ class PassesViewModel(
             val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
             val time = nextPass.aosTime.minus(timeNow).toTimerString()
             _uiState.update { it.copy(nextPass = nextPass, nextTime = time, isNextTimeAos = true) }
-        } catch (exception: NoSuchElementException) {
+        } catch (_: NoSuchElementException) {
             val lastPass = passes.last()
             val time = lastPass.losTime.minus(timeNow).toTimerString()
             _uiState.update { it.copy(nextPass = lastPass, nextTime = time, isNextTimeAos = false) }
