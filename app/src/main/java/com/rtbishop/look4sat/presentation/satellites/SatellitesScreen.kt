@@ -46,6 +46,7 @@ import com.rtbishop.look4sat.domain.model.SatItem
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.common.CardLoadingIndicator
+import com.rtbishop.look4sat.presentation.common.EmptyListCard
 import com.rtbishop.look4sat.presentation.common.IconCard
 import com.rtbishop.look4sat.presentation.common.InfoDialog
 import com.rtbishop.look4sat.presentation.common.TopBar
@@ -104,10 +105,11 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateUp: () -> Unit) {
             }
         }
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
-            if (uiState.isLoading) {
-                CardLoadingIndicator()
-            } else {
-                SatellitesCard(uiState.itemsList) { id, isTicked ->
+            val emptyMessage = stringResource(R.string.satellites_empty_list_message)
+            when {
+                uiState.isLoading -> CardLoadingIndicator()
+                uiState.itemsList.isEmpty() -> EmptyListCard(message = emptyMessage)
+                else -> SatellitesCard(uiState.itemsList) { id, isTicked ->
                     uiState.takeAction(SatellitesAction.SelectSingle(id, isTicked))
                 }
             }

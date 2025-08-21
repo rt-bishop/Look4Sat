@@ -35,17 +35,14 @@ fun qthToPosition(locator: String): GeoPos? {
 
 fun positionToQth(latitude: Double, longitude: Double): String? {
     if (!isValidPosition(latitude, longitude)) return null
-    val tempLon = if (longitude > 180.0) longitude - 180 else longitude
-    val upper = "ABCDEFGHIJKLMNOPQRSTUVWX"
-    val lower = "abcdefghijklmnopqrstuvwx"
-    val newLongitude = tempLon + 180
+    val newLongitude = if (longitude > 180.0) longitude else longitude + 180
     val newLatitude = latitude + 90
-    val lonFirst = upper[(newLongitude / 20).toInt()]
-    val latFirst = upper[(newLatitude / 10).toInt()]
-    val lonSecond = ((newLongitude / 2) % 10).toInt().toString()
-    val latSecond = (newLatitude % 10).toInt().toString()
-    val lonThird = lower[((newLongitude % 2) * 12).toInt()]
-    val latThird = lower[((newLatitude % 1) * 24).toInt()]
+    val lonFirst = (65 + (newLongitude / 20)).toInt().toChar()
+    val latFirst = (65 + (newLatitude / 10)).toInt().toChar()
+    val lonSecond = ((newLongitude / 2) % 10).toInt()
+    val latSecond = (newLatitude % 10).toInt()
+    val lonThird = (65 + (newLongitude % 2) * 12).toInt().toChar().lowercaseChar()
+    val latThird = (65 + (newLatitude % 1) * 24).toInt().toChar().lowercaseChar()
     return "$lonFirst$latFirst$lonSecond$latSecond$lonThird$latThird"
 }
 
