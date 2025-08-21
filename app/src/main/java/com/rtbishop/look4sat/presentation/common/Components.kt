@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -216,10 +217,24 @@ fun CardLoadingIndicator() {
     }
 }
 
+@Composable
+fun EmptyListCard(message: String) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Text(text = stringResource(R.string.empty_list_title), fontSize = 21.sp)
+            Text(text = message, fontSize = 18.sp, textAlign = TextAlign.Center)
+        }
+    }
+}
+
 fun getDefaultPass(): OrbitalPass {
-    val orbitalData = OrbitalData("No Future Passes", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
+    val orbitalData = OrbitalData("||=<☉>=||", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
     val satellite = NearEarthObject(orbitalData)
-    return OrbitalPass(0L, 0.0, 0L, 0.0, 0, 0.0, satellite, 0f)
+    return OrbitalPass(0L, 0.0, Long.MAX_VALUE, 0.0, 0, 0.0, satellite, 0f)
 }
 
 @Composable

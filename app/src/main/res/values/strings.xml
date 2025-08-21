@@ -12,7 +12,6 @@
     <string name="menu_about">About</string>
 
     <!--Buttons-->
-
     <string name="btn_add">Add</string>
     <string name="btn_accept">Accept</string>
     <string name="btn_understand" translatable="false">I Understand</string>
@@ -42,14 +41,20 @@
     <string name="btn_license">GPLv3 Licence</string>
     <string name="btn_privacy">Privacy Policy</string>
 
-    <!--Dialogs-->
+    <!--Commmon-->
+    <string name="empty_list_title" translatable="false">No items to display</string>
 
+    <!--Dialogs-->
+    <string name="satellites_empty_list_message" translatable="false">
+        Make sure your search query is correct and the DB is updated</string>
     <string name="satellites_warning_title" translatable="false">Warning\!</string>
     <string name="satellites_warning_message" translatable="false">
         There are over 9000 satellites listed in this app.
         It makes no sense to track them all at the same time.
         \n\nAlways try to narrow down the list to only the ones
         you\'re interested in via search and types selector.</string>
+    <string name="passes_empty_list_message" translatable="false">
+        Make sure your filters are correct and you have selected satellites</string>
     <string name="passes_welcome_title" translatable="false">Welcome to Look4Sat\!</string>
     <string name="passes_welcome_message" translatable="false">
         Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
@@ -80,7 +85,6 @@
     <string name="types_message">Selected type: %s</string>
 
     <!--Fragments-->
-
     <string name="entries_search_hint">Name / Id</string>
 
     <string name="passes_error">There are no upcoming satellite passes to display</string>
@@ -142,7 +146,6 @@
     <string name="map_copyright">Wikimedia maps | Map data © OpenStreetMap contributors</string>
 
     <!--Cards-->
-
     <string name="location_title">Station position</string>
     <string name="location_lat">Latitude: %.4f°</string>
     <string name="location_lon">Longitude: %.4f°</string>

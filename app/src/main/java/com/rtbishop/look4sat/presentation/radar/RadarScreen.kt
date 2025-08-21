@@ -100,6 +100,9 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
         if(isVerticalLayout()) {
             ElevatedCard(modifier = Modifier.weight(1f)) {
                 Box(contentAlignment = Alignment.Center) {
+                    if (uiState.orbitalPos == null) {
+                        ElevatedCard(modifier = Modifier.fillMaxSize()) {}
+                    }
                     uiState.orbitalPos?.let { position ->
                         RadarViewCompose(
                             item = position,
@@ -182,6 +185,9 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 ElevatedCard(modifier = Modifier.weight(1f)) {
                     Box(contentAlignment = Alignment.Center) {
+                        if (uiState.orbitalPos == null) {
+                            ElevatedCard(modifier = Modifier.fillMaxSize()) {}
+                        }
                         uiState.orbitalPos?.let { position ->
                             RadarViewCompose(
                                 item = position,
@@ -355,7 +361,7 @@ private fun TransmitterItem(radio: SatRadio) {
 //                BluetoothCIV.updateOnce(radio)
 //            }
 //        })
-        ) {
+    ) {
         Surface(modifier = Modifier.padding(bottom = 2.dp)) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -436,7 +442,7 @@ private fun FrequencyText(frequency: Long?) {
     Text(
         text = freqText,
         textAlign = TextAlign.Center,
-        fontSize = 21.sp,
+        fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.primary
     )

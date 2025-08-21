@@ -45,6 +45,7 @@ import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
+import com.rtbishop.look4sat.presentation.common.EmptyListCard
 import com.rtbishop.look4sat.presentation.common.IconCard
 import com.rtbishop.look4sat.presentation.common.InfoDialog
 import com.rtbishop.look4sat.presentation.common.NextPassRow
@@ -139,17 +140,21 @@ private fun PassesList(
                 )
             }
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(320.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                    NearEarthPass(
-                        pass = pass,
-                        navigateToRadar = navigateToRadar,
-                        modifier = Modifier.animateItem(),
-                        isVerticalLayout = isVerticalLayout
-                    )
+            if (passes.isEmpty()) {
+                EmptyListCard(message = stringResource(R.string.passes_empty_list_message))
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(320.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
+                        NearEarthPass(
+                            pass = pass,
+                            navigateToRadar = navigateToRadar,
+                            modifier = Modifier.animateItem(),
+                            isVerticalLayout = isVerticalLayout
+                        )
+                    }
                 }
             }
         }
