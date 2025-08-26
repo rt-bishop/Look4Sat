@@ -51,6 +51,9 @@ android {
         animationsDisabled true
         unitTests.includeAndroidResources true
     }
+    androidResources {
+        generateLocaleConfig true
+    }
 }
 
 kotlin {
