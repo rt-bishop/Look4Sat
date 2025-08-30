@@ -85,7 +85,7 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 }
 private val labelRect = Rect()
 
-fun NavGraphBuilder.mapDestination() {
+fun NavGraphBuilder.mapDestination(function: () -> Boolean) {
     composable(Screen.Map.route) {
         val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -110,17 +110,17 @@ private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
     Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {
-                IconCard(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
+                IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
-                IconCard(onClick = selectNext, iconId = R.drawable.ic_arrow)
+                IconCard(action = selectNext, resId = R.drawable.ic_arrow)
             }
             NextPassRow(pass = uiState.value.orbitalPass)
         } else {
             TopBar {
-                IconCard(onClick = selectPrev, iconId = R.drawable.ic_arrow, modifier = rotateMod)
+                IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
                 NextPassRow(pass = uiState.value.orbitalPass, modifier = Modifier.weight(1f))
-                IconCard(onClick = selectNext, iconId = R.drawable.ic_arrow)
+                IconCard(action = selectNext, resId = R.drawable.ic_arrow)
             }
         }
         ElevatedCard(modifier = Modifier.weight(1f)) {

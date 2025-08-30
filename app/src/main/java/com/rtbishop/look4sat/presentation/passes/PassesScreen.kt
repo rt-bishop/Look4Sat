@@ -44,16 +44,18 @@ import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.presentation.MainTheme
+import com.rtbishop.look4sat.presentation.NavActions
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.common.EmptyListCard
+import com.rtbishop.look4sat.presentation.common.FloatingBar
 import com.rtbishop.look4sat.presentation.common.IconCard
 import com.rtbishop.look4sat.presentation.common.InfoDialog
 import com.rtbishop.look4sat.presentation.common.NextPassRow
+import com.rtbishop.look4sat.presentation.common.ScreenColumn
 import com.rtbishop.look4sat.presentation.common.TimerRow
 import com.rtbishop.look4sat.presentation.common.TopBar
 import com.rtbishop.look4sat.presentation.common.infiniteMarquee
 import com.rtbishop.look4sat.presentation.common.isVerticalLayout
-import com.rtbishop.look4sat.presentation.common.layoutPadding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -61,20 +63,20 @@ import java.util.Locale
 private val sdfDate = SimpleDateFormat("EEE dd MMM", Locale.ENGLISH)
 private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
-fun NavGraphBuilder.passesDestination(navigateToRadar: (Int, Long) -> Unit) {
+fun NavGraphBuilder.passesDestination(navActions: NavActions) {
     composable(Screen.Passes.route) {
         val viewModel = viewModel(
             modelClass = PassesViewModel::class.java,
             factory = PassesViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        PassesScreen(uiState, navigateToRadar)
+        PassesScreen(uiState, navActions)
     }
 }
 
 @Composable
-private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> Unit) {
-    val refreshPasses = { uiState.takeAction(PassesAction.RefreshPasses) }
+private fun PassesScreen(uiState: PassesState, navActions: NavActions) {
+    val refreshList = { uiState.takeAction(PassesAction.RefreshPasses) }
     val showPassesDialog = { uiState.takeAction(PassesAction.TogglePassesDialog) }
     val showRadiosDialog = { uiState.takeAction(PassesAction.ToggleRadiosDialog) }
     if (uiState.isPassesDialogShown) {
@@ -95,24 +97,33 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
             uiState.takeAction(PassesAction.DismissWelcome)
         }
     }
-    Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        if (isVerticalLayout()) {
+    ScreenColumn(floatingBar = { PassesFloatingBar(navActions) }) { isVerticalLayout ->
+        if (isVerticalLayout) {
             TopBar {
-                IconCard(onClick = { showPassesDialog() }, iconId = R.drawable.ic_filter)
+                IconCard(action = { showPassesDialog() }, resId = R.drawable.ic_filter)
                 TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
-                IconCard(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
+                IconCard(action = { showRadiosDialog() }, resId = R.drawable.ic_satellite)
             }
             NextPassRow(pass = uiState.nextPass)
         } else {
             TopBar {
-                IconCard(onClick = { showPassesDialog() }, iconId = R.drawable.ic_filter)
+                IconCard(action = { showPassesDialog() }, resId = R.drawable.ic_filter)
                 TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
                 NextPassRow(pass = uiState.nextPass, modifier = Modifier.weight(1f))
-                IconCard(onClick = { showRadiosDialog() }, iconId = R.drawable.ic_satellite)
+                IconCard(action = { showRadiosDialog() }, resId = R.drawable.ic_satellite)
             }
         }
-        PassesList(uiState.isRefreshing, uiState.itemsList, navigateToRadar, refreshPasses)
+        PassesList(uiState.isRefreshing, uiState.itemsList, navActions.openRadar, refreshList)
     }
+}
+
+@Composable
+private fun PassesFloatingBar(navActions: NavActions) {
+    FloatingBar(
+        startAction = navActions.openSettings, startIconResId = R.drawable.ic_settings,
+        centerAction = navActions.openSatellites, centerIconResId = R.drawable.ic_sputnik,
+        endAction = navActions.openMap, endIconResId = R.drawable.ic_map
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

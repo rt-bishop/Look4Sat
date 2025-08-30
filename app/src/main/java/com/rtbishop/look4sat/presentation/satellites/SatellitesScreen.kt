@@ -92,16 +92,16 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateUp: () -> Unit) {
             }
             TopBar {
                 SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
-                IconCard(onClick = unselectAll, iconId = R.drawable.ic_check_off)
-                IconCard(onClick = selectAll, iconId = R.drawable.ic_check_on)
+                IconCard(action = unselectAll, resId = R.drawable.ic_check_off)
+                IconCard(action = selectAll, resId = R.drawable.ic_check_on)
             }
         } else {
             TopBar {
                 SaveButton(saveSelection = saveSelection, modifier = Modifier.height(48.dp))
                 TypeCard(types = uiState.currentTypes, toggleDialog, modifier = Modifier.weight(1f))
                 SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
-                IconCard(onClick = unselectAll, iconId = R.drawable.ic_check_off)
-                IconCard(onClick = selectAll, iconId = R.drawable.ic_check_on)
+                IconCard(action = unselectAll, resId = R.drawable.ic_check_off)
+                IconCard(action = selectAll, resId = R.drawable.ic_check_on)
             }
         }
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
