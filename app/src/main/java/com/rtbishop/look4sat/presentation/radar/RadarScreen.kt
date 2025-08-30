@@ -84,17 +84,17 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
     Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {
-                IconCard(onClick = navigateUp, iconId = R.drawable.ic_back)
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
-                IconCard(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
+                IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
             NextPassRow(pass = upcomingPass)
         } else {
             TopBar {
-                IconCard(onClick = navigateUp, iconId = R.drawable.ic_back)
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
                 NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f))
-                IconCard(onClick = addToCalendar, iconId = R.drawable.ic_calendar)
+                IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
         }
         if(isVerticalLayout()) {

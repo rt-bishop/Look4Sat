@@ -50,7 +50,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-fun NavGraphBuilder.settingsDestination() {
+fun NavGraphBuilder.settingsDestination(function: () -> Boolean) {
     composable(Screen.Settings.route) {
         val viewModel = viewModel(
             modelClass = SettingsViewModel::class.java,
@@ -348,7 +348,7 @@ private fun DataCard(
                 Spacer(modifier = Modifier.width(6.dp))
                 CardButton(
                     onClick = { updateFromFile() },
-                    text = stringResource(id = R.string.btn_file),
+                    text = stringResource(id = R.string.btn_import),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
