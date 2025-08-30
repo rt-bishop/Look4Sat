@@ -102,11 +102,11 @@ private fun SliderRow(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium),
-        modifier = Modifier.padding(horizontal = LocalSpacing.current.extraLarge)
+        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
+        modifier = Modifier.padding(horizontal = LocalSpacing.current.large)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium),
+            horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

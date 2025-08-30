@@ -22,23 +22,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 
 val LocalSpacing = compositionLocalOf { Spacing }
-//val MaterialTheme.spacing: Spacing
-//    @Composable @ReadOnlyComposable get() = Spacing
-
-data object SpacingDefaults {
-    internal const val EXTRA_SMALL = 4
-    internal const val SMALL = 6
-    internal const val MEDIUM = 8
-    internal const val LARGE = 12
-    internal const val EXTRA_LARGE = 16
-}
 
 data object Spacing {
-    val extraSmall = SpacingDefaults.EXTRA_SMALL.dp
-    val small = SpacingDefaults.SMALL.dp
-    val medium = SpacingDefaults.MEDIUM.dp
-    val large = SpacingDefaults.LARGE.dp
-    val extraLarge = SpacingDefaults.EXTRA_LARGE.dp
+    val extraExtraSmall = 4.dp
+    val extraSmall = 6.dp
+    val small = 8.dp
+    val medium = 12.dp
+    val large = 16.dp
+    val extraLarge = 24.dp
 }
 
 @Composable

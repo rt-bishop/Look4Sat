@@ -50,7 +50,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-fun NavGraphBuilder.settingsDestination() {
+fun NavGraphBuilder.settingsDestination(function: () -> Boolean) {
     composable(Screen.Settings.route) {
         val viewModel = viewModel(
             modelClass = SettingsViewModel::class.java,

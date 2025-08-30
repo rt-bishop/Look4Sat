@@ -1,5 +1,5 @@
 [versions]
-android-gradle-plugin = "8.12.1"
+android-gradle-plugin = "8.12.2"
 google-ksp = "2.2.10-2.0.2"
 kotlin = "2.2.10"
 
@@ -7,9 +7,9 @@ androidx-core-ktx = "1.17.0"
 androidx-core-splashscreen = "1.0.1"
 androidx-room = "2.7.2"
 
-compose-bom = "2025.08.00"
+compose-bom = "2025.08.01"
 compose-activity = "1.10.1"
-compose-lifecycle = "2.9.2"
+compose-lifecycle = "2.9.3"
 compose-navigation = "2.9.3"
 
 other-coroutines = "1.10.2"
@@ -33,7 +33,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-animation = { group = "androidx.compose.animation", name = "animation" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-compose-material3-navigation = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
+compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 
@@ -68,7 +68,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 [bundles]
 composeAll = [
     "compose-animation", "compose-runtime", "compose-tooling", "compose-activity",
-    "compose-lifecycle", "compose-material3", "compose-material3-navigation",
+    "compose-lifecycle", "compose-material3", "compose-material3-adaptive",
     "compose-navigation", "compose-viewmodel"
 ]
 composeDebug = ["compose-debug-manifest", "compose-debug-tooling"]
