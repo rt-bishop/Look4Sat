@@ -69,7 +69,7 @@
     <string name="pass_satName">%s</string>
     <string name="pass_satId">Id:%d</string>
     <string name="pass_aosAz">Початок - %.1f°</string>
-    <string name="pass_піднесення">Піднес.: %.1f°</string>
+    <string name="pass_elevation">Піднес.: %.1f°</string>
     <string name="pass_los">%.1f° - кінець</string>
     <string name="pass_altitude">Висота: %.0f км</string>
     <string name="pass_placeholder"> - - : - - </string>
@@ -106,7 +106,7 @@
     <string name="map_sat_name">%s</string>
     <string name="map_sat_id">Id:%d</string>
     <string name="map_azimuth">Азимут: %.1f°</string>
-    <string name="map_піднесення">Піднесення: %.1f°</string>
+    <string name="map_elevation">Піднесення: %.1f°</string>
     <string name="map_latitude">Широта: %.1f°</string>
     <string name="map_longitude">Довгота: %.1f°</string>
     <string name="map_qth">QTH Locator: %s</string>
@@ -157,7 +157,8 @@
     <string name="other_switch_sensors">Використовувати сенсори пристрою</string>
 
     <string name="outro_title">Я хотів би подякувати:</string>
-    <string name="outro_thanks"> • Вам за завантаження та використання Look4Sat! \nБажаю завжди чистого неба над головою!
+    <string name="outro_thanks"> • Вам за завантаження та використання Look4Sat!
+        \n Бажаю завжди чистого неба над головою!
         \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> за створення predict4java і доступ
         до неї по <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
@@ -168,9 +169,9 @@
         \n • <a href="https://libre.space/">Libre Space Foundation</a> за проєкт
         <a href="https://db.satnogs.org/">SatNOGS</a>, API та базу даних про супутники.
         \n • Команді <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
-        за інтерес до застосунку та публікацію інтерв'ю на сайті.
+        за інтерес до застосунку та публікацію інтерв\'ю на сайті.
     </string>
     <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Політика конфіденційності.</a>
-        Це ПЗ поставляється без жодних гарантій. \nДетальніше про ліцензію: <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.
+        Це ПЗ поставляється без жодних гарантій. \n Детальніше про ліцензію: <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.
     </string>
 </resources>
