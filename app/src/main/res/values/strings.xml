@@ -28,7 +28,7 @@
     <string name="btn_manual">Manual</string>
     <string name="btn_qth">QTH</string>
     <string name="btn_web">Online</string>
-    <string name="btn_file">File</string>
+    <string name="btn_import">Import</string>
     <string name="btn_github">GitHub</string>
     <string name="btn_support">Support</string>
     <string name="btn_fdroid">F-Droid</string>

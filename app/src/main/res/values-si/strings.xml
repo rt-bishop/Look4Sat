@@ -28,7 +28,7 @@
     <string name="btn_manual">අතින්</string>
     <string name="btn_qth">QTH</string>
     <string name="btn_web">මාර්ගගතව</string>
-    <string name="btn_file">File</string>
+    <string name="btn_import">Import</string>
     <string name="btn_github">GitHub</string>
     <string name="btn_support">දායකත්ව</string>
     <string name="btn_fdroid">F-Droid</string>

@@ -34,7 +34,7 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "34.0.0"
+          BUILD_TOOLS_VERSION: "35.0.1"
 
       - name: Sign Bundle
         uses: r0adkll/sign-android-release@v1
@@ -46,7 +46,7 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "34.0.0"
+          BUILD_TOOLS_VERSION: "35.0.1"
 
       - name: Rename APK and Bundle
         run: |
@@ -59,7 +59,7 @@ jobs:
           serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
           packageName: com.rtbishop.look4sat
           releaseFiles: app/build/outputs/apk/release/look4sat.aab
-          track: production
+          track: beta
           whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
 
       - name: Create release

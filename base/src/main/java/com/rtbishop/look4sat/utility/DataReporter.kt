@@ -52,11 +52,12 @@ class DataReporter(private val reporterScope: CoroutineScope) {
 
     fun reportRotation(server: String, port: Int, azimuth: Double, elevation: Double) {
         rotationReporting = reporterScope.launch {
+            val newElevation = if (elevation > 0.0) elevation else 0.0
             runCatching {
                 if (rotationSocketChannel == null) {
                     rotationSocketChannel = SocketChannel.open(InetSocketAddress(server, port))
                 } else {
-                    val buffer = ByteBuffer.wrap("\\P $azimuth $elevation\n".toByteArray())
+                    val buffer = ByteBuffer.wrap("\\P $azimuth $newElevation\n".toByteArray())
                     rotationSocketChannel?.write(buffer)
                 }
             }.onFailure { error ->

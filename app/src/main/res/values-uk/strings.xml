@@ -28,7 +28,7 @@
     <string name="btn_manual">Ввести вручну</string>
     <string name="btn_qth">QTH</string>
     <string name="btn_web">Онлайн</string>
-    <string name="btn_file">Файл</string>
+    <string name="btn_import">Импорт</string>
     <string name="btn_github">GitHub</string>
     <string name="btn_support">Підтримка</string>
     <string name="btn_fdroid">F-Droid</string>

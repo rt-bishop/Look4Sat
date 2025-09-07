@@ -23,7 +23,6 @@ class BTReporter(private val manager: BluetoothManager, private val reporterScop
 
     fun isConnecting(): Boolean = connecting
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     fun connectBTDevice(deviceId: String) {
         if (!connected) {
             rotationConnectionJob = reporterScope.launch {
@@ -47,13 +46,13 @@ class BTReporter(private val manager: BluetoothManager, private val reporterScop
         }
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     fun reportRotation(format: String, azimuth: Int, elevation: Int) {
         if (connected) {
             rotationReportingJob = reporterScope.launch {
+                val newElevation = if (elevation > 0) elevation else 0
                 try {
                     val azimuthString = intToStringWithLeadingZeroes(azimuth)
-                    val elevationString = intToStringWithLeadingZeroes(elevation)
+                    val elevationString = intToStringWithLeadingZeroes(newElevation)
                     val crChar = '\r'
                     val nlChar = '\n'
                     val tbChar = '\t'
