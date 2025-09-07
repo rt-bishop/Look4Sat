@@ -1,5 +1,0 @@
-Re-enabled the rotator control switch (fix)
-Increased radar sweep rotation speed
-Fixed negative lat/lon manual input bug
-Added R4UAB TLE source and category
-Updated libraries and dependencies

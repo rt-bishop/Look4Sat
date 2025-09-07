@@ -1,5 +1,0 @@
-Various minor tweaks, refactoring and bug fixes
-Added passes calculation progress indicator
-Added satellite visibility param to map and radar
-Added various additional satellite params to map
-Swapped buy me a coffee platform for Ko-Fi

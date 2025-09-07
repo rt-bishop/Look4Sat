@@ -1,5 +1,0 @@
-Switched to targeting Android 13, API v33
-Added automatic TLE update functionality
-Added recent TLE update time information
-Added passes recalculation on TLE update
-Enabled APK build minification with R8

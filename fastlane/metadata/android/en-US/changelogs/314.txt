@@ -1,4 +1,0 @@
-Aligned ROTCTL command with Gpredict #121
-Added ingoring inactive transmitters #125
-Fixed the satellite predictions bug #126
-Added date to a satellite pass ENG #127

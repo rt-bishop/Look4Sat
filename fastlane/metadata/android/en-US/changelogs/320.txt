@@ -1,2 +1,0 @@
-Added calendar reminder support by zhou2008
-Added Sinhala translation by Dilshan Hapuarachchi

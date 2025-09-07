@@ -1,2 +1,0 @@
-Minor correcting release
-Fixed a crash in the map fragment

@@ -1,6 +1,0 @@
-Integrated AJohns bluetooth reporting function
-Ref - https://github.com/rt-bishop/Look4Sat/pull/87
-Integrated BA7LWN Simplified Chinese translation
-Ref - https://github.com/rt-bishop/Look4Sat/pull/92
-Added satellites sorting by their reported categories
-Removed custom sources dialog, use file import instead

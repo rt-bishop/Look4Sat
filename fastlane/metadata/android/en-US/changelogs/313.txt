@@ -1,1 +1,0 @@
-Fixed the satellite data update bug #108
