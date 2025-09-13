@@ -17,22 +17,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,9 +56,9 @@ private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 @Preview(showBackground = true)
 private fun TopBarPreview() = MainTheme {
     TopBar {
-        IconCard(action = {}, resId = R.drawable.ic_filter)
+        IconCard(onClick = {}, iconId = R.drawable.ic_filter)
         TimerRow(timeString = "88:88:88", isTimeAos = true)
-        IconCard(action = {}, resId = R.drawable.ic_satellite)
+        IconCard(onClick = {}, iconId = R.drawable.ic_satellite)
     }
 }
 
@@ -201,13 +200,12 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier, main: Boolean = false) {
-    val clickableMod = Modifier.clickable { action() }
-    val defaultC = CardDefaults.elevatedCardColors()
-    val mainC = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary)
-    ElevatedCard(modifier = Modifier.size(48.dp), colors = if (main) mainC else defaultC, shape = CircleShape) {
-        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(resId), contentDescription = null, modifier = modifier)
+fun IconCard(onClick: () -> Unit, iconId: Int, modifier: Modifier = Modifier) {
+    val clickableModifier = Modifier.clickable { onClick() }
+    val iconRes = ImageVector.vectorResource(iconId)
+    ElevatedCard(modifier = Modifier.size(48.dp)) {
+        Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(imageVector = iconRes, contentDescription = null, modifier = modifier)
         }
     }
 }
@@ -243,7 +241,7 @@ fun getDefaultPass(): OrbitalPass {
 fun SharedDialog(
     title: String, onCancel: () -> Unit, onAccept: () -> Unit, content: @Composable () -> Unit
 ) {
-    val padding = LocalSpacing.current.large
+    val padding = LocalSpacing.current.extraLarge
     Dialog(onDismissRequest = { onCancel() }) {
         ElevatedCard {
             Column(
@@ -270,7 +268,7 @@ fun SharedDialog(
 
 @Composable
 fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
-    val padding = LocalSpacing.current.large
+    val padding = LocalSpacing.current.extraLarge
     Dialog(onDismissRequest = onDismiss) {
         ElevatedCard {
             Column(
@@ -292,10 +290,7 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
                 )
                 Row(modifier = Modifier.padding(start = padding, bottom = padding, end = padding)) {
                     Spacer(modifier = Modifier.weight(1f))
-                    CardButton(
-                        onClick = onDismiss,
-                        text = stringResource(id = R.string.btn_understand)
-                    )
+                    CardButton(onClick = onDismiss, text = stringResource(id = R.string.btn_understand))
                 }
             }
         }
@@ -316,41 +311,9 @@ fun Modifier.infiniteMarquee(): Modifier {
 @Composable
 fun Modifier.layoutPadding(): Modifier {
     val statusBarMod = this.statusBarsPadding()
-    val spacing = LocalSpacing.current.extraSmall
-    return statusBarMod.padding(start = spacing, top = 0.dp, end = spacing, bottom = spacing)
-}
-
-@Composable
-fun ScreenColumn(floatingBar: @Composable () -> Unit = {}, content: @Composable (Boolean) -> Unit) {
-    Box(contentAlignment = Alignment.BottomCenter) {
-        Column(
-            modifier = Modifier.layoutPadding(),
-            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.extraSmall)
-        ) { content(isVerticalLayout()) }
-        floatingBar()
-    }
-}
-
-@Composable
-fun FloatingBar(
-    startAction: () -> Unit, startIconResId: Int,
-    centerAction: () -> Unit, centerIconResId: Int,
-    endAction: () -> Unit, endIconResId: Int
-) {
-    val spacing = LocalSpacing.current
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        shape = CircleShape,
-        modifier = Modifier.padding(bottom = spacing.large)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(spacing.medium)
-        ) {
-            IconCard(action = startAction, resId = startIconResId)
-            IconCard(action = centerAction, resId = centerIconResId, main = true)
-            IconCard(action = endAction, resId = endIconResId)
-        }
+    val spacing = LocalSpacing.current.small
+    return when {
+        isVerticalLayout() -> statusBarMod.padding(horizontal = spacing)
+        else -> statusBarMod.padding(start = 0.dp, top = 0.dp, end = spacing, bottom = spacing)
     }
 }
