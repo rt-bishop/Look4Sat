@@ -34,6 +34,9 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
