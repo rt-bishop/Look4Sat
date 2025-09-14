@@ -1,5 +1,6 @@
 package com.rtbishop.look4sat.presentation
 
+import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +45,10 @@ fun MainTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
                 val window = (view.context as ComponentActivity).window
                 val insetsController = WindowCompat.getInsetsController(window, view)
                 insetsController.isAppearanceLightStatusBars = false
+                insetsController.isAppearanceLightNavigationBars = false
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    window.isNavigationBarContrastEnforced = false
+                }
             }
             MaterialTheme(colorScheme, shapes, typography, content)
         }

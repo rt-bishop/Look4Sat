@@ -3,6 +3,7 @@ package com.rtbishop.look4sat.presentation.common
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -201,11 +201,9 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier, main: Boolean = false) {
+fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
     val clickableMod = Modifier.clickable { action() }
-    val defaultC = CardDefaults.elevatedCardColors()
-    val mainC = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary)
-    ElevatedCard(modifier = Modifier.size(48.dp), colors = if (main) mainC else defaultC, shape = CircleShape) {
+    ElevatedCard(modifier = Modifier.size(48.dp)) {
         Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(painter = painterResource(resId), contentDescription = null, modifier = modifier)
         }
@@ -332,6 +330,27 @@ fun ScreenColumn(floatingBar: @Composable () -> Unit = {}, content: @Composable 
 }
 
 @Composable
+fun PrimaryButton(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
+    val clickableMod = modifier.clickable { action() }
+    val colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+    ElevatedCard(modifier = Modifier.size(96.dp, 48.dp), colors = colors, shape = MaterialTheme.shapes.large) {
+        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(painter = painterResource(resId), contentDescription = null)
+        }
+    }
+}
+
+@Composable
+fun SecondaryButton(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
+    val clickableMod = modifier.clickable { action() }
+    ElevatedCard(modifier = Modifier.size(48.dp), shape = MaterialTheme.shapes.large) {
+        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(painter = painterResource(resId), contentDescription = null)
+        }
+    }
+}
+
+@Composable
 fun FloatingBar(
     startAction: () -> Unit, startIconResId: Int,
     centerAction: () -> Unit, centerIconResId: Int,
@@ -340,17 +359,18 @@ fun FloatingBar(
     val spacing = LocalSpacing.current
     Surface(
         color = MaterialTheme.colorScheme.background,
-        shape = CircleShape,
-        modifier = Modifier.padding(bottom = spacing.large)
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = Modifier.padding(bottom = spacing.medium)
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.extraLarge)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(spacing.medium),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(spacing.medium)
+            modifier = Modifier.padding(horizontal = spacing.large, vertical = spacing.medium)
         ) {
-            IconCard(action = startAction, resId = startIconResId)
-            IconCard(action = centerAction, resId = centerIconResId, main = true)
-            IconCard(action = endAction, resId = endIconResId)
+            SecondaryButton(action = startAction, resId = startIconResId)
+            PrimaryButton(action = centerAction, resId = centerIconResId)
+            SecondaryButton(action = endAction, resId = endIconResId)
         }
     }
 }
