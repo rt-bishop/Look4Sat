@@ -34,7 +34,7 @@
     <string name="btn_manual">手动输入</string>
     <string name="btn_qth">QTH 网格</string>
     <string name="btn_web">在线更新</string>
-    <string name="btn_import">進口</string>
+    <string name="btn_import">导入文件</string>
     <string name="btn_github">GitHub</string>
     <string name="btn_donate">支持</string>
     <string name="btn_fdroid">F-Droid</string>
@@ -180,3 +180,4 @@
     </string>
     <string name="outro_license">该应用程序不提供任何保修.</string>
 </resources>
+
