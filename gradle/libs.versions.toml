@@ -5,13 +5,12 @@ kotlin = "2.2.20"
 
 androidx-core-ktx = "1.17.0"
 androidx-core-splashscreen = "1.0.1"
-androidx-room = "2.8.0"
+androidx-room = "2.8.1"
 
-compose-bom = "2025.09.00"
+compose-bom = "2025.09.01"
 compose-activity = "1.11.0"
-compose-lifecycle = "2.9.3"
-#compose-material3 = "1.4.0-rc01"
-compose-navigation = "2.9.4"
+compose-lifecycle = "2.9.4"
+compose-navigation = "2.9.5"
 
 other-coroutines = "1.10.2"
 other-json = "20250517"
@@ -19,7 +18,7 @@ other-okhttp = "5.1.0"
 other-osmdroid = "6.1.20"
 
 test-junit4 = "4.13.2"
-test-mockk = "1.14.5"
+test-mockk = "1.14.6"
 
 androidTest-junit = "1.3.0"
 androidTest-espresso = "3.7.0"
@@ -40,7 +39,6 @@ compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 compose-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "compose-lifecycle" }
-#compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
 compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-lifecycle" }
 

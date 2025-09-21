@@ -117,8 +117,8 @@ private val shapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp), // menus, snackbars, text fields
     small = RoundedCornerShape(6.dp), // buttons, chips
     medium = RoundedCornerShape(8.dp), // cards, small FABs
-    large = RoundedCornerShape(12.dp), // extended FABs, FABs, nav drawers
-    extraLarge = RoundedCornerShape(16.dp) // large FABs
+    large = RoundedCornerShape(24.dp), // extended FABs, FABs, nav drawers
+    extraLarge = RoundedCornerShape(32.dp) // large FABs
 )
 
 private val typography = Typography(

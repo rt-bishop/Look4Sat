@@ -1,5 +1,9 @@
 package com.rtbishop.look4sat.presentation.passes
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,8 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +31,8 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -97,7 +105,10 @@ private fun PassesScreen(uiState: PassesState, navActions: NavActions) {
             uiState.takeAction(PassesAction.DismissWelcome)
         }
     }
-    ScreenColumn(floatingBar = { PassesFloatingBar(navActions) }) { isVerticalLayout ->
+    val gridState = rememberLazyGridState()
+    ScreenColumn(
+        floatingBar = { PassesFloatingBar(gridState.isScrolling(), navActions) }
+    ) { isVerticalLayout ->
         if (isVerticalLayout) {
             TopBar {
                 IconCard(action = { showPassesDialog() }, resId = R.drawable.ic_filter)
@@ -113,17 +124,19 @@ private fun PassesScreen(uiState: PassesState, navActions: NavActions) {
                 IconCard(action = { showRadiosDialog() }, resId = R.drawable.ic_satellite)
             }
         }
-        PassesList(uiState.isRefreshing, uiState.itemsList, navActions.openRadar, refreshList)
+        PassesList(uiState.isRefreshing, uiState.itemsList, navActions.openRadar, refreshList, gridState)
     }
 }
 
 @Composable
-private fun PassesFloatingBar(navActions: NavActions) {
-    FloatingBar(
-        startAction = navActions.openSettings, startIconResId = R.drawable.ic_settings,
-        centerAction = navActions.openSatellites, centerIconResId = R.drawable.ic_sputnik,
-        endAction = navActions.openMap, endIconResId = R.drawable.ic_map
-    )
+private fun PassesFloatingBar(visible: Boolean, navActions: NavActions) {
+    AnimatedVisibility(visible = visible, enter = fadeIn(tween(250)), exit = fadeOut(tween(250))) {
+        FloatingBar(
+            startAction = navActions.openSettings, startIconResId = R.drawable.ic_settings,
+            centerAction = navActions.openSatellites, centerIconResId = R.drawable.ic_sputnik,
+            endAction = navActions.openMap, endIconResId = R.drawable.ic_map
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -132,7 +145,8 @@ private fun PassesList(
     isRefreshing: Boolean,
     passes: List<OrbitalPass>,
     navigateToRadar: (Int, Long) -> Unit,
-    refreshPasses: () -> Unit
+    refreshPasses: () -> Unit,
+    gridState: LazyGridState
 ) {
     val isVerticalLayout = isVerticalLayout()
     val refreshState = rememberPullToRefreshState()
@@ -155,6 +169,7 @@ private fun PassesList(
                 EmptyListCard(message = stringResource(R.string.passes_empty_list_message))
             } else {
                 LazyVerticalGrid(
+                    state = gridState,
                     columns = GridCells.Adaptive(320.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -309,4 +324,9 @@ private fun NearEarthPass(
             }
         }
     }
+}
+
+@Composable
+private fun LazyGridState.isScrolling(): Boolean {
+    return remember { derivedStateOf { !isScrollInProgress } }.value
 }
