@@ -5,8 +5,13 @@
     <string name="app_version">Версія: %s</string>
     <string name="app_subtitle">Трекер супутників та прогноз прольотів</string>
 
-    <!--Buttons-->
+    <string name="menu_satellites">Супутники</string>
+    <string name="menu_passes">Прольоти</string>
+    <string name="menu_map">Мапа</string>
+    <string name="menu_settings">Налаштування</string>
+    <string name="menu_about">Інфо</string>
 
+    <!--Buttons-->
     <string name="btn_add">Додати</string>
     <string name="btn_accept">Прийняти</string>
     <string name="btn_cancel">Скасувати</string>
@@ -30,11 +35,12 @@
     <string name="btn_web">Онлайн</string>
     <string name="btn_import">Імпорт</string>
     <string name="btn_github">GitHub</string>
-    <string name="btn_support">Підтримати</string>
+    <string name="btn_donate">Підтримати</string>
     <string name="btn_fdroid">F-Droid</string>
+    <string name="btn_license">Ліцензія GPLv3</string>
+    <string name="btn_privacy">Конфіденційність</string>
 
     <!--Dialogs-->
-
     <string name="filter_title">Фільтр прольотів</string>
     <string name="filter_hours_hint">Кількість годин</string>
     <string name="filter_hours_text">Показати за наступні X годин</string>
@@ -60,21 +66,20 @@
     <string name="types_message">Вибраний тип: %s</string>
 
     <!--Fragments-->
-
     <string name="entries_search_hint">Пошук за Назвою / Id</string>
 
     <string name="passes_error">Немає майбутніх прольотів супутників</string>
     <string name="passes_empty_db">Немає даних для відображення. Будь ласка, оновіть базу даних через меню Налаштування</string>
 
     <string name="pass_satName">%s</string>
-    <string name="pass_satId">Id:%d</string>
+    <string name="pass_satId">Id:%05d</string>
     <string name="pass_aosAz">Початок - %.1f°</string>
     <string name="pass_elevation">Піднес.: %.1f°</string>
-    <string name="pass_los">%.1f° - кінець</string>
+    <string name="pass_losAz">%.1f° - кінець</string>
     <string name="pass_altitude">Висота: %.0f км</string>
     <string name="pass_placeholder"> - - : - - </string>
-    <string name="pass_startTime">HH:mm:ss - MMM dd</string>
-    <string name="pass_endTime">dd MMM - HH:mm:ss</string>
+    <string name="pass_startTime">HH:mm:ss - EEE</string>
+    <string name="pass_endTime">EEE - HH:mm:ss</string>
 
     <string name="radar_az_text">Азимут</string>
     <string name="radar_az_value">%.1f°</string>
@@ -109,7 +114,6 @@
     <string name="map_elevation">Піднесення: %.1f°</string>
     <string name="map_latitude">Широта: %.1f°</string>
     <string name="map_longitude">Довгота: %.1f°</string>
-    <string name="map_qth">QTH Locator: %s</string>
     <string name="map_visible">Видимий</string>
     <string name="map_eclipsed">Затемнений</string>
     <string name="map_visibility">Видимість: %s</string>
@@ -121,7 +125,6 @@
     <string name="map_copyright">Wikimedia maps | Map data © OpenStreetMap contributors</string>
 
     <!--Cards-->
-
     <string name="location_title">Місцезнаходження</string>
     <string name="location_lat">Широта: %.4f°</string>
     <string name="location_lon">Довгота: %.4f°</string>
@@ -134,14 +137,14 @@
     <string name="data_title">Оновлення даних</string>
     <string name="data_error">Помилка при оновлені даних</string>
     <string name="data_update">Останнє оновлення: %s</string>
-    <string name="data_entries">Супутники: %s</string>
-    <string name="data_radios">Трансивери: %s</string>
+    <string name="data_entries">Супутників: %s</string>
+    <string name="data_radios">Трансиверів: %s</string>
     <string name="data_success">Оновлення успішне</string>
     <string name="data_clear_success">Дані успішно очищено</string>
 
     <string name="remote_title">Налаштування ротатора</string>
     <string name="remote_switch">Віддалене керування</string>
-    <string name="remote_ip_hint">IP-адреса</string>
+    <string name="remote_ip_hint">IP адреса</string>
     <string name="remote_port_hint">Порт</string>
 
     <string name="BTremote_title">Передача даних через Bluetooth</string>
@@ -150,28 +153,24 @@
     <string name="BTremote_output_hint">Формат даних</string>
     <string name="BTremote_perm_error">Перевірте дозвіл Bluetooth</string>
 
-    <string name="other_title">Інші налаштування</string>
     <string name="other_switch_utc">Показувати час в UTC</string>
     <string name="other_switch_update">Автоматичне оновлення даних</string>
     <string name="other_switch_sweep">Показувати анімацію радара</string>
     <string name="other_switch_sensors">Використовувати сенсори пристрою</string>
+    <string name="other_switch_light_theme">Використовувати світлу тему</string>
 
     <string name="outro_title">Я хотів би подякувати:</string>
-    <string name="outro_thanks"> • Вам за завантаження та використання Look4Sat!
-        \n Бажаю завжди чистого неба над головою!
-        \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
-        and <a href="https://github.com/davidmoten">Dave Moten</a> за створення predict4java і доступ
-        до неї по <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
-        \n • <a href="https://github.com/csete">Alexandru Csete</a> за створення Gpredict,
-        яка надихнула мене на створення Look4Sat.
-        \n • <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> за сайт
-        <a href="https://celestrak.com/">Celestrak</a> який надає доступ до файлів орбіт Two-Line Element.
-        \n • <a href="https://libre.space/">Libre Space Foundation</a> за проєкт
+    <string name="outro_thanks">Вам за завантаження та використання Look4Sat!
+        \nБажаю завжди чистого неба над головою!
+        \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
+        та <a href="https://github.com/davidmoten">Dave Moten</a> за створення бібліотеки predict4java.
+        \n<a href="https://github.com/csete">Alexandru Csete</a> за створення трекера Gpredict, який надихнув мене на створення Look4Sat.
+        \n<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> за його сайт
+        <a href="https://celestrak.com/">Celestrak</a> який надає доступ до даних Two-Line Element.
+        \n<a href="https://libre.space/">Libre Space Foundation</a> за проєкт
         <a href="https://db.satnogs.org/">SatNOGS</a>, API та базу даних про супутники.
-        \n • Команді <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
+        \nКоманді <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
         за інтерес до застосунку та публікацію інтерв\'ю на сайті.
     </string>
-    <string name="outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Політика конфіденційності.</a>
-        Це ПЗ поставляється без жодних гарантій. \n Детальніше про ліцензію: <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.
-    </string>
+    <string name="outro_license">Це ПЗ поставляється без жодних гарантій.</string>
 </resources>
