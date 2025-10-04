@@ -24,7 +24,6 @@ interface ISettingsManager {
     val sourcesMap: Map<String, String>
         get() = mapOf(
             "All" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-            "Amsat" to "https://amsat.org/tle/current/nasabare.txt",
             "Amateur" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=amateur&FORMAT=csv",
             "Classified" to "https://www.mmccants.org/~mmccants/tles/classfd.zip",
             "Cubesat" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=cubesat&FORMAT=csv",
@@ -48,7 +47,8 @@ interface ISettingsManager {
             "Starlink" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=csv",
             "Swarm" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=swarm&FORMAT=csv",
             "Weather" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=weather&FORMAT=csv",
-            "X-Comm" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv"
+            "X-Comm" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=x-comm&FORMAT=csv",
+            "Amsat" to "https://amsat.org/tle/current/nasabare.txt"
         )
 
     fun loadStationLocator(): String

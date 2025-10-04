@@ -75,7 +75,7 @@ class DataRepository(
             jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
                 entry.value?.let { stream ->
                     when (val type = entry.key) {
-                        "AMSAT", "R4UAB" -> {
+                        "Amsat", "R4UAB" -> {
                             // parse tle stream
                             val satellites = importSatellites(stream)
                             val catnums = satellites.map { it.data.catnum }
