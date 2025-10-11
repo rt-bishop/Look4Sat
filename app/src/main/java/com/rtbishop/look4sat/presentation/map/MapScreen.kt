@@ -114,7 +114,7 @@ private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
                 IconCard(action = selectNext, resId = R.drawable.ic_arrow)
             }
-            NextPassRow(pass = uiState.value.orbitalPass)
+            TopBar { NextPassRow(pass = uiState.value.orbitalPass) }
         } else {
             TopBar {
                 IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)

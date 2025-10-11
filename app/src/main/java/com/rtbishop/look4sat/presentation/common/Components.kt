@@ -1,9 +1,12 @@
 package com.rtbishop.look4sat.presentation.common
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.MarqueeSpacing
-import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,12 +21,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -98,17 +104,17 @@ fun RowScope.TimerRow(timeString: String, isTimeAos: Boolean) {
 @Composable
 @Preview(showBackground = true)
 private fun NextPassRowPreview() = MainTheme {
-    NextPassRow(pass = getDefaultPass())
+    TopBar { NextPassRow(pass = getDefaultPass()) }
 }
 
 @Composable
-fun NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
-    ElevatedCard(modifier = modifier.height(48.dp)) {
+fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
+    ElevatedCard(modifier = modifier.height(48.dp).weight(1f)) {
         Column(
             verticalArrangement = Arrangement.spacedBy((-2).dp),
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surface)
+//                .background(color = MaterialTheme.colorScheme.background)
                 .padding(start = 6.dp, top = 1.dp, end = 6.dp, bottom = 0.dp)
         ) {
             val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
@@ -319,58 +325,86 @@ fun Modifier.layoutPadding(): Modifier {
 }
 
 @Composable
-fun ScreenColumn(floatingBar: @Composable () -> Unit = {}, content: @Composable (Boolean) -> Unit) {
-    Box(contentAlignment = Alignment.BottomCenter) {
-        Column(
-            modifier = Modifier.layoutPadding(),
-            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.extraSmall)
-        ) { content(isVerticalLayout()) }
-        floatingBar()
-    }
-}
-
-@Composable
-fun PrimaryButton(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
-    val clickableMod = modifier.clickable { action() }
-    val colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-    ElevatedCard(modifier = Modifier.size(96.dp, 48.dp), colors = colors, shape = MaterialTheme.shapes.large) {
-        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(resId), contentDescription = null)
+fun ScreenColumn(
+    topBar: @Composable (Boolean) -> Unit = {},
+    floatingBar: @Composable () -> Unit = {},
+    content: @Composable (Boolean) -> Unit = {}
+) {
+    val surfaceCorners = LocalSpacing.current.large
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val isVerticalLayout = windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Box(modifier = Modifier.layoutPadding(), contentAlignment = Alignment.BottomCenter) {
+            Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.extraSmall)) {
+                topBar(isVerticalLayout)
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    shape = RoundedCornerShape(topStart = surfaceCorners, topEnd = surfaceCorners),
+                    color = MaterialTheme.colorScheme.surfaceContainer
+                ) { content(isVerticalLayout) }
+            }
+            floatingBar()
         }
     }
 }
 
 @Composable
-fun SecondaryButton(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
-    val clickableMod = modifier.clickable { action() }
-    ElevatedCard(modifier = Modifier.size(48.dp), shape = MaterialTheme.shapes.large) {
-        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(resId), contentDescription = null)
-        }
+fun TopBar(
+    isVerticalLayout: Boolean,
+    startAction: @Composable () -> Unit,
+    topInfo: @Composable (RowScope.() -> Unit),
+    bottomInfo: @Composable (RowScope.() -> Unit),
+    endAction: @Composable () -> Unit
+) {
+    val topBarRow = @Composable { content: @Composable RowScope.() -> Unit ->
+        Row(
+            modifier = Modifier.height(48.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) { content() }
+    }
+    if (isVerticalLayout) {
+        topBarRow { startAction().also { topInfo() }.also { endAction() } }
+        topBarRow { bottomInfo() }
+    } else {
+        topBarRow { startAction().also { topInfo() }.also { bottomInfo() }.also { endAction() } }
     }
 }
 
 @Composable
 fun FloatingBar(
-    startAction: () -> Unit, startIconResId: Int,
-    centerAction: () -> Unit, centerIconResId: Int,
-    endAction: () -> Unit, endIconResId: Int
+    visible: Boolean,
+    startAction: @Composable () -> Unit,
+    centerAction: @Composable () -> Unit,
+    endAction: @Composable () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        shape = MaterialTheme.shapes.extraLarge,
-        modifier = Modifier.padding(bottom = spacing.medium)
-            .border(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.extraLarge)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = spacing.large, vertical = spacing.medium)
+    AnimatedVisibility(visible = visible, enter = fadeIn(tween(250)), exit = fadeOut(tween(250))) {
+        Surface(
+            modifier = Modifier.padding(bottom = spacing.large),
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.background,
+            border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant)
         ) {
-            SecondaryButton(action = startAction, resId = startIconResId)
-            PrimaryButton(action = centerAction, resId = centerIconResId)
-            SecondaryButton(action = endAction, resId = endIconResId)
+            Row(
+                modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small),
+                horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall),
+                verticalAlignment = Alignment.CenterVertically
+            ) { startAction().also { centerAction() }.also { endAction() } }
         }
+    }
+}
+
+@Composable
+fun PrimaryAction(action: () -> Unit, resId: Int, descResId: Int) {
+    FilledIconButton(onClick = action, modifier = Modifier.width(72.dp)) {
+        Icon(painterResource(resId), stringResource(descResId))
+    }
+}
+
+@Composable
+fun SecondaryAction(action: () -> Unit, resId: Int, descResId: Int) {
+    IconButton(onClick = action) {
+        Icon(painterResource(resId), stringResource(descResId))
     }
 }

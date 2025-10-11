@@ -1,9 +1,5 @@
 package com.rtbishop.look4sat.presentation.passes
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,7 +55,9 @@ import com.rtbishop.look4sat.presentation.common.FloatingBar
 import com.rtbishop.look4sat.presentation.common.IconCard
 import com.rtbishop.look4sat.presentation.common.InfoDialog
 import com.rtbishop.look4sat.presentation.common.NextPassRow
+import com.rtbishop.look4sat.presentation.common.PrimaryAction
 import com.rtbishop.look4sat.presentation.common.ScreenColumn
+import com.rtbishop.look4sat.presentation.common.SecondaryAction
 import com.rtbishop.look4sat.presentation.common.TimerRow
 import com.rtbishop.look4sat.presentation.common.TopBar
 import com.rtbishop.look4sat.presentation.common.infiniteMarquee
@@ -88,7 +86,11 @@ private fun PassesScreen(uiState: PassesState, navActions: NavActions) {
     val showPassesDialog = { uiState.takeAction(PassesAction.TogglePassesDialog) }
     val showRadiosDialog = { uiState.takeAction(PassesAction.ToggleRadiosDialog) }
     if (uiState.isPassesDialogShown) {
-        PassesDialog(hours = uiState.hours, elevation = uiState.elevation, cancel = showPassesDialog) { hours, elevation ->
+        PassesDialog(
+            hours = uiState.hours,
+            elevation = uiState.elevation,
+            cancel = showPassesDialog
+        ) { hours, elevation ->
             uiState.takeAction(PassesAction.FilterPasses(hours, elevation))
         }
     }
@@ -107,36 +109,51 @@ private fun PassesScreen(uiState: PassesState, navActions: NavActions) {
     }
     val gridState = rememberLazyGridState()
     ScreenColumn(
-        floatingBar = { PassesFloatingBar(gridState.isScrolling(), navActions) }
-    ) { isVerticalLayout ->
-        if (isVerticalLayout) {
-            TopBar {
-                IconCard(action = { showPassesDialog() }, resId = R.drawable.ic_filter)
-                TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
-                IconCard(action = { showRadiosDialog() }, resId = R.drawable.ic_satellite)
-            }
-            NextPassRow(pass = uiState.nextPass)
-        } else {
-            TopBar {
-                IconCard(action = { showPassesDialog() }, resId = R.drawable.ic_filter)
-                TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
-                NextPassRow(pass = uiState.nextPass, modifier = Modifier.weight(1f))
-                IconCard(action = { showRadiosDialog() }, resId = R.drawable.ic_satellite)
-            }
+        topBar = { isVerticalLayout ->
+            TopBar(
+                isVerticalLayout = isVerticalLayout,
+                startAction = {
+                    IconCard(action = showPassesDialog, resId = R.drawable.ic_filter)
+                },
+                topInfo = {
+                    TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
+                },
+                bottomInfo = {
+                    NextPassRow(pass = uiState.nextPass)
+                },
+                endAction = {
+                    IconCard(action = showRadiosDialog, resId = R.drawable.ic_satellite)
+                }
+            )
+        },
+        floatingBar = {
+            PassesFloatingBar(visible = gridState.isScrolling(), actions = navActions)
         }
-        PassesList(uiState.isRefreshing, uiState.itemsList, navActions.openRadar, refreshList, gridState)
+    ) { isVerticalLayout ->
+        PassesList(
+            isRefreshing = uiState.isRefreshing,
+            passes = uiState.itemsList,
+            navigateToRadar = navActions.openRadar,
+            refreshPasses = refreshList,
+            gridState = gridState
+        )
     }
 }
 
 @Composable
-private fun PassesFloatingBar(visible: Boolean, navActions: NavActions) {
-    AnimatedVisibility(visible = visible, enter = fadeIn(tween(250)), exit = fadeOut(tween(250))) {
-        FloatingBar(
-            startAction = navActions.openSettings, startIconResId = R.drawable.ic_settings,
-            centerAction = navActions.openSatellites, centerIconResId = R.drawable.ic_sputnik,
-            endAction = navActions.openMap, endIconResId = R.drawable.ic_map
-        )
-    }
+private fun PassesFloatingBar(visible: Boolean, actions: NavActions) {
+    FloatingBar(
+        visible = visible,
+        startAction = {
+            SecondaryAction(actions.openSettings, R.drawable.ic_settings, R.string.btn_settings)
+        },
+        centerAction = {
+            PrimaryAction(actions.openSatellites, R.drawable.ic_sputnik, R.string.btn_satellites)
+        },
+        endAction = {
+            SecondaryAction(actions.openMap, R.drawable.ic_map, R.string.btn_map)
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
