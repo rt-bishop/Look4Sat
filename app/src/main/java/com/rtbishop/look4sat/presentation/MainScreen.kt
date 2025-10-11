@@ -1,9 +1,6 @@
 package com.rtbishop.look4sat.presentation
 
-import androidx.compose.foundation.background
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -39,11 +36,7 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
         openMap = { navController.navigate(Screen.Map.route) },
         openSettings = { navController.navigate(Screen.Settings.route) }
     )
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Passes.route,
-        modifier = Modifier.background(color = MaterialTheme.colorScheme.background)
-    ) {
+    NavHost(navController = navController, startDestination = Screen.Passes.route) {
         satellitesDestination { navController.navigateUp() }
         passesDestination(navActions)
         radarDestination { navController.navigateUp() }

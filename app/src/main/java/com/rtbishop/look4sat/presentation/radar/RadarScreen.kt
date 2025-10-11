@@ -88,7 +88,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
-            NextPassRow(pass = upcomingPass)
+            TopBar { NextPassRow(pass = upcomingPass) }
         } else {
             TopBar {
                 IconCard(action = navigateUp, resId = R.drawable.ic_back)
