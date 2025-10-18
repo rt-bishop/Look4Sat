@@ -1,10 +1,5 @@
 package com.rtbishop.look4sat.presentation.common
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -21,15 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.domain.predict.OrbitalData
@@ -308,8 +299,7 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
 
 @Composable
 fun isVerticalLayout(): Boolean {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    return windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+    return currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(600).not()
 }
 
 @Composable
@@ -331,8 +321,7 @@ fun ScreenColumn(
     content: @Composable (Boolean) -> Unit = {}
 ) {
     val surfaceCorners = LocalSpacing.current.large
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val isVerticalLayout = windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+    val isVerticalLayout = isVerticalLayout()
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.layoutPadding(), contentAlignment = Alignment.BottomCenter) {
             Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.extraSmall)) {
@@ -368,43 +357,5 @@ fun TopBar(
         topBarRow { bottomInfo() }
     } else {
         topBarRow { startAction().also { topInfo() }.also { bottomInfo() }.also { endAction() } }
-    }
-}
-
-@Composable
-fun FloatingBar(
-    visible: Boolean,
-    startAction: @Composable () -> Unit,
-    centerAction: @Composable () -> Unit,
-    endAction: @Composable () -> Unit
-) {
-    val spacing = LocalSpacing.current
-    AnimatedVisibility(visible = visible, enter = fadeIn(tween(250)), exit = fadeOut(tween(250))) {
-        Surface(
-            modifier = Modifier.padding(bottom = spacing.large),
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.background,
-            border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small),
-                horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall),
-                verticalAlignment = Alignment.CenterVertically
-            ) { startAction().also { centerAction() }.also { endAction() } }
-        }
-    }
-}
-
-@Composable
-fun PrimaryAction(action: () -> Unit, resId: Int, descResId: Int) {
-    FilledIconButton(onClick = action, modifier = Modifier.width(72.dp)) {
-        Icon(painterResource(resId), stringResource(descResId))
-    }
-}
-
-@Composable
-fun SecondaryAction(action: () -> Unit, resId: Int, descResId: Int) {
-    IconButton(onClick = action) {
-        Icon(painterResource(resId), stringResource(descResId))
     }
 }

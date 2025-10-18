@@ -5,10 +5,10 @@
     <string name="app_version">අනුවාදය: %s</string>
     <string name="app_subtitle">චන්ද්‍රිකා tracker හා නිසැක පෙරැයින්නා</string>
 
-    <string name="menu_satellites">චන්ද්‍රිකා</string>
-    <string name="menu_passes">පසුකර යෑම්</string>
-    <string name="menu_map">ලෝක සිතියම</string>
-    <string name="menu_settings">පසුතල</string>
+    <string name="nav_satellites">චන්ද්‍රිකා</string>
+    <string name="nav_passes">පසුකර යෑම්</string>
+    <string name="nav_map">ලෝක සිතියම</string>
+    <string name="nav_settings">පසුතල</string>
     <string name="menu_about">ගැන</string>
 
     <!--Buttons-->

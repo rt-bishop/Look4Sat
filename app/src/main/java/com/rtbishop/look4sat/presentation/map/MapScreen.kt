@@ -85,7 +85,7 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 }
 private val labelRect = Rect()
 
-fun NavGraphBuilder.mapDestination(function: () -> Boolean) {
+fun NavGraphBuilder.mapDestination() {
     composable(Screen.Map.route) {
         val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
         val uiState = viewModel.uiState.collectAsStateWithLifecycle()

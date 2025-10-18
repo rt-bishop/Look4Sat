@@ -5,10 +5,10 @@
     <string name="app_version">版本：%s</string>
     <string name="app_subtitle">人造卫星追踪和过境预测</string>
 
-    <string name="menu_satellites">卫星</string>
-    <string name="menu_passes">过境</string>
-    <string name="menu_map">世界地图</string>
-    <string name="menu_settings">设置</string>
+    <string name="nav_satellites">卫星</string>
+    <string name="nav_passes">过境</string>
+    <string name="nav_map">世界地图</string>
+    <string name="nav_settings">设置</string>
     <string name="menu_about">关于</string>
 
     <!--Buttons-->

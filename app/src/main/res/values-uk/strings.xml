@@ -5,10 +5,10 @@
     <string name="app_version">Версія: %s</string>
     <string name="app_subtitle">Трекер супутників та прогноз прольотів</string>
 
-    <string name="menu_satellites">Супутники</string>
-    <string name="menu_passes">Прольоти</string>
-    <string name="menu_map">Мапа</string>
-    <string name="menu_settings">Налаштування</string>
+    <string name="nav_satellites">Супутники</string>
+    <string name="nav_passes">Прольоти</string>
+    <string name="nav_map">Мапа</string>
+    <string name="nav_settings">Налаштування</string>
     <string name="menu_about">Інфо</string>
 
     <!--Buttons-->
