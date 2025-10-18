@@ -5,10 +5,10 @@
     <string name="app_version">Версия: %s</string>
     <string name="app_subtitle">Трекер спутников для Android</string>
 
-    <string name="menu_satellites">Спутники</string>
-    <string name="menu_passes">Пролеты</string>
-    <string name="menu_map">Карта</string>
-    <string name="menu_settings">Настройки</string>
+    <string name="nav_satellites">Спутники</string>
+    <string name="nav_passes">Пролеты</string>
+    <string name="nav_map">Карта</string>
+    <string name="nav_settings">Настройки</string>
     <string name="menu_about">Инфо</string>
 
     <!--Buttons-->

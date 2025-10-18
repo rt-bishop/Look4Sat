@@ -33,7 +33,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-animation = { group = "androidx.compose.animation", name = "animation" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
+compose-material3-navigation = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 
@@ -69,7 +69,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 composeAll = [
     "compose-animation", "compose-runtime", "compose-tooling",
     "compose-activity", "compose-lifecycle", "compose-material3",
-    "compose-material3-adaptive", "compose-navigation", "compose-viewmodel"
+    "compose-material3-navigation", "compose-navigation", "compose-viewmodel"
 ]
 composeDebug = ["compose-debug-manifest", "compose-debug-tooling"]
 unitTest = ["test-coroutines", "test-junit4", "test-mockk"]

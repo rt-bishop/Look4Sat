@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,6 +31,11 @@ import com.rtbishop.look4sat.presentation.MainScreen
 
 class MainActivity : ComponentActivity() {
 
+    override fun attachBaseContext(newBase: Context?) {
+        overrideSystemFontAndDisplaySizeScaling(newBase)
+        super.attachBaseContext(newBase)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         enableEdgeToEdge()
@@ -38,5 +45,10 @@ class MainActivity : ComponentActivity() {
             val otherSettings = container.settingsRepo.otherSettings.collectAsState().value
             MainTheme(isDarkTheme = !otherSettings.stateOfLightTheme) { MainScreen() }
         }
+    }
+
+    private fun overrideSystemFontAndDisplaySizeScaling(newBase: Context?) {
+        val newConfig = Configuration(newBase?.resources?.configuration).apply { fontScale = 1.0f }
+        applyOverrideConfiguration(newConfig)
     }
 }
