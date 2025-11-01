@@ -116,7 +116,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
                     NextPassRow(pass = uiState.nextPass)
                 },
                 endAction = {
-                    IconCard(action = showRadiosDialog, resId = R.drawable.ic_satellite)
+                    IconCard(action = showRadiosDialog, resId = R.drawable.ic_radios)
                 }
             )
         }

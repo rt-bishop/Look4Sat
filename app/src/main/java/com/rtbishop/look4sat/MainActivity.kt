@@ -23,16 +23,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.MainScreen
+import com.rtbishop.look4sat.presentation.MainTheme
 
 class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context?) {
-        overrideSystemFontAndDisplaySizeScaling(newBase)
+        val config = Configuration(newBase?.resources?.configuration)
+        applyOverrideConfiguration(config.apply { fontScale = 1.0f })
         super.attachBaseContext(newBase)
     }
 
@@ -41,14 +40,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            val container = (LocalContext.current.applicationContext as MainApplication).container
-            val otherSettings = container.settingsRepo.otherSettings.collectAsState().value
-            MainTheme(isDarkTheme = !otherSettings.stateOfLightTheme) { MainScreen() }
+            MainTheme(isDarkTheme = true) { MainScreen() }
         }
-    }
-
-    private fun overrideSystemFontAndDisplaySizeScaling(newBase: Context?) {
-        val newConfig = Configuration(newBase?.resources?.configuration).apply { fontScale = 1.0f }
-        applyOverrideConfiguration(newConfig)
     }
 }

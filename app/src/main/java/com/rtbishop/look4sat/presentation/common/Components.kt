@@ -56,7 +56,7 @@ private fun TopBarPreview() = MainTheme {
     TopBar {
         IconCard(action = {}, resId = R.drawable.ic_filter)
         TimerRow(timeString = "88:88:88", isTimeAos = true)
-        IconCard(action = {}, resId = R.drawable.ic_satellite)
+        IconCard(action = {}, resId = R.drawable.ic_radios)
     }
 }
 

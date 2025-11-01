@@ -160,7 +160,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_satellite),
+                            painter = painterResource(R.drawable.ic_radios),
                             contentDescription = null,
                             modifier = Modifier.size(64.dp)
                         )
@@ -245,7 +245,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                             verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.ic_satellite),
+                                painter = painterResource(R.drawable.ic_radios),
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp)
                             )

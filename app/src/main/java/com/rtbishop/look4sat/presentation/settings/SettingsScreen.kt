@@ -180,7 +180,7 @@ private fun CardAbout(version: String, sendUrlAction: (SystemAction) -> Unit = {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_sputnik),
+                    painter = painterResource(id = R.drawable.ic_satellites),
                     tint = MaterialTheme.colorScheme.primary,
                     contentDescription = null,
                     modifier = Modifier.size(72.dp)

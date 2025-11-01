@@ -91,7 +91,7 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
 
     private fun getSelectedTypes(): List<String> {
         val typesString = preferences.getString(keySelectedTypes, null)
-        if (typesString.isNullOrEmpty()) return emptyList()
+        if (typesString.isNullOrEmpty()) return listOf("Amateur")
         return typesString.split(separatorComma)
     }
     //endregion

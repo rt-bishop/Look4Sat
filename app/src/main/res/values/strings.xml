@@ -8,7 +8,7 @@
     <string name="nav_satellites">Satellites</string>
     <string name="nav_passes">Passes</string>
     <string name="nav_radar">Radar</string>
-    <string name="nav_map">World Map</string>
+    <string name="nav_map">Map</string>
     <string name="nav_settings">Settings</string>
 
     <!--Buttons-->
@@ -85,7 +85,7 @@
     <string name="types_message">Selected type: %s</string>
 
     <!--Fragments-->
-    <string name="entries_search_hint">Name / Id</string>
+    <string name="entries_search_hint">Id - Name</string>
 
     <string name="passes_error">There are no upcoming satellite passes to display</string>
     <string name="passes_empty_db">No data to show. Please update the database via Settings menu.</string>
