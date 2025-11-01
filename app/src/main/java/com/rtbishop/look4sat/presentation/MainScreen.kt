@@ -20,9 +20,9 @@ import com.rtbishop.look4sat.presentation.satellites.satellitesDestination
 import com.rtbishop.look4sat.presentation.settings.settingsDestination
 
 sealed class Screen(val route: String, val iconResId: Int, val titleResId: Int) {
-    data object Satellites : Screen("satellites", R.drawable.ic_sputnik, R.string.nav_satellites)
+    data object Satellites : Screen("satellites", R.drawable.ic_satellites, R.string.nav_satellites)
     data object Passes : Screen("passes", R.drawable.ic_passes, R.string.nav_passes)
-    data object Radar : Screen("radar", R.drawable.ic_satellite, R.string.nav_radar)
+    data object Radar : Screen("radar", R.drawable.ic_radar, R.string.nav_radar)
     data object Map : Screen("map", R.drawable.ic_map, R.string.nav_map)
     data object Settings : Screen("settings", R.drawable.ic_settings, R.string.nav_settings)
 }

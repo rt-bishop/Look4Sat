@@ -85,7 +85,7 @@ fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, accept: (Int
             title = "Show passes within",
             value = hoursValue.intValue.toDouble(),
             valuePostfix = "h",
-            valueResId = R.drawable.ic_time,
+            valueResId = R.drawable.ic_clock,
             valueRange = 1f..240f
         ) { hoursValue.intValue = it.toInt() }
     }
