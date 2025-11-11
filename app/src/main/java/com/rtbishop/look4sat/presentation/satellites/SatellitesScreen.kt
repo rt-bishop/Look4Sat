@@ -3,19 +3,16 @@ package com.rtbishop.look4sat.presentation.satellites
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -49,6 +46,7 @@ import com.rtbishop.look4sat.presentation.common.CardLoadingIndicator
 import com.rtbishop.look4sat.presentation.common.EmptyListCard
 import com.rtbishop.look4sat.presentation.common.IconCard
 import com.rtbishop.look4sat.presentation.common.InfoDialog
+import com.rtbishop.look4sat.presentation.common.PrimaryIconCard
 import com.rtbishop.look4sat.presentation.common.TopBar
 import com.rtbishop.look4sat.presentation.common.infiniteMarquee
 import com.rtbishop.look4sat.presentation.common.isVerticalLayout
@@ -88,7 +86,7 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateUp: () -> Unit) {
         if (isVerticalLayout()) {
             TopBar {
                 TypeCard(types = uiState.currentTypes, toggleDialog, modifier = Modifier.weight(1f))
-                SaveButton(saveSelection = saveSelection, modifier = Modifier.height(48.dp))
+                PrimaryIconCard(onClick = saveSelection, resId = R.drawable.ic_done)
             }
             TopBar {
                 SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
@@ -97,7 +95,7 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateUp: () -> Unit) {
             }
         } else {
             TopBar {
-                SaveButton(saveSelection = saveSelection, modifier = Modifier.height(48.dp))
+                PrimaryIconCard(onClick = saveSelection, resId = R.drawable.ic_done)
                 TypeCard(types = uiState.currentTypes, toggleDialog, modifier = Modifier.weight(1f))
                 SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
                 IconCard(action = unselectAll, resId = R.drawable.ic_check_off)
@@ -164,19 +162,6 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
 }
 
 @Composable
-private fun SaveButton(saveSelection: () -> Unit, modifier: Modifier = Modifier) {
-    val clickableModifier = modifier.clickable { saveSelection() }
-    ElevatedCard(
-        modifier = Modifier.width(102.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-    ) {
-        Box(modifier = clickableModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(id = R.drawable.ic_done), contentDescription = null)
-        }
-    }
-}
-
-@Composable
 private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val typesText = if (types.isEmpty()) "All" else types.joinToString(", ")
     ElevatedCard(modifier = modifier) {
@@ -187,7 +172,11 @@ private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifie
                 .height(48.dp)
                 .clickable { onClick() }) {
             Spacer(Modifier)
-            Icon(painter = painterResource(id = R.drawable.ic_tags), contentDescription = null)
+            Icon(
+                painter = painterResource(id = R.drawable.ic_tags),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
             Text(
                 text = "Tags: $typesText",
                 fontSize = 16.sp,

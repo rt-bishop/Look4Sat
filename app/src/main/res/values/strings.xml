@@ -192,8 +192,6 @@
         <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
         \n<a href="https://libre.space/">Libre Space Foundation</a> for their
         <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of data.
-        \n<a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
-        team for their interest to the app and the interview published.
     </string>
     <string name="outro_license">The app comes with no warranty.</string>
 </resources>

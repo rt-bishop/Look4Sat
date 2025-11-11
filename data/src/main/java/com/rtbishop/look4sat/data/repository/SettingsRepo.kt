@@ -18,9 +18,10 @@
 package com.rtbishop.look4sat.data.repository
 
 import android.content.SharedPreferences
+import android.location.Location
 import android.location.LocationManager
-import android.os.CancellationSignal
 import androidx.core.content.edit
+import androidx.core.location.LocationListenerCompat
 import androidx.core.location.LocationManagerCompat
 import com.rtbishop.look4sat.domain.model.DatabaseState
 import com.rtbishop.look4sat.domain.model.OtherSettings
@@ -30,11 +31,13 @@ import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.positionToQth
 import com.rtbishop.look4sat.domain.utility.qthToPosition
 import com.rtbishop.look4sat.domain.utility.round
-import java.util.concurrent.Executors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class SettingsRepo(private val manager: LocationManager, private val preferences: SharedPreferences) : ISettingsRepo {
+class SettingsRepo(
+    private val locationManager: LocationManager,
+    private val preferences: SharedPreferences
+) : ISettingsRepo, LocationListenerCompat {
 
     private val keyBluetoothAddress = "bluetoothAddress"
     private val keyBluetoothName = "bluetoothName"
@@ -118,31 +121,30 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
 
     //region # Station position settings
     private val _stationPosition = MutableStateFlow(getStationPosition())
-    private val executor = Executors.newSingleThreadExecutor()
     private val providerDef = LocationManager.PASSIVE_PROVIDER
     private val providerGps = LocationManager.GPS_PROVIDER
     private val providerNet = LocationManager.NETWORK_PROVIDER
-    private val timeoutSignal = CancellationSignal().apply {
-        setOnCancelListener { _stationPosition.value = getStationPosition() }
-    }
     override val stationPosition: StateFlow<GeoPos> = _stationPosition
 
-    override fun setStationPositionGeo(latitude: Double, longitude: Double, altitude: Double): Boolean {
+    override fun setStationPosition(latitude: Double, longitude: Double, altitude: Double): Boolean {
         val newLongitude = if (longitude > 180.0) longitude - 180 else longitude
         val locator = positionToQth(latitude, newLongitude) ?: return false
         setStationPosition(latitude, newLongitude, altitude, locator)
         return true
     }
 
-    override fun setStationPositionGps(): Boolean {
-        if (!LocationManagerCompat.isLocationEnabled(manager)) return false
+    override fun setStationPosition(): Boolean {
+        if (!LocationManagerCompat.isLocationEnabled(locationManager)) return false
         try {
-            val hasProviderGps = LocationManagerCompat.hasProvider(manager, providerGps)
-            val hasProviderNet = LocationManagerCompat.hasProvider(manager, providerNet)
-            val provider = if (hasProviderGps) providerGps else if (hasProviderNet) providerNet else providerDef
-            println("Requesting location for $provider provider")
-            LocationManagerCompat.getCurrentLocation(manager, provider, timeoutSignal, executor) {
-                it?.let { setStationPositionGeo(it.latitude, it.longitude, it.altitude) }
+            val hasGps = LocationManagerCompat.hasProvider(locationManager, providerGps)
+            val hasNet = LocationManagerCompat.hasProvider(locationManager, providerNet)
+            val provider = if (hasGps) providerGps else if (hasNet) providerNet else providerDef
+            val location = locationManager.getLastKnownLocation(providerDef)
+            if (location == null || System.currentTimeMillis() - location.time > 600_000L) {
+                println("Requesting location for $provider provider")
+                locationManager.requestLocationUpdates(provider, 0L, 0f, this)
+            } else {
+                setStationPosition(location.latitude, location.longitude, location.altitude)
             }
         } catch (exception: SecurityException) {
             println("No permissions were given - $exception")
@@ -150,7 +152,7 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
         return true
     }
 
-    override fun setStationPositionQth(locator: String): Boolean {
+    override fun setStationPosition(locator: String): Boolean {
         val position = qthToPosition(locator) ?: return false
         setStationPosition(position.latitude, position.longitude, 0.0, locator)
         return true
@@ -277,7 +279,7 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
     override fun getBluetoothAddress(): String = preferences.getString(keyBluetoothAddress, null) ?: "00:0C:BF:13:80:5D"
     override fun setBluetoothAddress(value: String) = preferences.edit { putString(keyBluetoothAddress, value) }
 
-    override fun getBluetoothFormat(): String = preferences.getString(keyBluetoothFormat, null) ?: "W\$AZ \$EL"
+    override fun getBluetoothFormat(): String = preferences.getString(keyBluetoothFormat, null) ?: $$"W$AZ $EL"
     override fun setBluetoothFormat(value: String) = preferences.edit { putString(keyBluetoothFormat, value) }
 
     override fun getBluetoothName(): String = preferences.getString(keyBluetoothName, null) ?: "Default"
@@ -294,5 +296,8 @@ class SettingsRepo(private val manager: LocationManager, private val preferences
 
     override fun getRotatorState(): Boolean = preferences.getBoolean(keyRotatorState, false)
     override fun setRotatorState(value: Boolean) = preferences.edit { putBoolean(keyRotatorState, value) }
+    override fun onLocationChanged(location: Location) {
+        setStationPosition(location.latitude, location.longitude, location.altitude)
+    }
     //endregion
 }

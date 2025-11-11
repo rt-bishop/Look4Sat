@@ -39,9 +39,9 @@ interface ISettingsRepo {
 
     //region # Station position settings
     val stationPosition: StateFlow<GeoPos>
-    fun setStationPositionGeo(latitude: Double, longitude: Double, altitude: Double): Boolean
-    fun setStationPositionGps(): Boolean
-    fun setStationPositionQth(locator: String): Boolean
+    fun setStationPosition(latitude: Double, longitude: Double, altitude: Double): Boolean
+    fun setStationPosition(): Boolean
+    fun setStationPosition(locator: String): Boolean
     //endregion
 
     //region # Database update settings

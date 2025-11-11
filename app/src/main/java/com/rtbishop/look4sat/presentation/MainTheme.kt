@@ -115,8 +115,8 @@ private val darkScheme = darkColorScheme(
 
 private val shapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp), // menus, snackbars, text fields
-    small = RoundedCornerShape(6.dp), // buttons, chips
-    medium = RoundedCornerShape(8.dp), // cards, small FABs
+    small = RoundedCornerShape(8.dp), // buttons, chips
+    medium = RoundedCornerShape(12.dp), // cards, small FABs
     large = RoundedCornerShape(24.dp), // extended FABs, FABs, nav drawers
     extraLarge = RoundedCornerShape(32.dp) // large FABs
 )

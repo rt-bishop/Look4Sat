@@ -24,26 +24,31 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
+import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.domain.usecase.IOpenWebUrl
 import com.rtbishop.look4sat.domain.usecase.IShowToast
+import com.rtbishop.look4sat.domain.utility.toTimerString
+import com.rtbishop.look4sat.presentation.common.getDefaultPass
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val databaseRepo: IDatabaseRepo,
+    private val satelliteRepo: ISatelliteRepo,
     private val settingsRepo: ISettingsRepo,
-    private val openWebUrl: IOpenWebUrl,
     private val showToast: IShowToast,
     appVersionName: String
 ) : ViewModel() {
 
-    private val githubUrl = "https://github.com/rt-bishop/Look4Sat/"
-    private val donateUrl = "https://ko-fi.com/rt_bishop"
-    private val fdroidUrl = "https://f-droid.org/en/packages/com.rtbishop.look4sat/"
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
     private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
     private val defaultRCSettings = RCSettings(
@@ -57,6 +62,9 @@ class SettingsViewModel(
     )
     private val _uiState = MutableStateFlow(
         SettingsState(
+            nextTime = "00:00:00",
+            isNextTimeAos = true,
+            nextPass = getDefaultPass(),
             appVersionName = appVersionName,
             positionSettings = defaultPosSettings,
             dataSettings = defaultDataSettings,
@@ -67,9 +75,24 @@ class SettingsViewModel(
             sendSystemAction = ::handleAction
         )
     )
+    private var processing: Job? = null
+
     val uiState: StateFlow<SettingsState> = _uiState
 
     init {
+        viewModelScope.launch {
+            satelliteRepo.passes.collectLatest { passes ->
+                processing?.cancelAndJoin()
+                processing = viewModelScope.launch {
+                    while (isActive) {
+                        val timeNow = System.currentTimeMillis()
+                        val newPasses = satelliteRepo.processPasses(passes, timeNow)
+                        setPassInfo(newPasses, timeNow)
+                        delay(1000)
+                    }
+                }
+            }
+        }
         viewModelScope.launch {
             settingsRepo.stationPosition.collect { geoPos ->
                 val newPosSettings = _uiState.value.positionSettings.copy(
@@ -127,15 +150,13 @@ class SettingsViewModel(
 
     private fun handleAction(action: SystemAction) {
         when (action) {
-            SystemAction.OpenGitHub -> openWebUrl(githubUrl)
-            SystemAction.OpenDonate -> openWebUrl(donateUrl)
-            SystemAction.OpenFDroid -> openWebUrl(fdroidUrl)
             is SystemAction.ShowToast -> showToast(action.message)
+            else -> {}
         }
     }
 
     private fun setGpsPosition() {
-        if (settingsRepo.setStationPositionGps()) {
+        if (settingsRepo.setStationPosition()) {
             val messageResId = R.string.location_success
             val newPosSettings = _uiState.value.positionSettings.copy(
                 isUpdating = true, messageResId = messageResId
@@ -151,7 +172,7 @@ class SettingsViewModel(
     }
 
     private fun setGeoPosition(latitude: Double, longitude: Double) {
-        if (settingsRepo.setStationPositionGeo(latitude, longitude, 0.0)) {
+        if (settingsRepo.setStationPosition(latitude, longitude, 0.0)) {
             val messageResId = R.string.location_success
             val newPosSettings = _uiState.value.positionSettings.copy(
                 isUpdating = false, messageResId = messageResId
@@ -167,7 +188,7 @@ class SettingsViewModel(
     }
 
     private fun setQthPosition(locator: String) {
-        if (settingsRepo.setStationPositionQth(locator)) {
+        if (settingsRepo.setStationPosition(locator)) {
             val messageResId = R.string.location_success
             val newPosSettings = _uiState.value.positionSettings.copy(
                 isUpdating = false, messageResId = messageResId
@@ -213,6 +234,19 @@ class SettingsViewModel(
         }
     }
 
+    private fun setPassInfo(passes: List<OrbitalPass>, timeNow: Long) {
+        if (passes.isEmpty()) return
+        try {
+            val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
+            val time = nextPass.aosTime.minus(timeNow).toTimerString()
+            _uiState.update { it.copy(nextPass = nextPass, nextTime = time, isNextTimeAos = true) }
+        } catch (_: NoSuchElementException) {
+            val lastPass = passes.last()
+            val time = lastPass.losTime.minus(timeNow).toTimerString()
+            _uiState.update { it.copy(nextPass = lastPass, nextTime = time, isNextTimeAos = false) }
+        }
+    }
+
     private fun clearAllData() = viewModelScope.launch { databaseRepo.clearAllData() }
 
     companion object {
@@ -222,8 +256,8 @@ class SettingsViewModel(
                 val container = (this[applicationKey] as MainApplication).container
                 SettingsViewModel(
                     container.databaseRepo,
+                    container.satelliteRepo,
                     container.settingsRepo,
-                    container.provideOpenWebUrl(),
                     container.provideShowToast(),
                     container.provideAppVersionName()
                 )
