@@ -16,8 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
@@ -208,6 +208,19 @@ fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun PrimaryIconCard(modifier: Modifier = Modifier, resId: Int, onClick: () -> Unit) {
+    val clickableMod = modifier.clickable { onClick() }
+    ElevatedCard(
+        modifier = Modifier.size(102.dp, 48.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary)
+    ) {
+        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(painter = painterResource(id = resId), contentDescription = null)
+        }
+    }
+}
+
+@Composable
 fun CardLoadingIndicator() {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator(modifier = Modifier.size(80.dp))
@@ -320,7 +333,6 @@ fun ScreenColumn(
     floatingBar: @Composable () -> Unit = {},
     content: @Composable (Boolean) -> Unit = {}
 ) {
-    val surfaceCorners = LocalSpacing.current.large
     val isVerticalLayout = isVerticalLayout()
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.layoutPadding(), contentAlignment = Alignment.BottomCenter) {
@@ -328,7 +340,6 @@ fun ScreenColumn(
                 topBar(isVerticalLayout)
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    shape = RoundedCornerShape(topStart = surfaceCorners, topEnd = surfaceCorners),
                     color = MaterialTheme.colorScheme.surfaceContainer
                 ) { content(isVerticalLayout) }
             }

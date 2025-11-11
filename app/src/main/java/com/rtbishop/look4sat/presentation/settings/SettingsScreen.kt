@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,7 +46,11 @@ import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
 import com.rtbishop.look4sat.presentation.common.CardButton
-import com.rtbishop.look4sat.presentation.common.layoutPadding
+import com.rtbishop.look4sat.presentation.common.IconCard
+import com.rtbishop.look4sat.presentation.common.PrimaryIconCard
+import com.rtbishop.look4sat.presentation.common.ScreenColumn
+import com.rtbishop.look4sat.presentation.common.TopBar
+import com.rtbishop.look4sat.presentation.common.infiniteMarquee
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -60,9 +65,6 @@ fun NavGraphBuilder.settingsDestination() {
         SettingsScreen(uiState)
     }
 }
-
-private const val POLICY_URL = "https://sites.google.com/view/look4sat-privacy-policy/home"
-private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
 
 @Composable
 private fun SettingsScreen(uiState: SettingsState) {
@@ -127,99 +129,64 @@ private fun SettingsScreen(uiState: SettingsState) {
     val toggleUpdate = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleUpdate(value)) }
     val toggleSweep = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSweep(value)) }
     val toggleSensor = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSensor(value)) }
-    val toggleLightTheme = { value: Boolean ->
-        uiState.sendAction(SettingsAction.ToggleLightTheme(value))
-    }
+    val uriHandler = LocalUriHandler.current
 
-    // Screen setup
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(320.dp),
-        modifier = Modifier.layoutPadding(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        item { CardAbout(uiState.appVersionName, uiState.sendSystemAction) }
-        item {
-            LocationCard(
-                positionSettings,
-                setGpsPos,
-                showPosDialog,
-                showLocDialog,
-                dismissPos,
-                uiState.sendSystemAction
-            )
-        }
-        item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
-        item {
-            OtherCard(
-                otherSettings,
-                toggleUtc,
-                toggleUpdate,
-                toggleSweep,
-                toggleSensor,
-                toggleLightTheme
-            )
-        }
-        item { CardCredits() }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CardAboutPreview() = MainTheme { CardAbout(version = "4.0.0") }
-
-@Composable
-private fun CardAbout(version: String, sendUrlAction: (SystemAction) -> Unit = {}) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_satellites),
-                    tint = MaterialTheme.colorScheme.primary,
-                    contentDescription = null,
-                    modifier = Modifier.size(72.dp)
-                )
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        fontSize = 48.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = stringResource(id = R.string.app_version, version), fontSize = 20.sp
-                    )
+    ScreenColumn(
+        topBar = { isVerticalLayout ->
+            if (isVerticalLayout) {
+                TopBar {
+                    TopCard(onClick = { uriHandler.openUri("https://play.google.com/store/apps/details?id=com.rtbishop.look4sat") }, version = uiState.appVersionName, modifier = Modifier.weight(1f))
+                    PrimaryIconCard(onClick = { uriHandler.openUri("https://ko-fi.com/rt_bishop") }, resId = R.drawable.ic_pound)
+                }
+                TopBar {
+                    Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        BotCard(onClick = { uriHandler.openUri("https://www.gnu.org/licenses/gpl-3.0.html") }, R.drawable.ic_license, "Licence", modifier = Modifier.weight(1f))
+                        BotCard(onClick = { uriHandler.openUri("https://sites.google.com/view/look4sat-privacy-policy/home") }, R.drawable.ic_policy, "Privacy", modifier = Modifier.weight(1f))
+                    }
+                    IconCard(action = { uriHandler.openUri("https://f-droid.org/en/packages/com.rtbishop.look4sat/") }, resId = R.drawable.ic_fdroid)
+                    IconCard(action = { uriHandler.openUri("https://github.com/rt-bishop/Look4Sat/") }, resId = R.drawable.ic_github)
+                }
+            } else {
+                TopBar {
+                    PrimaryIconCard(onClick = { uriHandler.openUri("https://ko-fi.com/rt_bishop") }, resId = R.drawable.ic_pound)
+                    TopCard(onClick = { uriHandler.openUri("https://play.google.com/store/apps/details?id=com.rtbishop.look4sat") }, version = uiState.appVersionName, modifier = Modifier.weight(1f))
+                    Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        BotCard(onClick = { uriHandler.openUri("https://www.gnu.org/licenses/gpl-3.0.html") }, R.drawable.ic_license, "Licence", modifier = Modifier.weight(1f))
+                        BotCard(onClick = { uriHandler.openUri("https://sites.google.com/view/look4sat-privacy-policy/home") }, R.drawable.ic_policy, "Privacy", modifier = Modifier.weight(1f))
+                    }
+                    IconCard(action = { uriHandler.openUri("https://f-droid.org/en/packages/com.rtbishop.look4sat/") }, resId = R.drawable.ic_fdroid)
+                    IconCard(action = { uriHandler.openUri("https://github.com/rt-bishop/Look4Sat/") }, resId = R.drawable.ic_github)
                 }
             }
-            Text(
-                text = stringResource(id = R.string.app_subtitle),
-                fontSize = 20.sp,
-                modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
-            )
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                CardButton(
-                    onClick = { sendUrlAction(SystemAction.OpenGitHub) },
-                    text = stringResource(id = R.string.btn_github),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                CardButton(
-                    onClick = { sendUrlAction(SystemAction.OpenDonate) },
-                    text = stringResource(id = R.string.btn_donate),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                CardButton(
-                    onClick = { sendUrlAction(SystemAction.OpenFDroid) },
-                    text = stringResource(id = R.string.btn_fdroid),
-                    modifier = Modifier.weight(1f)
+        }
+    ) { _ ->
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(320.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.clip(MaterialTheme.shapes.medium)
+        ) {
+            item {
+                LocationCard(
+                    positionSettings,
+                    setGpsPos,
+                    showPosDialog,
+                    showLocDialog,
+                    dismissPos,
+                    uiState.sendSystemAction
                 )
             }
+            item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
+            item {
+                OtherCard(
+                    otherSettings,
+                    toggleUtc,
+                    toggleUpdate,
+                    toggleSweep,
+                    toggleSensor
+                )
+            }
+            item { CardCredits() }
         }
     }
 }
@@ -419,7 +386,7 @@ private fun OtherCardPreview() = MainTheme {
         shouldSeeWarning = false,
         shouldSeeWelcome = false
     )
-    OtherCard(settings = values, {}, {}, {}, {}, {})
+    OtherCard(settings = values, {}, {}, {}, {})
 }
 
 @Composable
@@ -428,8 +395,7 @@ private fun OtherCard(
     toggleUtc: (Boolean) -> Unit,
     toggleUpdate: (Boolean) -> Unit,
     toggleSweep: (Boolean) -> Unit,
-    toggleSensor: (Boolean) -> Unit,
-    toggleLightTheme: (Boolean) -> Unit
+    toggleSensor: (Boolean) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
@@ -465,17 +431,6 @@ private fun OtherCard(
                 Text(text = stringResource(id = R.string.other_switch_sensors))
                 Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
             }
-//            Row(
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Text(text = stringResource(id = R.string.other_switch_light_theme))
-//                Switch(
-//                    checked = settings.stateOfLightTheme,
-//                    onCheckedChange = { toggleLightTheme(it) }
-//                )
-//            }
         }
     }
 }
@@ -508,7 +463,6 @@ private fun CardCreditsPreview() = MainTheme { CardCredits() }
 
 @Composable
 private fun CardCredits(modifier: Modifier = Modifier) {
-    val uriHandler = LocalUriHandler.current
     ElevatedCard(modifier = modifier.fillMaxWidth()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -533,19 +487,58 @@ private fun CardCredits(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.primary,
                 modifier = modifier.padding(6.dp)
             )
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                CardButton(
-                    onClick = { uriHandler.openUri(LICENSE_URL) },
-                    text = stringResource(id = R.string.btn_license),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                CardButton(
-                    onClick = { uriHandler.openUri(POLICY_URL) },
-                    text = stringResource(id = R.string.btn_privacy),
-                    modifier = Modifier.weight(1f)
-                )
-            }
+        }
+    }
+}
+
+@Composable
+private fun TopCard(onClick: () -> Unit, modifier: Modifier = Modifier, version: String) {
+    ElevatedCard(modifier = modifier) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .height(48.dp)
+                .clickable { onClick() }) {
+            Spacer(Modifier)
+            Icon(
+                painter = painterResource(id = R.drawable.ic_satellites),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Look4Sat v$version",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 6.dp)
+                    .infiniteMarquee()
+            )
+        }
+    }
+}
+
+@Composable
+private fun BotCard(onClick: () -> Unit, resId: Int, text: String, modifier: Modifier = Modifier) {
+    ElevatedCard(modifier = modifier) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .height(48.dp)
+                .clickable { onClick() }) {
+            Spacer(Modifier)
+            Icon(painter = painterResource(id = resId), contentDescription = null)
+            Text(
+                text = text,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 6.dp)
+                    .infiniteMarquee()
+            )
         }
     }
 }

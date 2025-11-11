@@ -2,6 +2,7 @@ package com.rtbishop.look4sat.presentation.settings
 
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
+import com.rtbishop.look4sat.domain.predict.OrbitalPass
 
 data class PositionSettings(
     val isUpdating: Boolean, val stationPos: GeoPos, val messageResId: Int
@@ -22,6 +23,9 @@ data class RCSettings(
 )
 
 data class SettingsState(
+    val nextPass: OrbitalPass,
+    val nextTime: String,
+    val isNextTimeAos: Boolean,
     val appVersionName: String,
     val positionSettings: PositionSettings,
     val dataSettings: DataSettings,
