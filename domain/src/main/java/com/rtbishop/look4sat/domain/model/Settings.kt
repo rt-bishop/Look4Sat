@@ -12,6 +12,16 @@ data class PassesSettings(
     val selectedModes: List<String>
 )
 
+data class RCSettings(
+    val rotatorState: Boolean,
+    val rotatorAddress: String,
+    val rotatorPort: String,
+    val bluetoothState: Boolean,
+    val bluetoothFormat: String,
+    val bluetoothName: String,
+    val bluetoothAddress: String,
+)
+
 data class OtherSettings(
     val stateOfAutoUpdate: Boolean,
     val stateOfSensors: Boolean,

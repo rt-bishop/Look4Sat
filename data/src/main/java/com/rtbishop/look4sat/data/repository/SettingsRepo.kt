@@ -26,6 +26,7 @@ import androidx.core.location.LocationManagerCompat
 import com.rtbishop.look4sat.domain.model.DatabaseState
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.PassesSettings
+import com.rtbishop.look4sat.domain.model.RCSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.positionToQth
@@ -33,6 +34,7 @@ import com.rtbishop.look4sat.domain.utility.qthToPosition
 import com.rtbishop.look4sat.domain.utility.round
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 class SettingsRepo(
     private val locationManager: LocationManager,
@@ -125,6 +127,10 @@ class SettingsRepo(
     private val providerGps = LocationManager.GPS_PROVIDER
     private val providerNet = LocationManager.NETWORK_PROVIDER
     override val stationPosition: StateFlow<GeoPos> = _stationPosition
+
+    override fun onLocationChanged(location: Location) {
+        setStationPosition(location.latitude, location.longitude, location.altitude)
+    }
 
     override fun setStationPosition(latitude: Double, longitude: Double, altitude: Double): Boolean {
         val newLongitude = if (longitude > 180.0) longitude - 180 else longitude
@@ -225,43 +231,93 @@ class SettingsRepo(
     }
     //endregion
 
+    //region # RC settings
+    private val _rcSettings = MutableStateFlow(getRCSettings())
+    override val rcSettings: StateFlow<RCSettings> = _rcSettings
+
+    override fun setBluetoothAddress(value: String) {
+        preferences.edit { putString(keyBluetoothAddress, value) }
+        _rcSettings.update { it.copy(bluetoothAddress = value) }
+    }
+
+    override fun setBluetoothFormat(value: String) {
+        preferences.edit { putString(keyBluetoothFormat, value) }
+        _rcSettings.update { it.copy(bluetoothFormat = value) }
+    }
+
+    override fun setBluetoothName(value: String) {
+        preferences.edit { putString(keyBluetoothName, value) }
+        _rcSettings.update { it.copy(bluetoothName = value) }
+    }
+
+    override fun setBluetoothState(value: Boolean) {
+        preferences.edit { putBoolean(keyBluetoothState, value) }
+        _rcSettings.update { it.copy(bluetoothState = value) }
+    }
+
+    override fun setRotatorAddress(value: String) {
+        preferences.edit { putString(keyRotatorAddress, value) }
+        _rcSettings.update { it.copy(rotatorAddress = value) }
+    }
+
+    override fun setRotatorPort(value: String) {
+        preferences.edit { putString(keyRotatorPort, value) }
+        _rcSettings.update { it.copy(rotatorPort = value) }
+    }
+
+    override fun setRotatorState(value: Boolean) {
+        preferences.edit { putBoolean(keyRotatorState, value) }
+        _rcSettings.update { it.copy(rotatorState = value) }
+    }
+
+    private fun getRCSettings(): RCSettings = RCSettings(
+        rotatorState = preferences.getBoolean(keyRotatorState, false),
+        rotatorAddress = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1",
+        rotatorPort = preferences.getString(keyRotatorPort, null) ?: "4533",
+        bluetoothState = preferences.getBoolean(keyBluetoothState, false),
+        bluetoothFormat = preferences.getString(keyBluetoothFormat, null) ?: $$"W$AZ $EL",
+        bluetoothName = preferences.getString(keyBluetoothName, null) ?: "Default",
+        bluetoothAddress = preferences.getString(keyBluetoothAddress, null) ?: "00:0C:BF:13:80:5D"
+    )
+    //endregion
+
     //region # Other settings
     private val _otherSettings = MutableStateFlow(getOtherSettings())
     override val otherSettings: StateFlow<OtherSettings> = _otherSettings
 
     override fun setStateOfAutoUpdate(value: Boolean) {
         preferences.edit { putBoolean(keyStateOfAutoUpdate, value) }
-        _otherSettings.value = otherSettings.value.copy(stateOfAutoUpdate = value)
+        _otherSettings.update { it.copy(stateOfAutoUpdate = value) }
     }
 
     override fun setStateOfSensors(value: Boolean) {
         preferences.edit { putBoolean(keyStateOfSensors, value) }
-        _otherSettings.value = otherSettings.value.copy(stateOfSensors = value)
+        _otherSettings.update { it.copy(stateOfSensors = value) }
     }
 
     override fun setStateOfSweep(value: Boolean) {
         preferences.edit { putBoolean(keyStateOfSweep, value) }
-        _otherSettings.value = otherSettings.value.copy(stateOfSweep = value)
+        _otherSettings.update { it.copy(stateOfSweep = value) }
     }
 
     override fun setStateOfUtc(value: Boolean) {
         preferences.edit { putBoolean(keyStateOfUtc, value) }
-        _otherSettings.value = otherSettings.value.copy(stateOfUtc = value)
+        _otherSettings.update { it.copy(stateOfUtc = value) }
     }
 
     override fun setStateOfLightTheme(value: Boolean){
         preferences.edit { putBoolean(keyStateOfLightTheme, value) }
-        _otherSettings.value = otherSettings.value.copy(stateOfLightTheme = value)
+        _otherSettings.update { it.copy(stateOfLightTheme = value) }
     }
 
     override fun setWarningDismissed() {
         preferences.edit { putBoolean(keyShouldSeeWarning, false) }
-        _otherSettings.value = otherSettings.value.copy(shouldSeeWarning = false)
+        _otherSettings.update { it.copy(shouldSeeWarning = false) }
     }
 
     override fun setWelcomeDismissed() {
         preferences.edit { putBoolean(keyShouldSeeWelcome, false) }
-        _otherSettings.value = otherSettings.value.copy(shouldSeeWelcome = false)
+        _otherSettings.update { it.copy(shouldSeeWelcome = false) }
     }
 
     private fun getOtherSettings(): OtherSettings = OtherSettings(
@@ -273,31 +329,5 @@ class SettingsRepo(
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
         shouldSeeWelcome = preferences.getBoolean(keyShouldSeeWelcome, true)
     )
-    //endregion
-
-    //region # Undefined settings
-    override fun getBluetoothAddress(): String = preferences.getString(keyBluetoothAddress, null) ?: "00:0C:BF:13:80:5D"
-    override fun setBluetoothAddress(value: String) = preferences.edit { putString(keyBluetoothAddress, value) }
-
-    override fun getBluetoothFormat(): String = preferences.getString(keyBluetoothFormat, null) ?: $$"W$AZ $EL"
-    override fun setBluetoothFormat(value: String) = preferences.edit { putString(keyBluetoothFormat, value) }
-
-    override fun getBluetoothName(): String = preferences.getString(keyBluetoothName, null) ?: "Default"
-    override fun setBluetoothName(value: String) = preferences.edit { putString(keyBluetoothName, value) }
-
-    override fun getBluetoothState(): Boolean = preferences.getBoolean(keyBluetoothState, false)
-    override fun setBluetoothState(value: Boolean) = preferences.edit { putBoolean(keyBluetoothState, value) }
-
-    override fun getRotatorAddress(): String = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1"
-    override fun setRotatorAddress(value: String) = preferences.edit { putString(keyRotatorAddress, value) }
-
-    override fun getRotatorPort(): String = preferences.getString(keyRotatorPort, null) ?: "4533"
-    override fun setRotatorPort(value: String) = preferences.edit { putString(keyRotatorPort, value) }
-
-    override fun getRotatorState(): Boolean = preferences.getBoolean(keyRotatorState, false)
-    override fun setRotatorState(value: Boolean) = preferences.edit { putBoolean(keyRotatorState, value) }
-    override fun onLocationChanged(location: Location) {
-        setStationPosition(location.latitude, location.longitude, location.altitude)
-    }
     //endregion
 }

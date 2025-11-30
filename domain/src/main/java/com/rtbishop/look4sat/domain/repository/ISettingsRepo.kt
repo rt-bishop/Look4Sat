@@ -20,6 +20,7 @@ package com.rtbishop.look4sat.domain.repository
 import com.rtbishop.look4sat.domain.model.DatabaseState
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.PassesSettings
+import com.rtbishop.look4sat.domain.model.RCSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import kotlinx.coroutines.flow.StateFlow
 
@@ -51,6 +52,17 @@ interface ISettingsRepo {
     fun updateDatabaseState(state: DatabaseState)
     //endregion
 
+    //region # RC settings
+    val rcSettings: StateFlow<RCSettings>
+    fun setBluetoothAddress(value: String)
+    fun setBluetoothFormat(value: String)
+    fun setBluetoothName(value: String)
+    fun setBluetoothState(value: Boolean)
+    fun setRotatorAddress(value: String)
+    fun setRotatorPort(value: String)
+    fun setRotatorState(value: Boolean)
+    //endregion
+
     //region # Other settings
     val otherSettings: StateFlow<OtherSettings>
     fun setStateOfAutoUpdate(value: Boolean)
@@ -60,22 +72,5 @@ interface ISettingsRepo {
     fun setStateOfLightTheme(value: Boolean)
     fun setWarningDismissed()
     fun setWelcomeDismissed()
-    //endregion
-
-    //region # Undefined settings
-    fun getBluetoothAddress(): String
-    fun setBluetoothAddress(value: String)
-    fun getBluetoothFormat(): String
-    fun setBluetoothFormat(value: String)
-    fun getBluetoothName(): String
-    fun setBluetoothName(value: String)
-    fun getBluetoothState(): Boolean
-    fun setBluetoothState(value: Boolean)
-    fun getRotatorAddress(): String
-    fun setRotatorAddress(value: String)
-    fun getRotatorPort(): String
-    fun setRotatorPort(value: String)
-    fun getRotatorState(): Boolean
-    fun setRotatorState(value: Boolean)
     //endregion
 }

@@ -1,6 +1,7 @@
 package com.rtbishop.look4sat.presentation.settings
 
 import com.rtbishop.look4sat.domain.model.OtherSettings
+import com.rtbishop.look4sat.domain.model.RCSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 
@@ -10,16 +11,6 @@ data class PositionSettings(
 
 data class DataSettings(
     val isUpdating: Boolean, val entriesTotal: Int, val radiosTotal: Int, val timestamp: Long
-)
-
-data class RCSettings(
-    val rotatorState: Boolean,
-    val rotatorAddress: String,
-    val rotatorPort: String,
-    val bluetoothState: Boolean,
-    val bluetoothFormat: String,
-    val bluetoothName: String,
-    val bluetoothAddress: String,
 )
 
 data class SettingsState(
@@ -52,9 +43,6 @@ sealed class SettingsAction {
 }
 
 sealed class SystemAction {
-    data object OpenGitHub : SystemAction()
-    data object OpenDonate : SystemAction()
-    data object OpenFDroid : SystemAction()
     data class ShowToast(val message: String) : SystemAction()
 }
 
