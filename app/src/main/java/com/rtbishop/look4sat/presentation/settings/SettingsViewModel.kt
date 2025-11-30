@@ -51,15 +51,6 @@ class SettingsViewModel(
 
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
     private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
-    private val defaultRCSettings = RCSettings(
-        rotatorState = settingsRepo.getRotatorState(),
-        rotatorAddress = settingsRepo.getRotatorAddress(),
-        rotatorPort = settingsRepo.getRotatorPort(),
-        bluetoothState = settingsRepo.getBluetoothState(),
-        bluetoothFormat = settingsRepo.getBluetoothFormat(),
-        bluetoothName = settingsRepo.getBluetoothName(),
-        bluetoothAddress = settingsRepo.getBluetoothAddress()
-    )
     private val _uiState = MutableStateFlow(
         SettingsState(
             nextTime = "00:00:00",
@@ -69,7 +60,7 @@ class SettingsViewModel(
             positionSettings = defaultPosSettings,
             dataSettings = defaultDataSettings,
             otherSettings = settingsRepo.otherSettings.value,
-            rcSettings = defaultRCSettings,
+            rcSettings = settingsRepo.rcSettings.value,
             sendAction = ::handleAction,
             sendRCAction = ::handleAction,
             sendSystemAction = ::handleAction
@@ -113,6 +104,11 @@ class SettingsViewModel(
             }
         }
         viewModelScope.launch {
+            settingsRepo.rcSettings.collect { settings ->
+                _uiState.update { it.copy(rcSettings = settings) }
+            }
+        }
+        viewModelScope.launch {
             settingsRepo.otherSettings.collect { settings ->
                 _uiState.update { it.copy(otherSettings = settings) }
             }
@@ -151,7 +147,6 @@ class SettingsViewModel(
     private fun handleAction(action: SystemAction) {
         when (action) {
             is SystemAction.ShowToast -> showToast(action.message)
-            else -> {}
         }
     }
 

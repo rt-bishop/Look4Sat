@@ -150,10 +150,10 @@ class RadarViewModel(
 
     private fun sendPassDataBT(orbitalPos: OrbitalPos) {
         viewModelScope.launch {
-            if (settingsRepo.getBluetoothState()) {
-                val btDevice = settingsRepo.getBluetoothAddress()
+            if (settingsRepo.rcSettings.value.bluetoothState) {
+                val btDevice = settingsRepo.rcSettings.value.bluetoothAddress
                 if (bluetoothReporter.isConnected()) {
-                    val format = settingsRepo.getBluetoothFormat()
+                    val format = settingsRepo.rcSettings.value.bluetoothFormat
                     val azimuth = orbitalPos.azimuth.toDegrees().round(0).toInt()
                     val elevation = orbitalPos.elevation.toDegrees().round(0).toInt()
                     bluetoothReporter.reportRotation(format, azimuth, elevation)

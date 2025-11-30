@@ -5,16 +5,16 @@ kotlin = "2.2.21"
 
 androidx-core-ktx = "1.17.0"
 androidx-core-splashscreen = "1.2.0"
-androidx-room = "2.8.3"
+androidx-room = "2.8.4"
 
-compose-bom = "2025.11.00"
-compose-activity = "1.11.0"
-compose-lifecycle = "2.9.4"
+compose-bom = "2025.11.01"
+compose-activity = "1.12.0"
+compose-lifecycle = "2.10.0"
 compose-navigation = "2.9.6"
 
 other-coroutines = "1.10.2"
 other-json = "20250517"
-other-okhttp = "5.3.0"
+other-okhttp = "5.3.2"
 other-osmdroid = "6.1.20"
 
 test-junit4 = "4.13.2"
