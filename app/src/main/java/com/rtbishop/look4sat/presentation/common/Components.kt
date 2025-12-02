@@ -311,6 +311,16 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
 }
 
 @Composable
+fun hasEnoughHeight(): Boolean {
+    return currentWindowAdaptiveInfo().windowSizeClass.isHeightAtLeastBreakpoint(480)
+}
+
+@Composable
+fun hasEnoughWidth(): Boolean {
+    return currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(600)
+}
+
+@Composable
 fun isVerticalLayout(): Boolean {
     return currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(600).not()
 }

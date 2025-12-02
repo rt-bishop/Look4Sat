@@ -137,15 +137,15 @@ class RadarViewModel(
             )
         }
         _uiState.update { it.copy(orbitalPos = orbitalPos, satTrack = track) }
-//        viewModelScope.launch {
-//            if (settingsRepo.getRotatorState()) {
-//                val server = settingsRepo.getRotatorAddress()
-//                val port = settingsRepo.getRotatorPort().toInt()
-//                val azimuth = orbitalPos.azimuth.toDegrees().round(2)
-//                val elevation = orbitalPos.elevation.toDegrees().round(2)
-//                networkReporter.reportRotation(server, port, azimuth, elevation)
-//            }
-//        }
+        viewModelScope.launch {
+            if (settingsRepo.rcSettings.value.rotatorState) {
+                val server = settingsRepo.rcSettings.value.rotatorAddress
+                val port = settingsRepo.rcSettings.value.rotatorPort.toInt()
+                val azimuth = orbitalPos.azimuth.toDegrees().round(2)
+                val elevation = orbitalPos.elevation.toDegrees().round(2)
+                networkReporter.reportRotation(server, port, azimuth, elevation)
+            }
+        }
     }
 
     private fun sendPassDataBT(orbitalPos: OrbitalPos) {

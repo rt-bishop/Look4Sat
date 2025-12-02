@@ -1,14 +1,14 @@
 [versions]
-android-gradle-plugin = "8.13.1"
+android-gradle-plugin = "8.13.2"
 google-ksp = "2.3.0"
-kotlin = "2.2.21"
+kotlin = "2.3.0"
 
 androidx-core-ktx = "1.17.0"
 androidx-core-splashscreen = "1.2.0"
 androidx-room = "2.8.4"
 
-compose-bom = "2025.11.01"
-compose-activity = "1.12.0"
+compose-bom = "2025.12.01"
+compose-activity = "1.12.2"
 compose-lifecycle = "2.10.0"
 compose-navigation = "2.9.6"
 
@@ -18,7 +18,6 @@ other-okhttp = "5.3.2"
 other-osmdroid = "6.1.20"
 
 test-junit4 = "4.13.2"
-test-mockk = "1.14.6"
 
 androidTest-junit = "1.3.0"
 androidTest-espresso = "3.7.0"
@@ -52,7 +51,6 @@ other-osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "othe
 
 test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "other-coroutines" }
 test-junit4 = { module = "junit:junit", version.ref = "test-junit4" }
-test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
 
 androidTest-junit = { module = "androidx.test.ext:junit", version.ref = "androidTest-junit" }
 androidTest-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "androidTest-espresso" }
@@ -72,5 +70,5 @@ composeAll = [
     "compose-material3-navigation", "compose-navigation", "compose-viewmodel"
 ]
 composeDebug = ["compose-debug-manifest", "compose-debug-tooling"]
-unitTest = ["test-coroutines", "test-junit4", "test-mockk"]
+unitTest = ["test-coroutines", "test-junit4"]
 androidTest = ["androidTest-junit", "androidTest-espresso"]

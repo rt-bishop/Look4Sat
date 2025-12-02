@@ -1,7 +1,9 @@
 package com.rtbishop.look4sat.presentation
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
@@ -12,7 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.presentation.common.isVerticalLayout
+import com.rtbishop.look4sat.presentation.common.hasEnoughHeight
+import com.rtbishop.look4sat.presentation.common.hasEnoughWidth
 import com.rtbishop.look4sat.presentation.map.mapDestination
 import com.rtbishop.look4sat.presentation.passes.passesDestination
 import com.rtbishop.look4sat.presentation.radar.radarDestination
@@ -48,8 +51,11 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
                         }
                     })
             }
-        }, layoutType = when {
-            isVerticalLayout() -> NavigationSuiteType.ShortNavigationBarCompact
+        }, navigationSuiteColors = NavigationSuiteDefaults.colors(
+            navigationRailContainerColor = MaterialTheme.colorScheme.surfaceContainer
+        ), layoutType = when {
+            !hasEnoughHeight() && hasEnoughWidth() -> NavigationSuiteType.NavigationRail
+            !hasEnoughWidth() -> NavigationSuiteType.ShortNavigationBarCompact
             else -> NavigationSuiteType.ShortNavigationBarMedium
         }
     ) {

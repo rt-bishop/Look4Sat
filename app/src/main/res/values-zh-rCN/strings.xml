@@ -7,9 +7,9 @@
 
     <string name="nav_satellites">卫星</string>
     <string name="nav_passes">过境</string>
+    <string name="nav_radar">Radar</string>
     <string name="nav_map">世界地图</string>
     <string name="nav_settings">设置</string>
-    <string name="menu_about">关于</string>
 
     <!--Buttons-->
 

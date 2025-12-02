@@ -7,9 +7,9 @@
 
     <string name="nav_satellites">Спутники</string>
     <string name="nav_passes">Пролеты</string>
+    <string name="nav_radar">Radar</string>
     <string name="nav_map">Карта</string>
     <string name="nav_settings">Настройки</string>
-    <string name="menu_about">Инфо</string>
 
     <!--Buttons-->
 

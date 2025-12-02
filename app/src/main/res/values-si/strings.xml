@@ -7,9 +7,9 @@
 
     <string name="nav_satellites">චන්ද්‍රිකා</string>
     <string name="nav_passes">පසුකර යෑම්</string>
+    <string name="nav_radar">Radar</string>
     <string name="nav_map">ලෝක සිතියම</string>
     <string name="nav_settings">පසුතල</string>
-    <string name="menu_about">ගැන</string>
 
     <!--Buttons-->
 

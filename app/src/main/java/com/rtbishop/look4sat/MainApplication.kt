@@ -17,11 +17,7 @@
  */
 package com.rtbishop.look4sat
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Application
-import android.content.pm.ActivityInfo
-import android.os.Bundle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -32,7 +28,6 @@ class MainApplication : Application() {
     lateinit var container: MainContainer
 
     override fun onCreate() {
-        disableMobileLandscapeLayout()
         super.onCreate()
         container = MainContainer(this)
         // trigger automatic update every 48 hours
@@ -50,24 +45,5 @@ class MainApplication : Application() {
                 container.databaseRepo.updateFromRemote()
             }
         }
-    }
-
-    @SuppressLint("SourceLockedOrientationActivity")
-    private fun disableMobileLandscapeLayout() {
-        val isTablet = applicationContext.resources?.getBoolean(R.bool.isTablet) ?: true
-        val lifecycleAdapter = object : ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                if (!isTablet) {
-                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
-            }
-            override fun onActivityStarted(activity: Activity) {}
-            override fun onActivityResumed(activity: Activity) {}
-            override fun onActivityPaused(activity: Activity) {}
-            override fun onActivityStopped(activity: Activity) {}
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-            override fun onActivityDestroyed(activity: Activity) {}
-        }
-        registerActivityLifecycleCallbacks(lifecycleAdapter)
     }
 }
