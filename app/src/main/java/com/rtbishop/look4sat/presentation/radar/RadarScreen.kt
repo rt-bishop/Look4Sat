@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -351,7 +349,8 @@ private fun TransmitterItem(radio: SatRadio) {
 //    LaunchedEffect(radio) {
 //        BluetoothCIV.updateOnce(radio)
 //    }
-
+    val title = if (radio.isInverted) "INVERTED: ${radio.info}" else radio.info
+    val fullTitle = "$title - (${radio.downlinkMode ?: "--"}/${radio.uplinkMode ?: "--"})"
     Surface(color = MaterialTheme.colorScheme.background,
 //        modifier = Modifier.clickable(onClick = {
 //            Log.d("BluetoothCivManager", radio.toString())
@@ -364,86 +363,66 @@ private fun TransmitterItem(radio: SatRadio) {
     ) {
         Surface(modifier = Modifier.padding(bottom = 2.dp)) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 6.dp, vertical = 8.dp)
+                    .padding(horizontal = 8.dp, vertical = 6.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow),
-                        tint = Color.Green,
-                        contentDescription = null, modifier = Modifier
-                            .rotate(90f)
-                            .weight(0.15f)
-                    )
-                    Text(
-                        text = if (radio.isInverted) "INVERTED: ${radio.info} " else "${radio.info} ",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .infiniteMarquee()
-                            .weight(0.7f)
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow),
-                        tint = Color.Red,
-                        contentDescription = null, modifier = Modifier
-                            .rotate(-90f)
-                            .weight(0.15f)
-                    )
-                }
-                FrequencyRow(satRadio = radio)
+                Text(
+                    text = fullTitle,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .infiniteMarquee()
+                )
+                FrequencyRow(radio = radio, isDownlink = true)
+                FrequencyRow(radio = radio, isDownlink = false)
             }
         }
     }
 }
 
 @Composable
-private fun FrequencyRow(satRadio: SatRadio) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        ModeText(satRadio.downlinkMode)
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.weight(0.35f)
-        ) {
-            FrequencyText(satRadio.downlinkHigh)
-            FrequencyText(satRadio.downlinkLow)
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.weight(0.35f)
-        ) {
-            FrequencyText(satRadio.uplinkHigh)
-            FrequencyText(satRadio.uplinkLow)
-        }
-        ModeText(satRadio.uplinkMode)
+private fun FrequencyRow(radio: SatRadio, isDownlink: Boolean, modifier: Modifier = Modifier) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier.fillMaxWidth()) {
+        val rotateMod = Modifier.rotate(if (isDownlink) 90f else -90f)
+        val weightMod = Modifier.weight(1f)
+        Text(
+            text = if (isDownlink) "D:" else "U:",
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = modifier.size(width = 24.dp, height = 24.dp)
+        )
+        FrequencyText(if (isDownlink) radio.downlinkLow else radio.uplinkLow, weightMod)
+        Text(
+            text = "-",
+            textAlign = TextAlign.Center,
+            fontSize = 21.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = modifier
+        )
+        FrequencyText(if (isDownlink) radio.downlinkHigh else radio.uplinkHigh, weightMod)
+        Icon(
+            painter = painterResource(id = R.drawable.ic_arrow),
+            tint = MaterialTheme.colorScheme.onSurface,
+            contentDescription = if (isDownlink) "Downlink" else "Uplink",
+            modifier = rotateMod.size(width = 24.dp, height = 24.dp)
+        )
     }
 }
 
 @Composable
-private fun RowScope.ModeText(mode: String?) {
-    Text(
-        text = mode ?: "- - : - -",
-        textAlign = TextAlign.Center,
-        modifier = Modifier.weight(0.15f)
-    )
-}
-
-@Composable
-private fun FrequencyText(frequency: Long?) {
+private fun FrequencyText(frequency: Long?, modifier: Modifier = Modifier) {
     val noLinkText = stringResource(R.string.radio_no_link)
     val freqValue = frequency?.let { it / 1000000f }
-    val freqText = freqValue?.let { stringResource(id = R.string.radio_link_low, it) } ?: noLinkText
     Text(
-        text = freqText,
+        text = freqValue?.let { stringResource(id = R.string.radio_link_low, it) } ?: noLinkText,
         textAlign = TextAlign.Center,
-        fontSize = 18.sp,
+        fontSize = 21.sp,
         fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier
     )
 }

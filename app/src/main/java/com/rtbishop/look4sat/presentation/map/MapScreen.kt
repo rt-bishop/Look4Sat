@@ -148,20 +148,20 @@ private fun MapDataCard(data: MapData) {
         Card(colors = cardColors) {
             Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_azimuth, data.azimuth))
-                    Text(text = stringResource(R.string.map_elevation, data.elevation))
+                    Text(text = stringResource(R.string.map_azimuth, data.azimuth), color = textColor)
+                    Text(text = stringResource(R.string.map_elevation, data.elevation), color = textColor)
                 }
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_altitude, data.altitude), color = textColor)
-                    Text(text = stringResource(R.string.map_distance, data.range), color = textColor)
+                    Text(text = stringResource(R.string.map_altitude, data.altitude))
+                    Text(text = stringResource(R.string.map_distance, data.range))
                 }
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude))
-                    Text(text = stringResource(R.string.map_longitude, data.osmPos.longitude))
+                    Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude), color = textColor)
+                    Text(text = stringResource(R.string.map_longitude, data.osmPos.longitude), color = textColor)
                 }
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_qth, data.qthLoc), color = textColor)
-                    Text(text = stringResource(R.string.map_phase, data.phase), color = textColor)
+                    Text(text = stringResource(R.string.map_qth, data.qthLoc))
+                    Text(text = stringResource(R.string.map_phase, data.phase))
                 }
             }
         }
@@ -177,27 +177,27 @@ private fun MapDataCards(data: MapData) {
     Box(modifier = Modifier.fillMaxSize()) {
         Card(colors = cardColors, modifier = Modifier.align(Alignment.TopStart)) {
             Column(horizontalAlignment = Alignment.Start, modifier = paddingMod) {
-                Text(text = stringResource(R.string.map_azimuth, data.azimuth))
-                Text(text = stringResource(R.string.map_elevation, data.elevation), color = textColor)
+                Text(text = stringResource(R.string.map_azimuth, data.azimuth), color = textColor)
+                Text(text = stringResource(R.string.map_elevation, data.elevation))
             }
         }
         Card(colors = cardColors, modifier = Modifier.align(Alignment.TopEnd)) {
             Column(horizontalAlignment = Alignment.End, modifier = paddingMod) {
-                Text(text = stringResource(R.string.map_altitude, data.altitude))
-                Text(text = stringResource(R.string.map_distance, data.range), color = textColor)
+                Text(text = stringResource(R.string.map_altitude, data.altitude), color = textColor)
+                Text(text = stringResource(R.string.map_distance, data.range))
             }
         }
         Card(colors = cardColors, modifier = Modifier.align(Alignment.BottomStart)) {
             Column(horizontalAlignment = Alignment.Start, modifier = paddingMod) {
-                Text(text = stringResource(R.string.map_phase, data.phase))
-                Text(text = stringResource(R.string.map_qth, data.qthLoc), color = textColor)
+                Text(text = stringResource(R.string.map_phase, data.phase), color = textColor)
+                Text(text = stringResource(R.string.map_qth, data.qthLoc))
             }
         }
         Text(text = osmText, fontSize = 14.sp, modifier = Modifier.align(Alignment.BottomCenter))
         Card(colors = cardColors, modifier = Modifier.align(Alignment.BottomEnd)) {
             Column(horizontalAlignment = Alignment.End, modifier = paddingMod) {
-                Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude))
-                Text(text = stringResource(R.string.map_longitude, data.osmPos.longitude), color = textColor)
+                Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude), color = textColor)
+                Text(text = stringResource(R.string.map_longitude, data.osmPos.longitude))
             }
         }
     }
