@@ -30,7 +30,7 @@
     <string name="btn_web">Online</string>
     <string name="btn_import">Importar</string>
     <string name="btn_github">GitHub</string>
-    <string name="btn_support">Soporte</string>
+    <!--<string name="btn_support">Soporte</string>-->
     <string name="btn_fdroid">F-Droid</string>
 
     <!--Dialogs-->
@@ -70,7 +70,7 @@
     <string name="pass_satId">Id:%d</string>
     <string name="pass_aosAz">AOS - %.1f°</string>
     <string name="pass_elevation">ELEV: %.1f°</string>
-    <string name="pass_los">%.1f° - LOS</string>
+    <!--<string name="pass_los">%.1f° - LOS</string>-->
     <string name="pass_altitude">ALT: %.0f km</string>
     <string name="pass_placeholder"> - - : - - </string>
     <string name="pass_startTime">HH:mm:ss - MMM dd</string>
@@ -150,7 +150,7 @@
     <string name="BTremote_output_hint">Formato de datos</string>
     <string name="BTremote_perm_error">Revisa los permisos de Bluetooth</string>
 
-    <string name="other_title">Otras preferencias</string>
+    <!--<string name="other_title">Otras preferencias</string>-->
     <string name="other_switch_utc">Mostrar tiempos de pase en UTC</string>
     <string name="other_switch_update">Habilitar auto actualización de datos</string>
     <string name="other_switch_sweep">Habilitar animaciones radar</string>
