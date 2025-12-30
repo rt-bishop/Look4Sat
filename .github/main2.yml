@@ -1,0 +1,78 @@
+name: Look4Sat wty
+
+on:
+  push:
+    tags:
+      - v**
+  workflow_dispatch:
+
+    inputs:
+      version:
+        description: 'Release version (e.g., v4.0.0)'
+        required: true
+        default: 'v4.0.0'
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install build tools
+        run: sdkmanager "build-tools;29.0.3"
+
+      - name: Build Release APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean assembleRelease
+
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
+        id: sign_apk
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEY_STORE }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+      
+      - name: Rename Signed APK with Version
+        run: |
+          echo "Listing signed APKs:"
+          ls -lh app/build/outputs/apk/release/
+          # 重命名为包含版本号的文件名
+          mv app/build/outputs/apk/release/app-release-unsigned-signed.apk app/build/outputs/apk/release/look4sat-${{ github.event.inputs.version }}.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: look4sat-apk
+          path: app/build/outputs/apk/release/look4sat-${{ github.event.inputs.version }}.apk
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.event.inputs.version }}
+          name: Look4Sat ${{ github.event.inputs.version }}
+          artifacts: "app/build/outputs/apk/release/look4sat-${{ github.event.inputs.version }}.apk"
+          body: |
+            Look4Sat ${{ github.event.inputs.version }}
+            
+            ## What's New
+            - Latest satellite tracking features
+            - Bug fixes and performance improvements
+            
+            Download the signed APK file above.
+          token: ${{ secrets.GITHUB_TOKEN }}

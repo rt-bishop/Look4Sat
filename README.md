@@ -2,8 +2,11 @@
 
 [![Look4Sat CI](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml/badge.svg)](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml)
 
-[<img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=com.rtbishop.look4sat)
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.rtbishop.look4sat/)
+
+# [cf 反代加速worker.js](/wty_add_whitelist_worker.js)
+### 将卫星数据更新添加了代理，方便访问
+
+### 修改了包名com.rtbishop_wty.look4sat
 
 ### Radio satellite tracker and pass predictor for Android, inspired by Gpredict
 

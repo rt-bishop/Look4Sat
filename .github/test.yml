@@ -1,0 +1,196 @@
+name: Look4Sat Release (Strict)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v4.0.0)'
+        required: true
+        default: 'v4.0.0'
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install build tools (specifically for verification)
+        run: |
+          # 安装构建工具和aapt2工具
+          yes | sdkmanager "build-tools;29.0.3"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls $ANDROID_HOME/build-tools/
+
+      - name: Clean Build with Cache Reset
+        run: |
+          chmod +x ./gradlew
+          echo "=== 1. 停止现有Gradle守护进程 ==="
+          ./gradlew --stop 2>/dev/null || echo "无Gradle守护进程在运行"
+          
+          echo "=== 2. 智能清理Gradle缓存 ==="
+          # 检查并清理用户主目录缓存
+          if [ -d "$HOME/.gradle/caches" ]; then
+              echo "清理Gradle缓存目录..."
+              # 删除lock文件（如果存在）
+              find "$HOME/.gradle/caches" -name "*.lock" -type f -delete 2>/dev/null || true
+              # 清理transforms缓存（影响资源处理）
+              rm -rf "$HOME/.gradle/caches/transforms-"* 2>/dev/null || true
+              # 清理journal缓存（构建历史）
+              rm -rf "$HOME/.gradle/caches/journal-"* 2>/dev/null || true
+              echo "✅ Gradle缓存清理完成"
+          else
+              echo "ℹ️ Gradle缓存目录不存在，跳过清理"
+          fi
+          
+          # 清理项目本地构建缓存
+          echo "=== 3. 清理项目本地构建缓存 ==="
+          rm -rf .gradle build app/build 2>/dev/null || true
+          
+          echo "=== 4. 清理项目构建 ==="
+          ./gradlew clean
+  
+      - name: Build Release APK
+        run: |
+          echo "=== 4. 强制刷新依赖并构建 ==="
+          # --refresh-dependencies 强制检查远程仓库最新依赖
+          # --no-daemon 防止守护进程干扰（可选，但更干净）
+          ./gradlew assembleRelease --refresh-dependencies --no-daemon
+          
+          echo "=== 5. 查找生成的APK文件 ==="
+          find app/build/outputs/apk -name "*.apk" -type f | head -5
+
+      - name: Verify APK Package Name
+        id: verify_apk
+        run: |
+          echo "=== 6. 验证APK包名 ==="
+          
+          # 确定Release APK路径（适配可能有多个变体的情况）
+          RELEASE_APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | grep -v "unsigned" | head -1)
+          
+          if [[ -z "$RELEASE_APK_PATH" ]]; then
+            echo "警告：未找到签名版APK，尝试查找任何APK文件..."
+            RELEASE_APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
+          fi
+          
+          if [[ -z "$RELEASE_APK_PATH" ]]; then
+            echo "❌ 错误：在 app/build/outputs/apk/release/ 中未找到任何APK文件"
+            ls -la app/build/outputs/apk/release/ || true
+            exit 1
+          fi
+          
+          echo "找到APK文件：$RELEASE_APK_PATH"
+          echo "apk_path=$RELEASE_APK_PATH" >> $GITHUB_OUTPUT
+          
+          # 使用aapt2验证包名
+          echo "使用aapt2解析包信息..."
+          PACKAGE_INFO=$($ANDROID_HOME/build-tools/29.0.3/aapt2 dump badging "$RELEASE_APK_PATH" 2>/dev/null | grep "package: name=" || true)
+          
+          if [[ -z "$PACKAGE_INFO" ]]; then
+            echo "⚠️ 警告：aapt2解析失败，尝试使用aapt..."
+            PACKAGE_INFO=$($ANDROID_HOME/build-tools/29.0.3/aapt dump badging "$RELEASE_APK_PATH" 2>/dev/null | grep "package: name=" || true)
+          fi
+          
+          if [[ -n "$PACKAGE_INFO" ]]; then
+            echo "✅ APK包名验证成功："
+            echo "$PACKAGE_INFO"
+            
+            # 提取包名
+            PACKAGE_NAME=$(echo "$PACKAGE_INFO" | sed "s/.*name='\([^']*\)'.*/\1/")
+            echo "提取的包名：$PACKAGE_NAME"
+            echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+            
+            # 验证包名是否符合预期
+            if [[ "$PACKAGE_NAME" == "com.rtbishop_xanyi.look4sat" ]]; then
+              echo "✅ 包名符合预期：com.rtbishop_xanyi.look4sat"
+            elif [[ "$PACKAGE_NAME" == "com.rtbishop.look4sat" ]]; then
+              echo "⚠️ 注意：包名仍为旧值 com.rtbishop.look4sat"
+              echo "请检查 build.gradle 中的 applicationId 配置"
+            else
+              echo "ℹ️ 包名为：$PACKAGE_NAME"
+            fi
+          else
+            echo "⚠️ 警告：无法解析APK包信息，但继续流程..."
+          fi
+
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
+        id: sign_apk
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEY_STORE }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Verify Signed APK Package Name
+        run: |
+          echo "=== 7. 验证签名后APK包名 ==="
+          SIGNED_APK_PATH="app/build/outputs/apk/release/app-release-unsigned-signed.apk"
+          
+          if [[ -f "$SIGNED_APK_PATH" ]]; then
+            echo "找到签名APK：$SIGNED_APK_PATH"
+            $ANDROID_HOME/build-tools/29.0.3/aapt2 dump badging "$SIGNED_APK_PATH" | grep "package: name="
+          else
+            echo "查找签名APK文件..."
+            find app/build/outputs/apk/release -name "*signed*.apk" -type f | while read file; do
+              echo "验证文件：$file"
+              $ANDROID_HOME/build-tools/29.0.3/aapt2 dump badging "$file" | grep "package: name=" || true
+            done
+          fi
+
+      - name: Rename Signed APK with Version
+        run: |
+          echo "=== 8. 重命名签名APK ==="
+          SIGNED_APK=$(find app/build/outputs/apk/release -name "*signed*.apk" | head -1)
+          
+          if [[ -z "$SIGNED_APK" ]]; then
+            echo "错误：未找到签名APK文件"
+            ls -la app/build/outputs/apk/release/
+            exit 1
+          fi
+          
+          NEW_NAME="look4sat-${{ github.event.inputs.version }}.apk"
+          echo "将 $SIGNED_APK 重命名为 $NEW_NAME"
+          mv "$SIGNED_APK" "app/build/outputs/apk/release/$NEW_NAME"
+          
+          echo "重命名后目录内容："
+          ls -lh app/build/outputs/apk/release/
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: look4sat-apk
+          path: app/build/outputs/apk/release/look4sat-${{ github.event.inputs.version }}.apk
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.event.inputs.version }}
+          name: Look4Sat ${{ github.event.inputs.version }}
+          artifacts: "app/build/outputs/apk/release/look4sat-${{ github.event.inputs.version }}.apk"
+          body: |
+            Look4Sat ${{ github.event.inputs.version }}
+            
+            ## 构建验证信息
+            - **构建时间**: ${{ github.workflow_dispatch.inputs.version }}
+            - **包名验证**: ${{ steps.verify_apk.outputs.package_name || '未获取到' }}
+            - **构建特点**: 强制清理缓存并验证包名
+            
+            ## What's New
+            - Latest satellite tracking features
+            - Bug fixes and performance improvements
+            
+            Download the signed APK file above.
+          token: ${{ secrets.GITHUB_TOKEN }}
