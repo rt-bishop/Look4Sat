@@ -8,9 +8,9 @@ on:
 
     inputs:
       version:
-        description: 'Release version (e.g., v4.0.0)'
+        description: 'Release version (e.g., v4.0.0dev)'
         required: true
-        default: 'v4.0.0'
+        default: 'v4.0.0dev.cf.wty'
         type: string
 
 jobs:
