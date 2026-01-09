@@ -1,6 +1,6 @@
 # Look4Sat: Satellite tracker
 
-[![Look4Sat CI](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml/badge.svg)](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml)
+[![Look4Sat CI](https://github.com/rt-bishop/Look4Sat/actions/workflows/release.yml/badge.svg)](https://github.com/rt-bishop/Look4Sat/actions/workflows/release.yml)
 
 [<img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=com.rtbishop.look4sat)
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.rtbishop.look4sat/)

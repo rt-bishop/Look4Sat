@@ -143,7 +143,7 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
                 decorationBox = { innerTextField ->
                     if (currentQuery.value.isEmpty()) {
                         Text(
-                            text = stringResource(id = R.string.entries_search_hint),
+                            text = stringResource(id = R.string.satellites_search_hint),
                             fontSize = 16.sp,
                             lineHeight = 20.sp,
                             fontWeight = FontWeight.Medium,
@@ -178,7 +178,7 @@ private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifie
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "Tags: $typesText",
+                text = stringResource(R.string.satellites_type, typesText),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
@@ -199,7 +199,7 @@ private fun SatellitePreview() {
 
 @Composable
 private fun Satellite(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: Modifier) {
-    val passSatId = stringResource(id = R.string.pass_satId, item.catnum)
+    val passSatId = stringResource(id = R.string.passes_satId, item.catnum)
     Surface(
         color = MaterialTheme.colorScheme.background,
         modifier = modifier.clickable { onSelected(item.catnum, item.isSelected) }) {

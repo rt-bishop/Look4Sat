@@ -1,26 +1,34 @@
-name: Look4Sat CI
+name: release
 
 on:
   push:
     tags:
       - v**
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Latest Commit
-        uses: actions/checkout@v4
+env:
+  TAG_NAME: ${{ github.ref_name }}
+  GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
-      - name: Setup java environment
-        uses: actions/setup-java@v4
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
-      - name: Assemble APK and Bundle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Assemble Artifacts
         run: |
-          chmod +x ./gradlew
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
@@ -34,7 +42,7 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "35.0.1"
+          BUILD_TOOLS_VERSION: "36.0.0"
 
       - name: Sign Bundle
         uses: r0adkll/sign-android-release@v1
@@ -46,14 +54,14 @@ jobs:
           alias: ${{ secrets.KEY_ALIAS }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "35.0.1"
+          BUILD_TOOLS_VERSION: "36.0.0"
 
-      - name: Rename APK and Bundle
+      - name: Rename Artifacts
         run: |
           mv ${{steps.sign_apk.outputs.signedReleaseFile}} app/build/outputs/apk/release/look4sat.apk
           mv ${{steps.sign_bundle.outputs.signedReleaseFile}} app/build/outputs/apk/release/look4sat.aab
 
-      - name: Deploy Bundle to Play Store
+      - name: Deploy Bundle
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
@@ -62,9 +70,7 @@ jobs:
           track: beta
           whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
 
-      - name: Create release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "app/build/outputs/apk/release/look4sat.apk,app/build/outputs/apk/release/look4sat.aab"
-          bodyFile: fastlane/metadata/android/en-US/whatsnew/whatsnew-en-US
-          token: ${{ secrets.RELEASE_TOKEN }}
+      - name: Create Release
+        run: |
+          gh release create $TAG_NAME --title=$TAG_NAME --generate-notes
+          gh release upload $TAG_NAME app/build/outputs/apk/release/look4sat.apk

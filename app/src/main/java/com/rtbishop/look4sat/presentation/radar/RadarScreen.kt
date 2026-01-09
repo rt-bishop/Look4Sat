@@ -32,6 +32,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -333,7 +335,7 @@ private fun EclipsedIndicator() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Eclipsed!",
+            text = stringResource(R.string.radar_eclipsed),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.background,
@@ -387,12 +389,13 @@ private fun FrequencyRow(radio: SatRadio, isDownlink: Boolean, modifier: Modifie
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier.fillMaxWidth()) {
         val rotateMod = Modifier.rotate(if (isDownlink) 90f else -90f)
         val weightMod = Modifier.weight(1f)
+        val desc = if (isDownlink) stringResource(R.string.radar_downlink) else stringResource(R.string.radar_uplink)
         Text(
             text = if (isDownlink) "D:" else "U:",
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = modifier.size(width = 24.dp, height = 24.dp)
+            modifier = modifier.size(width = 24.dp, height = 24.dp).semantics { contentDescription = desc }
         )
         FrequencyText(if (isDownlink) radio.downlinkLow else radio.uplinkLow, weightMod)
         Text(
@@ -407,7 +410,7 @@ private fun FrequencyRow(radio: SatRadio, isDownlink: Boolean, modifier: Modifie
         Icon(
             painter = painterResource(id = R.drawable.ic_arrow),
             tint = MaterialTheme.colorScheme.onSurface,
-            contentDescription = if (isDownlink) "Downlink" else "Uplink",
+            contentDescription = null,
             modifier = rotateMod.size(width = 24.dp, height = 24.dp)
         )
     }
@@ -415,10 +418,10 @@ private fun FrequencyRow(radio: SatRadio, isDownlink: Boolean, modifier: Modifie
 
 @Composable
 private fun FrequencyText(frequency: Long?, modifier: Modifier = Modifier) {
-    val noLinkText = stringResource(R.string.radio_no_link)
+    val noLinkText = stringResource(R.string.radar_no_link)
     val freqValue = frequency?.let { it / 1000000f }
     Text(
-        text = freqValue?.let { stringResource(id = R.string.radio_link_low, it) } ?: noLinkText,
+        text = freqValue?.let { stringResource(id = R.string.radar_link_low, it) } ?: noLinkText,
         textAlign = TextAlign.Center,
         fontSize = 21.sp,
         fontWeight = FontWeight.Bold,

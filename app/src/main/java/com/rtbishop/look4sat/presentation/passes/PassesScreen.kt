@@ -204,7 +204,7 @@ private fun NearEarthPass(
     modifier: Modifier = Modifier,
     isVerticalLayout: Boolean = true
 ) {
-    val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
+    val passSatId = stringResource(id = R.string.passes_satId, pass.catNum)
     val horizontalPadding = if (isVerticalLayout) 6.dp else 10.dp
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
@@ -254,7 +254,7 @@ private fun NearEarthPass(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (pass.isDeepSpace) {
-                            Text(text = "DeepSpace", fontSize = 15.sp)
+                            Text(text = stringResource(R.string.passes_deep_space), fontSize = 15.sp)
                         } else {
                             Text(
                                 text = sdfDate.format(Date(pass.aosTime)),
@@ -285,7 +285,7 @@ private fun NearEarthPass(
                     ) {
                         Text(
                             text = stringResource(
-                                id = R.string.pass_aosLos,
+                                id = R.string.passes_aosLos,
                                 pass.aosAzimuth.toInt(),
                                 pass.losAzimuth.toInt()
                             ),
