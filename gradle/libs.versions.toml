@@ -1,13 +1,13 @@
 [versions]
-android-gradle-plugin = "8.13.2"
-google-ksp = "2.3.0"
+android-gradle-plugin = "9.0.0"
+google-ksp = "2.3.2"
 kotlin = "2.3.0"
 
 androidx-core-ktx = "1.17.0"
 androidx-core-splashscreen = "1.2.0"
 androidx-room = "2.8.4"
 
-compose-bom = "2025.12.01"
+compose-bom = "2026.01.00"
 compose-activity = "1.12.2"
 compose-lifecycle = "2.10.0"
 compose-navigation = "2.9.6"
@@ -60,7 +60,6 @@ android-application = { id = "com.android.application", version.ref = "android-g
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "google-ksp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 [bundles]

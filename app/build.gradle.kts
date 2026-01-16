@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.ksp)
-    alias(libs.plugins.kotlin.android)
 }
 
 kotlin {
@@ -15,10 +14,8 @@ android {
     defaultConfig {
         applicationId = "com.rtbishop.look4sat"
         minSdk = 24
-        targetSdk = 36
         versionCode = 400
         versionName = "4.0.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
         compose = true
