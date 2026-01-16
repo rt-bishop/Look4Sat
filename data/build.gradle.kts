@@ -22,7 +22,6 @@ dependencies {
     implementation(libs.androidx.room)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
-
     implementation(libs.other.coroutines)
     implementation(libs.other.okhttp)
 

@@ -1,4 +1,4 @@
-package com.rtbishop.look4sat
+package com.rtbishop.look4sat.data.injection
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -33,14 +33,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
-import org.osmdroid.config.Configuration
 
 class MainContainer(private val context: Context) {
 
     private val localSource = provideLocalSource()
-    private val mainHandler = CoroutineExceptionHandler { _, error ->
-        println("MainHandler: $error")
-    }
+    private val mainHandler = CoroutineExceptionHandler { _, error -> println("MainHandler: $error") }
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + mainHandler)
     val settingsRepo = provideSettingsRepo()
     val selectionRepo = provideSelectionRepo()
@@ -48,26 +45,19 @@ class MainContainer(private val context: Context) {
     val databaseRepo = provideDatabaseRepo()
 
     fun provideAppVersionName(): String {
-        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        return packageInfo.versionName ?: "4.0.0"
+        return context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.0"
     }
 
-    fun provideAddToCalendar(): IAddToCalendar {
-        return AddToCalendar(context)
-    }
+    fun provideAddToCalendar(): IAddToCalendar = AddToCalendar(context)
 
-    fun provideShowToast(): IShowToast {
-        return ShowToast(context)
-    }
+    fun provideShowToast(): IShowToast = ShowToast(context)
 
     fun provideBluetoothReporter(): BluetoothReporter {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         return BluetoothReporter(manager, CoroutineScope(Dispatchers.IO))
     }
 
-    fun provideNetworkReporter(): NetworkReporter {
-        return NetworkReporter(CoroutineScope(Dispatchers.IO))
-    }
+    fun provideNetworkReporter(): NetworkReporter = NetworkReporter(CoroutineScope(Dispatchers.IO))
 
     fun provideSensorsRepo(): ISensorsRepo {
         val manager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -104,9 +94,6 @@ class MainContainer(private val context: Context) {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val appPrefsFileName = "${context.packageName}_preferences"
         val appPreferences = context.getSharedPreferences(appPrefsFileName, Context.MODE_PRIVATE)
-        val mapPrefsFileName = "${context.packageName}_osmdroid"
-        val mapPreferences = context.getSharedPreferences(mapPrefsFileName, Context.MODE_PRIVATE)
-        Configuration.getInstance().load(context, mapPreferences)
         return SettingsRepo(manager, appPreferences)
     }
 }
