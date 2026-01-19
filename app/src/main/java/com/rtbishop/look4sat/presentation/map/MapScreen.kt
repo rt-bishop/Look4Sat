@@ -144,7 +144,7 @@ private fun MapDataCard(data: MapData) {
     val textColor = MaterialTheme.colorScheme.primary
     val cardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
-        Text(text = "© OpenStreetMap contributors", fontSize = 14.sp)
+        Text(text = stringResource(R.string.map_copyright), fontSize = 14.sp)
         Card(colors = cardColors) {
             Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
@@ -172,7 +172,7 @@ private fun MapDataCard(data: MapData) {
 private fun MapDataCards(data: MapData) {
     val cardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
     val paddingMod = Modifier.padding(horizontal = 8.dp, vertical = 4.dp).width(160.dp)
-    val osmText = "© OpenStreetMap contributors"
+    val osmText = stringResource(R.string.map_copyright)
     val textColor = MaterialTheme.colorScheme.primary
     Box(modifier = Modifier.fillMaxSize()) {
         Card(colors = cardColors, modifier = Modifier.align(Alignment.TopStart)) {

@@ -108,7 +108,7 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
 //                .background(color = MaterialTheme.colorScheme.background)
                 .padding(start = 6.dp, top = 1.dp, end = 6.dp, bottom = 0.dp)
         ) {
-            val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
+            val passSatId = stringResource(id = R.string.passes_satId, pass.catNum)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "$passSatId - ",
@@ -175,7 +175,7 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
                 ) {
                     Text(
                         text = stringResource(
-                            id = R.string.pass_aosLos,
+                            id = R.string.passes_aosLos,
                             pass.aosAzimuth.toInt(),
                             pass.losAzimuth.toInt()
                         ),
@@ -235,7 +235,7 @@ fun EmptyListCard(message: String) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(32.dp)
         ) {
-            Text(text = stringResource(R.string.empty_list_title), fontSize = 21.sp)
+            Text(text = stringResource(R.string.empty_list_message), fontSize = 21.sp)
             Text(text = message, fontSize = 18.sp, textAlign = TextAlign.Center)
         }
     }
@@ -302,7 +302,7 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
                     Spacer(modifier = Modifier.weight(1f))
                     CardButton(
                         onClick = onDismiss,
-                        text = stringResource(id = R.string.btn_understand)
+                        text = stringResource(id = R.string.btn_accept)
                     )
                 }
             }

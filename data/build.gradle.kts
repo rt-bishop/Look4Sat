@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.google.ksp)
-    alias(libs.plugins.kotlin.android)
 }
 
 kotlin {
@@ -13,7 +12,6 @@ android {
     compileSdk = 36
     defaultConfig {
         minSdk = 24
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }
 
@@ -24,7 +22,6 @@ dependencies {
     implementation(libs.androidx.room)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
-
     implementation(libs.other.coroutines)
     implementation(libs.other.okhttp)
 

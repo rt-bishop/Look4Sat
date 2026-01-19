@@ -1,6 +1,6 @@
 # Look4Sat: Satellite tracker
 
-[![Look4Sat CI](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml/badge.svg)](https://github.com/rt-bishop/Look4Sat/actions/workflows/main.yml)
+[![Look4Sat CI](https://github.com/rt-bishop/Look4Sat/actions/workflows/release.yml/badge.svg)](https://github.com/rt-bishop/Look4Sat/actions/workflows/release.yml)
 
 # [cf 反代加速worker.js](/wty_add_whitelist_worker.js)
 
