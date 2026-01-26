@@ -6,144 +6,130 @@
     <string name="empty_list_message">No items to display</string>
 
     <!-- Navigation -->
-    <string name="nav_satellites">චන්ද්‍රිකා</string>
-    <string name="nav_passes">පසුකර යෑම්</string>
+    <string name="nav_sat">චන්ද්‍රිකා</string>
+    <string name="nav_pass">පසුකර යෑම්</string>
     <string name="nav_radar">Radar</string>
     <string name="nav_map">සිතියම</string>
-    <string name="nav_settings">පසුතල</string>
+    <string name="nav_prefs">පසුතල</string>
 
     <!-- Satellites screen -->
-    <string name="satellites_select_type">චන්ද්‍රිකා ආකාරය තෝරන්න</string>
-    <string name="satellites_type">තේරූ ආකාර: %s</string>
-    <string name="satellites_select_all">සියල්ල තෝරන්න</string>
-    <string name="satellites_clear_all">සියල්ල පිරිසිදු ක°</string>
-    <string name="satellites_search_hint">Name / Id</string>
-    <string name="satellites_empty_list_message">
+    <string name="sat_type_hint">තේරූ ආකාර: %s</string>
+    <string name="sat_type_title">චන්ද්‍රිකා ආකාරය තෝරන්න</string>
+    <string name="sat_search_hint">Id - Name</string>
+    <string name="sat_search_clear">පිරිසිදු ක°</string>
+    <string name="sat_clear_all">සියල්ල පිරිසිදු ක°</string>
+    <string name="sat_select_all">සියල්ල තෝරන්න</string>
+    <string name="sat_empty_list_message">
         Make sure your search query is correct and the DB is updated</string>
-    <string name="satellites_warning_title">Warning\!</string>
-    <string name="satellites_warning_message">
+    <string name="sat_warning_title">Warning\!</string>
+    <string name="sat_warning_message">
         There are over 9000 satellites listed in this app.
         It makes no sense to track them all at the same time.
         \n\nAlways try to narrow down the list to only the ones
         you\'re interested in via search and types selector.</string>
 
     <!-- Passes screen -->
-    <string name="passes_filter_passes">පසුකිරිම් පිරිපහදුව</string>
-    <string name="passes_filter_within">ඉදිරි පැය</string>
-    <string name="passes_filter_above">අවම උත්තෝලනය</string>
-    <string name="passes_filter_modes">මූර්ජන ආකාරය තෝරන්න</string>
-    <string name="passes_deep_space">DeepSpace</string>
-    <string name="passes_error">ප්‍රදර්ශනය කිරීමට ඉදිරියට එන චන්ද්‍රිකා පසුකර යෑම් නැත.</string>
-    <string name="passes_empty_db">පෙන්වීමට දත්ත නැත. කරුණාකර දත්ත සමුදාය යාවත්කාලීන කරන්න.</string>
-    <string name="passes_elevation">උත්තෝලනය: %.1f°</string>
-    <string name="passes_altitude">උන්නතාශය: %d km</string>
-    <string name="passes_placeholder"> -- : -- : -- </string>
-    <string name="passes_empty_list_message">
+    <string name="pass_filter_title">පසුකිරිම් පිරිපහදුව</string>
+    <string name="pass_filter_elev">අවම උත්තෝලනය</string>
+    <string name="pass_filter_hours">ඉදිරි පැය</string>
+    <string name="pass_modes_title">මූර්ජන ආකාරය තෝරන්න</string>
+    <string name="pass_elevation">උත්තෝලනය: %.1f°</string>
+    <string name="pass_altitude">උන්නතාශය: %d km</string>
+    <string name="pass_empty_db_message">පෙන්වීමට දත්ත නැත. කරුණාකර දත්ත සමුදාය යාවත්කාලීන කරන්න.</string>
+    <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
-    <string name="passes_welcome_title">Welcome to Look4Sat\!</string>
-    <string name="passes_welcome_message">
+    <string name="pass_error_message">ප්‍රදර්ශනය කිරීමට ඉදිරියට එන චන්ද්‍රිකා පසුකර යෑම් නැත.</string>
+    <string name="pass_welcome_title">Welcome to Look4Sat\!</string>
+    <string name="pass_welcome_message">
         Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
 
     <!-- Radar screen -->
+    <string name="radar_back">ආපසු</string>
+    <string name="radar_notify">දන්වනවා</string>
     <string name="radar_az_text">දිගංශය</string>
     <string name="radar_el_text">උත්තෝලනය</string>
     <string name="radar_alt_text">උන්නතාශය</string>
     <string name="radar_dist_text">පරතරය</string>
-    <string name="radar_visible">දෘශ්‍යමාන</string>
     <string name="radar_eclipsed">අදෘශ්‍ය</string>
-    <string name="radar_mode">ප්‍රාකාරය: %s</string>
-    <string name="radar_inverted">Inverted: %s</string>
-    <string name="radar_info">%s</string>
-    <string name="radar_no_link">- - . - -</string>
-    <string name="radar_link_low">%.4f</string>
-    <string name="radar_link_lowHigh">%.4f - %.4f</string>
-    <string name="radar_data">චන්ද්‍රිකා සම්ප්‍රේෂණයන්:</string>
-    <string name="radar_no_data">මෙම චන්ද්‍රිකාව සම්ප්‍රෙෂණය නොකරයි</string>
-    <string name="radar_string_yes">ඔව්</string>
-    <string name="radar_string_no">නෑ</string>
     <string name="radar_downlink">Downlink</string>
     <string name="radar_uplink">Uplink</string>
     <string name="radar_add">එකතු ක°</string>
-    <string name="radar_back">ආපසු</string>
-    <string name="radar_notify">දන්වනවා</string>
+    <string name="radar_data">චන්ද්‍රිකා සම්ප්‍රේෂණයන්:</string>
+    <string name="radar_inverted">Inverted: %s</string>
+    <string name="radar_mode">ප්‍රාකාරය: %s</string>
+    <string name="radar_no_data">මෙම චන්ද්‍රිකාව සම්ප්‍රෙෂණය නොකරයි</string>
+    <string name="radar_string_no">නෑ</string>
+    <string name="radar_string_yes">ඔව්</string>
+    <string name="radar_visible">දෘශ්‍යමාන</string>
 
     <!-- Map screen -->
-    <string name="map_title">ලෝක සිතියම</string>
-    <string name="map_sat_name">%s</string>
-    <string name="map_sat_id">Id:%d</string>
-    <string name="map_azimuth">දිගංශය: %.1f°</string>
-    <string name="map_elevation">උත්තෝලනය: %.1f°</string>
-    <string name="map_latitude">අක්‍ෂාංශ: %.1f°</string>
-    <string name="map_longitude">දේශාංශ: %.1f°</string>
-    <string name="map_visible">දෘශ්‍ය</string>
-    <string name="map_eclipsed">අදෘශ්‍ය</string>
-    <string name="map_visibility">දෘශ්‍යතාව: %s</string>
-    <string name="map_period">කාලය: %.0f min</string>
-    <string name="map_phase">අංශය: %.1f°</string>
-    <string name="map_altitude">උන්නතාශය: %.0f km</string>,
-    <string name="map_distance">පරතරය: %.0f km</string>
-    <string name="map_velocity">ප්‍රවේශය: %.2f km/s</string>
-    <string name="map_copyright">Wikimedia maps | සිතියම් දත්ත © OpenStreetMap බෙදාහැරීම</string>
     <string name="map_prev">පසුපස</string>
     <string name="map_next">ඊළග</string>
+    <string name="map_azimuth">දිගංශය: %.1f°</string>
+    <string name="map_elevation">උත්තෝලනය: %.1f°</string>
+    <string name="map_altitude">උන්නතාශය: %.0f km</string>,
+    <string name="map_distance">පරතරය: %.0f km</string>
+    <string name="map_latitude">අක්‍ෂාංශ: %.1f°</string>
+    <string name="map_longitude">දේශාංශ: %.1f°</string>
+    <string name="map_phase">අංශය: %.1f°</string>
+    <string name="map_eclipsed">අදෘශ්‍ය</string>
+    <string name="map_period">කාලය: %.0f min</string>
+    <string name="map_velocity">ප්‍රවේශය: %.2f km/s</string>
+    <string name="map_visibility">දෘශ්‍යතාව: %s</string>
+    <string name="map_visible">දෘශ්‍ය</string>
 
     <!-- Settings screen -->
-    <string name="settings_location_title">පොළෙහි පිහිටීම</string>
-    <string name="settings_location_lat">අක්‍ෂාංශ: %.4f°</string>
-    <string name="settings_location_lon">දේශාංශ: %.4f°</string>
-    <string name="settings_location_null">භූ ස්ථාන දත්ත නොමැත</string>
-    <string name="settings_location_gps_error">ඔබගේ location අවසර පරීක්ෂා ක°</string>
-    <string name="settings_location_manual_error">ඇතුළත් කළ ස්ථානය වලංගු නොවේ</string>
-    <string name="settings_location_qth_error">QTH locator වලංගු නොවේ</string>
-    <string name="settings_location_success">පිහිටීම යාවත්කාලීනය සාර්ථකයි</string>
+    <string name="prefs_donate">දායකත්ව</string>
+    <string name="prefs_license">GPLv3 බලපත්‍රය</string>
+    <string name="prefs_privacy">Privacy Policy</string>
+    <string name="prefs_fdroid">F-Droid</string>
+    <string name="prefs_github">GitHub</string>
 
-    <string name="settings_data_title">චන්ද්‍රිකා දත්ත යාවත්කාලීනයි</string>
-    <string name="settings_data_error">දෝෂ සහිතව යාවත්කාලීනය සම්පූර්ණයි</string>
-    <string name="settings_data_update">අවසන් යාවත්කාලීනය: %s</string>
-    <string name="settings_data_entries">චන්ද්‍රිකා: %s</string>
-    <string name="settings_data_radios">සම්ප්‍රෙේෂණය: %s</string>
-    <string name="settings_data_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
-    <string name="settings_data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
+    <string name="prefs_updated_title">අවසන් යාවත්කාලීනය: %s</string>
+    <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
 
-    <string name="settings_remote_title">භ්‍රමක මනාප</string>
-    <string name="settings_remote_switch">දුරස්ථ පාලනය සබල ක°</string>
-    <string name="settings_remote_ip_hint">IP ලිපිනය</string>
-    <string name="settings_remote_port_hint">Port</string>
+    <string name="prefs_loc_title">පොළෙහි පිහිටීම</string>
+    <string name="prefs_loc_gps_title">GPS</string>
+    <string name="prefs_loc_gps_error">ඔබගේ location අවසර පරීක්ෂා ක°</string>
+    <string name="prefs_loc_manual_title">අතින්</string>
+    <string name="prefs_loc_manual_error">ඇතුළත් කළ ස්ථානය වලංගු නොවේ</string>
+    <string name="prefs_loc_qth_title">QTH</string>
+    <string name="prefs_loc_qth_error">QTH locator වලංගු නොවේ</string>
+    <string name="prefs_loc_success">පිහිටීම යාවත්කාලීනය සාර්ථකයි</string>
+    <string name="prefs_station_title">පොළෙහි පිහිටීම් පසුතල</string>
+    <string name="prefs_station_lat_text">ඔබගේ පොළෙහි අක්‍ෂාංශය සකසන්න</string>
+    <string name="prefs_station_lon_text">ඔබගේ පොළෙහි දේශාංශය සකසන්න</string>
+    <string name="prefs_locator_title">QTH locator පසුතල</string>
+    <string name="prefs_locator_text"> ඔබගේ locator භාවිතා කර පොළහි පිහිටීම සකසන්න</string>
 
-    <string name="settings_BTremote_title">Bluetooth දත්ත ප්‍රතිදානය</string>
-    <string name="settings_BTremote_switch">ප්‍රතිදානය සබල ක°</string>
-    <string name="settings_BTremote_device_hint">උපාංග id</string>
-    <string name="settings_BTremote_output_hint">දත්ත අකාරය</string>
-    <string name="settings_BTremote_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
+    <string name="prefs_data_title">චන්ද්‍රිකා දත්ත යාවත්කාලීනයි</string>
+    <string name="prefs_data_entries">චන්ද්‍රිකා: %s</string>
+    <string name="prefs_data_radios">සම්ප්‍රෙේෂණය: %s</string>
+    <string name="prefs_data_online">මාර්ගගතව</string>
+    <string name="prefs_data_import">Import</string>
+    <string name="prefs_data_clear">පිරිසිදු ක°</string>
+    <string name="prefs_data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
+    <string name="prefs_data_update_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
 
-    <string name="settings_other_switch_utc">පසුකර වේලාවන් UTC මගින්</string>
-    <string name="settings_other_switch_update">ස්වයං දත්ත යාවත්කාලීනය</string>
-    <string name="settings_other_switch_sweep">radar sweep සජීවිකරණය සබල කරන්න</string>
-    <string name="settings_other_switch_sensors">Radar දර්ශනය කරකැවීමට සංවේදක භාවිතා කරන්න </string>
+    <string name="prefs_remote_title">භ්‍රමක මනාප</string>
+    <string name="prefs_remote_switch">දුරස්ථ පාලනය සබල ක°</string>
+    <string name="prefs_remote_ip_hint">IP ලිපිනය</string>
+    <string name="prefs_remote_port_hint">Port</string>
 
-    <string name="settings_station_gps">GPS</string>
-    <string name="settings_station_manual">අතින්</string>
-    <string name="settings_station_qth">QTH</string>
-    <string name="settings_data_online">මාර්ගගතව</string>
-    <string name="settings_data_import">Import</string>
-    <string name="settings_github">GitHub</string>
-    <string name="settings_donate">දායකත්ව</string>
-    <string name="settings_fdroid">F-Droid</string>
-    <string name="settings_license">GPLv3 බලපත්‍රය</string>
-    <string name="settings_privacy">Privacy Policy</string>
-    <string name="settings_data_clear">පිරිසිදු ක°</string>
+    <string name="prefs_BTremote_title">Bluetooth දත්ත ප්‍රතිදානය</string>
+    <string name="prefs_BTremote_switch">ප්‍රතිදානය සබල ක°</string>
+    <string name="prefs_BTremote_device_hint">උපාංග id</string>
+    <string name="prefs_BTremote_output_hint">දත්ත අකාරය</string>
+    <string name="prefs_BTremote_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
 
-    <string name="settings_last_updated_pattern">d MMM yyyy - HH:mm:ss</string>
+    <string name="prefs_other_switch_utc">පසුකර වේලාවන් UTC මගින්</string>
+    <string name="prefs_other_switch_update">ස්වයං දත්ත යාවත්කාලීනය</string>
+    <string name="prefs_other_switch_sweep">radar sweep සජීවිකරණය සබල කරන්න</string>
+    <string name="prefs_other_switch_sensors">Radar දර්ශනය කරකැවීමට සංවේදක භාවිතා කරන්න </string>
 
-    <string name="settings_locator_title">QTH locator පසුතල</string>
-    <string name="settings_locator_text"> ඔබගේ locator භාවිතා කර පොළහි පිහිටීම සකසන්න</string>
-    <string name="settings_position_title">පොළෙහි පිහිටීම් පසුතල</string>
-    <string name="settings_position_lat_text">ඔබගේ පොළෙහි අක්‍ෂාංශය සකසන්න</string>
-    <string name="settings_position_lon_text">ඔබගේ පොළෙහි දේශාංශය සකසන්න</string>
-
-    <string name="settings_outro_title">මම ස්තුති කිරීමට කැමති:</string>
-    <string name="settings_outro_thanks">බාගෙන භාවිතා කළ ඔබට! \nඅහස සදා ඔබ වෙනුවෙන් පැහැදිලියි!
+    <string name="prefs_outro_title">මම ස්තුති කිරීමට කැමති:</string>
+    <string name="prefs_outro_thanks">බාගෙන භාවිතා කළ ඔබට! \nඅහස සදා ඔබ වෙනුවෙන් පැහැදිලියි!
         \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
         සහ <a href="https://github.com/davidmoten">Dave Moten</a>ඔවුනට ප්‍රයෝජනවත් predict4java පුස්තකාලය නිර්මාණයට.
         \nසහ <a href="https://github.com/csete">Alexandru Csete</a> සඳහා Gpredict නිර්මාණයට සහ
@@ -153,6 +139,6 @@
         \n<a href="https://libre.space/">Libre Space Foundation</a>ට ඔවුන්ගේ
         <a href="https://db.satnogs.org/">SatNOGS</a>Web අඩවියට API හා DB විශාල දත්ත ප්‍රමාණයක් ලබාදීම සඳහා.
         \n<a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a> කණ්ඩායමට යෙදුම පිළිබඳ ඔවුන්ගේ උනන්දුව සහ කැපවීම ලැබිම සම්බන්ධයෙන්.</string>
-    <string name="settings_outro_license">මෘදුකාංගය වගකීමක් සමග නොලැබේ</string>
+    <string name="prefs_outro_license">මෘදුකාංගය වගකීමක් සමග නොලැබේ</string>
 
 </resources>

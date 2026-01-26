@@ -6,144 +6,130 @@
     <string name="empty_list_message">No items to display</string>
 
     <!-- Navigation -->
-    <string name="nav_satellites">Супутники</string>
-    <string name="nav_passes">Прольоти</string>
+    <string name="nav_sat">Супутники</string>
+    <string name="nav_pass">Прольоти</string>
     <string name="nav_radar">Radar</string>
     <string name="nav_map">Карта</string>
-    <string name="nav_settings">Налаштування</string>
+    <string name="nav_prefs">Налаштування</string>
 
     <!-- Satellites screen -->
-    <string name="satellites_select_all">Вибрати всі</string>
-    <string name="satellites_clear_all">Очистити</string>
-    <string name="satellites_select_type">Виберіть тип супутника</string>
-    <string name="satellites_type">Вибраний тип: %s</string>
-    <string name="satellites_search_hint">Пошук за Назвою / Id</string>
-    <string name="satellites_empty_list_message">
+    <string name="sat_type_hint">Вибраний тип: %s</string>
+    <string name="sat_type_title">Виберіть тип супутника</string>
+    <string name="sat_search_hint">Id - Назва</string>
+    <string name="sat_search_clear">Очистити</string>
+    <string name="sat_clear_all">Очистити</string>
+    <string name="sat_select_all">Вибрати всі</string>
+    <string name="sat_empty_list_message">
         Make sure your search query is correct and the DB is updated</string>
-    <string name="satellites_warning_title">Warning\!</string>
-    <string name="satellites_warning_message">
+    <string name="sat_warning_title">Warning\!</string>
+    <string name="sat_warning_message">
         There are over 9000 satellites listed in this app.
         It makes no sense to track them all at the same time.
         \n\nAlways try to narrow down the list to only the ones
         you\'re interested in via search and types selector.</string>
 
     <!-- Passes screen -->
-    <string name="passes_filter_passes">Фільтр прольотів</string>
-    <string name="passes_filter_within">Кількість годин</string>
-    <string name="passes_filter_above">Мінімальне піднесення</string>
-    <string name="passes_filter_modes">Виберіть тип модуляції</string>
-    <string name="passes_deep_space">DeepSpace</string>
-    <string name="passes_error">Немає майбутніх прольотів супутників</string>
-    <string name="passes_empty_db">Немає даних для відображення. Будь ласка, оновіть базу даних через меню Налаштування</string>
-    <string name="passes_elevation">Піднес.: %.1f°</string>
-    <string name="passes_altitude">Висота: %.0f км</string>
-    <string name="passes_placeholder"> - - : - - </string>
-    <string name="passes_empty_list_message">
+    <string name="pass_filter_title">Фільтр прольотів</string>
+    <string name="pass_filter_elev">Мінімальне піднесення</string>
+    <string name="pass_filter_hours">Кількість годин</string>
+    <string name="pass_modes_title">Виберіть тип модуляції</string>
+    <string name="pass_elevation">Піднес.: %.1f°</string>
+    <string name="pass_altitude">Висота: %.0f км</string>
+    <string name="pass_empty_db_message">Немає даних для відображення. Будь ласка, оновіть базу даних через меню Налаштування</string>
+    <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
-    <string name="passes_welcome_title">Welcome to Look4Sat\!</string>
-    <string name="passes_welcome_message">
+    <string name="pass_error_message">Немає майбутніх прольотів супутників</string>
+    <string name="pass_welcome_title">Welcome to Look4Sat\!</string>
+    <string name="pass_welcome_message">
         Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
 
     <!-- Radar screen -->
+    <string name="radar_back">Назад</string>
+    <string name="radar_notify">Сповістити</string>
     <string name="radar_az_text">Азимут</string>
     <string name="radar_el_text">Піднес.</string>
     <string name="radar_alt_text">Висота</string>
     <string name="radar_dist_text">Відстань</string>
-    <string name="radar_visible">Видимий</string>
     <string name="radar_eclipsed">В тіні</string>
-    <string name="radar_mode">Модуляція: %s</string>
-    <string name="radar_inverted">Інверсія: %s</string>
-    <string name="radar_info">%s</string>
-    <string name="radar_no_link">- - . - -</string>
-    <string name="radar_link_low">%.4f</string>
-    <string name="radar_link_lowHigh">%.4f - %.4f</string>
-    <string name="radar_data">Супутникові трансивери:</string>
-    <string name="radar_no_data">Цей супутник не має трансиверів</string>
-    <string name="radar_string_yes">Так</string>
-    <string name="radar_string_no">Ні</string>
     <string name="radar_downlink">Downlink</string>
     <string name="radar_uplink">Uplink</string>
     <string name="radar_add">Додати</string>
-    <string name="radar_notify">Сповістити</string>
-    <string name="radar_back">Назад</string>
+    <string name="radar_data">Супутникові трансивери:</string>
+    <string name="radar_inverted">Інверсія: %s</string>
+    <string name="radar_mode">Модуляція: %s</string>
+    <string name="radar_no_data">Цей супутник не має трансиверів</string>
+    <string name="radar_string_no">Ні</string>
+    <string name="radar_string_yes">Так</string>
+    <string name="radar_visible">Видимий</string>
 
     <!-- Map screen -->
-    <string name="map_title">Карта світу</string>
-    <string name="map_sat_name">%s</string>
-    <string name="map_sat_id">Id:%d</string>
-    <string name="map_azimuth">Азимут: %.1f°</string>
-    <string name="map_elevation">Піднесення: %.1f°</string>
-    <string name="map_latitude">Широта: %.1f°</string>
-    <string name="map_longitude">Довгота: %.1f°</string>
-    <string name="map_visible">Видимий</string>
-    <string name="map_eclipsed">Затемнений</string>
-    <string name="map_visibility">Видимість: %s</string>
-    <string name="map_period">Період: %.0f хв</string>
-    <string name="map_phase">Фаза: %.1f°</string>
-    <string name="map_altitude">Висота: %.0f км</string>
-    <string name="map_distance">Дистанція: %.0f км</string>
-    <string name="map_velocity">Швидкість: %.2f км/с</string>
-    <string name="map_copyright">Wikimedia maps | Map data © OpenStreetMap contributors</string>
     <string name="map_prev">Попередній</string>
     <string name="map_next">Наступний</string>
+    <string name="map_azimuth">Азимут: %.1f°</string>
+    <string name="map_elevation">Піднесення: %.1f°</string>
+    <string name="map_altitude">Висота: %.0f км</string>
+    <string name="map_distance">Дистанція: %.0f км</string>
+    <string name="map_latitude">Широта: %.1f°</string>
+    <string name="map_longitude">Довгота: %.1f°</string>
+    <string name="map_phase">Фаза: %.1f°</string>
+    <string name="map_eclipsed">Затемнений</string>
+    <string name="map_period">Період: %.0f хв</string>
+    <string name="map_velocity">Швидкість: %.2f км/с</string>
+    <string name="map_visibility">Видимість: %s</string>
+    <string name="map_visible">Видимий</string>
 
     <!-- Settings screen -->
-    <string name="settings_location_title">Місцезнаходження</string>
-    <string name="settings_location_lat">Широта: %.4f°</string>
-    <string name="settings_location_lon">Довгота: %.4f°</string>
-    <string name="settings_location_null">Немає даних геолокації</string>
-    <string name="settings_location_gps_error">Перевірте дозволи на визначення місця</string>
-    <string name="settings_location_manual_error">Введені некоректні дані</string>
-    <string name="settings_location_qth_error">Некоректний локатор QTH</string>
-    <string name="settings_location_success">Позицію успішно оновлено</string>
+    <string name="prefs_donate">Підтримати</string>
+    <string name="prefs_license">Ліцензія GPLv3</string>
+    <string name="prefs_privacy">Конфіденційність</string>
+    <string name="prefs_fdroid">F-Droid</string>
+    <string name="prefs_github">GitHub</string>
 
-    <string name="settings_data_title">Оновлення даних</string>
-    <string name="settings_data_error">Помилка при оновлені даних</string>
-    <string name="settings_data_update">Останнє оновлення: %s</string>
-    <string name="settings_data_entries">Супутників: %s</string>
-    <string name="settings_data_radios">Трансиверів: %s</string>
-    <string name="settings_data_success">Оновлення успішне</string>
-    <string name="settings_data_clear_success">Дані успішно очищено</string>
+    <string name="prefs_updated_title">Останнє оновлення: %s</string>
+    <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
 
-    <string name="settings_remote_title">Налаштування ротатора</string>
-    <string name="settings_remote_switch">Віддалене керування</string>
-    <string name="settings_remote_ip_hint">IP адреса</string>
-    <string name="settings_remote_port_hint">Порт</string>
+    <string name="prefs_loc_title">Місцезнаходження</string>
+    <string name="prefs_loc_gps_title">GPS</string>
+    <string name="prefs_loc_gps_error">Перевірте дозволи на визначення місця</string>
+    <string name="prefs_loc_manual_title">Вручну</string>
+    <string name="prefs_loc_manual_error">Введені некоректні дані</string>
+    <string name="prefs_loc_qth_title">QTH</string>
+    <string name="prefs_loc_qth_error">Некоректний локатор QTH</string>
+    <string name="prefs_loc_success">Позицію успішно оновлено</string>
+    <string name="prefs_station_title">Налаштування місцезнаходження станції</string>
+    <string name="prefs_station_lat_text">Задайте широту станції</string>
+    <string name="prefs_station_lon_text">Задайте довготу станції</string>
+    <string name="prefs_locator_title">Налаштування QTH локатора</string>
+    <string name="prefs_locator_text">Задати позицію за QTH локатором</string>
 
-    <string name="settings_BTremote_title">Передача даних через Bluetooth</string>
-    <string name="settings_BTremote_switch">Увімкнути передачу</string>
-    <string name="settings_BTremote_device_hint">Id пристрою</string>
-    <string name="settings_BTremote_output_hint">Формат даних</string>
-    <string name="settings_BTremote_perm_error">Перевірте дозвіл Bluetooth</string>
+    <string name="prefs_data_title">Оновлення даних</string>
+    <string name="prefs_data_entries">Супутників: %s</string>
+    <string name="prefs_data_radios">Трансиверів: %s</string>
+    <string name="prefs_data_online">Онлайн</string>
+    <string name="prefs_data_import">Імпорт</string>
+    <string name="prefs_data_clear">Очистити</string>
+    <string name="prefs_data_clear_success">Дані успішно очищено</string>
+    <string name="prefs_data_update_success">Оновлення успішне</string>
 
-    <string name="settings_other_switch_utc">Показувати час в UTC</string>
-    <string name="settings_other_switch_update">Автоматичне оновлення даних</string>
-    <string name="settings_other_switch_sweep">Показувати анімацію радара</string>
-    <string name="settings_other_switch_sensors">Використовувати сенсори пристрою</string>
+    <string name="prefs_remote_title">Налаштування ротатора</string>
+    <string name="prefs_remote_switch">Віддалене керування</string>
+    <string name="prefs_remote_ip_hint">IP адреса</string>
+    <string name="prefs_remote_port_hint">Порт</string>
 
-    <string name="settings_data_clear">Очистити</string>
-    <string name="settings_station_gps">GPS</string>
-    <string name="settings_station_manual">Вручну</string>
-    <string name="settings_station_qth">QTH</string>
-    <string name="settings_data_online">Онлайн</string>
-    <string name="settings_data_import">Імпорт</string>
-    <string name="settings_github">GitHub</string>
-    <string name="settings_donate">Підтримати</string>
-    <string name="settings_fdroid">F-Droid</string>
-    <string name="settings_license">Ліцензія GPLv3</string>
-    <string name="settings_privacy">Конфіденційність</string>
+    <string name="prefs_BTremote_title">Передача даних через Bluetooth</string>
+    <string name="prefs_BTremote_switch">Увімкнути передачу</string>
+    <string name="prefs_BTremote_device_hint">Id пристрою</string>
+    <string name="prefs_BTremote_output_hint">Формат даних</string>
+    <string name="prefs_BTremote_perm_error">Перевірте дозвіл Bluetooth</string>
 
-    <string name="settings_last_updated_pattern">d MMM yyyy - HH:mm:ss</string>
+    <string name="prefs_other_switch_utc">Показувати час в UTC</string>
+    <string name="prefs_other_switch_update">Автоматичне оновлення даних</string>
+    <string name="prefs_other_switch_sweep">Показувати анімацію радара</string>
+    <string name="prefs_other_switch_sensors">Використовувати сенсори пристрою</string>
 
-    <string name="settings_locator_title">Налаштування QTH локатора</string>
-    <string name="settings_locator_text">Задати позицію за QTH локатором</string>
-    <string name="settings_position_title">Налаштування місцезнаходження станції</string>
-    <string name="settings_position_lat_text">Задайте широту станції</string>
-    <string name="settings_position_lon_text">Задайте довготу станції</string>
-
-    <string name="settings_outro_title">Я хотів би подякувати:</string>
-    <string name="settings_outro_thanks">Вам за завантаження та використання Look4Sat!
+    <string name="prefs_outro_title">Я хотів би подякувати:</string>
+    <string name="prefs_outro_thanks">Вам за завантаження та використання Look4Sat!
         \nБажаю завжди чистого неба над головою!
         \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
         та <a href="https://github.com/davidmoten">Dave Moten</a> за створення бібліотеки predict4java.
@@ -155,6 +141,6 @@
         \nКоманді <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
         за інтерес до застосунку та публікацію інтерв\'ю на сайті.
     </string>
-    <string name="settings_outro_license">Це ПЗ поставляється без жодних гарантій.</string>
+    <string name="prefs_outro_license">Це ПЗ поставляється без жодних гарантій.</string>
 
 </resources>

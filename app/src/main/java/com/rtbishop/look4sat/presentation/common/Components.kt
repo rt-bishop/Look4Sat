@@ -108,7 +108,7 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
 //                .background(color = MaterialTheme.colorScheme.background)
                 .padding(start = 6.dp, top = 1.dp, end = 6.dp, bottom = 0.dp)
         ) {
-            val passSatId = stringResource(id = R.string.passes_satId, pass.catNum)
+            val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "$passSatId - ",
@@ -175,7 +175,7 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
                 ) {
                     Text(
                         text = stringResource(
-                            id = R.string.passes_aosLos,
+                            id = R.string.pass_aosLos,
                             pass.aosAzimuth.toInt(),
                             pass.losAzimuth.toInt()
                         ),

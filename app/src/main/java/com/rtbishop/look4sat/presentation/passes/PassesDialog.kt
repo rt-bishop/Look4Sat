@@ -74,16 +74,16 @@ fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, accept: (Int
     val onAccept = {
         accept(hoursValue.intValue, elevationValueNew.doubleValue).also { cancel() }
     }
-    SharedDialog(title = stringResource(R.string.passes_filter_passes), onCancel = cancel, onAccept = onAccept) {
+    SharedDialog(title = stringResource(R.string.pass_filter_title), onCancel = cancel, onAccept = onAccept) {
         SliderRow(
-            title = stringResource(R.string.passes_filter_above),
+            title = stringResource(R.string.pass_filter_elev),
             value = elevationValueNew.doubleValue,
             valuePostfix = "°",
             valueResId = R.drawable.ic_elevation,
             valueRange = 0f..60f
         ) { elevationValueNew.doubleValue = it.toDouble() }
         SliderRow(
-            title = stringResource(R.string.passes_filter_within),
+            title = stringResource(R.string.pass_filter_hours),
             value = hoursValue.intValue.toDouble(),
             valuePostfix = "h",
             valueResId = R.drawable.ic_clock,
@@ -146,7 +146,7 @@ fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List<String>)
         if (selected.contains(mode)) selected.remove(mode) else selected.add(mode)
     }
     val onAccept = { accept(selected.toList()).also { cancel() } }
-    SharedDialog(title = stringResource(R.string.passes_filter_modes), onCancel = cancel, onAccept = onAccept) {
+    SharedDialog(title = stringResource(R.string.pass_modes_title), onCancel = cancel, onAccept = onAccept) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(240.dp),
             modifier = Modifier

@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -72,8 +74,8 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateUp: () -> Unit) {
     }
     if (uiState.shouldSeeWarning) {
         InfoDialog(
-            stringResource(R.string.satellites_warning_title),
-            stringResource(R.string.satellites_warning_message)
+            stringResource(R.string.sat_warning_title),
+            stringResource(R.string.sat_warning_message)
         ) {
             uiState.takeAction(SatellitesAction.DismissWarning)
         }
@@ -82,28 +84,34 @@ private fun SatellitesScreen(uiState: SatellitesState, navigateUp: () -> Unit) {
     val selectAll = { uiState.takeAction(SatellitesAction.SelectAll) }
     val setQuery = { newQuery: String -> uiState.takeAction(SatellitesAction.SearchFor(newQuery)) }
     val saveSelection = { uiState.takeAction(SatellitesAction.SaveSelection).also { navigateUp() } }
+    val primCardCd = stringResource(R.string.btn_accept)
+    val primCardMod = Modifier.semantics { contentDescription = primCardCd }
+    val clearAllCd = stringResource(R.string.sat_clear_all)
+    val clearAllMod = Modifier.semantics { contentDescription = clearAllCd }
+    val selectAllCd = stringResource(R.string.sat_select_all)
+    val selectAllMod = Modifier.semantics { contentDescription = selectAllCd }
     Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {
                 TypeCard(types = uiState.currentTypes, toggleDialog, modifier = Modifier.weight(1f))
-                PrimaryIconCard(onClick = saveSelection, resId = R.drawable.ic_done)
+                PrimaryIconCard(onClick = saveSelection, resId = R.drawable.ic_done, modifier = primCardMod)
             }
             TopBar {
                 SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
-                IconCard(action = unselectAll, resId = R.drawable.ic_check_off)
-                IconCard(action = selectAll, resId = R.drawable.ic_check_on)
+                IconCard(action = unselectAll, resId = R.drawable.ic_check_off, modifier = clearAllMod)
+                IconCard(action = selectAll, resId = R.drawable.ic_check_on, modifier = selectAllMod)
             }
         } else {
             TopBar {
-                PrimaryIconCard(onClick = saveSelection, resId = R.drawable.ic_done)
+                PrimaryIconCard(onClick = saveSelection, resId = R.drawable.ic_done, modifier = primCardMod)
                 TypeCard(types = uiState.currentTypes, toggleDialog, modifier = Modifier.weight(1f))
                 SearchBar(setQuery = { setQuery(it) }, modifier = Modifier.weight(1f))
-                IconCard(action = unselectAll, resId = R.drawable.ic_check_off)
-                IconCard(action = selectAll, resId = R.drawable.ic_check_on)
+                IconCard(action = unselectAll, resId = R.drawable.ic_check_off, modifier = clearAllMod)
+                IconCard(action = selectAll, resId = R.drawable.ic_check_on, modifier = selectAllMod)
             }
         }
         ElevatedCard(modifier = Modifier.fillMaxSize()) {
-            val emptyMessage = stringResource(R.string.satellites_empty_list_message)
+            val emptyMessage = stringResource(R.string.sat_empty_list_message)
             when {
                 uiState.isLoading -> CardLoadingIndicator()
                 uiState.itemsList.isEmpty() -> EmptyListCard(message = emptyMessage)
@@ -143,7 +151,7 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
                 decorationBox = { innerTextField ->
                     if (currentQuery.value.isEmpty()) {
                         Text(
-                            text = stringResource(id = R.string.satellites_search_hint),
+                            text = stringResource(id = R.string.sat_search_hint),
                             fontSize = 16.sp,
                             lineHeight = 20.sp,
                             fontWeight = FontWeight.Medium,
@@ -155,7 +163,8 @@ private fun SearchBar(setQuery: (String) -> Unit, modifier: Modifier = Modifier)
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
             )
             IconButton(onClick = { setNewQuery("") }) {
-                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = null)
+                val clearCd = stringResource(R.string.sat_search_clear)
+                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = clearCd)
             }
         }
     }
@@ -178,7 +187,7 @@ private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifie
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = stringResource(R.string.satellites_type, typesText),
+                text = stringResource(R.string.sat_type_hint, typesText),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
@@ -199,7 +208,7 @@ private fun SatellitePreview() {
 
 @Composable
 private fun Satellite(item: SatItem, onSelected: (Int, Boolean) -> Unit, modifier: Modifier) {
-    val passSatId = stringResource(id = R.string.passes_satId, item.catnum)
+    val passSatId = stringResource(id = R.string.pass_satId, item.catnum)
     Surface(
         color = MaterialTheme.colorScheme.background,
         modifier = modifier.clickable { onSelected(item.catnum, item.isSelected) }) {

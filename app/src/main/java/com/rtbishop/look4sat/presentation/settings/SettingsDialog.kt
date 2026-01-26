@@ -21,12 +21,12 @@ private fun PositionDialogPreview() {
 fun PositionDialog(lat: Double, lon: Double, dismiss: () -> Unit, save: (Double, Double) -> Unit) {
     val latValue = rememberSaveable { mutableStateOf(lat.toString()) }
     val lonValue = rememberSaveable { mutableStateOf(lon.toString()) }
-    val titleText = stringResource(id = R.string.settings_position_title)
+    val titleText = stringResource(id = R.string.prefs_station_title)
     val onAccept = { saveValues(latValue.value, lonValue.value, save).also { dismiss() } }
     SharedDialog(title = titleText, onCancel = dismiss, onAccept = onAccept) {
-        Text(text = stringResource(id = R.string.settings_position_lat_text))
+        Text(text = stringResource(id = R.string.prefs_station_lat_text))
         OutlinedTextField(value = latValue.value, onValueChange = { latValue.value = it })
-        Text(text = stringResource(id = R.string.settings_position_lon_text))
+        Text(text = stringResource(id = R.string.prefs_station_lon_text))
         OutlinedTextField(value = lonValue.value, onValueChange = { lonValue.value = it })
     }
 }
@@ -49,8 +49,8 @@ private fun LocatorDialogPreview() {
 fun LocatorDialog(qthLocator: String, dismiss: () -> Unit, save: (String) -> Unit) {
     val locator = rememberSaveable { mutableStateOf(qthLocator) }
     val onAccept = { save(locator.value).also { dismiss() } }
-    SharedDialog(title = stringResource(R.string.settings_locator_title), onCancel = dismiss, onAccept = onAccept) {
-        Text(text = stringResource(id = R.string.settings_locator_text))
+    SharedDialog(title = stringResource(R.string.prefs_locator_title), onCancel = dismiss, onAccept = onAccept) {
+        Text(text = stringResource(id = R.string.prefs_locator_text))
         OutlinedTextField(value = locator.value, onValueChange = { locator.value = it })
     }
 }

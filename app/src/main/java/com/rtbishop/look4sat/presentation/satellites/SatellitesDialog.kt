@@ -42,7 +42,7 @@ fun MultiTypesDialog(
         if (selected.contains(type)) selected.remove(type) else selected.add(type)
     }
     val onAccept = { accept(selected.toList()) }
-    SharedDialog(title = stringResource(R.string.satellites_select_type), onCancel = cancel, onAccept = onAccept) {
+    SharedDialog(title = stringResource(R.string.sat_type_title), onCancel = cancel, onAccept = onAccept) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(240.dp),
             modifier = Modifier

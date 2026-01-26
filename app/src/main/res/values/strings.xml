@@ -7,48 +7,51 @@
     <string name="empty_list_message">No items to display</string>
 
     <!-- Navigation -->
-    <string name="nav_satellites">Satellites</string>
-    <string name="nav_passes">Passes</string>
+    <string name="nav_sat">Satellites</string>
+    <string name="nav_pass">Passes</string>
     <string name="nav_radar">Radar</string>
     <string name="nav_map">Map</string>
-    <string name="nav_settings">Settings</string>
+    <string name="nav_prefs">Settings</string>
 
     <!-- Satellites screen -->
-    <string name="satellites_type">Selected type: %s</string>
-    <string name="satellites_search_hint">Id - Name</string>
-    <string name="satellites_clear_all">Clear all</string>
-    <string name="satellites_select_all">Select all</string>
-    <string name="satellites_select_type">Select satellite type</string>
-    <string name="satellites_empty_list_message">
+    <string name="sat_type_hint">Selected type: %s</string>
+    <string name="sat_type_title">Select satellite type</string>
+    <string name="sat_search_hint">Id - Name</string>
+    <string name="sat_search_clear">Clear</string>
+    <string name="sat_clear_all">Clear all</string>
+    <string name="sat_select_all">Select all</string>
+    <string name="sat_empty_list_message">
         Make sure your search query is correct and the DB is updated</string>
-    <string name="satellites_warning_title">Warning\!</string>
-    <string name="satellites_warning_message">
+    <string name="sat_warning_title">Warning\!</string>
+    <string name="sat_warning_message">
         There are over 9000 satellites listed in this app.
         It makes no sense to track them all at the same time.
         \n\nAlways try to narrow down the list to only the ones
         you\'re interested in via search and types selector.</string>
 
     <!-- Passes screen -->
-    <string name="passes_filter_passes">Filter passes</string>
-    <string name="passes_filter_above">Minimal elevation</string>
-    <string name="passes_filter_within">Hours ahead</string>
-    <string name="passes_filter_modes">Select modulation type</string>
-    <string name="passes_error">There are no upcoming satellite passes to display</string>
-    <string name="passes_empty_db">No data to show. Please update the database via Settings menu.</string>
-    <string name="passes_deep_space">DeepSpace</string>
-    <string name="passes_satId" translatable="false">%05d</string>
-    <string name="passes_aosLos" translatable="false">%03d° - %03d°</string>
-    <string name="passes_elevation">Elevation: %.1f°</string>
-    <string name="passes_altitude">Altitude: %d km</string>
-    <string name="passes_placeholder"> -- : -- : -- </string>
-    <string name="passes_empty_list_message">
+    <string name="pass_filter_title">Filter passes</string>
+    <string name="pass_filter_elev">Minimal elevation</string>
+    <string name="pass_filter_hours">Hours ahead</string>
+    <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
+    <string name="pass_modes_title">Select modulation type</string>
+    <string name="pass_satId" translatable="false">%05d</string>
+    <string name="pass_elevation">Elevation: %.1f°</string>
+    <string name="pass_deep_space" translatable="false">DeepSpace</string>
+    <string name="pass_altitude">Altitude: %d km</string>
+    <string name="pass_aosLos" translatable="false">%03d° - %03d°</string>
+    <string name="pass_empty_db_message">No data to show. Please update the database via Settings menu.</string>
+    <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
-    <string name="passes_welcome_title">Welcome to Look4Sat\!</string>
-    <string name="passes_welcome_message">
+    <string name="pass_error_message">There are no upcoming satellite passes to display</string>
+    <string name="pass_welcome_title">Welcome to Look4Sat\!</string>
+    <string name="pass_welcome_message">
         Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
 
     <!-- Radar screen -->
+    <string name="radar_back">Back</string>
+    <string name="radar_notify">Notify</string>
     <string name="radar_az_text">Azimuth</string>
     <string name="radar_az_value" translatable="false">%.1f°</string>
     <string name="radar_el_text">Elevation</string>
@@ -57,102 +60,90 @@
     <string name="radar_alt_value" translatable="false">%.0f km</string>
     <string name="radar_dist_text">Distance</string>
     <string name="radar_dist_value" translatable="false">%.0f km</string>
-    <string name="radar_visible">Visible</string>
     <string name="radar_eclipsed">Eclipsed</string>
-    <string name="radar_notify">Notify</string>
-    <string name="radar_mode">Mode: %s</string>
-    <string name="radar_inverted">Inverted: %s</string>
-    <string name="radar_info">%s</string>
-    <string name="radar_no_link">- - . - -</string>
-    <string name="radar_link_low">%.4f</string>
-    <string name="radar_link_lowHigh">%.4f - %.4f</string>
-    <string name="radar_data">Satellite transceivers:</string>
-    <string name="radar_no_data">This satellite has no transceivers</string>
-    <string name="radar_string_yes">Yes</string>
-    <string name="radar_string_no">No</string>
     <string name="radar_downlink">Downlink</string>
     <string name="radar_uplink">Uplink</string>
-    <string name="radar_back">Back</string>
+    <string name="radar_link_low" translatable="false">%.4f</string>
+    <string name="radar_link_lowHigh" translatable="false">%.4f - %.4f</string>
+    <string name="radar_no_link" translatable="false">- - . - -</string>
     <string name="radar_add">Add</string>
+    <string name="radar_data">Satellite transceivers:</string>
+    <string name="radar_inverted">Inverted: %s</string>
+    <string name="radar_mode">Mode: %s</string>
+    <string name="radar_no_data">This satellite has no transceivers</string>
+    <string name="radar_string_no">No</string>
+    <string name="radar_string_yes">Yes</string>
+    <string name="radar_visible">Visible</string>
 
     <!-- Map screen -->
-    <string name="map_title">World Map</string>
-    <string name="map_sat_name">%s</string>
-    <string name="map_sat_id">Id:%d</string>
+    <string name="map_prev">Prev</string>
+    <string name="map_next">Next</string>
+    <string name="map_copyright" translatable="false">© OpenStreetMap contributors</string>
     <string name="map_azimuth">Azimuth: %.1f°</string>
     <string name="map_elevation">Elevation: %.1f°</string>
+    <string name="map_altitude">Altitude: %.0f km</string>
+    <string name="map_distance">Distance: %.0f km</string>
     <string name="map_latitude">Latitude: %.1f°</string>
     <string name="map_longitude">Longitude: %.1f°</string>
     <string name="map_qth" translatable="false">QTH: %s</string>
-    <string name="map_visible">Visible</string>
-    <string name="map_eclipsed">Eclipsed</string>
-    <string name="map_visibility">Visibility: %s</string>
-    <string name="map_period">Period: %.0f min</string>
     <string name="map_phase">Phase: %.1f°</string>
-    <string name="map_altitude">Altitude: %.0f km</string>
-    <string name="map_distance">Distance: %.0f km</string>
+    <string name="map_eclipsed">Eclipsed</string>
+    <string name="map_period">Period: %.0f min</string>
     <string name="map_velocity">Velocity: %.2f km/s</string>
-    <string name="map_copyright">Wikimedia maps | Map data © OpenStreetMap contributors</string>
-    <string name="map_prev">Prev</string>
-    <string name="map_next">Next</string>
+    <string name="map_visibility">Visibility: %s</string>
+    <string name="map_visible">Visible</string>
 
     <!-- Settings screen -->
-    <string name="settings_location_title">Station position</string>
-    <string name="settings_location_lat">Latitude: %.4f°</string>
-    <string name="settings_location_lon">Longitude: %.4f°</string>
-    <string name="settings_location_null">No geolocation data</string>
-    <string name="settings_location_gps_error">Check your location permissions</string>
-    <string name="settings_location_manual_error">Invalid location entered</string>
-    <string name="settings_location_qth_error">Invalid QTH locator</string>
-    <string name="settings_location_success">Position updated successfully</string>
+    <string name="prefs_donate">Donate</string>
+    <string name="prefs_license">GPLv3 Licence</string>
+    <string name="prefs_privacy">Privacy Policy</string>
+    <string name="prefs_fdroid">F-Droid</string>
+    <string name="prefs_github">GitHub</string>
 
-    <string name="settings_data_clear">Clear</string>
-    <string name="settings_station_gps">GPS</string>
-    <string name="settings_station_manual">Manual</string>
-    <string name="settings_station_qth">QTH</string>
-    <string name="settings_data_online">Online</string>
-    <string name="settings_data_import">Import</string>
-    <string name="settings_github">GitHub</string>
-    <string name="settings_donate">Donate</string>
-    <string name="settings_fdroid">F-Droid</string>
-    <string name="settings_license">GPLv3 Licence</string>
-    <string name="settings_privacy">Privacy Policy</string>
+    <string name="prefs_updated_title">Last updated: %s</string>
+    <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
 
-    <string name="settings_position_title">Station position settings</string>
-    <string name="settings_position_lat_text">Set your ground station\'s latitude</string>
-    <string name="settings_position_lon_text">Set your ground station\'s longitude</string>
+    <string name="prefs_loc_title">Station position</string>
+    <string name="prefs_loc_gps_title">GPS</string>
+    <string name="prefs_loc_gps_error">Check your location permissions</string>
+    <string name="prefs_loc_manual_title">Manual</string>
+    <string name="prefs_loc_manual_error">Invalid location entered</string>
+    <string name="prefs_loc_qth_title">QTH</string>
+    <string name="prefs_loc_qth_error">Invalid QTH locator</string>
+    <string name="prefs_loc_success">Position updated successfully</string>
+    <string name="prefs_station_title">Station position settings</string>
+    <string name="prefs_station_lat_text">Set your ground station\'s latitude</string>
+    <string name="prefs_station_lon_text">Set your ground station\'s longitude</string>
+    <string name="prefs_locator_title">QTH locator settings</string>
+    <string name="prefs_locator_text">Set station\'s position using locator</string>
 
-    <string name="settings_locator_title">QTH locator settings</string>
-    <string name="settings_locator_text">Set station\'s position using locator</string>
+    <string name="prefs_data_title">Satellite data</string>
+    <string name="prefs_data_entries">Satellites: %s</string>
+    <string name="prefs_data_radios">Transceivers: %s</string>
+    <string name="prefs_data_online">Online</string>
+    <string name="prefs_data_import">Import</string>
+    <string name="prefs_data_clear">Clear</string>
+    <string name="prefs_data_clear_success">Data was cleared successfully</string>
+    <string name="prefs_data_update_success">Update completed successfully</string>
 
-    <string name="settings_data_title">Satellite data update</string>
-    <string name="settings_data_error">Update completed with errors</string>
-    <string name="settings_data_update">Last updated: %s</string>
-    <string name="settings_data_entries">Satellites: %s</string>
-    <string name="settings_data_radios">Transceivers: %s</string>
-    <string name="settings_data_success">Update completed successfully</string>
-    <string name="settings_data_clear_success">Data was cleared successfully</string>
+    <string name="prefs_remote_title">Rotator preferences</string>
+    <string name="prefs_remote_switch">Enable remote control</string>
+    <string name="prefs_remote_ip_hint">IP address</string>
+    <string name="prefs_remote_port_hint">Port</string>
 
-    <string name="settings_last_updated_pattern">d MMM yyyy - HH:mm:ss</string>
+    <string name="prefs_BTremote_title">Bluetooth data output</string>
+    <string name="prefs_BTremote_switch">Enable output</string>
+    <string name="prefs_BTremote_device_hint">Device id</string>
+    <string name="prefs_BTremote_output_hint">Data format</string>
+    <string name="prefs_BTremote_perm_error">Check your bluetooth permission</string>
 
-    <string name="settings_remote_title">Rotator preferences</string>
-    <string name="settings_remote_switch">Enable remote control</string>
-    <string name="settings_remote_ip_hint">IP address</string>
-    <string name="settings_remote_port_hint">Port</string>
+    <string name="prefs_other_switch_utc">Show pass time in UTC</string>
+    <string name="prefs_other_switch_update">Enable automatic data update</string>
+    <string name="prefs_other_switch_sweep">Enable radar sweep animation</string>
+    <string name="prefs_other_switch_sensors">Use sensors to rotate radar view</string>
 
-    <string name="settings_BTremote_title">Bluetooth data output</string>
-    <string name="settings_BTremote_switch">Enable output</string>
-    <string name="settings_BTremote_device_hint">Device id</string>
-    <string name="settings_BTremote_output_hint">Data format</string>
-    <string name="settings_BTremote_perm_error">Check your bluetooth permission</string>
-
-    <string name="settings_other_switch_utc">Show pass time in UTC</string>
-    <string name="settings_other_switch_update">Enable automatic data update</string>
-    <string name="settings_other_switch_sweep">Enable radar sweep animation</string>
-    <string name="settings_other_switch_sensors">Use sensors to rotate radar view</string>
-
-    <string name="settings_outro_title">I would like to say thanks to:</string>
-    <string name="settings_outro_thanks">You for downloading and using Look4Sat! \nMay your sky always be clear!
+    <string name="prefs_outro_title">I would like to say thanks to:</string>
+    <string name="prefs_outro_thanks">You for downloading and using Look4Sat! \nMay your sky always be clear!
         \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
         and <a href="https://github.com/davidmoten">Dave Moten</a> for creating a super useful predict4java library.
         \n<a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
@@ -162,6 +153,6 @@
         \n<a href="https://libre.space/">Libre Space Foundation</a> for their
         <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of data.
     </string>
-    <string name="settings_outro_license">The app comes with no warranty.</string>
+    <string name="prefs_outro_license">The app comes with no warranty.</string>
 
 </resources>
