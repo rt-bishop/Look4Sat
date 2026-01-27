@@ -3,7 +3,7 @@
     <!-- Commmon -->
     <string name="btn_accept">පිළිගන්න</string>
     <string name="btn_cancel">අවලංගු ක°</string>
-    <string name="empty_list_message">No items to display</string>
+    <string name="empty_list_message">පෙන්වීමට දත්ත නැත</string>
 
     <!-- Navigation -->
     <string name="nav_sat">චන්ද්‍රිකා</string>
@@ -35,7 +35,6 @@
     <string name="pass_modes_title">මූර්ජන ආකාරය තෝරන්න</string>
     <string name="pass_elevation">උත්තෝලනය: %.1f°</string>
     <string name="pass_altitude">උන්නතාශය: %d km</string>
-    <string name="pass_empty_db_message">පෙන්වීමට දත්ත නැත. කරුණාකර දත්ත සමුදාය යාවත්කාලීන කරන්න.</string>
     <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
     <string name="pass_error_message">ප්‍රදර්ශනය කිරීමට ඉදිරියට එන චන්ද්‍රිකා පසුකර යෑම් නැත.</string>
@@ -54,11 +53,11 @@
     <string name="radar_eclipsed">අදෘශ්‍ය</string>
     <string name="radar_downlink">Downlink</string>
     <string name="radar_uplink">Uplink</string>
+    <string name="radar_no_data">මෙම චන්ද්‍රිකාව සම්ප්‍රෙෂණය නොකරයි</string>
     <string name="radar_add">එකතු ක°</string>
     <string name="radar_data">චන්ද්‍රිකා සම්ප්‍රේෂණයන්:</string>
     <string name="radar_inverted">Inverted: %s</string>
     <string name="radar_mode">ප්‍රාකාරය: %s</string>
-    <string name="radar_no_data">මෙම චන්ද්‍රිකාව සම්ප්‍රෙෂණය නොකරයි</string>
     <string name="radar_string_no">නෑ</string>
     <string name="radar_string_yes">ඔව්</string>
     <string name="radar_visible">දෘශ්‍යමාන</string>
@@ -80,11 +79,8 @@
     <string name="map_visible">දෘශ්‍ය</string>
 
     <!-- Settings screen -->
-    <string name="prefs_donate">දායකත්ව</string>
-    <string name="prefs_license">GPLv3 බලපත්‍රය</string>
-    <string name="prefs_privacy">Privacy Policy</string>
-    <string name="prefs_fdroid">F-Droid</string>
-    <string name="prefs_github">GitHub</string>
+    <string name="prefs_donate_title">දායකත්ව</string>
+    <string name="prefs_privacy_title">Privacy Policy</string>
 
     <string name="prefs_updated_title">අවසන් යාවත්කාලීනය: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
@@ -92,8 +88,8 @@
     <string name="prefs_loc_title">පොළෙහි පිහිටීම</string>
     <string name="prefs_loc_gps_title">GPS</string>
     <string name="prefs_loc_gps_error">ඔබගේ location අවසර පරීක්ෂා ක°</string>
-    <string name="prefs_loc_manual_title">අතින්</string>
-    <string name="prefs_loc_manual_error">ඇතුළත් කළ ස්ථානය වලංගු නොවේ</string>
+    <string name="prefs_loc_input_title">අතින්</string>
+    <string name="prefs_loc_input_error">ඇතුළත් කළ ස්ථානය වලංගු නොවේ</string>
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">QTH locator වලංගු නොවේ</string>
     <string name="prefs_loc_success">පිහිටීම යාවත්කාලීනය සාර්ථකයි</string>
@@ -106,39 +102,30 @@
     <string name="prefs_data_title">චන්ද්‍රිකා දත්ත යාවත්කාලීනයි</string>
     <string name="prefs_data_entries">චන්ද්‍රිකා: %s</string>
     <string name="prefs_data_radios">සම්ප්‍රෙේෂණය: %s</string>
-    <string name="prefs_data_online">මාර්ගගතව</string>
+    <string name="prefs_data_update">මාර්ගගතව</string>
     <string name="prefs_data_import">Import</string>
     <string name="prefs_data_clear">පිරිසිදු ක°</string>
     <string name="prefs_data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
     <string name="prefs_data_update_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
 
-    <string name="prefs_remote_title">භ්‍රමක මනාප</string>
-    <string name="prefs_remote_switch">දුරස්ථ පාලනය සබල ක°</string>
-    <string name="prefs_remote_ip_hint">IP ලිපිනය</string>
-    <string name="prefs_remote_port_hint">Port</string>
+    <string name="prefs_net_title">භ්‍රමක මනාප</string>
+    <string name="prefs_net_switch">දුරස්ථ පාලනය සබල ක°</string>
+    <string name="prefs_net_ip_hint">IP ලිපිනය</string>
+    <string name="prefs_net_port_hint">Port</string>
 
-    <string name="prefs_BTremote_title">Bluetooth දත්ත ප්‍රතිදානය</string>
-    <string name="prefs_BTremote_switch">ප්‍රතිදානය සබල ක°</string>
-    <string name="prefs_BTremote_device_hint">උපාංග id</string>
-    <string name="prefs_BTremote_output_hint">දත්ත අකාරය</string>
-    <string name="prefs_BTremote_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
+    <string name="prefs_bt_title">Bluetooth දත්ත ප්‍රතිදානය</string>
+    <string name="prefs_bt_switch">ප්‍රතිදානය සබල ක°</string>
+    <string name="prefs_bt_device_hint">උපාංග id</string>
+    <string name="prefs_bt_output_hint">දත්ත අකාරය</string>
+    <string name="prefs_bt_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
 
+    <string name="prefs_other_title">Other settings</string>
     <string name="prefs_other_switch_utc">පසුකර වේලාවන් UTC මගින්</string>
     <string name="prefs_other_switch_update">ස්වයං දත්ත යාවත්කාලීනය</string>
     <string name="prefs_other_switch_sweep">radar sweep සජීවිකරණය සබල කරන්න</string>
     <string name="prefs_other_switch_sensors">Radar දර්ශනය කරකැවීමට සංවේදක භාවිතා කරන්න </string>
 
     <string name="prefs_outro_title">මම ස්තුති කිරීමට කැමති:</string>
-    <string name="prefs_outro_thanks">බාගෙන භාවිතා කළ ඔබට! \nඅහස සදා ඔබ වෙනුවෙන් පැහැදිලියි!
-        \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
-        සහ <a href="https://github.com/davidmoten">Dave Moten</a>ඔවුනට ප්‍රයෝජනවත් predict4java පුස්තකාලය නිර්මාණයට.
-        \nසහ <a href="https://github.com/csete">Alexandru Csete</a> සඳහා Gpredict නිර්මාණයට සහ
-          Look4Sat නිර්මාණය⁣ට පෙළඹවීමට.
-        \n<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a>ට TLE දත්ත සැපයීමට, ඔහුගේ නඩත්තුවෙන් ක්‍රියාත්මක WEB අඩවිට ප්‍රවේශය සැපයීම වෙනුවෙන්
-        <a href="https://celestrak.com/"> (Celestrak)</a>.
-        \n<a href="https://libre.space/">Libre Space Foundation</a>ට ඔවුන්ගේ
-        <a href="https://db.satnogs.org/">SatNOGS</a>Web අඩවියට API හා DB විශාල දත්ත ප්‍රමාණයක් ලබාදීම සඳහා.
-        \n<a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a> කණ්ඩායමට යෙදුම පිළිබඳ ඔවුන්ගේ උනන්දුව සහ කැපවීම ලැබිම සම්බන්ධයෙන්.</string>
     <string name="prefs_outro_license">මෘදුකාංගය වගකීමක් සමග නොලැබේ</string>
 
 </resources>

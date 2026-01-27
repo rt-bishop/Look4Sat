@@ -3,7 +3,7 @@
     <!-- Commmon -->
     <string name="btn_accept">确定</string>
     <string name="btn_cancel">取消</string>
-    <string name="empty_list_message">没有可显示的内容</string>
+    <string name="empty_list_message">没有数据可显示</string>
 
     <!-- Navigation -->
     <string name="nav_sat">卫星</string>
@@ -30,7 +30,6 @@
     <string name="pass_modes_title">选择调制类型</string>
     <string name="pass_elevation">仰角：%.1f°</string>
     <string name="pass_altitude">高度：%d km</string>
-    <string name="pass_empty_db_message">没有数据可显示，请通过设置菜单更新卫星数据。</string>
     <string name="pass_empty_list_message">请确保您的筛选设置正确并且已勾选卫星</string>
     <string name="pass_error_message">没有即将过境的卫星</string>
     <string name="pass_welcome_title">欢迎使用Look4Sat!</string>
@@ -46,11 +45,11 @@
     <string name="radar_eclipsed">地影中</string>
     <string name="radar_downlink">下行链路</string>
     <string name="radar_uplink">上行链路</string>
+    <string name="radar_no_data">这颗卫星没有收发器</string>
     <string name="radar_add">添加</string>
     <string name="radar_data">卫星收发器：</string>
     <string name="radar_inverted">倒置：%s</string>
     <string name="radar_mode">调制：%s</string>
-    <string name="radar_no_data">这颗卫星没有收发器</string>
     <string name="radar_string_no">否</string>
     <string name="radar_string_yes">是</string>
     <string name="radar_visible">日照中</string>
@@ -72,11 +71,8 @@
     <string name="map_visible">日照中</string>
 
     <!-- Settings screen -->
-    <string name="prefs_donate">支持</string>
-    <string name="prefs_license">GNU GPLv3</string>
-    <string name="prefs_privacy">隐私政策</string>
-    <string name="prefs_fdroid">F-Droid</string>
-    <string name="prefs_github">GitHub</string>
+    <string name="prefs_donate_title">支持</string>
+    <string name="prefs_privacy_title">隐私政策</string>
 
     <string name="prefs_updated_title">最后更新时间：%s</string>
     <string name="prefs_updated_time">yyyy MMM d - HH:mm:ss</string>
@@ -84,8 +80,8 @@
     <string name="prefs_loc_title">站位</string>
     <string name="prefs_loc_gps_title">GPS 定位</string>
     <string name="prefs_loc_gps_error">检查您的位置权限</string>
-    <string name="prefs_loc_manual_title">手动输入</string>
-    <string name="prefs_loc_manual_error">输入的位置无效</string>
+    <string name="prefs_loc_input_title">手动输入</string>
+    <string name="prefs_loc_input_error">输入的位置无效</string>
     <string name="prefs_loc_qth_title">QTH 网格</string>
     <string name="prefs_loc_qth_error">无效的 QTH 网格</string>
     <string name="prefs_loc_success">位置更新成功</string>
@@ -98,43 +94,30 @@
     <string name="prefs_data_title">卫星数据更新</string>
     <string name="prefs_data_entries">卫星：%s</string>
     <string name="prefs_data_radios">收发器：%s</string>
-    <string name="prefs_data_online">在线更新</string>
+    <string name="prefs_data_update">在线更新</string>
     <string name="prefs_data_import">导入文件</string>
     <string name="prefs_data_clear">清空</string>
     <string name="prefs_data_clear_success">数据清空成功</string>
     <string name="prefs_data_update_success">更新成功</string>
 
-    <string name="prefs_remote_title">旋转器首选项</string>
-    <string name="prefs_remote_switch">启用远程控制</string>
-    <string name="prefs_remote_ip_hint">IP地址</string>
-    <string name="prefs_remote_port_hint">端口</string>
+    <string name="prefs_net_title">旋转器首选项</string>
+    <string name="prefs_net_switch">启用远程控制</string>
+    <string name="prefs_net_ip_hint">IP地址</string>
+    <string name="prefs_net_port_hint">端口</string>
 
-    <string name="prefs_BTremote_title">蓝牙数据输出</string>
-    <string name="prefs_BTremote_switch">启用输出</string>
-    <string name="prefs_BTremote_device_hint">蓝牙设备 ID</string>
-    <string name="prefs_BTremote_output_hint">数据格式</string>
-    <string name="prefs_BTremote_perm_error">请检查蓝牙权限</string>
+    <string name="prefs_bt_title">蓝牙数据输出</string>
+    <string name="prefs_bt_switch">启用输出</string>
+    <string name="prefs_bt_device_hint">蓝牙设备 ID</string>
+    <string name="prefs_bt_output_hint">数据格式</string>
+    <string name="prefs_bt_perm_error">请检查蓝牙权限</string>
 
+    <string name="prefs_other_title">Other settings</string>
     <string name="prefs_other_switch_utc">以 UTC 时间显示</string>
     <string name="prefs_other_switch_update">启用卫星数据自动更新</string>
     <string name="prefs_other_switch_sweep">启用雷达扫描动画</string>
     <string name="prefs_other_switch_sensors">使用传感器旋转雷达视图</string>
 
     <string name="prefs_outro_title">我要感谢：</string>
-    <string name="prefs_outro_thanks">感谢下载和使用 Look4Sat！愿你的天空永远晴朗！
-        \n简体中文版翻译由 <a href="https://github.com/BA7LWN">BA7LWN</a> 于 2022.5.10 创建。
-        \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
-        and <a href="https://github.com/davidmoten">Dave Moten</a> for creating predict4java lib
-        under the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
-        \n<a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
-        satellite tracker that inspired the creation of Look4Sat.
-        \n<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
-        <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
-        \n<a href="https://libre.space/">Libre Space Foundation</a> for their
-        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of satellite data.
-        \n<a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
-        team for their interest to the app and the interview published.
-    </string>
     <string name="prefs_outro_license">该应用程序不提供任何保修.</string>
 
 </resources>

@@ -232,9 +232,10 @@ fun EmptyListCard(message: String) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             modifier = Modifier.padding(32.dp)
         ) {
+            Text(text = """¯\_(ツ)_/¯""", fontSize = 32.sp)
             Text(text = stringResource(R.string.empty_list_message), fontSize = 21.sp)
             Text(text = message, fontSize = 18.sp, textAlign = TextAlign.Center)
         }
@@ -242,7 +243,7 @@ fun EmptyListCard(message: String) {
 }
 
 fun getDefaultPass(): OrbitalPass {
-    val orbitalData = OrbitalData("||=<☉>=||", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
+    val orbitalData = OrbitalData(""" ¯\_(ツ)_/¯ ⚠️""", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
     val satellite = NearEarthObject(orbitalData)
     return OrbitalPass(0L, 0.0, Long.MAX_VALUE, 0.0, 0, 0.0, satellite, 0f)
 }

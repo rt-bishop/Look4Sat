@@ -3,7 +3,7 @@
     <!-- Commmon -->
     <string name="btn_accept">Принять</string>
     <string name="btn_cancel">Отменить</string>
-    <string name="empty_list_message">No items to display</string>
+    <string name="empty_list_message">Нет данных для отображения</string>
 
     <!-- Navigation -->
     <string name="nav_sat">Спутники</string>
@@ -35,7 +35,6 @@
     <string name="pass_modes_title">Выберите тип модуляции</string>
     <string name="pass_elevation">Элевация: %.1f°</string>
     <string name="pass_altitude">Высота: %d км</string>
-    <string name="pass_empty_db_message">Пожалуйста, обновите базу данных спутников через меню Настроек</string>
     <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
     <string name="pass_error_message">Нет предстоящих пролётов спутников</string>
@@ -54,11 +53,11 @@
     <string name="radar_eclipsed">В тени</string>
     <string name="radar_downlink">Даунлинк</string>
     <string name="radar_uplink">Аплинк</string>
+    <string name="radar_no_data">У этого спутника нет трансиверов</string>
     <string name="radar_add">Добавить</string>
     <string name="radar_data">Трансиверы спутника:</string>
     <string name="radar_inverted">Инверсия: %s</string>
     <string name="radar_mode">Модуляция: %s</string>
-    <string name="radar_no_data">У этого спутника нет трансиверов</string>
     <string name="radar_string_no">Нет</string>
     <string name="radar_string_yes">Да</string>
     <string name="radar_visible">Видимый</string>
@@ -80,11 +79,8 @@
     <string name="map_visible">Видимый</string>
 
     <!-- Settings screen -->
-    <string name="prefs_donate">Поддержать</string>
-    <string name="prefs_license">Лицензия</string>
-    <string name="prefs_privacy">Конфиденц.</string>
-    <string name="prefs_fdroid">F-Droid</string>
-    <string name="prefs_github">GitHub</string>
+    <string name="prefs_donate_title">Поддержать</string>
+    <string name="prefs_privacy_title">Конфиденциальность</string>
 
     <string name="prefs_updated_title">Обновлено: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
@@ -92,8 +88,8 @@
     <string name="prefs_loc_title">Местоположение</string>
     <string name="prefs_loc_gps_title">GPS</string>
     <string name="prefs_loc_gps_error">Нет разрешения использовать геоданные</string>
-    <string name="prefs_loc_manual_title">Ввести</string>
-    <string name="prefs_loc_manual_error">Введены неверные данные</string>
+    <string name="prefs_loc_input_title">Ввести</string>
+    <string name="prefs_loc_input_error">Введены неверные данные</string>
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Неправильный локатор QTH</string>
     <string name="prefs_loc_success">Позиция успешно обновлена</string>
@@ -106,42 +102,30 @@
     <string name="prefs_data_title">Обновление данных</string>
     <string name="prefs_data_entries">Спутников: %s</string>
     <string name="prefs_data_radios">Трансиверов: %s</string>
-    <string name="prefs_data_online">Онлайн</string>
+    <string name="prefs_data_update">Онлайн</string>
     <string name="prefs_data_import">Импорт</string>
     <string name="prefs_data_clear">Очистить</string>
     <string name="prefs_data_clear_success">Очистка прошла успешно</string>
     <string name="prefs_data_update_success">Обновление прошло успешно</string>
 
-    <string name="prefs_remote_title">Настройки ротатора</string>
-    <string name="prefs_remote_switch">Удаленное управление</string>
-    <string name="prefs_remote_ip_hint">IP адрес</string>
-    <string name="prefs_remote_port_hint">Порт</string>
+    <string name="prefs_net_title">Настройки ротатора</string>
+    <string name="prefs_net_switch">Удаленное управление</string>
+    <string name="prefs_net_ip_hint">IP адрес</string>
+    <string name="prefs_net_port_hint">Порт</string>
 
-    <string name="prefs_BTremote_title">Передача данных по Bluetooth</string>
-    <string name="prefs_BTremote_switch">Включить передачу</string>
-    <string name="prefs_BTremote_device_hint">Id устройства</string>
-    <string name="prefs_BTremote_output_hint">Формат данных</string>
-    <string name="prefs_BTremote_perm_error">Нет разрешения использовать bluetooth</string>
+    <string name="prefs_bt_title">Передача данных по Bluetooth</string>
+    <string name="prefs_bt_switch">Включить передачу</string>
+    <string name="prefs_bt_device_hint">Id устройства</string>
+    <string name="prefs_bt_output_hint">Формат данных</string>
+    <string name="prefs_bt_perm_error">Нет разрешения использовать bluetooth</string>
 
+    <string name="prefs_other_title">Other settings</string>
     <string name="prefs_other_switch_utc">Показывать время по UTC</string>
     <string name="prefs_other_switch_update">Обновлять данные автоматически</string>
     <string name="prefs_other_switch_sweep">Показывать анимацию радара</string>
     <string name="prefs_other_switch_sensors">Использовать сенсоры устройства</string>
 
     <string name="prefs_outro_title">Я хотел бы сказать спасибо:</string>
-    <string name="prefs_outro_thanks">Вам за использование этого приложения! \nЖелаю всегда чистого неба над головой!
-        \n<a href="https://github.com/g4dpz">David A. B. Johnson</a> и
-        <a href="https://github.com/davidmoten">Dave Moten</a> за работу над predict4java и доступ
-        к ней по <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>
-        \n<a href="https://github.com/csete">Alexandru Csete</a> за его программу
-        Gpredict, которая послужила для меня вдохновением.
-        \n<a href="https://celestrak.com/webmaster.php">Доктору T.S. Kelso</a> за его сайт
-        <a href="https://celestrak.com/">Celestrak</a> и доступ к файлам орбит Two-Line Element.
-        \n<a href="https://libre.space/">Libre Space Foundation</a> за проект
-        <a href="https://db.satnogs.org/">SatNOGS</a>, API и базу данных с информацией о спутниках.
-        \n<a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
-        за интерес к приложению и публикацию интервью на сайте.
-    </string>
     <string name="prefs_outro_license">Это ПО поставляется без гарантий.</string>
 
 </resources>

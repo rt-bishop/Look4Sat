@@ -120,7 +120,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
                 }
             )
         }
-    ) { isVerticalLayout ->
+    ) { _ ->
         PassesList(
             isRefreshing = uiState.isRefreshing,
             passes = uiState.itemsList,

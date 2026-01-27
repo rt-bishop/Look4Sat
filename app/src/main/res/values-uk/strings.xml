@@ -3,7 +3,7 @@
     <!-- Commmon -->
     <string name="btn_accept">Прийняти</string>
     <string name="btn_cancel">Скасувати</string>
-    <string name="empty_list_message">No items to display</string>
+    <string name="empty_list_message">Немає даних для відображення</string>
 
     <!-- Navigation -->
     <string name="nav_sat">Супутники</string>
@@ -35,7 +35,6 @@
     <string name="pass_modes_title">Виберіть тип модуляції</string>
     <string name="pass_elevation">Піднес.: %.1f°</string>
     <string name="pass_altitude">Висота: %.0f км</string>
-    <string name="pass_empty_db_message">Немає даних для відображення. Будь ласка, оновіть базу даних через меню Налаштування</string>
     <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
     <string name="pass_error_message">Немає майбутніх прольотів супутників</string>
@@ -54,11 +53,11 @@
     <string name="radar_eclipsed">В тіні</string>
     <string name="radar_downlink">Downlink</string>
     <string name="radar_uplink">Uplink</string>
+    <string name="radar_no_data">Цей супутник не має трансиверів</string>
     <string name="radar_add">Додати</string>
     <string name="radar_data">Супутникові трансивери:</string>
     <string name="radar_inverted">Інверсія: %s</string>
     <string name="radar_mode">Модуляція: %s</string>
-    <string name="radar_no_data">Цей супутник не має трансиверів</string>
     <string name="radar_string_no">Ні</string>
     <string name="radar_string_yes">Так</string>
     <string name="radar_visible">Видимий</string>
@@ -80,11 +79,8 @@
     <string name="map_visible">Видимий</string>
 
     <!-- Settings screen -->
-    <string name="prefs_donate">Підтримати</string>
-    <string name="prefs_license">Ліцензія GPLv3</string>
-    <string name="prefs_privacy">Конфіденційність</string>
-    <string name="prefs_fdroid">F-Droid</string>
-    <string name="prefs_github">GitHub</string>
+    <string name="prefs_donate_title">Підтримати</string>
+    <string name="prefs_privacy_title">Конфіденційність</string>
 
     <string name="prefs_updated_title">Останнє оновлення: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
@@ -92,8 +88,8 @@
     <string name="prefs_loc_title">Місцезнаходження</string>
     <string name="prefs_loc_gps_title">GPS</string>
     <string name="prefs_loc_gps_error">Перевірте дозволи на визначення місця</string>
-    <string name="prefs_loc_manual_title">Вручну</string>
-    <string name="prefs_loc_manual_error">Введені некоректні дані</string>
+    <string name="prefs_loc_input_title">Вручну</string>
+    <string name="prefs_loc_input_error">Введені некоректні дані</string>
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Некоректний локатор QTH</string>
     <string name="prefs_loc_success">Позицію успішно оновлено</string>
@@ -106,41 +102,30 @@
     <string name="prefs_data_title">Оновлення даних</string>
     <string name="prefs_data_entries">Супутників: %s</string>
     <string name="prefs_data_radios">Трансиверів: %s</string>
-    <string name="prefs_data_online">Онлайн</string>
+    <string name="prefs_data_update">Онлайн</string>
     <string name="prefs_data_import">Імпорт</string>
     <string name="prefs_data_clear">Очистити</string>
     <string name="prefs_data_clear_success">Дані успішно очищено</string>
     <string name="prefs_data_update_success">Оновлення успішне</string>
 
-    <string name="prefs_remote_title">Налаштування ротатора</string>
-    <string name="prefs_remote_switch">Віддалене керування</string>
-    <string name="prefs_remote_ip_hint">IP адреса</string>
-    <string name="prefs_remote_port_hint">Порт</string>
+    <string name="prefs_net_title">Налаштування ротатора</string>
+    <string name="prefs_net_switch">Віддалене керування</string>
+    <string name="prefs_net_ip_hint">IP адреса</string>
+    <string name="prefs_net_port_hint">Порт</string>
 
-    <string name="prefs_BTremote_title">Передача даних через Bluetooth</string>
-    <string name="prefs_BTremote_switch">Увімкнути передачу</string>
-    <string name="prefs_BTremote_device_hint">Id пристрою</string>
-    <string name="prefs_BTremote_output_hint">Формат даних</string>
-    <string name="prefs_BTremote_perm_error">Перевірте дозвіл Bluetooth</string>
+    <string name="prefs_bt_title">Передача даних через Bluetooth</string>
+    <string name="prefs_bt_switch">Увімкнути передачу</string>
+    <string name="prefs_bt_device_hint">Id пристрою</string>
+    <string name="prefs_bt_output_hint">Формат даних</string>
+    <string name="prefs_bt_perm_error">Перевірте дозвіл Bluetooth</string>
 
+    <string name="prefs_other_title">Other settings</string>
     <string name="prefs_other_switch_utc">Показувати час в UTC</string>
     <string name="prefs_other_switch_update">Автоматичне оновлення даних</string>
     <string name="prefs_other_switch_sweep">Показувати анімацію радара</string>
     <string name="prefs_other_switch_sensors">Використовувати сенсори пристрою</string>
 
     <string name="prefs_outro_title">Я хотів би подякувати:</string>
-    <string name="prefs_outro_thanks">Вам за завантаження та використання Look4Sat!
-        \nБажаю завжди чистого неба над головою!
-        \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
-        та <a href="https://github.com/davidmoten">Dave Moten</a> за створення бібліотеки predict4java.
-        \n<a href="https://github.com/csete">Alexandru Csete</a> за створення трекера Gpredict, який надихнув мене на створення Look4Sat.
-        \n<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> за його сайт
-        <a href="https://celestrak.com/">Celestrak</a> який надає доступ до даних Two-Line Element.
-        \n<a href="https://libre.space/">Libre Space Foundation</a> за проєкт
-        <a href="https://db.satnogs.org/">SatNOGS</a>, API та базу даних про супутники.
-        \nКоманді <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
-        за інтерес до застосунку та публікацію інтерв\'ю на сайті.
-    </string>
     <string name="prefs_outro_license">Це ПЗ поставляється без жодних гарантій.</string>
 
 </resources>

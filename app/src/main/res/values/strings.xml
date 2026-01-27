@@ -4,7 +4,7 @@
     <string name="app_name" translatable="false">Look4Sat</string>
     <string name="btn_accept">Accept</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="empty_list_message">No items to display</string>
+    <string name="empty_list_message">No data to show</string>
 
     <!-- Navigation -->
     <string name="nav_sat">Satellites</string>
@@ -14,7 +14,7 @@
     <string name="nav_prefs">Settings</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">Selected type: %s</string>
+    <string name="sat_type_hint">Type: %s</string>
     <string name="sat_type_title">Select satellite type</string>
     <string name="sat_search_hint">Id - Name</string>
     <string name="sat_search_clear">Clear</string>
@@ -40,7 +40,6 @@
     <string name="pass_deep_space" translatable="false">DeepSpace</string>
     <string name="pass_altitude">Altitude: %d km</string>
     <string name="pass_aosLos" translatable="false">%03d° - %03d°</string>
-    <string name="pass_empty_db_message">No data to show. Please update the database via Settings menu.</string>
     <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
     <string name="pass_error_message">There are no upcoming satellite passes to display</string>
@@ -66,11 +65,11 @@
     <string name="radar_link_low" translatable="false">%.4f</string>
     <string name="radar_link_lowHigh" translatable="false">%.4f - %.4f</string>
     <string name="radar_no_link" translatable="false">- - . - -</string>
+    <string name="radar_no_data">This satellite has no transceivers</string>
     <string name="radar_add">Add</string>
     <string name="radar_data">Satellite transceivers:</string>
     <string name="radar_inverted">Inverted: %s</string>
     <string name="radar_mode">Mode: %s</string>
-    <string name="radar_no_data">This satellite has no transceivers</string>
     <string name="radar_string_no">No</string>
     <string name="radar_string_yes">Yes</string>
     <string name="radar_visible">Visible</string>
@@ -94,20 +93,27 @@
     <string name="map_visible">Visible</string>
 
     <!-- Settings screen -->
-    <string name="prefs_donate">Donate</string>
-    <string name="prefs_license">GPLv3 Licence</string>
-    <string name="prefs_privacy">Privacy Policy</string>
-    <string name="prefs_fdroid">F-Droid</string>
-    <string name="prefs_github">GitHub</string>
+    <string name="prefs_app_title" translatable="false">Look4Sat v%s</string>
+    <string name="prefs_app_url" translatable="false">https://play.google.com/store/apps/details?id=com.rtbishop.look4sat</string>
+    <string name="prefs_donate_title">Donate</string>
+    <string name="prefs_donate_url" translatable="false">https://ko-fi.com/rt_bishop</string>
+    <string name="prefs_fdroid_title" translatable="false">F-Droid</string>
+    <string name="prefs_fdroid_url" translatable="false">https://f-droid.org/en/packages/com.rtbishop.look4sat/</string>
+    <string name="prefs_github_title" translatable="false">GitHub</string>
+    <string name="prefs_github_url" translatable="false">https://github.com/rt-bishop/Look4Sat/</string>
+    <string name="prefs_license_title" translatable="false">GPLv3</string>
+    <string name="prefs_license_url" translatable="false">https://www.gnu.org/licenses/gpl-3.0.html</string>
+    <string name="prefs_privacy_title">Privacy Policy</string>
+    <string name="prefs_privacy_url" translatable="false">https://sites.google.com/view/look4sat-privacy-policy/home</string>
 
-    <string name="prefs_updated_title">Last updated: %s</string>
+    <string name="prefs_updated_title">Updated: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
 
     <string name="prefs_loc_title">Station position</string>
     <string name="prefs_loc_gps_title">GPS</string>
     <string name="prefs_loc_gps_error">Check your location permissions</string>
-    <string name="prefs_loc_manual_title">Manual</string>
-    <string name="prefs_loc_manual_error">Invalid location entered</string>
+    <string name="prefs_loc_input_title">Input</string>
+    <string name="prefs_loc_input_error">Invalid location entered</string>
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Invalid QTH locator</string>
     <string name="prefs_loc_success">Position updated successfully</string>
@@ -120,39 +126,37 @@
     <string name="prefs_data_title">Satellite data</string>
     <string name="prefs_data_entries">Satellites: %s</string>
     <string name="prefs_data_radios">Transceivers: %s</string>
-    <string name="prefs_data_online">Online</string>
+    <string name="prefs_data_update">Update</string>
     <string name="prefs_data_import">Import</string>
     <string name="prefs_data_clear">Clear</string>
     <string name="prefs_data_clear_success">Data was cleared successfully</string>
     <string name="prefs_data_update_success">Update completed successfully</string>
 
-    <string name="prefs_remote_title">Rotator preferences</string>
-    <string name="prefs_remote_switch">Enable remote control</string>
-    <string name="prefs_remote_ip_hint">IP address</string>
-    <string name="prefs_remote_port_hint">Port</string>
+    <string name="prefs_net_title">Network data output</string>
+    <string name="prefs_net_switch">Enable output</string>
+    <string name="prefs_net_ip_hint">IP address</string>
+    <string name="prefs_net_port_hint">Port</string>
 
-    <string name="prefs_BTremote_title">Bluetooth data output</string>
-    <string name="prefs_BTremote_switch">Enable output</string>
-    <string name="prefs_BTremote_device_hint">Device id</string>
-    <string name="prefs_BTremote_output_hint">Data format</string>
-    <string name="prefs_BTremote_perm_error">Check your bluetooth permission</string>
+    <string name="prefs_bt_title">Bluetooth data output</string>
+    <string name="prefs_bt_switch">Enable output</string>
+    <string name="prefs_bt_device_hint">Device id</string>
+    <string name="prefs_bt_output_hint">Data format</string>
+    <string name="prefs_bt_perm_error">Check your bluetooth permission</string>
 
+    <string name="prefs_other_title">Other settings</string>
     <string name="prefs_other_switch_utc">Show pass time in UTC</string>
     <string name="prefs_other_switch_update">Enable automatic data update</string>
     <string name="prefs_other_switch_sweep">Enable radar sweep animation</string>
     <string name="prefs_other_switch_sensors">Use sensors to rotate radar view</string>
 
     <string name="prefs_outro_title">I would like to say thanks to:</string>
-    <string name="prefs_outro_thanks">You for downloading and using Look4Sat! \nMay your sky always be clear!
-        \n<a href="https://github.com/g4dpz">David A. B. Johnson</a>
-        and <a href="https://github.com/davidmoten">Dave Moten</a> for creating a super useful predict4java library.
-        \n<a href="https://github.com/csete">Alexandru Csete</a> for creating Gpredict
-        tracker that inspired the creation of Look4Sat.
-        \n<a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> for maintaining his
-        <a href="https://celestrak.com/">Celestrak</a> website that provides access to the TLE data.
-        \n<a href="https://libre.space/">Libre Space Foundation</a> for their
-        <a href="https://db.satnogs.org/">SatNOGS</a> API and DB providing a huge amount of data.
-    </string>
+    <string name="prefs_outro_thanks" translatable="false">
+        • You, Look4Sat users and contributors!
+        \n• David A. B. Johnson (predict4java)
+        \n• Dave Moten (predict4java)
+        \n• Alexandru Csete (Gpredict)
+        \n• Dr T.S. Kelso (Celestrak)
+        \n• Libre Space Foundation (SatNOGS)</string>
     <string name="prefs_outro_license">The app comes with no warranty.</string>
 
 </resources>

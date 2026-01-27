@@ -174,7 +174,7 @@ class SettingsViewModel(
             )
             _uiState.update { it.copy(positionSettings = newPosSettings) }
         } else {
-            val errorResId = R.string.prefs_loc_manual_error
+            val errorResId = R.string.prefs_loc_input_error
             val newPosSettings = _uiState.value.positionSettings.copy(
                 isUpdating = false, messageResId = errorResId
             )

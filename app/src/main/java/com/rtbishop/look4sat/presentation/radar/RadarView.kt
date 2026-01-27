@@ -42,7 +42,7 @@ import kotlin.math.sin
 
 @Composable
 fun RadarViewCompose(
-    item: OrbitalPos,
+    item: OrbitalPos?,
     items: List<OrbitalPos>,
     azimElev: Pair<Float, Float>,
     shouldShowSweep: Boolean,
@@ -144,7 +144,7 @@ fun RadarViewCompose(
             drawInfo(radius, trackColor, measurer, 3)
             translate(center.x, center.y) {
                 drawTrack(trackPath.value, trackEffect.value, aimColor, trackColor)
-                if (item.elevation > 0) {
+                if (item != null && item.elevation > 0) {
                     drawPosition(item, radius, animScale.value, trackColor)
                 }
                 if (shouldUseCompass) {

@@ -3,7 +3,7 @@
     <!-- Commmon -->
     <string name="btn_accept">Aceptar</string>
     <string name="btn_cancel">Cancelar</string>
-    <string name="empty_list_message">No items to display</string>
+    <string name="empty_list_message">No hay datos para mostrar</string>
 
     <!-- Navigation -->
     <string name="nav_sat">Satélites</string>
@@ -35,7 +35,6 @@
     <string name="pass_modes_title">Tipo de modulación</string>
     <string name="pass_elevation">ELEV: %.1f°</string>
     <string name="pass_altitude">ALT: %.0f km</string>
-    <string name="pass_empty_db_message">No hay datos para mostrar. Por favor, actualiza la base de datos a través del menú Ajustes.</string>
     <string name="pass_empty_list_message">
         Make sure your filters are correct and you have selected satellites</string>
     <string name="pass_error_message">No hay pases de satélite próximos para mostrar</string>
@@ -54,11 +53,11 @@
     <string name="radar_eclipsed">Eclipsado</string>
     <string name="radar_downlink">Downlink</string>
     <string name="radar_uplink">Uplink</string>
+    <string name="radar_no_data">Este satélite no lleva transmisores</string>
     <string name="radar_add">Añadir</string>
     <string name="radar_data">Transmisores satélite:</string>
     <string name="radar_inverted">Invertido: %s</string>
     <string name="radar_mode">Modo: %s</string>
-    <string name="radar_no_data">Este satélite no lleva transmisores</string>
     <string name="radar_string_no">No</string>
     <string name="radar_string_yes">Si</string>
     <string name="radar_visible">Visible</string>
@@ -80,11 +79,8 @@
     <string name="map_visible">Visible</string>
 
     <!-- Settings screen -->
-    <string name="prefs_donate">Soporte</string>
-    <string name="prefs_license">GPLv3 Licence</string>
-    <string name="prefs_privacy">Privacy Policy</string>
-    <string name="prefs_fdroid">F-Droid</string>
-    <string name="prefs_github">GitHub</string>
+    <string name="prefs_donate_title">Soporte</string>
+    <string name="prefs_privacy_title">Privacy Policy</string>
 
     <string name="prefs_updated_title">Última actualización: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
@@ -92,8 +88,8 @@
     <string name="prefs_loc_title">Ubicación estación</string>
     <string name="prefs_loc_gps_title">GPS</string>
     <string name="prefs_loc_gps_error">Revisa los permisos de ubicación</string>
-    <string name="prefs_loc_manual_title">Manual</string>
-    <string name="prefs_loc_manual_error">Ubicación no válida</string>
+    <string name="prefs_loc_input_title">Manual</string>
+    <string name="prefs_loc_input_error">Ubicación no válida</string>
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Ubicación QTH no válida</string>
     <string name="prefs_loc_success">Ubicación actualizada con éxito</string>
@@ -106,44 +102,30 @@
     <string name="prefs_data_title">Actualizar datos de satélites</string>
     <string name="prefs_data_entries">Satélites: %s</string>
     <string name="prefs_data_radios">Transmisores: %s</string>
-    <string name="prefs_data_online">Online</string>
+    <string name="prefs_data_update">Online</string>
     <string name="prefs_data_import">Importar</string>
     <string name="prefs_data_clear">Vaciar</string>
     <string name="prefs_data_clear_success">Datos eliminados con éxito</string>
     <string name="prefs_data_update_success">Actualización completada con éxito</string>
 
-    <string name="prefs_remote_title">Preferencias Rotator</string>
-    <string name="prefs_remote_switch">Habilitar control remoto</string>
-    <string name="prefs_remote_ip_hint">Dirección IP</string>
-    <string name="prefs_remote_port_hint">Puerto</string>
+    <string name="prefs_net_title">Preferencias Rotator</string>
+    <string name="prefs_net_switch">Habilitar control remoto</string>
+    <string name="prefs_net_ip_hint">Dirección IP</string>
+    <string name="prefs_net_port_hint">Puerto</string>
 
-    <string name="prefs_BTremote_title">Salida por Bluetooth</string>
-    <string name="prefs_BTremote_switch">Habilitar salida</string>
-    <string name="prefs_BTremote_device_hint">Id dispositivo</string>
-    <string name="prefs_BTremote_output_hint">Formato de datos</string>
-    <string name="prefs_BTremote_perm_error">Revisa los permisos de Bluetooth</string>
+    <string name="prefs_bt_title">Salida por Bluetooth</string>
+    <string name="prefs_bt_switch">Habilitar salida</string>
+    <string name="prefs_bt_device_hint">Id dispositivo</string>
+    <string name="prefs_bt_output_hint">Formato de datos</string>
+    <string name="prefs_bt_perm_error">Revisa los permisos de Bluetooth</string>
 
+    <string name="prefs_other_title">Other settings</string>
     <string name="prefs_other_switch_utc">Mostrar tiempos de pase en UTC</string>
     <string name="prefs_other_switch_update">Habilitar auto actualización de datos</string>
     <string name="prefs_other_switch_sweep">Habilitar animaciones radar</string>
     <string name="prefs_other_switch_sensors">Usar sensores para rotar vista de radar</string>
 
     <string name="prefs_outro_title">Me gustaría dar las gracias a:</string>
-    <string name="prefs_outro_thanks"> • ti por descargar y usar Look4Sat! \nQue tengas cielos despejados!
-        \n • <a href="https://github.com/g4dpz">David A. B. Johnson</a>
-        y <a href="https://github.com/davidmoten">Dave Moten</a> por crear predict4java lib
-        bajo <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.en.html">GNU GPLv2</a>.
-        \n • <a href="https://github.com/csete">Alexandru Csete</a> por crear el rastreador de satélites Gpredict
-        que ha inspirado la creación de Look4Sat.
-        \n • <a href="https://celestrak.com/webmaster.php">Dr T.S. Kelso</a> por mantener
-        <a href="https://celestrak.com/">Celestrak</a> que proporciona acceso a datos TLE.
-        \n • <a href="https://libre.space/">Libre Space Foundation</a> por la API y base de datos
-        <a href="https://db.satnogs.org/">SatNOGS</a> que proporciona gran cantidad de datos de satélites.
-        \n • <a href="https://appoftheday.downloadastro.com/app/look4sat-satellite-tracker/">DownloadAstro</a>
-        por su interés en la app y la entrevista publicada.
-    </string>
-    <string name="prefs_outro_license"><a href="https://sites.google.com/view/look4sat-privacy-policy/home">Política de privacidad.</a>
-        La app viene sin garantías de ningún tipo. \nPara más información revisa la licencia <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPLv3</a>.
-    </string>
+    <string name="prefs_outro_license">La app viene sin garantías de ningún tipo.</string>
 
 </resources>
