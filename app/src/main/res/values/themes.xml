@@ -4,6 +4,6 @@
     <style name="Theme.Look4Sat.SplashScreen" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@android:style/Theme.Material.NoActionBar</item>
         <item name="windowSplashScreenBackground">@color/background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/launcher_fg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_fg</item>
     </style>
 </resources>

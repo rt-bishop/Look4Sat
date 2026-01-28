@@ -234,8 +234,8 @@ private fun LocationCard(
             Text(text = setUpdateTime(updateTime = settings.stationPos.timestamp))
             Spacer(modifier = Modifier.height(2.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Lat: ${settings.stationPos.latitude}")
-                Text(text = "Lon: ${settings.stationPos.longitude}")
+                Text(text = "Lat: ${settings.stationPos.latitude}°")
+                Text(text = "Lon: ${settings.stationPos.longitude}°")
                 Text(text = "Qth: ${settings.stationPos.qthLocator}")
             }
             Spacer(modifier = Modifier.height(1.dp))

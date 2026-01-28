@@ -149,7 +149,7 @@
     <string name="prefs_other_switch_sweep">Enable radar sweep animation</string>
     <string name="prefs_other_switch_sensors">Use sensors to rotate radar view</string>
 
-    <string name="prefs_outro_title">I would like to say thanks to:</string>
+    <string name="prefs_outro_title">I would like to say thanks to</string>
     <string name="prefs_outro_thanks" translatable="false">
         • You, Look4Sat users and contributors!
         \n• David A. B. Johnson (predict4java)
@@ -157,6 +157,6 @@
         \n• Alexandru Csete (Gpredict)
         \n• Dr T.S. Kelso (Celestrak)
         \n• Libre Space Foundation (SatNOGS)</string>
-    <string name="prefs_outro_license">The app comes with no warranty.</string>
+    <string name="prefs_outro_license">The app comes with no warranty</string>
 
 </resources>
