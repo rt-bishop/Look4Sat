@@ -20,8 +20,7 @@
     <string name="sat_search_clear">Clear</string>
     <string name="sat_clear_all">Clear all</string>
     <string name="sat_select_all">Select all</string>
-    <string name="sat_empty_list_message">
-        Make sure your search query is correct and the DB is updated</string>
+    <string name="sat_empty_list_message">"         Make sure your search query is correct and the DB is updated"</string>
     <string name="sat_warning_title">Warning\!</string>
     <string name="sat_warning_message">
         There are over 9000 satellites listed in this app.

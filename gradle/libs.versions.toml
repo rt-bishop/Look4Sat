@@ -7,10 +7,10 @@ androidx-core-ktx = "1.17.0"
 androidx-core-splashscreen = "1.2.0"
 androidx-room = "2.8.4"
 
-compose-bom = "2026.01.00"
-compose-activity = "1.12.2"
+compose-bom = "2026.01.01"
+compose-activity = "1.12.3"
 compose-lifecycle = "2.10.0"
-compose-navigation = "2.9.6"
+compose-navigation = "2.9.7"
 
 other-coroutines = "1.10.2"
 other-json = "20251224"

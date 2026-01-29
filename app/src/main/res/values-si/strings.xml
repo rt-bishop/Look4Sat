@@ -8,25 +8,25 @@
     <!-- Navigation -->
     <string name="nav_sat">චන්ද්‍රිකා</string>
     <string name="nav_pass">පසුකර යෑම්</string>
-    <string name="nav_radar">Radar</string>
+    <string name="nav_radar">රේඩාර්</string>
     <string name="nav_map">සිතියම</string>
     <string name="nav_prefs">පසුතල</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">තේරූ ආකාර: %s</string>
+    <string name="sat_type_hint">වර්ගය: %s</string>
     <string name="sat_type_title">චන්ද්‍රිකා ආකාරය තෝරන්න</string>
-    <string name="sat_search_hint">Id - Name</string>
+    <string name="sat_search_hint">Id - නම</string>
     <string name="sat_search_clear">පිරිසිදු ක°</string>
     <string name="sat_clear_all">සියල්ල පිරිසිදු ක°</string>
     <string name="sat_select_all">සියල්ල තෝරන්න</string>
     <string name="sat_empty_list_message">
-        Make sure your search query is correct and the DB is updated</string>
-    <string name="sat_warning_title">Warning\!</string>
+        ඔබගේ සෙවුම් විමසුම නිවැරදි බවත් දත්ත සමුදාය යාවත්කාලීන කර ඇති බවත් සහතික කර ගන්න</string>
+    <string name="sat_warning_title">අවවාදයයි\!</string>
     <string name="sat_warning_message">
-        There are over 9000 satellites listed in this app.
-        It makes no sense to track them all at the same time.
-        \n\nAlways try to narrow down the list to only the ones
-        you\'re interested in via search and types selector.</string>
+        මෙම යෙදුමේ ලැයිස්තුගත කර ඇති චන්ද්‍රිකා 9000 කට වඩා තිබේ.
+        ඒවා සියල්ලම එකවර නිරීක්ෂණය කිරීම තේරුමක් නැති දෙයක්.
+        \n\nසෙවීම සහ වර්ග තේරීම හරහා ඔබ උනන්දුවක් දක්වන
+        ඒවාට පමණක් ලැයිස්තුව පටු කිරීමට සැමවිටම උත්සාහ කරන්න.</string>
 
     <!-- Passes screen -->
     <string name="pass_filter_title">පසුකිරිම් පිරිපහදුව</string>
@@ -36,12 +36,12 @@
     <string name="pass_elevation">උත්තෝලනය: %.1f°</string>
     <string name="pass_altitude">උන්නතාශය: %d km</string>
     <string name="pass_empty_list_message">
-        Make sure your filters are correct and you have selected satellites</string>
+        ඔබගේ පෙරහන් නිවැරදි බවත් ඔබ චන්ද්‍රිකා තෝරාගෙන ඇති බවත් සහතික කර ගන්න</string>
     <string name="pass_error_message">ප්‍රදර්ශනය කිරීමට ඉදිරියට එන චන්ද්‍රිකා පසුකර යෑම් නැත.</string>
-    <string name="pass_welcome_title">Welcome to Look4Sat\!</string>
+    <string name="pass_welcome_title">Look4Sat වෙත සාදරයෙන් පිළිගනිමු\!</string>
     <string name="pass_welcome_message">
-        Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
-        \n\nPlease update the database at least weekly to get accurate predictions.</string>
+        සැකසුම් තුළ GPS, Lat/Lon හෝ QTH හරහා ඔබේ ස්ථානය සැකසීමට වග බලා ගන්න.
+        \n\nනිවැරදි අනාවැකි ලබා ගැනීම සඳහා අවම වශයෙන් සතිපතා දත්ත සමුදාය යාවත්කාලීන කරන්න.</string>
 
     <!-- Radar screen -->
     <string name="radar_back">ආපසු</string>
@@ -51,8 +51,8 @@
     <string name="radar_alt_text">උන්නතාශය</string>
     <string name="radar_dist_text">පරතරය</string>
     <string name="radar_eclipsed">අදෘශ්‍ය</string>
-    <string name="radar_downlink">Downlink</string>
-    <string name="radar_uplink">Uplink</string>
+    <string name="radar_downlink">පහළ සබැඳිය</string>
+    <string name="radar_uplink">උඩුගත කිරීම</string>
     <string name="radar_no_data">මෙම චන්ද්‍රිකාව සම්ප්‍රෙෂණය නොකරයි</string>
     <string name="radar_add">එකතු ක°</string>
     <string name="radar_data">චන්ද්‍රිකා සම්ප්‍රේෂණයන්:</string>
@@ -80,15 +80,15 @@
 
     <!-- Settings screen -->
     <string name="prefs_donate_title">දායකත්ව</string>
-    <string name="prefs_privacy_title">Privacy Policy</string>
+    <string name="prefs_privacy_title">රහස්යතා ප්රතිපත්තිය</string>
 
-    <string name="prefs_updated_title">අවසන් යාවත්කාලීනය: %s</string>
+    <string name="prefs_updated_title">යාවත්කාලීන කරන ලදී: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
 
     <string name="prefs_loc_title">පොළෙහි පිහිටීම</string>
     <string name="prefs_loc_gps_title">GPS</string>
     <string name="prefs_loc_gps_error">ඔබගේ location අවසර පරීක්ෂා ක°</string>
-    <string name="prefs_loc_input_title">අතින්</string>
+    <string name="prefs_loc_input_title">ආදානය</string>
     <string name="prefs_loc_input_error">ඇතුළත් කළ ස්ථානය වලංගු නොවේ</string>
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">QTH locator වලංගු නොවේ</string>
@@ -99,27 +99,27 @@
     <string name="prefs_locator_title">QTH locator පසුතල</string>
     <string name="prefs_locator_text"> ඔබගේ locator භාවිතා කර පොළහි පිහිටීම සකසන්න</string>
 
-    <string name="prefs_data_title">චන්ද්‍රිකා දත්ත යාවත්කාලීනයි</string>
+    <string name="prefs_data_title">චන්ද්‍රිකා දත්ත</string>
     <string name="prefs_data_entries">චන්ද්‍රිකා: %s</string>
     <string name="prefs_data_radios">සම්ප්‍රෙේෂණය: %s</string>
-    <string name="prefs_data_update">මාර්ගගතව</string>
-    <string name="prefs_data_import">Import</string>
+    <string name="prefs_data_update">නැවුම් කරන්න</string>
+    <string name="prefs_data_import">ආදානය</string>
     <string name="prefs_data_clear">පිරිසිදු ක°</string>
     <string name="prefs_data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
     <string name="prefs_data_update_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
 
-    <string name="prefs_net_title">භ්‍රමක මනාප</string>
-    <string name="prefs_net_switch">දුරස්ථ පාලනය සබල ක°</string>
+    <string name="prefs_net_title">ජාල ප්‍රතිදානය</string>
+    <string name="prefs_net_switch">ප්‍රතිදානය සක්‍රීය කරන්න</string>
     <string name="prefs_net_ip_hint">IP ලිපිනය</string>
     <string name="prefs_net_port_hint">Port</string>
 
     <string name="prefs_bt_title">Bluetooth දත්ත ප්‍රතිදානය</string>
-    <string name="prefs_bt_switch">ප්‍රතිදානය සබල ක°</string>
+    <string name="prefs_bt_switch">ප්‍රතිදානය සක්‍රීය කරන්න</string>
     <string name="prefs_bt_device_hint">උපාංග id</string>
     <string name="prefs_bt_output_hint">දත්ත අකාරය</string>
     <string name="prefs_bt_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
 
-    <string name="prefs_other_title">Other settings</string>
+    <string name="prefs_other_title">වෙනත් සැකසුම්</string>
     <string name="prefs_other_switch_utc">පසුකර වේලාවන් UTC මගින්</string>
     <string name="prefs_other_switch_update">ස්වයං දත්ත යාවත්කාලීනය</string>
     <string name="prefs_other_switch_sweep">radar sweep සජීවිකරණය සබල කරන්න</string>

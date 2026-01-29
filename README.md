@@ -16,7 +16,7 @@
 
 ### Track satellite passes with ease!
 
-Thanks to [Celestrak](https://celestrak.com/) and [SatNOGS](https://satnogs.org/) you have access to over 9000 satellites.\
+Thanks to [Celestrak](https://celestrak.com/) and [SatNOGS](https://satnogs.org/) you have access to over 9000 active satellites.\
 You can search the entire database by NORAD Catalog Number or the satellite's name.
 
 Orbital positions and passes are calculated relative to your location.\

@@ -478,7 +478,7 @@ private fun OtherCard(
     ElevatedCard(modifier = Modifier.fillMaxWidth().height(220.dp)) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Text(
-                text = stringResource(id = R.string.prefs_bt_title),
+                text = stringResource(id = R.string.prefs_other_title),
                 color = MaterialTheme.colorScheme.primary
             )
             Row(
