@@ -1,1 +1,9 @@
-Added Spanish (es-rES) translation by CertainBot #183
+Added support for landscape layout and tablets
+Added AOS/LOS info to the countdown component
+Added various minor UI fixes for readability
+Cleaned up the translations and strings.xml
+Moved Modes filter dialog to Passes screen
+Rewrote all the screens with Jetpack Compose
+Switched to using Bottom Navigation component
+Switched to using unified dialogs and top bars
+Updated GitHub Actions workflow deps and scripts

@@ -150,7 +150,7 @@
 
     <string name="prefs_outro_title">I would like to say thanks to</string>
     <string name="prefs_outro_thanks" translatable="false">
-        • You, Look4Sat users and contributors!
+        • Look4Sat users and contributors!
         \n• David A. B. Johnson (predict4java)
         \n• Dave Moten (predict4java)
         \n• Alexandru Csete (Gpredict)

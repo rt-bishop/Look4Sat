@@ -1,1 +1,1 @@
-Radio satellite tracker and pass predictor for Android
+Satellite tracker and pass predictor for Android

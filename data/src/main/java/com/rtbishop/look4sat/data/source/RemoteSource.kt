@@ -1,6 +1,6 @@
 /*
  * Look4Sat. Amateur radio satellite tracker and pass predictor.
- * Copyright (C) 2019-2022 Arty Bishop (bishop.arty@gmail.com)
+ * Copyright (C) 2019-2026 Arty Bishop and contributors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class RemoteSource(
     override suspend fun getFileStream(uri: String): InputStream? = withContext(dispatcher) {
         try {
             val fileUri = uri.toUri()
-            contentResolver.openInputStream(fileUri)
+            contentResolver.openInputStream(fileUri)?.buffered()
         } catch (exception: Exception) {
             println("RemoteSource file stream exception: $exception")
             null
@@ -45,7 +45,7 @@ class RemoteSource(
     override suspend fun getNetworkStream(url: String): InputStream? = withContext(dispatcher) {
         try {
             val networkRequest = Request.Builder().url(url).build()
-            httpClient.newCall(networkRequest).execute().body?.byteStream()
+            httpClient.newCall(networkRequest).execute().body.byteStream()
         } catch (exception: Exception) {
             println("RemoteSource network stream exception: $exception")
             null
