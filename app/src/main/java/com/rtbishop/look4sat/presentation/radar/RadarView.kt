@@ -17,7 +17,6 @@
  */
 package com.rtbishop.look4sat.presentation.radar
 
-import android.media.SoundPool
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -27,7 +26,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -44,8 +42,6 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -59,15 +55,15 @@ import kotlin.math.sin
 
 @Composable
 fun RadarViewCompose(
-    item: OrbitalPos?,
+    item: OrbitalPos,
     items: List<OrbitalPos>,
     azimElev: Pair<Float, Float>,
     shouldShowSweep: Boolean,
     shouldUseCompass: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val view = LocalView.current
+//    val context = LocalContext.current
+//    val view = LocalView.current
     val radarColor = MaterialTheme.colorScheme.secondary
     val trackColor = MaterialTheme.colorScheme.primary
     val aimColor = MaterialTheme.colorScheme.error
@@ -75,15 +71,15 @@ fun RadarViewCompose(
     val animTransition = rememberInfiniteTransition(label = "animScale")
     val animSpec = infiniteRepeatable<Float>(tween(1000))
     val animScale = animTransition.animateFloat(16f, 64f, animSpec, label = "animScale")
-    val aimThreshold = 0.05f
+//    val aimThreshold = 0.05f
     val measurer = rememberTextMeasurer()
     val sweepDegrees = remember { mutableFloatStateOf(0f) }
     val trackCreated = remember { mutableStateOf(false) }
     val trackPath = remember { mutableStateOf(Path()) }
     val trackEffect = remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
-    val soundPool = remember { mutableStateOf<SoundPool?>(null) }
-    val beepSoundId = remember { mutableIntStateOf(0) }
-    val aimTargetDifference = remember { mutableFloatStateOf(0f) }
+//    val soundPool = remember { mutableStateOf<SoundPool?>(null) }
+//    val beepSoundId = remember { mutableIntStateOf(0) }
+//    val aimTargetDifference = remember { mutableFloatStateOf(0f) }
 
 //    LaunchedEffect(item.azimuth, item.elevation, azimElev.first, azimElev.second) {
 //        val aimAzimuthRadians = azimElev.first.toDouble().toRadians()
@@ -95,13 +91,10 @@ fun RadarViewCompose(
 //        val satX = sph2CartX(item.azimuth, item.elevation, radius)
 //        val satY = sph2CartY(item.azimuth, item.elevation, radius)
 //        aimTargetDifference.floatValue = sqrt((satX - aimX).pow(2) + (satY - aimY).pow(2))
-//
-//
 //        val minPlaybackRate = 0.5f
 //        val maxPlaybackRate = 2.0f
 //        val playbackRate =
 //            maxPlaybackRate - (aimTargetDifference.floatValue / (maxPlaybackRate - minPlaybackRate))
-//
 //        soundPool.value?.setRate(beepSoundId.intValue, playbackRate)
 //    }
 //
@@ -127,20 +120,16 @@ fun RadarViewCompose(
 //            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
 //            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
 //            .build()
-//
 //        soundPool.value = SoundPool.Builder()
 //            .setMaxStreams(1)
 //            .setAudioAttributes(audioAttributes)
 //            .build()
-//
 //        beepSoundId.intValue = soundPool.value?.load(context, R.raw.beep, 1) ?: 0
-//
 //        soundPool.value?.setOnLoadCompleteListener { soundPool, _, status ->
 //            if (status == 0) {
 //                soundPool.play(beepSoundId.intValue, 0.5f, 0.5f, 0, -1, 1f)
 //            }
 //        }
-//
 //        onDispose {
 //            soundPool.value?.release()
 //        }
@@ -161,7 +150,7 @@ fun RadarViewCompose(
             drawInfo(radius, trackColor, measurer, 3)
             translate(center.x, center.y) {
                 drawTrack(trackPath.value, trackEffect.value, aimColor, trackColor)
-                if (item != null && item.elevation > 0) {
+                if (item.elevation > 0) {
                     drawPosition(item, radius, animScale.value, trackColor)
                 }
                 if (shouldUseCompass) {
