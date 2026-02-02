@@ -17,7 +17,7 @@
     <string name="sat_type_title">Виберіть тип супутника</string>
     <string name="sat_search_hint">Id - Назва</string>
     <string name="sat_search_clear">Очистити</string>
-    <string name="sat_clear_all">Очистити</string>
+    <string name="sat_clear_all">Очистити всі</string>
     <string name="sat_select_all">Вибрати всі</string>
     <string name="sat_empty_list_message">
         Переконайтеся, що ваш пошуковий запит правильний, а база даних оновлена</string>
@@ -87,15 +87,15 @@
 
     <string name="prefs_loc_title">Місцезнаходження</string>
     <string name="prefs_loc_gps_title">GPS</string>
-    <string name="prefs_loc_gps_error">Перевірте дозволи на визначення місця</string>
+    <string name="prefs_loc_gps_error">Перевірте дозвіл на використання геолокацї</string>
     <string name="prefs_loc_input_title">Ввести</string>
-    <string name="prefs_loc_input_error">Введені некоректні дані</string>
+    <string name="prefs_loc_input_error">Введено некоректну локацію</string>
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Некоректний локатор QTH</string>
     <string name="prefs_loc_success">Позицію успішно оновлено</string>
     <string name="prefs_station_title">Налаштування місцезнаходження станції</string>
-    <string name="prefs_station_lat_text">Задайте широту станції</string>
-    <string name="prefs_station_lon_text">Задайте довготу станції</string>
+    <string name="prefs_station_lat_text">Широта місцезнаходження станції</string>
+    <string name="prefs_station_lon_text">Довгота місцезнаходження станції</string>
     <string name="prefs_locator_title">Налаштування QTH локатора</string>
     <string name="prefs_locator_text">Задати позицію за QTH локатором</string>
 
@@ -126,6 +126,6 @@
     <string name="prefs_other_switch_sensors">Використовувати сенсори пристрою</string>
 
     <string name="prefs_outro_title">Я хотів би подякувати:</string>
-    <string name="prefs_outro_license">Це ПЗ поставляється без жодних гарантій.</string>
+    <string name="prefs_outro_license">Ця програма поставляється без жодних гарантій</string>
 
 </resources>
