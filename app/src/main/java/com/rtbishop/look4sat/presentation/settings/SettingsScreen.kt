@@ -115,6 +115,9 @@ private fun SettingsScreen(uiState: SettingsState) {
     val contentRequest = rememberLauncherForActivityResult(contentContract) { uri ->
         uri?.let { uiState.sendAction(SettingsAction.UpdateFromFile(uri.toString())) }
     }
+    val contentRequestForTransceivers = rememberLauncherForActivityResult(contentContract) { uri ->
+        uri?.let { uiState.sendAction(SettingsAction.UpdateTransceiversFromFile(uri.toString())) }
+    }
 
     // Position settings
     val posSettings = uiState.positionSettings
@@ -135,6 +138,27 @@ private fun SettingsScreen(uiState: SettingsState) {
     val showLocDialog = { locDialogState.value = locDialogState.value.not() }
     if (locDialogState.value) {
         LocatorDialog(posSettings.stationPos.qthLocator, showLocDialog, setQthPos)
+    }
+
+    // Transceivers dialog
+    val updateTransceiversFromFile = { contentRequestForTransceivers.launch("*/*") }
+    val transceiversDialogState = rememberSaveable { mutableStateOf(false) }
+    val showTransceiversDialog = { transceiversDialogState.value = true }
+    val dismissTransceiversDialog = { transceiversDialogState.value = false }
+    if (transceiversDialogState.value) {
+        TransceiversDialog(
+            enabled = uiState.transceiversSettings.enabled,
+            url = uiState.transceiversSettings.url,
+            dismiss = dismissTransceiversDialog,
+            onSave = {
+                enabled, url ->
+                if (!enabled || url.isNotBlank()) {
+                    uiState.sendAction(SettingsAction.SetTransceiversEnabled(enabled))
+                    uiState.sendAction(SettingsAction.SetTransceiversUrl(url))
+                }
+            },
+            importFromFile = updateTransceiversFromFile
+        )
     }
 
     // Data settings
@@ -209,7 +233,7 @@ private fun SettingsScreen(uiState: SettingsState) {
             item {
                 LocationCard(posSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos, uiState.sendSystemAction)
             }
-            item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData) }
+            item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData, showTransceiversDialog) }
             item { NetworkOutputCard(rcSettings, setRotatorState, setRotatorAddress, setRotatorPort) }
             item { BluetoothOutputCard(rcSettings, setBluetoothState, setBluetoothAddress, setBluetoothFormat) }
             item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
@@ -290,7 +314,7 @@ private fun LocationCard(
 @Composable
 private fun DataCardPreview() = MainTheme {
     val settings = DataSettings(true, 5000, 2500, 0L)
-    DataCard(settings = settings, {}, {}) {}
+    DataCard(settings = settings, {}, {},{}) {}
 }
 
 @Composable
@@ -298,7 +322,8 @@ private fun DataCard(
     settings: DataSettings,
     updateFromWeb: () -> Unit,
     updateFromFile: () -> Unit,
-    clearAllData: () -> Unit
+    clearAllData: () -> Unit,
+    showTransceiversDialog: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -320,24 +345,42 @@ private fun DataCard(
                 Text(text = stringResource(R.string.prefs_data_radios, settings.radiosTotal))
             }
             Spacer(modifier = Modifier.height(1.dp))
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                CardButton(
-                    onClick = { updateFromWeb() },
-                    text = stringResource(id = R.string.prefs_data_update),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                CardButton(
-                    onClick = { updateFromFile() },
-                    text = stringResource(id = R.string.prefs_data_import),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                CardButton(
-                    onClick = { clearAllData() },
-                    text = stringResource(id = R.string.prefs_data_clear),
-                    modifier = Modifier.weight(1f)
-                )
+            Column {
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        CardButton(
+                            onClick = updateFromWeb,
+                            text = stringResource(id = R.string.prefs_data_update),
+                            modifier = Modifier.weight(1f)
+                        )
+                        CardButton(
+                            onClick = updateFromFile,
+                            text = stringResource(id = R.string.prefs_data_import),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        CardButton(
+                            onClick = clearAllData,
+                            text = stringResource(id = R.string.prefs_data_clear),
+                            modifier = Modifier.weight(1f)
+                        )
+                        CardButton(
+                            onClick = showTransceiversDialog,
+                            text = stringResource(id = R.string.prefs_data_transceivers),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
         }
     }

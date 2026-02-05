@@ -48,3 +48,8 @@ data class OtherSettings(
     val shouldSeeWarning: Boolean,
     val shouldSeeWelcome: Boolean
 )
+
+data class TransceiversSettings(
+    val enabled: Boolean,
+    val url: String
+)

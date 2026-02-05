@@ -104,8 +104,14 @@
     <string name="prefs_data_update">Обновить</string>
     <string name="prefs_data_import">Импорт</string>
     <string name="prefs_data_clear">Очистить</string>
+    <string name="prefs_data_transceivers">Трансиверы</string>
     <string name="prefs_data_clear_success">Очистка прошла успешно</string>
     <string name="prefs_data_update_success">Обновление прошло успешно</string>
+
+    <string name="prefs_transceivers_title">Трансиверы</string>
+    <string name="prefs_transceivers_switch">Произвольный URL</string>
+    <string name="prefs_transceivers_url_title">URL (https)</string>
+    <string name="prefs_transceivers_import">Импорт из файла</string>
 
     <string name="prefs_net_title">Вывод сетевых данных</string>
     <string name="prefs_net_switch">Включить вывод</string>

@@ -45,12 +45,25 @@ class DatabaseRepo(
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
+    override suspend fun updateTransceiversFromFile(uri: String) = withContext(dispatcher) {
+        val radios = remoteSource.getFileStream(uri)?.let { dataParser.parseJSONStream(it) }
+        radios?.let {
+            if(it.isNotEmpty()) {
+                localSource.deleteRadios()
+                localSource.insertRadios(it)
+            }
+        }
+        setUpdateSuccessful(System.currentTimeMillis())
+    }
+
     override suspend fun updateFromRemote() = withContext(dispatcher) {
         val importedEntries = mutableListOf<OrbitalData>()
         val importedRadios = mutableListOf<SatRadio>()
         // fetch
         val jobsMap = Sources.satelliteDataUrls.mapValues { async { remoteSource.getNetworkStream(it.value) } }
-        val jobRadios = async { remoteSource.getNetworkStream(Sources.RADIO_DATA_URL) }
+        var radioUrl = Sources.RADIO_DATA_URL
+        if(settingsRepo.transceiversSettings.value.enabled) { radioUrl = settingsRepo.transceiversSettings.value.url }
+        val jobRadios = async { remoteSource.getNetworkStream(radioUrl) }
         // parse
         jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
             entry.value?.let { stream ->

@@ -128,8 +128,14 @@
     <string name="prefs_data_update">Update</string>
     <string name="prefs_data_import">Import</string>
     <string name="prefs_data_clear">Clear</string>
+    <string name="prefs_data_transceivers">Transceivers</string>
     <string name="prefs_data_clear_success">Data was cleared successfully</string>
     <string name="prefs_data_update_success">Update completed successfully</string>
+
+    <string name="prefs_transceivers_title">Transceivers</string>
+    <string name="prefs_transceivers_switch">Custom URL</string>
+    <string name="prefs_transceivers_url_title">URL (https)</string>
+    <string name="prefs_transceivers_import">Import from file</string>
 
     <string name="prefs_net_title">Network data output</string>
     <string name="prefs_net_switch">Enable output</string>

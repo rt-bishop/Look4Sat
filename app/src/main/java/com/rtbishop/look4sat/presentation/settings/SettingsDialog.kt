@@ -27,6 +27,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.common.SharedDialog
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Button
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.rtbishop.look4sat.presentation.LocalSpacing
 
 @Preview(showBackground = true)
 @Composable
@@ -69,5 +80,70 @@ fun LocatorDialog(qthLocator: String, dismiss: () -> Unit, save: (String) -> Uni
     SharedDialog(title = stringResource(R.string.prefs_locator_title), onCancel = dismiss, onAccept = onAccept) {
         Text(text = stringResource(id = R.string.prefs_locator_text))
         OutlinedTextField(value = locator.value, onValueChange = { locator.value = it })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TransceiversDialogPreview() {
+    MainTheme {
+        TransceiversDialog(
+            enabled = true,
+            url = "https://example.com/tx.json",
+            dismiss = {},
+            onSave = { _, _ -> },
+            importFromFile = {}
+        )
+    }
+}
+
+@Composable
+fun TransceiversDialog(
+    enabled: Boolean,
+    url: String,
+    dismiss: () -> Unit,
+    onSave: (Boolean, String) -> Unit,
+    importFromFile: () -> Unit
+) {
+    val padding = LocalSpacing.current.large
+    val isEnabled = rememberSaveable { mutableStateOf(enabled) }
+    val urlValue = rememberSaveable { mutableStateOf(url) }
+    val onAccept = {
+        onSave(isEnabled.value, urlValue.value)
+        dismiss()
+    }
+    val onCancel = { dismiss() }
+    SharedDialog(
+        title = stringResource(id = R.string.prefs_transceivers_title),
+        onCancel = onCancel,
+        onAccept = onAccept,
+    ) {
+        Column(modifier = Modifier.padding(horizontal = padding)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.prefs_transceivers_switch))
+                Switch(
+                    checked = isEnabled.value,
+                    onCheckedChange = { isEnabled.value = it }
+                )
+            }
+            OutlinedTextField(
+                value = urlValue.value,
+                onValueChange = { urlValue.value = it },
+                label = { Text(text = stringResource(id = R.string.prefs_transceivers_url_title)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = isEnabled.value,
+            )
+        }
+        Button(
+            onClick = { importFromFile() },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = padding)
+        ) {
+            Text(stringResource(id = R.string.prefs_transceivers_import))
+        }
     }
 }

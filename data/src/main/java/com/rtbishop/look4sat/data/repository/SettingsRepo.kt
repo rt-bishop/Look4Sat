@@ -27,6 +27,7 @@ import com.rtbishop.look4sat.domain.model.DatabaseState
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.PassesSettings
 import com.rtbishop.look4sat.domain.model.RCSettings
+import com.rtbishop.look4sat.domain.model.TransceiversSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.positionToQth
@@ -69,6 +70,8 @@ class SettingsRepo(
     private val keyShouldSeeWarning = "shouldSeeWarning"
     private val keyShouldSeeWelcome = "shouldSeeWelcome"
     private val separatorComma = ","
+    private val keyTransceiversEnabled = "transceiversEnabled"
+    private val keyTransceiversUrl = "transceiversUrl"
 
     //region # Satellites selection settings
     private val _satelliteSelection = MutableStateFlow(getSelectedIds())
@@ -328,6 +331,26 @@ class SettingsRepo(
         stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme, false),
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
         shouldSeeWelcome = preferences.getBoolean(keyShouldSeeWelcome, true)
+    )
+    //endregion
+
+    //region # Transceivers settings
+    private val _transceiversSettings = MutableStateFlow(getTransceiversSettings())
+    override val transceiversSettings: StateFlow<TransceiversSettings> = _transceiversSettings
+
+    override fun setTransceiversEnabled(value: Boolean) {
+        preferences.edit { putBoolean(keyTransceiversEnabled, value) }
+        _transceiversSettings.update { it.copy(enabled = value) }
+    }
+
+    override fun setTransceiversUrl(value: String) {
+        preferences.edit { putString(keyTransceiversUrl, value) }
+        _transceiversSettings.update { it.copy(url = value) }
+    }
+
+    private fun getTransceiversSettings(): TransceiversSettings = TransceiversSettings(
+        enabled = preferences.getBoolean(keyTransceiversEnabled, false),
+        url = preferences.getString(keyTransceiversUrl, "https://example.com/radio.json") ?: ""
     )
     //endregion
 }

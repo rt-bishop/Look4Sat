@@ -105,8 +105,14 @@
     <string name="prefs_data_update">නැවුම් කරන්න</string>
     <string name="prefs_data_import">ආදානය</string>
     <string name="prefs_data_clear">පිරිසිදු ක°</string>
+    <string name="prefs_data_transceivers">Transceivers</string>
     <string name="prefs_data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
     <string name="prefs_data_update_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
+
+    <string name="prefs_transceivers_title">Transceivers</string>
+    <string name="prefs_transceivers_switch">Custom URL</string>
+    <string name="prefs_transceivers_url_title">URL (https)</string>
+    <string name="prefs_transceivers_import">Import from file</string>
 
     <string name="prefs_net_title">ජාල ප්‍රතිදානය</string>
     <string name="prefs_net_switch">ප්‍රතිදානය සක්‍රීය කරන්න</string>

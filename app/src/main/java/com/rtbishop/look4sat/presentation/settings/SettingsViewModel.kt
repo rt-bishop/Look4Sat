@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
+import com.rtbishop.look4sat.domain.model.TransceiversSettings
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
@@ -51,6 +52,7 @@ class SettingsViewModel(
 
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
     private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
+    private val defaultTransceiversSettings = TransceiversSettings(false,settingsRepo.transceiversSettings.value.url)
     private val _uiState = MutableStateFlow(
         SettingsState(
             nextTime = "00:00:00",
@@ -61,6 +63,7 @@ class SettingsViewModel(
             dataSettings = defaultDataSettings,
             otherSettings = settingsRepo.otherSettings.value,
             rcSettings = settingsRepo.rcSettings.value,
+            transceiversSettings = defaultTransceiversSettings,
             sendAction = ::handleAction,
             sendRCAction = ::handleAction,
             sendSystemAction = ::handleAction
@@ -113,6 +116,13 @@ class SettingsViewModel(
                 _uiState.update { it.copy(otherSettings = settings) }
             }
         }
+        viewModelScope.launch {
+            settingsRepo.transceiversSettings.collect { settings ->
+                _uiState.update {
+                    it.copy(transceiversSettings = settings)
+                }
+            }
+        }
     }
 
     private fun handleAction(action: SettingsAction) {
@@ -123,12 +133,15 @@ class SettingsViewModel(
             SettingsAction.DismissPosMessages -> dismissPosMessage()
             SettingsAction.UpdateFromWeb -> updateFromWeb()
             is SettingsAction.UpdateFromFile -> updateFromFile(action.uri)
+            is SettingsAction.UpdateTransceiversFromFile -> updateTransceiversFromFile(action.uri)
             SettingsAction.ClearAllData -> clearAllData()
             is SettingsAction.ToggleUtc -> settingsRepo.setStateOfUtc(action.value)
             is SettingsAction.ToggleUpdate -> settingsRepo.setStateOfAutoUpdate(action.value)
             is SettingsAction.ToggleSweep -> settingsRepo.setStateOfSweep(action.value)
             is SettingsAction.ToggleSensor -> settingsRepo.setStateOfSensors(action.value)
             is SettingsAction.ToggleLightTheme -> settingsRepo.setStateOfLightTheme(action.value)
+            is SettingsAction.SetTransceiversEnabled ->  settingsRepo.setTransceiversEnabled(action.value)
+            is SettingsAction.SetTransceiversUrl -> settingsRepo.setTransceiversUrl(action.value)
         }
     }
 
@@ -222,6 +235,18 @@ class SettingsViewModel(
             val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = true)
             _uiState.update { it.copy(dataSettings = newDataSettings) }
             databaseRepo.updateFromFile(uri)
+        } catch (exception: Exception) {
+            val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = false)
+            _uiState.update { it.copy(dataSettings = newDataSettings) }
+            println(exception)
+        }
+    }
+
+    private fun updateTransceiversFromFile(uri: String) = viewModelScope.launch {
+        try {
+            val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = true)
+            _uiState.update { it.copy(dataSettings = newDataSettings) }
+            databaseRepo.updateTransceiversFromFile(uri)
         } catch (exception: Exception) {
             val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = false)
             _uiState.update { it.copy(dataSettings = newDataSettings) }
