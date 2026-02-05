@@ -360,40 +360,36 @@ private fun DataCard(
                 Text(text = stringResource(R.string.prefs_data_radios, settings.radiosTotal))
             }
             Spacer(modifier = Modifier.height(1.dp))
-            Column {
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        CardButton(
-                            onClick = updateFromWeb,
-                            text = stringResource(id = R.string.prefs_data_update),
-                            modifier = Modifier.weight(1f)
-                        )
-                        CardButton(
-                            onClick = showImportDialog,
-                            text = stringResource(id = R.string.prefs_data_import),
-                            modifier = Modifier.weight(1f)
-                        )
-                        CardButton(
-                            onClick = clearAllData,
-                            text = stringResource(id = R.string.prefs_data_clear),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        CardButton(
-                            onClick = showDataSourcesDialog,
-                            text = stringResource(id = R.string.prefs_data_sources),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CardButton(
+                    onClick = updateFromWeb,
+                    text = stringResource(id = R.string.prefs_data_update),
+                    modifier = Modifier.weight(1f)
+                )
+                CardButton(
+                    onClick = showImportDialog,
+                    text = stringResource(id = R.string.prefs_data_import),
+                    modifier = Modifier.weight(1f)
+                )
+                CardButton(
+                    onClick = clearAllData,
+                    text = stringResource(id = R.string.prefs_data_clear),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CardButton(
+                    onClick = showDataSourcesDialog,
+                    text = stringResource(id = R.string.prefs_data_sources),
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
