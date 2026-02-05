@@ -27,13 +27,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.common.SharedDialog
+import com.rtbishop.look4sat.presentation.common.InfoDialog
+import com.rtbishop.look4sat.presentation.common.CardButton
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Button
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,36 +86,87 @@ fun LocatorDialog(qthLocator: String, dismiss: () -> Unit, save: (String) -> Uni
 
 @Preview(showBackground = true)
 @Composable
+private fun ImportDialogPreview() = MainTheme {
+    ImportDialog(
+        onImportTle = {},
+        onImportTransceivers = {},
+        onDismiss = {}
+    )
+}
+
+@Composable
+fun ImportDialog(
+    onImportTle: () -> Unit,
+    onImportTransceivers: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val padding = LocalSpacing.current.large
+    InfoDialog(
+        title = stringResource(R.string.prefs_data_import),
+        onDismiss = onDismiss
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .padding(horizontal = padding)
+                .fillMaxWidth()
+        ) {
+            CardButton(
+                onClick = {
+                    onImportTle()
+                    onDismiss()
+                },
+                text = "TLE",
+                modifier = Modifier.weight(0.7f)
+            )
+            CardButton(
+                onClick = {
+                    onImportTransceivers()
+                    onDismiss()
+                },
+                text = "Transceivers",
+                modifier = Modifier.weight(1.3f)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun TransceiversDialogPreview() {
     MainTheme {
-        TransceiversDialog(
-            enabled = true,
-            url = "https://example.com/tx.json",
+        DataSourcesDialog(
+            useCustomTle = true,
+            useCustomTransceivers = true,
+            tleUrl = "https://example.com/tle.txt",
+            transceiversUrl = "https://example.com/tx.json",
             dismiss = {},
-            onSave = { _, _ -> },
-            importFromFile = {}
+            onSave = { _, _, _, _ -> }
         )
     }
 }
 
 @Composable
-fun TransceiversDialog(
-    enabled: Boolean,
-    url: String,
+fun DataSourcesDialog(
+    useCustomTle: Boolean,
+    useCustomTransceivers: Boolean,
+    tleUrl: String,
+    transceiversUrl: String,
     dismiss: () -> Unit,
-    onSave: (Boolean, String) -> Unit,
-    importFromFile: () -> Unit
+    onSave: (Boolean, Boolean, String, String) -> Unit
 ) {
     val padding = LocalSpacing.current.large
-    val isEnabled = rememberSaveable { mutableStateOf(enabled) }
-    val urlValue = rememberSaveable { mutableStateOf(url) }
+    val isEnabledCustomTle = rememberSaveable { mutableStateOf(useCustomTle) }
+    val isEnabledCustomTransceivers = rememberSaveable { mutableStateOf(useCustomTransceivers) }
+    val urlTle = rememberSaveable { mutableStateOf(tleUrl) }
+    val urlTransceivers = rememberSaveable { mutableStateOf(transceiversUrl) }
     val onAccept = {
-        onSave(isEnabled.value, urlValue.value)
+        onSave(isEnabledCustomTle.value, isEnabledCustomTransceivers.value, urlTle.value, urlTransceivers.value)
         dismiss()
     }
     val onCancel = { dismiss() }
     SharedDialog(
-        title = stringResource(id = R.string.prefs_transceivers_title),
+        title = stringResource(id = R.string.prefs_data_sources_title),
         onCancel = onCancel,
         onAccept = onAccept,
     ) {
@@ -124,26 +176,39 @@ fun TransceiversDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = stringResource(id = R.string.prefs_transceivers_switch))
+                Text(text = stringResource(id = R.string.prefs_data_sources_tle_switch))
                 Switch(
-                    checked = isEnabled.value,
-                    onCheckedChange = { isEnabled.value = it }
+                    checked = isEnabledCustomTle.value,
+                    onCheckedChange = { isEnabledCustomTle.value = it }
                 )
             }
             OutlinedTextField(
-                value = urlValue.value,
-                onValueChange = { urlValue.value = it },
-                label = { Text(text = stringResource(id = R.string.prefs_transceivers_url_title)) },
+                value = urlTle.value,
+                onValueChange = { urlTle.value = it },
+                label = { Text(text = stringResource(id = R.string.prefs_data_sources_url_title)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                enabled = isEnabled.value,
+                enabled = isEnabledCustomTle.value,
             )
-        }
-        Button(
-            onClick = { importFromFile() },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = padding)
-        ) {
-            Text(stringResource(id = R.string.prefs_transceivers_import))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.prefs_data_sources_transceivers_switch))
+                Switch(
+                    checked = isEnabledCustomTransceivers.value,
+                    onCheckedChange = { isEnabledCustomTransceivers.value = it }
+                )
+            }
+            OutlinedTextField(
+                value = urlTransceivers.value,
+                onValueChange = { urlTransceivers.value = it },
+                label = { Text(text = stringResource(id = R.string.prefs_data_sources_url_title)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = isEnabledCustomTransceivers.value,
+            )
         }
     }
 }

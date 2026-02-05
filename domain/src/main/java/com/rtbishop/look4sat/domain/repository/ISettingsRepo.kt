@@ -21,7 +21,7 @@ import com.rtbishop.look4sat.domain.model.DatabaseState
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.PassesSettings
 import com.rtbishop.look4sat.domain.model.RCSettings
-import com.rtbishop.look4sat.domain.model.TransceiversSettings
+import com.rtbishop.look4sat.domain.model.DataSourcesSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import kotlinx.coroutines.flow.StateFlow
 
@@ -76,8 +76,10 @@ interface ISettingsRepo {
     //endregion
 
     //region # Transceivers settings
-    val transceiversSettings: StateFlow<TransceiversSettings>
-    fun setTransceiversEnabled(value: Boolean)
+    val dataSourcesSettings: StateFlow<DataSourcesSettings>
+    fun setUseCustomTle(value: Boolean)
+    fun setUseCustomTransceivers(value: Boolean)
+    fun setTleUrl(value: String)
     fun setTransceiversUrl(value: String)
     //endregion
 }

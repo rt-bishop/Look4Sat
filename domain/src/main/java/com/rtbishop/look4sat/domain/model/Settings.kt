@@ -49,7 +49,9 @@ data class OtherSettings(
     val shouldSeeWelcome: Boolean
 )
 
-data class TransceiversSettings(
-    val enabled: Boolean,
-    val url: String
+data class DataSourcesSettings(
+    val useCustomTLE: Boolean,
+    val useCustomTransceivers: Boolean,
+    val tleUrl: String,
+    val transceiversUrl: String
 )

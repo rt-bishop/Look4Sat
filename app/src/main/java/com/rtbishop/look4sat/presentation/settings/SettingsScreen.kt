@@ -112,8 +112,8 @@ private fun SettingsScreen(uiState: SettingsState) {
         }
     }
     val contentContract = ActivityResultContracts.GetContent()
-    val contentRequest = rememberLauncherForActivityResult(contentContract) { uri ->
-        uri?.let { uiState.sendAction(SettingsAction.UpdateFromFile(uri.toString())) }
+    val contentRequestForTle = rememberLauncherForActivityResult(contentContract) { uri ->
+        uri?.let { uiState.sendAction(SettingsAction.UpdateTLEFromFile(uri.toString())) }
     }
     val contentRequestForTransceivers = rememberLauncherForActivityResult(contentContract) { uri ->
         uri?.let { uiState.sendAction(SettingsAction.UpdateTransceiversFromFile(uri.toString())) }
@@ -140,31 +140,46 @@ private fun SettingsScreen(uiState: SettingsState) {
         LocatorDialog(posSettings.stationPos.qthLocator, showLocDialog, setQthPos)
     }
 
-    // Transceivers dialog
-    val updateTransceiversFromFile = { contentRequestForTransceivers.launch("*/*") }
-    val transceiversDialogState = rememberSaveable { mutableStateOf(false) }
-    val showTransceiversDialog = { transceiversDialogState.value = true }
-    val dismissTransceiversDialog = { transceiversDialogState.value = false }
-    if (transceiversDialogState.value) {
-        TransceiversDialog(
-            enabled = uiState.transceiversSettings.enabled,
-            url = uiState.transceiversSettings.url,
-            dismiss = dismissTransceiversDialog,
+    // Data sources dialog
+    val dataSourcesDialogState = rememberSaveable { mutableStateOf(false) }
+    val showDataSourcesDialog = { dataSourcesDialogState.value = true }
+    val dismissDataSourcesDialog = { dataSourcesDialogState.value = false }
+    if (dataSourcesDialogState.value) {
+        DataSourcesDialog(
+            useCustomTle = uiState.dataSourcesSettings.useCustomTLE,
+            useCustomTransceivers = uiState.dataSourcesSettings.useCustomTransceivers,
+            tleUrl = uiState.dataSourcesSettings.tleUrl,
+            transceiversUrl = uiState.dataSourcesSettings.transceiversUrl,
+            dismiss = dismissDataSourcesDialog,
             onSave = {
-                enabled, url ->
-                if (!enabled || url.isNotBlank()) {
-                    uiState.sendAction(SettingsAction.SetTransceiversEnabled(enabled))
-                    uiState.sendAction(SettingsAction.SetTransceiversUrl(url))
+                useCustomTle, useCustomTransceivers, tleUrl, transceiversUrl  ->
+                if (!useCustomTle || tleUrl.isNotBlank()) {
+                    uiState.sendDataSourcesAction(DataSourcesAction.SetUseCustomTle(useCustomTle))
+                    uiState.sendDataSourcesAction(DataSourcesAction.SetTleUrl(tleUrl))
                 }
-            },
-            importFromFile = updateTransceiversFromFile
+                if (!useCustomTransceivers || transceiversUrl.isNotBlank()) {
+                    uiState.sendDataSourcesAction(DataSourcesAction.SetUseCustomTransceivers(useCustomTransceivers))
+                    uiState.sendDataSourcesAction(DataSourcesAction.SetTransceiversUrl(transceiversUrl))
+                }
+            }
+        )
+    }
+
+    // Import dialog
+    val importDialogState = rememberSaveable { mutableStateOf(false) }
+    val showImportDialog = { importDialogState.value = true }
+    val dismissImportDialog = { importDialogState.value = false }
+    if (importDialogState.value) {
+        ImportDialog(
+            onImportTle = { contentRequestForTle.launch("*/*") },
+            onImportTransceivers = { contentRequestForTransceivers.launch("*/*") },
+            onDismiss = dismissImportDialog
         )
     }
 
     // Data settings
     val dataSettings = uiState.dataSettings
     val updateFromWeb: () -> Unit = { uiState.sendAction(SettingsAction.UpdateFromWeb) }
-    val updateFromFile = { contentRequest.launch("*/*") }
     val clearAllData: () -> Unit = { uiState.sendAction(SettingsAction.ClearAllData) }
 
     // RC settings
@@ -233,7 +248,7 @@ private fun SettingsScreen(uiState: SettingsState) {
             item {
                 LocationCard(posSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos, uiState.sendSystemAction)
             }
-            item { DataCard(dataSettings, updateFromWeb, updateFromFile, clearAllData, showTransceiversDialog) }
+            item { DataCard(dataSettings, updateFromWeb, clearAllData, showImportDialog, showDataSourcesDialog) }
             item { NetworkOutputCard(rcSettings, setRotatorState, setRotatorAddress, setRotatorPort) }
             item { BluetoothOutputCard(rcSettings, setBluetoothState, setBluetoothAddress, setBluetoothFormat) }
             item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
@@ -321,9 +336,9 @@ private fun DataCardPreview() = MainTheme {
 private fun DataCard(
     settings: DataSettings,
     updateFromWeb: () -> Unit,
-    updateFromFile: () -> Unit,
     clearAllData: () -> Unit,
-    showTransceiversDialog: () -> Unit
+    showImportDialog: () -> Unit,
+    showDataSourcesDialog: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -357,26 +372,24 @@ private fun DataCard(
                             modifier = Modifier.weight(1f)
                         )
                         CardButton(
-                            onClick = updateFromFile,
+                            onClick = showImportDialog,
                             text = stringResource(id = R.string.prefs_data_import),
                             modifier = Modifier.weight(1f)
                         )
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
                         CardButton(
                             onClick = clearAllData,
                             text = stringResource(id = R.string.prefs_data_clear),
                             modifier = Modifier.weight(1f)
                         )
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         CardButton(
-                            onClick = showTransceiversDialog,
-                            text = stringResource(id = R.string.prefs_data_transceivers),
+                            onClick = showDataSourcesDialog,
+                            text = stringResource(id = R.string.prefs_data_sources),
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -676,3 +689,4 @@ private fun BotCard(onClick: () -> Unit, resId: Int, text: String, modifier: Mod
         }
     }
 }
+

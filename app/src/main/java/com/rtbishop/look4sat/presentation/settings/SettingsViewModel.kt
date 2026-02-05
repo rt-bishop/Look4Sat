@@ -24,7 +24,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.R
-import com.rtbishop.look4sat.domain.model.TransceiversSettings
+import com.rtbishop.look4sat.domain.model.DataSourcesSettings
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.domain.repository.ISatelliteRepo
@@ -52,7 +52,7 @@ class SettingsViewModel(
 
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
     private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
-    private val defaultTransceiversSettings = TransceiversSettings(false,settingsRepo.transceiversSettings.value.url)
+    private val defaultDataSourcesSettings = DataSourcesSettings(false, false, settingsRepo.dataSourcesSettings.value.tleUrl, settingsRepo.dataSourcesSettings.value.transceiversUrl)
     private val _uiState = MutableStateFlow(
         SettingsState(
             nextTime = "00:00:00",
@@ -63,10 +63,11 @@ class SettingsViewModel(
             dataSettings = defaultDataSettings,
             otherSettings = settingsRepo.otherSettings.value,
             rcSettings = settingsRepo.rcSettings.value,
-            transceiversSettings = defaultTransceiversSettings,
+            dataSourcesSettings = defaultDataSourcesSettings,
             sendAction = ::handleAction,
             sendRCAction = ::handleAction,
-            sendSystemAction = ::handleAction
+            sendSystemAction = ::handleAction,
+            sendDataSourcesAction = ::handleAction
         )
     )
     private var processing: Job? = null
@@ -117,9 +118,9 @@ class SettingsViewModel(
             }
         }
         viewModelScope.launch {
-            settingsRepo.transceiversSettings.collect { settings ->
+            settingsRepo.dataSourcesSettings.collect { settings ->
                 _uiState.update {
-                    it.copy(transceiversSettings = settings)
+                    it.copy(dataSourcesSettings = settings)
                 }
             }
         }
@@ -132,7 +133,7 @@ class SettingsViewModel(
             is SettingsAction.SetQthPosition -> setQthPosition(action.locator)
             SettingsAction.DismissPosMessages -> dismissPosMessage()
             SettingsAction.UpdateFromWeb -> updateFromWeb()
-            is SettingsAction.UpdateFromFile -> updateFromFile(action.uri)
+            is SettingsAction.UpdateTLEFromFile -> updateTLEFromFile(action.uri)
             is SettingsAction.UpdateTransceiversFromFile -> updateTransceiversFromFile(action.uri)
             SettingsAction.ClearAllData -> clearAllData()
             is SettingsAction.ToggleUtc -> settingsRepo.setStateOfUtc(action.value)
@@ -140,8 +141,6 @@ class SettingsViewModel(
             is SettingsAction.ToggleSweep -> settingsRepo.setStateOfSweep(action.value)
             is SettingsAction.ToggleSensor -> settingsRepo.setStateOfSensors(action.value)
             is SettingsAction.ToggleLightTheme -> settingsRepo.setStateOfLightTheme(action.value)
-            is SettingsAction.SetTransceiversEnabled ->  settingsRepo.setTransceiversEnabled(action.value)
-            is SettingsAction.SetTransceiversUrl -> settingsRepo.setTransceiversUrl(action.value)
         }
     }
 
@@ -160,6 +159,15 @@ class SettingsViewModel(
     private fun handleAction(action: SystemAction) {
         when (action) {
             is SystemAction.ShowToast -> showToast(action.message)
+        }
+    }
+
+    private fun handleAction(action: DataSourcesAction) {
+        when (action) {
+            is DataSourcesAction.SetUseCustomTle ->  settingsRepo.setUseCustomTle(action.value)
+            is DataSourcesAction.SetUseCustomTransceivers ->  settingsRepo.setUseCustomTransceivers(action.value)
+            is DataSourcesAction.SetTleUrl -> settingsRepo.setTleUrl(action.value)
+            is DataSourcesAction.SetTransceiversUrl -> settingsRepo.setTransceiversUrl(action.value)
         }
     }
 
@@ -230,11 +238,11 @@ class SettingsViewModel(
         }
     }
 
-    private fun updateFromFile(uri: String) = viewModelScope.launch {
+    private fun updateTLEFromFile(uri: String) = viewModelScope.launch {
         try {
             val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = true)
             _uiState.update { it.copy(dataSettings = newDataSettings) }
-            databaseRepo.updateFromFile(uri)
+            databaseRepo.updateTLEFromFile(uri)
         } catch (exception: Exception) {
             val newDataSettings = _uiState.value.dataSettings.copy(isUpdating = false)
             _uiState.update { it.copy(dataSettings = newDataSettings) }

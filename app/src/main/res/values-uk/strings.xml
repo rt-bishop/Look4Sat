@@ -105,14 +105,14 @@
     <string name="prefs_data_update">Оновити</string>
     <string name="prefs_data_import">Імпорт</string>
     <string name="prefs_data_clear">Очистити</string>
-    <string name="prefs_data_transceivers">Transceivers</string>
+    <string name="prefs_data_sources">Custom data sources</string>
     <string name="prefs_data_clear_success">Дані успішно очищено</string>
     <string name="prefs_data_update_success">Оновлення успішне</string>
 
-    <string name="prefs_transceivers_title">Transceivers</string>
-    <string name="prefs_transceivers_switch">Custom URL</string>
-    <string name="prefs_transceivers_url_title">URL (https)</string>
-    <string name="prefs_transceivers_import">Import from file</string>
+    <string name="prefs_data_sources_title">Custom data sources</string>
+    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
+    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
+    <string name="prefs_data_sources_url_title">URL (https)</string>
 
     <string name="prefs_net_title">Вивід мережевих даних</string>
     <string name="prefs_net_switch">Увімкнути вихід</string>
