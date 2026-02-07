@@ -93,10 +93,10 @@
     <string name="prefs_loc_qth_error">Неправильный локатор QTH</string>
     <string name="prefs_loc_success">Позиция успешно обновлена</string>
     <string name="prefs_station_title">Настройки местоположения</string>
-    <string name="prefs_station_lat_text">Установите широту наземной станции</string>
-    <string name="prefs_station_lon_text">Установите долготу наземной станции</string>
+    <string name="prefs_station_lat_text">Введите широту наземной станции</string>
+    <string name="prefs_station_lon_text">Введите долготу наземной станции</string>
     <string name="prefs_locator_title">Настройки локатора QTH</string>
-    <string name="prefs_locator_text">Установить позицию используя локатор</string>
+    <string name="prefs_locator_text">Введите позицию через локатор</string>
 
     <string name="prefs_data_title">Данные спутников</string>
     <string name="prefs_data_entries">Спутников: %s</string>
@@ -104,14 +104,12 @@
     <string name="prefs_data_update">Обновить</string>
     <string name="prefs_data_import">Импорт</string>
     <string name="prefs_data_clear">Очистить</string>
-    <string name="prefs_data_sources">Свои источники данных</string>
     <string name="prefs_data_clear_success">Очистка прошла успешно</string>
     <string name="prefs_data_update_success">Обновление прошло успешно</string>
 
     <string name="prefs_data_sources_title">Свои источники данных</string>
     <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
-    <string name="prefs_data_sources_url_title">URL (https)</string>
+    <string name="prefs_data_sources_transceivers_switch">Custom Transceivers URL</string>
 
     <string name="prefs_net_title">Вывод сетевых данных</string>
     <string name="prefs_net_switch">Включить вывод</string>

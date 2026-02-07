@@ -20,7 +20,7 @@
     <string name="sat_search_clear">Clear</string>
     <string name="sat_clear_all">Clear all</string>
     <string name="sat_select_all">Select all</string>
-    <string name="sat_empty_list_message">"         Make sure your search query is correct and the DB is updated"</string>
+    <string name="sat_empty_list_message">"Make sure your search query is correct and the DB is updated"</string>
     <string name="sat_warning_title">Warning\!</string>
     <string name="sat_warning_message">
         There are over 9000 satellites listed in this app.
@@ -128,14 +128,13 @@
     <string name="prefs_data_update">Update</string>
     <string name="prefs_data_import">Import</string>
     <string name="prefs_data_clear">Clear</string>
-    <string name="prefs_data_sources">Custom data sources</string>
     <string name="prefs_data_clear_success">Data was cleared successfully</string>
     <string name="prefs_data_update_success">Update completed successfully</string>
 
     <string name="prefs_data_sources_title">Custom data sources</string>
     <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
-    <string name="prefs_data_sources_url_title">URL (https)</string>
+    <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
 
     <string name="prefs_net_title">Network data output</string>
     <string name="prefs_net_switch">Enable output</string>

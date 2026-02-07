@@ -212,8 +212,8 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ), shape = MaterialTheme.shapes.small, modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 12.dp)
-    ) { Text(text = text, fontSize = 16.sp) }
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
+    ) { Text(text = text, fontSize = 16.sp, textAlign = TextAlign.Center) }
 }
 
 @Composable
@@ -280,7 +280,7 @@ fun SharedDialog(
             ) {
                 Text(
                     text = title,
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(start = padding, top = padding, end = padding)
@@ -323,40 +323,6 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
                     CardButton(
                         onClick = onDismiss,
                         text = stringResource(id = R.string.btn_accept)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun InfoDialog(
-    title: String,
-    onDismiss: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    val padding = LocalSpacing.current.large
-
-    Dialog(onDismissRequest = onDismiss) {
-        ElevatedCard {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(padding)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(start = padding, top = padding, end = padding)
-                )
-                content()
-                Row(modifier = Modifier.padding(start = padding, bottom = padding, end = padding)) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    CardButton(
-                        onClick = onDismiss,
-                        text = stringResource(id = R.string.btn_cancel)
                     )
                 }
             }

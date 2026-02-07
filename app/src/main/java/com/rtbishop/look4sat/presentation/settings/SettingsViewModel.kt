@@ -52,7 +52,12 @@ class SettingsViewModel(
 
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
     private val defaultDataSettings = DataSettings(false, 0, 0, 0L)
-    private val defaultDataSourcesSettings = DataSourcesSettings(false, false, settingsRepo.dataSourcesSettings.value.tleUrl, settingsRepo.dataSourcesSettings.value.transceiversUrl)
+    private val defaultDataSourcesSettings = DataSourcesSettings(
+        useCustomTLE = false,
+        useCustomTransceivers = false,
+        tleUrl = settingsRepo.dataSourcesSettings.value.tleUrl,
+        transceiversUrl = settingsRepo.dataSourcesSettings.value.transceiversUrl
+    )
     private val _uiState = MutableStateFlow(
         SettingsState(
             nextTime = "00:00:00",

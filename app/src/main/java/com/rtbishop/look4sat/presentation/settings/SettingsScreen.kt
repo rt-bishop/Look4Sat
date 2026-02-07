@@ -150,7 +150,9 @@ private fun SettingsScreen(uiState: SettingsState) {
             useCustomTransceivers = uiState.dataSourcesSettings.useCustomTransceivers,
             tleUrl = uiState.dataSourcesSettings.tleUrl,
             transceiversUrl = uiState.dataSourcesSettings.transceiversUrl,
-            dismiss = dismissDataSourcesDialog,
+            onImportTle = { contentRequestForTle.launch("*/*") },
+            onImportTransceivers = { contentRequestForTransceivers.launch("*/*") },
+            onDismiss = dismissDataSourcesDialog,
             onSave = {
                 useCustomTle, useCustomTransceivers, tleUrl, transceiversUrl  ->
                 if (!useCustomTle || tleUrl.isNotBlank()) {
@@ -162,18 +164,6 @@ private fun SettingsScreen(uiState: SettingsState) {
                     uiState.sendDataSourcesAction(DataSourcesAction.SetTransceiversUrl(transceiversUrl))
                 }
             }
-        )
-    }
-
-    // Import dialog
-    val importDialogState = rememberSaveable { mutableStateOf(false) }
-    val showImportDialog = { importDialogState.value = true }
-    val dismissImportDialog = { importDialogState.value = false }
-    if (importDialogState.value) {
-        ImportDialog(
-            onImportTle = { contentRequestForTle.launch("*/*") },
-            onImportTransceivers = { contentRequestForTransceivers.launch("*/*") },
-            onDismiss = dismissImportDialog
         )
     }
 
@@ -248,7 +238,7 @@ private fun SettingsScreen(uiState: SettingsState) {
             item {
                 LocationCard(posSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos, uiState.sendSystemAction)
             }
-            item { DataCard(dataSettings, updateFromWeb, clearAllData, showImportDialog, showDataSourcesDialog) }
+            item { DataCard(dataSettings, updateFromWeb, clearAllData, showDataSourcesDialog) }
             item { NetworkOutputCard(rcSettings, setRotatorState, setRotatorAddress, setRotatorPort) }
             item { BluetoothOutputCard(rcSettings, setBluetoothState, setBluetoothAddress, setBluetoothFormat) }
             item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
@@ -329,7 +319,7 @@ private fun LocationCard(
 @Composable
 private fun DataCardPreview() = MainTheme {
     val settings = DataSettings(true, 5000, 2500, 0L)
-    DataCard(settings = settings, {}, {},{}) {}
+    DataCard(settings = settings, {}, {}, {})
 }
 
 @Composable
@@ -337,7 +327,6 @@ private fun DataCard(
     settings: DataSettings,
     updateFromWeb: () -> Unit,
     clearAllData: () -> Unit,
-    showImportDialog: () -> Unit,
     showDataSourcesDialog: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
@@ -360,34 +349,20 @@ private fun DataCard(
                 Text(text = stringResource(R.string.prefs_data_radios, settings.radiosTotal))
             }
             Spacer(modifier = Modifier.height(1.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 CardButton(
                     onClick = updateFromWeb,
                     text = stringResource(id = R.string.prefs_data_update),
                     modifier = Modifier.weight(1f)
                 )
                 CardButton(
-                    onClick = showImportDialog,
+                    onClick = showDataSourcesDialog,
                     text = stringResource(id = R.string.prefs_data_import),
                     modifier = Modifier.weight(1f)
                 )
                 CardButton(
                     onClick = clearAllData,
                     text = stringResource(id = R.string.prefs_data_clear),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                CardButton(
-                    onClick = showDataSourcesDialog,
-                    text = stringResource(id = R.string.prefs_data_sources),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -685,4 +660,3 @@ private fun BotCard(onClick: () -> Unit, resId: Int, text: String, modifier: Mod
         }
     }
 }
-
