@@ -17,6 +17,9 @@
  */
 package com.rtbishop.look4sat.presentation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -76,7 +79,12 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
             else -> NavigationSuiteType.ShortNavigationBarMedium
         }
     ) {
-        NavHost(navController = navController, startDestination = startDestination) {
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            enterTransition =  { fadeIn(animationSpec = tween(350)) },
+            exitTransition = { fadeOut(animationSpec = tween(350)) }
+        ) {
             satellitesDestination { navController.navigateUp() }
             passesDestination { catNum: Int, aosTime: Long ->
                 val radarRoute = "${Screen.Radar.route}?catNum=${catNum}&aosTime=${aosTime}"

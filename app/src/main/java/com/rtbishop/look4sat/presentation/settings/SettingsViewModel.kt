@@ -124,9 +124,7 @@ class SettingsViewModel(
         }
         viewModelScope.launch {
             settingsRepo.dataSourcesSettings.collect { settings ->
-                _uiState.update {
-                    it.copy(dataSourcesSettings = settings)
-                }
+                _uiState.update { it.copy(dataSourcesSettings = settings) }
             }
         }
     }

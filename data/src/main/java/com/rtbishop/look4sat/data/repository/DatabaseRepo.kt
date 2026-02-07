@@ -61,7 +61,7 @@ class DatabaseRepo(
         val importedRadios = mutableListOf<SatRadio>()
         val tleUrls = Sources.satelliteDataUrls.toMutableMap().apply {
             if (settingsRepo.dataSourcesSettings.value.useCustomTLE) {
-                this["Other"] = settingsRepo.dataSourcesSettings.value.transceiversUrl
+                this["Other"] = settingsRepo.dataSourcesSettings.value.tleUrl
             }
         }
         val jobsMap = tleUrls

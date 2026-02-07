@@ -163,6 +163,9 @@ private fun SettingsScreen(uiState: SettingsState) {
                     uiState.sendDataSourcesAction(DataSourcesAction.SetUseCustomTransceivers(useCustomTransceivers))
                     uiState.sendDataSourcesAction(DataSourcesAction.SetTransceiversUrl(transceiversUrl))
                 }
+                if (useCustomTle || useCustomTransceivers) {
+                    uiState.sendAction(SettingsAction.UpdateFromWeb)
+                }
             }
         )
     }

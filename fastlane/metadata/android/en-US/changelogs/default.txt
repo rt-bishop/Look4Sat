@@ -1,9 +1,3 @@
-Added support for landscape layout and tablets
-Added AOS/LOS info to the countdown component
-Added various minor UI fixes for readability
-Cleaned up the translations and strings.xml
-Moved Modes filter dialog to Passes screen
-Rewrote all the screens with Jetpack Compose
-Switched to using Bottom Navigation component
-Switched to using unified dialogs and top bars
-Updated GitHub Actions workflow deps and scripts
+Added minor tweaks for UK translation, by Eugene #188
+Added custom data sources import, by londre7 #189
+Added various UI fixes, updated dependencies

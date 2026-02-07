@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -69,7 +69,7 @@ jobs:
           serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
           packageName: com.rtbishop.look4sat
           releaseFiles: app/build/outputs/apk/release/look4sat.aab
-          track: beta
+          track: production
           whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
 
       - name: Create Release
