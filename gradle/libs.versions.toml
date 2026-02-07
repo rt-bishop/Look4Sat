@@ -1,7 +1,7 @@
 [versions]
 android-gradle-plugin = "9.0.0"
 google-ksp = "2.3.2"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 
 androidx-core-ktx = "1.17.0"
 androidx-core-splashscreen = "1.2.0"

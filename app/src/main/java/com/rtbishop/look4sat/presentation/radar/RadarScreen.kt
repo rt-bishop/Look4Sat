@@ -179,7 +179,11 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                             modifier = Modifier.padding(32.dp)
                         ) {
                             Text(text = """¯\_(ツ)_/¯""", fontSize = 32.sp)
-                            Text(text = stringResource(R.string.empty_list_message), fontSize = 21.sp)
+                            Text(
+                                text = stringResource(R.string.empty_list_message),
+                                fontSize = 21.sp,
+                                textAlign = TextAlign.Center
+                            )
                             Text(
                                 text = stringResource(R.string.radar_no_data),
                                 fontSize = 18.sp,
@@ -263,7 +267,11 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                                 modifier = Modifier.padding(32.dp)
                             ) {
                                 Text(text = """¯\_(ツ)_/¯""", fontSize = 32.sp)
-                                Text(text = stringResource(R.string.empty_list_message), fontSize = 21.sp)
+                                Text(
+                                    text = stringResource(R.string.empty_list_message),
+                                    fontSize = 21.sp,
+                                    textAlign = TextAlign.Center
+                                )
                                 Text(
                                     text = stringResource(R.string.radar_no_data),
                                     fontSize = 18.sp,
