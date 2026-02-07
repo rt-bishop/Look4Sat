@@ -39,23 +39,46 @@ class DatabaseRepo(
     private val settingsRepo: ISettingsRepo
 ) : IDatabaseRepo {
 
-    override suspend fun updateFromFile(uri: String) = withContext(dispatcher) {
+    override suspend fun updateTLEFromFile(uri: String) = withContext(dispatcher) {
         val importedSatellites = remoteSource.getFileStream(uri)?.let { dataParser.parseTLEStream(it) }
         importedSatellites?.let { localSource.insertEntries(it) }
+        setUpdateSuccessful(System.currentTimeMillis())
+    }
+
+    override suspend fun updateTransceiversFromFile(uri: String) = withContext(dispatcher) {
+        val radios = remoteSource.getFileStream(uri)?.let { dataParser.parseJSONStream(it) }
+        radios?.let {
+            if(it.isNotEmpty()) {
+                localSource.deleteRadios()
+                localSource.insertRadios(it)
+            }
+        }
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
     override suspend fun updateFromRemote() = withContext(dispatcher) {
         val importedEntries = mutableListOf<OrbitalData>()
         val importedRadios = mutableListOf<SatRadio>()
-        // fetch
-        val jobsMap = Sources.satelliteDataUrls.mapValues { async { remoteSource.getNetworkStream(it.value) } }
-        val jobRadios = async { remoteSource.getNetworkStream(Sources.RADIO_DATA_URL) }
+        val tleUrls = Sources.satelliteDataUrls.toMutableMap().apply {
+            if (settingsRepo.dataSourcesSettings.value.useCustomTLE) {
+                this["Other"] = settingsRepo.dataSourcesSettings.value.transceiversUrl
+            }
+        }
+        val jobsMap = tleUrls
+            .filter { (_, url) -> url.isNotEmpty() }
+            .mapValues { (_, url) -> async { remoteSource.getNetworkStream(url) } }
+        val radioUrls = buildList {
+            add(Sources.RADIO_DATA_URL)
+            if (settingsRepo.dataSourcesSettings.value.useCustomTransceivers) {
+                add(settingsRepo.dataSourcesSettings.value.transceiversUrl)
+            }
+        }
+        val jobRadios = radioUrls.associateWith { url -> async { remoteSource.getNetworkStream(url) } }
         // parse
         jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
             entry.value?.let { stream ->
                 when (val type = entry.key) {
-                    "Amsat", "R4UAB" -> {
+                    "Amsat", "R4UAB", "Other" -> {
                         // parse tle stream
                         val satellites = dataParser.parseTLEStream(stream)
                         val catnums = satellites.map { it.catnum }
@@ -82,7 +105,11 @@ class DatabaseRepo(
                 }
             }
         }
-        jobRadios.await()?.let { importedRadios.addAll(dataParser.parseJSONStream(it)) }
+        jobRadios.values.forEach { job ->
+            job.await()?.let {
+                importedRadios.addAll(dataParser.parseJSONStream(it))
+            }
+        }
         // insert
         localSource.insertEntries(importedEntries)
         localSource.insertRadios(importedRadios)

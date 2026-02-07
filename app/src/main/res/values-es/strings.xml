@@ -105,8 +105,14 @@
     <string name="prefs_data_update">Actualizar</string>
     <string name="prefs_data_import">Importar</string>
     <string name="prefs_data_clear">Vaciar</string>
+    <string name="prefs_data_sources">Custom data sources</string>
     <string name="prefs_data_clear_success">Datos eliminados con éxito</string>
     <string name="prefs_data_update_success">Actualización completada con éxito</string>
+
+    <string name="prefs_data_sources_title">Custom data sources</string>
+    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
+    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
+    <string name="prefs_data_sources_url_title">URL (https)</string>
 
     <string name="prefs_net_title">Salida de datos de red</string>
     <string name="prefs_net_switch">Habilitar salida</string>

@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.presentation.settings
 
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.RCSettings
+import com.rtbishop.look4sat.domain.model.DataSourcesSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.predict.OrbitalPass
 
@@ -39,9 +40,11 @@ data class SettingsState(
     val dataSettings: DataSettings,
     val otherSettings: OtherSettings,
     val rcSettings: RCSettings,
+    val dataSourcesSettings: DataSourcesSettings,
     val sendAction: (SettingsAction) -> Unit,
     val sendRCAction: (RCAction) -> Unit,
-    val sendSystemAction: (SystemAction) -> Unit
+    val sendSystemAction: (SystemAction) -> Unit,
+    val sendDataSourcesAction: (DataSourcesAction) -> Unit
 )
 
 sealed class SettingsAction {
@@ -50,7 +53,8 @@ sealed class SettingsAction {
     data class SetQthPosition(val locator: String) : SettingsAction()
     data object DismissPosMessages : SettingsAction()
     data object UpdateFromWeb : SettingsAction()
-    data class UpdateFromFile(val uri: String) : SettingsAction()
+    data class UpdateTLEFromFile(val uri: String) : SettingsAction()
+    data class UpdateTransceiversFromFile(val uri: String) : SettingsAction()
     data object ClearAllData : SettingsAction()
     data class ToggleUtc(val value: Boolean) : SettingsAction()
     data class ToggleUpdate(val value: Boolean) : SettingsAction()
@@ -71,4 +75,11 @@ sealed class RCAction {
     data class SetBluetoothFormat(val value: String) : RCAction()
     data class SetBluetoothName(val value: String) : RCAction()
     data class SetBluetoothAddress(val value: String) : RCAction()
+}
+
+sealed class DataSourcesAction {
+    data class SetUseCustomTle(val value: Boolean) : DataSourcesAction()
+    data class SetUseCustomTransceivers(val value: Boolean) : DataSourcesAction()
+    data class SetTleUrl(val value: String) : DataSourcesAction()
+    data class SetTransceiversUrl(val value: String) : DataSourcesAction()
 }

@@ -48,3 +48,10 @@ data class OtherSettings(
     val shouldSeeWarning: Boolean,
     val shouldSeeWelcome: Boolean
 )
+
+data class DataSourcesSettings(
+    val useCustomTLE: Boolean,
+    val useCustomTransceivers: Boolean,
+    val tleUrl: String,
+    val transceiversUrl: String
+)

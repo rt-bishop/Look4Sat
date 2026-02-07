@@ -27,6 +27,7 @@ import com.rtbishop.look4sat.domain.model.DatabaseState
 import com.rtbishop.look4sat.domain.model.OtherSettings
 import com.rtbishop.look4sat.domain.model.PassesSettings
 import com.rtbishop.look4sat.domain.model.RCSettings
+import com.rtbishop.look4sat.domain.model.DataSourcesSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.domain.utility.positionToQth
@@ -68,6 +69,10 @@ class SettingsRepo(
     private val keyUpdateTimestamp = "updateTimestamp"
     private val keyShouldSeeWarning = "shouldSeeWarning"
     private val keyShouldSeeWelcome = "shouldSeeWelcome"
+    private val keyUseCustomTle = "useCustomTle"
+    private val keyUseCustomTransceivers = "useCustomTransceivers"
+    private val keyTleUrl = "tleUrl"
+    private val keyTransceiversUrl = "transceiversUrl"
     private val separatorComma = ","
 
     //region # Satellites selection settings
@@ -328,6 +333,38 @@ class SettingsRepo(
         stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme, false),
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
         shouldSeeWelcome = preferences.getBoolean(keyShouldSeeWelcome, true)
+    )
+    //endregion
+
+    //region # Data sources settings
+    private val _dataSourcesSettings = MutableStateFlow(getDataSourcesSettings())
+    override val dataSourcesSettings: StateFlow<DataSourcesSettings> = _dataSourcesSettings
+
+    override fun setUseCustomTle(value: Boolean) {
+        preferences.edit { putBoolean(keyUseCustomTle, value) }
+        _dataSourcesSettings.update { it.copy(useCustomTLE = value) }
+    }
+
+    override fun setUseCustomTransceivers(value: Boolean) {
+        preferences.edit { putBoolean(keyUseCustomTransceivers, value) }
+        _dataSourcesSettings.update { it.copy(useCustomTransceivers = value) }
+    }
+
+    override fun setTleUrl(value: String) {
+        preferences.edit { putString(keyTleUrl, value) }
+        _dataSourcesSettings.update { it.copy(tleUrl = value) }
+    }
+
+    override fun setTransceiversUrl(value: String) {
+        preferences.edit { putString(keyTransceiversUrl, value) }
+        _dataSourcesSettings.update { it.copy(transceiversUrl = value) }
+    }
+
+    private fun getDataSourcesSettings(): DataSourcesSettings = DataSourcesSettings(
+        useCustomTLE = preferences.getBoolean(keyUseCustomTle, false),
+        useCustomTransceivers = preferences.getBoolean(keyUseCustomTransceivers, false),
+        tleUrl = preferences.getString(keyTleUrl, "https://example.com/tle.txt") ?: "",
+        transceiversUrl = preferences.getString(keyTransceiversUrl, "https://example.com/radio.json") ?: ""
     )
     //endregion
 }

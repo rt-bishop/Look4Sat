@@ -331,6 +331,40 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
 }
 
 @Composable
+fun InfoDialog(
+    title: String,
+    onDismiss: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val padding = LocalSpacing.current.large
+
+    Dialog(onDismissRequest = onDismiss) {
+        ElevatedCard {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(padding)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = padding, top = padding, end = padding)
+                )
+                content()
+                Row(modifier = Modifier.padding(start = padding, bottom = padding, end = padding)) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    CardButton(
+                        onClick = onDismiss,
+                        text = stringResource(id = R.string.btn_cancel)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun hasEnoughHeight(): Boolean {
     return currentWindowAdaptiveInfo().windowSizeClass.isHeightAtLeastBreakpoint(480)
 }
