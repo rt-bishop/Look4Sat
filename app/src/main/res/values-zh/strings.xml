@@ -100,9 +100,9 @@
     <string name="prefs_data_clear_success">数据清空成功</string>
     <string name="prefs_data_update_success">更新成功</string>
 
-    <string name="prefs_data_sources_title">Custom data sources</string>
-    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
+    <string name="prefs_data_sources_title">自定义数据源</string>
+    <string name="prefs_data_sources_tle_switch">自定义TLE URL</string>
+    <string name="prefs_data_sources_transceivers_switch">自定义收发器URL</string>
 
     <string name="prefs_net_title">网络数据输出</string>
     <string name="prefs_net_switch">启用输出</string>
