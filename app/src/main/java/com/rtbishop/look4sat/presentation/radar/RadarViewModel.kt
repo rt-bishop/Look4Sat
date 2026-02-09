@@ -65,6 +65,7 @@ class RadarViewModel(
             satTrack = emptyList(),
             shouldShowSweep = settingsRepo.otherSettings.value.stateOfSweep,
             shouldUseCompass = settingsRepo.otherSettings.value.stateOfSensors,
+            shouldKeepScreenOn = settingsRepo.otherSettings.value.radarScreenCaffeine,
             transmitters = emptyList(),
             sendAction = ::handleAction,
         )

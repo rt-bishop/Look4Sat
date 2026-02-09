@@ -58,6 +58,7 @@ class SettingsRepo(
     private val keySelectedModes = "selectedModes"
     private val keyStateOfAutoUpdate = "stateOfAutoUpdate"
     private val keyStateOfSensors = "stateOfSensors"
+    private val keyStateOfCaffeine = "stateOfCaffeine"
     private val keyStateOfSweep = "stateOfSweep"
     private val keyStateOfUtc = "stateOfUtc"
     private val keyStateOfLightTheme = "stateOfLightTheme"
@@ -315,6 +316,11 @@ class SettingsRepo(
         _otherSettings.update { it.copy(stateOfLightTheme = value) }
     }
 
+    override fun setStateOfCaffeine(value: Boolean) {
+        preferences.edit { putBoolean(keyStateOfCaffeine, value) }
+        _otherSettings.update { it.copy(radarScreenCaffeine = value) }
+    }
+
     override fun setWarningDismissed() {
         preferences.edit { putBoolean(keyShouldSeeWarning, false) }
         _otherSettings.update { it.copy(shouldSeeWarning = false) }
@@ -332,7 +338,8 @@ class SettingsRepo(
         stateOfUtc = preferences.getBoolean(keyStateOfUtc, false),
         stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme, false),
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
-        shouldSeeWelcome = preferences.getBoolean(keyShouldSeeWelcome, true)
+        shouldSeeWelcome = preferences.getBoolean(keyShouldSeeWelcome, true),
+        radarScreenCaffeine = preferences.getBoolean(keyStateOfCaffeine, false)
     )
     //endregion
 

@@ -143,6 +143,7 @@ class SettingsViewModel(
             is SettingsAction.ToggleUpdate -> settingsRepo.setStateOfAutoUpdate(action.value)
             is SettingsAction.ToggleSweep -> settingsRepo.setStateOfSweep(action.value)
             is SettingsAction.ToggleSensor -> settingsRepo.setStateOfSensors(action.value)
+            is SettingsAction.ToggleCaffeine -> settingsRepo.setStateOfCaffeine(action.value)
             is SettingsAction.ToggleLightTheme -> settingsRepo.setStateOfLightTheme(action.value)
         }
     }
