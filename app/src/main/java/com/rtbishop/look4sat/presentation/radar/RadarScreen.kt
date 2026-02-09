@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.keepScreenOn
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -89,6 +90,7 @@ fun NavGraphBuilder.radarDestination(navigateUp: () -> Unit) {
 
 @Composable
 private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
+
 //    BluetoothCIV.init(LocalContext.current)
     val addToCalendar: () -> Unit = {
         uiState.currentPass?.let { pass ->
@@ -97,7 +99,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
     }
     val upcomingPass = uiState.currentPass ?: getDefaultPass()
     if (upcomingPass.losTime < System.currentTimeMillis()) navigateUp()
-    Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(modifier = Modifier.layoutPadding().keepScreenOn(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {
                 IconCard(action = navigateUp, resId = R.drawable.ic_back)
