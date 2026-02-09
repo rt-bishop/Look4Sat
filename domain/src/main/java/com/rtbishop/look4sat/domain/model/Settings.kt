@@ -46,8 +46,7 @@ data class OtherSettings(
     val stateOfUtc: Boolean,
     val stateOfLightTheme: Boolean,
     val shouldSeeWarning: Boolean,
-    val shouldSeeWelcome: Boolean,
-    val radarScreenCaffeine: Boolean
+    val shouldSeeWelcome: Boolean
 )
 
 data class DataSourcesSettings(

@@ -152,7 +152,6 @@
     <string name="prefs_other_switch_update">Enable automatic data update</string>
     <string name="prefs_other_switch_sweep">Enable radar sweep animation</string>
     <string name="prefs_other_switch_sensors">Use sensors to rotate radar view</string>
-    <string name="prefs_other_switch_caffeine">Keep the screen on in radar view</string>
 
     <string name="prefs_outro_title">I would like to say thanks to</string>
     <string name="prefs_outro_thanks" translatable="false">

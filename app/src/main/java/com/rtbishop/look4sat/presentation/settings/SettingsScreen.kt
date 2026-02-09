@@ -193,8 +193,6 @@ private fun SettingsScreen(uiState: SettingsState) {
     val toggleUpdate = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleUpdate(value)) }
     val toggleSweep = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSweep(value)) }
     val toggleSensor = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSensor(value)) }
-    val toggleCaffeine = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleCaffeine(value)) }
-
     val uriHandler = LocalUriHandler.current
     val appUrl = stringResource(R.string.prefs_app_url)
     val donateUrl = stringResource(R.string.prefs_donate_url)
@@ -246,7 +244,7 @@ private fun SettingsScreen(uiState: SettingsState) {
             item { DataCard(dataSettings, updateFromWeb, clearAllData, showDataSourcesDialog) }
             item { NetworkOutputCard(rcSettings, setRotatorState, setRotatorAddress, setRotatorPort) }
             item { BluetoothOutputCard(rcSettings, setBluetoothState, setBluetoothAddress, setBluetoothFormat) }
-            item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor, toggleCaffeine) }
+            item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
             item { CardCredits() }
         }
     }
@@ -511,10 +509,9 @@ private fun OtherCardPreview() = MainTheme {
         stateOfUtc = false,
         stateOfLightTheme = false,
         shouldSeeWarning = false,
-        shouldSeeWelcome = false,
-        radarScreenCaffeine = false
+        shouldSeeWelcome = false
     )
-    OtherCard(settings = values, {}, {}, {}, {}, {})
+    OtherCard(settings = values, {}, {}, {}, {})
 }
 
 @Composable
@@ -523,10 +520,9 @@ private fun OtherCard(
     toggleUtc: (Boolean) -> Unit,
     toggleUpdate: (Boolean) -> Unit,
     toggleSweep: (Boolean) -> Unit,
-    toggleSensor: (Boolean) -> Unit,
-    toggleCaffeine: (Boolean) -> Unit
+    toggleSensor: (Boolean) -> Unit
 ) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth().height(275.dp)) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth().height(220.dp)) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Text(
                 text = stringResource(id = R.string.prefs_other_title),
@@ -563,15 +559,6 @@ private fun OtherCard(
             ) {
                 Text(text = stringResource(id = R.string.prefs_other_switch_sensors))
                 Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.prefs_other_switch_caffeine))
-                Switch(checked = settings.radarScreenCaffeine, onCheckedChange = { toggleCaffeine(it) })
             }
         }
     }

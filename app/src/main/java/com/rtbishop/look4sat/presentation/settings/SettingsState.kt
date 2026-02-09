@@ -61,8 +61,6 @@ sealed class SettingsAction {
     data class ToggleSweep(val value: Boolean) : SettingsAction()
     data class ToggleSensor(val value: Boolean) : SettingsAction()
     data class ToggleLightTheme(val value: Boolean) : SettingsAction()
-
-    data class ToggleCaffeine(val value: Boolean) : SettingsAction()
 }
 
 sealed class SystemAction {

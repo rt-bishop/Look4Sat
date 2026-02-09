@@ -30,7 +30,6 @@ data class RadarState(
     val satTrack: List<OrbitalPos>,
     val shouldShowSweep: Boolean,
     val shouldUseCompass: Boolean,
-    val shouldKeepScreenOn: Boolean,
     val transmitters: List<SatRadio>,
     val sendAction: (RadarAction) -> Unit
 )
