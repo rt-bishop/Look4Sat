@@ -13,8 +13,8 @@ android {
     defaultConfig {
         applicationId = "com.rtbishop.look4sat"
         minSdk = 24
-        versionCode = 402
-        versionName = "4.0.2"
+        versionCode = 403
+        versionName = "4.0.3"
     }
     buildFeatures {
         compose = true

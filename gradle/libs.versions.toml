@@ -34,7 +34,7 @@ compose-animation = { group = "androidx.compose.animation", name = "animation" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-material3-navigation = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
-compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 compose-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "compose-lifecycle" }

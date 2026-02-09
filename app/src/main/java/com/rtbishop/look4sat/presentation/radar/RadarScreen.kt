@@ -90,7 +90,6 @@ fun NavGraphBuilder.radarDestination(navigateUp: () -> Unit) {
 
 @Composable
 private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
-
 //    BluetoothCIV.init(LocalContext.current)
     val addToCalendar: () -> Unit = {
         uiState.currentPass?.let { pass ->

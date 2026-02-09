@@ -1,3 +1,2 @@
-Added minor tweaks for UK translation, by Eugene #188
-Added custom data sources import, by londre7 #189
-Added various UI fixes, updated dependencies
+Added custom data source translations, by troilus #191
+Added keepScreenOn for RadarScreen, by Kaitlyn Kenwell #193
