@@ -80,7 +80,7 @@
     <string name="prefs_loc_title">站位</string>
     <string name="prefs_loc_gps_title">GPS 定位</string>
     <string name="prefs_loc_gps_error">检查您的位置权限</string>
-    <string name="prefs_loc_input_title">进入</string>
+    <string name="prefs_loc_input_title">输入位置</string>
     <string name="prefs_loc_input_error">输入的位置无效</string>
     <string name="prefs_loc_qth_title">QTH 网格</string>
     <string name="prefs_loc_qth_error">无效的 QTH 网格</string>
