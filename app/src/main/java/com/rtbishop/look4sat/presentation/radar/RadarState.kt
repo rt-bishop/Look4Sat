@@ -31,9 +31,12 @@ data class RadarState(
     val shouldShowSweep: Boolean,
     val shouldUseCompass: Boolean,
     val transmitters: List<SatRadio>,
+    val selectedTransmitterUuid: String?,
+    val selectedFrequency: Long?,
     val sendAction: (RadarAction) -> Unit
 )
 
 sealed class RadarAction {
     data class AddToCalendar(val name: String, val aosTime: Long, val losTime: Long) : RadarAction()
+    data class SelectTransmitter(val uuid: String) : RadarAction()
 }

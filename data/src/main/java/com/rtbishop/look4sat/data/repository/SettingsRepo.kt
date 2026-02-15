@@ -42,10 +42,13 @@ class SettingsRepo(
     private val preferences: SharedPreferences
 ) : ISettingsRepo, LocationListenerCompat {
 
-    private val keyBluetoothAddress = "bluetoothAddress"
-    private val keyBluetoothName = "bluetoothName"
-    private val keyBluetoothFormat = "bluetoothFormat"
-    private val keyBluetoothState = "bluetoothState"
+    private val keyBluetoothRotatorAddress = "bluetoothAddress"
+    private val keyBluetoothRotatorName = "bluetoothName"
+    private val keyBluetoothRotatorFormat = "bluetoothFormat"
+    private val keyBluetoothRotatorState = "bluetoothState"
+    private val keyBluetoothFrequencyState = "bluetoothFrequencyState"
+    private val keyBluetoothFrequencyAddress = "bluetoothFrequencyAddress"
+    private val keyBluetoothFrequencyFormat = "bluetoothFrequencyFormat"
     private val keyFilterHoursAhead = "filterHoursAhead"
     private val keyFilterMinElevation = "filterMinElevation"
     private val keyNumberOfRadios = "numberOfRadios"
@@ -53,6 +56,11 @@ class SettingsRepo(
     private val keyRotatorAddress = "rotatorAddress"
     private val keyRotatorPort = "rotatorPort"
     private val keyRotatorState = "rotatorState"
+    private val keyRotatorFormat = "rotatorFormat"
+    private val keyFrequencyState = "frequencyState"
+    private val keyFrequencyAddress = "frequencyAddress"
+    private val keyFrequencyPort = "frequencyPort"
+    private val keyFrequencyFormat = "frequencyFormat"
     private val keySelectedIds = "selectedIds"
     private val keySelectedTypes = "selectedTypes"
     private val keySelectedModes = "selectedModes"
@@ -240,24 +248,39 @@ class SettingsRepo(
     private val _rcSettings = MutableStateFlow(getRCSettings())
     override val rcSettings: StateFlow<RCSettings> = _rcSettings
 
-    override fun setBluetoothAddress(value: String) {
-        preferences.edit { putString(keyBluetoothAddress, value) }
-        _rcSettings.update { it.copy(bluetoothAddress = value) }
+    override fun setBluetoothRotatorAddress(value: String) {
+        preferences.edit { putString(keyBluetoothRotatorAddress, value) }
+        _rcSettings.update { it.copy(bluetoothRotatorAddress = value) }
     }
 
-    override fun setBluetoothFormat(value: String) {
-        preferences.edit { putString(keyBluetoothFormat, value) }
-        _rcSettings.update { it.copy(bluetoothFormat = value) }
+    override fun setBluetoothRotatorFormat(value: String) {
+        preferences.edit { putString(keyBluetoothRotatorFormat, value) }
+        _rcSettings.update { it.copy(bluetoothRotatorFormat = value) }
     }
 
-    override fun setBluetoothName(value: String) {
-        preferences.edit { putString(keyBluetoothName, value) }
-        _rcSettings.update { it.copy(bluetoothName = value) }
+    override fun setBluetoothRotatorName(value: String) {
+        preferences.edit { putString(keyBluetoothRotatorName, value) }
+        _rcSettings.update { it.copy(bluetoothRotatorName = value) }
     }
 
-    override fun setBluetoothState(value: Boolean) {
-        preferences.edit { putBoolean(keyBluetoothState, value) }
-        _rcSettings.update { it.copy(bluetoothState = value) }
+    override fun setBluetoothRotatorState(value: Boolean) {
+        preferences.edit { putBoolean(keyBluetoothRotatorState, value) }
+        _rcSettings.update { it.copy(bluetoothRotatorState = value) }
+    }
+
+    override fun setBluetoothFrequencyState(value: Boolean) {
+        preferences.edit { putBoolean(keyBluetoothFrequencyState, value) }
+        _rcSettings.update { it.copy(bluetoothFrequencyState = value) }
+    }
+
+    override fun setBluetoothFrequencyAddress(value: String) {
+        preferences.edit { putString(keyBluetoothFrequencyAddress, value) }
+        _rcSettings.update { it.copy(bluetoothFrequencyAddress = value) }
+    }
+
+    override fun setBluetoothFrequencyFormat(value: String) {
+        preferences.edit { putString(keyBluetoothFrequencyFormat, value) }
+        _rcSettings.update { it.copy(bluetoothFrequencyFormat = value) }
     }
 
     override fun setRotatorAddress(value: String) {
@@ -275,14 +298,47 @@ class SettingsRepo(
         _rcSettings.update { it.copy(rotatorState = value) }
     }
 
+    override fun setRotatorFormat(value: String) {
+        preferences.edit { putString(keyRotatorFormat, value) }
+        _rcSettings.update { it.copy(rotatorFormat = value) }
+    }
+
+    override fun setFrequencyState(value: Boolean) {
+        preferences.edit { putBoolean(keyFrequencyState, value) }
+        _rcSettings.update { it.copy(frequencyState = value) }
+    }
+
+    override fun setFrequencyAddress(value: String) {
+        preferences.edit { putString(keyFrequencyAddress, value) }
+        _rcSettings.update { it.copy(frequencyAddress = value) }
+    }
+
+    override fun setFrequencyPort(value: String) {
+        preferences.edit { putString(keyFrequencyPort, value) }
+        _rcSettings.update { it.copy(frequencyPort = value) }
+    }
+
+    override fun setFrequencyFormat(value: String) {
+        preferences.edit { putString(keyFrequencyFormat, value) }
+        _rcSettings.update { it.copy(frequencyFormat = value) }
+    }
+
     private fun getRCSettings(): RCSettings = RCSettings(
         rotatorState = preferences.getBoolean(keyRotatorState, false),
         rotatorAddress = preferences.getString(keyRotatorAddress, null) ?: "127.0.0.1",
         rotatorPort = preferences.getString(keyRotatorPort, null) ?: "4533",
-        bluetoothState = preferences.getBoolean(keyBluetoothState, false),
-        bluetoothFormat = preferences.getString(keyBluetoothFormat, null) ?: $$"W$AZ $EL",
-        bluetoothName = preferences.getString(keyBluetoothName, null) ?: "Default",
-        bluetoothAddress = preferences.getString(keyBluetoothAddress, null) ?: "00:0C:BF:13:80:5D"
+        rotatorFormat = preferences.getString(keyRotatorFormat, null) ?: $$"P $AZ $EL",
+        frequencyState = preferences.getBoolean(keyFrequencyState, false),
+        frequencyAddress = preferences.getString(keyFrequencyAddress, null) ?: "127.0.0.1",
+        frequencyPort = preferences.getString(keyFrequencyPort, null) ?: "4532",
+        frequencyFormat = preferences.getString(keyFrequencyFormat, null) ?: $$"set_freq $FREQ",
+        bluetoothRotatorState = preferences.getBoolean(keyBluetoothRotatorState, false),
+        bluetoothRotatorFormat = preferences.getString(keyBluetoothRotatorFormat, null) ?: $$"W$AZ $EL",
+        bluetoothRotatorName = preferences.getString(keyBluetoothRotatorName, null) ?: "Default",
+        bluetoothRotatorAddress = preferences.getString(keyBluetoothRotatorAddress, null) ?: "00:0C:BF:13:80:5D",
+        bluetoothFrequencyState = preferences.getBoolean(keyBluetoothFrequencyState, false),
+        bluetoothFrequencyAddress = preferences.getString(keyBluetoothFrequencyAddress, null) ?: "00:0C:BF:13:80:5D",
+        bluetoothFrequencyFormat = preferences.getString(keyBluetoothFrequencyFormat, null) ?: $$"FA$FREQ"
     )
     //endregion
 

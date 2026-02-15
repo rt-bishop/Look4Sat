@@ -25,6 +25,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,8 +34,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Brush
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
@@ -194,7 +198,15 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                     }
                 } else {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        TransmittersList(transmitters = uiState.transmitters)
+                        TransmittersList(
+                            transmitters = uiState.transmitters,
+                            selectedUuid = uiState.selectedTransmitterUuid,
+                            onSelect = { uuid ->
+                                if (uiState.selectedTransmitterUuid != null) {
+                                    uiState.sendAction(RadarAction.SelectTransmitter(uuid))
+                                }
+                            }
+                        )
                         if (uiState.orbitalPos?.eclipsed == true) {
                             EclipsedIndicator()
                         }
@@ -282,7 +294,15 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                         }
                     } else {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            TransmittersList(transmitters = uiState.transmitters)
+                            TransmittersList(
+                                transmitters = uiState.transmitters,
+                                selectedUuid = uiState.selectedTransmitterUuid,
+                                onSelect = { uuid ->
+                                    if (uiState.selectedTransmitterUuid != null) {
+                                        uiState.sendAction(RadarAction.SelectTransmitter(uuid))
+                                    }
+                                }
+                            )
                             if (uiState.orbitalPos?.eclipsed == true) {
                                 EclipsedIndicator()
                             }
@@ -315,10 +335,19 @@ private fun RadarTextBottom(value: Double, text: String, isLeft: Boolean) {
 }
 
 @Composable
-private fun TransmittersList(transmitters: List<SatRadio>) {
+private fun TransmittersList(
+    transmitters: List<SatRadio>,
+    selectedUuid: String?,
+    onSelect: (String) -> Unit
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(items = transmitters, key = { item -> item.uuid }) { radio ->
-            TransmitterItem(radio)
+            TransmitterItem(
+                radio,
+                (selectedUuid != null),
+                (radio.uuid == selectedUuid),
+                { onSelect(radio.uuid) }
+            )
         }
     }
 }
@@ -330,7 +359,7 @@ private fun TransmitterItemPreview() {
         "", "Extremely powerful transmitter", true, 10000000000L, 10000000000L,
         null, 10000000000L, 10000000000L, "FSK AX.100 Mode 5", true, 0
     )
-    MainTheme { TransmitterItem(transmitter) }
+    MainTheme { TransmitterItem(transmitter, true, true,{}) }
 }
 
 @Composable
@@ -370,13 +399,24 @@ private fun EclipsedIndicator() {
 }
 
 @Composable
-private fun TransmitterItem(radio: SatRadio) {
+private fun TransmitterItem(
+    radio: SatRadio,
+    isClickable: Boolean,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
 //    LaunchedEffect(radio) {
 //        BluetoothCIV.updateOnce(radio)
 //    }
     val title = if (radio.isInverted) "INVERTED: ${radio.info}" else radio.info
     val fullTitle = "$title - (${radio.downlinkMode ?: "--"}/${radio.uplinkMode ?: "--"})"
-    Surface(color = MaterialTheme.colorScheme.background,
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (isClickable) Modifier.clickable { onClick() } else Modifier
+            )
 //        modifier = Modifier.clickable(onClick = {
 //            Log.d("BluetoothCivManager", radio.toString())
 //            if(radio.uuid == BluetoothCIV.selected) BluetoothCIV.selected = "NONE" else
@@ -387,21 +427,51 @@ private fun TransmitterItem(radio: SatRadio) {
 //        })
     ) {
         Surface(modifier = Modifier.padding(bottom = 2.dp)) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = fullTitle,
-                    textAlign = TextAlign.Center,
+            Box {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .infiniteMarquee()
-                )
-                FrequencyRow(radio = radio, isDownlink = true)
-                FrequencyRow(radio = radio, isDownlink = false)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = fullTitle,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .infiniteMarquee()
+                    )
+                    FrequencyRow(radio = radio, isDownlink = true)
+                    FrequencyRow(radio = radio, isDownlink = false)
+                }
+                if (isSelected) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(start = 4.dp, top = 5.dp)
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.surface,
+                                        MaterialTheme.colorScheme.surface.copy(alpha = 0f)
+                                    ),
+                                    radius = 80f
+                                ),
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                            .width(30.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_radios),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(start = 4.dp)
+                                .size(24.dp)
+                        )
+                    }
+                }
             }
         }
     }

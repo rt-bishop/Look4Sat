@@ -24,40 +24,52 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+import com.rtbishop.look4sat.domain.repository.IReporterParams
+import com.rtbishop.look4sat.domain.repository.IReporterRepo
 
-class NetworkReporter(private val reporterScope: CoroutineScope) {
+data class ExtendedParams(
+    val server: String,
+    val port: Int
+) : IReporterParams
+
+class NetworkReporter(private val reporterScope: CoroutineScope): IReporterRepo<ExtendedParams> {
 
     private var rotationSocketChannel: SocketChannel? = null
     private var rotationReporting: Job? = null
 
-//    private var frequencySocketChannel: SocketChannel? = null
-//    private var frequencyReporting: Job? = null
-//
-//    fun reportFrequency(server: String, port: Int, frequency: Long) {
-//        frequencyReporting = reporterScope.launch {
-//            runCatching {
-//                if (frequencySocketChannel == null) {
-//                    frequencySocketChannel = SocketChannel.open(InetSocketAddress(server, port))
-//                } else {
-//                    val buffer = ByteBuffer.wrap("\\set_freq $frequency\n".toByteArray())
-//                    frequencySocketChannel?.write(buffer)
-//                }
-//            }.onFailure { error ->
-//                println(error.localizedMessage)
-//                frequencySocketChannel = null
-//                frequencyReporting?.cancelAndJoin()
-//            }
-//        }
-//    }
+    private var frequencySocketChannel: SocketChannel? = null
+    private var frequencyReporting: Job? = null
 
-    fun reportRotation(server: String, port: Int, azimuth: Double, elevation: Double) {
+    override fun reportFrequency(format: String, frequency: Long, params: ExtendedParams) {
+        frequencyReporting = reporterScope.launch {
+            runCatching {
+                if (frequencySocketChannel == null) {
+                    frequencySocketChannel = SocketChannel.open(InetSocketAddress(params.server, params.port))
+                } else {
+                    val command = format
+                        .replace("\$FREQ", frequency.toString())
+                    val buffer = ByteBuffer.wrap("\\$command\n".toByteArray())
+                    frequencySocketChannel?.write(buffer)
+                }
+            }.onFailure { error ->
+                println(error.localizedMessage)
+                frequencySocketChannel = null
+                frequencyReporting?.cancelAndJoin()
+            }
+        }
+    }
+
+    override fun reportRotation(format: String, azimuth: Double, elevation: Double, params: ExtendedParams) {
         rotationReporting = reporterScope.launch {
             val newElevation = if (elevation > 0.0) elevation else 0.0
             runCatching {
                 if (rotationSocketChannel == null) {
-                    rotationSocketChannel = SocketChannel.open(InetSocketAddress(server, port))
+                    rotationSocketChannel = SocketChannel.open(InetSocketAddress(params.server, params.port))
                 } else {
-                    val buffer = ByteBuffer.wrap("\\P $azimuth $newElevation\n".toByteArray())
+                    val command = format
+                        .replace("\$AZ", azimuth.toString())
+                        .replace("\$EL", newElevation.toString())
+                    val buffer = ByteBuffer.wrap("\\$command\n".toByteArray())
                     rotationSocketChannel?.write(buffer)
                 }
             }.onFailure { error ->

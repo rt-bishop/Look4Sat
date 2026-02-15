@@ -112,15 +112,27 @@
     <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
 
+    <string name="prefs_data_output_title">Data output</string>
+    <string name="prefs_net_output">Network</string>
+    <string name="prefs_bt_output">Bluetooth</string>
+
     <string name="prefs_net_title">Salida de datos de red</string>
-    <string name="prefs_net_switch">Habilitar salida</string>
-    <string name="prefs_net_ip_hint">Dirección IP</string>
-    <string name="prefs_net_port_hint">Puerto</string>
+    <string name="prefs_net_rotator_switch">Enable rotation output</string>
+    <string name="prefs_net_rotator_ip_hint">Dirección IP</string>
+    <string name="prefs_net_rotator_port_hint">Puerto</string>
+    <string name="prefs_net_rotator_format_hint">Formato de datos</string>
+    <string name="prefs_net_frequency_switch">Enable frequency output</string>
+    <string name="prefs_net_frequency_ip_hint">Dirección IP</string>
+    <string name="prefs_net_frequency_port_hint">Puerto</string>
+    <string name="prefs_net_frequency_format_hint">Formato de datos</string>
 
     <string name="prefs_bt_title">Salida por Bluetooth</string>
-    <string name="prefs_bt_switch">Habilitar salida</string>
-    <string name="prefs_bt_device_hint">Id dispositivo</string>
-    <string name="prefs_bt_output_hint">Formato de datos</string>
+    <string name="prefs_bt_rotator_switch">Enable rotation output</string>
+    <string name="prefs_bt_rotator_device_hint">Id dispositivo</string>
+    <string name="prefs_bt_rotator_output_hint">Formato de datos</string>
+    <string name="prefs_bt_frequency_switch">Enable frequency output</string>
+    <string name="prefs_bt_frequency_device_hint">Id dispositivo</string>
+    <string name="prefs_bt_frequency_output_hint">Formato de datos</string>
     <string name="prefs_bt_perm_error">Revisa los permisos de Bluetooth</string>
 
     <string name="prefs_other_title">Otros ajustes</string>

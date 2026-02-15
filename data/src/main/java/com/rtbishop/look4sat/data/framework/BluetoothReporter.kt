@@ -25,35 +25,47 @@ import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import com.rtbishop.look4sat.domain.repository.IReporterParams
+import com.rtbishop.look4sat.domain.repository.IReporterRepo
+
+data class WithoutExtParams(
+    val dummy: Int
+) : IReporterParams
 
 class BluetoothReporter(
     private val bluetoothManager: BluetoothManager,
     private val reporterScope: CoroutineScope
-) {
+) : IReporterRepo<WithoutExtParams> {
 
     private val tag = "BTReporter"
     private val sppid: UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-    private lateinit var outputStream: OutputStream
+    private lateinit var rotationOutputStream: OutputStream
     private var rotationConnectionJob: Job? = null
     private var rotationReportingJob: Job? = null
-    private var connected = false
-    private var connecting = false
+    private var rotationConnected = false
+    private var rotationConnecting = false
+    private lateinit var frequencyOutputStream: OutputStream
+    private var frequencyConnectionJob: Job? = null
+    private var frequencyReportingJob: Job? = null
+    private var frequencyConnected = false
+    private var frequencyConnecting = false
 
-    fun isConnected(): Boolean = connected
+    fun isRotationConnected(): Boolean = rotationConnected
+    fun isRotationConnecting(): Boolean = rotationConnecting
+    fun isFrequencyConnected(): Boolean = frequencyConnected
+    fun isFrequencyConnecting(): Boolean = frequencyConnecting
 
-    fun isConnecting(): Boolean = connecting
-
-    fun connectBTDevice(deviceId: String) {
-        if (!connected) {
+    fun connectBTRotatorDevice(deviceId: String) {
+        if (!rotationConnected) {
             rotationConnectionJob = reporterScope.launch {
                 try {
                     bluetoothManager.adapter.getRemoteDevice(deviceId)?.let { device ->
                         device.createInsecureRfcommSocketToServiceRecord(sppid)?.let { socket ->
-                            connecting = true
+                            rotationConnecting = true
                             socket.connect()
-                            outputStream = socket.outputStream
-                            connected = true
-                            connecting = false
+                            rotationOutputStream = socket.outputStream
+                            rotationConnected = true
+                            rotationConnecting = false
                             Log.i(tag, "$tag: Connected!")
                         }
                     }
@@ -66,13 +78,38 @@ class BluetoothReporter(
         }
     }
 
-    fun reportRotation(format: String, azimuth: Int, elevation: Int) {
-        if (connected) {
-            rotationReportingJob = reporterScope.launch {
-                val newElevation = if (elevation > 0) elevation else 0
+    fun connectBTFrequencyDevice(deviceId: String) {
+        if (!frequencyConnected) {
+            frequencyConnectionJob = reporterScope.launch {
                 try {
-                    val azimuthString = intToStringWithLeadingZeroes(azimuth)
-                    val elevationString = intToStringWithLeadingZeroes(newElevation)
+                    bluetoothManager.adapter.getRemoteDevice(deviceId)?.let { device ->
+                        device.createInsecureRfcommSocketToServiceRecord(sppid)?.let { socket ->
+                            frequencyConnecting = true
+                            socket.connect()
+                            frequencyOutputStream = socket.outputStream
+                            frequencyConnected = true
+                            frequencyConnecting = false
+                            Log.i(tag, "$tag: Frequency Connected!")
+                        }
+                    }
+                } catch (e: SecurityException) {
+                    Log.e(tag, "$tag: ${e.message}")
+                } catch (e: Exception) {
+                    Log.e(tag, "$tag: ${e.message}")
+                    frequencyConnected = false
+                    frequencyConnecting = false
+                }
+            }
+        }
+    }
+
+    override fun reportRotation(format: String, azimuth: Double, elevation: Double, params: WithoutExtParams) {
+        if (rotationConnected) {
+            rotationReportingJob = reporterScope.launch {
+                val newElevation = if (elevation > 0.0) elevation else 0.0
+                try {
+                    val azimuthString = intToStringWithLeadingZeroes(azimuth.toInt())
+                    val elevationString = intToStringWithLeadingZeroes(newElevation.toInt())
                     val crChar = '\r'
                     val nlChar = '\n'
                     val tbChar = '\t'
@@ -82,10 +119,33 @@ class BluetoothReporter(
                     buffer = buffer.replace("\\n", nlChar.toString())
                     buffer = buffer.replace("\\t", tbChar.toString())
                     Log.i(tag, "$tag: Sending $buffer")
-                    if (connected) outputStream.write(buffer.toByteArray())
+                    if (rotationConnected) rotationOutputStream.write(buffer.toByteArray())
                 } catch (e: Exception) {
                     Log.e(tag, "$tag: ${e.message}")
-                    connected = false
+                    rotationConnected = false
+                }
+            }
+        }
+    }
+
+    override fun reportFrequency(format: String, frequency: Long, params: WithoutExtParams) {
+        if (frequencyConnected) {
+            frequencyReportingJob = reporterScope.launch {
+                try {
+                    val crChar = '\r'
+                    val nlChar = '\n'
+                    val tbChar = '\t'
+                    var buffer = format.replace("\$FREQ", frequency.toString())
+                    buffer = buffer.replace("\\r", crChar.toString())
+                    buffer = buffer.replace("\\n", nlChar.toString())
+                    buffer = buffer.replace("\\t", tbChar.toString())
+                    Log.i(tag, "$tag: Sending $buffer")
+                    if (frequencyConnected) {
+                        frequencyOutputStream.write(buffer.toByteArray())
+                    }
+                } catch (e: Exception) {
+                    Log.e(tag, "$tag: ${e.message}")
+                    frequencyConnected = false
                 }
             }
         }
