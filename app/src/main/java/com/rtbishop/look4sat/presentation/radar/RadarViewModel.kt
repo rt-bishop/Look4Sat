@@ -27,6 +27,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.MainApplication
 import com.rtbishop.look4sat.data.framework.WithoutExtParams
 import com.rtbishop.look4sat.data.framework.BluetoothReporter
+import com.rtbishop.look4sat.data.framework.BtService
 import com.rtbishop.look4sat.data.framework.ExtendedParams
 import com.rtbishop.look4sat.data.framework.NetworkReporter
 import com.rtbishop.look4sat.domain.model.SatRadio
@@ -166,27 +167,27 @@ class RadarViewModel(
         viewModelScope.launch {
             if (settingsRepo.rcSettings.value.bluetoothRotatorState) {
                 val btRotatorDevice = settingsRepo.rcSettings.value.bluetoothRotatorAddress
-                if (bluetoothReporter.isRotationConnected()) {
+                if (bluetoothReporter.isConnected(BtService.ROTATOR)) {
                     val format = settingsRepo.rcSettings.value.bluetoothRotatorFormat
                     val azimuth = orbitalPos.azimuth.toDegrees().round(0)
                     val elevation = orbitalPos.elevation.toDegrees().round(0)
                     bluetoothReporter.reportRotation(format, azimuth, elevation, WithoutExtParams(0))
-                } else if (!bluetoothReporter.isRotationConnecting()) {
+                } else if (!bluetoothReporter.isConnecting(BtService.ROTATOR)) {
 //                    Log.i("BTReporter", "BTReporter (rotator): Attempting to connect...")
-                    bluetoothReporter.connectBTRotatorDevice(btRotatorDevice)
+                    bluetoothReporter.connect(BtService.ROTATOR,btRotatorDevice)
                 }
             }
             if (settingsRepo.rcSettings.value.bluetoothFrequencyState) {
                 val btFrequencyDevice = settingsRepo.rcSettings.value.bluetoothFrequencyAddress
-                if (bluetoothReporter.isFrequencyConnected()) {
+                if (bluetoothReporter.isConnected(BtService.FREQUENCY)) {
                     val format = settingsRepo.rcSettings.value.bluetoothFrequencyFormat
                     val frequency = _uiState.value.selectedFrequency
                     frequency?.let { freq ->
                         bluetoothReporter.reportFrequency(format, freq, WithoutExtParams(0))
                     }
-                } else if (!bluetoothReporter.isFrequencyConnecting()) {
+                } else if (!bluetoothReporter.isConnecting(BtService.FREQUENCY)) {
 //                    Log.i("BTReporter", "BTReporter (frequency): Attempting to connect...")
-                    bluetoothReporter.connectBTFrequencyDevice(btFrequencyDevice)
+                    bluetoothReporter.connect(BtService.FREQUENCY, btFrequencyDevice)
                 }
             }
         }
