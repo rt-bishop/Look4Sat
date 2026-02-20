@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.rtbishop.look4sat.presentation.LocalSpacing
+import com.rtbishop.look4sat.domain.model.RCSettings
 
 @Preview(showBackground = true)
 @Composable
@@ -196,6 +197,286 @@ fun DataSourcesDialog(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = isEnabledCustomTransceivers.value,
             )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewNetworkOutputDialog() {
+    MainTheme {
+        NetworkOutputDialog(
+            initialSettings = RCSettings(
+                rotatorState = false,
+                rotatorAddress = "127.0.0.1",
+                rotatorPort = "4533",
+                rotatorFormat = $$"P $AZ $EL",
+                frequencyState = false,
+                frequencyAddress = "127.0.0.1",
+                frequencyPort = "4532",
+                frequencyFormat = $$"set_freq $FREQ",
+                bluetoothRotatorState = false,
+                bluetoothRotatorFormat = $$"W$AZ $EL",
+                bluetoothRotatorName = "Default",
+                bluetoothRotatorAddress = "00:0C:BF:13:80:5D",
+                bluetoothFrequencyState = false,
+                bluetoothFrequencyAddress = "00:0C:BF:13:80:5D",
+                bluetoothFrequencyFormat = $$"FA$FREQ"
+            ),
+            onDismiss = {},
+            onSave = { _, _, _, _, _, _, _, _ -> }
+        )
+    }
+}
+
+@Composable
+fun NetworkOutputDialog(
+    initialSettings: RCSettings,
+    onDismiss: () -> Unit,
+    onSave: (
+        Boolean, String, String, String,
+        Boolean, String, String, String
+    ) -> Unit
+) {
+    val rotatorState = rememberSaveable { mutableStateOf(initialSettings.rotatorState) }
+    val rotatorAddress = rememberSaveable { mutableStateOf(initialSettings.rotatorAddress) }
+    val rotatorPort = rememberSaveable { mutableStateOf(initialSettings.rotatorPort) }
+    val rotatorFormat = rememberSaveable { mutableStateOf(initialSettings.rotatorFormat) }
+    val frequencyState = rememberSaveable { mutableStateOf(initialSettings.frequencyState) }
+    val frequencyAddress = rememberSaveable { mutableStateOf(initialSettings.frequencyAddress) }
+    val frequencyPort = rememberSaveable { mutableStateOf(initialSettings.frequencyPort) }
+    val frequencyFormat = rememberSaveable { mutableStateOf(initialSettings.frequencyFormat) }
+    val onAccept = {
+        onSave(
+            rotatorState.value,
+            rotatorAddress.value,
+            rotatorPort.value,
+            rotatorFormat.value,
+            frequencyState.value,
+            frequencyAddress.value,
+            frequencyPort.value,
+            frequencyFormat.value
+        )
+        onDismiss()
+    }
+    SharedDialog(
+        title = stringResource(R.string.prefs_net_title),
+        onCancel = onDismiss,
+        onAccept = onAccept
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.prefs_net_rotator_switch))
+                Switch(
+                    checked = rotatorState.value,
+                    onCheckedChange = { rotatorState.value = it }
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = rotatorAddress.value,
+                    onValueChange = { rotatorAddress.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_net_rotator_ip_hint)) },
+                    modifier = Modifier.weight(1.5f),
+                    enabled = rotatorState.value
+                )
+                OutlinedTextField(
+                    value = rotatorPort.value,
+                    onValueChange = { rotatorPort.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_net_rotator_port_hint)) },
+                    modifier = Modifier.weight(1f),
+                    enabled = rotatorState.value
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = rotatorFormat.value,
+                onValueChange = { rotatorFormat.value = it },
+                singleLine = true,
+                label = { Text(stringResource(R.string.prefs_net_rotator_format_hint)) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = rotatorState.value
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.prefs_net_frequency_switch))
+                Switch(
+                    checked = frequencyState.value,
+                    onCheckedChange = { frequencyState.value = it }
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = frequencyAddress.value,
+                    onValueChange = { frequencyAddress.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_net_frequency_ip_hint)) },
+                    modifier = Modifier.weight(1.5f),
+                    enabled = frequencyState.value
+                )
+                OutlinedTextField(
+                    value = frequencyPort.value,
+                    onValueChange = { frequencyPort.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_net_frequency_port_hint)) },
+                    modifier = Modifier.weight(1f),
+                    enabled = frequencyState.value
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = frequencyFormat.value,
+                onValueChange = { frequencyFormat.value = it },
+                maxLines = 2,
+                label = { Text(stringResource(R.string.prefs_net_frequency_format_hint)) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = frequencyState.value
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewBluetoothOutputDialog() {
+    MainTheme {
+        BluetoothOutputDialog(
+            initialSettings = RCSettings(
+                rotatorState = false,
+                rotatorAddress = "127.0.0.1",
+                rotatorPort = "4533",
+                rotatorFormat = $$"P $AZ $EL",
+                frequencyState = false,
+                frequencyAddress = "127.0.0.1",
+                frequencyPort = "4532",
+                frequencyFormat = $$"set_freq $FREQ",
+                bluetoothRotatorState = false,
+                bluetoothRotatorFormat = $$"W$AZ $EL",
+                bluetoothRotatorName = "Default",
+                bluetoothRotatorAddress = "00:0C:BF:13:80:5D",
+                bluetoothFrequencyState = false,
+                bluetoothFrequencyAddress = "00:0C:BF:13:80:5D",
+                bluetoothFrequencyFormat = $$"FA$FREQ"
+            ),
+            onDismiss = {},
+            onSave = { _, _, _, _, _, _ -> }
+        )
+    }
+}
+
+@Composable
+fun BluetoothOutputDialog(
+    initialSettings: RCSettings,
+    onDismiss: () -> Unit,
+    onSave: (
+        Boolean, String, String,
+        Boolean, String, String
+    ) -> Unit
+) {
+    val rotatorState = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorState) }
+    val rotatorAddress = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorAddress) }
+    val rotatorFormat = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorFormat) }
+    val frequencyState = rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyState) }
+    val frequencyAddress = rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyAddress) }
+    val frequencyFormat = rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyFormat) }
+    val onAccept = {
+        onSave(
+            rotatorState.value,
+            rotatorAddress.value,
+            rotatorFormat.value,
+            frequencyState.value,
+            frequencyAddress.value,
+            frequencyFormat.value
+        )
+        onDismiss()
+    }
+    SharedDialog(
+        title = stringResource(R.string.prefs_bt_title),
+        onCancel = onDismiss,
+        onAccept = onAccept
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.prefs_bt_rotator_switch))
+                Switch(
+                    checked = rotatorState.value,
+                    onCheckedChange = { rotatorState.value = it }
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = rotatorAddress.value,
+                    onValueChange = { rotatorAddress.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_bt_rotator_device_hint)) },
+                    modifier = Modifier.weight(1.5f),
+                    enabled = rotatorState.value
+                )
+                OutlinedTextField(
+                    value = rotatorFormat.value,
+                    onValueChange = { rotatorFormat.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_bt_rotator_output_hint)) },
+                    modifier = Modifier.weight(1f),
+                    enabled = rotatorState.value
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.prefs_bt_frequency_switch))
+                Switch(
+                    checked = frequencyState.value,
+                    onCheckedChange = { frequencyState.value = it }
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = frequencyAddress.value,
+                    onValueChange = { frequencyAddress.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_bt_frequency_device_hint)) },
+                    modifier = Modifier.weight(1.5f),
+                    enabled = frequencyState.value
+                )
+                OutlinedTextField(
+                    value = frequencyFormat.value,
+                    onValueChange = { frequencyFormat.value = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.prefs_bt_frequency_output_hint)) },
+                    modifier = Modifier.weight(1f),
+                    enabled = frequencyState.value
+                )
+            }
         }
     }
 }

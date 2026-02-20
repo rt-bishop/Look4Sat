@@ -112,15 +112,27 @@
     <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
 
+    <string name="prefs_data_output_title">Data output</string>
+    <string name="prefs_net_output">Network</string>
+    <string name="prefs_bt_output">Bluetooth</string>
+
     <string name="prefs_net_title">Вивід мережевих даних</string>
-    <string name="prefs_net_switch">Увімкнути вихід</string>
-    <string name="prefs_net_ip_hint">IP адреса</string>
-    <string name="prefs_net_port_hint">Порт</string>
+    <string name="prefs_net_rotator_switch">Enable rotation output</string>
+    <string name="prefs_net_rotator_ip_hint">IP адреса</string>
+    <string name="prefs_net_rotator_port_hint">Порт</string>
+    <string name="prefs_net_rotator_format_hint">Формат даних</string>
+    <string name="prefs_net_frequency_switch">Enable frequency output</string>
+    <string name="prefs_net_frequency_ip_hint">IP адреса</string>
+    <string name="prefs_net_frequency_port_hint">Порт</string>
+    <string name="prefs_net_frequency_format_hint">Формат даних</string>
 
     <string name="prefs_bt_title">Вивід даних Bluetooth</string>
-    <string name="prefs_bt_switch">Увімкнути вихід</string>
-    <string name="prefs_bt_device_hint">Id пристрою</string>
-    <string name="prefs_bt_output_hint">Формат даних</string>
+    <string name="prefs_bt_rotator_switch">Enable rotation output</string>
+    <string name="prefs_bt_rotator_device_hint">Id пристрою</string>
+    <string name="prefs_bt_rotator_output_hint">Формат даних</string>
+    <string name="prefs_bt_frequency_switch">Enable frequency output</string>
+    <string name="prefs_bt_frequency_device_hint">Id пристрою</string>
+    <string name="prefs_bt_frequency_output_hint">Формат даних</string>
     <string name="prefs_bt_perm_error">Перевірте дозвіл Bluetooth</string>
 
     <string name="prefs_other_title">Інші налаштування</string>

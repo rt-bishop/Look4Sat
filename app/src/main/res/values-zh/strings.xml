@@ -104,15 +104,27 @@
     <string name="prefs_data_sources_tle_switch">自定义TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">自定义收发器URL</string>
 
+    <string name="prefs_data_output_title">Data output</string>
+    <string name="prefs_net_output">Network</string>
+    <string name="prefs_bt_output">Bluetooth</string>
+
     <string name="prefs_net_title">网络数据输出</string>
-    <string name="prefs_net_switch">启用输出</string>
-    <string name="prefs_net_ip_hint">IP地址</string>
-    <string name="prefs_net_port_hint">端口</string>
+    <string name="prefs_net_rotator_switch">Enable rotation output</string>
+    <string name="prefs_net_rotator_ip_hint">IP地址</string>
+    <string name="prefs_net_rotator_port_hint">端口</string>
+    <string name="prefs_net_rotator_format_hint">数据格式</string>
+    <string name="prefs_net_frequency_switch">Enable frequency output</string>
+    <string name="prefs_net_frequency_ip_hint">IP地址</string>
+    <string name="prefs_net_frequency_port_hint">端口</string>
+    <string name="prefs_net_frequency_format_hint">数据格式</string>
 
     <string name="prefs_bt_title">蓝牙数据输出</string>
-    <string name="prefs_bt_switch">启用输出</string>
-    <string name="prefs_bt_device_hint">蓝牙设备 ID</string>
-    <string name="prefs_bt_output_hint">数据格式</string>
+    <string name="prefs_bt_rotator_switch">Enable rotation output</string>
+    <string name="prefs_bt_rotator_device_hint">蓝牙设备 ID</string>
+    <string name="prefs_bt_rotator_output_hint">数据格式</string>
+    <string name="prefs_bt_frequency_switch">Enable frequency output</string>
+    <string name="prefs_bt_frequency_device_hint">蓝牙设备 ID</string>
+    <string name="prefs_bt_frequency_output_hint">数据格式</string>
     <string name="prefs_bt_perm_error">请检查蓝牙权限</string>
 
     <string name="prefs_other_title">其他设置</string>

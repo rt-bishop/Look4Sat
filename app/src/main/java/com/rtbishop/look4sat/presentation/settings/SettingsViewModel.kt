@@ -152,10 +152,18 @@ class SettingsViewModel(
             is RCAction.SetRotatorState -> settingsRepo.setRotatorState(action.value)
             is RCAction.SetRotatorAddress -> settingsRepo.setRotatorAddress(action.value)
             is RCAction.SetRotatorPort -> settingsRepo.setRotatorPort(action.value)
-            is RCAction.SetBluetoothState -> settingsRepo.setBluetoothState(action.value)
-            is RCAction.SetBluetoothAddress -> settingsRepo.setBluetoothAddress(action.value)
-            is RCAction.SetBluetoothFormat -> settingsRepo.setBluetoothFormat(action.value)
-            is RCAction.SetBluetoothName -> settingsRepo.setBluetoothName(action.value)
+            is RCAction.SetRotatorFormat -> settingsRepo.setRotatorFormat(action.value)
+            is RCAction.SetFrequencyState -> settingsRepo.setFrequencyState(action.value)
+            is RCAction.SetFrequencyAddress -> settingsRepo.setFrequencyAddress(action.value)
+            is RCAction.SetFrequencyPort -> settingsRepo.setFrequencyPort(action.value)
+            is RCAction.SetFrequencyFormat -> settingsRepo.setFrequencyFormat(action.value)
+            is RCAction.SetBluetoothRotatorState -> settingsRepo.setBluetoothRotatorState(action.value)
+            is RCAction.SetBluetoothRotatorAddress -> settingsRepo.setBluetoothRotatorAddress(action.value)
+            is RCAction.SetBluetoothRotatorFormat -> settingsRepo.setBluetoothRotatorFormat(action.value)
+            is RCAction.SetBluetoothRotatorName -> settingsRepo.setBluetoothRotatorName(action.value)
+            is RCAction.SetBluetoothFrequencyState -> settingsRepo.setBluetoothFrequencyState(action.value)
+            is RCAction.SetBluetoothFrequencyFormat -> settingsRepo.setBluetoothFrequencyFormat(action.value)
+            is RCAction.SetBluetoothFrequencyAddress -> settingsRepo.setBluetoothFrequencyAddress(action.value)
         }
     }
 

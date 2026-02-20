@@ -111,15 +111,27 @@
     <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">Custom Transceivers URL</string>
 
+    <string name="prefs_data_output_title">Вывод данных</string>
+    <string name="prefs_net_output">Сеть</string>
+    <string name="prefs_bt_output">Bluetooth</string>
+
     <string name="prefs_net_title">Вывод сетевых данных</string>
-    <string name="prefs_net_switch">Включить вывод</string>
-    <string name="prefs_net_ip_hint">IP адрес</string>
-    <string name="prefs_net_port_hint">Порт</string>
+    <string name="prefs_net_rotator_switch">Включить вывод ротатора</string>
+    <string name="prefs_net_rotator_ip_hint">IP адрес</string>
+    <string name="prefs_net_rotator_port_hint">Порт</string>
+    <string name="prefs_net_rotator_format_hint">Формат</string>
+    <string name="prefs_net_frequency_switch">Включить вывод частоты</string>
+    <string name="prefs_net_frequency_ip_hint">IP адрес</string>
+    <string name="prefs_net_frequency_port_hint">Порт</string>
+    <string name="prefs_net_frequency_format_hint">Формат</string>
 
     <string name="prefs_bt_title">Вывод данных Bluetooth</string>
-    <string name="prefs_bt_switch">Включить вывод</string>
-    <string name="prefs_bt_device_hint">Id устройства</string>
-    <string name="prefs_bt_output_hint">Формат данных</string>
+    <string name="prefs_bt_rotator_switch">Включить вывод ротатора</string>
+    <string name="prefs_bt_rotator_device_hint">Id устройства</string>
+    <string name="prefs_bt_rotator_output_hint">Формат</string>
+    <string name="prefs_bt_frequency_switch">Включить вывод частоты</string>
+    <string name="prefs_bt_frequency_device_hint">Id устройства</string>
+    <string name="prefs_bt_frequency_output_hint">Формат</string>
     <string name="prefs_bt_perm_error">Нет разрешения использовать bluetooth</string>
 
     <string name="prefs_other_title">Другие настройки</string>

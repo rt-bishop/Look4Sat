@@ -33,10 +33,18 @@ data class RCSettings(
     val rotatorState: Boolean,
     val rotatorAddress: String,
     val rotatorPort: String,
-    val bluetoothState: Boolean,
-    val bluetoothFormat: String,
-    val bluetoothName: String,
-    val bluetoothAddress: String,
+    val rotatorFormat: String,
+    val frequencyState: Boolean,
+    val frequencyAddress: String,
+    val frequencyPort: String,
+    val frequencyFormat: String,
+    val bluetoothRotatorState: Boolean,
+    val bluetoothRotatorFormat: String,
+    val bluetoothRotatorName: String,
+    val bluetoothRotatorAddress: String,
+    val bluetoothFrequencyState: Boolean,
+    val bluetoothFrequencyFormat: String,
+    val bluetoothFrequencyAddress: String
 )
 
 data class OtherSettings(

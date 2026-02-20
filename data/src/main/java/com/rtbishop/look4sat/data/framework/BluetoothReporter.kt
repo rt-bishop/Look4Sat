@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.data.framework
 
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothSocket
 import android.util.Log
 import java.io.OutputStream
 import java.util.*
@@ -25,69 +26,110 @@ import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import com.rtbishop.look4sat.domain.repository.IReporterParams
+import com.rtbishop.look4sat.domain.repository.IReporterRepo
+
+data class WithoutExtParams(
+    val dummy: Int
+) : IReporterParams
+
+enum class BtService { ROTATOR, FREQUENCY }
+
+data class DeviceConnection(
+    var socket: BluetoothSocket? = null,
+    var outputStream: OutputStream? = null,
+    var connected: Boolean = false,
+    var connecting: Boolean = false,
+    var connectionJob: Job? = null
+)
 
 class BluetoothReporter(
     private val bluetoothManager: BluetoothManager,
     private val reporterScope: CoroutineScope
-) {
+) : IReporterRepo<WithoutExtParams> {
 
     private val tag = "BTReporter"
     private val sppid: UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
-    private lateinit var outputStream: OutputStream
-    private var rotationConnectionJob: Job? = null
-    private var rotationReportingJob: Job? = null
-    private var connected = false
-    private var connecting = false
 
-    fun isConnected(): Boolean = connected
+    private val serviceToDevice = mutableMapOf<BtService, String>()
+    private val deviceConnections = mutableMapOf<String, DeviceConnection>()
+    private val writeMutex = Mutex()
 
-    fun isConnecting(): Boolean = connecting
+    fun isConnected(service: BtService): Boolean {
+        val deviceId = serviceToDevice[service] ?: return false
+        return deviceConnections[deviceId]?.connected == true
+    }
+    fun isConnecting(service: BtService): Boolean {
+        val deviceId = serviceToDevice[service] ?: return false
+        return deviceConnections[deviceId]?.connecting == true
+    }
 
-    fun connectBTDevice(deviceId: String) {
-        if (!connected) {
-            rotationConnectionJob = reporterScope.launch {
-                try {
-                    bluetoothManager.adapter.getRemoteDevice(deviceId)?.let { device ->
-                        device.createInsecureRfcommSocketToServiceRecord(sppid)?.let { socket ->
-                            connecting = true
-                            socket.connect()
-                            outputStream = socket.outputStream
-                            connected = true
-                            connecting = false
-                            Log.i(tag, "$tag: Connected!")
-                        }
-                    }
-                } catch (e: SecurityException) {
-                    Log.e(tag, "$tag: ${e.message}")
-                } catch (e: Exception) {
-                    Log.e(tag, "$tag: ${e.message}")
-                }
+    fun connect(service: BtService, deviceId: String) {
+        serviceToDevice[service] = deviceId
+        val connection = deviceConnections.getOrPut(deviceId) {
+            DeviceConnection()
+        }
+        if (connection.connected || connection.connecting) return
+        connection.connectionJob = reporterScope.launch {
+            try {
+                connection.connecting = true
+                val device = bluetoothManager.adapter.getRemoteDevice(deviceId)
+                val socket = device.createInsecureRfcommSocketToServiceRecord(sppid)
+                socket.connect()
+                connection.socket = socket
+                connection.outputStream = socket.outputStream
+                connection.connected = true
+                Log.i(tag, "$tag: Connected to $deviceId")
+            } catch (e: Exception) {
+                Log.e(tag, "$tag: ${e.message}")
+                connection.connected = false
+            } finally {
+                connection.connecting = false
             }
         }
     }
 
-    fun reportRotation(format: String, azimuth: Int, elevation: Int) {
-        if (connected) {
-            rotationReportingJob = reporterScope.launch {
-                val newElevation = if (elevation > 0) elevation else 0
-                try {
-                    val azimuthString = intToStringWithLeadingZeroes(azimuth)
-                    val elevationString = intToStringWithLeadingZeroes(newElevation)
-                    val crChar = '\r'
-                    val nlChar = '\n'
-                    val tbChar = '\t'
-                    var buffer = format.replace("\$AZ", azimuthString)
-                    buffer = buffer.replace("\$EL", elevationString)
-                    buffer = buffer.replace("\\r", crChar.toString())
-                    buffer = buffer.replace("\\n", nlChar.toString())
-                    buffer = buffer.replace("\\t", tbChar.toString())
-                    Log.i(tag, "$tag: Sending $buffer")
-                    if (connected) outputStream.write(buffer.toByteArray())
-                } catch (e: Exception) {
-                    Log.e(tag, "$tag: ${e.message}")
-                    connected = false
-                }
+    private suspend fun write(service: BtService, buffer: String) {
+        val deviceId = serviceToDevice[service] ?: return
+        val connection = deviceConnections[deviceId] ?: return
+        if (!connection.connected) return
+        try {
+            writeMutex.withLock {
+                connection.outputStream?.write(buffer.toByteArray())
             }
+        } catch (e: Exception) {
+            Log.e(tag, "$tag: Write failed ${e.message}")
+            connection.connected = false
+        }
+    }
+
+    override fun reportRotation(format: String, azimuth: Double, elevation: Double, params: WithoutExtParams) {
+        reporterScope.launch {
+            if (!isConnected(BtService.ROTATOR)) return@launch
+            val newElevation = if (elevation > 0.0) elevation else 0.0
+            val azimuthString = intToStringWithLeadingZeroes(azimuth.toInt())
+            val elevationString = intToStringWithLeadingZeroes(newElevation.toInt())
+            var buffer = format
+                .replace("\$AZ", azimuthString)
+                .replace("\$EL", elevationString)
+                .replace("\\r", "\r")
+                .replace("\\n", "\n")
+                .replace("\\t", "\t")
+            write(BtService.ROTATOR, buffer)
+        }
+    }
+
+    override fun reportFrequency(format: String, frequency: Long, params: WithoutExtParams) {
+        reporterScope.launch {
+            if (!isConnected(BtService.FREQUENCY)) return@launch
+            var buffer = format
+                .replace("\$FREQ", frequency.toString())
+                .replace("\\r", "\r")
+                .replace("\\n", "\n")
+                .replace("\\t", "\t")
+            write(BtService.FREQUENCY, buffer)
         }
     }
 

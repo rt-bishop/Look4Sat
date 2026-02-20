@@ -37,7 +37,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,7 +59,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.R
 import com.rtbishop.look4sat.domain.model.OtherSettings
-import com.rtbishop.look4sat.domain.model.RCSettings
 import com.rtbishop.look4sat.domain.predict.GeoPos
 import com.rtbishop.look4sat.presentation.MainTheme
 import com.rtbishop.look4sat.presentation.Screen
@@ -87,19 +85,6 @@ fun NavGraphBuilder.settingsDestination() {
 
 @Composable
 private fun SettingsScreen(uiState: SettingsState) {
-    // Permissions setup
-    val bluetoothContract = ActivityResultContracts.RequestPermission()
-    val bluetoothError = stringResource(R.string.prefs_bt_perm_error)
-    val bluetoothPerm = when {
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
-        else -> Manifest.permission.BLUETOOTH_CONNECT
-    }
-    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
-        if (!isGranted) {
-            uiState.sendRCAction(RCAction.SetBluetoothState(false))
-            uiState.sendSystemAction(SystemAction.ShowToast(bluetoothError))
-        }
-    }
     val locationContract = ActivityResultContracts.RequestMultiplePermissions()
     val locationError = stringResource(R.string.prefs_loc_gps_error)
     val locationPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
@@ -180,12 +165,84 @@ private fun SettingsScreen(uiState: SettingsState) {
     val setRotatorState = { value: Boolean -> uiState.sendRCAction(RCAction.SetRotatorState(value)) }
     val setRotatorAddress = { value: String -> uiState.sendRCAction(RCAction.SetRotatorAddress(value)) }
     val setRotatorPort = { value: String -> uiState.sendRCAction(RCAction.SetRotatorPort(value)) }
-    val setBluetoothState = { value: Boolean ->
-        bluetoothRequest.launch(bluetoothPerm)
-        uiState.sendRCAction(RCAction.SetBluetoothState(value))
+    val setRotatorFormat = { value: String -> uiState.sendRCAction(RCAction.SetRotatorFormat(value)) }
+    val setFrequencyState = { value: Boolean -> uiState.sendRCAction(RCAction.SetFrequencyState(value)) }
+    val setFrequencyAddress = { value: String -> uiState.sendRCAction(RCAction.SetFrequencyAddress(value)) }
+    val setFrequencyPort = { value: String -> uiState.sendRCAction(RCAction.SetFrequencyPort(value)) }
+    val setFrequencyFormat = { value: String -> uiState.sendRCAction(RCAction.SetFrequencyFormat(value)) }
+    val setBluetoothRotatorState = { value: Boolean -> uiState.sendRCAction(RCAction.SetBluetoothRotatorState(value)) }
+    val setBluetoothRotatorAddress = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothRotatorAddress(value)) }
+    val setBluetoothRotatorFormat = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothRotatorFormat(value)) }
+    val setBluetoothFrequencyState = { value: Boolean -> uiState.sendRCAction(RCAction.SetBluetoothFrequencyState(value)) }
+    val setBluetoothFrequencyAddress = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothFrequencyAddress(value)) }
+    val setBluetoothFrequencyFormat = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothFrequencyFormat(value)) }
+
+    // Network data output
+    val networkDialogState = rememberSaveable { mutableStateOf(false) }
+    val showNetworkDialog = { networkDialogState.value = true }
+    val dismissNetworkDialog = { networkDialogState.value = false }
+    if (networkDialogState.value) {
+        NetworkOutputDialog(
+            initialSettings = rcSettings,
+            onDismiss = dismissNetworkDialog,
+            onSave = { rotatorState,
+                       rotatorAddress,
+                       rotatorPort,
+                       rotatorFormat,
+                       frequencyState,
+                       frequencyAddress,
+                       frequencyPort,
+                       frequencyFormat ->
+                setRotatorState(rotatorState)
+                setRotatorAddress(rotatorAddress)
+                setRotatorPort(rotatorPort)
+                setRotatorFormat(rotatorFormat)
+                setFrequencyState(frequencyState)
+                setFrequencyAddress(frequencyAddress)
+                setFrequencyPort(frequencyPort)
+                setFrequencyFormat(frequencyFormat)
+            }
+        )
     }
-    val setBluetoothAddress = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothAddress(value)) }
-    val setBluetoothFormat = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothFormat(value)) }
+
+    // Bluetooth data output
+    val bluetoothDialogState = rememberSaveable { mutableStateOf(false) }
+    val bluetoothContract = ActivityResultContracts.RequestPermission()
+    val bluetoothError = stringResource(R.string.prefs_bt_perm_error)
+    val bluetoothPerm = when {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
+        else -> Manifest.permission.BLUETOOTH_CONNECT
+    }
+    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
+        if (!isGranted)
+        {
+            uiState.sendRCAction(RCAction.SetBluetoothRotatorState(false))
+            uiState.sendRCAction(RCAction.SetBluetoothFrequencyState(false))
+            uiState.sendSystemAction(SystemAction.ShowToast(bluetoothError))
+        }
+        else { bluetoothDialogState.value = true }
+    }
+    val showBluetoothDialog = { bluetoothRequest.launch(bluetoothPerm) }
+    val dismissBluetoothDialog = { bluetoothDialogState.value = false }
+    if (bluetoothDialogState.value) {
+        BluetoothOutputDialog(
+            initialSettings = rcSettings,
+            onDismiss = dismissBluetoothDialog,
+            onSave = { rotatorState,
+                       rotatorAddress,
+                       rotatorFormat,
+                       frequencyState,
+                       frequencyAddress,
+                       frequencyFormat ->
+                setBluetoothRotatorState(rotatorState)
+                setBluetoothRotatorAddress(rotatorAddress)
+                setBluetoothRotatorFormat(rotatorFormat)
+                setBluetoothFrequencyState(frequencyState)
+                setBluetoothFrequencyAddress(frequencyAddress)
+                setBluetoothFrequencyFormat(frequencyFormat)
+            }
+        )
+    }
 
     // Other settings
     val otherSettings = uiState.otherSettings
@@ -242,8 +299,7 @@ private fun SettingsScreen(uiState: SettingsState) {
                 LocationCard(posSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos, uiState.sendSystemAction)
             }
             item { DataCard(dataSettings, updateFromWeb, clearAllData, showDataSourcesDialog) }
-            item { NetworkOutputCard(rcSettings, setRotatorState, setRotatorAddress, setRotatorPort) }
-            item { BluetoothOutputCard(rcSettings, setBluetoothState, setBluetoothAddress, setBluetoothFormat) }
+            item { OutputCard({ showNetworkDialog() }, { showBluetoothDialog() }) }
             item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
             item { CardCredits() }
         }
@@ -375,126 +431,32 @@ private fun DataCard(
 
 @Preview(showBackground = true)
 @Composable
-private fun NetworkOutputCardPreview() = MainTheme {
-    val settings = RCSettings(
-        rotatorState = false,
-        rotatorAddress = "127.0.0.1",
-        rotatorPort = "4533",
-        bluetoothState = false,
-        bluetoothFormat = $$"W$AZ $EL",
-        bluetoothName = "Name",
-        bluetoothAddress = "00:0C:BF:13:80:5D"
-    )
-    NetworkOutputCard(settings)
-}
+private fun OutputCardPreview() = MainTheme { OutputCard({}, {}) }
 
 @Composable
-private fun NetworkOutputCard(
-    settings: RCSettings,
-    setRotatorState: (Boolean) -> Unit = {},
-    setRotatorAddress: (String) -> Unit = {},
-    setRotatorPort: (String) -> Unit = {}
+private fun OutputCard(
+    onNetworkClick: () -> Unit,
+    onBluetoothClick: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Text(
-                text = stringResource(id = R.string.prefs_net_title),
+                text = stringResource(id = R.string.prefs_data_output_title),
                 color = MaterialTheme.colorScheme.primary
             )
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(R.string.prefs_net_switch))
-                Switch(checked = settings.rotatorState, onCheckedChange = { setRotatorState(it) })
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = settings.rotatorAddress,
-                    singleLine = true,
-                    label = { Text(text = stringResource(R.string.prefs_net_ip_hint)) },
-                    onValueChange = { setRotatorAddress(it) },
-                    modifier = Modifier.weight(1.5f),
-                    enabled = settings.rotatorState
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                CardButton(
+                    onClick = onNetworkClick,
+                    text = stringResource(id = R.string.prefs_net_output),
+                    modifier = Modifier.weight(1f)
                 )
-                OutlinedTextField(
-                    value = settings.rotatorPort,
-                    onValueChange = { setRotatorPort(it) },
-                    label = { Text(text = stringResource(R.string.prefs_net_port_hint)) },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                    enabled = settings.rotatorState
+                CardButton(
+                    onClick = onBluetoothClick,
+                    text = stringResource(id = R.string.prefs_bt_output),
+                    modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun BluetoothOutputCardPreview() = MainTheme {
-    val settings = RCSettings(
-        rotatorState = false,
-        rotatorAddress = "127.0.0.1",
-        rotatorPort = "4533",
-        bluetoothState = false,
-        bluetoothFormat = $$"W$AZ $EL",
-        bluetoothName = "Name",
-        bluetoothAddress = "00:0C:BF:13:80:5D"
-    )
-    BluetoothOutputCard(settings)
-}
-
-@Composable
-private fun BluetoothOutputCard(
-    settings: RCSettings,
-    setBluetoothState: (Boolean) -> Unit = {},
-    setBluetoothAddress: (String) -> Unit = {},
-    setBluetoothFormat: (String) -> Unit = {}
-) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-            Text(
-                text = stringResource(id = R.string.prefs_bt_title),
-                color = MaterialTheme.colorScheme.primary
-            )
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(R.string.prefs_bt_switch))
-                Switch(checked = settings.bluetoothState, onCheckedChange = { setBluetoothState(it) })
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = settings.bluetoothAddress,
-                    singleLine = true,
-                    label = { Text(text = stringResource(R.string.prefs_bt_device_hint)) },
-                    onValueChange = { setBluetoothAddress(it) },
-                    modifier = Modifier.weight(1.5f),
-                    enabled = settings.bluetoothState
-                )
-                OutlinedTextField(
-                    value = settings.bluetoothFormat,
-                    onValueChange = { setBluetoothFormat(it) },
-                    label = { Text(text = stringResource(R.string.prefs_bt_output_hint)) },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                    enabled = settings.bluetoothState
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }

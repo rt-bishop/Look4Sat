@@ -55,13 +55,22 @@ interface ISettingsRepo {
 
     //region # RC settings
     val rcSettings: StateFlow<RCSettings>
-    fun setBluetoothAddress(value: String)
-    fun setBluetoothFormat(value: String)
-    fun setBluetoothName(value: String)
-    fun setBluetoothState(value: Boolean)
+    fun setBluetoothRotatorAddress(value: String)
+    fun setBluetoothRotatorFormat(value: String)
+    fun setBluetoothRotatorName(value: String)
+    fun setBluetoothRotatorState(value: Boolean)
+    fun setBluetoothFrequencyAddress(value: String)
+    fun setBluetoothFrequencyFormat(value: String)
+    fun setBluetoothFrequencyState(value: Boolean)
     fun setRotatorAddress(value: String)
     fun setRotatorPort(value: String)
     fun setRotatorState(value: Boolean)
+    fun setRotatorFormat(value: String)
+    fun setFrequencyAddress(value: String)
+    fun setFrequencyPort(value: String)
+    fun setFrequencyState(value: Boolean)
+    fun setFrequencyFormat(value: String)
+
     //endregion
 
     //region # Other settings
