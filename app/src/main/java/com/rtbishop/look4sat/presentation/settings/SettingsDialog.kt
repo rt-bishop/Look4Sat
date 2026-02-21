@@ -238,6 +238,7 @@ fun NetworkOutputDialog(
         Boolean, String, String, String
     ) -> Unit
 ) {
+    val padding = LocalSpacing.current.large
     val rotatorState = rememberSaveable { mutableStateOf(initialSettings.rotatorState) }
     val rotatorAddress = rememberSaveable { mutableStateOf(initialSettings.rotatorAddress) }
     val rotatorPort = rememberSaveable { mutableStateOf(initialSettings.rotatorPort) }
@@ -264,7 +265,7 @@ fun NetworkOutputDialog(
         onCancel = onDismiss,
         onAccept = onAccept
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = padding)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -277,7 +278,7 @@ fun NetworkOutputDialog(
                 )
             }
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
@@ -297,7 +298,7 @@ fun NetworkOutputDialog(
                     enabled = rotatorState.value
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = rotatorFormat.value,
                 onValueChange = { rotatorFormat.value = it },
@@ -306,7 +307,7 @@ fun NetworkOutputDialog(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = rotatorState.value
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -319,7 +320,7 @@ fun NetworkOutputDialog(
                 )
             }
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
@@ -339,7 +340,7 @@ fun NetworkOutputDialog(
                     enabled = frequencyState.value
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = frequencyFormat.value,
                 onValueChange = { frequencyFormat.value = it },
@@ -389,6 +390,7 @@ fun BluetoothOutputDialog(
         Boolean, String, String
     ) -> Unit
 ) {
+    val padding = LocalSpacing.current.large
     val rotatorState = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorState) }
     val rotatorAddress = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorAddress) }
     val rotatorFormat = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorFormat) }
@@ -411,7 +413,7 @@ fun BluetoothOutputDialog(
         onCancel = onDismiss,
         onAccept = onAccept
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = padding)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -424,7 +426,7 @@ fun BluetoothOutputDialog(
                 )
             }
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
@@ -444,7 +446,7 @@ fun BluetoothOutputDialog(
                     enabled = rotatorState.value
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -457,7 +459,7 @@ fun BluetoothOutputDialog(
                 )
             }
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(

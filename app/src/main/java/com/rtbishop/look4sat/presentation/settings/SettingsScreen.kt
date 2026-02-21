@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -299,7 +300,7 @@ private fun SettingsScreen(uiState: SettingsState) {
                 LocationCard(posSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos, uiState.sendSystemAction)
             }
             item { DataCard(dataSettings, updateFromWeb, clearAllData, showDataSourcesDialog) }
-            item { OutputCard({ showNetworkDialog() }, { showBluetoothDialog() }) }
+            item(span = { GridItemSpan(maxLineSpan) }) { OutputCard({ showNetworkDialog() }, { showBluetoothDialog() }) }
             item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
             item { CardCredits() }
         }

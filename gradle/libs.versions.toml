@@ -1,6 +1,6 @@
 [versions]
 android-gradle-plugin = "9.0.1"
-google-ksp = "2.3.2"
+google-ksp = "2.3.5"
 kotlin = "2.3.10"
 
 androidx-core-ktx = "1.17.0"
