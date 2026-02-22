@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -14,3 +15,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Look4Sat"
 include(":app", ":data", ":domain")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
