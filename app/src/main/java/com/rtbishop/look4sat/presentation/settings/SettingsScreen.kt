@@ -472,7 +472,7 @@ private fun OtherCardPreview() = MainTheme {
         stateOfUtc = false,
         stateOfLightTheme = false,
         shouldSeeWarning = false,
-        shouldSeeWelcome = false
+        shouldSeeWhatsNew = false
     )
     OtherCard(settings = values, {}, {}, {}, {})
 }

@@ -110,12 +110,12 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
             uiState.takeAction(PassesAction.FilterRadios(modes))
         }
     }
-    if (uiState.shouldSeeWelcome) {
+    if (uiState.shouldSeeWhatsNew) {
         InfoDialog(
-            title = stringResource(R.string.pass_welcome_title),
-            text = stringResource(R.string.pass_welcome_message)
+            title = stringResource(R.string.pass_whatsnew_title),
+            text = stringResource(R.string.pass_whatsnew_message)
         ) {
-            uiState.takeAction(PassesAction.DismissWelcome)
+            uiState.takeAction(PassesAction.DismissWhatsNew)
         }
     }
     val gridState = rememberLazyGridState()

@@ -31,12 +31,12 @@ data class PassesState(
     val elevation: Double,
     val modes: List<String>,
     val itemsList: List<OrbitalPass>,
-    val shouldSeeWelcome: Boolean,
+    val shouldSeeWhatsNew: Boolean,
     val takeAction: (PassesAction) -> Unit
 )
 
 sealed class PassesAction {
-    data object DismissWelcome : PassesAction()
+    data object DismissWhatsNew : PassesAction()
     data class FilterPasses(val hoursAhead: Int, val minElevation: Double) : PassesAction()
     data class FilterRadios(val modes: List<String>) : PassesAction()
     data object RefreshPasses : PassesAction()

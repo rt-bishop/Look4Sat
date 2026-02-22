@@ -40,7 +40,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class PassesViewModel(
-    private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo
+    private val satelliteRepo: ISatelliteRepo,
+    private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -56,7 +57,7 @@ class PassesViewModel(
             elevation = settingsRepo.passesSettings.value.minElevation,
             modes = settingsRepo.passesSettings.value.selectedModes,
             itemsList = emptyList(),
-            shouldSeeWelcome = settingsRepo.otherSettings.value.shouldSeeWelcome,
+            shouldSeeWhatsNew = settingsRepo.otherSettings.value.shouldSeeWhatsNew,
             takeAction = ::handleAction
         )
     )
@@ -81,14 +82,14 @@ class PassesViewModel(
         }
         viewModelScope.launch {
             settingsRepo.otherSettings.collectLatest { settings ->
-                _uiState.update { it.copy(shouldSeeWelcome = settings.shouldSeeWelcome) }
+                _uiState.update { it.copy(shouldSeeWhatsNew = settings.shouldSeeWhatsNew) }
             }
         }
     }
 
     private fun handleAction(action: PassesAction) {
         when (action) {
-            PassesAction.DismissWelcome -> settingsRepo.setWelcomeDismissed()
+            PassesAction.DismissWhatsNew -> settingsRepo.setWhatsNewDismissed()
             is PassesAction.FilterPasses -> applyFilter(action.hoursAhead, action.minElevation, uiState.value.modes)
             is PassesAction.FilterRadios -> applyFilter(uiState.value.hours, uiState.value.elevation, action.modes)
             PassesAction.RefreshPasses -> refreshPasses()

@@ -46,8 +46,7 @@ class SettingsViewModel(
     private val databaseRepo: IDatabaseRepo,
     private val satelliteRepo: ISatelliteRepo,
     private val settingsRepo: ISettingsRepo,
-    private val showToast: IShowToast,
-    appVersionName: String
+    private val showToast: IShowToast
 ) : ViewModel() {
 
     private val defaultPosSettings = PositionSettings(false, settingsRepo.stationPosition.value, 0)
@@ -63,7 +62,7 @@ class SettingsViewModel(
             nextTime = "00:00:00",
             isNextTimeAos = true,
             nextPass = getDefaultPass(),
-            appVersionName = appVersionName,
+            appVersionName = settingsRepo.appVersionName,
             positionSettings = defaultPosSettings,
             dataSettings = defaultDataSettings,
             otherSettings = settingsRepo.otherSettings.value,
@@ -297,8 +296,7 @@ class SettingsViewModel(
                     container.databaseRepo,
                     container.satelliteRepo,
                     container.settingsRepo,
-                    container.provideShowToast(),
-                    container.provideAppVersionName()
+                    container.provideShowToast()
                 )
             }
         }

@@ -39,7 +39,8 @@ import kotlinx.coroutines.flow.update
 
 class SettingsRepo(
     private val locationManager: LocationManager,
-    private val preferences: SharedPreferences
+    private val preferences: SharedPreferences,
+    override val appVersionName: String
 ) : ISettingsRepo, LocationListenerCompat {
 
     private val keyBluetoothRotatorAddress = "bluetoothAddress"
@@ -76,7 +77,7 @@ class SettingsRepo(
     private val keyStationTimestamp = "stationTimestamp"
     private val keyUpdateTimestamp = "updateTimestamp"
     private val keyShouldSeeWarning = "shouldSeeWarning"
-    private val keyShouldSeeWelcome = "shouldSeeWelcome"
+    private val keyShouldSeeWhatsNew = "shouldSeeWhatsNew_v$appVersionName"
     private val keyUseCustomTle = "useCustomTle"
     private val keyUseCustomTransceivers = "useCustomTransceivers"
     private val keyTleUrl = "tleUrl"
@@ -376,9 +377,9 @@ class SettingsRepo(
         _otherSettings.update { it.copy(shouldSeeWarning = false) }
     }
 
-    override fun setWelcomeDismissed() {
-        preferences.edit { putBoolean(keyShouldSeeWelcome, false) }
-        _otherSettings.update { it.copy(shouldSeeWelcome = false) }
+    override fun setWhatsNewDismissed() {
+        preferences.edit { putBoolean(keyShouldSeeWhatsNew, false) }
+        _otherSettings.update { it.copy(shouldSeeWhatsNew = false) }
     }
 
     private fun getOtherSettings(): OtherSettings = OtherSettings(
@@ -388,7 +389,7 @@ class SettingsRepo(
         stateOfUtc = preferences.getBoolean(keyStateOfUtc, false),
         stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme, false),
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
-        shouldSeeWelcome = preferences.getBoolean(keyShouldSeeWelcome, true)
+        shouldSeeWhatsNew = preferences.getBoolean(keyShouldSeeWhatsNew, true)
     )
     //endregion
 

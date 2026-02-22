@@ -299,7 +299,7 @@ fun SharedDialog(
 @Composable
 fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
     val padding = LocalSpacing.current.large
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = {}) {
         ElevatedCard {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

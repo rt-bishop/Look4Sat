@@ -46,6 +46,11 @@
     <string name="pass_welcome_message">
         Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
+    <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
+    <string name="pass_whatsnew_message" translatable="false">
+        • Londre7 added a remote frequency control feature (Hamlib/SDR++) by sending compatible messages via Network/BT.
+        Enable it in Settings and tap the transceiver (Radar Screen).
+    </string>
 
     <!-- Radar screen -->
     <string name="radar_back">Back</string>

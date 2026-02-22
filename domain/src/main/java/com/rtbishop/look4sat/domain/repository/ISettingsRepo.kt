@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface ISettingsRepo {
 
+    val appVersionName: String
+
     //region # Satellites selection settings
     val selectedIds: StateFlow<List<Int>>
     val selectedTypes: StateFlow<List<String>>
@@ -70,7 +72,6 @@ interface ISettingsRepo {
     fun setFrequencyPort(value: String)
     fun setFrequencyState(value: Boolean)
     fun setFrequencyFormat(value: String)
-
     //endregion
 
     //region # Other settings
@@ -81,7 +82,7 @@ interface ISettingsRepo {
     fun setStateOfUtc(value: Boolean)
     fun setStateOfLightTheme(value: Boolean)
     fun setWarningDismissed()
-    fun setWelcomeDismissed()
+    fun setWhatsNewDismissed()
     //endregion
 
     //region # Transceivers settings

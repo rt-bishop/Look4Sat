@@ -61,10 +61,6 @@ class MainContainer(private val context: Context) {
     val satelliteRepo = provideSatelliteRepo()
     val databaseRepo = provideDatabaseRepo()
 
-    fun provideAppVersionName(): String {
-        return context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.0"
-    }
-
     fun provideAddToCalendar(): IAddToCalendar = AddToCalendar(context)
 
     fun provideShowToast(): IShowToast = ShowToast(context)
@@ -111,6 +107,7 @@ class MainContainer(private val context: Context) {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val appPrefsFileName = "${context.packageName}_preferences"
         val appPreferences = context.getSharedPreferences(appPrefsFileName, Context.MODE_PRIVATE)
-        return SettingsRepo(manager, appPreferences)
+        val appVersionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.4"
+        return SettingsRepo(manager, appPreferences, appVersionName)
     }
 }
