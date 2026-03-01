@@ -18,15 +18,19 @@
 package com.rtbishop.look4sat
 
 import android.app.Application
-import com.rtbishop.look4sat.data.injection.MainContainer
+import com.rtbishop.look4sat.core.data.injection.MainContainer
+import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.repository.IMainContainer
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlinx.coroutines.launch
 
-class MainApplication : Application() {
+class MainApplication : Application(), IContainerProvider {
 
-    lateinit var container: MainContainer
+    private lateinit var container: IMainContainer
+
+    override fun getMainContainer(): IMainContainer = container
 
     override fun onCreate() {
         super.onCreate()

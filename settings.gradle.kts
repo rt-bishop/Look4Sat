@@ -1,4 +1,6 @@
+@file:Suppress("UnstableApiUsage")
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -13,4 +15,17 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Look4Sat"
-include(":app", ":data", ":domain")
+include(":app")
+include(
+    ":core:data",
+    ":core:domain",
+    ":core:presentation"
+)
+include(
+    ":feature:map",
+    ":feature:passes",
+    ":feature:radar",
+    ":feature:satellites",
+    ":feature:settings"
+)
+//enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
