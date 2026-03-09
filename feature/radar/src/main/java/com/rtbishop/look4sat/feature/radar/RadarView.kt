@@ -137,8 +137,7 @@ fun RadarViewCompose(
 
     Canvas(modifier = modifier.aspectRatio(1f)) {
         val radius = (size.minDimension / 2f) * 0.95f
-        if(radius != trackLastRadius.value)
-        {
+        if(radius != trackLastRadius.value) {
             trackPath.value = createTrackPath(items, radius)
             trackEffect.value = createTrackEffect(trackPath.value)
             trackLastRadius.value = radius
