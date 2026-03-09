@@ -74,7 +74,7 @@ fun RadarViewCompose(
 //    val aimThreshold = 0.05f
     val measurer = rememberTextMeasurer()
     val sweepDegrees = remember { mutableFloatStateOf(0f) }
-    val trackCreated = remember { mutableStateOf(false) }
+    val trackLastRadius = remember { mutableStateOf(0f) }
     val trackPath = remember { mutableStateOf(Path()) }
     val trackEffect = remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
 //    val soundPool = remember { mutableStateOf<SoundPool?>(null) }
@@ -137,10 +137,11 @@ fun RadarViewCompose(
 
     Canvas(modifier = modifier.aspectRatio(1f)) {
         val radius = (size.minDimension / 2f) * 0.95f
-        if (!trackCreated.value) {
+        if(radius != trackLastRadius.value)
+        {
             trackPath.value = createTrackPath(items, radius)
             trackEffect.value = createTrackEffect(trackPath.value)
-            trackCreated.value = true
+            trackLastRadius.value = radius
         }
         rotate(if (shouldUseCompass) -azimElev.first else 0f) {
             if (shouldShowSweep) {
