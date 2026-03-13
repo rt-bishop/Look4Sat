@@ -1,8 +1,6 @@
 import org.gradle.initialization.DependenciesAccessors
 import org.gradle.kotlin.dsl.support.serviceOf
 
-//import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
 }
@@ -10,7 +8,6 @@ plugins {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
-
     gradle.serviceOf<DependenciesAccessors>().classes.asFiles.forEach {
         compileOnly(files(it.absolutePath))
     }
@@ -24,21 +21,6 @@ tasks {
 }
 
 group = "com.rtbishop.look4sat.build_logic.convention"
-
-//kotlin {
-//    jvmToolchain(libs.versions.jdkVersion.get().toInt())
-//}
-
-//java {
-//    sourceCompatibility = JavaVersion.VERSION_17
-//    targetCompatibility = JavaVersion.VERSION_17
-//}
-//
-//tasks.withType<KotlinCompile>().configureEach {
-//    kotlinOptions {
-//        jvmTarget = JavaVersion.VERSION_17.toString()
-//    }
-//}
 
 gradlePlugin {
     plugins {

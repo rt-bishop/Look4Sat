@@ -17,44 +17,29 @@
  */
 package com.rtbishop.look4sat.convention
 
-import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
 @Suppress("Unused")
-class AndroidAppPlugin : Plugin<Project> {
+internal class AndroidAppPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            with(pluginManager) {
-                alias(libs.plugins.android.application)
-                alias(libs.plugins.compose.compiler)
-            }
-            configureKotlinLibrary()
-            extensions.configure<ApplicationExtension> {
-                configureAndroidApp(this)
-            }
+            setupAndroidApplication()
+            setupComposeFeature()
+            setupKotlinToolchain()
+            setupAndroidTestDependencies()
+            setupTestDependencies()
             dependencies {
                 IMPLEMENTATION(project(":core:data"))
                 IMPLEMENTATION(project(":core:domain"))
                 IMPLEMENTATION(project(":core:presentation"))
-
                 IMPLEMENTATION(project(":feature:map"))
                 IMPLEMENTATION(project(":feature:passes"))
                 IMPLEMENTATION(project(":feature:radar"))
                 IMPLEMENTATION(project(":feature:satellites"))
                 IMPLEMENTATION(project(":feature:settings"))
-
                 IMPLEMENTATION(libs.androidx.core.splashscreen)
-                IMPLEMENTATION(platform(libs.compose.bom))
-                IMPLEMENTATION(libs.bundles.composeAll)
-                IMPLEMENTATION(libs.other.osmdroid)
-                DEBUG_IMPLEMENTATION(libs.bundles.composeDebug)
-
-                TEST_IMPLEMENTATION(libs.test.coroutines)
-                TEST_IMPLEMENTATION(libs.test.junit4)
-                ANDROID_TEST_IMPLEMENTATION(libs.bundles.androidTest)
             }
         }
     }

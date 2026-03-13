@@ -18,15 +18,11 @@
 package com.rtbishop.look4sat.convention
 
 import com.android.build.api.dsl.ApplicationExtension
-import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.dsl.CommonExtension
 import org.gradle.accessors.dm.LibrariesForLibs
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.artifacts.MinimalExternalModuleDependency
-import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.PluginManager
 import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ProviderConvertible
 import org.gradle.kotlin.dsl.accessors.runtime.extensionOf
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
@@ -40,71 +36,21 @@ internal const val KSP = "ksp"
 internal const val TEST_IMPLEMENTATION = "testImplementation"
 
 internal val Project.libs
-    //    get(): VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
     get(): LibrariesForLibs = extensionOf(this, "libs") as LibrariesForLibs
 
-internal fun Project.configureKotlinLibrary() {
-//    kotlinExtension.jvmToolchain(libs.findVersion("jdkVersion").get().requiredVersion.toInt())
-    kotlinExtension.jvmToolchain(libs.versions.jdkVersion.get().toInt())
-//    tasks.withType(AbstractTestTask::class.java).configureEach { setProperty("failOnNoDiscoveredTests", false) }
-}
-
-fun PluginManager.alias(notation: Provider<PluginDependency>) {
+internal fun PluginManager.alias(notation: Provider<PluginDependency>) {
     apply(notation.get().pluginId)
 }
 
-fun PluginManager.alias(notation: ProviderConvertible<PluginDependency>) {
-    apply(notation.asProvider().get().pluginId)
-}
-
-fun DependencyHandler.implementation(provider: Provider<MinimalExternalModuleDependency>) {
-    add("implementation", provider.get().group + ":" + provider.get().name + ":" + provider.get().version)
-}
-
-fun DependencyHandler.testImplementation(provider: Provider<MinimalExternalModuleDependency>) {
-    add("testImplementation", provider.get().group + ":" + provider.get().name + ":" + provider.get().version)
-}
-
-fun DependencyHandler.ksp(provider: Provider<MinimalExternalModuleDependency>) {
-    add("ksp", provider.get().group + ":" + provider.get().name + ":" + provider.get().version)
-}
-
-internal fun Project.configureAndroidLibrary(commonExtension: LibraryExtension) {
-    commonExtension.apply {
-        compileSdk = libs.versions.compileSdk.get().toInt()
-        defaultConfig {
-            minSdk = libs.versions.minSdk.get().toInt()
-        }
-//        compileOptions { isCoreLibraryDesugaringEnabled = true }
-//        testOptions {
-//            unitTests {
-//                all { it.useJUnitPlatform() }
-//                isReturnDefaultValues = true
-//                isIncludeAndroidResources = true
-//            }
-//        }
-//        packaging { resources { excludes += listOf("META-INF/*") } }
-//        dependencies {
-//            IMPLEMENTATION(libs.findLibrary("androidx-core").get())
-//            IMPLEMENTATION(libs.findLibrary("kotlinx-serialization-json").get())
-//            IMPLEMENTATION(libs.findLibrary("other-timber").get())
-//            IMPLEMENTATION(libs.findLibrary("google-hilt-android").get())
-//            KSP(libs.findLibrary("google-hilt-compiler").get())
-//
-//            ANDROID_TEST_IMPLEMENTATION(libs.findBundle("androidTest").get())
-//            ANDROID_TEST_IMPLEMENTATION(libs.findBundle("unitTest").get())
-//            CORE_LIBRARY_DESUGARING(libs.findLibrary("other-desugaring").get())
-//            TEST_IMPLEMENTATION(libs.findBundle("unitTest").get())
-//        }
+internal fun Project.setupAndroidApplication() {
+    with(pluginManager) {
+        alias(libs.plugins.android.application)
     }
-}
-
-internal fun Project.configureAndroidApp(commonExtension: ApplicationExtension) {
-    commonExtension.apply {
-        namespace = "com.rtbishop.look4sat"
+    extensions.configure<ApplicationExtension> {
+        namespace = libs.versions.packageName.get()
         compileSdk = libs.versions.compileSdk.get().toInt()
         defaultConfig {
-            applicationId = "com.rtbishop.look4sat"
+            applicationId = libs.versions.packageName.get()
             minSdk = libs.versions.minSdk.get().toInt()
             versionCode = libs.versions.appVersionCode.get().toInt()
             versionName = libs.versions.appVersionName.get()
@@ -126,84 +72,47 @@ internal fun Project.configureAndroidApp(commonExtension: ApplicationExtension) 
             generateLocaleConfig = true
             localeFilters.addAll(listOf("en", "es", "ru", "si", "uk", "zh"))
         }
-    }
-//    extensions.configure<ApplicationExtension> {
-//        namespace = "com.rtbishop.look4sat"
-//        compileSdk = 36
-//        defaultConfig {
-//            applicationId = "com.rtbishop.look4sat"
-//            minSdk = 24
-//            versionCode = 410
-//            versionName = "4.1.0"
-//        }
-//        buildFeatures {
-//            compose = true
-//        }
-//        buildTypes {
-//            debug {
-//                applicationIdSuffix = ".debug"
-//            }
-//            release {
-//                isMinifyEnabled = true
-//                isShrinkResources = true
-//                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
-//            }
-//        }
-//        androidResources {
-//            generateLocaleConfig = true
-//            localeFilters.addAll(listOf("en", "es", "ru", "si", "uk", "zh"))
-//        }
-//    }
-}
-
-internal fun Project.configureComposeFeature(commonExtension: LibraryExtension) {
-    commonExtension.apply {
-        buildFeatures { compose = true }
-//        testOptions { animationsDisabled = true }
-        dependencies {
-//            IMPLEMENTATION(platform(libs.findLibrary("compose-bom").get()))
-//            IMPLEMENTATION(libs.findBundle("composeAll").get())
-//
-//            ANDROID_TEST_IMPLEMENTATION(libs.findBundle("composeDebug").get())
-//            DEBUG_IMPLEMENTATION(libs.findBundle("composeDebug").get())
-//            SCREENSHOT_TEST_IMPLEMENTATION(libs.findLibrary("compose-ui-tooling").get())
-        }
+        packaging { resources { excludes += listOf("META-INF/*") } }
     }
 }
 
-fun Project.setupAndroidModule(isApplication: Boolean) {
+internal fun Project.setupCommonLibrary() {
     with(pluginManager) {
-        if (isApplication) {
-            alias(libs.plugins.android.application)
-            alias(libs.plugins.compose.compiler)
-        } else {
-            alias(libs.plugins.android.library)
-            alias(libs.plugins.google.ksp)
-        }
+        alias(libs.plugins.android.library)
     }
-    extensions.configure<ApplicationExtension> {
+    extensions.configure<CommonExtension> {
         compileSdk = libs.versions.compileSdk.get().toInt()
-        defaultConfig {
-            minSdk = 26
-            versionCode = 1
-            versionName = "1.0"
-        }
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
-        }
-        buildTypes {
-            buildTypes {
-                maybeCreate("debug")
-                maybeCreate("release")
-                named("release") {
-                    isMinifyEnabled = true
-                    proguardFiles(
-                        getDefaultProguardFile("proguard-android-optimize.txt"),
-                        "proguard-rules.pro"
-                    )
-                }
-            }
-        }
+        defaultConfig.minSdk = libs.versions.minSdk.get().toInt()
+    }
+}
+
+internal fun Project.setupComposeFeature() {
+    with(pluginManager) {
+        alias(libs.plugins.compose.compiler)
+    }
+    extensions.configure<CommonExtension> {
+        buildFeatures.compose = true
+    }
+    dependencies {
+        IMPLEMENTATION(platform(libs.compose.bom))
+        IMPLEMENTATION(libs.bundles.composeAll)
+        DEBUG_IMPLEMENTATION(libs.bundles.composeDebug)
+    }
+}
+
+internal fun Project.setupKotlinToolchain() {
+    kotlinExtension.jvmToolchain(libs.versions.jdkVersion.get().toInt())
+}
+
+internal fun Project.setupAndroidTestDependencies() {
+    dependencies {
+        ANDROID_TEST_IMPLEMENTATION(libs.bundles.androidTest)
+    }
+}
+
+internal fun Project.setupTestDependencies() {
+    dependencies {
+        TEST_IMPLEMENTATION(libs.test.coroutines)
+        TEST_IMPLEMENTATION(libs.test.junit4)
     }
 }

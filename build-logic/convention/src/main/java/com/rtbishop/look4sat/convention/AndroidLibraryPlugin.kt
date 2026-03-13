@@ -17,39 +17,29 @@
  */
 package com.rtbishop.look4sat.convention
 
-import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
 @Suppress("Unused")
-class AndroidLibraryPlugin : Plugin<Project> {
+internal class AndroidLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                alias(libs.plugins.android.library)
                 alias(libs.plugins.google.ksp)
             }
-//            setupAndroidModule(isApplication = false)
-//            setupBaseDependencies()
-            configureKotlinLibrary()
-            extensions.configure<LibraryExtension> {
-                configureAndroidLibrary(this)
-            }
+            setupCommonLibrary()
+            setupKotlinToolchain()
+            setupAndroidTestDependencies()
+            setupTestDependencies()
             dependencies {
                 IMPLEMENTATION(project(":core:domain"))
-
                 IMPLEMENTATION(libs.androidx.core.ktx)
                 IMPLEMENTATION(libs.androidx.room.asProvider())
                 IMPLEMENTATION(libs.androidx.room.runtime)
                 KSP(libs.androidx.room.compiler)
                 IMPLEMENTATION(libs.other.coroutines)
                 IMPLEMENTATION(libs.other.okhttp)
-
-                TEST_IMPLEMENTATION(libs.test.coroutines)
-                TEST_IMPLEMENTATION(libs.test.junit4)
-                ANDROID_TEST_IMPLEMENTATION(libs.bundles.androidTest)
             }
         }
     }

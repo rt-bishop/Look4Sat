@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 dependencyResolutionManagement {
     repositories {
         google()
@@ -13,4 +11,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "build-logic"
 include(":convention")
-//enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.rtbishop.look4sat.feature.map"
 }
+
+dependencies {
+    implementation(libs.other.osmdroid)
+}

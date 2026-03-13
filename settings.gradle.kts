@@ -1,4 +1,3 @@
-@file:Suppress("UnstableApiUsage")
 pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -28,4 +27,3 @@ include(
     ":feature:satellites",
     ":feature:settings"
 )
-//enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

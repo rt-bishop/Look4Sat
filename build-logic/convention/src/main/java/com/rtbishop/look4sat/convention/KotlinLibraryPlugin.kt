@@ -22,18 +22,17 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 @Suppress("Unused")
-class KotlinLibraryPlugin : Plugin<Project> {
+internal class KotlinLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
                 alias(libs.plugins.kotlin.jvm)
             }
-            configureKotlinLibrary()
+            setupKotlinToolchain()
+            setupTestDependencies()
             dependencies {
-                implementation(libs.other.coroutines)
-                implementation(libs.other.json)
-                testImplementation(libs.test.coroutines)
-                testImplementation(libs.test.junit4)
+                IMPLEMENTATION(libs.other.coroutines)
+                IMPLEMENTATION(libs.other.json)
             }
         }
     }
