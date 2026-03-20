@@ -22,6 +22,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.view.Surface
+import android.view.WindowManager
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.RAD2DEG
 import com.rtbishop.look4sat.core.domain.repository.ISensorsRepo
@@ -29,7 +31,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.round
 
-class SensorsRepo(private val sensorManager: SensorManager, private val sensor: Sensor?) :
+class SensorsRepo(
+    private val sensorManager: SensorManager,
+    private val sensor: Sensor?,
+    private val windowManager: WindowManager
+) :
     SensorEventListener, ISensorsRepo {
 
     private val _orientation = MutableStateFlow(Pair(0f, 0f))
@@ -61,8 +67,40 @@ class SensorsRepo(private val sensorManager: SensorManager, private val sensor: 
         else -> {}
     }
 
+    private fun getDisplayRotation(): Int {
+        return try {
+            @Suppress("DEPRECATION")
+            windowManager.defaultDisplay.rotation
+        } catch (e: Exception) {
+            Surface.ROTATION_0
+        }
+    }
+
+    private fun transformRotationMatrix(rotationMatrix: FloatArray, rotation: Int) {
+        val tempMatrix = FloatArray(9)
+        when (rotation) {
+            Surface.ROTATION_0 -> {
+                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Y, tempMatrix)
+                System.arraycopy(tempMatrix, 0, rotationMatrix, 0, 9)
+            }
+            Surface.ROTATION_90 -> {
+                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, tempMatrix)
+                SensorManager.remapCoordinateSystem(tempMatrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_Y, rotationMatrix)
+            }
+            Surface.ROTATION_180 -> {
+                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y, tempMatrix)
+                System.arraycopy(tempMatrix, 0, rotationMatrix, 0, 9)
+            }
+            Surface.ROTATION_270 -> {
+                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X, tempMatrix)
+                SensorManager.remapCoordinateSystem(tempMatrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_Y, rotationMatrix)
+            }
+        }
+    }
+
     private fun updateOrientation(rotationVector: FloatArray) {
         SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationVector)
+        transformRotationMatrix(rotationMatrix, getDisplayRotation())
         SensorManager.getOrientation(rotationMatrix, orientationValues)
         val azimuth = (orientationValues[0] * RAD2DEG).toFloat()
         val pitch = (orientationValues[1] * RAD2DEG).toFloat() // roll [2]

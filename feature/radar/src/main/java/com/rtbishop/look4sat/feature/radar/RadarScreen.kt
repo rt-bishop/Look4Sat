@@ -229,7 +229,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                                 items = uiState.satTrack,
                                 azimElev = uiState.orientationValues,
                                 shouldShowSweep = uiState.shouldShowSweep,
-                                shouldUseCompass = false,
+                                shouldUseCompass = uiState.shouldUseCompass,
                                 modifier = Modifier.align(Alignment.Center)
                             )
                             Column(
