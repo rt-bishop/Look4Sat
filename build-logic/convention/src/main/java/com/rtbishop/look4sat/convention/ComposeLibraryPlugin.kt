@@ -32,6 +32,7 @@ internal class ComposeLibraryPlugin : Plugin<Project> {
             setupTestDependencies()
             dependencies {
                 IMPLEMENTATION(project(":core:domain"))
+                IMPLEMENTATION(libs.androidx.core.splashscreen)
             }
         }
     }

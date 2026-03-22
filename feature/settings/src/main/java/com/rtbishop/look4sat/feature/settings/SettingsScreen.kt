@@ -69,6 +69,7 @@ import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
+import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -290,8 +291,9 @@ private fun SettingsScreen(uiState: SettingsState) {
             }
         }
     ) { _ ->
+        val isVerticalLayout = isVerticalLayout()
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(320.dp),
+            columns = GridCells.Fixed(if (isVerticalLayout) 1 else 2),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.clip(MaterialTheme.shapes.medium)

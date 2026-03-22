@@ -1,3 +1,2 @@
-Added What's New dialog to announce changes and features
-Added remote frequency control feature, by londre7 #195
-Updated the Chinese translation, by wty2019wty #196
+* Fixed track path creation issue for split screens (#199) by londre7
+* Enabled using compass data for landscape orientation (#202) by londre7
