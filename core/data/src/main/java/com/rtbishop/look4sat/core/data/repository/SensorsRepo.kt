@@ -35,78 +35,109 @@ class SensorsRepo(
     private val sensorManager: SensorManager,
     private val sensor: Sensor?,
     private val windowManager: WindowManager
-) :
-    SensorEventListener, ISensorsRepo {
+) : SensorEventListener, ISensorsRepo {
 
     private val _orientation = MutableStateFlow(Pair(0f, 0f))
     private val rotationMatrix = FloatArray(9)
+    private val tempMatrix = FloatArray(9)
     private val orientationValues = FloatArray(3)
-    private var sensorAccuracy = SensorManager.SENSOR_STATUS_UNRELIABLE
+    private var smoothAzimuth = 0f
+    private var smoothPitch = 0f
+    private var hasInitialReading = false
+
+    companion object {
+        private const val SMOOTHING_FACTOR = 0.15f
+    }
 
     override val orientation: StateFlow<Pair<Float, Float>> = _orientation
 
     override fun getMagDeclination(geoPos: GeoPos, time: Long): Float {
-        val latitude = geoPos.latitude.toFloat()
-        val longitude = geoPos.longitude.toFloat()
-        return GeomagneticField(latitude, longitude, geoPos.altitude.toFloat(), time).declination
+        return GeomagneticField(
+            geoPos.latitude.toFloat(),
+            geoPos.longitude.toFloat(),
+            geoPos.altitude.toFloat(),
+            time
+        ).declination
     }
 
     override fun enableSensor() {
+        hasInitialReading = false
         sensor?.let { sensorManager.registerListener(this, it, 8000) }
     }
 
     override fun disableSensor() = sensorManager.unregisterListener(this)
 
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-        sensorAccuracy = accuracy
-    }
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) = Unit
 
-    override fun onSensorChanged(event: SensorEvent) = when {
-        sensorAccuracy == SensorManager.SENSOR_STATUS_UNRELIABLE -> {}
-        event.sensor == sensor -> updateOrientation(event.values)
-        else -> {}
+    override fun onSensorChanged(event: SensorEvent) {
+        if (event.sensor == sensor) updateOrientation(event.values)
     }
 
     private fun getDisplayRotation(): Int {
         return try {
             @Suppress("DEPRECATION")
             windowManager.defaultDisplay.rotation
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Surface.ROTATION_0
         }
     }
 
-    private fun transformRotationMatrix(rotationMatrix: FloatArray, rotation: Int) {
-        val tempMatrix = FloatArray(9)
-        when (rotation) {
-            Surface.ROTATION_0 -> {
-                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Y, tempMatrix)
-                System.arraycopy(tempMatrix, 0, rotationMatrix, 0, 9)
-            }
-            Surface.ROTATION_90 -> {
-                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, tempMatrix)
-                SensorManager.remapCoordinateSystem(tempMatrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_Y, rotationMatrix)
-            }
-            Surface.ROTATION_180 -> {
-                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y, tempMatrix)
-                System.arraycopy(tempMatrix, 0, rotationMatrix, 0, 9)
-            }
-            Surface.ROTATION_270 -> {
-                SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X, tempMatrix)
-                SensorManager.remapCoordinateSystem(tempMatrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_Y, rotationMatrix)
-            }
+    private fun remapForRotation(rotation: Int) {
+        val remapped = when (rotation) {
+            Surface.ROTATION_90 -> SensorManager.remapCoordinateSystem(
+                rotationMatrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, tempMatrix
+            )
+
+            Surface.ROTATION_180 -> SensorManager.remapCoordinateSystem(
+                rotationMatrix, SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y, tempMatrix
+            )
+
+            Surface.ROTATION_270 -> SensorManager.remapCoordinateSystem(
+                rotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X, tempMatrix
+            )
+
+            else -> false
         }
+        if (remapped) System.arraycopy(tempMatrix, 0, rotationMatrix, 0, 9)
     }
 
     private fun updateOrientation(rotationVector: FloatArray) {
         SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationVector)
-        transformRotationMatrix(rotationMatrix, getDisplayRotation())
+        remapForRotation(getDisplayRotation())
         SensorManager.getOrientation(rotationMatrix, orientationValues)
         val azimuth = (orientationValues[0] * RAD2DEG).toFloat()
-        val pitch = (orientationValues[1] * RAD2DEG).toFloat() // roll [2]
+        val pitch = (orientationValues[1] * RAD2DEG).toFloat()
         val magneticAzimuth = (azimuth + 360f) % 360f
-        val roundedAzimuth = round(magneticAzimuth * 10) / 10
-        val roundedPitch = round(pitch * 10) / 10
-        _orientation.value = Pair(roundedAzimuth, roundedPitch)
+
+        if (!hasInitialReading) {
+            smoothAzimuth = magneticAzimuth
+            smoothPitch = pitch
+            hasInitialReading = true
+        } else {
+            smoothAzimuth = lowPassAngle(smoothAzimuth, magneticAzimuth)
+            smoothPitch = lowPass(smoothPitch, pitch)
+        }
+
+        _orientation.value = Pair(
+            round(smoothAzimuth * 10) / 10,
+            round(smoothPitch * 10) / 10
+        )
+    }
+
+    /** Standard exponential low-pass filter. */
+    private fun lowPass(previous: Float, current: Float): Float {
+        return previous + SMOOTHING_FACTOR * (current - previous)
+    }
+
+    /**
+     * Low-pass filter that accounts for the 0°/360° wraparound.
+     * Always takes the shortest angular path between the two values.
+     */
+    private fun lowPassAngle(previous: Float, current: Float): Float {
+        var delta = current - previous
+        // Normalise delta into the range (-180, 180]
+        while (delta > 180f) delta -= 360f
+        while (delta <= -180f) delta += 360f
+        return (previous + SMOOTHING_FACTOR * delta + 360f) % 360f
     }
 }

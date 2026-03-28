@@ -25,9 +25,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -53,6 +55,10 @@ import com.rtbishop.look4sat.core.domain.utility.toRadians
 import kotlin.math.cos
 import kotlin.math.sin
 
+private const val CIRCLES = 3
+private const val STROKE_WIDTH = 6f
+private const val SWEEP_INCREMENT = 360f / 12f / 60f
+
 @Composable
 fun RadarViewCompose(
     item: OrbitalPos,
@@ -62,149 +68,81 @@ fun RadarViewCompose(
     shouldUseCompass: Boolean,
     modifier: Modifier = Modifier
 ) {
-//    val context = LocalContext.current
-//    val view = LocalView.current
     val radarColor = MaterialTheme.colorScheme.secondary
     val trackColor = MaterialTheme.colorScheme.primary
     val aimColor = MaterialTheme.colorScheme.error
-    val strokeWidth = 6f
     val animTransition = rememberInfiniteTransition(label = "animScale")
-    val animSpec = infiniteRepeatable<Float>(tween(1000))
-    val animScale = animTransition.animateFloat(16f, 64f, animSpec, label = "animScale")
-//    val aimThreshold = 0.05f
+    val animScale by animTransition.animateFloat(
+        initialValue = 16f,
+        targetValue = 64f,
+        animationSpec = infiniteRepeatable(tween(1000)),
+        label = "animScale"
+    )
     val measurer = rememberTextMeasurer()
-    val sweepDegrees = remember { mutableFloatStateOf(0f) }
-    val trackLastRadius = remember { mutableStateOf(0f) }
-    val trackPath = remember { mutableStateOf(Path()) }
-    val trackEffect = remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
-//    val soundPool = remember { mutableStateOf<SoundPool?>(null) }
-//    val beepSoundId = remember { mutableIntStateOf(0) }
-//    val aimTargetDifference = remember { mutableFloatStateOf(0f) }
-
-//    LaunchedEffect(item.azimuth, item.elevation, azimElev.first, azimElev.second) {
-//        val aimAzimuthRadians = azimElev.first.toDouble().toRadians()
-//        val aimElevationRadians = abs(min(azimElev.second, 0f)).toDouble().toRadians()
-//        // radius of 0.5 makes the aimTargetDifference range 0.0 to 1.0
-//        val radius = 0.5
-//        val aimX = sph2CartX(aimAzimuthRadians, aimElevationRadians, radius)
-//        val aimY = sph2CartY(aimAzimuthRadians, aimElevationRadians, radius)
-//        val satX = sph2CartX(item.azimuth, item.elevation, radius)
-//        val satY = sph2CartY(item.azimuth, item.elevation, radius)
-//        aimTargetDifference.floatValue = sqrt((satX - aimX).pow(2) + (satY - aimY).pow(2))
-//        val minPlaybackRate = 0.5f
-//        val maxPlaybackRate = 2.0f
-//        val playbackRate =
-//            maxPlaybackRate - (aimTargetDifference.floatValue / (maxPlaybackRate - minPlaybackRate))
-//        soundPool.value?.setRate(beepSoundId.intValue, playbackRate)
-//    }
-//
-//    LaunchedEffect(aimTargetDifference.floatValue < aimThreshold) {
-//        if (aimTargetDifference.floatValue < aimThreshold) {
-//            view.performHapticFeedback(HapticFeedbackConstantsCompat.VIRTUAL_KEY)
-//            soundPool.value?.pause(beepSoundId.intValue)
-//        } else {
-//            soundPool.value?.resume(beepSoundId.intValue)
-//        }
-//    }
-//
-//    LaunchedEffect(item.elevation > 0) {
-//        if(item.elevation > 0) {
-//            soundPool.value?.resume(beepSoundId.intValue)
-//        } else {
-//            soundPool.value?.pause(beepSoundId.intValue)
-//        }
-//    }
-//
-//    DisposableEffect(Unit) {
-//        val audioAttributes = AudioAttributes.Builder()
-//            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-//            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-//            .build()
-//        soundPool.value = SoundPool.Builder()
-//            .setMaxStreams(1)
-//            .setAudioAttributes(audioAttributes)
-//            .build()
-//        beepSoundId.intValue = soundPool.value?.load(context, R.raw.beep, 1) ?: 0
-//        soundPool.value?.setOnLoadCompleteListener { soundPool, _, status ->
-//            if (status == 0) {
-//                soundPool.play(beepSoundId.intValue, 0.5f, 0.5f, 0, -1, 1f)
-//            }
-//        }
-//        onDispose {
-//            soundPool.value?.release()
-//        }
-//    }
+    var sweepDegrees by remember { mutableFloatStateOf(0f) }
+    var cachedRadius by remember { mutableFloatStateOf(0f) }
+    var trackPath by remember { mutableStateOf(Path()) }
+    var trackEffect by remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
 
     Canvas(modifier = modifier.aspectRatio(1f)) {
-        val radius = (size.minDimension / 2f) * 0.95f
-        if(radius != trackLastRadius.value) {
-            trackPath.value = createTrackPath(items, radius)
-            trackEffect.value = createTrackEffect(trackPath.value)
-            trackLastRadius.value = radius
+        val radius = size.minDimension / 2f * 0.95f
+        if (radius != cachedRadius) {
+            trackPath = createTrackPath(items, radius)
+            trackEffect = createTrackEffect(trackPath)
+            cachedRadius = radius
         }
         rotate(if (shouldUseCompass) -azimElev.first else 0f) {
-            if (shouldShowSweep) {
-                drawSweep(center, sweepDegrees.floatValue, radius, trackColor)
-            }
-            drawRadar(radius, radarColor, strokeWidth, 3)
-            drawInfo(radius, trackColor, measurer, 3)
+            if (shouldShowSweep) drawSweep(center, sweepDegrees, radius, trackColor)
+            drawRadar(radius, radarColor)
+            drawElevationLabels(radius, trackColor, measurer)
             translate(center.x, center.y) {
-                drawTrack(trackPath.value, trackEffect.value, aimColor, trackColor)
-                if (item.elevation > 0) {
-                    drawPosition(item, radius, animScale.value, trackColor)
-                }
-                if (shouldUseCompass) {
-                    drawAim(azimElev.first, azimElev.second, radius, strokeWidth, aimColor)
-                }
+                drawTrack(trackPath, trackEffect, aimColor, trackColor)
+                if (item.elevation > 0) drawPosition(item, radius, animScale, trackColor)
+                if (shouldUseCompass) drawAim(azimElev.first, azimElev.second, radius, aimColor)
             }
-            sweepDegrees.floatValue = (sweepDegrees.floatValue + 360 / 12.0f / 60) % 360
+            sweepDegrees = (sweepDegrees + SWEEP_INCREMENT) % 360f
         }
     }
 }
 
-private fun DrawScope.drawRadar(radius: Float, color: Color, width: Float, circles: Int) {
-    for (i in 0 until circles) {
-        val circleRadius = radius - radius / circles.toFloat() * i.toFloat()
-        drawCircle(color, circleRadius, style = Stroke(width))
+private fun DrawScope.drawRadar(radius: Float, color: Color) {
+    val step = radius / CIRCLES
+    for (i in 0 until CIRCLES) {
+        drawCircle(color, radius - step * i, style = Stroke(STROKE_WIDTH))
     }
-    drawLine(color, center.copy(x = center.x - radius), center.copy(x = center.x + radius), width)
-    drawLine(color, center.copy(y = center.y - radius), center.copy(y = center.y + radius), width)
+    drawLine(color, Offset(center.x - radius, center.y), Offset(center.x + radius, center.y), STROKE_WIDTH)
+    drawLine(color, Offset(center.x, center.y - radius), Offset(center.x, center.y + radius), STROKE_WIDTH)
 }
 
-private fun DrawScope.drawInfo(radius: Float, color: Color, measurer: TextMeasurer, circles: Int) {
-    for (i in 0 until circles) {
-        val textY = (radius - radius / circles * i) - 32f
-        val textDeg = " ${(90 / circles) * (circles - i)}°"
-        drawText(measurer, textDeg, center.copy(y = textY), style = TextStyle(color, 15.sp))
+private fun DrawScope.drawElevationLabels(radius: Float, color: Color, measurer: TextMeasurer) {
+    val step = radius / CIRCLES
+    val degStep = 90 / CIRCLES
+    val style = TextStyle(color, 15.sp)
+    for (i in 0 until CIRCLES) {
+        val textY = (radius - step * i) - 32f
+        drawText(measurer, " ${degStep * (CIRCLES - i)}°", Offset(center.x, textY), style = style)
     }
 }
 
 private fun DrawScope.drawTrack(path: Path, effect: PathEffect, color: Color, effectColor: Color) {
-    drawPath(path, color, style = Stroke(6f))
+    drawPath(path, color, style = Stroke(STROKE_WIDTH))
     drawPath(path, effectColor, style = Stroke(pathEffect = effect))
 }
 
 private fun DrawScope.drawPosition(item: OrbitalPos, radius: Float, posRadius: Float, color: Color) {
-    val satX = sph2CartX(item.azimuth, item.elevation, radius.toDouble())
-    val satY = sph2CartY(item.azimuth, item.elevation, radius.toDouble())
-    drawCircle(color, 16f, center.copy(satX, -satY))
-    drawCircle(color.copy(alpha = 1 - (posRadius / 64f)), posRadius, center.copy(satX, -satY))
+    val pos = sph2Cart(item.azimuth, item.elevation, radius.toDouble())
+    drawCircle(color, 16f, pos)
+    drawCircle(color.copy(alpha = 1 - (posRadius / 64f)), posRadius, pos)
 }
 
-private fun DrawScope.drawAim(azim: Float, elev: Float, radius: Float, width: Float, color: Color) {
+private fun DrawScope.drawAim(azim: Float, elev: Float, radius: Float, color: Color) {
     val size = 36f
-    val azimRadians = azim.toDouble().toRadians()
-    val tempElevRadians = elev.toDouble().toRadians()
-    val elevRadians = if (tempElevRadians > 0.0) 0.0 else tempElevRadians
-    val aimX = sph2CartX(azimRadians, -elevRadians, radius.toDouble())
-    val aimY = sph2CartY(azimRadians, -elevRadians, radius.toDouble())
-    try {
-        drawLine(color, center.copy(aimX - size, -aimY), center.copy(aimX + size, -aimY), width)
-        drawLine(color, center.copy(aimX, -aimY - size), center.copy(aimX, -aimY + size), width)
-        drawCircle(color, size / 2, center.copy(aimX, -aimY), style = Stroke(width))
-    } catch (exception: Exception) {
-        println(exception)
-    }
+    val azimRad = azim.toDouble().toRadians()
+    val elevRad = elev.toDouble().toRadians().coerceAtMost(0.0)
+    val pos = sph2Cart(azimRad, -elevRad, radius.toDouble())
+    drawLine(color, Offset(pos.x - size, pos.y), Offset(pos.x + size, pos.y), STROKE_WIDTH)
+    drawLine(color, Offset(pos.x, pos.y - size), Offset(pos.x, pos.y + size), STROKE_WIDTH)
+    drawCircle(color, size / 2, pos, style = Stroke(STROKE_WIDTH))
 }
 
 private fun DrawScope.drawSweep(center: Offset, degrees: Float, radius: Float, color: Color) {
@@ -216,37 +154,34 @@ private fun DrawScope.drawSweep(center: Offset, degrees: Float, radius: Float, c
 
 private fun createTrackPath(positions: List<OrbitalPos>, radius: Float): Path {
     val trackPath = Path()
-    positions.forEachIndexed { index, satPos ->
-        val passX = sph2CartX(satPos.azimuth, satPos.elevation, radius.toDouble())
-        val passY = sph2CartY(satPos.azimuth, satPos.elevation, radius.toDouble())
-        if (index == 0) trackPath.moveTo(passX, -passY) else trackPath.lineTo(passX, -passY)
+    positions.forEachIndexed { index, pos ->
+        val offset = sph2Cart(pos.azimuth, pos.elevation, radius.toDouble())
+        if (index == 0) trackPath.moveTo(offset.x, offset.y) else trackPath.lineTo(offset.x, offset.y)
     }
     return trackPath
 }
 
 private fun createTrackEffect(trackPath: Path): PathEffect {
-    val shape = Path()
     val shapeRadius = 24f
     val angle = 120.0.toRadians()
-    shape.moveTo((shapeRadius * cos(angle)).toFloat(), (shapeRadius * sin(angle)).toFloat())
-    for (i in 1 until 3) {
-        val x = (shapeRadius * cos(angle - angle * i)).toFloat()
-        val y = (shapeRadius * sin(angle - angle * i)).toFloat()
-        shape.lineTo(x, y)
+    val shape = Path().apply {
+        moveTo((shapeRadius * cos(angle)).toFloat(), (shapeRadius * sin(angle)).toFloat())
+        for (i in 1 until 3) {
+            lineTo(
+                x = (shapeRadius * cos(angle - angle * i)).toFloat(),
+                y = (shapeRadius * sin(angle - angle * i)).toFloat()
+            )
+        }
+        close()
     }
-    shape.close()
     val trackLength = PathMeasure().apply { setPath(trackPath, false) }.length
-    val advance = trackLength / 2f
-    val phase = trackLength / 4f
-    return PathEffect.stampedPathEffect(shape, advance, phase, StampedPathEffectStyle.Rotate)
+    return PathEffect.stampedPathEffect(shape, trackLength / 2f, trackLength / 4f, StampedPathEffectStyle.Rotate)
 }
 
-private fun sph2CartX(azim: Double, elev: Double, r: Double): Float {
+private fun sph2Cart(azim: Double, elev: Double, r: Double): Offset {
     val radius = r * (PI_2 - elev) / PI_2
-    return (radius * cos(PI_2 - azim)).toFloat()
-}
-
-private fun sph2CartY(azim: Double, elev: Double, r: Double): Float {
-    val radius = r * (PI_2 - elev) / PI_2
-    return (radius * sin(PI_2 - azim)).toFloat()
+    return Offset(
+        x = (radius * cos(PI_2 - azim)).toFloat(),
+        y = -(radius * sin(PI_2 - azim)).toFloat()
+    )
 }
