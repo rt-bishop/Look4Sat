@@ -22,18 +22,14 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 @Suppress("Unused")
-internal class ComposeFeaturePlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            setupCommonLibrary()
-            setupComposeFeature()
-            setupKotlinToolchain()
-            setupAndroidTestDependencies()
-            setupTestDependencies()
-            dependencies {
-                IMPLEMENTATION(project(":core:domain"))
-                IMPLEMENTATION(project(":core:presentation"))
-            }
+internal class FeaturePlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        setupAndroidLib()
+        setupCompose()
+        setupKotlin()
+        dependencies {
+            implementation(project(":core:domain"))
+            implementation(project(":core:presentation"))
         }
     }
 }

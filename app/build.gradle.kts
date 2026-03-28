@@ -1,3 +1,3 @@
 plugins {
-    alias(libs.plugins.convention.androidAppPlugin)
+    alias(libs.plugins.convention.applicationPlugin)
 }

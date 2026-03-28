@@ -21,7 +21,7 @@ import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.Project
-import org.gradle.api.plugins.PluginManager
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.accessors.runtime.extensionOf
 import org.gradle.kotlin.dsl.configure
@@ -29,23 +29,30 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 
-internal const val ANDROID_TEST_IMPLEMENTATION = "androidTestImplementation"
-internal const val DEBUG_IMPLEMENTATION = "debugImplementation"
-internal const val IMPLEMENTATION = "implementation"
-internal const val KSP = "ksp"
-internal const val TEST_IMPLEMENTATION = "testImplementation"
-
 internal val Project.libs
     get(): LibrariesForLibs = extensionOf(this, "libs") as LibrariesForLibs
 
-internal fun PluginManager.alias(notation: Provider<PluginDependency>) {
-    apply(notation.get().pluginId)
+internal fun Project.applyPlugin(notation: Provider<PluginDependency>) {
+    pluginManager.apply(notation.get().pluginId)
 }
 
-internal fun Project.setupAndroidApplication() {
-    with(pluginManager) {
-        alias(libs.plugins.android.application)
-    }
+internal fun DependencyHandler.implementation(dependencyNotation: Any) =
+    add("implementation", dependencyNotation)
+
+internal fun DependencyHandler.debugImplementation(dependencyNotation: Any) =
+    add("debugImplementation", dependencyNotation)
+
+internal fun DependencyHandler.testImplementation(dependencyNotation: Any) =
+    add("testImplementation", dependencyNotation)
+
+internal fun DependencyHandler.androidTestImplementation(dependencyNotation: Any) =
+    add("androidTestImplementation", dependencyNotation)
+
+internal fun DependencyHandler.ksp(dependencyNotation: Any) =
+    add("ksp", dependencyNotation)
+
+internal fun Project.setupAndroidApp() {
+    applyPlugin(libs.plugins.android.application)
     extensions.configure<ApplicationExtension> {
         namespace = libs.versions.packageName.get()
         compileSdk = libs.versions.compileSdk.get().toInt()
@@ -54,9 +61,6 @@ internal fun Project.setupAndroidApplication() {
             minSdk = libs.versions.minSdk.get().toInt()
             versionCode = libs.versions.appVersionCode.get().toInt()
             versionName = libs.versions.appVersionName.get()
-        }
-        buildFeatures {
-            compose = true
         }
         buildTypes {
             debug {
@@ -76,43 +80,32 @@ internal fun Project.setupAndroidApplication() {
     }
 }
 
-internal fun Project.setupCommonLibrary() {
-    with(pluginManager) {
-        alias(libs.plugins.android.library)
-    }
+internal fun Project.setupAndroidLib() {
+    applyPlugin(libs.plugins.android.library)
     extensions.configure<CommonExtension> {
         compileSdk = libs.versions.compileSdk.get().toInt()
         defaultConfig.minSdk = libs.versions.minSdk.get().toInt()
     }
+    dependencies {
+        androidTestImplementation(libs.bundles.androidTest)
+    }
 }
 
-internal fun Project.setupComposeFeature() {
-    with(pluginManager) {
-        alias(libs.plugins.compose.compiler)
-    }
+internal fun Project.setupCompose() {
+    applyPlugin(libs.plugins.compose.compiler)
     extensions.configure<CommonExtension> {
         buildFeatures.compose = true
     }
     dependencies {
-        IMPLEMENTATION(platform(libs.compose.bom))
-        IMPLEMENTATION(libs.bundles.composeAll)
-        DEBUG_IMPLEMENTATION(libs.bundles.composeDebug)
+        implementation(platform(libs.compose.bom))
+        implementation(libs.bundles.composeAll)
+        debugImplementation(libs.bundles.composeDebug)
     }
 }
 
-internal fun Project.setupKotlinToolchain() {
+internal fun Project.setupKotlin() {
     kotlinExtension.jvmToolchain(libs.versions.jdkVersion.get().toInt())
-}
-
-internal fun Project.setupAndroidTestDependencies() {
     dependencies {
-        ANDROID_TEST_IMPLEMENTATION(libs.bundles.androidTest)
-    }
-}
-
-internal fun Project.setupTestDependencies() {
-    dependencies {
-        TEST_IMPLEMENTATION(libs.test.coroutines)
-        TEST_IMPLEMENTATION(libs.test.junit4)
+        testImplementation(libs.bundles.unitTest)
     }
 }

@@ -22,18 +22,19 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 @Suppress("Unused")
-internal class ComposeLibraryPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            setupCommonLibrary()
-            setupComposeFeature()
-            setupKotlinToolchain()
-            setupAndroidTestDependencies()
-            setupTestDependencies()
-            dependencies {
-                IMPLEMENTATION(project(":core:domain"))
-                IMPLEMENTATION(libs.androidx.core.splashscreen)
-            }
+internal class CoreDataPlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        applyPlugin(libs.plugins.google.ksp)
+        setupAndroidLib()
+        setupKotlin()
+        dependencies {
+            implementation(project(":core:domain"))
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.room)
+            implementation(libs.androidx.room.runtime)
+            ksp(libs.androidx.room.compiler)
+            implementation(libs.other.coroutines)
+            implementation(libs.other.okhttp)
         }
     }
 }

@@ -12,7 +12,7 @@ jdkVersion = "17"
 #noinspection UnusedVersionCatalogEntry
 packageName = "com.rtbishop.look4sat"
 
-android-gradle-plugin = "9.0.1"
+android-gradle-plugin = "9.1.0"
 google-ksp = "2.3.6"
 kotlin = "2.3.20"
 
@@ -20,7 +20,7 @@ androidx-core-ktx = "1.18.0"
 androidx-core-splashscreen = "1.2.0"
 androidx-room = "2.8.4"
 
-compose-bom = "2026.03.00"
+compose-bom = "2026.03.01"
 compose-activity = "1.13.0"
 compose-lifecycle = "2.10.0"
 compose-navigation = "2.9.7"
@@ -88,11 +88,11 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "google-ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 # plugins defined by this project
-convention-androidAppPlugin = { id = "com.rtbishop.look4sat.convention.androidAppPlugin" }
-convention-androidLibraryPlugin = { id = "com.rtbishop.look4sat.convention.androidLibraryPlugin" }
-convention-composeFeaturePlugin = { id = "com.rtbishop.look4sat.convention.composeFeaturePlugin" }
-convention-composeLibraryPlugin = { id = "com.rtbishop.look4sat.convention.composeLibraryPlugin" }
-convention-kotlinLibraryPlugin = { id = "com.rtbishop.look4sat.convention.kotlinLibraryPlugin" }
+convention-applicationPlugin = { id = "com.rtbishop.look4sat.convention.applicationPlugin" }
+convention-coreDataPlugin = { id = "com.rtbishop.look4sat.convention.coreDataPlugin" }
+convention-coreDomainPlugin = { id = "com.rtbishop.look4sat.convention.coreDomainPlugin" }
+convention-corePresentationPlugin = { id = "com.rtbishop.look4sat.convention.corePresentationPlugin" }
+convention-featurePlugin = { id = "com.rtbishop.look4sat.convention.featurePlugin" }
 
 [bundles]
 #noinspection UnusedVersionCatalogEntry

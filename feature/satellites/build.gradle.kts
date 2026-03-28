@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.convention.composeFeaturePlugin)
+    alias(libs.plugins.convention.featurePlugin)
 }
 
 android {

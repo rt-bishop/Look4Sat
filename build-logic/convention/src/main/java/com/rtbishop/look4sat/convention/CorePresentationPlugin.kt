@@ -22,25 +22,14 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 @Suppress("Unused")
-internal class AndroidAppPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            setupAndroidApplication()
-            setupComposeFeature()
-            setupKotlinToolchain()
-            setupAndroidTestDependencies()
-            setupTestDependencies()
-            dependencies {
-                IMPLEMENTATION(project(":core:data"))
-                IMPLEMENTATION(project(":core:domain"))
-                IMPLEMENTATION(project(":core:presentation"))
-                IMPLEMENTATION(project(":feature:map"))
-                IMPLEMENTATION(project(":feature:passes"))
-                IMPLEMENTATION(project(":feature:radar"))
-                IMPLEMENTATION(project(":feature:satellites"))
-                IMPLEMENTATION(project(":feature:settings"))
-                IMPLEMENTATION(libs.androidx.core.splashscreen)
-            }
+internal class CorePresentationPlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        setupAndroidLib()
+        setupCompose()
+        setupKotlin()
+        dependencies {
+            implementation(project(":core:domain"))
+            implementation(libs.androidx.core.splashscreen)
         }
     }
 }

@@ -24,25 +24,25 @@ group = "com.rtbishop.look4sat.build_logic.convention"
 
 gradlePlugin {
     plugins {
-        register("androidAppPlugin") {
-            id = libs.plugins.convention.androidAppPlugin.get().pluginId
-            implementationClass = "com.rtbishop.look4sat.convention.AndroidAppPlugin"
+        register("applicationPlugin") {
+            id = libs.plugins.convention.applicationPlugin.get().pluginId
+            implementationClass = "com.rtbishop.look4sat.convention.ApplicationPlugin"
         }
-        register("androidLibraryPlugin") {
-            id = libs.plugins.convention.androidLibraryPlugin.get().pluginId
-            implementationClass = "com.rtbishop.look4sat.convention.AndroidLibraryPlugin"
+        register("coreDataPlugin") {
+            id = libs.plugins.convention.coreDataPlugin.get().pluginId
+            implementationClass = "com.rtbishop.look4sat.convention.CoreDataPlugin"
         }
-        register("composeFeaturePlugin") {
-            id = libs.plugins.convention.composeFeaturePlugin.get().pluginId
-            implementationClass = "com.rtbishop.look4sat.convention.ComposeFeaturePlugin"
+        register("coreDomainPlugin") {
+            id = libs.plugins.convention.coreDomainPlugin.get().pluginId
+            implementationClass = "com.rtbishop.look4sat.convention.CoreDomainPlugin"
         }
-        register("composeLibraryPlugin") {
-            id = libs.plugins.convention.composeLibraryPlugin.get().pluginId
-            implementationClass = "com.rtbishop.look4sat.convention.ComposeLibraryPlugin"
+        register("corePresentationPlugin") {
+            id = libs.plugins.convention.corePresentationPlugin.get().pluginId
+            implementationClass = "com.rtbishop.look4sat.convention.CorePresentationPlugin"
         }
-        register("kotlinLibraryPlugin") {
-            id = libs.plugins.convention.kotlinLibraryPlugin.get().pluginId
-            implementationClass = "com.rtbishop.look4sat.convention.KotlinLibraryPlugin"
+        register("featurePlugin") {
+            id = libs.plugins.convention.featurePlugin.get().pluginId
+            implementationClass = "com.rtbishop.look4sat.convention.FeaturePlugin"
         }
     }
 }

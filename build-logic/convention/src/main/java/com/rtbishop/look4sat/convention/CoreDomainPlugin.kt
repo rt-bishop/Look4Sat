@@ -22,25 +22,13 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 @Suppress("Unused")
-internal class AndroidLibraryPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            with(pluginManager) {
-                alias(libs.plugins.google.ksp)
-            }
-            setupCommonLibrary()
-            setupKotlinToolchain()
-            setupAndroidTestDependencies()
-            setupTestDependencies()
-            dependencies {
-                IMPLEMENTATION(project(":core:domain"))
-                IMPLEMENTATION(libs.androidx.core.ktx)
-                IMPLEMENTATION(libs.androidx.room.asProvider())
-                IMPLEMENTATION(libs.androidx.room.runtime)
-                KSP(libs.androidx.room.compiler)
-                IMPLEMENTATION(libs.other.coroutines)
-                IMPLEMENTATION(libs.other.okhttp)
-            }
+internal class CoreDomainPlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        applyPlugin(libs.plugins.kotlin.jvm)
+        setupKotlin()
+        dependencies {
+            implementation(libs.other.coroutines)
+            implementation(libs.other.json)
         }
     }
 }

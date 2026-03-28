@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.convention.composeLibraryPlugin)
+    alias(libs.plugins.convention.corePresentationPlugin)
 }
 
 android {

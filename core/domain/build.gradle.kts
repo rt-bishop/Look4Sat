@@ -1,3 +1,3 @@
 plugins {
-    alias(libs.plugins.convention.kotlinLibraryPlugin)
+    alias(libs.plugins.convention.coreDomainPlugin)
 }
