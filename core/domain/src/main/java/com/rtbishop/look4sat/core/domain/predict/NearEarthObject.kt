@@ -141,53 +141,51 @@ class NearEarthObject(data: OrbitalData) : OrbitalObject(data) {
     }
 
     internal fun calculateSGP4(tSince: Double) {
-        synchronized(this) {
-            val temp = DoubleArray(9)
-            val xmdf = data.xmo + xmdot * tSince
-            val omgadf = data.omegao + omgdot * tSince
-            val xnoddf = data.xnodeo + xnodot * tSince
-            var omega = omgadf
-            var xmp = xmdf
-            val tsq = sqr(tSince)
-            val xnode = xnoddf + xnodcf * tsq
-            val bstar = data.bstar
-            var tempa = 1.0 - c1 * tSince
-            var tempe = bstar * c4 * tSince
-            var templ = t2cof * tsq
-            if (!sgp4Simple) {
-                val delomg = omgcof * tSince
-                val delm = xmcof * ((1.0 + eta * cos(xmdf)).pow(3.0) - delmo)
-                temp[0] = delomg + delm
-                xmp = xmdf + temp[0]
-                omega = omgadf - temp[0]
-                val tcube = tsq * tSince
-                val tfour = tSince * tcube
-                tempa = tempa - d2 * tsq - d3 * tcube - d4 * tfour
-                tempe += bstar * c5 * (sin(xmp) - sinmo)
-                templ += t3cof * tcube + tfour * (t4cof + tSince * t5cof)
-            }
-            val a = aodp * tempa.pow(2.0)
-            val eo = data.eccn
-            val e = eo - tempe
-            val xl = xmp + omega + xnode + xnodp * templ
-            val beta = sqrt(1.0 - e * e)
-            val xn = XKE / a.pow(1.5)
-
-            // Long period periodics
-            val axn = e * cos(omega)
-            temp[0] = invert(a * sqr(beta))
-            val xll = temp[0] * xlcof * axn
-            val aynl = temp[0] * aycof
-            val xlt = xl + xll
-            val ayn = e * sin(omega) + aynl
-
-            // Solve Kepler's equation
-            val capu = mod2PI(xlt - xnode)
-            temp[2] = capu
-            converge(temp, axn, ayn, capu)
-            calculatePosAndVel(temp, xnode, a, xn, axn, ayn)
-            calculatePhase(xlt, xnode, omgadf)
+        val temp = DoubleArray(9)
+        val xmdf = data.xmo + xmdot * tSince
+        val omgadf = data.omegao + omgdot * tSince
+        val xnoddf = data.xnodeo + xnodot * tSince
+        var omega = omgadf
+        var xmp = xmdf
+        val tsq = tSince * tSince
+        val xnode = xnoddf + xnodcf * tsq
+        val bstar = data.bstar
+        var tempa = 1.0 - c1 * tSince
+        var tempe = bstar * c4 * tSince
+        var templ = t2cof * tsq
+        if (!sgp4Simple) {
+            val delomg = omgcof * tSince
+            val delm = xmcof * ((1.0 + eta * cos(xmdf)).pow(3.0) - delmo)
+            temp[0] = delomg + delm
+            xmp = xmdf + temp[0]
+            omega = omgadf - temp[0]
+            val tcube = tsq * tSince
+            val tfour = tSince * tcube
+            tempa = tempa - d2 * tsq - d3 * tcube - d4 * tfour
+            tempe += bstar * c5 * (sin(xmp) - sinmo)
+            templ += t3cof * tcube + tfour * (t4cof + tSince * t5cof)
         }
+        val a = aodp * tempa * tempa
+        val eo = data.eccn
+        val e = eo - tempe
+        val xl = xmp + omega + xnode + xnodp * templ
+        val beta = sqrt(1.0 - e * e)
+        val xn = XKE / a.pow(1.5)
+
+        // Long period periodics
+        val axn = e * cos(omega)
+        temp[0] = invert(a * sqr(beta))
+        val xll = temp[0] * xlcof * axn
+        val aynl = temp[0] * aycof
+        val xlt = xl + xll
+        val ayn = e * sin(omega) + aynl
+
+        // Solve Kepler's equation
+        val capu = mod2PI(xlt - xnode)
+        temp[2] = capu
+        converge(temp, axn, ayn, capu)
+        calculatePosAndVel(temp, xnode, a, xn, axn, ayn)
+        calculatePhase(xlt, xnode, omgadf)
     }
 
     private fun calculatePosAndVel(

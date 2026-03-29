@@ -21,7 +21,6 @@ import kotlin.math.acos
 import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -50,23 +49,32 @@ data class OrbitalPos(
     }
 
     fun getOrbitalVelocity(): Double {
-        val earthG = 6.674 * 10.0.pow(-11)
-        val earthM = 5.98 * 10.0.pow(24)
-        val radius = 6.37 * 10.0.pow(6) + altitude * 10.0.pow(3)
-        return sqrt(earthG * earthM / radius) / 1000
+        val radius = EARTH_RADIUS_M + altitude * 1000.0
+        return sqrt(GM_EARTH / radius) / 1000.0
     }
 
     fun getRangeCircle(): List<GeoPos> {
-        val rangeCirclePoints = mutableListOf<GeoPos>()
-        val beta = acos(EARTH_RADIUS / (EARTH_RADIUS + altitude)) // * EARTH_RADIUS = radiusKm
+        val pointCount = 721
+        val rangeCirclePoints = ArrayList<GeoPos>(pointCount)
+        val beta = acos(EARTH_RADIUS / (EARTH_RADIUS + altitude))
+        val sinLat = sin(latitude)
+        val cosLat = cos(latitude)
+        val cosBeta = cos(beta)
+        val sinBeta = sin(beta)
         for (azimuth in 0..720) {
             val rads = azimuth * DEG2RAD
-            val lat = asin(sin(latitude) * cos(beta) + (cos(latitude) * sin(beta) * cos(rads)))
-            val lon = (longitude + atan2(
-                sin(rads) * sin(beta) * cos(latitude), cos(beta) - sin(latitude) * sin(lat)
-            ))
+            val sinRads = sin(rads)
+            val cosRads = cos(rads)
+            val lat = asin(sinLat * cosBeta + cosLat * sinBeta * cosRads)
+            val lon = longitude + atan2(sinRads * sinBeta * cosLat, cosBeta - sinLat * sin(lat))
             rangeCirclePoints.add(GeoPos(lat * RAD2DEG, lon * RAD2DEG))
         }
         return rangeCirclePoints
+    }
+
+    companion object {
+        // Pre-computed constants for orbital velocity calculation
+        private const val GM_EARTH = 3.986004418E14 // m^3/s^2
+        private const val EARTH_RADIUS_M = 6.37E6 // meters
     }
 }

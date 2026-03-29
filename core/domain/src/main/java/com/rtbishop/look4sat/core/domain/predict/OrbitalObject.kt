@@ -42,6 +42,27 @@ abstract class OrbitalObject(val data: OrbitalData) {
     var qoms24 = 0.0
     var s4 = 0.0
 
+    // Pre-allocated reusable vectors to avoid GC pressure in hot loops
+    private val obsPos = Vector4()
+    private val obsVel = Vector4()
+    private val rangeVector = Vector4()
+    private val rgvelVector = Vector4()
+    private val squintVector = Vector4()
+
+    // Cached observer position data to avoid recalculation when observer hasn't moved
+    private var cachedGsLat = Double.NaN
+    private var cachedGsLon = Double.NaN
+    private var cachedGsAlt = Double.NaN
+    private var cachedSinLat = 0.0
+    private var cachedCosLat = 0.0
+    private var cachedObsC = 0.0
+    private var cachedObsSq = 0.0
+    private var cachedObsAchFactor = 0.0
+    private var cachedObsZFactor = 0.0
+
+    // Cache for julian epoch to avoid recomputing every call
+    private val julEpoch: Double = juliandDateOfEpoch(data.epoch)
+
     fun willBeSeen(pos: GeoPos): Boolean {
         return if (data.meanmo < 1e-8) false
         else {
@@ -57,21 +78,51 @@ abstract class OrbitalObject(val data: OrbitalData) {
         orbitalPos = OrbitalPos()
         // Date/time at which the position and velocity were calculated
         julUTC = calcCurrentDaynum(time) + 2444238.5
-        // Convert satellite's epoch time to Julian and calculate time since epoch in minutes
-        val julEpoch = juliandDateOfEpoch(data.epoch)
+        // Calculate time since epoch in minutes
         val tsince = (julUTC - julEpoch) * MIN_PER_DAY
         calculateSDP4orSGP4(tsince)
         // Scale position and velocity vectors to km and km/sec
         convertSatState(position, velocity)
         // Calculate velocity of satellite
         magnitude(velocity)
-        val squintVector = Vector4()
         // Angles in rads, dist in km, vel in km/S. Calculate sat Az, El, Range and Range-rate.
         calculateObs(julUTC, position, velocity, pos, squintVector)
         calculateLatLonAlt(julUTC)
         orbitalPos.time = time
         orbitalPos.eclipsed = isEclipsed()
         orbitalPos.eclipseDepth = eclipseDepth
+        return orbitalPos
+    }
+
+    /**
+     * Lightweight elevation-only check for pass finding. Avoids full lat/lon/alt,
+     * eclipse, and squint calculations that aren't needed when just searching for
+     * horizon crossings.
+     */
+    fun getElevation(pos: GeoPos, time: Long): Double {
+        julUTC = calcCurrentDaynum(time) + 2444238.5
+        val tsince = (julUTC - julEpoch) * MIN_PER_DAY
+        calculateSDP4orSGP4(tsince)
+        convertSatState(position, velocity)
+        magnitude(velocity)
+        calculateObs(julUTC, position, velocity, pos, squintVector)
+        return orbitalPos.elevation
+    }
+
+    /**
+     * Full position calculation that also populates azimuth, altitude, etc.
+     * Used when we need all fields (AOS/LOS refinement, track computation).
+     */
+    fun getFullPosition(pos: GeoPos, time: Long): OrbitalPos {
+        orbitalPos = OrbitalPos()
+        julUTC = calcCurrentDaynum(time) + 2444238.5
+        val tsince = (julUTC - julEpoch) * MIN_PER_DAY
+        calculateSDP4orSGP4(tsince)
+        convertSatState(position, velocity)
+        magnitude(velocity)
+        calculateObs(julUTC, position, velocity, pos, squintVector)
+        calculateLatLonAlt(julUTC)
+        orbitalPos.time = time
         return orbitalPos
     }
 
@@ -117,38 +168,34 @@ abstract class OrbitalObject(val data: OrbitalData) {
         gsPos: GeoPos,
         squintVector: Vector4
     ) {
-        val obsPos = Vector4()
-        val obsVel = Vector4()
-        val range = Vector4()
-        val rgvel = Vector4()
         calculateUserPosVel(julianUTC, gsPos, obsPos, obsVel)
-        range.setXYZ(
+        rangeVector.setXYZ(
             positionVector.x - obsPos.x,
             positionVector.y - obsPos.y,
             positionVector.z - obsPos.z
         )
         // Save these values globally for calculating squint angles later
-        squintVector.setXYZ(range.x, range.y, range.z)
-        rgvel.setXYZ(
+        squintVector.setXYZ(rangeVector.x, rangeVector.y, rangeVector.z)
+        rgvelVector.setXYZ(
             velocityVector.x - obsVel.x,
             velocityVector.y - obsVel.y,
             velocityVector.z - obsVel.z
         )
-        magnitude(range)
-        val sinLat = sin(DEG2RAD * gsPos.latitude)
-        val cosLat = cos(DEG2RAD * gsPos.latitude)
+        magnitude(rangeVector)
+        val sinLat = cachedSinLat
+        val cosLat = cachedCosLat
         val sinTheta = sin(gsPosTheta)
         val cosTheta = cos(gsPosTheta)
-        val topS = sinLat * cosTheta * range.x + sinLat * sinTheta * range.y - cosLat * range.z
-        val topE = -sinTheta * range.x + cosTheta * range.y
-        val topZ = cosLat * cosTheta * range.x + cosLat * sinTheta * range.y + sinLat * range.z
+        val topS = sinLat * cosTheta * rangeVector.x + sinLat * sinTheta * rangeVector.y - cosLat * rangeVector.z
+        val topE = -sinTheta * rangeVector.x + cosTheta * rangeVector.y
+        val topZ = cosLat * cosTheta * rangeVector.x + cosLat * sinTheta * rangeVector.y + sinLat * rangeVector.z
         var azim = atan(-topE / topS)
         if (topS > 0.0) azim += PI
         if (azim < 0.0) azim += TWO_PI
         orbitalPos.azimuth = azim
-        orbitalPos.elevation = asin(topZ / range.w)
-        orbitalPos.distance = range.w
-        orbitalPos.distanceRate = dot(range, rgvel) / range.w
+        orbitalPos.elevation = asin(topZ / rangeVector.w)
+        orbitalPos.distance = rangeVector.w
+        orbitalPos.distanceRate = dot(rangeVector, rgvelVector) / rangeVector.w
         var elevation = orbitalPos.elevation / TWO_PI * 360.0
         if (elevation > 90) elevation = 180 - elevation
         orbitalPos.aboveHorizon = elevation - 0 > EPSILON
@@ -163,12 +210,24 @@ abstract class OrbitalObject(val data: OrbitalData) {
     ) {
         val mFactor = 7.292115E-5
         gsPosTheta = mod2PI(thetaGJD(time) + DEG2RAD * gsPos.longitude)
-        val c = invert(sqrt(1.0 + FLAT_FACT * (FLAT_FACT - 2) * sqr(sin(DEG2RAD * gsPos.latitude))))
-        val sq = sqr(1.0 - FLAT_FACT) * c
-        val achcp = (EARTH_RADIUS * c + gsPos.altitude / 1000.0) * cos(DEG2RAD * gsPos.latitude)
+
+        // Cache trig and position factors when observer position changes
+        if (gsPos.latitude != cachedGsLat || gsPos.longitude != cachedGsLon || gsPos.altitude != cachedGsAlt) {
+            cachedGsLat = gsPos.latitude
+            cachedGsLon = gsPos.longitude
+            cachedGsAlt = gsPos.altitude
+            cachedSinLat = sin(DEG2RAD * gsPos.latitude)
+            cachedCosLat = cos(DEG2RAD * gsPos.latitude)
+            cachedObsC = invert(sqrt(1.0 + FLAT_FACT * (FLAT_FACT - 2) * sqr(cachedSinLat)))
+            cachedObsSq = sqr(1.0 - FLAT_FACT) * cachedObsC
+            cachedObsAchFactor = (EARTH_RADIUS * cachedObsC + gsPos.altitude / 1000.0) * cachedCosLat
+            cachedObsZFactor = (EARTH_RADIUS * cachedObsSq + gsPos.altitude / 1000.0) * cachedSinLat
+        }
+
         obsPos.setXYZ(
-            achcp * cos(gsPosTheta), achcp * sin(gsPosTheta),
-            (EARTH_RADIUS * sq + gsPos.altitude / 1000.0) * sin(DEG2RAD * gsPos.latitude)
+            cachedObsAchFactor * cos(gsPosTheta),
+            cachedObsAchFactor * sin(gsPosTheta),
+            cachedObsZFactor
         )
         obsVel.setXYZ(-mFactor * obsPos.y, mFactor * obsPos.x, 0.0)
         magnitude(obsPos)
@@ -368,7 +427,7 @@ abstract class OrbitalObject(val data: OrbitalData) {
      * The function Delta_ET has been added to allow calculations on the
      * position of the sun. It provides the difference between UT (approximately
      * the same as UTC) and ET (now referred to as TDT) This function is based
-     * on a least squares fit of data from 1950 to 1991 and will need to be
+     * on the least squares fit of data from 1950 to 1991 and will need to be
      * updated periodically.
      *
      * Values determined using data from 1950-1991 in the 1990 Astronomical

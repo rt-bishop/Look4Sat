@@ -97,40 +97,38 @@ class DeepSpaceObject(data: OrbitalData) : OrbitalObject(data) {
     }
 
     internal fun calculateSDP4(tSince: Double) {
-        synchronized(this) {
-            val temp = DoubleArray(12)
-            val xmdf = data.xmo + dsv.xmdot * tSince
-            val tsq = tSince * tSince
-            val templ = t2cof * tsq
-            dsv.xll = xmdf + dsv.xnodp * templ
-            dsv.omgadf = data.omegao + dsv.omgdot * tSince
-            val xnoddf = data.xnodeo + dsv.xnodot * tSince
-            dsv.xnode = xnoddf + xnodcf * tsq
-            val tempa = 1.0 - c1 * tSince
-            val tempe = data.bstar * c4 * tSince
-            dsv.xn = dsv.xnodp
-            dsv.t = tSince
-            deep.dpsec(data)
-            val a = (XKE / dsv.xn).pow(TWO_THIRDS) * tempa * tempa
-            dsv.em -= tempe
-            deep.dpper()
-            val xl = dsv.xll + dsv.omgadf + dsv.xnode
-            val beta = sqrt(1.0 - dsv.em * dsv.em)
-            dsv.xn = XKE / a.pow(1.5)
-            // Long period periodics
-            val axn = dsv.em * cos(dsv.omgadf)
-            temp[0] = invert(a * beta * beta)
-            val xll = temp[0] * xlcof * axn
-            val aynl = temp[0] * aycof
-            val xlt = xl + xll
-            val ayn = dsv.em * sin(dsv.omgadf) + aynl
-            // Solve Kepler's equation
-            val capu = mod2PI(xlt - dsv.xnode)
-            temp[2] = capu
-            converge(temp, axn, ayn, capu)
-            calculatePosAndVel(temp, a, axn, ayn)
-            calculatePhase(xlt, dsv.xnode, dsv.omgadf)
-        }
+        val temp = DoubleArray(12)
+        val xmdf = data.xmo + dsv.xmdot * tSince
+        val tsq = tSince * tSince
+        val templ = t2cof * tsq
+        dsv.xll = xmdf + dsv.xnodp * templ
+        dsv.omgadf = data.omegao + dsv.omgdot * tSince
+        val xnoddf = data.xnodeo + dsv.xnodot * tSince
+        dsv.xnode = xnoddf + xnodcf * tsq
+        val tempa = 1.0 - c1 * tSince
+        val tempe = data.bstar * c4 * tSince
+        dsv.xn = dsv.xnodp
+        dsv.t = tSince
+        deep.dpsec(data)
+        val a = (XKE / dsv.xn).pow(TWO_THIRDS) * tempa * tempa
+        dsv.em -= tempe
+        deep.dpper()
+        val xl = dsv.xll + dsv.omgadf + dsv.xnode
+        val beta = sqrt(1.0 - dsv.em * dsv.em)
+        dsv.xn = XKE / a.pow(1.5)
+        // Long period periodics
+        val axn = dsv.em * cos(dsv.omgadf)
+        temp[0] = invert(a * beta * beta)
+        val xll = temp[0] * xlcof * axn
+        val aynl = temp[0] * aycof
+        val xlt = xl + xll
+        val ayn = dsv.em * sin(dsv.omgadf) + aynl
+        // Solve Kepler's equation
+        val capu = mod2PI(xlt - dsv.xnode)
+        temp[2] = capu
+        converge(temp, axn, ayn, capu)
+        calculatePosAndVel(temp, a, axn, ayn)
+        calculatePhase(xlt, dsv.xnode, dsv.omgadf)
     }
 
     private fun calculatePosAndVel(temp: DoubleArray, a: Double, axn: Double, ayn: Double) {

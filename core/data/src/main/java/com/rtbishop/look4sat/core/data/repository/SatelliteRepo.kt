@@ -28,6 +28,9 @@ import com.rtbishop.look4sat.core.domain.source.ILocalSource
 import com.rtbishop.look4sat.core.domain.utility.round
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -62,7 +65,8 @@ class SatelliteRepo(
 
     override suspend fun getTrack(sat: OrbitalObject, pos: GeoPos, start: Long, end: Long): List<OrbitalPos> {
         return withContext(dispatcher) {
-            val positions = mutableListOf<OrbitalPos>()
+            val estimatedSize = ((end - start) / 15000).toInt() + 1
+            val positions = ArrayList<OrbitalPos>(estimatedSize)
             var currentTime = start
             while (currentTime < end) {
                 positions.add(sat.getPosition(pos, currentTime))
@@ -80,20 +84,21 @@ class SatelliteRepo(
     ): List<SatRadio> {
         return withContext(dispatcher) {
             val satPos = sat.getPosition(pos, time)
-            val copiedList = radios.map { it.copy() }
-            copiedList.forEach { transmitter ->
-                transmitter.downlinkLow?.let { transmitter.downlinkLow = satPos.getDownlinkFreq(it) }
-                transmitter.downlinkHigh?.let { transmitter.downlinkHigh = satPos.getDownlinkFreq(it) }
-                transmitter.uplinkLow?.let { transmitter.uplinkLow = satPos.getUplinkFreq(it) }
-                transmitter.uplinkHigh?.let { transmitter.uplinkHigh = satPos.getUplinkFreq(it) }
+            radios.map { transmitter ->
+                transmitter.copy(
+                    downlinkLow = transmitter.downlinkLow?.let { satPos.getDownlinkFreq(it) },
+                    downlinkHigh = transmitter.downlinkHigh?.let { satPos.getDownlinkFreq(it) },
+                    uplinkLow = transmitter.uplinkLow?.let { satPos.getUplinkFreq(it) },
+                    uplinkHigh = transmitter.uplinkHigh?.let { satPos.getUplinkFreq(it) }
+                )
             }
-            copiedList.map { it.copy() }
         }
     }
 
     override suspend fun processPasses(passList: List<OrbitalPass>, time: Long): List<OrbitalPass> {
         return withContext(dispatcher) {
-            passList.forEach { pass ->
+            val result = ArrayList<OrbitalPass>(passList.size)
+            for (pass in passList) {
                 if (!pass.isDeepSpace) {
                     val timeStart = pass.aosTime
                     if (time > timeStart) {
@@ -102,22 +107,45 @@ class SatelliteRepo(
                         pass.progress = (deltaNow / deltaTotal).round(2)
                     }
                 }
+                if (pass.progress < 1.0f) {
+                    result.add(pass.copy())
+                }
             }
-            passList.filter { pass -> pass.progress < 1.0 }.map { it.copy() }
+            result
         }
     }
 
     override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>) {
-        if (_satellites.value.isNotEmpty()) {
+        val currentSatellites = _satellites.value
+        if (currentSatellites.isNotEmpty()) {
             withContext(dispatcher) {
-                val newPasses = mutableListOf<OrbitalPass>()
                 val idsWithModes = localStorage.getIdsWithModes(modes)
-                _satellites.value.forEach { satellite ->
-                    if (idsWithModes.isEmpty() || satellite.data.catnum in idsWithModes) {
-                        newPasses.addAll(satellite.getPasses(settingsRepo.stationPosition.value, time, hoursAhead))
+                val stationPos = settingsRepo.stationPosition.value
+                val filteredSatellites = if (idsWithModes.isEmpty()) {
+                    currentSatellites
+                } else {
+                    currentSatellites.filter { it.data.catnum in idsWithModes }
+                }
+                // Compute passes for each satellite in parallel
+                val passLists = coroutineScope {
+                    filteredSatellites.map { satellite ->
+                        async {
+                            satellite.getPasses(stationPos, time, hoursAhead)
+                        }
+                    }.awaitAll()
+                }
+                // Flatten and filter in a single pass
+                val timeFuture = time + (hoursAhead * 60L * 60L * 1000L)
+                val newPasses = ArrayList<OrbitalPass>()
+                for (list in passLists) {
+                    for (pass in list) {
+                        if (pass.losTime > time && pass.aosTime < timeFuture && pass.maxElevation > minElevation) {
+                            newPasses.add(pass)
+                        }
                     }
                 }
-                _passes.update { newPasses.filter(time, hoursAhead, minElevation) }
+                newPasses.sortBy { it.aosTime }
+                _passes.update { newPasses }
             }
         } else {
             _passes.update { emptyList() }
@@ -149,11 +177,6 @@ class SatelliteRepo(
         return passes
     }
 
-    private fun List<OrbitalPass>.filter(time: Long, hoursAhead: Int, minElev: Double): List<OrbitalPass> {
-        val timeFuture = time + (hoursAhead * 60L * 60L * 1000L)
-        return this.filter { it.losTime > time }.filter { it.aosTime < timeFuture }
-            .filter { it.maxElevation > minElev }.sortedBy { it.aosTime }
-    }
 
     private fun getGeoPass(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPass {
         val satPos = sat.getPosition(pos, time)
@@ -170,72 +193,72 @@ class SatelliteRepo(
         var calendarTimeMillis = time
         var elevation: Double
         var maxElevation = 0.0
-        var alt = 0.0 // var tcaAz = 0.0
         // rewind 1/4 of an orbit
-        if (rewind) calendarTimeMillis += -quarterOrbitMin * 60L * 1000L
+        if (rewind) calendarTimeMillis -= quarterOrbitMin * 60L * 1000L
 
-        var satPos = sat.getPosition(pos, calendarTimeMillis)
-        if (satPos.elevation > 0.0) {
+        // Use lightweight elevation check for coarse searching
+        if (sat.getElevation(pos, calendarTimeMillis) > 0.0) {
             // move forward in 30 second intervals until the sat goes below the horizon
             do {
                 calendarTimeMillis += 30 * 1000L
-                satPos = sat.getPosition(pos, calendarTimeMillis)
-            } while (satPos.elevation > 0.0)
+            } while (sat.getElevation(pos, calendarTimeMillis) > 0.0)
             // move forward 3/4 of an orbit
             calendarTimeMillis += quarterOrbitMin * 3 * 60L * 1000L
         }
 
-        // find the next time sat comes above the horizon
+        // find the next time sat comes above the horizon (coarse: 60s steps)
         do {
             calendarTimeMillis += 60L * 1000L
-            satPos = sat.getPosition(pos, calendarTimeMillis)
-            elevation = satPos.elevation
+            elevation = sat.getElevation(pos, calendarTimeMillis)
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
-        } while (satPos.elevation < 0.0)
+        } while (elevation < 0.0)
 
-        // refine to 1 second
-        calendarTimeMillis += -60L * 1000L
+        // refine AOS to ~500ms precision
+        calendarTimeMillis -= 60L * 1000L
         do {
-            calendarTimeMillis += 1L * 500L
-            satPos = sat.getPosition(pos, calendarTimeMillis)
-            elevation = satPos.elevation
+            calendarTimeMillis += 500L
+            elevation = sat.getElevation(pos, calendarTimeMillis)
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
-        } while (satPos.elevation < 0.0)
+        } while (elevation < 0.0)
 
-        val aos = 1000 * ((satPos.time + 500) / 1000)
-        val aosAz = satPos.azimuth.toDegrees().round(1)
+        // Get full position for AOS data (azimuth, altitude)
+        val aosPos = sat.getFullPosition(pos, calendarTimeMillis)
+        val aos = 1000 * ((aosPos.time + 500) / 1000)
+        val aosAz = aosPos.azimuth.toDegrees().round(1)
 
-        // find when sat goes below
+        // find when sat goes below (coarse: 30s steps)
         do {
             calendarTimeMillis += 30L * 1000L
-            satPos = sat.getPosition(pos, calendarTimeMillis)
-            elevation = satPos.elevation
+            elevation = sat.getElevation(pos, calendarTimeMillis)
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
-        } while (satPos.elevation > 0.0)
+        } while (elevation > 0.0)
 
-        // refine to 1 second
-        calendarTimeMillis += -30L * 1000L
+        // refine LOS to ~500ms precision
+        calendarTimeMillis -= 30L * 1000L
         do {
-            calendarTimeMillis += 1L * 500L
-            satPos = sat.getPosition(pos, calendarTimeMillis)
-            elevation = satPos.elevation
+            calendarTimeMillis += 500L
+            elevation = sat.getElevation(pos, calendarTimeMillis)
             if (elevation > maxElevation) {
                 maxElevation = elevation
-                alt = satPos.altitude // tcaAz = satPos.azimuth.toDegrees()
             }
-        } while (satPos.elevation > 0.0)
+        } while (elevation > 0.0)
 
-        val los = 1000 * ((satPos.time + 500) / 1000) // val tca = (aos + los) / 2
-        val losAz = satPos.azimuth.toDegrees().round(1)
+        // Get full position for LOS data (azimuth, altitude)
+        val losPos = sat.getFullPosition(pos, calendarTimeMillis)
+        val los = 1000 * ((losPos.time + 500) / 1000)
+        val losAz = losPos.azimuth.toDegrees().round(1)
+
+        // Get altitude at approximate TCA (max elevation)
+        val tcaTime = (aos + los) / 2
+        val tcaPos = sat.getFullPosition(pos, tcaTime)
+        val alt = tcaPos.altitude
+
         val elev = maxElevation.toDegrees().round(1)
         return OrbitalPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat)
     }
