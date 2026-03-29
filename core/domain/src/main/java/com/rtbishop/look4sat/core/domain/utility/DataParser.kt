@@ -29,126 +29,94 @@ import kotlin.math.pow
 class DataParser(private val dispatcher: CoroutineDispatcher) {
 
     suspend fun parseCSVStream(stream: InputStream): List<OrbitalData> = withContext(dispatcher) {
-        val parsedItems = mutableListOf<OrbitalData>()
         stream.bufferedReader().useLines { lines ->
-            lines.forEachIndexed { index, line ->
-                if (index != 0) {
-                    val values = line.split(",")
-                    parseCSV(values)?.let { tle -> parsedItems.add(tle) }
-                }
-            }
+            lines.drop(1).mapNotNull { parseCSV(it.split(",")) }.toList()
         }
-        return@withContext parsedItems
     }
 
     suspend fun parseTLEStream(stream: InputStream): List<OrbitalData> = withContext(dispatcher) {
-        val tleStrings = mutableListOf(String(), String(), String())
-        val parsedItems = mutableListOf<OrbitalData>()
-        var lineIndex = 0
-        stream.bufferedReader().forEachLine { line ->
-            tleStrings[lineIndex] = line
-            if (lineIndex < 2) {
-                lineIndex++
-            } else {
-                val isLineOneValid = tleStrings[1].substring(0, 1) == "1"
-                val isLineTwoValid = tleStrings[2].substring(0, 1) == "2"
-                if (!isLineOneValid && !isLineTwoValid) return@forEachLine
-                parseTLE(tleStrings)?.let { tle -> parsedItems.add(tle) }
-                lineIndex = 0
-            }
-        }
-        return@withContext parsedItems
+        stream.bufferedReader().readLines()
+            .chunked(3)
+            .filter { it.size == 3 && it[1].startsWith("1") && it[2].startsWith("2") }
+            .mapNotNull { parseTLE(it) }
     }
 
     suspend fun parseJSONStream(stream: InputStream): List<SatRadio> = withContext(dispatcher) {
-        val parsedItems = mutableListOf<SatRadio>()
-        try {
+        runCatching {
             val jsonArray = JSONArray(stream.bufferedReader().readText())
-            for (index in 0 until jsonArray.length()) {
-                val jsonObject = jsonArray.getJSONObject(index)
-                parseJSON(jsonObject)?.let { parsedItems.add(it) }
-            }
-            return@withContext parsedItems
-        } catch (_: Exception) {
-            return@withContext parsedItems
-        }
+            (0 until jsonArray.length()).mapNotNull { parseJSON(jsonArray.getJSONObject(it)) }
+        }.getOrDefault(emptyList())
     }
 
-    fun isLeapYear(year: Int): Boolean {
-        return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)
-    }
+    fun isLeapYear(year: Int): Boolean = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
 
-    private fun parseCSV(values: List<String>): OrbitalData? = try {
+    private fun parseCSV(values: List<String>): OrbitalData? = runCatching {
         val name = values[0]
-        val year = values[2].substring(0, 4)
-        val month = values[2].substring(5, 7)
-        val dayOfMonth = values[2].substring(8, 10)
-        val dayInt = getDayOfYear(year.toInt(), month.toInt(), dayOfMonth.toInt())
-        val day = if (dayInt < 10) "00$dayInt" else if (dayInt < 100) "0$dayInt" else "$dayInt"
-        val hour = values[2].substring(11, 13).toInt() * 3600000 // ms in one hour
-        val min = values[2].substring(14, 16).toInt() * 60000 // ms in one minute
-        val sec = values[2].substring(17, 19).toInt() * 1000 // ms in one second
-        val ms = values[2].substring(20, 26).toInt() / 1000.0 // microseconds to ms
-        val frac = ((hour + min + sec + ms) / 86400000.0).toString()
-        val epoch = "${year.substring(2)}$day${frac.substring(1)}".toDouble()
-        val meanmo = values[3].toDouble()
-        val eccn = values[4].toDouble()
-        val incl = values[5].toDouble()
-        val raan = values[6].toDouble()
-        val argper = values[7].toDouble()
-        val meanan = values[8].toDouble()
-        val catnum = values[11].toInt()
-        val bstar = values[14].toDouble()
-        OrbitalData(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
-    } catch (exception: Exception) {
-        println("CSV parsing exception: $exception")
-        null
-    }
+        val timestamp = values[2]
+        val year = timestamp.substring(0, 4)
+        val month = timestamp.substring(5, 7).toInt()
+        val dayOfMonth = timestamp.substring(8, 10).toInt()
+        val dayInt = getDayOfYear(year.toInt(), month, dayOfMonth)
+        val day = dayInt.toString().padStart(3, '0')
+        val hour = timestamp.substring(11, 13).toInt() * 3600000
+        val min = timestamp.substring(14, 16).toInt() * 60000
+        val sec = timestamp.substring(17, 19).toInt() * 1000
+        val ms = timestamp.substring(20, 26).toInt() / 1000.0
+        val frac = ((hour + min + sec + ms) / 86400000.0).toString().substring(1)
+        val epoch = "${year.substring(2)}$day$frac".toDouble()
+        OrbitalData(
+            name = name,
+            epoch = epoch,
+            meanmo = values[3].toDouble(),
+            eccn = values[4].toDouble(),
+            incl = values[5].toDouble(),
+            raan = values[6].toDouble(),
+            argper = values[7].toDouble(),
+            meanan = values[8].toDouble(),
+            catnum = values[11].toInt(),
+            bstar = values[14].toDouble()
+        )
+    }.onFailure { println("CSV parsing exception: $it") }.getOrNull()
 
-    private fun parseTLE(tle: List<String>): OrbitalData? = try {
-        val name: String = tle[0].trim()
-        val epoch: Double = tle[1].substring(18, 32).toDouble()
-        val meanmo: Double = tle[2].substring(52, 63).toDouble()
-        val eccn: Double = tle[2].substring(26, 33).toDouble() / 10000000.0
-        val incl: Double = tle[2].substring(8, 16).toDouble()
-        val raan: Double = tle[2].substring(17, 25).toDouble()
-        val argper: Double = tle[2].substring(34, 42).toDouble()
-        val meanan: Double = tle[2].substring(43, 51).toDouble()
-        val catnum: Int = tle[1].substring(2, 7).trim().toInt()
-        val bstar: Double = 1.0e-5 * tle[1].substring(53, 59).toDouble() / 10.0.pow(tle[1].substring(60, 61).toDouble())
-        OrbitalData(name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar)
-    } catch (exception: Exception) {
-        println("TLE parsing exception: $exception")
-        null
-    }
+    private fun parseTLE(tle: List<String>): OrbitalData? = runCatching {
+        val line1 = tle[1]
+        val line2 = tle[2]
+        OrbitalData(
+            name = tle[0].trim(),
+            epoch = line1.substring(18, 32).toDouble(),
+            meanmo = line2.substring(52, 63).toDouble(),
+            eccn = line2.substring(26, 33).toDouble() / 1e7,
+            incl = line2.substring(8, 16).toDouble(),
+            raan = line2.substring(17, 25).toDouble(),
+            argper = line2.substring(34, 42).toDouble(),
+            meanan = line2.substring(43, 51).toDouble(),
+            catnum = line1.substring(2, 7).trim().toInt(),
+            bstar = 1e-5 * line1.substring(53, 59).toDouble() / 10.0.pow(line1.substring(60, 61).toDouble())
+        )
+    }.onFailure { println("TLE parsing exception: $it") }.getOrNull()
 
-    private fun parseJSON(json: JSONObject): SatRadio? = try {
-        val uuid = json.getString("uuid")
-        val info = json.getString("description")
-        val alive = json.getBoolean("alive")
-        val dlinkLow = if (json.isNull("downlink_low")) null else json.getLong("downlink_low")
-        val dlinkHigh = if (json.isNull("downlink_high")) null else json.getLong("downlink_high")
-        val dlinkMode = if (json.isNull("mode")) null else json.getString("mode")
-        val ulinkLow = if (json.isNull("uplink_low")) null else json.getLong("uplink_low")
-        val ulinkHigh = if (json.isNull("uplink_high")) null else json.getLong("uplink_high")
-        val ulinkMode = if (json.isNull("uplink_mode")) null else json.getString("uplink_mode")
-        val inverted = json.getBoolean("invert")
-        val catnum = if (json.isNull("norad_cat_id")) null else json.getInt("norad_cat_id")
-        SatRadio(uuid, info, alive, dlinkLow, dlinkHigh, dlinkMode, ulinkLow, ulinkHigh, ulinkMode, inverted, catnum)
-    } catch (exception: Exception) {
-        println("JSON parsing exception: $exception")
-        null
-    }
+    private fun parseJSON(json: JSONObject): SatRadio? = runCatching {
+        SatRadio(
+            uuid = json.getString("uuid"),
+            info = json.getString("description"),
+            isAlive = json.getBoolean("alive"),
+            downlinkLow = json.optLongOrNull("downlink_low"),
+            downlinkHigh = json.optLongOrNull("downlink_high"),
+            downlinkMode = json.optStringOrNull("mode"),
+            uplinkLow = json.optLongOrNull("uplink_low"),
+            uplinkHigh = json.optLongOrNull("uplink_high"),
+            uplinkMode = json.optStringOrNull("uplink_mode"),
+            isInverted = json.getBoolean("invert"),
+            catnum = json.optIntOrNull("norad_cat_id")
+        )
+    }.onFailure { println("JSON parsing exception: $it") }.getOrNull()
+
+    private fun JSONObject.optStringOrNull(key: String): String? = if (isNull(key)) null else getString(key)
+    private fun JSONObject.optLongOrNull(key: String): Long? = if (isNull(key)) null else getLong(key)
+    private fun JSONObject.optIntOrNull(key: String): Int? = if (isNull(key)) null else getInt(key)
 
     private fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
-        if (month == 1) return dayOfMonth
-        val daysArray = arrayOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-        var dayOfYear = dayOfMonth
-        // If leap year increment Feb days
-        if (isLeapYear(year)) daysArray[1]++
-        for (i in 0 until month - 1) {
-            dayOfYear += daysArray[i]
-        }
-        return dayOfYear
+        val daysInMonth = intArrayOf(31, if (isLeapYear(year)) 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        return daysInMonth.take(month - 1).sum() + dayOfMonth
     }
 }

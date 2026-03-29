@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.core.data.repository
 
 import com.rtbishop.look4sat.core.domain.model.DatabaseState
-import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalData
 import com.rtbishop.look4sat.core.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
@@ -28,7 +27,9 @@ import com.rtbishop.look4sat.core.domain.source.Sources
 import com.rtbishop.look4sat.core.domain.utility.DataParser
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import java.io.InputStream
 import java.util.zip.ZipInputStream
 
 class DatabaseRepo(
@@ -39,78 +40,55 @@ class DatabaseRepo(
     private val settingsRepo: ISettingsRepo
 ) : IDatabaseRepo {
 
+    private companion object {
+        val tleTypes = setOf("Amsat", "R4UAB", "Other")
+        val zippedTleTypes = setOf("McCants", "Classified")
+    }
+
     override suspend fun updateTLEFromFile(uri: String) = withContext(dispatcher) {
-        val importedSatellites = remoteSource.getFileStream(uri)?.let { dataParser.parseTLEStream(it) }
-        importedSatellites?.let { localSource.insertEntries(it) }
+        remoteSource.getFileStream(uri)?.let {
+            localSource.insertEntries(dataParser.parseTLEStream(it))
+        }
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
     override suspend fun updateTransceiversFromFile(uri: String) = withContext(dispatcher) {
-        val radios = remoteSource.getFileStream(uri)?.let { dataParser.parseJSONStream(it) }
-        radios?.let {
-            if(it.isNotEmpty()) {
+        remoteSource.getFileStream(uri)
+            ?.let { dataParser.parseJSONStream(it) }
+            ?.takeIf { it.isNotEmpty() }
+            ?.let {
                 localSource.deleteRadios()
                 localSource.insertRadios(it)
             }
-        }
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
     override suspend fun updateFromRemote() = withContext(dispatcher) {
-        val importedEntries = mutableListOf<OrbitalData>()
-        val importedRadios = mutableListOf<SatRadio>()
-        val tleUrls = Sources.satelliteDataUrls.toMutableMap().apply {
-            if (settingsRepo.dataSourcesSettings.value.useCustomTLE) {
-                this["Other"] = settingsRepo.dataSourcesSettings.value.tleUrl
-            }
-        }
-        val jobsMap = tleUrls
-            .filter { (_, url) -> url.isNotEmpty() }
-            .mapValues { (_, url) -> async { remoteSource.getNetworkStream(url) } }
+        val dataSourcesSettings = settingsRepo.dataSourcesSettings.value
+        val tleUrls = buildMap {
+            putAll(Sources.satelliteDataUrls)
+            if (dataSourcesSettings.useCustomTLE) put("Other", dataSourcesSettings.tleUrl)
+        }.filterValues { it.isNotEmpty() }
+
         val radioUrls = buildList {
             add(Sources.RADIO_DATA_URL)
-            if (settingsRepo.dataSourcesSettings.value.useCustomTransceivers) {
-                add(settingsRepo.dataSourcesSettings.value.transceiversUrl)
-            }
+            if (dataSourcesSettings.useCustomTransceivers) add(dataSourcesSettings.transceiversUrl)
         }
-        val jobRadios = radioUrls.associateWith { url -> async { remoteSource.getNetworkStream(url) } }
-        // parse
-        jobsMap.mapValues { job -> job.value.await() }.forEach { entry ->
-            entry.value?.let { stream ->
-                when (val type = entry.key) {
-                    "Amsat", "R4UAB", "Other" -> {
-                        // parse tle stream
-                        val satellites = dataParser.parseTLEStream(stream)
-                        val catnums = satellites.map { it.catnum }
-                        settingsRepo.setSatelliteTypeIds(type, catnums)
-                        importedEntries.addAll(satellites)
-                    }
 
-                    "McCants", "Classified" -> {
-                        // unzip and parse tle stream
-                        val unzipped = ZipInputStream(stream).apply { nextEntry }
-                        val satellites = dataParser.parseTLEStream(unzipped)
-                        val catnums = satellites.map { it.catnum }
-                        settingsRepo.setSatelliteTypeIds(type, catnums)
-                        importedEntries.addAll(satellites)
-                    }
+        // launch all network requests concurrently
+        val tleJobs = tleUrls.map { (type, url) -> async { type to remoteSource.getNetworkStream(url) } }
+        val radioJobs = radioUrls.map { url -> async { remoteSource.getNetworkStream(url) } }
 
-                    else -> {
-                        // parse csv stream
-                        val satellites = dataParser.parseCSVStream(stream)
-                        val catnums = satellites.map { it.catnum }
-                        settingsRepo.setSatelliteTypeIds(type, catnums)
-                        importedEntries.addAll(satellites)
-                    }
-                }
+        // parse satellite data
+        val importedEntries = tleJobs.awaitAll().flatMap { (type, stream) ->
+            stream?.let { parseSatelliteStream(type, it) }.orEmpty().also { satellites ->
+                settingsRepo.setSatelliteTypeIds(type, satellites.map { it.catnum })
             }
         }
-        jobRadios.values.forEach { job ->
-            job.await()?.let {
-                importedRadios.addAll(dataParser.parseJSONStream(it))
-            }
-        }
-        // insert
+
+        // parse radio data
+        val importedRadios = radioJobs.awaitAll().filterNotNull().flatMap { dataParser.parseJSONStream(it) }
+
         localSource.insertEntries(importedEntries)
         localSource.insertRadios(importedRadios)
         setUpdateSuccessful(System.currentTimeMillis())
@@ -122,9 +100,15 @@ class DatabaseRepo(
         setUpdateSuccessful(0L)
     }
 
-    private suspend fun setUpdateSuccessful(timestamp: Long) = withContext(dispatcher) {
-        val numberOfRadios = localSource.getRadiosTotal()
-        val numberOfSatellites = localSource.getEntriesTotal()
-        settingsRepo.updateDatabaseState(DatabaseState(numberOfRadios, numberOfSatellites, timestamp))
+    private suspend fun parseSatelliteStream(type: String, stream: InputStream): List<OrbitalData> = when (type) {
+        in tleTypes -> dataParser.parseTLEStream(stream)
+        in zippedTleTypes -> dataParser.parseTLEStream(ZipInputStream(stream).apply { nextEntry })
+        else -> dataParser.parseCSVStream(stream)
+    }
+
+    private suspend fun setUpdateSuccessful(timestamp: Long) {
+        settingsRepo.updateDatabaseState(
+            DatabaseState(localSource.getRadiosTotal(), localSource.getEntriesTotal(), timestamp)
+        )
     }
 }
