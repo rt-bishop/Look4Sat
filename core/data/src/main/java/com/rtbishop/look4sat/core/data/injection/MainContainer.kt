@@ -19,15 +19,13 @@ import com.rtbishop.look4sat.core.data.source.LocalSource
 import com.rtbishop.look4sat.core.data.source.RemoteSource
 import com.rtbishop.look4sat.core.data.usecase.AddToCalendar
 import com.rtbishop.look4sat.core.data.usecase.ShowToast
-import com.rtbishop.look4sat.core.domain.repository.ExtendedParams
 import com.rtbishop.look4sat.core.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.core.domain.repository.IMainContainer
-import com.rtbishop.look4sat.core.domain.repository.IReporterRepo
+import com.rtbishop.look4sat.core.domain.repository.IReporter
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISelectionRepo
 import com.rtbishop.look4sat.core.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.core.domain.repository.WithoutExtParams
 import com.rtbishop.look4sat.core.domain.source.ILocalSource
 import com.rtbishop.look4sat.core.domain.source.IRemoteSource
 import com.rtbishop.look4sat.core.domain.usecase.IAddToCalendar
@@ -53,13 +51,26 @@ class MainContainer(private val context: Context) : IMainContainer {
 
     override fun provideShowToast(): IShowToast = ShowToast(context)
 
-    override fun provideBluetoothReporter(): IReporterRepo<WithoutExtParams> {
+    override fun provideBluetoothReporter(): IReporter {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        return BluetoothReporter(manager, CoroutineScope(Dispatchers.IO))
+        val rc = settingsRepo.rcSettings.value
+        return BluetoothReporter(
+            manager,
+            CoroutineScope(Dispatchers.IO),
+            rc.bluetoothRotatorAddress,
+            rc.bluetoothFrequencyAddress
+        )
     }
 
-    override fun provideNetworkReporter(): IReporterRepo<ExtendedParams> {
-        return NetworkReporter(CoroutineScope(Dispatchers.IO))
+    override fun provideNetworkReporter(): IReporter {
+        val rc = settingsRepo.rcSettings.value
+        return NetworkReporter(
+            CoroutineScope(Dispatchers.IO),
+            rc.rotatorAddress,
+            rc.rotatorPort.toIntOrNull() ?: 0,
+            rc.frequencyAddress,
+            rc.frequencyPort.toIntOrNull() ?: 0
+        )
     }
 
     override fun provideSensorsRepo(): ISensorsRepo {

@@ -12,8 +12,8 @@ interface IMainContainer {
     val databaseRepo: IDatabaseRepo
     fun provideAddToCalendar(): IAddToCalendar
     fun provideShowToast(): IShowToast
-    fun provideBluetoothReporter(): IReporterRepo<WithoutExtParams>
-    fun provideNetworkReporter(): IReporterRepo<ExtendedParams>
+    fun provideBluetoothReporter(): IReporter
+    fun provideNetworkReporter(): IReporter
     fun provideSensorsRepo(): ISensorsRepo
 }
 

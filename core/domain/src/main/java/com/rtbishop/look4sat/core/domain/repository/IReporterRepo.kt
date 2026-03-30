@@ -17,18 +17,7 @@
  */
 package com.rtbishop.look4sat.core.domain.repository
 
-interface IReporterParams
-
-interface IReporterRepo<T : IReporterParams> {
-    fun isConnected(service: BtService): Boolean
-    fun isConnecting(service: BtService): Boolean
-    fun connect(service: BtService, deviceId: String)
-    fun reportRotation(format: String, azimuth: Double, elevation: Double, params: T)
-    fun reportFrequency(format: String, frequency: Long, params: T)
+interface IReporter {
+    fun reportRotation(format: String, azimuth: Double, elevation: Double)
+    fun reportFrequency(format: String, frequency: Long)
 }
-
-data class ExtendedParams(val server: String, val port: Int) : IReporterParams
-
-data class WithoutExtParams(val dummy: Int) : IReporterParams
-
-enum class BtService { ROTATOR, FREQUENCY }

@@ -28,14 +28,11 @@ import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
-import com.rtbishop.look4sat.core.domain.repository.BtService
-import com.rtbishop.look4sat.core.domain.repository.ExtendedParams
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
-import com.rtbishop.look4sat.core.domain.repository.IReporterRepo
+import com.rtbishop.look4sat.core.domain.repository.IReporter
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.core.domain.repository.WithoutExtParams
 import com.rtbishop.look4sat.core.domain.usecase.IAddToCalendar
 import com.rtbishop.look4sat.core.domain.utility.round
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
@@ -49,8 +46,8 @@ import kotlinx.coroutines.launch
 
 class RadarViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val bluetoothReporter: IReporterRepo<WithoutExtParams>,
-    private val networkReporter: IReporterRepo<ExtendedParams>,
+    private val bluetoothReporter: IReporter,
+    private val networkReporter: IReporter,
     private val satelliteRepo: ISatelliteRepo,
     private val settingsRepo: ISettingsRepo,
     private val sensorsRepo: ISensorsRepo,
@@ -143,20 +140,15 @@ class RadarViewModel(
         }
         _uiState.update { it.copy(orbitalPos = orbitalPos, satTrack = track) }
         viewModelScope.launch {
-            if (settingsRepo.rcSettings.value.rotatorState) {
-                val server = settingsRepo.rcSettings.value.rotatorAddress
-                val port = settingsRepo.rcSettings.value.rotatorPort.toInt()
-                val format = settingsRepo.rcSettings.value.rotatorFormat
+            val rc = settingsRepo.rcSettings.value
+            if (rc.rotatorState) {
                 val azimuth = orbitalPos.azimuth.toDegrees().round(2)
                 val elevation = orbitalPos.elevation.toDegrees().round(2)
-                networkReporter.reportRotation(format, azimuth, elevation, ExtendedParams(server, port))
+                networkReporter.reportRotation(rc.rotatorFormat, azimuth, elevation)
             }
-            if (settingsRepo.rcSettings.value.frequencyState) {
+            if (rc.frequencyState) {
                 _uiState.value.selectedFrequency?.let { freq ->
-                    val server = settingsRepo.rcSettings.value.frequencyAddress
-                    val port = settingsRepo.rcSettings.value.frequencyPort.toInt()
-                    val format = settingsRepo.rcSettings.value.frequencyFormat
-                    networkReporter.reportFrequency(format,freq, ExtendedParams(server, port))
+                    networkReporter.reportFrequency(rc.frequencyFormat, freq)
                 }
             }
         }
@@ -164,29 +156,15 @@ class RadarViewModel(
 
     private fun sendPassDataBT(orbitalPos: OrbitalPos) {
         viewModelScope.launch {
-            if (settingsRepo.rcSettings.value.bluetoothRotatorState) {
-                val btRotatorDevice = settingsRepo.rcSettings.value.bluetoothRotatorAddress
-                if (bluetoothReporter.isConnected(BtService.ROTATOR)) {
-                    val format = settingsRepo.rcSettings.value.bluetoothRotatorFormat
-                    val azimuth = orbitalPos.azimuth.toDegrees().round(0)
-                    val elevation = orbitalPos.elevation.toDegrees().round(0)
-                    bluetoothReporter.reportRotation(format, azimuth, elevation, WithoutExtParams(0))
-                } else if (!bluetoothReporter.isConnecting(BtService.ROTATOR)) {
-//                    Log.i("BTReporter", "BTReporter (rotator): Attempting to connect...")
-                    bluetoothReporter.connect(BtService.ROTATOR,btRotatorDevice)
-                }
+            val rc = settingsRepo.rcSettings.value
+            if (rc.bluetoothRotatorState) {
+                val azimuth = orbitalPos.azimuth.toDegrees().round(0)
+                val elevation = orbitalPos.elevation.toDegrees().round(0)
+                bluetoothReporter.reportRotation(rc.bluetoothRotatorFormat, azimuth, elevation)
             }
-            if (settingsRepo.rcSettings.value.bluetoothFrequencyState) {
-                val btFrequencyDevice = settingsRepo.rcSettings.value.bluetoothFrequencyAddress
-                if (bluetoothReporter.isConnected(BtService.FREQUENCY)) {
-                    val format = settingsRepo.rcSettings.value.bluetoothFrequencyFormat
-                    val frequency = _uiState.value.selectedFrequency
-                    frequency?.let { freq ->
-                        bluetoothReporter.reportFrequency(format, freq, WithoutExtParams(0))
-                    }
-                } else if (!bluetoothReporter.isConnecting(BtService.FREQUENCY)) {
-//                    Log.i("BTReporter", "BTReporter (frequency): Attempting to connect...")
-                    bluetoothReporter.connect(BtService.FREQUENCY, btFrequencyDevice)
+            if (rc.bluetoothFrequencyState) {
+                _uiState.value.selectedFrequency?.let { freq ->
+                    bluetoothReporter.reportFrequency(rc.bluetoothFrequencyFormat, freq)
                 }
             }
         }

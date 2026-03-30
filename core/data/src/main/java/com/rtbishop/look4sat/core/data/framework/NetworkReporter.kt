@@ -17,11 +17,8 @@
  */
 package com.rtbishop.look4sat.core.data.framework
 
-import com.rtbishop.look4sat.core.domain.repository.BtService
-import com.rtbishop.look4sat.core.domain.repository.ExtendedParams
-import com.rtbishop.look4sat.core.domain.repository.IReporterRepo
+import com.rtbishop.look4sat.core.domain.repository.IReporter
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -29,89 +26,88 @@ import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
-enum class NetworkService { ROTATOR, FREQUENCY }
+class NetworkReporter(
+    private val reporterScope: CoroutineScope,
+    private val rotatorServer: String,
+    private val rotatorPort: Int,
+    private val frequencyServer: String,
+    private val frequencyPort: Int
+) : IReporter {
 
-data class SocketConnection(
-    var socket: SocketChannel? = null,
-    var connected: Boolean = false,
-    var connecting: Boolean = false,
-    var connectionJob: Job? = null
-)
-
-class NetworkReporter(private val reporterScope: CoroutineScope) : IReporterRepo<ExtendedParams> {
-    private val serviceToAddress = mutableMapOf<NetworkService, String>()
-    private val connections = mutableMapOf<String, SocketConnection>()
     private val writeMutex = Mutex()
 
-    fun isConnected(service: NetworkService): Boolean {
-        val addr = serviceToAddress[service] ?: return false
-        return connections[addr]?.connected == true
+    private var rotatorSocket: SocketChannel? = null
+    private var rotatorConnected = false
+    private var rotatorConnecting = false
+
+    private var frequencySocket: SocketChannel? = null
+    private var frequencyConnected = false
+    private var frequencyConnecting = false
+
+    override fun reportRotation(format: String, azimuth: Double, elevation: Double) {
+        reporterScope.launch {
+            ensureRotatorConnected()
+            if (!rotatorConnected) return@launch
+            val el = if (elevation > 0.0) elevation else 0.0
+            val command = format
+                .replace($$"$AZ", azimuth.toString())
+                .replace($$"$EL", el.toString())
+            write(rotatorSocket, command) { rotatorConnected = false }
+        }
     }
 
-    private fun getOrCreateConnection(addr: String): SocketConnection {
-        return connections.getOrPut(addr) { SocketConnection() }
+    override fun reportFrequency(format: String, frequency: Long) {
+        reporterScope.launch {
+            ensureFrequencyConnected()
+            if (!frequencyConnected) return@launch
+            val command = format.replace($$"$FREQ", frequency.toString())
+            write(frequencySocket, command) { frequencyConnected = false }
+        }
     }
 
-    fun connect(service: NetworkService, server: String, port: Int) {
-        val addr = "$server:$port"
-        serviceToAddress[service] = addr
-        val connection = getOrCreateConnection(addr)
-        if (connection.connected || connection.connecting) return
-        connection.connectionJob = reporterScope.launch {
+    private fun ensureRotatorConnected() {
+        if (rotatorConnected || rotatorConnecting || rotatorServer.isBlank()) return
+        reporterScope.launch {
             try {
-                connection.connecting = true
-                val socket = SocketChannel.open(InetSocketAddress(server, port))
-                connection.socket = socket
-                connection.connected = true
-                println("NetworkReporter: $service connected to $addr")
+                rotatorConnecting = true
+                rotatorSocket = SocketChannel.open(InetSocketAddress(rotatorServer, rotatorPort))
+                rotatorConnected = true
+                println("NetworkReporter: Rotator connected to $rotatorServer:$rotatorPort")
             } catch (e: Exception) {
-                println("NetworkReporter connect error: ${e.message}")
-                connection.connected = false
+                println("NetworkReporter rotator connect error: ${e.message}")
+                rotatorConnected = false
             } finally {
-                connection.connecting = false
+                rotatorConnecting = false
             }
         }
     }
 
-    private suspend fun write(service: NetworkService, command: String) {
-        val addr = serviceToAddress[service] ?: return
-        val connection = connections[addr] ?: return
-        if (!connection.connected) return
+    private fun ensureFrequencyConnected() {
+        if (frequencyConnected || frequencyConnecting || frequencyServer.isBlank()) return
+        reporterScope.launch {
+            try {
+                frequencyConnecting = true
+                frequencySocket = SocketChannel.open(InetSocketAddress(frequencyServer, frequencyPort))
+                frequencyConnected = true
+                println("NetworkReporter: Frequency connected to $frequencyServer:$frequencyPort")
+            } catch (e: Exception) {
+                println("NetworkReporter frequency connect error: ${e.message}")
+                frequencyConnected = false
+            } finally {
+                frequencyConnecting = false
+            }
+        }
+    }
+
+    private suspend fun write(socket: SocketChannel?, command: String, onError: () -> Unit) {
         try {
             writeMutex.withLock {
                 val buffer = ByteBuffer.wrap("\\$command\n".toByteArray())
-                connection.socket?.write(buffer)
+                socket?.write(buffer)
             }
         } catch (e: Exception) {
             println("NetworkReporter write error: ${e.message}")
-            connection.connected = false
-        }
-    }
-
-    override fun isConnected(service: BtService): Boolean = false
-
-    override fun isConnecting(service: BtService): Boolean = false
-
-    override fun connect(service: BtService, deviceId: String) {}
-
-    override fun reportRotation(format: String, azimuth: Double, elevation: Double, params: ExtendedParams) {
-        reporterScope.launch {
-            connect(NetworkService.ROTATOR, params.server, params.port)
-            if (!isConnected(NetworkService.ROTATOR)) return@launch
-            val el = if (elevation > 0.0) elevation else 0.0
-            val command = format
-                .replace("\$AZ", azimuth.toString())
-                .replace("\$EL", el.toString())
-            write(NetworkService.ROTATOR, command)
-        }
-    }
-
-    override fun reportFrequency(format: String, frequency: Long, params: ExtendedParams) {
-        reporterScope.launch {
-            connect(NetworkService.FREQUENCY, params.server, params.port)
-            if (!isConnected(NetworkService.FREQUENCY)) return@launch
-            val command = format.replace("\$FREQ", frequency.toString())
-            write(NetworkService.FREQUENCY, command)
+            onError()
         }
     }
 }
