@@ -40,11 +40,23 @@ class SelectionRepo(
     private val currentItems = MutableStateFlow<List<SatItem>>(emptyList())
     private val currentTypes = MutableStateFlow(settingsRepo.selectedTypes.value)
     private val currentQuery = MutableStateFlow("")
+
+    // Resolve type IDs once when types change, then filter items reactively.
+    // The HashSet gives O(1) catnum lookups instead of O(n) with a List.
     private val itemsWithTypes = currentTypes.flatMapLatest { types: List<String> ->
-        currentItems.map { items -> items.filterByTypes(types) }
+        val catnumSet: Set<Int>? = if (types.isEmpty()) {
+            null // null = no filtering
+        } else {
+            val ids = settingsRepo.getSatelliteTypesIds(types)
+            if (ids.isEmpty()) null else ids.toHashSet()
+        }
+        currentItems.map { items ->
+            if (catnumSet == null) items else items.filter { it.catnum in catnumSet }
+        }
     }
+
     private val itemsWithQuery = currentQuery.flatMapLatest { query ->
-        itemsWithTypes.map { items -> items.filterByQuery(query) }
+        itemsWithTypes.map { items -> filterByQuery(items, query) }
     }
 
     override fun getCurrentTypes() = currentTypes.value
@@ -54,7 +66,7 @@ class SelectionRepo(
     }
 
     override suspend fun getEntriesFlow() = withContext(dispatcher) {
-        val selectedIds = settingsRepo.selectedIds.value
+        val selectedIds = settingsRepo.selectedIds.value.toHashSet()
         currentItems.value = localSource.getEntriesList().map { item ->
             item.copy(isSelected = item.catnum in selectedIds)
         }
@@ -66,17 +78,19 @@ class SelectionRepo(
         settingsRepo.setSelectedTypes(types)
     }
 
-    override suspend fun setQuery(query: String) = withContext(dispatcher) {
+    override suspend fun setQuery(query: String) {
         currentQuery.value = query
     }
 
     override suspend fun setSelection(selectAll: Boolean) = withContext(dispatcher) {
-        setSelection(itemsWithQuery.first().map { item -> item.catnum }, selectAll)
+        val visibleIds = itemsWithQuery.first().mapTo(HashSet()) { it.catnum }
+        setSelection(visibleIds, selectAll)
     }
 
     override suspend fun setSelection(ids: List<Int>, isTicked: Boolean) = withContext(dispatcher) {
+        val idSet = ids.toHashSet()
         currentItems.value = currentItems.value.map { item ->
-            if (item.catnum in ids) item.copy(isSelected = isTicked) else item
+            if (item.catnum in idSet) item.copy(isSelected = isTicked) else item
         }
     }
 
@@ -85,19 +99,24 @@ class SelectionRepo(
         settingsRepo.setSelectedIds(currentSelection)
     }
 
-    private suspend fun List<SatItem>.filterByTypes(types: List<String>) = withContext(dispatcher) {
-        if (types.isEmpty()) return@withContext this@filterByTypes
-        val catnums = settingsRepo.getSatelliteTypesIds(types)
-        if (catnums.isEmpty()) return@withContext this@filterByTypes
-        return@withContext this@filterByTypes.filter { item -> item.catnum in catnums }
+    /**
+     * Bulk selection using a pre-built Set for O(1) lookups.
+     */
+    private suspend fun setSelection(idSet: Set<Int>, isTicked: Boolean) = withContext(dispatcher) {
+        currentItems.value = currentItems.value.map { item ->
+            if (item.catnum in idSet) item.copy(isSelected = isTicked) else item
+        }
     }
 
-    private suspend fun List<SatItem>.filterByQuery(query: String) = withContext(dispatcher) {
-        if (query.isBlank()) return@withContext this@filterByQuery
-        return@withContext try {
-            this@filterByQuery.filter { it.catnum == query.toInt() }
-        } catch (_: Exception) {
-            this@filterByQuery.filter { item -> item.name.lowercase().contains(query.lowercase()) }
-        }
+    /**
+     * Filters items by query. Uses toIntOrNull() instead of exception-based flow,
+     * and lowercases the query once up front instead of per-item.
+     */
+    private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
+        if (query.isBlank()) return items
+        val catnum = query.toIntOrNull()
+        if (catnum != null) return items.filter { it.catnum == catnum }
+        val lowerQuery = query.lowercase()
+        return items.filter { it.name.lowercase().contains(lowerQuery) }
     }
 }

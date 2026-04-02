@@ -76,19 +76,23 @@ private fun TopBarPreview() = MainTheme {
 }
 
 @Composable
-fun TopBar(content: @Composable (RowScope.() -> Unit)) {
+fun TopBar(content: @Composable RowScope.() -> Unit) {
     Row(
         modifier = Modifier.height(48.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) { content() }
+        verticalAlignment = Alignment.CenterVertically,
+        content = content
+    )
 }
 
 @Composable
 fun RowScope.TimerRow(timeString: String, isTimeAos: Boolean) {
     val colorScheme = MaterialTheme.colorScheme
-    val aosColor = if (isTimeAos) colorScheme.primary else colorScheme.onSurface
-    val losColor = if (!isTimeAos) colorScheme.primary else colorScheme.onSurface
+    val (aosColor, losColor) = if (isTimeAos) {
+        colorScheme.primary to colorScheme.onSurface
+    } else {
+        colorScheme.onSurface to colorScheme.primary
+    }
     ElevatedCard(modifier = Modifier.weight(1f)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -100,7 +104,7 @@ fun RowScope.TimerRow(timeString: String, isTimeAos: Boolean) {
                 text = timeString,
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = colorScheme.primary
             )
             Text(text = "LOS", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = losColor)
         }
@@ -124,13 +128,11 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy((-2).dp),
             modifier = Modifier
                 .fillMaxSize()
-//                .background(color = MaterialTheme.colorScheme.background)
                 .padding(start = 6.dp, top = 1.dp, end = 6.dp, bottom = 0.dp)
         ) {
-            val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "$passSatId - ",
+                    text = "${stringResource(R.string.pass_satId, pass.catNum)} - ",
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
@@ -144,7 +146,7 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_elevation),
+                    painter = painterResource(R.drawable.ic_elevation),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(16.dp)
@@ -160,47 +162,30 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = sdfTime.format(Date(pass.aosTime)),
-                        fontSize = 15.sp,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                Text(
+                    text = sdfTime.format(Date(pass.aosTime)),
+                    fontSize = 15.sp,
+                    modifier = Modifier.weight(1f)
+                )
                 Row(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_altitude),
+                        painter = painterResource(R.drawable.ic_altitude),
                         contentDescription = null,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${pass.altitude} km",
-                        fontSize = 15.sp
-                    )
+                    Text(text = "${pass.altitude} km", fontSize = 15.sp)
                 }
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(
-                            id = R.string.pass_aosLos,
-                            pass.aosAzimuth.toInt(),
-                            pass.losAzimuth.toInt()
-                        ),
-                        fontSize = 15.sp
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.pass_aosLos, pass.aosAzimuth.toInt(), pass.losAzimuth.toInt()),
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
@@ -209,34 +194,41 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
 @Composable
 fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
     ElevatedButton(
-        onClick = { onClick() }, colors = ButtonDefaults.buttonColors(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        ), shape = MaterialTheme.shapes.small, modifier = modifier,
+        ),
+        shape = MaterialTheme.shapes.small,
+        modifier = modifier,
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
     ) { Text(text = text, fontSize = 16.sp, textAlign = TextAlign.Center) }
 }
 
 @Composable
 fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
-    val clickableMod = Modifier.clickable { action() }
     ElevatedCard(modifier = Modifier.size(48.dp)) {
-        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(resId), contentDescription = null, modifier = modifier)
-        }
+        Box(
+            modifier = Modifier
+                .clickable(onClick = action)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) { Icon(painter = painterResource(resId), contentDescription = null, modifier = modifier) }
     }
 }
 
 @Composable
 fun PrimaryIconCard(modifier: Modifier = Modifier, resId: Int, onClick: () -> Unit) {
-    val clickableMod = modifier.clickable { onClick() }
     ElevatedCard(
         modifier = Modifier.size(102.dp, 48.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
-        Box(modifier = clickableMod.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Icon(painter = painterResource(id = resId), contentDescription = null)
-        }
+        Box(
+            modifier = modifier
+                .clickable(onClick = onClick)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) { Icon(painter = painterResource(resId), contentDescription = null) }
     }
 }
 
@@ -262,56 +254,56 @@ fun EmptyListCard(message: String) {
     }
 }
 
-fun getDefaultPass(): OrbitalPass {
-    val orbitalData = OrbitalData(
-        """ ¯\_(ツ)_/¯ ⚠️""",
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0,
-        0.0
-    )
-    val satellite = NearEarthObject(orbitalData)
-    return OrbitalPass(0L, 0.0, Long.MAX_VALUE, 0.0, 0, 0.0, satellite, 0f)
-}
+private val defaultOrbitalData = OrbitalData(
+    name = """ ¯\_(ツ)_/¯ ⚠️""",
+    epoch = 0.0, meanmo = 0.0, eccn = 0.0, incl = 0.0,
+    raan = 0.0, argper = 0.0, meanan = 0.0, catnum = 0, bstar = 0.0
+)
+
+fun getDefaultPass(): OrbitalPass = OrbitalPass(
+    aosTime = 0L, aosAzimuth = 0.0, losTime = Long.MAX_VALUE, losAzimuth = 0.0,
+    altitude = 0, maxElevation = 0.0, orbitalObject = NearEarthObject(defaultOrbitalData), progress = 0f
+)
 
 @Composable
 fun SharedDialog(
     title: String, onCancel: () -> Unit, onAccept: () -> Unit, content: @Composable () -> Unit
 ) {
-    val padding = LocalSpacing.current.large
-    Dialog(onDismissRequest = { onCancel() }) {
-        ElevatedCard {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(padding)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(start = padding, top = padding, end = padding)
-                )
-                content()
-                Row(modifier = Modifier.padding(start = padding, bottom = padding, end = padding)) {
-                    CardButton(onClick = onCancel, text = stringResource(id = R.string.btn_cancel))
-                    Spacer(modifier = Modifier.weight(1f))
-                    CardButton(onClick = onAccept, text = stringResource(id = R.string.btn_accept))
-                }
-            }
+    DialogShell(title = title, titleFontSize = 16, onDismissRequest = onCancel) {
+        content()
+        Row(modifier = Modifier.padding(start = it, bottom = it, end = it)) {
+            CardButton(onClick = onCancel, text = stringResource(R.string.btn_cancel))
+            Spacer(modifier = Modifier.weight(1f))
+            CardButton(onClick = onAccept, text = stringResource(R.string.btn_accept))
         }
     }
 }
 
 @Composable
 fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
+    DialogShell(title = title, titleFontSize = 18, onDismissRequest = {}) {
+        Text(
+            text = text,
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = it)
+        )
+        Row(modifier = Modifier.padding(start = it, bottom = it, end = it)) {
+            Spacer(modifier = Modifier.weight(1f))
+            CardButton(onClick = onDismiss, text = stringResource(R.string.btn_accept))
+        }
+    }
+}
+
+@Composable
+private fun DialogShell(
+    title: String,
+    titleFontSize: Int,
+    onDismissRequest: () -> Unit,
+    content: @Composable (padding: androidx.compose.ui.unit.Dp) -> Unit
+) {
     val padding = LocalSpacing.current.large
-    Dialog(onDismissRequest = {}) {
+    Dialog(onDismissRequest = onDismissRequest) {
         ElevatedCard {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -319,54 +311,36 @@ fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
             ) {
                 Text(
                     text = title,
-                    fontSize = 18.sp,
+                    fontSize = titleFontSize.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(start = padding, top = padding, end = padding)
                 )
-                Text(
-                    text = text,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(horizontal = padding)
-                )
-                Row(modifier = Modifier.padding(start = padding, bottom = padding, end = padding)) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    CardButton(
-                        onClick = onDismiss,
-                        text = stringResource(id = R.string.btn_accept)
-                    )
-                }
+                content(padding)
             }
         }
     }
 }
 
 @Composable
-fun hasEnoughHeight(): Boolean {
-    return currentWindowAdaptiveInfo().windowSizeClass.isHeightAtLeastBreakpoint(480)
-}
+fun hasEnoughHeight(): Boolean =
+    currentWindowAdaptiveInfo().windowSizeClass.isHeightAtLeastBreakpoint(480)
 
 @Composable
-fun hasEnoughWidth(): Boolean {
-    return currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(600)
-}
+fun hasEnoughWidth(): Boolean =
+    currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(600)
 
 @Composable
-fun isVerticalLayout(): Boolean {
-    return currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(600).not()
-}
+fun isVerticalLayout(): Boolean = !hasEnoughWidth()
 
 @Composable
-fun Modifier.infiniteMarquee(): Modifier {
-    return basicMarquee(iterations = Int.MAX_VALUE, spacing = MarqueeSpacing(16.dp))
-}
+fun Modifier.infiniteMarquee(): Modifier =
+    basicMarquee(iterations = Int.MAX_VALUE, spacing = MarqueeSpacing(16.dp))
 
 @Composable
 fun Modifier.layoutPadding(): Modifier {
-    val statusBarMod = this.statusBarsPadding()
     val spacing = LocalSpacing.current.extraSmall
-    return statusBarMod.padding(start = spacing, top = 0.dp, end = spacing, bottom = spacing)
+    return statusBarsPadding().padding(start = spacing, top = 0.dp, end = spacing, bottom = spacing)
 }
 
 @Composable
@@ -375,15 +349,15 @@ fun ScreenColumn(
     floatingBar: @Composable () -> Unit = {},
     content: @Composable (Boolean) -> Unit = {}
 ) {
-    val isVerticalLayout = isVerticalLayout()
+    val isVertical = isVerticalLayout()
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier = Modifier.layoutPadding(), contentAlignment = Alignment.BottomCenter) {
             Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.extraSmall)) {
-                topBar(isVerticalLayout)
+                topBar(isVertical)
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surfaceContainer
-                ) { content(isVerticalLayout) }
+                ) { content(isVertical) }
             }
             floatingBar()
         }
@@ -394,21 +368,14 @@ fun ScreenColumn(
 fun TopBar(
     isVerticalLayout: Boolean,
     startAction: @Composable () -> Unit,
-    topInfo: @Composable (RowScope.() -> Unit),
-    bottomInfo: @Composable (RowScope.() -> Unit),
+    topInfo: @Composable RowScope.() -> Unit,
+    bottomInfo: @Composable RowScope.() -> Unit,
     endAction: @Composable () -> Unit
 ) {
-    val topBarRow = @Composable { content: @Composable RowScope.() -> Unit ->
-        Row(
-            modifier = Modifier.height(48.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) { content() }
-    }
     if (isVerticalLayout) {
-        topBarRow { startAction().also { topInfo() }.also { endAction() } }
-        topBarRow { bottomInfo() }
+        TopBar { startAction(); topInfo(); endAction() }
+        TopBar { bottomInfo() }
     } else {
-        topBarRow { startAction().also { topInfo() }.also { bottomInfo() }.also { endAction() } }
+        TopBar { startAction(); topInfo(); bottomInfo(); endAction() }
     }
 }
