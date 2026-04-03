@@ -102,7 +102,7 @@ class NetworkReporter(
     private suspend fun write(socket: SocketChannel?, command: String, onError: () -> Unit) {
         try {
             writeMutex.withLock {
-                val buffer = ByteBuffer.wrap("\\$command\n".toByteArray())
+                val buffer = ByteBuffer.wrap("$command\n".toByteArray())
                 socket?.write(buffer)
             }
         } catch (e: Exception) {
