@@ -24,6 +24,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import androidx.collection.LruCache
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,6 +81,13 @@ import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
+// Overlay indices
+private const val OVERLAY_STATION = 0
+private const val OVERLAY_TRACK = 1
+private const val OVERLAY_FOOTPRINT = 2
+private const val OVERLAY_POSITIONS = 3
+private const val OVERLAY_COUNT = 4
+
 private val minLat = MapView.getTileSystem().minLatitude
 private val maxLat = MapView.getTileSystem().maxLatitude
 private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -100,88 +108,104 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     color = "#FFE082".toColorInt()
     setShadowLayer(3f, 3f, 3f, Color.BLACK)
 }
-private val labelRect = Rect()
+private val iconCache = LruCache<String, Drawable>(128)
 
 fun NavGraphBuilder.mapDestination() {
     composable(Screen.Map.route) {
         val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
-        val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val mapView = rememberMapViewWithLifecycle()
         MapScreen(uiState, mapView)
     }
 }
 
 @Composable
-private fun MapScreen(uiState: State<MapState>, mapView: MapView) {
-    val onItemClick = { item: OrbitalObject -> uiState.value.sendAction(MapAction.SelectItem(item)) }
-    val selectPrev = { uiState.value.sendAction(MapAction.SelectPrev) }
-    val selectNext = { uiState.value.sendAction(MapAction.SelectNext) }
+private fun MapScreen(uiState: MapState, mapView: MapView) {
+    val onItemClick = { item: OrbitalObject -> uiState.sendAction(MapAction.SelectItem(item)) }
+    val selectPrev = { uiState.sendAction(MapAction.SelectPrev) }
+    val selectNext = { uiState.sendAction(MapAction.SelectNext) }
     val rotateMod = Modifier.rotate(180f)
-    val timeString = uiState.value.mapData?.aosTime ?: "00:00:00"
-    val isTimeAos = uiState.value.mapData?.isTimeAos ?: true
-    LaunchedEffect(uiState.value.track) {
-        val latitude = uiState.value.track?.get(0)?.get(0)?.latitude ?: 0.0
-        val longitude = uiState.value.track?.get(0)?.get(0)?.longitude ?: 0.0
-        mapView.controller.animateTo(GeoPoint(latitude, longitude))
+    val timeString = uiState.mapData?.aosTime ?: "00:00:00"
+    val isTimeAos = uiState.mapData?.isTimeAos ?: true
+
+    LaunchedEffect(uiState.track) {
+        val firstPos = uiState.track?.firstOrNull()?.firstOrNull() ?: return@LaunchedEffect
+        mapView.controller.animateTo(GeoPoint(firstPos.latitude, firstPos.longitude))
     }
     Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        if (isVerticalLayout()) {
+        val isVertical = isVerticalLayout()
+        if (isVertical) {
             TopBar {
                 IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
                 IconCard(action = selectNext, resId = R.drawable.ic_arrow)
             }
-            TopBar { NextPassRow(pass = uiState.value.orbitalPass) }
+            TopBar { NextPassRow(pass = uiState.orbitalPass) }
         } else {
             TopBar {
                 IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
-                NextPassRow(pass = uiState.value.orbitalPass, modifier = Modifier.weight(1f))
+                NextPassRow(pass = uiState.orbitalPass, modifier = Modifier.weight(1f))
                 IconCard(action = selectNext, resId = R.drawable.ic_arrow)
             }
         }
         ElevatedCard(modifier = Modifier.weight(1f)) {
             Box(contentAlignment = Alignment.BottomCenter) {
-                AndroidView({ mapView }) { mapView ->
-                    uiState.value.stationPosition?.let { setStationPosition(it, mapView) }
-                    uiState.value.positions?.let { setPositions(it, mapView, onItemClick) }
-                    uiState.value.track?.let { setSatelliteTrack(it, mapView) }
-                    uiState.value.footprint?.let { setFootprint(it, mapView) }
+                AndroidView({ mapView }) { view ->
+                    uiState.stationPosition?.let { setStationPosition(it, view) }
+                    uiState.track?.let { setSatelliteTrack(it, view) }
+                    uiState.footprint?.let { setFootprint(it, view) }
+                    uiState.positions?.let { setPositions(it, view, onItemClick) }
+                    view.invalidate()
                 }
-                uiState.value.mapData?.let { mapData ->
-                    if (isVerticalLayout()) MapDataCard(mapData) else MapDataCards(mapData)
+                uiState.mapData?.let { mapData ->
+                    if (isVertical) MapDataCard(mapData) else MapDataCards(mapData)
                 }
             }
         }
     }
 }
 
+// region Map data composables
 @Composable
 private fun MapDataCard(data: MapData) {
     val textColor = MaterialTheme.colorScheme.primary
     val cardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = stringResource(R.string.map_copyright), fontSize = 14.sp)
         Card(colors = cardColors) {
             Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_azimuth, data.azimuth), color = textColor)
-                    Text(text = stringResource(R.string.map_elevation, data.elevation), color = textColor)
-                }
-                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_altitude, data.altitude))
-                    Text(text = stringResource(R.string.map_distance, data.range))
-                }
-                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude), color = textColor)
-                    Text(text = stringResource(R.string.map_longitude, data.osmPos.longitude), color = textColor)
-                }
-                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.map_qth, data.qthLoc))
-                    Text(text = stringResource(R.string.map_phase, data.phase))
-                }
+                MapDataRow(
+                    stringResource(R.string.map_azimuth, data.azimuth) to textColor,
+                    stringResource(R.string.map_elevation, data.elevation) to textColor
+                )
+                MapDataRow(
+                    stringResource(R.string.map_altitude, data.altitude) to null,
+                    stringResource(R.string.map_distance, data.range) to null
+                )
+                MapDataRow(
+                    stringResource(R.string.map_latitude, data.osmPos.latitude) to textColor,
+                    stringResource(R.string.map_longitude, data.osmPos.longitude) to textColor
+                )
+                MapDataRow(
+                    stringResource(R.string.map_qth, data.qthLoc) to null,
+                    stringResource(R.string.map_phase, data.phase) to null
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun MapDataRow(
+    left: Pair<String, androidx.compose.ui.graphics.Color?>,
+    right: Pair<String, androidx.compose.ui.graphics.Color?>
+) {
+    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+        if (left.second != null) Text(text = left.first, color = left.second!!)
+        else Text(text = left.first)
+        if (right.second != null) Text(text = right.first, color = right.second!!)
+        else Text(text = right.first)
     }
 }
 
@@ -191,7 +215,6 @@ private fun MapDataCards(data: MapData) {
     val paddingMod = Modifier
         .padding(horizontal = 8.dp, vertical = 4.dp)
         .width(160.dp)
-    val osmText = stringResource(R.string.map_copyright)
     val textColor = MaterialTheme.colorScheme.primary
     Box(modifier = Modifier.fillMaxSize()) {
         Card(colors = cardColors, modifier = Modifier.align(Alignment.TopStart)) {
@@ -212,7 +235,11 @@ private fun MapDataCards(data: MapData) {
                 Text(text = stringResource(R.string.map_qth, data.qthLoc))
             }
         }
-        Text(text = osmText, fontSize = 14.sp, modifier = Modifier.align(Alignment.BottomCenter))
+        Text(
+            text = stringResource(R.string.map_copyright),
+            fontSize = 14.sp,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
         Card(colors = cardColors, modifier = Modifier.align(Alignment.BottomEnd)) {
             Column(horizontalAlignment = Alignment.End, modifier = paddingMod) {
                 Text(text = stringResource(R.string.map_latitude, data.osmPos.latitude), color = textColor)
@@ -221,113 +248,175 @@ private fun MapDataCards(data: MapData) {
         }
     }
 }
+// endregion
 
+// region Map overlay helpers
 private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
     try {
-        Marker(mapView).apply {
-            setInfoWindow(null)
-            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            icon = ContextCompat.getDrawable(mapView.context, R.drawable.ic_position)
-            position = GeoPoint(stationPos.latitude, stationPos.longitude)
-            mapView.overlays[0] = this
-            mapView.invalidate()
-        }
-    } catch (exception: Exception) {
-        println(exception)
-    }
-}
-
-private fun setPositions(posMap: Map<OrbitalObject, GeoPos>, mapView: MapView, action: (OrbitalObject) -> Unit) {
-    val markers = FolderOverlay()
-    try {
-        posMap.entries.forEach {
-            Marker(mapView).apply {
+        val overlay = mapView.overlays[OVERLAY_STATION]
+        if (overlay is Marker) {
+            overlay.position = GeoPoint(stationPos.latitude, stationPos.longitude)
+        } else {
+            mapView.overlays[OVERLAY_STATION] = Marker(mapView).apply {
                 setInfoWindow(null)
-                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                icon = getCustomTextIcon(it.key.data.name, mapView)
-                try {
-                    position = GeoPoint(it.value.latitude, it.value.longitude)
-                } catch (exception: IllegalArgumentException) {
-                    println(exception.stackTraceToString())
-                }
-                setOnMarkerClickListener { _, _ ->
-                    action(it.key)
-                    return@setOnMarkerClickListener true
-                }
-                markers.add(this)
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                icon = ContextCompat.getDrawable(mapView.context, R.drawable.ic_position)
+                position = GeoPoint(stationPos.latitude, stationPos.longitude)
             }
         }
-        mapView.overlays[3] = markers
-        mapView.invalidate()
-    } catch (exception: Exception) {
-        println(exception)
+    } catch (e: Exception) {
+        println(e)
     }
 }
 
-private fun getCustomTextIcon(textLabel: String, mapView: MapView): Drawable {
-    textPaint.getTextBounds(textLabel, 0, textLabel.length, labelRect)
+/** Pool of reusable Marker objects keyed by satellite name, to avoid re-creation every frame */
+private val markerPool = HashMap<String, Marker>()
+private var lastMapView: MapView? = null
+
+private fun setPositions(
+    posMap: Map<OrbitalObject, GeoPos>,
+    mapView: MapView,
+    action: (OrbitalObject) -> Unit
+) {
+    try {
+        // Clear caches when the MapView instance changes (e.g. config change)
+        if (lastMapView !== mapView) {
+            lastMapView = mapView
+            markerPool.clear()
+            iconCache.evictAll()
+            footprintPolyline = null
+            footprintPoints = null
+        }
+        // Reuse the existing FolderOverlay — creating a new one and replacing it
+        // causes osmdroid to detach shared Marker objects, making them invisible.
+        val folder = mapView.overlays[OVERLAY_POSITIONS] as? FolderOverlay ?: FolderOverlay().also {
+            mapView.overlays[OVERLAY_POSITIONS] = it
+        }
+        folder.items.clear()
+
+        val activeNames = HashSet<String>(posMap.size)
+        posMap.forEach { (satellite, geoPos) ->
+            val name = satellite.data.name
+            activeNames.add(name)
+            val marker = markerPool.getOrPut(name) {
+                Marker(mapView).apply {
+                    setInfoWindow(null)
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    icon = getCachedTextIcon(name, mapView)
+                }
+            }
+            // Update position in-place — reuse existing GeoPoint if available
+            val pos = marker.position
+            if (pos != null) {
+                pos.latitude = geoPos.latitude
+                pos.longitude = geoPos.longitude
+            } else {
+                marker.position = GeoPoint(geoPos.latitude, geoPos.longitude)
+            }
+            marker.setOnMarkerClickListener { _, _ ->
+                action(satellite)
+                true
+            }
+            folder.add(marker)
+        }
+        // Evict markers for satellites no longer tracked
+        val iter = markerPool.keys.iterator()
+        while (iter.hasNext()) {
+            if (iter.next() !in activeNames) iter.remove()
+        }
+    } catch (e: Exception) {
+        println(e)
+    }
+}
+
+private fun getCachedTextIcon(name: String, mapView: MapView): Drawable {
+    iconCache[name]?.let { return it }
+    val labelRect = Rect()
+    textPaint.getTextBounds(name, 0, name.length, labelRect)
     val iconSize = 10f
     val width = labelRect.width() + iconSize * 2f
     val height = textPaint.textSize * 3f + iconSize * 2f
     val bitmap = createBitmap(width.toInt(), height.toInt())
     Canvas(bitmap).run {
         drawCircle(width / 2f, height / 2f, iconSize, textPaint)
-        drawText(textLabel, iconSize / 2f, height - iconSize, textPaint)
+        drawText(name, iconSize / 2f, height - iconSize, textPaint)
     }
-    return bitmap.toDrawable(mapView.context.resources)
+    val drawable = bitmap.toDrawable(mapView.context.resources)
+    iconCache.put(name, drawable)
+    return drawable
 }
 
 private fun setSatelliteTrack(satTrack: List<List<GeoPos>>, mapView: MapView) {
     val trackOverlay = FolderOverlay()
     try {
         satTrack.forEach { track ->
-            val trackPoints = track.map { GeoPoint(it.latitude, it.longitude) }
             Polyline().apply {
-                setPoints(trackPoints)
+                setPoints(track.map { GeoPoint(it.latitude, it.longitude) })
                 outlinePaint.set(trackPaint)
                 trackOverlay.add(this)
             }
         }
-        mapView.overlays[1] = trackOverlay
-    } catch (exception: Exception) {
-        println(exception)
+        mapView.overlays[OVERLAY_TRACK] = trackOverlay
+    } catch (e: Exception) {
+        println(e)
     }
 }
+
+/** Reusable footprint Polyline — created once, points updated in-place each frame */
+private var footprintPolyline: Polyline? = null
+private var footprintPoints: ArrayList<GeoPoint>? = null
 
 private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
-    val footprintPoints = orbitalPos.getRangeCircle().map { GeoPoint(it.latitude, it.longitude) }
     try {
-        val footprintOverlay = Polyline().apply {
-            outlinePaint.set(footprintPaint)
-            setPoints(footprintPoints)
+        val rangeCircle = orbitalPos.getRangeCircle()
+        // Lazily initialise the reusable point list and polyline
+        var pts = footprintPoints
+        if (pts == null || pts.size != rangeCircle.size) {
+            pts = ArrayList(rangeCircle.size)
+            for (gp in rangeCircle) pts.add(GeoPoint(gp.latitude, gp.longitude))
+            footprintPoints = pts
+        } else {
+            // Update coordinates in-place — zero allocations
+            for (i in rangeCircle.indices) {
+                pts[i].latitude = rangeCircle[i].latitude
+                pts[i].longitude = rangeCircle[i].longitude
+            }
         }
-        mapView.overlays[2] = footprintOverlay
-    } catch (exception: Exception) {
-        println(exception)
+        val polyline = footprintPolyline ?: Polyline().apply {
+            outlinePaint.set(footprintPaint)
+            footprintPolyline = this
+        }
+        polyline.setPoints(pts)
+        mapView.overlays[OVERLAY_FOOTPRINT] = polyline
+    } catch (e: Exception) {
+        println(e)
     }
 }
+// endregion
 
+// region MapView lifecycle
 @Composable
 private fun rememberMapViewWithLifecycle(): MapView {
     val tileSource = XYTileSource("tiles", 0, 6, 256, ".webp", emptyArray<String>())
     val context = LocalContext.current
-    val mapView = remember { MapView(context) }.apply {
-        setMultiTouchControls(true)
-        setUseDataConnection(false)
-        setTileSource(tileSource)
-        minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels)
-        maxZoomLevel = 7.0
-        controller.setCenter(GeoPoint(48.8575, 6.3514))
-        controller.setZoom(minZoomLevel + 2)
-        zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
-        overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
-        overlayManager.tilesOverlay.setColorFilter(getColorFilter())
-        setScrollableAreaLimitLatitude(maxLat, minLat, 0)
-        // add overlays: 0 - GSP, 1 - SatTrack, 2 - SatFootprint, 3 - SatIcons
-        overlays.addAll(Array(4) { FolderOverlay() })
+    val isVertical = isVerticalLayout()
+    val mapView = remember {
+        MapView(context).apply {
+            setMultiTouchControls(true)
+            setUseDataConnection(false)
+            setTileSource(tileSource)
+            minZoomLevel = getMinZoom(resources.displayMetrics.heightPixels, isVertical)
+            maxZoomLevel = 7.0
+            controller.setCenter(GeoPoint(48.8575, 6.3514))
+            controller.setZoom(minZoomLevel + 2)
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+            overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
+            overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
+            overlayManager.tilesOverlay.setColorFilter(createColorFilter())
+            setScrollableAreaLimitLatitude(maxLat, minLat, 0)
+            overlays.addAll(Array(OVERLAY_COUNT) { FolderOverlay() })
+        }
     }
-    // Makes MapView follow the lifecycle of this composable
     val lifecycleObserver = rememberMapViewLifecycleObserver(mapView)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -348,8 +437,7 @@ private fun rememberMapViewLifecycleObserver(mapView: MapView) = remember(mapVie
     }
 }
 
-@Composable
-private fun getColorFilter(): ColorMatrixColorFilter {
+private fun createColorFilter(): ColorMatrixColorFilter {
     val grayScale = ColorMatrix().apply { setSaturation(0f) }
     val negative = ColorMatrix(
         floatArrayOf(-1f, 0f, 0f, 0f, 260f, 0f, -1f, 0f, 0f, 260f, 0f, 0f, -1f, 0f, 260f, 0f, 0f, 0f, 1f, 0f)
@@ -358,8 +446,8 @@ private fun getColorFilter(): ColorMatrixColorFilter {
     return ColorMatrixColorFilter(negative)
 }
 
-@Composable
-private fun getMinZoom(screenHeight: Int): Double {
-    if (!isVerticalLayout()) return 3.5
+private fun getMinZoom(screenHeight: Int, isVertical: Boolean): Double {
+    if (!isVertical) return 3.5
     return MapView.getTileSystem().getLatitudeZoom(maxLat, minLat, screenHeight)
 }
+// endregion

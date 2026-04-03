@@ -24,6 +24,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
+import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
+import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
@@ -34,7 +36,10 @@ import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -120,13 +125,126 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
                 getSatTrack(orbitalObject, stationPos, dateNow)
                 while (isActive) {
                     dateNow.time = System.currentTimeMillis()
-                    getPositions(allSatellites, stationPos, dateNow)
-                    getSatFootprint(orbitalObject, stationPos, dateNow)
-                    getSatData(orbitalObject, stationPos, dateNow)
+                    updateMapState(orbitalObject, allSatellites, stationPos, dateNow)
                     delay(updateFreq)
                 }
             }
         }
+    }
+
+    /**
+     * Combined update: computes all satellite positions in parallel, then derives
+     * the selected satellite's footprint and info panel data from the same batch,
+     * and emits a single state update to avoid redundant recompositions.
+     */
+    private suspend fun updateMapState(
+        selected: OrbitalObject,
+        orbitalObjects: List<OrbitalObject>,
+        pos: GeoPos,
+        date: Date
+    ) {
+        // 1. Compute all positions in parallel, collecting full OrbitalPos for the selected sat
+        val positionsMap = HashMap<OrbitalObject, GeoPos>(orbitalObjects.size)
+        var selectedSatPos: OrbitalPos? = null
+
+        coroutineScope {
+            // Chunk satellites to balance parallelism vs coroutine overhead
+            val chunkSize = maxOf(1, orbitalObjects.size / PARALLEL_CHUNKS)
+            val deferreds = orbitalObjects.chunked(chunkSize).map { chunk ->
+                async {
+                    val localPositions = ArrayList<Pair<OrbitalObject, GeoPos>>(chunk.size)
+                    var localSelectedPos: OrbitalPos? = null
+                    for (satellite in chunk) {
+                        val satPos = satelliteRepo.getPosition(satellite, pos, date.time)
+                        val osmLat = clipLat(satPos.latitude.toDegrees())
+                        val osmLon = clipLon(satPos.longitude.toDegrees())
+                        localPositions.add(satellite to GeoPos(osmLat, osmLon))
+                        if (satellite === selected) {
+                            localSelectedPos = satPos
+                        }
+                    }
+                    Pair(localPositions, localSelectedPos)
+                }
+            }
+            for ((localPositions, localSelectedPos) in deferreds.awaitAll()) {
+                for (pair in localPositions) {
+                    positionsMap[pair.first] = pair.second
+                }
+                if (localSelectedPos != null) {
+                    selectedSatPos = localSelectedPos
+                }
+            }
+        }
+
+        // 2. Derive footprint and info data from the already-computed selected position
+        val satPos = selectedSatPos ?: satelliteRepo.getPosition(selected, pos, date.time)
+        val footprint = satPos
+        val mapData = buildMapData(selected, satPos, date)
+
+        // 3. Single atomic state update — one recomposition per cycle
+        _uiState.update {
+            it.copy(
+                positions = positionsMap,
+                footprint = footprint,
+                mapData = mapData.first,
+                orbitalPass = mapData.second
+            )
+        }
+    }
+
+    /**
+     * Builds the map info panel data from an already-computed OrbitalPos.
+     * No additional getPosition() call needed.
+     */
+    private fun buildMapData(
+        sat: OrbitalObject,
+        satPos: OrbitalPos,
+        date: Date
+    ): Pair<MapData, OrbitalPass> {
+        var orbitalPass = defaultPass
+        var aosTime = 0L.toTimerString()
+        var isTimeAos = true
+        allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 1 }
+            ?.let { satPass ->
+                orbitalPass = satPass
+                if (!satPass.isDeepSpace) {
+                    aosTime = if (date.time < satPass.aosTime) {
+                        val millisBeforeStart = satPass.aosTime.minus(date.time)
+                        isTimeAos = true
+                        millisBeforeStart.toTimerString()
+                    } else {
+                        val millisBeforeEnd = satPass.losTime.minus(date.time)
+                        isTimeAos = false
+                        millisBeforeEnd.toTimerString()
+                    }
+                }
+            }
+        val azimuth = satPos.azimuth.toDegrees()
+        val elevation = satPos.elevation.toDegrees()
+        val osmLat = clipLat(satPos.latitude.toDegrees())
+        val osmLon = clipLon(satPos.longitude.toDegrees())
+        val osmPos = GeoPos(osmLat, osmLon)
+        val qthLoc = positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
+        val velocity = satPos.getOrbitalVelocity()
+        val phase = satPos.phase.toDegrees()
+        val visibility = satPos.eclipsed
+        val satData = MapData(
+            sat.data.catnum,
+            sat.data.name,
+            aosTime,
+            isTimeAos,
+            azimuth,
+            elevation,
+            satPos.distance,
+            satPos.altitude,
+            velocity,
+            qthLoc,
+            osmPos,
+            sat.data.orbitalPeriod,
+            phase,
+            visibility
+        )
+        return satData to orbitalPass
     }
 
     private suspend fun getSatTrack(orbitalObject: OrbitalObject, pos: GeoPos, date: Date) {
@@ -158,71 +276,10 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
         _uiState.update { it.copy(track = satTracks) }
     }
 
-    private suspend fun getPositions(orbitalObjects: List<OrbitalObject>, pos: GeoPos, date: Date) {
-        val positions = mutableMapOf<OrbitalObject, GeoPos>()
-        orbitalObjects.forEach { satellite ->
-            val satPos = satelliteRepo.getPosition(satellite, pos, date.time)
-            val osmLat = clipLat(satPos.latitude.toDegrees())
-            val osmLon = clipLon(satPos.longitude.toDegrees())
-            positions[satellite] = GeoPos(osmLat, osmLon)
-        }
-        _uiState.update { it.copy(positions = positions) }
-    }
-
-    private suspend fun getSatFootprint(orbitalObject: OrbitalObject, pos: GeoPos, date: Date) {
-        val satPos = satelliteRepo.getPosition(orbitalObject, pos, date.time)
-        _uiState.update { it.copy(footprint = satPos) }
-    }
-
-    private suspend fun getSatData(sat: OrbitalObject, pos: GeoPos, date: Date) {
-        var orbitalPass = defaultPass
-        var aosTime = 0L.toTimerString()
-        var isTimeAos = true
-        allPasses.find { pass -> pass.catNum == sat.data.catnum && pass.progress < 1 }
-            ?.let { satPass ->
-                orbitalPass = satPass
-                if (!satPass.isDeepSpace) {
-                    aosTime = if (date.time < satPass.aosTime) {
-                        val millisBeforeStart = satPass.aosTime.minus(date.time)
-                        isTimeAos = true
-                        millisBeforeStart.toTimerString()
-                    } else {
-                        val millisBeforeEnd = satPass.losTime.minus(date.time)
-                        isTimeAos = false
-                        millisBeforeEnd.toTimerString()
-                    }
-                }
-            }
-        val satPos = satelliteRepo.getPosition(sat, pos, date.time)
-        val azimuth = satPos.azimuth.toDegrees()
-        val elevation = satPos.elevation.toDegrees()
-        val osmLat = clipLat(satPos.latitude.toDegrees())
-        val osmLon = clipLon(satPos.longitude.toDegrees())
-        val osmPos = GeoPos(osmLat, osmLon)
-        val qthLoc = positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
-        val velocity = satPos.getOrbitalVelocity()
-        val phase = satPos.phase.toDegrees()
-        val visibility = satPos.eclipsed
-        val satData = MapData(
-            sat.data.catnum,
-            sat.data.name,
-            aosTime,
-            isTimeAos,
-            azimuth,
-            elevation,
-            satPos.distance,
-            satPos.altitude,
-            velocity,
-            qthLoc,
-            osmPos,
-            sat.data.orbitalPeriod,
-            phase,
-            visibility
-        )
-        _uiState.update { it.copy(mapData = satData, orbitalPass = orbitalPass) }
-    }
-
     companion object {
+        /** Number of parallel chunks for satellite position computation */
+        private const val PARALLEL_CHUNKS = 4
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
