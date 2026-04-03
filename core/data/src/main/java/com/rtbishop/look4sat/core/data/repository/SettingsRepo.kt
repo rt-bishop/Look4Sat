@@ -332,7 +332,7 @@ class SettingsRepo(
         frequencyState = preferences.getBoolean(keyFrequencyState, false),
         frequencyAddress = preferences.getString(keyFrequencyAddress, null) ?: "127.0.0.1",
         frequencyPort = preferences.getString(keyFrequencyPort, null) ?: "4532",
-        frequencyFormat = preferences.getString(keyFrequencyFormat, null) ?: $$"set_freq $FREQ",
+        frequencyFormat = preferences.getString(keyFrequencyFormat, null) ?: $$"F $FREQ",
         bluetoothRotatorState = preferences.getBoolean(keyBluetoothRotatorState, false),
         bluetoothRotatorFormat = preferences.getString(keyBluetoothRotatorFormat, null) ?: $$"W$AZ $EL",
         bluetoothRotatorName = preferences.getString(keyBluetoothRotatorName, null) ?: "Default",
