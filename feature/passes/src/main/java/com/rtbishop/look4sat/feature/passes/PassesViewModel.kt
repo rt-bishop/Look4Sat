@@ -27,10 +27,9 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.core.domain.utility.round
 import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,6 +43,7 @@ class PassesViewModel(
     private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
+    private val defaultPass = getDefaultPass()
     private val _uiState = MutableStateFlow(
         PassesState(
             isPassesDialogShown = false,
@@ -52,7 +52,7 @@ class PassesViewModel(
             isUtc = settingsRepo.otherSettings.value.stateOfUtc,
             nextTime = "00:00:00",
             isNextTimeAos = true,
-            nextPass = getDefaultPass(),
+            nextPass = defaultPass,
             hours = settingsRepo.passesSettings.value.hoursAhead,
             elevation = settingsRepo.passesSettings.value.minElevation,
             modes = settingsRepo.passesSettings.value.selectedModes,
@@ -61,23 +61,34 @@ class PassesViewModel(
             takeAction = ::handleAction
         )
     )
-    private var processing: Job? = null
     val uiState: StateFlow<PassesState> = _uiState
 
     init {
+        // React to raw pass list changes (initial load, recalculation, filter change)
         viewModelScope.launch {
-            delay(1000)
+            var initialLoadDone = false
             satelliteRepo.passes.collectLatest { passes ->
-                processing?.cancelAndJoin()
-                processing = viewModelScope.launch {
-                    while (isActive) {
-                        val timeNow = System.currentTimeMillis()
-                        val newPasses = satelliteRepo.processPasses(passes, timeNow)
-                        setPassInfo(newPasses, timeNow)
-                        _uiState.update { it.copy(isRefreshing = false, itemsList = newPasses) }
-                        delay(1000)
-                    }
+                if (!initialLoadDone && passes.isNotEmpty()) {
+                    initialLoadDone = true
+                    _uiState.update { it.copy(isRefreshing = false) }
                 }
+            }
+        }
+        // Local tick loop — computes pass progress and countdown timer every second
+        viewModelScope.launch {
+            while (isActive) {
+                val timeNow = System.currentTimeMillis()
+                val processed = computePassProgress(satelliteRepo.passes.value, timeNow)
+                val nextInfo = resolveNextPass(processed, timeNow)
+                _uiState.update {
+                    it.copy(
+                        itemsList = processed,
+                        nextPass = nextInfo.first,
+                        nextTime = nextInfo.second,
+                        isNextTimeAos = nextInfo.third
+                    )
+                }
+                delay(1000)
             }
         }
         viewModelScope.launch {
@@ -85,6 +96,43 @@ class PassesViewModel(
                 _uiState.update { it.copy(shouldSeeWhatsNew = settings.shouldSeeWhatsNew) }
             }
         }
+    }
+
+    /** Computes live progress for each pass, filtering out expired ones. */
+    private fun computePassProgress(passList: List<OrbitalPass>, time: Long): List<OrbitalPass> {
+        val result = ArrayList<OrbitalPass>(passList.size)
+        for (pass in passList) {
+            if (!pass.isDeepSpace && time > pass.aosTime) {
+                val deltaNow = time.minus(pass.aosTime).toFloat()
+                val deltaTotal = pass.losTime.minus(pass.aosTime).toFloat()
+                val newProgress = (deltaNow / deltaTotal).round(2)
+                if (newProgress >= 1.0f) continue
+                if (newProgress != pass.progress) {
+                    result.add(pass.copy(progress = newProgress))
+                } else {
+                    result.add(pass)
+                }
+            } else {
+                result.add(pass)
+            }
+        }
+        return result
+    }
+
+    /** Resolves the next upcoming or active pass and its countdown timer. */
+    private fun resolveNextPass(
+        passes: List<OrbitalPass>,
+        timeNow: Long
+    ): Triple<OrbitalPass, String, Boolean> {
+        val upcoming = passes.firstOrNull { it.aosTime.minus(timeNow) > 0 }
+        if (upcoming != null) {
+            return Triple(upcoming, upcoming.aosTime.minus(timeNow).toTimerString(), true)
+        }
+        if (passes.isNotEmpty()) {
+            val lastPass = passes.last()
+            return Triple(lastPass, lastPass.losTime.minus(timeNow).toTimerString(), false)
+        }
+        return Triple(defaultPass, "00:00:00", true)
     }
 
     private fun handleAction(action: PassesAction) {
@@ -100,30 +148,17 @@ class PassesViewModel(
 
     private fun applyFilter(hoursAhead: Int, minElevation: Double, modes: List<String>) = viewModelScope.launch {
         _uiState.update { it.copy(isRefreshing = true) }
-        processing?.cancelAndJoin()
         settingsRepo.setPassesSettings(PassesSettings(hoursAhead, minElevation, modes))
         _uiState.update { it.copy(hours = hoursAhead, elevation = minElevation, modes = modes) }
         satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
+        _uiState.update { it.copy(isRefreshing = false) }
     }
 
     private fun refreshPasses() = viewModelScope.launch {
         _uiState.update { it.copy(isRefreshing = true) }
-        processing?.cancelAndJoin()
         val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
         satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
-    }
-
-    private fun setPassInfo(passes: List<OrbitalPass>, timeNow: Long) {
-        if (passes.isEmpty()) return
-        try {
-            val nextPass = passes.first { it.aosTime.minus(timeNow) > 0 }
-            val time = nextPass.aosTime.minus(timeNow).toTimerString()
-            _uiState.update { it.copy(nextPass = nextPass, nextTime = time, isNextTimeAos = true) }
-        } catch (_: NoSuchElementException) {
-            val lastPass = passes.last()
-            val time = lastPass.losTime.minus(timeNow).toTimerString()
-            _uiState.update { it.copy(nextPass = lastPass, nextTime = time, isNextTimeAos = false) }
-        }
+        _uiState.update { it.copy(isRefreshing = false) }
     }
 
     private fun toggleFilterDialog() {

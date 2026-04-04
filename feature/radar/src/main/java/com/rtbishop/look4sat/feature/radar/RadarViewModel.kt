@@ -26,7 +26,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
-import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.repository.IReporter
@@ -75,6 +74,7 @@ class RadarViewModel(
     val uiState: StateFlow<RadarState> = _uiState
 
     init {
+        // Compass sensor collection
         if (settingsRepo.otherSettings.value.stateOfSensors) {
             viewModelScope.launch {
                 sensorsRepo.enableSensor()
@@ -84,6 +84,7 @@ class RadarViewModel(
                 }
             }
         }
+        // Resolve which pass we're tracking
         viewModelScope.launch {
             val catNum = savedStateHandle.get<Int>("catNum") ?: 0
             val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
@@ -93,25 +94,33 @@ class RadarViewModel(
             currentPass?.let { satPass ->
                 _uiState.update { it.copy(currentPass = satPass) }
                 val transmitters = satelliteRepo.getRadiosWithId(satPass.catNum)
+                // Compute track once (it doesn't change)
+                if (!satPass.isDeepSpace) {
+                    val track = satelliteRepo.getTrack(
+                        satPass.orbitalObject, stationPos, satPass.aosTime, satPass.losTime
+                    )
+                    _uiState.update { it.copy(satTrack = track) }
+                }
+                // Local tick loop — computes position only while the radar screen is alive
                 while (isActive) {
                     val timeNow = System.currentTimeMillis()
                     val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
                     when {
                         satPass.isDeepSpace -> {
                             val time = 0L.toTimerString()
-                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false) }
+                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false, orbitalPos = pos) }
                         }
                         satPass.aosTime > timeNow -> {
                             val time = satPass.aosTime.minus(timeNow).toTimerString()
-                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = true) }
+                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = true, orbitalPos = pos) }
                         }
                         else -> {
                             val time = satPass.losTime.minus(timeNow).toTimerString()
-                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false) }
+                            _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = false, orbitalPos = pos) }
                         }
                     }
                     processRadios(transmitters, satPass.orbitalObject, timeNow)
-                    sendPassData(satPass, pos, satPass.orbitalObject)
+                    sendPassData(pos)
                     sendPassDataBT(pos)
                     delay(1000)
                 }
@@ -131,14 +140,7 @@ class RadarViewModel(
         }
     }
 
-    private suspend fun sendPassData(orbitalPass: OrbitalPass, orbitalPos: OrbitalPos, orbitalObject: OrbitalObject) {
-        var track: List<OrbitalPos> = emptyList()
-        if (!orbitalPass.isDeepSpace) {
-            track = satelliteRepo.getTrack(
-                orbitalObject, stationPos, orbitalPass.aosTime, orbitalPass.losTime
-            )
-        }
-        _uiState.update { it.copy(orbitalPos = orbitalPos, satTrack = track) }
+    private fun sendPassData(orbitalPos: OrbitalPos) {
         viewModelScope.launch {
             val rc = settingsRepo.rcSettings.value
             if (rc.rotatorState) {

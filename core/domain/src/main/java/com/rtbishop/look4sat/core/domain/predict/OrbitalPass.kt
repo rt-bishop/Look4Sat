@@ -25,7 +25,7 @@ data class OrbitalPass(
     val altitude: Int = 1000,
     val maxElevation: Double = 75.0,
     val orbitalObject: OrbitalObject,
-    var progress: Float = 0.0f
+    val progress: Float = 0.0f
 ) {
     val catNum: Int = orbitalObject.data.catnum
     val name: String = orbitalObject.data.name

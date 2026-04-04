@@ -44,6 +44,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -223,6 +224,10 @@ private fun NearEarthPass(
 ) {
     val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
     val horizontalPadding = if (isVerticalLayout) 6.dp else 10.dp
+    // Cache formatted date/time strings — aosTime/losTime never change for a given pass
+    val aosDateStr = remember(pass.aosTime) { sdfDate.format(Date(pass.aosTime)) }
+    val aosTimeStr = remember(pass.aosTime) { sdfTime.format(Date(pass.aosTime)) }
+    val losTimeStr = remember(pass.losTime) { sdfTime.format(Date(pass.losTime)) }
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
             .padding(bottom = 2.dp)
@@ -274,7 +279,7 @@ private fun NearEarthPass(
                             Text(text = stringResource(R.string.pass_deep_space), fontSize = 15.sp)
                         } else {
                             Text(
-                                text = sdfDate.format(Date(pass.aosTime)),
+                                text = aosDateStr,
                                 fontSize = 15.sp
                             )
                         }
@@ -317,7 +322,7 @@ private fun NearEarthPass(
                 ) {
                     val defaultTime = "   - - : - -   "
                     Text(
-                        text = if (pass.isDeepSpace) defaultTime else sdfTime.format(Date(pass.aosTime)),
+                        text = if (pass.isDeepSpace) defaultTime else aosTimeStr,
                         fontSize = 15.sp
                     )
                     LinearProgressIndicator(
@@ -326,7 +331,7 @@ private fun NearEarthPass(
                         modifier = modifier.fillMaxWidth(0.75f)
                     )
                     Text(
-                        text = if (pass.isDeepSpace) defaultTime else sdfTime.format(Date(pass.losTime)),
+                        text = if (pass.isDeepSpace) defaultTime else losTimeStr,
                         fontSize = 15.sp
                     )
                 }

@@ -25,13 +25,27 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import kotlinx.coroutines.flow.StateFlow
 
 interface ISatelliteRepo {
-    val passes: StateFlow<List<OrbitalPass>>
+    /** All selected OrbitalObjects, updated when the selection changes. */
     val satellites: StateFlow<List<OrbitalObject>>
-    suspend fun getRadiosWithId(id: Int): List<SatRadio>
+
+    /** Raw calculated passes (without live progress). Updated on selection/filter change. */
+    val passes: StateFlow<List<OrbitalPass>>
+
+    /** Load satellite objects from DB based on the current selection. */
     suspend fun initRepository()
-    suspend fun getPosition(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPos
-    suspend fun getTrack(sat: OrbitalObject, pos: GeoPos, start: Long, end: Long): List<OrbitalPos>
-    suspend fun getRadios(sat: OrbitalObject, pos: GeoPos, radios: List<SatRadio>, time: Long): List<SatRadio>
-    suspend fun processPasses(passList: List<OrbitalPass>, time: Long): List<OrbitalPass>
+
+    /** Recalculate passes with the given filter parameters. */
     suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>)
+
+    /** Get the current position of a single satellite. */
+    suspend fun getPosition(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPos
+
+    /** Get the ground track for a satellite over a time range. */
+    suspend fun getTrack(sat: OrbitalObject, pos: GeoPos, start: Long, end: Long): List<OrbitalPos>
+
+    /** Get Doppler-shifted radio frequencies for a satellite at the given time. */
+    suspend fun getRadios(sat: OrbitalObject, pos: GeoPos, radios: List<SatRadio>, time: Long): List<SatRadio>
+
+    /** Fetch radio transceivers for a satellite by its catalog number. */
+    suspend fun getRadiosWithId(id: Int): List<SatRadio>
 }

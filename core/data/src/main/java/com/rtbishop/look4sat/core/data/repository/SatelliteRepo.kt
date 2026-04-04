@@ -54,8 +54,7 @@ class SatelliteRepo(
         settingsRepo.selectedIds.collect { selectedIds ->
             _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
             val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
-            val timeNow = 1000 * ((System.currentTimeMillis() + 500) / 1000)
-            calculatePasses(timeNow, hoursAhead, minElevation, modes)
+            calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
         }
     }
 
@@ -95,27 +94,10 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun processPasses(passList: List<OrbitalPass>, time: Long): List<OrbitalPass> {
-        return withContext(dispatcher) {
-            val result = ArrayList<OrbitalPass>(passList.size)
-            for (pass in passList) {
-                if (!pass.isDeepSpace) {
-                    val timeStart = pass.aosTime
-                    if (time > timeStart) {
-                        val deltaNow = time.minus(timeStart).toFloat()
-                        val deltaTotal = pass.losTime.minus(timeStart).toFloat()
-                        pass.progress = (deltaNow / deltaTotal).round(2)
-                    }
-                }
-                if (pass.progress < 1.0f) {
-                    result.add(pass.copy())
-                }
-            }
-            result
-        }
-    }
-
     override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>) {
+        // Normalize to the start of the current minute so that coarse 60-second stepping
+        // in getLeoPass always begins from the same phase, producing stable AOS/LOS times
+        val normalizedTime = time / 60_000L * 60_000L
         val currentSatellites = _satellites.value
         if (currentSatellites.isNotEmpty()) {
             withContext(dispatcher) {
@@ -129,13 +111,11 @@ class SatelliteRepo(
                 // Compute passes for each satellite in parallel
                 val passLists = coroutineScope {
                     filteredSatellites.map { satellite ->
-                        async {
-                            satellite.getPasses(stationPos, time, hoursAhead)
-                        }
+                        async { satellite.getPasses(stationPos, normalizedTime, hoursAhead) }
                     }.awaitAll()
                 }
                 // Flatten and filter in a single pass
-                val timeFuture = time + (hoursAhead * 60L * 60L * 1000L)
+                val timeFuture = normalizedTime + (hoursAhead * 60L * 60L * 1000L)
                 val newPasses = ArrayList<OrbitalPass>()
                 for (list in passLists) {
                     for (pass in list) {
@@ -177,7 +157,6 @@ class SatelliteRepo(
         return passes
     }
 
-
     private fun getGeoPass(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPass {
         val satPos = sat.getPosition(pos, time)
         val aos = time - 24 * 60L * 60L * 1000L
@@ -210,9 +189,7 @@ class SatelliteRepo(
         do {
             calendarTimeMillis += 60L * 1000L
             elevation = sat.getElevation(pos, calendarTimeMillis)
-            if (elevation > maxElevation) {
-                maxElevation = elevation
-            }
+            if (elevation > maxElevation) maxElevation = elevation
         } while (elevation < 0.0)
 
         // refine AOS to ~500ms precision
@@ -220,9 +197,7 @@ class SatelliteRepo(
         do {
             calendarTimeMillis += 500L
             elevation = sat.getElevation(pos, calendarTimeMillis)
-            if (elevation > maxElevation) {
-                maxElevation = elevation
-            }
+            if (elevation > maxElevation) maxElevation = elevation
         } while (elevation < 0.0)
 
         // Get full position for AOS data (azimuth, altitude)
@@ -234,9 +209,7 @@ class SatelliteRepo(
         do {
             calendarTimeMillis += 30L * 1000L
             elevation = sat.getElevation(pos, calendarTimeMillis)
-            if (elevation > maxElevation) {
-                maxElevation = elevation
-            }
+            if (elevation > maxElevation) maxElevation = elevation
         } while (elevation > 0.0)
 
         // refine LOS to ~500ms precision
@@ -244,9 +217,7 @@ class SatelliteRepo(
         do {
             calendarTimeMillis += 500L
             elevation = sat.getElevation(pos, calendarTimeMillis)
-            if (elevation > maxElevation) {
-                maxElevation = elevation
-            }
+            if (elevation > maxElevation) maxElevation = elevation
         } while (elevation > 0.0)
 
         // Get full position for LOS data (azimuth, altitude)
