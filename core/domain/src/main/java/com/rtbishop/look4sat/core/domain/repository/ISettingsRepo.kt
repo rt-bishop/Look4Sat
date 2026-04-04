@@ -57,39 +57,18 @@ interface ISettingsRepo {
 
     //region # RC settings
     val rcSettings: StateFlow<RCSettings>
-    fun setBluetoothRotatorAddress(value: String)
-    fun setBluetoothRotatorFormat(value: String)
-    fun setBluetoothRotatorName(value: String)
-    fun setBluetoothRotatorState(value: Boolean)
-    fun setBluetoothFrequencyAddress(value: String)
-    fun setBluetoothFrequencyFormat(value: String)
-    fun setBluetoothFrequencyState(value: Boolean)
-    fun setRotatorAddress(value: String)
-    fun setRotatorPort(value: String)
-    fun setRotatorState(value: Boolean)
-    fun setRotatorFormat(value: String)
-    fun setFrequencyAddress(value: String)
-    fun setFrequencyPort(value: String)
-    fun setFrequencyState(value: Boolean)
-    fun setFrequencyFormat(value: String)
+    fun updateRCSettings(settings: RCSettings)
     //endregion
 
     //region # Other settings
     val otherSettings: StateFlow<OtherSettings>
-    fun setStateOfAutoUpdate(value: Boolean)
-    fun setStateOfSensors(value: Boolean)
-    fun setStateOfSweep(value: Boolean)
-    fun setStateOfUtc(value: Boolean)
-    fun setStateOfLightTheme(value: Boolean)
-    fun setWarningDismissed()
-    fun setWhatsNewDismissed()
+    fun updateOtherSettings(transform: (OtherSettings) -> OtherSettings)
+    fun setWarningDismissed() = updateOtherSettings { it.copy(shouldSeeWarning = false) }
+    fun setWhatsNewDismissed() = updateOtherSettings { it.copy(shouldSeeWhatsNew = false) }
     //endregion
 
     //region # Transceivers settings
     val dataSourcesSettings: StateFlow<DataSourcesSettings>
-    fun setUseCustomTle(value: Boolean)
-    fun setUseCustomTransceivers(value: Boolean)
-    fun setTleUrl(value: String)
-    fun setTransceiversUrl(value: String)
+    fun updateDataSourcesSettings(settings: DataSourcesSettings)
     //endregion
 }

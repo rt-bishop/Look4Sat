@@ -21,7 +21,6 @@ import com.rtbishop.look4sat.core.domain.model.DataSourcesSettings
 import com.rtbishop.look4sat.core.domain.model.OtherSettings
 import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
-import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 
 data class PositionSettings(
     val isUpdating: Boolean, val stationPos: GeoPos, val messageResId: Int
@@ -32,9 +31,6 @@ data class DataSettings(
 )
 
 data class SettingsState(
-    val nextPass: OrbitalPass,
-    val nextTime: String,
-    val isNextTimeAos: Boolean,
     val appVersionName: String,
     val positionSettings: PositionSettings,
     val dataSettings: DataSettings,
@@ -68,26 +64,9 @@ sealed class SystemAction {
 }
 
 sealed class RCAction {
-    data class SetRotatorState(val value: Boolean) : RCAction()
-    data class SetRotatorAddress(val value: String) : RCAction()
-    data class SetRotatorPort(val value: String) : RCAction()
-    data class SetRotatorFormat(val value: String) : RCAction()
-    data class SetFrequencyState(val value: Boolean) : RCAction()
-    data class SetFrequencyAddress(val value: String) : RCAction()
-    data class SetFrequencyPort(val value: String) : RCAction()
-    data class SetFrequencyFormat(val value: String) : RCAction()
-    data class SetBluetoothRotatorState(val value: Boolean) : RCAction()
-    data class SetBluetoothRotatorFormat(val value: String) : RCAction()
-    data class SetBluetoothRotatorName(val value: String) : RCAction()
-    data class SetBluetoothRotatorAddress(val value: String) : RCAction()
-    data class SetBluetoothFrequencyState(val value: Boolean) : RCAction()
-    data class SetBluetoothFrequencyFormat(val value: String) : RCAction()
-    data class SetBluetoothFrequencyAddress(val value: String) : RCAction()
+    data class Update(val settings: RCSettings) : RCAction()
 }
 
 sealed class DataSourcesAction {
-    data class SetUseCustomTle(val value: Boolean) : DataSourcesAction()
-    data class SetUseCustomTransceivers(val value: Boolean) : DataSourcesAction()
-    data class SetTleUrl(val value: String) : DataSourcesAction()
-    data class SetTransceiversUrl(val value: String) : DataSourcesAction()
+    data class Update(val settings: DataSourcesSettings) : DataSourcesAction()
 }

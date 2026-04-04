@@ -43,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -140,15 +141,16 @@ private fun SettingsScreen(uiState: SettingsState) {
             onImportTle = { contentRequestForTle.launch("*/*") },
             onImportTransceivers = { contentRequestForTransceivers.launch("*/*") },
             onDismiss = dismissDataSourcesDialog,
-            onSave = {
-                useCustomTle, useCustomTransceivers, tleUrl, transceiversUrl  ->
-                if (!useCustomTle || tleUrl.isNotBlank()) {
-                    uiState.sendDataSourcesAction(DataSourcesAction.SetUseCustomTle(useCustomTle))
-                    uiState.sendDataSourcesAction(DataSourcesAction.SetTleUrl(tleUrl))
-                }
-                if (!useCustomTransceivers || transceiversUrl.isNotBlank()) {
-                    uiState.sendDataSourcesAction(DataSourcesAction.SetUseCustomTransceivers(useCustomTransceivers))
-                    uiState.sendDataSourcesAction(DataSourcesAction.SetTransceiversUrl(transceiversUrl))
+            onSave = { useCustomTle, useCustomTransceivers, tleUrl, transceiversUrl ->
+                val current = uiState.dataSourcesSettings
+                val newSettings = current.copy(
+                    useCustomTLE = if (!useCustomTle || tleUrl.isNotBlank()) useCustomTle else current.useCustomTLE,
+                    tleUrl = if (!useCustomTle || tleUrl.isNotBlank()) tleUrl else current.tleUrl,
+                    useCustomTransceivers = if (!useCustomTransceivers || transceiversUrl.isNotBlank()) useCustomTransceivers else current.useCustomTransceivers,
+                    transceiversUrl = if (!useCustomTransceivers || transceiversUrl.isNotBlank()) transceiversUrl else current.transceiversUrl
+                )
+                if (newSettings != current) {
+                    uiState.sendDataSourcesAction(DataSourcesAction.Update(newSettings))
                 }
                 if (useCustomTle || useCustomTransceivers) {
                     uiState.sendAction(SettingsAction.UpdateFromWeb)
@@ -164,20 +166,6 @@ private fun SettingsScreen(uiState: SettingsState) {
 
     // RC settings
     val rcSettings = uiState.rcSettings
-    val setRotatorState = { value: Boolean -> uiState.sendRCAction(RCAction.SetRotatorState(value)) }
-    val setRotatorAddress = { value: String -> uiState.sendRCAction(RCAction.SetRotatorAddress(value)) }
-    val setRotatorPort = { value: String -> uiState.sendRCAction(RCAction.SetRotatorPort(value)) }
-    val setRotatorFormat = { value: String -> uiState.sendRCAction(RCAction.SetRotatorFormat(value)) }
-    val setFrequencyState = { value: Boolean -> uiState.sendRCAction(RCAction.SetFrequencyState(value)) }
-    val setFrequencyAddress = { value: String -> uiState.sendRCAction(RCAction.SetFrequencyAddress(value)) }
-    val setFrequencyPort = { value: String -> uiState.sendRCAction(RCAction.SetFrequencyPort(value)) }
-    val setFrequencyFormat = { value: String -> uiState.sendRCAction(RCAction.SetFrequencyFormat(value)) }
-    val setBluetoothRotatorState = { value: Boolean -> uiState.sendRCAction(RCAction.SetBluetoothRotatorState(value)) }
-    val setBluetoothRotatorAddress = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothRotatorAddress(value)) }
-    val setBluetoothRotatorFormat = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothRotatorFormat(value)) }
-    val setBluetoothFrequencyState = { value: Boolean -> uiState.sendRCAction(RCAction.SetBluetoothFrequencyState(value)) }
-    val setBluetoothFrequencyAddress = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothFrequencyAddress(value)) }
-    val setBluetoothFrequencyFormat = { value: String -> uiState.sendRCAction(RCAction.SetBluetoothFrequencyFormat(value)) }
 
     // Network data output
     val networkDialogState = rememberSaveable { mutableStateOf(false) }
@@ -187,22 +175,22 @@ private fun SettingsScreen(uiState: SettingsState) {
         NetworkOutputDialog(
             initialSettings = rcSettings,
             onDismiss = dismissNetworkDialog,
-            onSave = { rotatorState,
-                       rotatorAddress,
-                       rotatorPort,
-                       rotatorFormat,
-                       frequencyState,
-                       frequencyAddress,
-                       frequencyPort,
-                       frequencyFormat ->
-                setRotatorState(rotatorState)
-                setRotatorAddress(rotatorAddress)
-                setRotatorPort(rotatorPort)
-                setRotatorFormat(rotatorFormat)
-                setFrequencyState(frequencyState)
-                setFrequencyAddress(frequencyAddress)
-                setFrequencyPort(frequencyPort)
-                setFrequencyFormat(frequencyFormat)
+            onSave = { rotatorState, rotatorAddress, rotatorPort, rotatorFormat,
+                       frequencyState, frequencyAddress, frequencyPort, frequencyFormat ->
+                uiState.sendRCAction(
+                    RCAction.Update(
+                        rcSettings.copy(
+                            rotatorState = rotatorState,
+                            rotatorAddress = rotatorAddress,
+                            rotatorPort = rotatorPort,
+                            rotatorFormat = rotatorFormat,
+                            frequencyState = frequencyState,
+                            frequencyAddress = frequencyAddress,
+                            frequencyPort = frequencyPort,
+                            frequencyFormat = frequencyFormat
+                        )
+                    )
+                )
             }
         )
     }
@@ -218,8 +206,11 @@ private fun SettingsScreen(uiState: SettingsState) {
     val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
         if (!isGranted)
         {
-            uiState.sendRCAction(RCAction.SetBluetoothRotatorState(false))
-            uiState.sendRCAction(RCAction.SetBluetoothFrequencyState(false))
+            uiState.sendRCAction(
+                RCAction.Update(
+                    rcSettings.copy(bluetoothRotatorState = false, bluetoothFrequencyState = false)
+                )
+            )
             uiState.sendSystemAction(SystemAction.ShowToast(bluetoothError))
         }
         else { bluetoothDialogState.value = true }
@@ -230,28 +221,26 @@ private fun SettingsScreen(uiState: SettingsState) {
         BluetoothOutputDialog(
             initialSettings = rcSettings,
             onDismiss = dismissBluetoothDialog,
-            onSave = { rotatorState,
-                       rotatorAddress,
-                       rotatorFormat,
-                       frequencyState,
-                       frequencyAddress,
-                       frequencyFormat ->
-                setBluetoothRotatorState(rotatorState)
-                setBluetoothRotatorAddress(rotatorAddress)
-                setBluetoothRotatorFormat(rotatorFormat)
-                setBluetoothFrequencyState(frequencyState)
-                setBluetoothFrequencyAddress(frequencyAddress)
-                setBluetoothFrequencyFormat(frequencyFormat)
+            onSave = { rotatorState, rotatorAddress, rotatorFormat,
+                       frequencyState, frequencyAddress, frequencyFormat ->
+                uiState.sendRCAction(
+                    RCAction.Update(
+                        rcSettings.copy(
+                            bluetoothRotatorState = rotatorState,
+                            bluetoothRotatorAddress = rotatorAddress,
+                            bluetoothRotatorFormat = rotatorFormat,
+                            bluetoothFrequencyState = frequencyState,
+                            bluetoothFrequencyAddress = frequencyAddress,
+                            bluetoothFrequencyFormat = frequencyFormat
+                        )
+                    )
+                )
             }
         )
     }
 
     // Other settings
     val otherSettings = uiState.otherSettings
-    val toggleUtc = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleUtc(value)) }
-    val toggleUpdate = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleUpdate(value)) }
-    val toggleSweep = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSweep(value)) }
-    val toggleSensor = { value: Boolean -> uiState.sendAction(SettingsAction.ToggleSensor(value)) }
     val uriHandler = LocalUriHandler.current
     val appUrl = stringResource(R.string.prefs_app_url)
     val donateUrl = stringResource(R.string.prefs_donate_url)
@@ -303,7 +292,7 @@ private fun SettingsScreen(uiState: SettingsState) {
             }
             item { DataCard(dataSettings, updateFromWeb, clearAllData, showDataSourcesDialog) }
             item(span = { GridItemSpan(maxLineSpan) }) { OutputCard({ showNetworkDialog() }, { showBluetoothDialog() }) }
-            item { OtherCard(otherSettings, toggleUtc, toggleUpdate, toggleSweep, toggleSensor) }
+            item { OtherCard(otherSettings, uiState.sendAction) }
             item { CardCredits() }
         }
     }
@@ -476,17 +465,11 @@ private fun OtherCardPreview() = MainTheme {
         shouldSeeWarning = false,
         shouldSeeWhatsNew = false
     )
-    OtherCard(settings = values, {}, {}, {}, {})
+    OtherCard(settings = values) {}
 }
 
 @Composable
-private fun OtherCard(
-    settings: OtherSettings,
-    toggleUtc: (Boolean) -> Unit,
-    toggleUpdate: (Boolean) -> Unit,
-    toggleSweep: (Boolean) -> Unit,
-    toggleSensor: (Boolean) -> Unit
-) {
+private fun OtherCard(settings: OtherSettings, sendAction: (SettingsAction) -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -497,49 +480,44 @@ private fun OtherCard(
                 text = stringResource(id = R.string.prefs_other_title),
                 color = MaterialTheme.colorScheme.primary
             )
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.prefs_other_switch_utc))
-                Switch(checked = settings.stateOfUtc, onCheckedChange = { toggleUtc(it) })
+            SwitchRow(R.string.prefs_other_switch_utc, settings.stateOfUtc) {
+                sendAction(SettingsAction.ToggleUtc(it))
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.prefs_other_switch_update))
-                Switch(checked = settings.stateOfAutoUpdate, onCheckedChange = { toggleUpdate(it) })
+            SwitchRow(R.string.prefs_other_switch_update, settings.stateOfAutoUpdate) {
+                sendAction(SettingsAction.ToggleUpdate(it))
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.prefs_other_switch_sweep))
-                Switch(checked = settings.stateOfSweep, onCheckedChange = { toggleSweep(it) })
+            SwitchRow(R.string.prefs_other_switch_sweep, settings.stateOfSweep) {
+                sendAction(SettingsAction.ToggleSweep(it))
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.prefs_other_switch_sensors))
-                Switch(checked = settings.stateOfSensors, onCheckedChange = { toggleSensor(it) })
+            SwitchRow(R.string.prefs_other_switch_sensors, settings.stateOfSensors) {
+                sendAction(SettingsAction.ToggleSensor(it))
             }
         }
     }
 }
 
 @Composable
+private fun SwitchRow(labelResId: Int, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(text = stringResource(id = labelResId))
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+@Composable
 private fun setUpdateTime(updateTime: Long): String {
-    val updateDate = if (updateTime != 0L) {
-        val timePattern = stringResource(id = R.string.prefs_updated_time)
-        SimpleDateFormat(timePattern, Locale.getDefault()).format(Date(updateTime))
-    } else {
-        stringResource(id = R.string.pass_time_placeholder)
+    val timePattern = stringResource(id = R.string.prefs_updated_time)
+    val placeholder = stringResource(id = R.string.pass_time_placeholder)
+    val updateDate = remember(updateTime) {
+        if (updateTime != 0L) {
+            SimpleDateFormat(timePattern, Locale.getDefault()).format(Date(updateTime))
+        } else {
+            placeholder
+        }
     }
     return stringResource(id = R.string.prefs_updated_title, updateDate)
 }

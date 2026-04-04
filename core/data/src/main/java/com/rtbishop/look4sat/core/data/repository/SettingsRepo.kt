@@ -249,79 +249,25 @@ class SettingsRepo(
     private val _rcSettings = MutableStateFlow(getRCSettings())
     override val rcSettings: StateFlow<RCSettings> = _rcSettings
 
-    override fun setBluetoothRotatorAddress(value: String) {
-        preferences.edit { putString(keyBluetoothRotatorAddress, value) }
-        _rcSettings.update { it.copy(bluetoothRotatorAddress = value) }
-    }
-
-    override fun setBluetoothRotatorFormat(value: String) {
-        preferences.edit { putString(keyBluetoothRotatorFormat, value) }
-        _rcSettings.update { it.copy(bluetoothRotatorFormat = value) }
-    }
-
-    override fun setBluetoothRotatorName(value: String) {
-        preferences.edit { putString(keyBluetoothRotatorName, value) }
-        _rcSettings.update { it.copy(bluetoothRotatorName = value) }
-    }
-
-    override fun setBluetoothRotatorState(value: Boolean) {
-        preferences.edit { putBoolean(keyBluetoothRotatorState, value) }
-        _rcSettings.update { it.copy(bluetoothRotatorState = value) }
-    }
-
-    override fun setBluetoothFrequencyState(value: Boolean) {
-        preferences.edit { putBoolean(keyBluetoothFrequencyState, value) }
-        _rcSettings.update { it.copy(bluetoothFrequencyState = value) }
-    }
-
-    override fun setBluetoothFrequencyAddress(value: String) {
-        preferences.edit { putString(keyBluetoothFrequencyAddress, value) }
-        _rcSettings.update { it.copy(bluetoothFrequencyAddress = value) }
-    }
-
-    override fun setBluetoothFrequencyFormat(value: String) {
-        preferences.edit { putString(keyBluetoothFrequencyFormat, value) }
-        _rcSettings.update { it.copy(bluetoothFrequencyFormat = value) }
-    }
-
-    override fun setRotatorAddress(value: String) {
-        preferences.edit { putString(keyRotatorAddress, value) }
-        _rcSettings.update { it.copy(rotatorAddress = value) }
-    }
-
-    override fun setRotatorPort(value: String) {
-        preferences.edit { putString(keyRotatorPort, value) }
-        _rcSettings.update { it.copy(rotatorPort = value) }
-    }
-
-    override fun setRotatorState(value: Boolean) {
-        preferences.edit { putBoolean(keyRotatorState, value) }
-        _rcSettings.update { it.copy(rotatorState = value) }
-    }
-
-    override fun setRotatorFormat(value: String) {
-        preferences.edit { putString(keyRotatorFormat, value) }
-        _rcSettings.update { it.copy(rotatorFormat = value) }
-    }
-
-    override fun setFrequencyState(value: Boolean) {
-        preferences.edit { putBoolean(keyFrequencyState, value) }
-        _rcSettings.update { it.copy(frequencyState = value) }
-    }
-
-    override fun setFrequencyAddress(value: String) {
-        preferences.edit { putString(keyFrequencyAddress, value) }
-        _rcSettings.update { it.copy(frequencyAddress = value) }
-    }
-
-    override fun setFrequencyPort(value: String) {
-        preferences.edit { putString(keyFrequencyPort, value) }
-        _rcSettings.update { it.copy(frequencyPort = value) }
-    }
-
-    override fun setFrequencyFormat(value: String) {
-        preferences.edit { putString(keyFrequencyFormat, value) }
-        _rcSettings.update { it.copy(frequencyFormat = value) }
+    override fun updateRCSettings(settings: RCSettings) {
+        preferences.edit {
+            putBoolean(keyRotatorState, settings.rotatorState)
+            putString(keyRotatorAddress, settings.rotatorAddress)
+            putString(keyRotatorPort, settings.rotatorPort)
+            putString(keyRotatorFormat, settings.rotatorFormat)
+            putBoolean(keyFrequencyState, settings.frequencyState)
+            putString(keyFrequencyAddress, settings.frequencyAddress)
+            putString(keyFrequencyPort, settings.frequencyPort)
+            putString(keyFrequencyFormat, settings.frequencyFormat)
+            putBoolean(keyBluetoothRotatorState, settings.bluetoothRotatorState)
+            putString(keyBluetoothRotatorFormat, settings.bluetoothRotatorFormat)
+            putString(keyBluetoothRotatorName, settings.bluetoothRotatorName)
+            putString(keyBluetoothRotatorAddress, settings.bluetoothRotatorAddress)
+            putBoolean(keyBluetoothFrequencyState, settings.bluetoothFrequencyState)
+            putString(keyBluetoothFrequencyFormat, settings.bluetoothFrequencyFormat)
+            putString(keyBluetoothFrequencyAddress, settings.bluetoothFrequencyAddress)
+        }
+        _rcSettings.value = settings
     }
 
     private fun getRCSettings(): RCSettings = RCSettings(
@@ -347,39 +293,20 @@ class SettingsRepo(
     private val _otherSettings = MutableStateFlow(getOtherSettings())
     override val otherSettings: StateFlow<OtherSettings> = _otherSettings
 
-    override fun setStateOfAutoUpdate(value: Boolean) {
-        preferences.edit { putBoolean(keyStateOfAutoUpdate, value) }
-        _otherSettings.update { it.copy(stateOfAutoUpdate = value) }
-    }
-
-    override fun setStateOfSensors(value: Boolean) {
-        preferences.edit { putBoolean(keyStateOfSensors, value) }
-        _otherSettings.update { it.copy(stateOfSensors = value) }
-    }
-
-    override fun setStateOfSweep(value: Boolean) {
-        preferences.edit { putBoolean(keyStateOfSweep, value) }
-        _otherSettings.update { it.copy(stateOfSweep = value) }
-    }
-
-    override fun setStateOfUtc(value: Boolean) {
-        preferences.edit { putBoolean(keyStateOfUtc, value) }
-        _otherSettings.update { it.copy(stateOfUtc = value) }
-    }
-
-    override fun setStateOfLightTheme(value: Boolean){
-        preferences.edit { putBoolean(keyStateOfLightTheme, value) }
-        _otherSettings.update { it.copy(stateOfLightTheme = value) }
-    }
-
-    override fun setWarningDismissed() {
-        preferences.edit { putBoolean(keyShouldSeeWarning, false) }
-        _otherSettings.update { it.copy(shouldSeeWarning = false) }
-    }
-
-    override fun setWhatsNewDismissed() {
-        preferences.edit { putBoolean(keyShouldSeeWhatsNew, false) }
-        _otherSettings.update { it.copy(shouldSeeWhatsNew = false) }
+    override fun updateOtherSettings(transform: (OtherSettings) -> OtherSettings) {
+        _otherSettings.update { current ->
+            val new = transform(current)
+            preferences.edit {
+                putBoolean(keyStateOfAutoUpdate, new.stateOfAutoUpdate)
+                putBoolean(keyStateOfSensors, new.stateOfSensors)
+                putBoolean(keyStateOfSweep, new.stateOfSweep)
+                putBoolean(keyStateOfUtc, new.stateOfUtc)
+                putBoolean(keyStateOfLightTheme, new.stateOfLightTheme)
+                putBoolean(keyShouldSeeWarning, new.shouldSeeWarning)
+                putBoolean(keyShouldSeeWhatsNew, new.shouldSeeWhatsNew)
+            }
+            new
+        }
     }
 
     private fun getOtherSettings(): OtherSettings = OtherSettings(
@@ -397,24 +324,14 @@ class SettingsRepo(
     private val _dataSourcesSettings = MutableStateFlow(getDataSourcesSettings())
     override val dataSourcesSettings: StateFlow<DataSourcesSettings> = _dataSourcesSettings
 
-    override fun setUseCustomTle(value: Boolean) {
-        preferences.edit { putBoolean(keyUseCustomTle, value) }
-        _dataSourcesSettings.update { it.copy(useCustomTLE = value) }
-    }
-
-    override fun setUseCustomTransceivers(value: Boolean) {
-        preferences.edit { putBoolean(keyUseCustomTransceivers, value) }
-        _dataSourcesSettings.update { it.copy(useCustomTransceivers = value) }
-    }
-
-    override fun setTleUrl(value: String) {
-        preferences.edit { putString(keyTleUrl, value) }
-        _dataSourcesSettings.update { it.copy(tleUrl = value) }
-    }
-
-    override fun setTransceiversUrl(value: String) {
-        preferences.edit { putString(keyTransceiversUrl, value) }
-        _dataSourcesSettings.update { it.copy(transceiversUrl = value) }
+    override fun updateDataSourcesSettings(settings: DataSourcesSettings) {
+        preferences.edit {
+            putBoolean(keyUseCustomTle, settings.useCustomTLE)
+            putBoolean(keyUseCustomTransceivers, settings.useCustomTransceivers)
+            putString(keyTleUrl, settings.tleUrl)
+            putString(keyTransceiversUrl, settings.transceiversUrl)
+        }
+        _dataSourcesSettings.value = settings
     }
 
     private fun getDataSourcesSettings(): DataSourcesSettings = DataSourcesSettings(
