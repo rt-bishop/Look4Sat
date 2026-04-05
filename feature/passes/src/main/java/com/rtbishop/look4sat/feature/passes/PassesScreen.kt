@@ -77,9 +77,7 @@ import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-private val sdfDate = SimpleDateFormat("EEE dd MMM", Locale.ENGLISH)
-private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+import java.util.TimeZone
 
 fun NavGraphBuilder.passesDestination(navigateToRadar: (Int, Long) -> Unit) {
     composable(Screen.Passes.route) {
@@ -131,7 +129,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
                     TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
                 },
                 bottomInfo = {
-                    NextPassRow(pass = uiState.nextPass)
+                    NextPassRow(pass = uiState.nextPass, isUtc = uiState.isUtc)
                 },
                 endAction = {
                     IconCard(action = showRadiosDialog, resId = R.drawable.ic_radios)
@@ -141,6 +139,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
     ) { _ ->
         PassesList(
             isRefreshing = uiState.isRefreshing,
+            isUtc = uiState.isUtc,
             passes = uiState.itemsList,
             navigateToRadar = navigateToRadar,
             refreshPasses = refreshList,
@@ -153,6 +152,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
 @Composable
 private fun PassesList(
     isRefreshing: Boolean,
+    isUtc: Boolean,
     passes: List<OrbitalPass>,
     navigateToRadar: (Int, Long) -> Unit,
     refreshPasses: () -> Unit,
@@ -188,7 +188,8 @@ private fun PassesList(
                             pass = pass,
                             navigateToRadar = navigateToRadar,
                             modifier = Modifier.animateItem(),
-                            isVerticalLayout = isVerticalLayout
+                            isVerticalLayout = isVerticalLayout,
+                            isUtc = isUtc
                         )
                     }
                 }
@@ -220,14 +221,24 @@ private fun NearEarthPass(
     pass: OrbitalPass,
     navigateToRadar: (Int, Long) -> Unit,
     modifier: Modifier = Modifier,
-    isVerticalLayout: Boolean = true
+    isVerticalLayout: Boolean = true,
+    isUtc: Boolean = false
 ) {
     val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
     val horizontalPadding = if (isVerticalLayout) 6.dp else 10.dp
+    val timeZone = remember(isUtc) {
+        if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault()
+    }
+    val sdfDate = remember(isUtc) {
+        SimpleDateFormat("EEE dd MMM", Locale.ENGLISH).also { it.timeZone = timeZone }
+    }
+    val sdfTime = remember(isUtc) {
+        SimpleDateFormat("HH:mm:ss", Locale.ENGLISH).also { it.timeZone = timeZone }
+    }
     // Cache formatted date/time strings — aosTime/losTime never change for a given pass
-    val aosDateStr = remember(pass.aosTime) { sdfDate.format(Date(pass.aosTime)) }
-    val aosTimeStr = remember(pass.aosTime) { sdfTime.format(Date(pass.aosTime)) }
-    val losTimeStr = remember(pass.losTime) { sdfTime.format(Date(pass.losTime)) }
+    val aosDateStr = remember(pass.aosTime, isUtc) { sdfDate.format(Date(pass.aosTime)) }
+    val aosTimeStr = remember(pass.aosTime, isUtc) { sdfTime.format(Date(pass.aosTime)) }
+    val losTimeStr = remember(pass.losTime, isUtc) { sdfTime.format(Date(pass.losTime)) }
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
         Surface(modifier = Modifier
             .padding(bottom = 2.dp)

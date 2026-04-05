@@ -140,12 +140,12 @@ private fun MapScreen(uiState: MapState, mapView: MapView) {
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
                 IconCard(action = selectNext, resId = R.drawable.ic_arrow)
             }
-            TopBar { NextPassRow(pass = uiState.orbitalPass) }
+            TopBar { NextPassRow(pass = uiState.orbitalPass, isUtc = uiState.isUtc) }
         } else {
             TopBar {
                 IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
-                NextPassRow(pass = uiState.orbitalPass, modifier = Modifier.weight(1f))
+                NextPassRow(pass = uiState.orbitalPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
                 IconCard(action = selectNext, resId = R.drawable.ic_arrow)
             }
         }

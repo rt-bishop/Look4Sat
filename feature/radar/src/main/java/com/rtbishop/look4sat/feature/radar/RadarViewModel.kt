@@ -39,6 +39,7 @@ import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -58,6 +59,7 @@ class RadarViewModel(
             currentPass = null,
             currentTime = "00:00:00",
             isCurrentTimeAos = true,
+            isUtc = settingsRepo.otherSettings.value.stateOfUtc,
             orientationValues = sensorsRepo.orientation.value,
             orbitalPos = null,
             satTrack = emptyList(),
@@ -82,6 +84,12 @@ class RadarViewModel(
                     val orientationValues = Pair(data.first + magDeclination, data.second)
                     _uiState.update { it.copy(orientationValues = orientationValues) }
                 }
+            }
+        }
+        // React to UTC setting changes
+        viewModelScope.launch {
+            settingsRepo.otherSettings.collectLatest { settings ->
+                _uiState.update { it.copy(isUtc = settings.stateOfUtc) }
             }
         }
         // Resolve which pass we're tracking

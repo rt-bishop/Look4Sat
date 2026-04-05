@@ -25,6 +25,7 @@ data class RadarState(
     val currentPass: OrbitalPass?,
     val currentTime: String,
     val isCurrentTimeAos: Boolean,
+    val isUtc: Boolean,
     val orientationValues: Pair<Float, Float>,
     val orbitalPos: OrbitalPos?,
     val satTrack: List<OrbitalPos>,

@@ -45,6 +45,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -62,8 +63,7 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-private val sdfTime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+import java.util.TimeZone
 
 @Composable
 @Preview(showBackground = true)
@@ -118,7 +118,13 @@ private fun NextPassRowPreview() = MainTheme {
 }
 
 @Composable
-fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier) {
+fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier, isUtc: Boolean = false) {
+    val timeZone = remember(isUtc) {
+        if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault()
+    }
+    val sdfTime = remember(isUtc) {
+        SimpleDateFormat("HH:mm:ss", Locale.ENGLISH).also { it.timeZone = timeZone }
+    }
     ElevatedCard(
         modifier = modifier
             .height(48.dp)

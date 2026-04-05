@@ -25,6 +25,7 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 data class MapState(
     val mapData: MapData?,
     val isLightUi: Boolean,
+    val isUtc: Boolean,
     val stationPosition: GeoPos?,
     val orbitalPass: OrbitalPass,
     val track: List<List<GeoPos>>?,

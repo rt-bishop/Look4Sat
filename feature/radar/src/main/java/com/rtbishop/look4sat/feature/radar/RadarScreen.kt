@@ -113,12 +113,12 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
-            TopBar { NextPassRow(pass = upcomingPass) }
+            TopBar { NextPassRow(pass = upcomingPass, isUtc = uiState.isUtc) }
         } else {
             TopBar {
                 IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
-                NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f))
+                NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
         }

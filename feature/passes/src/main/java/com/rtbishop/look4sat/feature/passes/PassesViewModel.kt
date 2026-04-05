@@ -93,7 +93,12 @@ class PassesViewModel(
         }
         viewModelScope.launch {
             settingsRepo.otherSettings.collectLatest { settings ->
-                _uiState.update { it.copy(shouldSeeWhatsNew = settings.shouldSeeWhatsNew) }
+                _uiState.update {
+                    it.copy(
+                        isUtc = settings.stateOfUtc,
+                        shouldSeeWhatsNew = settings.shouldSeeWhatsNew
+                    )
+                }
             }
         }
     }

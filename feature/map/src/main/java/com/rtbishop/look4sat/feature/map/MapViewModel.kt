@@ -43,12 +43,13 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISettingsRepo) :
+class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo) :
     ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
@@ -57,6 +58,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
         MapState(
             mapData = null,
             isLightUi = settingsRepo.otherSettings.value.stateOfLightTheme,
+            isUtc = settingsRepo.otherSettings.value.stateOfUtc,
             stationPosition = null,
             orbitalPass = defaultPass,
             track = null,
@@ -73,6 +75,11 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, settingsRepo: ISet
     val uiState: StateFlow<MapState> = _uiState
 
     init {
+        viewModelScope.launch {
+            settingsRepo.otherSettings.collectLatest { settings ->
+                _uiState.update { it.copy(isUtc = settings.stateOfUtc) }
+            }
+        }
         selectDefaultSatellite(-1)
     }
 
