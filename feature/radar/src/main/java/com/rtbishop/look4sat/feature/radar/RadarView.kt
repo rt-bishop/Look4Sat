@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat.feature.radar
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -78,11 +80,21 @@ fun RadarViewCompose(
         animationSpec = infiniteRepeatable(tween(1000)),
         label = "animScale"
     )
+    val eclipsedGlowAlpha by animTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 0.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, delayMillis = 25, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "eclipsedGlowAlpha"
+    )
     val measurer = rememberTextMeasurer()
     var sweepDegrees by remember { mutableFloatStateOf(0f) }
     var cachedRadius by remember { mutableFloatStateOf(0f) }
     var trackPath by remember { mutableStateOf(Path()) }
     var trackEffect by remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
+    val isEclipsed = item.eclipsed
 
     Canvas(modifier = modifier.aspectRatio(1f)) {
         val radius = size.minDimension / 2f * 0.95f
@@ -97,7 +109,13 @@ fun RadarViewCompose(
             drawElevationLabels(radius, trackColor, measurer)
             translate(center.x, center.y) {
                 drawTrack(trackPath, trackEffect, aimColor, trackColor)
-                if (item.elevation > 0) drawPosition(item, radius, animScale, trackColor)
+                if (item.elevation > 0) {
+                    if (isEclipsed) {
+                        drawEclipsedPosition(item, radius, eclipsedGlowAlpha, trackColor)
+                    } else {
+                        drawPosition(item, radius, animScale, trackColor)
+                    }
+                }
                 if (shouldUseCompass) drawAim(azimElev.first, azimElev.second, radius, aimColor)
             }
             sweepDegrees = (sweepDegrees + SWEEP_INCREMENT) % 360f
@@ -133,6 +151,11 @@ private fun DrawScope.drawPosition(item: OrbitalPos, radius: Float, posRadius: F
     val pos = sph2Cart(item.azimuth, item.elevation, radius.toDouble())
     drawCircle(color, 16f, pos)
     drawCircle(color.copy(alpha = 1 - (posRadius / 64f)), posRadius, pos)
+}
+
+private fun DrawScope.drawEclipsedPosition(item: OrbitalPos, radius: Float, glowAlpha: Float, color: Color) {
+    val pos = sph2Cart(item.azimuth, item.elevation, radius.toDouble())
+    drawCircle(color.copy(alpha = glowAlpha), 16f, pos)
 }
 
 private fun DrawScope.drawAim(azim: Float, elev: Float, radius: Float, color: Color) {
