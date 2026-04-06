@@ -246,6 +246,29 @@ class SettingsRepo(
     //endregion
 
     //region # RC settings
+    init {
+        migrateRCFormats()
+    }
+
+    // TODO: Remove after a few releases (added in v4.2.0)
+    private val keyRCFormatsMigrated = "rcFormatsMigrated"
+
+    private fun migrateRCFormats() {
+        if (preferences.getBoolean(keyRCFormatsMigrated, false)) return
+        val formatKeys = listOf(
+            keyRotatorFormat, keyFrequencyFormat, keyBluetoothRotatorFormat, keyBluetoothFrequencyFormat
+        )
+        preferences.edit {
+            for (key in formatKeys) {
+                val value = preferences.getString(key, null) ?: continue
+                if (value.contains("_") && !value.startsWith("\\")) {
+                    putString(key, "\\$value")
+                }
+            }
+            putBoolean(keyRCFormatsMigrated, true)
+        }
+    }
+
     private val _rcSettings = MutableStateFlow(getRCSettings())
     override val rcSettings: StateFlow<RCSettings> = _rcSettings
 
@@ -280,12 +303,12 @@ class SettingsRepo(
         frequencyPort = preferences.getString(keyFrequencyPort, null) ?: "4532",
         frequencyFormat = preferences.getString(keyFrequencyFormat, null) ?: $$"F $FREQ",
         bluetoothRotatorState = preferences.getBoolean(keyBluetoothRotatorState, false),
-        bluetoothRotatorFormat = preferences.getString(keyBluetoothRotatorFormat, null) ?: $$"W$AZ $EL",
+        bluetoothRotatorFormat = preferences.getString(keyBluetoothRotatorFormat, null) ?: $$"P $AZ $EL",
         bluetoothRotatorName = preferences.getString(keyBluetoothRotatorName, null) ?: "Default",
         bluetoothRotatorAddress = preferences.getString(keyBluetoothRotatorAddress, null) ?: "00:0C:BF:13:80:5D",
         bluetoothFrequencyState = preferences.getBoolean(keyBluetoothFrequencyState, false),
         bluetoothFrequencyAddress = preferences.getString(keyBluetoothFrequencyAddress, null) ?: "00:0C:BF:13:80:5D",
-        bluetoothFrequencyFormat = preferences.getString(keyBluetoothFrequencyFormat, null) ?: $$"FA$FREQ"
+        bluetoothFrequencyFormat = preferences.getString(keyBluetoothFrequencyFormat, null) ?: $$"F $FREQ"
     )
     //endregion
 

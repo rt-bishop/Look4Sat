@@ -52,6 +52,7 @@ class NetworkReporter(
             val command = format
                 .replace($$"$AZ", azimuth.toString())
                 .replace($$"$EL", el.toString())
+                .unescapeControlChars()
             write(rotatorSocket, command) { rotatorConnected = false }
         }
     }
@@ -60,7 +61,9 @@ class NetworkReporter(
         reporterScope.launch {
             ensureFrequencyConnected()
             if (!frequencyConnected) return@launch
-            val command = format.replace($$"$FREQ", frequency.toString())
+            val command = format
+                .replace($$"$FREQ", frequency.toString())
+                .unescapeControlChars()
             write(frequencySocket, command) { frequencyConnected = false }
         }
     }
@@ -110,4 +113,7 @@ class NetworkReporter(
             onError()
         }
     }
+
+    private fun String.unescapeControlChars(): String =
+        replace("\\r", "\r").replace("\\n", "\n").replace("\\t", "\t")
 }

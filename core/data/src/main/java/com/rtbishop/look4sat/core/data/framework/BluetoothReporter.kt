@@ -55,8 +55,8 @@ class BluetoothReporter(
             if (!rotatorConnected) return@launch
             val el = if (elevation > 0.0) elevation else 0.0
             val command = format
-                .replace($$"$AZ", "%03d".format(azimuth.toInt()))
-                .replace($$"$EL", "%03d".format(el.toInt()))
+                .replace($$"$AZ", azimuth.toString())
+                .replace($$"$EL", el.toString())
                 .unescapeControlChars()
             write(rotatorStream, command) { rotatorConnected = false }
         }

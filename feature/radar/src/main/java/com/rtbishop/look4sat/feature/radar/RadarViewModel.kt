@@ -129,7 +129,6 @@ class RadarViewModel(
                     }
                     processRadios(transmitters, satPass.orbitalObject, timeNow)
                     sendPassData(pos)
-                    sendPassDataBT(pos)
                     delay(1000)
                 }
             }
@@ -149,33 +148,35 @@ class RadarViewModel(
     }
 
     private fun sendPassData(orbitalPos: OrbitalPos) {
-        viewModelScope.launch {
-            val rc = settingsRepo.rcSettings.value
-            if (rc.rotatorState) {
-                val azimuth = orbitalPos.azimuth.toDegrees().round(2)
-                val elevation = orbitalPos.elevation.toDegrees().round(2)
-                networkReporter.reportRotation(rc.rotatorFormat, azimuth, elevation)
-            }
-            if (rc.frequencyState) {
-                _uiState.value.selectedFrequency?.let { freq ->
-                    networkReporter.reportFrequency(rc.frequencyFormat, freq)
-                }
-            }
-        }
+        val rc = settingsRepo.rcSettings.value
+        sendReporterData(
+            networkReporter, orbitalPos,
+            rc.rotatorState, rc.rotatorFormat,
+            rc.frequencyState, rc.frequencyFormat
+        )
+        sendReporterData(
+            bluetoothReporter, orbitalPos,
+            rc.bluetoothRotatorState, rc.bluetoothRotatorFormat,
+            rc.bluetoothFrequencyState, rc.bluetoothFrequencyFormat
+        )
     }
 
-    private fun sendPassDataBT(orbitalPos: OrbitalPos) {
-        viewModelScope.launch {
-            val rc = settingsRepo.rcSettings.value
-            if (rc.bluetoothRotatorState) {
-                val azimuth = orbitalPos.azimuth.toDegrees().round(0)
-                val elevation = orbitalPos.elevation.toDegrees().round(0)
-                bluetoothReporter.reportRotation(rc.bluetoothRotatorFormat, azimuth, elevation)
-            }
-            if (rc.bluetoothFrequencyState) {
-                _uiState.value.selectedFrequency?.let { freq ->
-                    bluetoothReporter.reportFrequency(rc.bluetoothFrequencyFormat, freq)
-                }
+    private fun sendReporterData(
+        reporter: IReporter,
+        orbitalPos: OrbitalPos,
+        rotatorEnabled: Boolean,
+        rotatorFormat: String,
+        frequencyEnabled: Boolean,
+        frequencyFormat: String
+    ) {
+        if (rotatorEnabled) {
+            val azimuth = orbitalPos.azimuth.toDegrees().round(2)
+            val elevation = orbitalPos.elevation.toDegrees().round(2)
+            reporter.reportRotation(rotatorFormat, azimuth, elevation)
+        }
+        if (frequencyEnabled) {
+            _uiState.value.selectedFrequency?.let { freq ->
+                reporter.reportFrequency(frequencyFormat, freq)
             }
         }
     }

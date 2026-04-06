@@ -216,12 +216,12 @@ fun PreviewNetworkOutputDialog() {
                 frequencyPort = "4532",
                 frequencyFormat = $$"F $FREQ",
                 bluetoothRotatorState = false,
-                bluetoothRotatorFormat = $$"W$AZ $EL",
+                bluetoothRotatorFormat = $$"P $AZ $EL",
                 bluetoothRotatorName = "Default",
                 bluetoothRotatorAddress = "00:0C:BF:13:80:5D",
                 bluetoothFrequencyState = false,
                 bluetoothFrequencyAddress = "00:0C:BF:13:80:5D",
-                bluetoothFrequencyFormat = $$"FA$FREQ"
+                bluetoothFrequencyFormat = $$"F $FREQ"
             ),
             onDismiss = {},
             onSave = { _, _, _, _, _, _, _, _ -> }
@@ -361,14 +361,14 @@ fun PreviewBluetoothOutputDialog() {
                 frequencyState = false,
                 frequencyAddress = "127.0.0.1",
                 frequencyPort = "4532",
-                frequencyFormat = $$"set_freq $FREQ",
+                frequencyFormat = $$"F $FREQ",
                 bluetoothRotatorState = false,
-                bluetoothRotatorFormat = $$"W$AZ $EL",
+                bluetoothRotatorFormat = $$"P $AZ $EL",
                 bluetoothRotatorName = "Default",
                 bluetoothRotatorAddress = "00:0C:BF:13:80:5D",
                 bluetoothFrequencyState = false,
                 bluetoothFrequencyAddress = "00:0C:BF:13:80:5D",
-                bluetoothFrequencyFormat = $$"FA$FREQ"
+                bluetoothFrequencyFormat = $$"F $FREQ"
             ),
             onDismiss = {},
             onSave = { _, _, _, _, _, _ -> }
