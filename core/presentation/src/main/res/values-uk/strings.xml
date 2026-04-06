@@ -118,12 +118,10 @@
 
     <string name="prefs_net_title">Вивід мережевих даних</string>
     <string name="prefs_net_rotator_switch">Enable rotation output</string>
-    <string name="prefs_net_rotator_ip_hint">IP адреса</string>
-    <string name="prefs_net_rotator_port_hint">Порт</string>
+    <string name="prefs_net_rotator_address_hint">IP:Порт</string>
     <string name="prefs_net_rotator_format_hint">Формат даних</string>
     <string name="prefs_net_frequency_switch">Enable frequency output</string>
-    <string name="prefs_net_frequency_ip_hint">IP адреса</string>
-    <string name="prefs_net_frequency_port_hint">Порт</string>
+    <string name="prefs_net_frequency_address_hint">IP:Порт</string>
     <string name="prefs_net_frequency_format_hint">Формат даних</string>
 
     <string name="prefs_bt_title">Вивід даних Bluetooth</string>

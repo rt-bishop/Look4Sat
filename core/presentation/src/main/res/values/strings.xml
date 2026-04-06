@@ -147,12 +147,10 @@
 
     <string name="prefs_net_title">Network data output</string>
     <string name="prefs_net_rotator_switch">Enable rotation output</string>
-    <string name="prefs_net_rotator_ip_hint">IP address</string>
-    <string name="prefs_net_rotator_port_hint">Port</string>
+    <string name="prefs_net_rotator_address_hint">IP:Port</string>
     <string name="prefs_net_rotator_format_hint">Format</string>
     <string name="prefs_net_frequency_switch">Enable frequency output</string>
-    <string name="prefs_net_frequency_ip_hint">IP address</string>
-    <string name="prefs_net_frequency_port_hint">Port</string>
+    <string name="prefs_net_frequency_address_hint">IP:Port</string>
     <string name="prefs_net_frequency_format_hint">Format</string>
 
     <string name="prefs_bt_title">Bluetooth data output</string>

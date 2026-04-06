@@ -118,12 +118,10 @@
 
     <string name="prefs_net_title">Salida de datos de red</string>
     <string name="prefs_net_rotator_switch">Enable rotation output</string>
-    <string name="prefs_net_rotator_ip_hint">Dirección IP</string>
-    <string name="prefs_net_rotator_port_hint">Puerto</string>
+    <string name="prefs_net_rotator_address_hint">IP:Puerto</string>
     <string name="prefs_net_rotator_format_hint">Formato de datos</string>
     <string name="prefs_net_frequency_switch">Enable frequency output</string>
-    <string name="prefs_net_frequency_ip_hint">Dirección IP</string>
-    <string name="prefs_net_frequency_port_hint">Puerto</string>
+    <string name="prefs_net_frequency_address_hint">IP:Puerto</string>
     <string name="prefs_net_frequency_format_hint">Formato de datos</string>
 
     <string name="prefs_bt_title">Salida por Bluetooth</string>

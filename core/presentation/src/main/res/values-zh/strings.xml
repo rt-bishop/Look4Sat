@@ -110,12 +110,10 @@
 
     <string name="prefs_net_title">网络数据输出</string>
     <string name="prefs_net_rotator_switch">启用方位俯仰角输出</string>
-    <string name="prefs_net_rotator_ip_hint">IP地址</string>
-    <string name="prefs_net_rotator_port_hint">端口</string>
+    <string name="prefs_net_rotator_address_hint">IP:端口</string>
     <string name="prefs_net_rotator_format_hint">数据格式</string>
     <string name="prefs_net_frequency_switch">启用多普勒频率输出</string>
-    <string name="prefs_net_frequency_ip_hint">IP地址</string>
-    <string name="prefs_net_frequency_port_hint">端口</string>
+    <string name="prefs_net_frequency_address_hint">IP:端口</string>
     <string name="prefs_net_frequency_format_hint">数据格式</string>
 
     <string name="prefs_bt_title">蓝牙数据输出</string>

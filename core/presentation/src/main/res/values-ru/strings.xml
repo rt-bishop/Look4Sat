@@ -117,12 +117,10 @@
 
     <string name="prefs_net_title">Вывод сетевых данных</string>
     <string name="prefs_net_rotator_switch">Включить вывод ротатора</string>
-    <string name="prefs_net_rotator_ip_hint">IP адрес</string>
-    <string name="prefs_net_rotator_port_hint">Порт</string>
+    <string name="prefs_net_rotator_address_hint">IP:Порт</string>
     <string name="prefs_net_rotator_format_hint">Формат</string>
     <string name="prefs_net_frequency_switch">Включить вывод частоты</string>
-    <string name="prefs_net_frequency_ip_hint">IP адрес</string>
-    <string name="prefs_net_frequency_port_hint">Порт</string>
+    <string name="prefs_net_frequency_address_hint">IP:Порт</string>
     <string name="prefs_net_frequency_format_hint">Формат</string>
 
     <string name="prefs_bt_title">Вывод данных Bluetooth</string>

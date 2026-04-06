@@ -240,22 +240,26 @@ fun NetworkOutputDialog(
 ) {
     val padding = LocalSpacing.current.large
     val rotatorState = rememberSaveable { mutableStateOf(initialSettings.rotatorState) }
-    val rotatorAddress = rememberSaveable { mutableStateOf(initialSettings.rotatorAddress) }
-    val rotatorPort = rememberSaveable { mutableStateOf(initialSettings.rotatorPort) }
+    val rotatorAddress = rememberSaveable {
+        mutableStateOf("${initialSettings.rotatorAddress}:${initialSettings.rotatorPort}")
+    }
     val rotatorFormat = rememberSaveable { mutableStateOf(initialSettings.rotatorFormat) }
     val frequencyState = rememberSaveable { mutableStateOf(initialSettings.frequencyState) }
-    val frequencyAddress = rememberSaveable { mutableStateOf(initialSettings.frequencyAddress) }
-    val frequencyPort = rememberSaveable { mutableStateOf(initialSettings.frequencyPort) }
+    val frequencyAddress = rememberSaveable {
+        mutableStateOf("${initialSettings.frequencyAddress}:${initialSettings.frequencyPort}")
+    }
     val frequencyFormat = rememberSaveable { mutableStateOf(initialSettings.frequencyFormat) }
     val onAccept = {
+        val (rotIp, rotPort) = splitAddress(rotatorAddress.value)
+        val (freqIp, freqPort) = splitAddress(frequencyAddress.value)
         onSave(
             rotatorState.value,
-            rotatorAddress.value,
-            rotatorPort.value,
+            rotIp,
+            rotPort,
             rotatorFormat.value,
             frequencyState.value,
-            frequencyAddress.value,
-            frequencyPort.value,
+            freqIp,
+            freqPort,
             frequencyFormat.value
         )
         onDismiss()
@@ -285,28 +289,19 @@ fun NetworkOutputDialog(
                     value = rotatorAddress.value,
                     onValueChange = { rotatorAddress.value = it },
                     singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_rotator_ip_hint)) },
-                    modifier = Modifier.weight(1.5f),
+                    label = { Text(stringResource(R.string.prefs_net_rotator_address_hint)) },
+                    modifier = Modifier.weight(0.6f),
                     enabled = rotatorState.value
                 )
                 OutlinedTextField(
-                    value = rotatorPort.value,
-                    onValueChange = { rotatorPort.value = it },
+                    value = rotatorFormat.value,
+                    onValueChange = { rotatorFormat.value = it },
                     singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_rotator_port_hint)) },
-                    modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.prefs_net_rotator_format_hint)) },
+                    modifier = Modifier.weight(0.4f),
                     enabled = rotatorState.value
                 )
             }
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                value = rotatorFormat.value,
-                onValueChange = { rotatorFormat.value = it },
-                singleLine = true,
-                label = { Text(stringResource(R.string.prefs_net_rotator_format_hint)) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = rotatorState.value
-            )
             Spacer(modifier = Modifier.height(6.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -327,29 +322,29 @@ fun NetworkOutputDialog(
                     value = frequencyAddress.value,
                     onValueChange = { frequencyAddress.value = it },
                     singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_frequency_ip_hint)) },
-                    modifier = Modifier.weight(1.5f),
+                    label = { Text(stringResource(R.string.prefs_net_frequency_address_hint)) },
+                    modifier = Modifier.weight(0.6f),
                     enabled = frequencyState.value
                 )
                 OutlinedTextField(
-                    value = frequencyPort.value,
-                    onValueChange = { frequencyPort.value = it },
+                    value = frequencyFormat.value,
+                    onValueChange = { frequencyFormat.value = it },
                     singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_frequency_port_hint)) },
-                    modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.prefs_net_frequency_format_hint)) },
+                    modifier = Modifier.weight(0.4f),
                     enabled = frequencyState.value
                 )
             }
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                value = frequencyFormat.value,
-                onValueChange = { frequencyFormat.value = it },
-                maxLines = 2,
-                label = { Text(stringResource(R.string.prefs_net_frequency_format_hint)) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = frequencyState.value
-            )
         }
+    }
+}
+
+private fun splitAddress(address: String): Pair<String, String> {
+    val lastColon = address.lastIndexOf(':')
+    return if (lastColon >= 0) {
+        address.substring(0, lastColon) to address.substring(lastColon + 1)
+    } else {
+        address to ""
     }
 }
 
@@ -434,7 +429,7 @@ fun BluetoothOutputDialog(
                     onValueChange = { rotatorAddress.value = it },
                     singleLine = true,
                     label = { Text(stringResource(R.string.prefs_bt_rotator_device_hint)) },
-                    modifier = Modifier.weight(1.5f),
+                    modifier = Modifier.weight(0.6f),
                     enabled = rotatorState.value
                 )
                 OutlinedTextField(
@@ -442,7 +437,7 @@ fun BluetoothOutputDialog(
                     onValueChange = { rotatorFormat.value = it },
                     singleLine = true,
                     label = { Text(stringResource(R.string.prefs_bt_rotator_output_hint)) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(0.4f),
                     enabled = rotatorState.value
                 )
             }
@@ -467,7 +462,7 @@ fun BluetoothOutputDialog(
                     onValueChange = { frequencyAddress.value = it },
                     singleLine = true,
                     label = { Text(stringResource(R.string.prefs_bt_frequency_device_hint)) },
-                    modifier = Modifier.weight(1.5f),
+                    modifier = Modifier.weight(0.6f),
                     enabled = frequencyState.value
                 )
                 OutlinedTextField(
@@ -475,7 +470,7 @@ fun BluetoothOutputDialog(
                     onValueChange = { frequencyFormat.value = it },
                     singleLine = true,
                     label = { Text(stringResource(R.string.prefs_bt_frequency_output_hint)) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(0.4f),
                     enabled = frequencyState.value
                 )
             }

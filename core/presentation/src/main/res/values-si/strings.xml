@@ -118,12 +118,10 @@
 
     <string name="prefs_net_title">ජාල ප්‍රතිදානය</string>
     <string name="prefs_net_rotator_switch">Enable rotation output</string>
-    <string name="prefs_net_rotator_ip_hint">IP ලිපිනය</string>
-    <string name="prefs_net_rotator_port_hint">Port</string>
+    <string name="prefs_net_rotator_address_hint">IP:Port</string>
     <string name="prefs_net_rotator_format_hint">දත්ත අකාරය</string>
     <string name="prefs_net_frequency_switch">Enable frequency output</string>
-    <string name="prefs_net_frequency_ip_hint">IP ලිපිනය</string>
-    <string name="prefs_net_frequency_port_hint">Port</string>
+    <string name="prefs_net_frequency_address_hint">IP:Port</string>
     <string name="prefs_net_frequency_format_hint">දත්ත අකාරය</string>
 
     <string name="prefs_bt_title">Bluetooth දත්ත ප්‍රතිදානය</string>

@@ -46,8 +46,10 @@ class DatabaseRepo(
     }
 
     override suspend fun updateTLEFromFile(uri: String) = withContext(dispatcher) {
-        remoteSource.getFileStream(uri)?.let {
-            localSource.insertEntries(dataParser.parseTLEStream(it))
+        remoteSource.getFileStream(uri)?.let { stream ->
+            val entries = dataParser.parseTLEStream(stream)
+            localSource.insertEntries(entries)
+            settingsRepo.setSatelliteTypeIds("Other", entries.map { it.catnum })
         }
         setUpdateSuccessful(System.currentTimeMillis())
     }
