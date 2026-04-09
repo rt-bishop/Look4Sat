@@ -34,6 +34,7 @@ internal class ApplicationPlugin : Plugin<Project> {
             implementation(project(":feature:map"))
             implementation(project(":feature:passes"))
             implementation(project(":feature:radar"))
+            implementation(project(":feature:radiocontrol"))
             implementation(project(":feature:satellites"))
             implementation(project(":feature:settings"))
             implementation(libs.androidx.core.splashscreen)

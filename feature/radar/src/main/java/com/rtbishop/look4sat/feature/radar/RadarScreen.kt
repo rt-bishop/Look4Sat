@@ -77,7 +77,10 @@ import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
 
-fun NavGraphBuilder.radarDestination(navigateUp: () -> Unit) {
+fun NavGraphBuilder.radarDestination(
+    navigateUp: () -> Unit,
+    navigateToRadioControl: (Int, Long) -> Unit = { _, _ -> }
+) {
     val radarRoute = "${Screen.Radar.route}?catNum={catNum}&aosTime={aosTime}"
     val radarArgs = listOf(
         navArgument("catNum") { defaultValue = 0 },
@@ -86,15 +89,24 @@ fun NavGraphBuilder.radarDestination(navigateUp: () -> Unit) {
     composable(radarRoute, radarArgs) {
         val viewModel = viewModel(RadarViewModel::class.java, factory = RadarViewModel.Factory)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        RadarScreen(uiState, navigateUp)
+        RadarScreen(uiState, navigateUp, navigateToRadioControl)
     }
 }
 
 @Composable
-private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
+private fun RadarScreen(
+    uiState: RadarState,
+    navigateUp: () -> Unit,
+    navigateToRadioControl: (Int, Long) -> Unit
+) {
     val addToCalendar: () -> Unit = {
         uiState.currentPass?.let { pass ->
             uiState.sendAction(RadarAction.AddToCalendar(pass.name, pass.aosTime, pass.losTime))
+        }
+    }
+    val openRadioControl: () -> Unit = {
+        uiState.currentPass?.let { pass ->
+            navigateToRadioControl(pass.catNum, pass.aosTime)
         }
     }
     val upcomingPass = uiState.currentPass ?: getDefaultPass()
@@ -110,6 +122,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
             TopBar {
                 IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
+                IconCard(action = openRadioControl, resId = R.drawable.ic_radios)
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
             TopBar { NextPassRow(pass = upcomingPass, isUtc = uiState.isUtc) }
@@ -118,6 +131,7 @@ private fun RadarScreen(uiState: RadarState, navigateUp: () -> Unit) {
                 IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
                 NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
+                IconCard(action = openRadioControl, resId = R.drawable.ic_radios)
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
         }

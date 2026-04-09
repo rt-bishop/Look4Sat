@@ -63,3 +63,20 @@ data class DataSourcesSettings(
     val tleUrl: String,
     val transceiversUrl: String
 )
+
+data class RadioControlSettings(
+    val enabled: Boolean,
+    val radioModel: String,
+    val txRadioAddress: String,
+    val rxRadioAddress: String,
+    val txRadioName: String,
+    val rxRadioName: String,
+    val baudRate: Int
+) {
+    companion object {
+        val SUPPORTED_RADIOS = listOf(
+            "Yaesu FT-817/818",
+            "Yaesu FT-857/897"
+        )
+    }
+}

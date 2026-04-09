@@ -22,6 +22,7 @@ import com.rtbishop.look4sat.core.domain.model.DatabaseState
 import com.rtbishop.look4sat.core.domain.model.OtherSettings
 import com.rtbishop.look4sat.core.domain.model.PassesSettings
 import com.rtbishop.look4sat.core.domain.model.RCSettings
+import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import kotlinx.coroutines.flow.StateFlow
 
@@ -70,5 +71,10 @@ interface ISettingsRepo {
     //region # Transceivers settings
     val dataSourcesSettings: StateFlow<DataSourcesSettings>
     fun updateDataSourcesSettings(settings: DataSourcesSettings)
+    //endregion
+
+    //region # Radio control settings
+    val radioControlSettings: StateFlow<RadioControlSettings>
+    fun updateRadioControlSettings(settings: RadioControlSettings)
     //endregion
 }

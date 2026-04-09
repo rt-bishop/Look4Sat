@@ -47,9 +47,11 @@ class SettingsViewModel(
             dataSettings = defaultDataSettings,
             otherSettings = settingsRepo.otherSettings.value,
             rcSettings = settingsRepo.rcSettings.value,
+            radioControlSettings = settingsRepo.radioControlSettings.value,
             dataSourcesSettings = settingsRepo.dataSourcesSettings.value,
             sendAction = ::handleAction,
             sendRCAction = ::handleAction,
+            sendRadioControlAction = ::handleAction,
             sendSystemAction = ::handleAction,
             sendDataSourcesAction = ::handleAction
         )
@@ -94,6 +96,11 @@ class SettingsViewModel(
                 _uiState.update { it.copy(dataSourcesSettings = settings) }
             }
         }
+        viewModelScope.launch {
+            settingsRepo.radioControlSettings.collect { settings ->
+                _uiState.update { it.copy(radioControlSettings = settings) }
+            }
+        }
     }
 
 
@@ -135,6 +142,12 @@ class SettingsViewModel(
     private fun handleAction(action: DataSourcesAction) {
         when (action) {
             is DataSourcesAction.Update -> settingsRepo.updateDataSourcesSettings(action.settings)
+        }
+    }
+
+    private fun handleAction(action: RadioControlSettingsAction) {
+        when (action) {
+            is RadioControlSettingsAction.Update -> settingsRepo.updateRadioControlSettings(action.settings)
         }
     }
 

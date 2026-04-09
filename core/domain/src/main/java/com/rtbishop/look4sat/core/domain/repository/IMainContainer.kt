@@ -15,6 +15,9 @@ interface IMainContainer {
     fun provideBluetoothReporter(): IReporter
     fun provideNetworkReporter(): IReporter
     fun provideSensorsRepo(): ISensorsRepo
+    fun provideTxRadioController(): IRadioController
+    fun provideRxRadioController(): IRadioController
+    val radioTrackingService: IRadioTrackingService
 }
 
 interface IContainerProvider {

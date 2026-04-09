@@ -24,6 +24,7 @@ include(
     ":feature:map",
     ":feature:passes",
     ":feature:radar",
+    ":feature:radiocontrol",
     ":feature:satellites",
     ":feature:settings"
 )
