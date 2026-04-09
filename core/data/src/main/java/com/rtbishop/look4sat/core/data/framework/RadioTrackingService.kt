@@ -68,7 +68,6 @@ class RadioTrackingService(
             return
         }
 
-        // Create fresh controllers with current addresses
         val tx = Ft817Controller(bluetoothManager, txAddr)
         val rx = Ft817Controller(bluetoothManager, rxAddr)
         txController = tx
@@ -142,9 +141,11 @@ class RadioTrackingService(
             }
             _state.update { it.copy(txMode = txMode, rxMode = rxMode) }
 
-            // Gpredict-style: 0.0 = sync invalidated, skip dial feedback next cycle
             var lastSetTxFreq = 0.0
             var lastSetRxFreq = 0.0
+            var tuningRadio = "" // "", "tx", or "rx" - which radio the user is tuning
+            var lastReadFreq = 0L
+            var stableCount = 0
 
             while (isActive) {
                 val currentState = _state.value
@@ -159,45 +160,76 @@ class RadioTrackingService(
                 val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
                 val tx = txController
                 val rx = rxController
-                val isLinearMode = currentState.txMode?.uppercase() in listOf("USB", "LSB", "CW", "CW-R")
+                val hasUplink = txBaseFreq != null
                 val c = com.rtbishop.look4sat.core.domain.predict.SPEED_OF_LIGHT
                 val v = pos.distanceRate * 1000.0
-                var skipTxWrite = false
-                var skipRxWrite = false
 
-                // --- TX dial feedback ---
-                if (isLinearMode && txBaseFreq != null && tx != null && tx.isConnected && lastSetTxFreq > 0.0) {
-                    val readResult = tx.readFrequencyAndMode()
-                    if (readResult != null) {
-                        val (actualTxFreq, _) = readResult
-                        if (kotlin.math.abs(actualTxFreq - lastSetTxFreq) >= 10.0) {
-                            val newBase = (actualTxFreq.toDouble() * c / (c + v)).toLong()
-                            if (newBase > 0) {
-                                txBaseFreq = newBase
-                                _state.update { it.copy(txBaseFrequencyHz = newBase) }
-                                Log.i(tag, "TX dial → base=$newBase (read=$actualTxFreq, lastSet=$lastSetTxFreq)")
+                if (tuningRadio.isNotEmpty()) {
+                    // --- User is tuning: keep reading, wait for stabilization ---
+                    val radio = if (tuningRadio == "tx") tx else rx
+                    if (radio != null && radio.isConnected) {
+                        val readResult = radio.readFrequencyAndMode()
+                        if (readResult != null) {
+                            val (freq, _) = readResult
+                            if (kotlin.math.abs(freq - lastReadFreq) <= 20) {
+                                stableCount++
+                            } else {
+                                stableCount = 0
+                                lastReadFreq = freq
                             }
-                            lastSetTxFreq = 0.0
-                            skipTxWrite = true
+                            // Stable for 2 reads → user stopped turning
+                            if (stableCount >= 2) {
+                                if (tuningRadio == "tx" && txBaseFreq != null) {
+                                    val newBase = (freq.toDouble() * c / (c + v)).toLong()
+                                    if (newBase > 0) {
+                                        txBaseFreq = newBase
+                                        _state.update { it.copy(txBaseFrequencyHz = newBase) }
+                                        Log.i(tag, "TX tuning done → base=$newBase")
+                                    }
+                                } else if (tuningRadio == "rx") {
+                                    val rxNominal = (freq.toDouble() * c / (c - v)).toLong()
+                                    val newTxBase = TransponderMapper.mapDownlinkToUplink(rxNominal, xpdr)
+                                    if (newTxBase != null && newTxBase > 0) {
+                                        txBaseFreq = newTxBase
+                                        _state.update { it.copy(txBaseFrequencyHz = newTxBase) }
+                                        Log.i(tag, "RX tuning done → txBase=$newTxBase")
+                                    }
+                                }
+                                tuningRadio = ""
+                                stableCount = 0
+                                lastSetTxFreq = 0.0
+                                lastSetRxFreq = 0.0
+                            }
                         }
                     }
-                }
+                } else {
+                    // --- Normal tracking: read, detect changes, command ---
 
-                // --- RX dial feedback ---
-                if (isLinearMode && !skipTxWrite && rx != null && rx.isConnected && lastSetRxFreq > 0.0) {
-                    val readResult = rx.readFrequencyAndMode()
-                    if (readResult != null) {
-                        val (actualRxFreq, _) = readResult
-                        if (kotlin.math.abs(actualRxFreq - lastSetRxFreq) >= 10.0) {
-                            val rxNominal = (actualRxFreq.toDouble() * c / (c - v)).toLong()
-                            val newTxBase = TransponderMapper.mapDownlinkToUplink(rxNominal, xpdr)
-                            if (newTxBase != null && newTxBase > 0) {
-                                txBaseFreq = newTxBase
-                                _state.update { it.copy(txBaseFrequencyHz = newTxBase) }
-                                Log.i(tag, "RX dial → txBase=$newTxBase")
+                    // TX dial feedback
+                    if (hasUplink && tx != null && tx.isConnected && lastSetTxFreq > 0.0) {
+                        val readResult = tx.readFrequencyAndMode()
+                        if (readResult != null) {
+                            val (actualTxFreq, _) = readResult
+                            if (kotlin.math.abs(actualTxFreq - lastSetTxFreq) >= 20.0) {
+                                tuningRadio = "tx"
+                                lastReadFreq = actualTxFreq
+                                stableCount = 0
+                                Log.i(tag, "TX tuning detected (read=$actualTxFreq, lastSet=$lastSetTxFreq)")
                             }
-                            lastSetRxFreq = 0.0
-                            skipRxWrite = true
+                        }
+                    }
+
+                    // RX dial feedback (only if TX not tuning)
+                    if (tuningRadio.isEmpty() && rx != null && rx.isConnected && lastSetRxFreq > 0.0) {
+                        val readResult = rx.readFrequencyAndMode()
+                        if (readResult != null) {
+                            val (actualRxFreq, _) = readResult
+                            if (kotlin.math.abs(actualRxFreq - lastSetRxFreq) >= 20.0) {
+                                tuningRadio = "rx"
+                                lastReadFreq = actualRxFreq
+                                stableCount = 0
+                                Log.i(tag, "RX tuning detected (read=$actualRxFreq, lastSet=$lastSetRxFreq)")
+                            }
                         }
                     }
                 }
@@ -211,14 +243,16 @@ class RadioTrackingService(
                 }
                 val rxRadioFreq = rxBaseFreq?.let { pos.getDownlinkFreq(it) }
 
-                // Command radios (skip one cycle after dial change)
-                if (!skipTxWrite && tx != null && tx.isConnected && txRadioFreq != null) {
-                    tx.setFrequency(txRadioFreq)
-                    lastSetTxFreq = txRadioFreq.toDouble()
-                }
-                if (!skipRxWrite && rx != null && rx.isConnected && rxRadioFreq != null) {
-                    rx.setFrequency(rxRadioFreq)
-                    lastSetRxFreq = rxRadioFreq.toDouble()
+                // Command radios (only when not tuning)
+                if (tuningRadio.isEmpty()) {
+                    if (tx != null && tx.isConnected && txRadioFreq != null) {
+                        tx.setFrequency(txRadioFreq)
+                        lastSetTxFreq = txRadioFreq.toDouble()
+                    }
+                    if (rx != null && rx.isConnected && rxRadioFreq != null) {
+                        rx.setFrequency(rxRadioFreq)
+                        lastSetRxFreq = rxRadioFreq.toDouble()
+                    }
                 }
 
                 _state.update {
@@ -233,7 +267,7 @@ class RadioTrackingService(
                     )
                 }
 
-                delay(500)
+                delay(1000)
             }
         }
     }
@@ -319,4 +353,5 @@ class RadioTrackingService(
         }
         _state.update { it.copy(txMode = txMode, rxMode = rxMode) }
     }
+
 }

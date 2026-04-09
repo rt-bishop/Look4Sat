@@ -276,12 +276,33 @@ private fun CtcssSelector(uiState: RadioControlState) {
 @Composable
 private fun FrequencyTuner(uiState: RadioControlState) {
     val freq = uiState.txBaseFrequencyHz ?: return
+    val transponder = uiState.transponders.find { it.uuid == uiState.selectedTransponderUuid }
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Text(text = "TX Base Frequency", color = MaterialTheme.colorScheme.primary)
+            if (transponder != null) {
+                val upLow = transponder.uplinkLow
+                val upHigh = transponder.uplinkHigh
+                val dnLow = transponder.downlinkLow
+                val dnHigh = transponder.downlinkHigh
+                if (upLow != null && upHigh != null && upLow != upHigh) {
+                    Text(
+                        text = "UP: ${RadioControlViewModel.formatFrequency(upLow)} - ${RadioControlViewModel.formatFrequency(upHigh)}",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (dnLow != null && dnHigh != null && dnLow != dnHigh) {
+                    Text(
+                        text = "DN: ${RadioControlViewModel.formatFrequency(dnLow)} - ${RadioControlViewModel.formatFrequency(dnHigh)}",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "${RadioControlViewModel.formatFrequency(freq)} MHz",
