@@ -144,6 +144,17 @@
     <string name="prefs_data_output_title">Data output</string>
     <string name="prefs_net_output">Network</string>
     <string name="prefs_bt_output">Bluetooth</string>
+    <string name="prefs_cat_output">CAT</string>
+
+    <!-- Radio Control -->
+    <string name="nav_radiocontrol">Radio Control</string>
+    <string name="rc_settings_title">CAT Radio Control</string>
+    <string name="rc_radio_model">Radio Model</string>
+    <string name="rc_tx_device_hint">TX Radio BT Address</string>
+    <string name="rc_rx_device_hint">RX Radio BT Address</string>
+    <string name="rc_tx_name_hint">TX Radio Name</string>
+    <string name="rc_rx_name_hint">RX Radio Name</string>
+    <string name="rc_enable_switch">Enable CAT Control</string>
 
     <string name="prefs_net_title">Network data output</string>
     <string name="prefs_net_rotator_switch">Enable rotation output</string>

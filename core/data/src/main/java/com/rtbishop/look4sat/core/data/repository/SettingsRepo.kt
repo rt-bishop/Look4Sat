@@ -28,6 +28,7 @@ import com.rtbishop.look4sat.core.domain.model.DatabaseState
 import com.rtbishop.look4sat.core.domain.model.OtherSettings
 import com.rtbishop.look4sat.core.domain.model.PassesSettings
 import com.rtbishop.look4sat.core.domain.model.RCSettings
+import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.core.domain.utility.positionToQth
@@ -362,6 +363,42 @@ class SettingsRepo(
         useCustomTransceivers = preferences.getBoolean(keyUseCustomTransceivers, false),
         tleUrl = preferences.getString(keyTleUrl, "https://example.com/tle.txt") ?: "",
         transceiversUrl = preferences.getString(keyTransceiversUrl, "https://example.com/radio.json") ?: ""
+    )
+    //endregion
+
+    //region # Radio control settings
+    private val keyRadioControlEnabled = "radioControlEnabled"
+    private val keyRadioModel = "radioModel"
+    private val keyTxRadioAddress = "txRadioAddress"
+    private val keyRxRadioAddress = "rxRadioAddress"
+    private val keyTxRadioName = "txRadioName"
+    private val keyRxRadioName = "rxRadioName"
+    private val keyRadioBaudRate = "radioBaudRate"
+
+    private val _radioControlSettings = MutableStateFlow(getRadioControlSettings())
+    override val radioControlSettings: StateFlow<RadioControlSettings> = _radioControlSettings
+
+    override fun updateRadioControlSettings(settings: RadioControlSettings) {
+        preferences.edit {
+            putBoolean(keyRadioControlEnabled, settings.enabled)
+            putString(keyRadioModel, settings.radioModel)
+            putString(keyTxRadioAddress, settings.txRadioAddress)
+            putString(keyRxRadioAddress, settings.rxRadioAddress)
+            putString(keyTxRadioName, settings.txRadioName)
+            putString(keyRxRadioName, settings.rxRadioName)
+            putInt(keyRadioBaudRate, settings.baudRate)
+        }
+        _radioControlSettings.value = settings
+    }
+
+    private fun getRadioControlSettings(): RadioControlSettings = RadioControlSettings(
+        enabled = preferences.getBoolean(keyRadioControlEnabled, false),
+        radioModel = preferences.getString(keyRadioModel, null) ?: "Yaesu FT-817/818",
+        txRadioAddress = preferences.getString(keyTxRadioAddress, null) ?: "",
+        rxRadioAddress = preferences.getString(keyRxRadioAddress, null) ?: "",
+        txRadioName = preferences.getString(keyTxRadioName, null) ?: "TX Radio",
+        rxRadioName = preferences.getString(keyRxRadioName, null) ?: "RX Radio",
+        baudRate = preferences.getInt(keyRadioBaudRate, 4800)
     )
     //endregion
 }

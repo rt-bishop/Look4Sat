@@ -20,6 +20,7 @@ package com.rtbishop.look4sat.feature.settings
 import com.rtbishop.look4sat.core.domain.model.DataSourcesSettings
 import com.rtbishop.look4sat.core.domain.model.OtherSettings
 import com.rtbishop.look4sat.core.domain.model.RCSettings
+import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 
 data class PositionSettings(
@@ -36,9 +37,11 @@ data class SettingsState(
     val dataSettings: DataSettings,
     val otherSettings: OtherSettings,
     val rcSettings: RCSettings,
+    val radioControlSettings: RadioControlSettings,
     val dataSourcesSettings: DataSourcesSettings,
     val sendAction: (SettingsAction) -> Unit,
     val sendRCAction: (RCAction) -> Unit,
+    val sendRadioControlAction: (RadioControlSettingsAction) -> Unit,
     val sendSystemAction: (SystemAction) -> Unit,
     val sendDataSourcesAction: (DataSourcesAction) -> Unit
 )
@@ -69,4 +72,8 @@ sealed class RCAction {
 
 sealed class DataSourcesAction {
     data class Update(val settings: DataSourcesSettings) : DataSourcesAction()
+}
+
+sealed class RadioControlSettingsAction {
+    data class Update(val settings: RadioControlSettings) : RadioControlSettingsAction()
 }

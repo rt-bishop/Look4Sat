@@ -167,6 +167,20 @@ private fun SettingsScreen(uiState: SettingsState) {
     // RC settings
     val rcSettings = uiState.rcSettings
 
+    // Radio control (FT-817) settings
+    val radioControlDialogState = rememberSaveable { mutableStateOf(false) }
+    val showRadioControlDialog = { radioControlDialogState.value = true }
+    val dismissRadioControlDialog = { radioControlDialogState.value = false }
+    if (radioControlDialogState.value) {
+        RadioControlDialog(
+            initialSettings = uiState.radioControlSettings,
+            onDismiss = dismissRadioControlDialog,
+            onSave = { settings ->
+                uiState.sendRadioControlAction(RadioControlSettingsAction.Update(settings))
+            }
+        )
+    }
+
     // Network data output
     val networkDialogState = rememberSaveable { mutableStateOf(false) }
     val showNetworkDialog = { networkDialogState.value = true }
@@ -291,7 +305,9 @@ private fun SettingsScreen(uiState: SettingsState) {
                 LocationCard(posSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos, uiState.sendSystemAction)
             }
             item { DataCard(dataSettings, updateFromWeb, clearAllData, showDataSourcesDialog) }
-            item(span = { GridItemSpan(maxLineSpan) }) { OutputCard({ showNetworkDialog() }, { showBluetoothDialog() }) }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                OutputCard({ showNetworkDialog() }, { showBluetoothDialog() }, { showRadioControlDialog() })
+            }
             item { OtherCard(otherSettings, uiState.sendAction) }
             item { CardCredits() }
         }
@@ -423,12 +439,13 @@ private fun DataCard(
 
 @Preview(showBackground = true)
 @Composable
-private fun OutputCardPreview() = MainTheme { OutputCard({}, {}) }
+private fun OutputCardPreview() = MainTheme { OutputCard({}, {}, {}) }
 
 @Composable
 private fun OutputCard(
     onNetworkClick: () -> Unit,
-    onBluetoothClick: () -> Unit
+    onBluetoothClick: () -> Unit,
+    onRadioControlClick: () -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
@@ -446,6 +463,11 @@ private fun OutputCard(
                 CardButton(
                     onClick = onBluetoothClick,
                     text = stringResource(id = R.string.prefs_bt_output),
+                    modifier = Modifier.weight(1f)
+                )
+                CardButton(
+                    onClick = onRadioControlClick,
+                    text = stringResource(id = R.string.prefs_cat_output),
                     modifier = Modifier.weight(1f)
                 )
             }

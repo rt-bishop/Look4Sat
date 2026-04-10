@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.feature.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,13 +30,16 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.core.domain.model.RCSettings
+import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.LocalSpacing
 import com.rtbishop.look4sat.core.presentation.MainTheme
@@ -473,6 +477,164 @@ fun BluetoothOutputDialog(
                     modifier = Modifier.weight(0.4f),
                     enabled = frequencyState.value
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun RadioControlDialog(
+    initialSettings: RadioControlSettings,
+    onDismiss: () -> Unit,
+    onSave: (RadioControlSettings) -> Unit
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val padding = LocalSpacing.current.large
+    val baudRates = listOf(4800, 9600, 38400)
+    val enabled = rememberSaveable { mutableStateOf(initialSettings.enabled) }
+    val radioModel = rememberSaveable { mutableStateOf(initialSettings.radioModel) }
+    val txAddress = rememberSaveable { mutableStateOf(initialSettings.txRadioAddress) }
+    val rxAddress = rememberSaveable { mutableStateOf(initialSettings.rxRadioAddress) }
+    val txName = rememberSaveable { mutableStateOf(initialSettings.txRadioName) }
+    val rxName = rememberSaveable { mutableStateOf(initialSettings.rxRadioName) }
+    val baudRate = rememberSaveable { mutableStateOf(initialSettings.baudRate) }
+    val selectingFor = rememberSaveable { mutableStateOf("") } // "tx", "rx", or ""
+
+    val pairedDevices = remember {
+        try {
+            val manager = context.getSystemService(android.content.Context.BLUETOOTH_SERVICE) as android.bluetooth.BluetoothManager
+            manager.adapter?.bondedDevices?.map { Pair(it.name ?: "Unknown", it.address) } ?: emptyList()
+        } catch (_: SecurityException) {
+            emptyList()
+        }
+    }
+
+    val onAccept = {
+        onSave(
+            RadioControlSettings(
+                enabled = enabled.value,
+                radioModel = radioModel.value,
+                txRadioAddress = txAddress.value,
+                rxRadioAddress = rxAddress.value,
+                txRadioName = txName.value,
+                rxRadioName = rxName.value,
+                baudRate = baudRate.value
+            )
+        )
+        onDismiss()
+    }
+    SharedDialog(
+        title = stringResource(R.string.rc_settings_title),
+        onCancel = onDismiss,
+        onAccept = onAccept
+    ) {
+        Column(modifier = Modifier.padding(horizontal = padding)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.rc_enable_switch))
+                Switch(checked = enabled.value, onCheckedChange = { enabled.value = it })
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Radio model selection
+            Text(
+                stringResource(R.string.rc_radio_model),
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                RadioControlSettings.SUPPORTED_RADIOS.forEach { model ->
+                    androidx.compose.material3.FilterChip(
+                        selected = radioModel.value == model,
+                        onClick = { radioModel.value = model },
+                        label = { Text(model, fontSize = 12.sp) },
+                        enabled = enabled.value
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // TX Radio selection
+            Text("TX Radio (Uplink)", fontWeight = androidx.compose.ui.text.font.FontWeight.Medium)
+            if (txAddress.value.isNotBlank()) {
+                Text("${txName.value} - ${txAddress.value}", fontSize = 13.sp)
+            }
+            CardButton(
+                onClick = { selectingFor.value = "tx" },
+                text = "Select TX Device",
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // RX Radio selection
+            Text("RX Radio (Downlink)", fontWeight = androidx.compose.ui.text.font.FontWeight.Medium)
+            if (rxAddress.value.isNotBlank()) {
+                Text("${rxName.value} - ${rxAddress.value}", fontSize = 13.sp)
+            }
+            CardButton(
+                onClick = { selectingFor.value = "rx" },
+                text = "Select RX Device",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Paired devices list (shown when selecting)
+            if (selectingFor.value.isNotBlank()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Paired Bluetooth Devices:",
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                )
+                if (pairedDevices.isEmpty()) {
+                    Text("No paired devices found. Pair your BT adapter in Android Bluetooth settings first.")
+                } else {
+                    pairedDevices.forEach { (name, address) ->
+                        androidx.compose.material3.Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (selectingFor.value == "tx") {
+                                        txAddress.value = address
+                                        txName.value = name
+                                    } else {
+                                        rxAddress.value = address
+                                        rxName.value = name
+                                    }
+                                    selectingFor.value = ""
+                                }
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(name, modifier = Modifier.weight(1f))
+                                Text(address, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Baud Rate:")
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    baudRates.forEach { rate ->
+                        CardButton(
+                            onClick = { baudRate.value = rate },
+                            text = if (rate == baudRate.value) "[$rate]" else rate.toString(),
+                            modifier = Modifier
+                        )
+                    }
+                }
             }
         }
     }
