@@ -26,14 +26,12 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
@@ -59,11 +57,15 @@ import androidx.navigation.navArgument
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.IconCard
+import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
+import com.rtbishop.look4sat.core.presentation.getDefaultPass
+import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
+import java.util.Locale
 
 fun NavGraphBuilder.radioControlDestination(navigateUp: () -> Unit) {
     val route = "${Screen.RadioControl.route}?catNum={catNum}&aosTime={aosTime}"
@@ -86,16 +88,21 @@ private fun RadioControlScreen(uiState: RadioControlState, navigateUp: () -> Uni
             .keepScreenOn(),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        TopBar {
-            IconCard(action = navigateUp, resId = R.drawable.ic_back)
-            TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
-            uiState.currentPass?.let { pass ->
-                Text(
-                    text = pass.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
+        val currentPass = uiState.currentPass ?: getDefaultPass()
+        val isVertical = isVerticalLayout()
+        if (isVertical) {
+            TopBar {
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
+                TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
+            }
+            TopBar { NextPassRow(pass = currentPass) }
+        } else {
+            TopBar {
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
+                TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isCurrentTimeAos)
+                NextPassRow(pass = currentPass, modifier = Modifier.weight(1f))
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
             }
         }
 
@@ -265,7 +272,7 @@ private fun CtcssSelector(uiState: RadioControlState) {
                     FilterChip(
                         selected = uiState.ctcssTone == tone,
                         onClick = { uiState.sendAction(RadioControlAction.SetCtcssTone(tone)) },
-                        label = { Text(String.format("%.1f", tone)) }
+                        label = { Text(String.format(Locale.ENGLISH, "%.1f", tone)) }
                     )
                 }
             }

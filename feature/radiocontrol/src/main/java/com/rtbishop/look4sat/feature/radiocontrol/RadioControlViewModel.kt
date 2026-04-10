@@ -30,11 +30,9 @@ import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.repository.IRadioTrackingService
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.core.domain.repository.RadioTrackingState
 import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -108,8 +106,8 @@ class RadioControlViewModel(
                 }
                 val isAos = pass != null && !pass.isDeepSpace && pass.aosTime > timeNow
 
-                _uiState.update {
-                    it.copy(
+                _uiState.update { state ->
+                    state.copy(
                         currentTime = timeStr,
                         isCurrentTimeAos = isAos,
                         azimuth = String.format(Locale.ENGLISH, "%.1f", svc.azimuth),

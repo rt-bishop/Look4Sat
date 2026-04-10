@@ -22,19 +22,18 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 
 data class RadarState(
-    val currentPass: OrbitalPass?,
-    val currentTime: String,
-    val isCurrentTimeAos: Boolean,
-    val isUtc: Boolean,
-    val orientationValues: Pair<Float, Float>,
-    val orbitalPos: OrbitalPos?,
-    val satTrack: List<OrbitalPos>,
-    val shouldShowSweep: Boolean,
-    val shouldUseCompass: Boolean,
-    val transmitters: List<SatRadio>,
-    val selectedTransmitterUuid: String?,
-    val selectedFrequency: Long?,
-    val sendAction: (RadarAction) -> Unit
+    val currentPass: OrbitalPass? = null,
+    val currentTime: String = "00:00:00",
+    val isCurrentTimeAos: Boolean = true,
+    val isUtc: Boolean = false,
+    val orientationValues: Pair<Float, Float> = 0f to 0f,
+    val orbitalPos: OrbitalPos? = null,
+    val satTrack: List<OrbitalPos> = emptyList(),
+    val shouldShowSweep: Boolean = false,
+    val shouldUseCompass: Boolean = false,
+    val transmitters: List<SatRadio> = emptyList(),
+    val selectedTransmitterUuid: String? = null,
+    val selectedFrequency: Long? = null
 )
 
 sealed class RadarAction {
