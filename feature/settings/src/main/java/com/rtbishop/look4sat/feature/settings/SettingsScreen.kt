@@ -42,9 +42,12 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,66 +84,44 @@ fun NavGraphBuilder.settingsDestination() {
             modelClass = SettingsViewModel::class.java,
             factory = SettingsViewModel.Factory
         )
-        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        SettingsScreen(uiState)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        SettingsScreen(uiState, viewModel::onAction)
     }
 }
 
 @Composable
-private fun SettingsScreen(uiState: SettingsState) {
-    val locationContract = ActivityResultContracts.RequestMultiplePermissions()
-    val locationError = stringResource(R.string.prefs_loc_gps_error)
-    val locationPermCoarse = Manifest.permission.ACCESS_COARSE_LOCATION
-    val locationPermFine = Manifest.permission.ACCESS_FINE_LOCATION
-    val locationRequest = rememberLauncherForActivityResult(locationContract) { permissions ->
-        when {
-            permissions[locationPermFine] == true -> uiState.sendAction(SettingsAction.SetGpsPosition)
-            permissions[locationPermCoarse] == true -> uiState.sendAction(SettingsAction.SetGpsPosition)
-            else -> uiState.sendSystemAction(SystemAction.ShowToast(locationError))
-        }
-    }
-    val contentContract = ActivityResultContracts.GetContent()
-    val contentRequestForTle = rememberLauncherForActivityResult(contentContract) { uri ->
-        uri?.let { uiState.sendAction(SettingsAction.UpdateTLEFromFile(uri.toString())) }
-    }
-    val contentRequestForTransceivers = rememberLauncherForActivityResult(contentContract) { uri ->
-        uri?.let { uiState.sendAction(SettingsAction.UpdateTransceiversFromFile(uri.toString())) }
-    }
+private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) -> Unit) {
+    val dialogs = rememberDialogVisibility()
+    val permissions = rememberSettingsPermissions(
+        sendAction = onAction,
+        onBluetoothGranted = { dialogs.bluetooth = true }
+    )
 
-    // Position settings
-    val posSettings = uiState.positionSettings
-    val setGpsPos = { locationRequest.launch(arrayOf(locationPermCoarse, locationPermFine)) }
-    val setGeoPos = { lat: Double, lon: Double ->
-        uiState.sendAction(SettingsAction.SetGeoPosition(lat, lon))
+    // Dialogs
+    if (dialogs.position) {
+        PositionDialog(
+            uiState.positionSettings.stationPos.latitude,
+            uiState.positionSettings.stationPos.longitude,
+            dismiss = { dialogs.position = false },
+            save = { lat, lon -> onAction(SettingsAction.SetGeoPosition(lat, lon)) }
+        )
     }
-    val setQthPos = { locator: String ->
-        uiState.sendAction(SettingsAction.SetQthPosition(locator))
+    if (dialogs.locator) {
+        LocatorDialog(
+            uiState.positionSettings.stationPos.qthLocator,
+            dismiss = { dialogs.locator = false },
+            save = { onAction(SettingsAction.SetQthPosition(it)) }
+        )
     }
-    val dismissPos = { uiState.sendAction(SettingsAction.DismissPosMessages) }
-    val posDialogState = rememberSaveable { mutableStateOf(false) }
-    val showPosDialog = { posDialogState.value = posDialogState.value.not() }
-    if (posDialogState.value) {
-        PositionDialog(posSettings.stationPos.latitude, posSettings.stationPos.longitude, showPosDialog, setGeoPos)
-    }
-    val locDialogState = rememberSaveable { mutableStateOf(false) }
-    val showLocDialog = { locDialogState.value = locDialogState.value.not() }
-    if (locDialogState.value) {
-        LocatorDialog(posSettings.stationPos.qthLocator, showLocDialog, setQthPos)
-    }
-
-    // Data sources dialog
-    val dataSourcesDialogState = rememberSaveable { mutableStateOf(false) }
-    val showDataSourcesDialog = { dataSourcesDialogState.value = true }
-    val dismissDataSourcesDialog = { dataSourcesDialogState.value = false }
-    if (dataSourcesDialogState.value) {
+    if (dialogs.dataSources) {
         DataSourcesDialog(
             useCustomTle = uiState.dataSourcesSettings.useCustomTLE,
             useCustomTransceivers = uiState.dataSourcesSettings.useCustomTransceivers,
             tleUrl = uiState.dataSourcesSettings.tleUrl,
             transceiversUrl = uiState.dataSourcesSettings.transceiversUrl,
-            onImportTle = { contentRequestForTle.launch("*/*") },
-            onImportTransceivers = { contentRequestForTransceivers.launch("*/*") },
-            onDismiss = dismissDataSourcesDialog,
+            onImportTle = { permissions.launchTleImport(); dialogs.dataSources = false },
+            onImportTransceivers = { permissions.launchTransceiverImport(); dialogs.dataSources = false },
+            onDismiss = { dialogs.dataSources = false },
             onSave = { useCustomTle, useCustomTransceivers, tleUrl, transceiversUrl ->
                 val current = uiState.dataSourcesSettings
                 val newSettings = current.copy(
@@ -149,112 +130,55 @@ private fun SettingsScreen(uiState: SettingsState) {
                     useCustomTransceivers = if (!useCustomTransceivers || transceiversUrl.isNotBlank()) useCustomTransceivers else current.useCustomTransceivers,
                     transceiversUrl = if (!useCustomTransceivers || transceiversUrl.isNotBlank()) transceiversUrl else current.transceiversUrl
                 )
-                if (newSettings != current) {
-                    uiState.sendDataSourcesAction(DataSourcesAction.Update(newSettings))
-                }
-                if (useCustomTle || useCustomTransceivers) {
-                    uiState.sendAction(SettingsAction.UpdateFromWeb)
-                }
+                if (newSettings != current) onAction(SettingsAction.UpdateDataSources(newSettings))
+                if (useCustomTle || useCustomTransceivers) onAction(SettingsAction.UpdateFromWeb)
             }
         )
     }
-
-    // Data settings
-    val dataSettings = uiState.dataSettings
-    val updateFromWeb: () -> Unit = { uiState.sendAction(SettingsAction.UpdateFromWeb) }
-    val clearAllData: () -> Unit = { uiState.sendAction(SettingsAction.ClearAllData) }
-
-    // RC settings
-    val rcSettings = uiState.rcSettings
-
-    // Radio control (FT-817) settings
-    val radioControlDialogState = rememberSaveable { mutableStateOf(false) }
-    val showRadioControlDialog = { radioControlDialogState.value = true }
-    val dismissRadioControlDialog = { radioControlDialogState.value = false }
-    if (radioControlDialogState.value) {
+    if (dialogs.network) {
+        NetworkOutputDialog(
+            initialSettings = uiState.rcSettings,
+            onDismiss = { dialogs.network = false },
+            onSave = { rotState, rotAddr, rotPort, rotFmt, freqState, freqAddr, freqPort, freqFmt ->
+                onAction(
+                    SettingsAction.UpdateRC(
+                        uiState.rcSettings.copy(
+                            rotatorState = rotState, rotatorAddress = rotAddr,
+                            rotatorPort = rotPort, rotatorFormat = rotFmt,
+                            frequencyState = freqState, frequencyAddress = freqAddr,
+                            frequencyPort = freqPort, frequencyFormat = freqFmt
+                        )
+                    )
+                )
+            }
+        )
+    }
+    if (dialogs.bluetooth) {
+        BluetoothOutputDialog(
+            initialSettings = uiState.rcSettings,
+            onDismiss = { dialogs.bluetooth = false },
+            onSave = { rotState, rotAddr, rotFmt, freqState, freqAddr, freqFmt ->
+                onAction(
+                    SettingsAction.UpdateRC(
+                        uiState.rcSettings.copy(
+                            bluetoothRotatorState = rotState, bluetoothRotatorAddress = rotAddr,
+                            bluetoothRotatorFormat = rotFmt, bluetoothFrequencyState = freqState,
+                            bluetoothFrequencyAddress = freqAddr, bluetoothFrequencyFormat = freqFmt
+                        )
+                    )
+                )
+            }
+        )
+    }
+    if (dialogs.radioControl) {
         RadioControlDialog(
             initialSettings = uiState.radioControlSettings,
-            onDismiss = dismissRadioControlDialog,
-            onSave = { settings ->
-                uiState.sendRadioControlAction(RadioControlSettingsAction.Update(settings))
-            }
+            onDismiss = { dialogs.radioControl = false },
+            onSave = { onAction(SettingsAction.UpdateRadioControl(it)) }
         )
     }
 
-    // Network data output
-    val networkDialogState = rememberSaveable { mutableStateOf(false) }
-    val showNetworkDialog = { networkDialogState.value = true }
-    val dismissNetworkDialog = { networkDialogState.value = false }
-    if (networkDialogState.value) {
-        NetworkOutputDialog(
-            initialSettings = rcSettings,
-            onDismiss = dismissNetworkDialog,
-            onSave = { rotatorState, rotatorAddress, rotatorPort, rotatorFormat,
-                       frequencyState, frequencyAddress, frequencyPort, frequencyFormat ->
-                uiState.sendRCAction(
-                    RCAction.Update(
-                        rcSettings.copy(
-                            rotatorState = rotatorState,
-                            rotatorAddress = rotatorAddress,
-                            rotatorPort = rotatorPort,
-                            rotatorFormat = rotatorFormat,
-                            frequencyState = frequencyState,
-                            frequencyAddress = frequencyAddress,
-                            frequencyPort = frequencyPort,
-                            frequencyFormat = frequencyFormat
-                        )
-                    )
-                )
-            }
-        )
-    }
-
-    // Bluetooth data output
-    val bluetoothDialogState = rememberSaveable { mutableStateOf(false) }
-    val bluetoothContract = ActivityResultContracts.RequestPermission()
-    val bluetoothError = stringResource(R.string.prefs_bt_perm_error)
-    val bluetoothPerm = when {
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> Manifest.permission.BLUETOOTH
-        else -> Manifest.permission.BLUETOOTH_CONNECT
-    }
-    val bluetoothRequest = rememberLauncherForActivityResult(bluetoothContract) { isGranted ->
-        if (!isGranted)
-        {
-            uiState.sendRCAction(
-                RCAction.Update(
-                    rcSettings.copy(bluetoothRotatorState = false, bluetoothFrequencyState = false)
-                )
-            )
-            uiState.sendSystemAction(SystemAction.ShowToast(bluetoothError))
-        }
-        else { bluetoothDialogState.value = true }
-    }
-    val showBluetoothDialog = { bluetoothRequest.launch(bluetoothPerm) }
-    val dismissBluetoothDialog = { bluetoothDialogState.value = false }
-    if (bluetoothDialogState.value) {
-        BluetoothOutputDialog(
-            initialSettings = rcSettings,
-            onDismiss = dismissBluetoothDialog,
-            onSave = { rotatorState, rotatorAddress, rotatorFormat,
-                       frequencyState, frequencyAddress, frequencyFormat ->
-                uiState.sendRCAction(
-                    RCAction.Update(
-                        rcSettings.copy(
-                            bluetoothRotatorState = rotatorState,
-                            bluetoothRotatorAddress = rotatorAddress,
-                            bluetoothRotatorFormat = rotatorFormat,
-                            bluetoothFrequencyState = frequencyState,
-                            bluetoothFrequencyAddress = frequencyAddress,
-                            bluetoothFrequencyFormat = frequencyFormat
-                        )
-                    )
-                )
-            }
-        )
-    }
-
-    // Other settings
-    val otherSettings = uiState.otherSettings
+    // URLs for top bar
     val uriHandler = LocalUriHandler.current
     val appUrl = stringResource(R.string.prefs_app_url)
     val donateUrl = stringResource(R.string.prefs_donate_url)
@@ -302,13 +226,31 @@ private fun SettingsScreen(uiState: SettingsState) {
             modifier = Modifier.clip(MaterialTheme.shapes.medium)
         ) {
             item {
-                LocationCard(posSettings, setGpsPos, showPosDialog, showLocDialog, dismissPos, uiState.sendSystemAction)
+                LocationCard(
+                    settings = uiState.positionSettings,
+                    setGpsPos = permissions.launchLocation,
+                    showPosDialog = { dialogs.position = true },
+                    showLocDialog = { dialogs.locator = true },
+                    dismissPosMessage = { onAction(SettingsAction.DismissPosMessages) },
+                    onAction = onAction
+                )
             }
-            item { DataCard(dataSettings, updateFromWeb, clearAllData, showDataSourcesDialog) }
+            item {
+                DataCard(
+                    settings = uiState.dataSettings,
+                    updateFromWeb = { onAction(SettingsAction.UpdateFromWeb) },
+                    clearAllData = { onAction(SettingsAction.ClearAllData) },
+                    showDataSourcesDialog = { dialogs.dataSources = true }
+                )
+            }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                OutputCard({ showNetworkDialog() }, { showBluetoothDialog() }, { showRadioControlDialog() })
+                OutputCard(
+                    onNetworkClick = { dialogs.network = true },
+                    onBluetoothClick = permissions.launchBluetooth,
+                    onRadioControlClick = { dialogs.radioControl = true }
+                )
             }
-            item { OtherCard(otherSettings, uiState.sendAction) }
+            item { OtherCard(uiState.otherSettings, onAction) }
             item { CardCredits() }
         }
     }
@@ -329,7 +271,7 @@ private fun LocationCard(
     showPosDialog: () -> Unit,
     showLocDialog: () -> Unit,
     dismissPosMessage: () -> Unit,
-    sendSystemAction: (SystemAction) -> Unit
+    onAction: (SettingsAction) -> Unit
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -344,7 +286,7 @@ private fun LocationCard(
                 UpdateIndicator(isUpdating = settings.isUpdating, Modifier.weight(1f))
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = setUpdateTime(updateTime = settings.stationPos.timestamp))
+            Text(text = formatUpdateTime(updateTime = settings.stationPos.timestamp))
             Spacer(modifier = Modifier.height(2.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                 Text(text = "Lat: ${settings.stationPos.latitude}°")
@@ -376,7 +318,7 @@ private fun LocationCard(
     if (settings.messageResId != 0) {
         val errorString = stringResource(id = settings.messageResId)
         LaunchedEffect(key1 = settings.messageResId) {
-            sendSystemAction(SystemAction.ShowToast(errorString))
+            onAction(SettingsAction.ShowToast(errorString))
             dismissPosMessage()
         }
     }
@@ -409,7 +351,7 @@ private fun DataCard(
                 UpdateIndicator(isUpdating = settings.isUpdating, Modifier.weight(1f))
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = setUpdateTime(updateTime = settings.timestamp))
+            Text(text = formatUpdateTime(updateTime = settings.timestamp))
             Spacer(modifier = Modifier.height(2.dp))
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                 Text(text = stringResource(R.string.prefs_data_entries, settings.entriesTotal))
@@ -491,7 +433,7 @@ private fun OtherCardPreview() = MainTheme {
 }
 
 @Composable
-private fun OtherCard(settings: OtherSettings, sendAction: (SettingsAction) -> Unit) {
+private fun OtherCard(settings: OtherSettings, onAction: (SettingsAction) -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -503,16 +445,16 @@ private fun OtherCard(settings: OtherSettings, sendAction: (SettingsAction) -> U
                 color = MaterialTheme.colorScheme.primary
             )
             SwitchRow(R.string.prefs_other_switch_utc, settings.stateOfUtc) {
-                sendAction(SettingsAction.ToggleUtc(it))
+                onAction(SettingsAction.ToggleUtc(it))
             }
             SwitchRow(R.string.prefs_other_switch_update, settings.stateOfAutoUpdate) {
-                sendAction(SettingsAction.ToggleUpdate(it))
+                onAction(SettingsAction.ToggleUpdate(it))
             }
             SwitchRow(R.string.prefs_other_switch_sweep, settings.stateOfSweep) {
-                sendAction(SettingsAction.ToggleSweep(it))
+                onAction(SettingsAction.ToggleSweep(it))
             }
             SwitchRow(R.string.prefs_other_switch_sensors, settings.stateOfSensors) {
-                sendAction(SettingsAction.ToggleSensor(it))
+                onAction(SettingsAction.ToggleSensor(it))
             }
         }
     }
@@ -531,7 +473,7 @@ private fun SwitchRow(labelResId: Int, checked: Boolean, onCheckedChange: (Boole
 }
 
 @Composable
-private fun setUpdateTime(updateTime: Long): String {
+private fun formatUpdateTime(updateTime: Long): String {
     val timePattern = stringResource(id = R.string.prefs_updated_time)
     val placeholder = stringResource(id = R.string.pass_time_placeholder)
     val updateDate = remember(updateTime) {
@@ -638,3 +580,91 @@ private fun BotCard(onClick: () -> Unit, resId: Int, text: String, modifier: Mod
         }
     }
 }
+
+// region Dialog visibility state holder
+
+@Stable
+private class DialogVisibility {
+    var position by mutableStateOf(false)
+    var locator by mutableStateOf(false)
+    var dataSources by mutableStateOf(false)
+    var network by mutableStateOf(false)
+    var bluetooth by mutableStateOf(false)
+    var radioControl by mutableStateOf(false)
+}
+
+@Composable
+private fun rememberDialogVisibility(): DialogVisibility {
+    return rememberSaveable(saver = run {
+        androidx.compose.runtime.saveable.Saver(
+            save = {
+                listOf(it.position, it.locator, it.dataSources, it.network, it.bluetooth, it.radioControl)
+            },
+            restore = {
+                DialogVisibility().apply {
+                    position = it[0]; locator = it[1]; dataSources = it[2]
+                    network = it[3]; bluetooth = it[4]; radioControl = it[5]
+                }
+            }
+        )
+    }) { DialogVisibility() }
+}
+
+// endregion
+
+// region Permission launchers holder
+
+@Stable
+private class SettingsPermissions(
+    val launchLocation: () -> Unit,
+    val launchTleImport: () -> Unit,
+    val launchTransceiverImport: () -> Unit,
+    val launchBluetooth: () -> Unit
+)
+
+@Composable
+private fun rememberSettingsPermissions(
+    sendAction: (SettingsAction) -> Unit,
+    onBluetoothGranted: () -> Unit
+): SettingsPermissions {
+    val locationError = stringResource(R.string.prefs_loc_gps_error)
+    val locationRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fine = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        val coarse = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (fine || coarse) sendAction(SettingsAction.SetGpsPosition)
+        else sendAction(SettingsAction.ShowToast(locationError))
+    }
+
+    val tleRequest = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { sendAction(SettingsAction.UpdateTLEFromFile(it.toString())) }
+    }
+
+    val transceiversRequest = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { sendAction(SettingsAction.UpdateTransceiversFromFile(it.toString())) }
+    }
+
+    val bluetoothError = stringResource(R.string.prefs_bt_perm_error)
+    val bluetoothPerm = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+        Manifest.permission.BLUETOOTH else Manifest.permission.BLUETOOTH_CONNECT
+    val bluetoothRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) onBluetoothGranted()
+        else sendAction(SettingsAction.ShowToast(bluetoothError))
+    }
+
+    return remember {
+        SettingsPermissions(
+            launchLocation = {
+                locationRequest.launch(
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+                )
+            },
+            launchTleImport = { tleRequest.launch("*/*") },
+            launchTransceiverImport = { transceiversRequest.launch("*/*") },
+            launchBluetooth = { bluetoothRequest.launch(bluetoothPerm) }
+        )
+    }
+}
+
+// endregion

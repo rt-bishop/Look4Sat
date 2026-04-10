@@ -28,13 +28,13 @@ data class SatellitesState(
     val typesList: List<String> = emptyList()
 )
 
-sealed class SatellitesAction {
-    data object DismissWarning : SatellitesAction()
-    data object SaveSelection : SatellitesAction()
-    data class SearchFor(val query: String) : SatellitesAction()
-    data object SelectAll : SatellitesAction()
-    data class SelectSingle(val id: Int, val isTicked: Boolean) : SatellitesAction()
-    data class SelectTypes(val types: List<String>) : SatellitesAction()
-    data object ToggleTypesDialog : SatellitesAction()
-    data object UnselectAll : SatellitesAction()
+sealed interface SatellitesAction {
+    data object DismissWarning : SatellitesAction
+    data object SaveSelection : SatellitesAction
+    data class SearchFor(val query: String) : SatellitesAction
+    data object SelectAll : SatellitesAction
+    data class SelectSingle(val id: Int, val isTicked: Boolean) : SatellitesAction
+    data class SelectTypes(val types: List<String>) : SatellitesAction
+    data object ToggleTypesDialog : SatellitesAction
+    data object UnselectAll : SatellitesAction
 }

@@ -30,10 +30,13 @@ import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.repository.IRadioTrackingService
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.domain.utility.toTimerString
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -46,6 +49,7 @@ class RadioControlViewModel(
 
     private var currentPass: OrbitalPass? = null
     private var transponders: List<SatRadio> = emptyList()
+    private val stationPos = settingsRepo.stationPosition.value
 
     private val _uiState = MutableStateFlow(
         RadioControlState(
@@ -62,8 +66,7 @@ class RadioControlViewModel(
             txBaseFrequencyHz = null,
             ctcssTone = null,
             isTracking = false,
-            errorMessage = null,
-            sendAction = ::handleAction
+            errorMessage = null
         )
     )
     val uiState: StateFlow<RadioControlState> = _uiState
@@ -72,6 +75,7 @@ class RadioControlViewModel(
         val catNum = savedStateHandle.get<Int>("catNum") ?: 0
         val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
 
+        // Resolve pass and load transponders
         viewModelScope.launch {
             val passes = satelliteRepo.passes.value
             val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
@@ -90,29 +94,30 @@ class RadioControlViewModel(
                         it.copy(selectedTransponderUuid = svcState.selectedTransponder?.uuid)
                     }
                 }
+                // Tick loop — timer and satellite position updates every second
+                while (isActive) {
+                    val timeNow = System.currentTimeMillis()
+                    val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
+                    val (timeStr, isAos) = computeTimer(satPass.isDeepSpace, satPass.aosTime, satPass.losTime, timeNow)
+                    _uiState.update { state ->
+                        state.copy(
+                            currentTime = timeStr,
+                            isCurrentTimeAos = isAos,
+                            azimuth = String.format(Locale.ENGLISH, "%.1f", pos.azimuth.toDegrees()),
+                            elevation = String.format(Locale.ENGLISH, "%.1f", pos.elevation.toDegrees()),
+                            distance = String.format(Locale.ENGLISH, "%.0f", pos.distance)
+                        )
+                    }
+                    delay(1000)
+                }
             }
         }
 
-        // Observe service state and map to UI state
+        // Observe service state for radio-specific updates (panels, frequencies, tracking status)
         viewModelScope.launch {
             trackingService.state.collect { svc ->
-                val timeNow = System.currentTimeMillis()
-                val pass = currentPass
-                val timeStr = when {
-                    pass == null -> "00:00:00"
-                    pass.isDeepSpace -> 0L.toTimerString()
-                    pass.aosTime > timeNow -> pass.aosTime.minus(timeNow).toTimerString()
-                    else -> pass.losTime.minus(timeNow).toTimerString()
-                }
-                val isAos = pass != null && !pass.isDeepSpace && pass.aosTime > timeNow
-
                 _uiState.update { state ->
                     state.copy(
-                        currentTime = timeStr,
-                        isCurrentTimeAos = isAos,
-                        azimuth = String.format(Locale.ENGLISH, "%.1f", svc.azimuth),
-                        elevation = String.format(Locale.ENGLISH, "%.1f", svc.elevation),
-                        distance = String.format(Locale.ENGLISH, "%.0f", svc.distance),
                         txPanel = RadioPanelState(
                             label = "TX (Uplink)",
                             isConnected = svc.txConnected,
@@ -138,7 +143,15 @@ class RadioControlViewModel(
         }
     }
 
-    private fun handleAction(action: RadioControlAction) {
+    private fun computeTimer(isDeepSpace: Boolean, aosTime: Long, losTime: Long, timeNow: Long): Pair<String, Boolean> {
+        return when {
+            isDeepSpace -> 0L.toTimerString() to false
+            aosTime > timeNow -> (aosTime - timeNow).toTimerString() to true
+            else -> (losTime - timeNow).toTimerString() to false
+        }
+    }
+
+    fun onAction(action: RadioControlAction) {
         when (action) {
             is RadioControlAction.SelectTransponder -> {
                 val transponder = transponders.find { it.uuid == action.uuid } ?: return

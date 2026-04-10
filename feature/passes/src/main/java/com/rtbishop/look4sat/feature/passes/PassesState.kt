@@ -34,11 +34,11 @@ data class PassesState(
     val shouldSeeWhatsNew: Boolean = false
 )
 
-sealed class PassesAction {
-    data object DismissWhatsNew : PassesAction()
-    data class FilterPasses(val hoursAhead: Int, val minElevation: Double) : PassesAction()
-    data class FilterRadios(val modes: List<String>) : PassesAction()
-    data object RefreshPasses : PassesAction()
-    data object TogglePassesDialog : PassesAction()
-    data object ToggleRadiosDialog : PassesAction()
+sealed interface PassesAction {
+    data object DismissWhatsNew : PassesAction
+    data class FilterPasses(val hoursAhead: Int, val minElevation: Double) : PassesAction
+    data class FilterRadios(val modes: List<String>) : PassesAction
+    data object RefreshPasses : PassesAction
+    data object TogglePassesDialog : PassesAction
+    data object ToggleRadiosDialog : PassesAction
 }

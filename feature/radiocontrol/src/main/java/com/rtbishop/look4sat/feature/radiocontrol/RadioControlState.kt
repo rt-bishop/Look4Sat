@@ -42,16 +42,15 @@ data class RadioControlState(
     val txBaseFrequencyHz: Long?,
     val ctcssTone: Double?,
     val isTracking: Boolean,
-    val errorMessage: String?,
-    val sendAction: (RadioControlAction) -> Unit
+    val errorMessage: String?
 )
 
-sealed class RadioControlAction {
-    data class SelectTransponder(val uuid: String) : RadioControlAction()
-    data class SetTxFrequency(val frequencyHz: Long) : RadioControlAction()
-    data class AdjustTxFrequency(val deltaHz: Long) : RadioControlAction()
-    data class SetCtcssTone(val toneHz: Double?) : RadioControlAction()
-    data object ToggleTracking : RadioControlAction()
-    data object ConnectRadios : RadioControlAction()
-    data object DisconnectRadios : RadioControlAction()
+sealed interface RadioControlAction {
+    data class SelectTransponder(val uuid: String) : RadioControlAction
+    data class SetTxFrequency(val frequencyHz: Long) : RadioControlAction
+    data class AdjustTxFrequency(val deltaHz: Long) : RadioControlAction
+    data class SetCtcssTone(val toneHz: Double?) : RadioControlAction
+    data object ToggleTracking : RadioControlAction
+    data object ConnectRadios : RadioControlAction
+    data object DisconnectRadios : RadioControlAction
 }

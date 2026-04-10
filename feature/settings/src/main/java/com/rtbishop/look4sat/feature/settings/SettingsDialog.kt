@@ -17,6 +17,8 @@
  */
 package com.rtbishop.look4sat.feature.settings
 
+import android.bluetooth.BluetoothManager
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -257,14 +260,8 @@ fun NetworkOutputDialog(
         val (rotIp, rotPort) = splitAddress(rotatorAddress.value)
         val (freqIp, freqPort) = splitAddress(frequencyAddress.value)
         onSave(
-            rotatorState.value,
-            rotIp,
-            rotPort,
-            rotatorFormat.value,
-            frequencyState.value,
-            freqIp,
-            freqPort,
-            frequencyFormat.value
+            rotatorState.value, rotIp, rotPort, rotatorFormat.value,
+            frequencyState.value, freqIp, freqPort, frequencyFormat.value
         )
         onDismiss()
     }
@@ -274,71 +271,29 @@ fun NetworkOutputDialog(
         onAccept = onAccept
     ) {
         Column(modifier = Modifier.padding(horizontal = padding)) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.prefs_net_rotator_switch))
-                Switch(
-                    checked = rotatorState.value,
-                    onCheckedChange = { rotatorState.value = it }
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = rotatorAddress.value,
-                    onValueChange = { rotatorAddress.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_rotator_address_hint)) },
-                    modifier = Modifier.weight(0.6f),
-                    enabled = rotatorState.value
-                )
-                OutlinedTextField(
-                    value = rotatorFormat.value,
-                    onValueChange = { rotatorFormat.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_rotator_format_hint)) },
-                    modifier = Modifier.weight(0.4f),
-                    enabled = rotatorState.value
-                )
-            }
+            OutputChannelSection(
+                switchLabel = stringResource(R.string.prefs_net_rotator_switch),
+                enabled = rotatorState.value,
+                onEnabledChange = { rotatorState.value = it },
+                address = rotatorAddress.value,
+                onAddressChange = { rotatorAddress.value = it },
+                addressLabel = stringResource(R.string.prefs_net_rotator_address_hint),
+                format = rotatorFormat.value,
+                onFormatChange = { rotatorFormat.value = it },
+                formatLabel = stringResource(R.string.prefs_net_rotator_format_hint)
+            )
             Spacer(modifier = Modifier.height(6.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.prefs_net_frequency_switch))
-                Switch(
-                    checked = frequencyState.value,
-                    onCheckedChange = { frequencyState.value = it }
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = frequencyAddress.value,
-                    onValueChange = { frequencyAddress.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_frequency_address_hint)) },
-                    modifier = Modifier.weight(0.6f),
-                    enabled = frequencyState.value
-                )
-                OutlinedTextField(
-                    value = frequencyFormat.value,
-                    onValueChange = { frequencyFormat.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_net_frequency_format_hint)) },
-                    modifier = Modifier.weight(0.4f),
-                    enabled = frequencyState.value
-                )
-            }
+            OutputChannelSection(
+                switchLabel = stringResource(R.string.prefs_net_frequency_switch),
+                enabled = frequencyState.value,
+                onEnabledChange = { frequencyState.value = it },
+                address = frequencyAddress.value,
+                onAddressChange = { frequencyAddress.value = it },
+                addressLabel = stringResource(R.string.prefs_net_frequency_address_hint),
+                format = frequencyFormat.value,
+                onFormatChange = { frequencyFormat.value = it },
+                formatLabel = stringResource(R.string.prefs_net_frequency_format_hint)
+            )
         }
     }
 }
@@ -398,12 +353,8 @@ fun BluetoothOutputDialog(
     val frequencyFormat = rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyFormat) }
     val onAccept = {
         onSave(
-            rotatorState.value,
-            rotatorAddress.value,
-            rotatorFormat.value,
-            frequencyState.value,
-            frequencyAddress.value,
-            frequencyFormat.value
+            rotatorState.value, rotatorAddress.value, rotatorFormat.value,
+            frequencyState.value, frequencyAddress.value, frequencyFormat.value
         )
         onDismiss()
     }
@@ -413,72 +364,77 @@ fun BluetoothOutputDialog(
         onAccept = onAccept
     ) {
         Column(modifier = Modifier.padding(horizontal = padding)) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.prefs_bt_rotator_switch))
-                Switch(
-                    checked = rotatorState.value,
-                    onCheckedChange = { rotatorState.value = it }
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = rotatorAddress.value,
-                    onValueChange = { rotatorAddress.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_bt_rotator_device_hint)) },
-                    modifier = Modifier.weight(0.6f),
-                    enabled = rotatorState.value
-                )
-                OutlinedTextField(
-                    value = rotatorFormat.value,
-                    onValueChange = { rotatorFormat.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_bt_rotator_output_hint)) },
-                    modifier = Modifier.weight(0.4f),
-                    enabled = rotatorState.value
-                )
-            }
+            OutputChannelSection(
+                switchLabel = stringResource(R.string.prefs_bt_rotator_switch),
+                enabled = rotatorState.value,
+                onEnabledChange = { rotatorState.value = it },
+                address = rotatorAddress.value,
+                onAddressChange = { rotatorAddress.value = it },
+                addressLabel = stringResource(R.string.prefs_bt_rotator_device_hint),
+                format = rotatorFormat.value,
+                onFormatChange = { rotatorFormat.value = it },
+                formatLabel = stringResource(R.string.prefs_bt_rotator_output_hint)
+            )
             Spacer(modifier = Modifier.height(6.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.prefs_bt_frequency_switch))
-                Switch(
-                    checked = frequencyState.value,
-                    onCheckedChange = { frequencyState.value = it }
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = frequencyAddress.value,
-                    onValueChange = { frequencyAddress.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_bt_frequency_device_hint)) },
-                    modifier = Modifier.weight(0.6f),
-                    enabled = frequencyState.value
-                )
-                OutlinedTextField(
-                    value = frequencyFormat.value,
-                    onValueChange = { frequencyFormat.value = it },
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.prefs_bt_frequency_output_hint)) },
-                    modifier = Modifier.weight(0.4f),
-                    enabled = frequencyState.value
-                )
-            }
+            OutputChannelSection(
+                switchLabel = stringResource(R.string.prefs_bt_frequency_switch),
+                enabled = frequencyState.value,
+                onEnabledChange = { frequencyState.value = it },
+                address = frequencyAddress.value,
+                onAddressChange = { frequencyAddress.value = it },
+                addressLabel = stringResource(R.string.prefs_bt_frequency_device_hint),
+                format = frequencyFormat.value,
+                onFormatChange = { frequencyFormat.value = it },
+                formatLabel = stringResource(R.string.prefs_bt_frequency_output_hint)
+            )
         }
+    }
+}
+
+/**
+ * Reusable section for a switch-toggled output channel with address and format fields.
+ * Used by both Network and Bluetooth output dialogs.
+ */
+@Composable
+private fun OutputChannelSection(
+    switchLabel: String,
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
+    address: String,
+    onAddressChange: (String) -> Unit,
+    addressLabel: String,
+    format: String,
+    onFormatChange: (String) -> Unit,
+    formatLabel: String
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(switchLabel)
+        Switch(checked = enabled, onCheckedChange = onEnabledChange)
+    }
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = address,
+            onValueChange = onAddressChange,
+            singleLine = true,
+            label = { Text(addressLabel) },
+            modifier = Modifier.weight(0.6f),
+            enabled = enabled
+        )
+        OutlinedTextField(
+            value = format,
+            onValueChange = onFormatChange,
+            singleLine = true,
+            label = { Text(formatLabel) },
+            modifier = Modifier.weight(0.4f),
+            enabled = enabled
+        )
     }
 }
 
@@ -497,12 +453,12 @@ fun RadioControlDialog(
     val rxAddress = rememberSaveable { mutableStateOf(initialSettings.rxRadioAddress) }
     val txName = rememberSaveable { mutableStateOf(initialSettings.txRadioName) }
     val rxName = rememberSaveable { mutableStateOf(initialSettings.rxRadioName) }
-    val baudRate = rememberSaveable { mutableStateOf(initialSettings.baudRate) }
+    val baudRate = rememberSaveable { mutableIntStateOf(initialSettings.baudRate) }
     val selectingFor = rememberSaveable { mutableStateOf("") } // "tx", "rx", or ""
 
     val pairedDevices = remember {
         try {
-            val manager = context.getSystemService(android.content.Context.BLUETOOTH_SERVICE) as android.bluetooth.BluetoothManager
+            val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             manager.adapter?.bondedDevices?.map { Pair(it.name ?: "Unknown", it.address) } ?: emptyList()
         } catch (_: SecurityException) {
             emptyList()
@@ -518,7 +474,7 @@ fun RadioControlDialog(
                 rxRadioAddress = rxAddress.value,
                 txRadioName = txName.value,
                 rxRadioName = rxName.value,
-                baudRate = baudRate.value
+                baudRate = baudRate.intValue
             )
         )
         onDismiss()
@@ -629,8 +585,8 @@ fun RadioControlDialog(
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     baudRates.forEach { rate ->
                         CardButton(
-                            onClick = { baudRate.value = rate },
-                            text = if (rate == baudRate.value) "[$rate]" else rate.toString(),
+                            onClick = { baudRate.intValue = rate },
+                            text = if (rate == baudRate.intValue) "[$rate]" else rate.toString(),
                             modifier = Modifier
                         )
                     }

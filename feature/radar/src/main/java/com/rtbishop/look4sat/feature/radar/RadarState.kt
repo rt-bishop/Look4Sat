@@ -36,7 +36,7 @@ data class RadarState(
     val selectedFrequency: Long? = null
 )
 
-sealed class RadarAction {
-    data class AddToCalendar(val name: String, val aosTime: Long, val losTime: Long) : RadarAction()
-    data class SelectTransmitter(val uuid: String) : RadarAction()
+sealed interface RadarAction {
+    data class AddToCalendar(val name: String, val aosTime: Long, val losTime: Long) : RadarAction
+    data class SelectTransmitter(val uuid: String) : RadarAction
 }

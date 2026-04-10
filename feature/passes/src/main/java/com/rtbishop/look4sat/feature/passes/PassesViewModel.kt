@@ -34,6 +34,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -57,15 +58,22 @@ class PassesViewModel(
     val uiState: StateFlow<PassesState> = _uiState
 
     init {
-        // React to raw pass list changes — stops the refreshing indicator on first emission
+        // Show refreshing indicator whenever the selected satellites list changes
         viewModelScope.launch {
-            var initialLoadDone = false
-            satelliteRepo.passes.collectLatest { _ ->
-                if (!initialLoadDone) {
-                    initialLoadDone = true
-                    delay(1000) // Artificial delay to show the refreshing state on first load
+            settingsRepo.selectedIds.collectLatest { selectedIds ->
+                _uiState.update { it.copy(isRefreshing = true) }
+                if (selectedIds.isEmpty()) {
+                    // No satellites selected — show indicator briefly, then stop
+                    delay(1000)
                     _uiState.update { it.copy(isRefreshing = false) }
                 }
+                // For non-empty selections, the passes collector below will clear isRefreshing
+            }
+        }
+        // Stop refreshing whenever new passes arrive (from initial load, selection change, or filter)
+        viewModelScope.launch {
+            satelliteRepo.passes.drop(1).collect { _ ->
+                _uiState.update { it.copy(isRefreshing = false) }
             }
         }
         // Local tick loop — computes pass progress and countdown timer every second

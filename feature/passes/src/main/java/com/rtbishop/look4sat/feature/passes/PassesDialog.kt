@@ -60,6 +60,8 @@ private val allModes = listOf(
     "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
 )
 
+private val hourSteps = listOf(1, 2, 4, 8, 12, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240)
+
 @Preview
 @Composable
 private fun PassesDialogPreview() {
@@ -68,26 +70,27 @@ private fun PassesDialogPreview() {
 
 @Composable
 internal fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, accept: (Int, Double) -> Unit) {
-    val hoursValue = remember { mutableIntStateOf(hours) }
+    val hoursIndex = remember { mutableIntStateOf(hourSteps.indexOfFirst { it >= hours }.coerceAtLeast(0)) }
     val elevationValueNew = remember { mutableDoubleStateOf(elevation) }
     val onAccept = {
-        accept(hoursValue.intValue, elevationValueNew.doubleValue).also { cancel() }
+        accept(hourSteps[hoursIndex.intValue], elevationValueNew.doubleValue).also { cancel() }
     }
     SharedDialog(title = stringResource(R.string.pass_filter_title), onCancel = cancel, onAccept = onAccept) {
         SliderRow(
             title = stringResource(R.string.pass_filter_elev),
             value = elevationValueNew.doubleValue,
-            valuePostfix = "°",
+            displayValue = "${elevationValueNew.doubleValue.toInt()}°",
             valueResId = R.drawable.ic_elevation,
             valueRange = 0f..60f
         ) { elevationValueNew.doubleValue = it.toDouble() }
         SliderRow(
             title = stringResource(R.string.pass_filter_hours),
-            value = hoursValue.intValue.toDouble(),
-            valuePostfix = "h",
+            value = hoursIndex.intValue.toDouble(),
+            displayValue = "${hourSteps[hoursIndex.intValue]}h",
             valueResId = R.drawable.ic_clock,
-            valueRange = 1f..240f
-        ) { hoursValue.intValue = it.toInt() }
+            valueRange = 0f..(hourSteps.size - 1).toFloat(),
+            steps = hourSteps.size - 2
+        ) { hoursIndex.intValue = it.toInt().coerceIn(0, hourSteps.size - 1) }
     }
 }
 
@@ -95,9 +98,10 @@ internal fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, acc
 private fun SliderRow(
     title: String,
     value: Double,
-    valuePostfix: String,
+    displayValue: String,
     valueResId: Int,
     valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int = 0,
     onChange: (Float) -> Unit
 ) {
     Column(
@@ -122,13 +126,13 @@ private fun SliderRow(
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = "${value.toInt()}$valuePostfix",
+                text = displayValue,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.primary
             )
         }
-        Slider(value = value.toFloat(), onValueChange = onChange, valueRange = valueRange)
+        Slider(value = value.toFloat(), onValueChange = onChange, valueRange = valueRange, steps = steps)
     }
 }
 

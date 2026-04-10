@@ -38,42 +38,36 @@ data class SettingsState(
     val otherSettings: OtherSettings,
     val rcSettings: RCSettings,
     val radioControlSettings: RadioControlSettings,
-    val dataSourcesSettings: DataSourcesSettings,
-    val sendAction: (SettingsAction) -> Unit,
-    val sendRCAction: (RCAction) -> Unit,
-    val sendRadioControlAction: (RadioControlSettingsAction) -> Unit,
-    val sendSystemAction: (SystemAction) -> Unit,
-    val sendDataSourcesAction: (DataSourcesAction) -> Unit
+    val dataSourcesSettings: DataSourcesSettings
 )
 
-sealed class SettingsAction {
-    data object SetGpsPosition : SettingsAction()
-    data class SetGeoPosition(val latitude: Double, val longitude: Double) : SettingsAction()
-    data class SetQthPosition(val locator: String) : SettingsAction()
-    data object DismissPosMessages : SettingsAction()
-    data object UpdateFromWeb : SettingsAction()
-    data class UpdateTLEFromFile(val uri: String) : SettingsAction()
-    data class UpdateTransceiversFromFile(val uri: String) : SettingsAction()
-    data object ClearAllData : SettingsAction()
-    data class ToggleUtc(val value: Boolean) : SettingsAction()
-    data class ToggleUpdate(val value: Boolean) : SettingsAction()
-    data class ToggleSweep(val value: Boolean) : SettingsAction()
-    data class ToggleSensor(val value: Boolean) : SettingsAction()
-    data class ToggleLightTheme(val value: Boolean) : SettingsAction()
-}
+sealed interface SettingsAction {
+    // Position
+    data object SetGpsPosition : SettingsAction
+    data class SetGeoPosition(val latitude: Double, val longitude: Double) : SettingsAction
+    data class SetQthPosition(val locator: String) : SettingsAction
+    data object DismissPosMessages : SettingsAction
 
-sealed class SystemAction {
-    data class ShowToast(val message: String) : SystemAction()
-}
+    // Data
+    data object UpdateFromWeb : SettingsAction
+    data class UpdateTLEFromFile(val uri: String) : SettingsAction
+    data class UpdateTransceiversFromFile(val uri: String) : SettingsAction
+    data object ClearAllData : SettingsAction
 
-sealed class RCAction {
-    data class Update(val settings: RCSettings) : RCAction()
-}
+    // Toggles
+    data class ToggleUtc(val value: Boolean) : SettingsAction
+    data class ToggleUpdate(val value: Boolean) : SettingsAction
+    data class ToggleSweep(val value: Boolean) : SettingsAction
+    data class ToggleSensor(val value: Boolean) : SettingsAction
+    data class ToggleLightTheme(val value: Boolean) : SettingsAction
 
-sealed class DataSourcesAction {
-    data class Update(val settings: DataSourcesSettings) : DataSourcesAction()
-}
+    // Remote control
+    data class UpdateRC(val settings: RCSettings) : SettingsAction
+    data class UpdateRadioControl(val settings: RadioControlSettings) : SettingsAction
 
-sealed class RadioControlSettingsAction {
-    data class Update(val settings: RadioControlSettings) : RadioControlSettingsAction()
+    // Data sources
+    data class UpdateDataSources(val settings: DataSourcesSettings) : SettingsAction
+
+    // System
+    data class ShowToast(val message: String) : SettingsAction
 }

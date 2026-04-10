@@ -33,11 +33,11 @@ data class MapState(
     val positions: Map<OrbitalObject, GeoPos>? = null
 )
 
-sealed class MapAction {
-    data object SelectPrev : MapAction()
-    data object SelectNext : MapAction()
-    data class SelectItem(val item: OrbitalObject) : MapAction()
-    data class SelectDefaultItem(val catnum: Int) : MapAction()
+sealed interface MapAction {
+    data object SelectPrev : MapAction
+    data object SelectNext : MapAction
+    data class SelectItem(val item: OrbitalObject) : MapAction
+    data class SelectDefaultItem(val catnum: Int) : MapAction
 }
 
 data class MapData(

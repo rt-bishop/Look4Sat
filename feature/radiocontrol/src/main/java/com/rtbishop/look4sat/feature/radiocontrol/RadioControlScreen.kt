@@ -76,12 +76,16 @@ fun NavGraphBuilder.radioControlDestination(navigateUp: () -> Unit) {
     composable(route, args) {
         val viewModel = viewModel(RadioControlViewModel::class.java, factory = RadioControlViewModel.Factory)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        RadioControlScreen(uiState, navigateUp)
+        RadioControlScreen(uiState, viewModel::onAction, navigateUp)
     }
 }
 
 @Composable
-private fun RadioControlScreen(uiState: RadioControlState, navigateUp: () -> Unit) {
+private fun RadioControlScreen(
+    uiState: RadioControlState,
+    onAction: (RadioControlAction) -> Unit,
+    navigateUp: () -> Unit
+) {
     Column(
         modifier = Modifier
             .layoutPadding()
@@ -115,21 +119,39 @@ private fun RadioControlScreen(uiState: RadioControlState, navigateUp: () -> Uni
             distance = uiState.distance
         )
 
+        val selectedTransponder = uiState.transponders.find {
+            it.uuid == uiState.selectedTransponderUuid
+        }
+
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            item { TransponderSelector(uiState) }
-
-            val selectedTransponder = uiState.transponders.find {
-                it.uuid == uiState.selectedTransponderUuid
+            item {
+                TransponderSelector(
+                    transponders = uiState.transponders,
+                    selectedUuid = uiState.selectedTransponderUuid,
+                    onAction = onAction
+                )
             }
+
             if (selectedTransponder?.uplinkMode?.uppercase() == "FM") {
-                item { CtcssSelector(uiState) }
+                item {
+                    CtcssSelector(
+                        ctcssTone = uiState.ctcssTone,
+                        onAction = onAction
+                    )
+                }
             }
 
             if (uiState.txBaseFrequencyHz != null) {
-                item { FrequencyTuner(uiState) }
+                item {
+                    FrequencyTuner(
+                        txBaseFrequencyHz = uiState.txBaseFrequencyHz,
+                        selectedTransponder = selectedTransponder,
+                        onAction = onAction
+                    )
+                }
             }
 
             uiState.errorMessage?.let { msg ->
@@ -143,7 +165,11 @@ private fun RadioControlScreen(uiState: RadioControlState, navigateUp: () -> Uni
             }
         }
 
-        ControlButtons(uiState)
+        ControlButtons(
+            isConnected = uiState.txPanel.isConnected || uiState.rxPanel.isConnected,
+            isTracking = uiState.isTracking,
+            onAction = onAction
+        )
     }
 }
 
@@ -208,8 +234,12 @@ private fun PositionRow(azimuth: String, elevation: String, distance: String) {
 }
 
 @Composable
-private fun TransponderSelector(uiState: RadioControlState) {
-    if (uiState.transponders.isEmpty()) {
+private fun TransponderSelector(
+    transponders: List<SatRadio>,
+    selectedUuid: String?,
+    onAction: (RadioControlAction) -> Unit
+) {
+    if (transponders.isEmpty()) {
         ElevatedCard(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = "No transponders with uplink+downlink available",
@@ -222,11 +252,11 @@ private fun TransponderSelector(uiState: RadioControlState) {
         return
     }
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        uiState.transponders.forEach { radio ->
+        transponders.forEach { radio ->
             TransponderItem(
                 radio = radio,
-                isSelected = radio.uuid == uiState.selectedTransponderUuid,
-                onSelect = { uiState.sendAction(RadioControlAction.SelectTransponder(radio.uuid)) }
+                isSelected = radio.uuid == selectedUuid,
+                onSelect = { onAction(RadioControlAction.SelectTransponder(radio.uuid)) }
             )
         }
     }
@@ -257,21 +287,24 @@ private fun TransponderItem(radio: SatRadio, isSelected: Boolean, onSelect: () -
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun CtcssSelector(uiState: RadioControlState) {
+private fun CtcssSelector(
+    ctcssTone: Double?,
+    onAction: (RadioControlAction) -> Unit
+) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
             Text(text = "CTCSS Tone", color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(4.dp))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 FilterChip(
-                    selected = uiState.ctcssTone == null,
-                    onClick = { uiState.sendAction(RadioControlAction.SetCtcssTone(null)) },
+                    selected = ctcssTone == null,
+                    onClick = { onAction(RadioControlAction.SetCtcssTone(null)) },
                     label = { Text("Off") }
                 )
                 RadioControlViewModel.CTCSS_TONES.forEach { tone ->
                     FilterChip(
-                        selected = uiState.ctcssTone == tone,
-                        onClick = { uiState.sendAction(RadioControlAction.SetCtcssTone(tone)) },
+                        selected = ctcssTone == tone,
+                        onClick = { onAction(RadioControlAction.SetCtcssTone(tone)) },
                         label = { Text(String.format(Locale.ENGLISH, "%.1f", tone)) }
                     )
                 }
@@ -280,21 +313,26 @@ private fun CtcssSelector(uiState: RadioControlState) {
     }
 }
 
+private val FREQ_ADJUSTMENTS =
+    listOf(-10_000L to "-10k", -1_000L to "-1k", -100L to "-100", 100L to "+100", 1_000L to "+1k", 10_000L to "+10k")
+
 @Composable
-private fun FrequencyTuner(uiState: RadioControlState) {
-    val freq = uiState.txBaseFrequencyHz ?: return
-    val transponder = uiState.transponders.find { it.uuid == uiState.selectedTransponderUuid }
+private fun FrequencyTuner(
+    txBaseFrequencyHz: Long,
+    selectedTransponder: SatRadio?,
+    onAction: (RadioControlAction) -> Unit
+) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Text(text = "TX Base Frequency", color = MaterialTheme.colorScheme.primary)
-            if (transponder != null) {
-                val upLow = transponder.uplinkLow
-                val upHigh = transponder.uplinkHigh
-                val dnLow = transponder.downlinkLow
-                val dnHigh = transponder.downlinkHigh
+            if (selectedTransponder != null) {
+                val upLow = selectedTransponder.uplinkLow
+                val upHigh = selectedTransponder.uplinkHigh
+                val dnLow = selectedTransponder.downlinkLow
+                val dnHigh = selectedTransponder.downlinkHigh
                 if (upLow != null && upHigh != null && upLow != upHigh) {
                     Text(
                         text = "UP: ${RadioControlViewModel.formatFrequency(upLow)} - ${RadioControlViewModel.formatFrequency(upHigh)}",
@@ -312,68 +350,48 @@ private fun FrequencyTuner(uiState: RadioControlState) {
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${RadioControlViewModel.formatFrequency(freq)} MHz",
+                text = "${RadioControlViewModel.formatFrequency(txBaseFrequencyHz)} MHz",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(4.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardButton(
-                    onClick = { uiState.sendAction(RadioControlAction.AdjustTxFrequency(-10_000)) },
-                    text = "-10k",
-                    modifier = Modifier.weight(1f)
-                )
-                CardButton(
-                    onClick = { uiState.sendAction(RadioControlAction.AdjustTxFrequency(-1_000)) },
-                    text = "-1k",
-                    modifier = Modifier.weight(1f)
-                )
-                CardButton(
-                    onClick = { uiState.sendAction(RadioControlAction.AdjustTxFrequency(-100)) },
-                    text = "-100",
-                    modifier = Modifier.weight(1f)
-                )
-                CardButton(
-                    onClick = { uiState.sendAction(RadioControlAction.AdjustTxFrequency(100)) },
-                    text = "+100",
-                    modifier = Modifier.weight(1f)
-                )
-                CardButton(
-                    onClick = { uiState.sendAction(RadioControlAction.AdjustTxFrequency(1_000)) },
-                    text = "+1k",
-                    modifier = Modifier.weight(1f)
-                )
-                CardButton(
-                    onClick = { uiState.sendAction(RadioControlAction.AdjustTxFrequency(10_000)) },
-                    text = "+10k",
-                    modifier = Modifier.weight(1f)
-                )
+                FREQ_ADJUSTMENTS.forEach { (delta, label) ->
+                    CardButton(
+                        onClick = { onAction(RadioControlAction.AdjustTxFrequency(delta)) },
+                        text = label,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun ControlButtons(uiState: RadioControlState) {
-    val isConnected = uiState.txPanel.isConnected || uiState.rxPanel.isConnected
+private fun ControlButtons(
+    isConnected: Boolean,
+    isTracking: Boolean,
+    onAction: (RadioControlAction) -> Unit
+) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         if (!isConnected) {
             CardButton(
-                onClick = { uiState.sendAction(RadioControlAction.ConnectRadios) },
+                onClick = { onAction(RadioControlAction.ConnectRadios) },
                 text = "Connect",
                 modifier = Modifier.weight(1f)
             )
         } else {
             CardButton(
-                onClick = { uiState.sendAction(RadioControlAction.DisconnectRadios) },
+                onClick = { onAction(RadioControlAction.DisconnectRadios) },
                 text = "Disconnect",
                 modifier = Modifier.weight(1f)
             )
         }
         CardButton(
-            onClick = { uiState.sendAction(RadioControlAction.ToggleTracking) },
-            text = if (uiState.isTracking) "Stop Tracking" else "Start Tracking",
+            onClick = { onAction(RadioControlAction.ToggleTracking) },
+            text = if (isTracking) "Stop Tracking" else "Start Tracking",
             modifier = Modifier.weight(1f)
         )
     }

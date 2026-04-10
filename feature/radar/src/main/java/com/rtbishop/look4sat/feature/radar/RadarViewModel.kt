@@ -174,6 +174,10 @@ class RadarViewModel(
             settingsRepo.rcSettings.value.frequencyState || settingsRepo.rcSettings.value.bluetoothFrequencyState
         _uiState.update { state ->
             if (!isFreqEnabled) {
+                // Skip update if nothing changed
+                if (state.transmitters == transmitters && state.selectedTransmitterUuid == null && state.selectedFrequency == null) {
+                    return@update state
+                }
                 return@update state.copy(
                     transmitters = transmitters,
                     selectedTransmitterUuid = null,
@@ -190,6 +194,10 @@ class RadarViewModel(
                     low != null -> low
                     else -> null
                 }
+            }
+            // Skip update if nothing changed
+            if (state.transmitters == transmitters && state.selectedTransmitterUuid == selectedUuid && state.selectedFrequency == freq) {
+                return@update state
             }
             state.copy(transmitters = transmitters, selectedTransmitterUuid = selectedUuid, selectedFrequency = freq)
         }
