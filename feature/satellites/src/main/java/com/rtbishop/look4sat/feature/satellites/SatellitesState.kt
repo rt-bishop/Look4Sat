@@ -20,13 +20,12 @@ package com.rtbishop.look4sat.feature.satellites
 import com.rtbishop.look4sat.core.domain.model.SatItem
 
 data class SatellitesState(
-    val isDialogShown: Boolean,
-    val isLoading: Boolean,
-    val shouldSeeWarning: Boolean,
-    val itemsList: List<SatItem>,
-    val currentTypes: List<String>,
-    val typesList: List<String>,
-    val takeAction: (SatellitesAction) -> Unit
+    val isDialogShown: Boolean = false,
+    val isLoading: Boolean = true,
+    val shouldSeeWarning: Boolean = false,
+    val itemsList: List<SatItem> = emptyList(),
+    val currentTypes: List<String> = emptyList(),
+    val typesList: List<String> = emptyList()
 )
 
 sealed class SatellitesAction {

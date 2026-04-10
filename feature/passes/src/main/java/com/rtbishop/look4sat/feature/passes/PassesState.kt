@@ -20,19 +20,18 @@ package com.rtbishop.look4sat.feature.passes
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 
 data class PassesState(
-    val isPassesDialogShown: Boolean,
-    val isRadiosDialogShown: Boolean,
-    val isRefreshing: Boolean,
-    val isUtc: Boolean,
+    val isPassesDialogShown: Boolean = false,
+    val isRadiosDialogShown: Boolean = false,
+    val isRefreshing: Boolean = true,
+    val isUtc: Boolean = false,
     val nextPass: OrbitalPass,
-    val nextTime: String,
-    val isNextTimeAos: Boolean,
-    val hours: Int,
-    val elevation: Double,
-    val modes: List<String>,
-    val itemsList: List<OrbitalPass>,
-    val shouldSeeWhatsNew: Boolean,
-    val takeAction: (PassesAction) -> Unit
+    val nextTime: String = "00:00:00",
+    val isNextTimeAos: Boolean = true,
+    val hours: Int = 24,
+    val elevation: Double = 16.0,
+    val modes: List<String> = emptyList(),
+    val itemsList: List<OrbitalPass> = emptyList(),
+    val shouldSeeWhatsNew: Boolean = false
 )
 
 sealed class PassesAction {

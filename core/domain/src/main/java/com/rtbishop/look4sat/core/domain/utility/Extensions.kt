@@ -21,10 +21,11 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 fun Long.toTimerString(): String {
+    val millis = coerceAtLeast(0L)
     val format = "%02d:%02d:%02d"
-    val hours = TimeUnit.MILLISECONDS.toHours(this)
-    val minutes = TimeUnit.MILLISECONDS.toMinutes(this) % 60
-    val seconds = TimeUnit.MILLISECONDS.toSeconds(this) % 60
+    val hours = TimeUnit.MILLISECONDS.toHours(millis)
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(millis) % 60
     return String.format(Locale.ENGLISH, format, hours, minutes, seconds)
 }
 

@@ -32,12 +32,11 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,7 +67,7 @@ private fun PassesDialogPreview() {
 }
 
 @Composable
-fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, accept: (Int, Double) -> Unit) {
+internal fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, accept: (Int, Double) -> Unit) {
     val hoursValue = remember { mutableIntStateOf(hours) }
     val elevationValueNew = remember { mutableDoubleStateOf(elevation) }
     val onAccept = {
@@ -140,12 +139,12 @@ private fun RadiosDialogPreview() {
 }
 
 @Composable
-fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List<String>) -> Unit) {
-    val selected = remember { mutableStateListOf<String>().apply { addAll(modes) } }
-    val select = { mode: String ->
-        if (selected.contains(mode)) selected.remove(mode) else selected.add(mode)
+internal fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List<String>) -> Unit) {
+    val selected = remember { mutableStateOf(modes.toSet()) }
+    val toggle = { mode: String ->
+        selected.value = if (mode in selected.value) selected.value - mode else selected.value + mode
     }
-    val onAccept = { accept(selected.toList()).also { cancel() } }
+    val onAccept = { accept(selected.value.toList()).also { cancel() } }
     SharedDialog(title = stringResource(R.string.pass_modes_title), onCancel = cancel, onAccept = onAccept) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(240.dp),
@@ -156,32 +155,30 @@ fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List<String>)
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             itemsIndexed(allModes) { index, item ->
-                Surface {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface)
-                            .clickable { select(item) }
-                    ) {
-                        Text(
-                            text = "${index + 1}).",
-                            modifier = Modifier.padding(start = 16.dp, end = 8.dp),
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = item,
-                            modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Checkbox(
-                            checked = selected.contains(item),
-                            onCheckedChange = null,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .clickable { toggle(item) }
+                ) {
+                    Text(
+                        text = "${index + 1}).",
+                        modifier = Modifier.padding(start = 16.dp, end = 8.dp),
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = item,
+                        modifier = Modifier.weight(1f),
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Checkbox(
+                        checked = item in selected.value,
+                        onCheckedChange = null,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
                 }
             }
         }

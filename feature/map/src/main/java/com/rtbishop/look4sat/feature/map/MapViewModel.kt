@@ -56,15 +56,9 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settin
     private val defaultPass = getDefaultPass()
     private val _uiState = MutableStateFlow(
         MapState(
-            mapData = null,
             isLightUi = settingsRepo.otherSettings.value.stateOfLightTheme,
             isUtc = settingsRepo.otherSettings.value.stateOfUtc,
-            stationPosition = null,
-            orbitalPass = defaultPass,
-            track = null,
-            footprint = null,
-            positions = null,
-            sendAction = ::handleAction
+            orbitalPass = defaultPass
         )
     )
     private var allPasses = satelliteRepo.passes.value
@@ -83,7 +77,7 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settin
         selectDefaultSatellite(-1)
     }
 
-    private fun handleAction(action: MapAction) {
+    fun onAction(action: MapAction) {
         when (action) {
             MapAction.SelectPrev -> scrollSelection(true)
             MapAction.SelectNext -> scrollSelection(false)
@@ -215,14 +209,19 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settin
             ?.let { satPass ->
                 orbitalPass = satPass
                 if (!satPass.isDeepSpace) {
-                    aosTime = if (date.time < satPass.aosTime) {
-                        val millisBeforeStart = satPass.aosTime.minus(date.time)
-                        isTimeAos = true
-                        millisBeforeStart.toTimerString()
-                    } else {
-                        val millisBeforeEnd = satPass.losTime.minus(date.time)
-                        isTimeAos = false
-                        millisBeforeEnd.toTimerString()
+                    when {
+                        date.time < satPass.aosTime -> {
+                            // Pass hasn't started yet — count down to AOS
+                            isTimeAos = true
+                            aosTime = (satPass.aosTime - date.time).toTimerString()
+                        }
+
+                        date.time < satPass.losTime -> {
+                            // Pass is in progress — count down to LOS
+                            isTimeAos = false
+                            aosTime = (satPass.losTime - date.time).toTimerString()
+                        }
+                        // else: pass has ended (losTime <= date.time) — keep default "00:00:00"
                     }
                 }
             }

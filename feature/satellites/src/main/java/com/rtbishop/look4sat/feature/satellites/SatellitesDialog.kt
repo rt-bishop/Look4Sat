@@ -30,7 +30,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,14 +51,14 @@ private fun MultiTypesDialogPreview() {
 }
 
 @Composable
-fun MultiTypesDialog(
+internal fun MultiTypesDialog(
     allTypes: List<String>, types: List<String>, cancel: () -> Unit, accept: (List<String>) -> Unit
 ) {
-    val selected = remember { mutableStateListOf<String>().apply { addAll(types) } }
-    val select = { type: String ->
-        if (selected.contains(type)) selected.remove(type) else selected.add(type)
+    val selected = remember { mutableStateOf(types.toSet()) }
+    val toggle = { type: String ->
+        selected.value = if (type in selected.value) selected.value - type else selected.value + type
     }
-    val onAccept = { accept(selected.toList()) }
+    val onAccept = { accept(selected.value.toList()) }
     SharedDialog(title = stringResource(R.string.sat_type_title), onCancel = cancel, onAccept = onAccept) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(240.dp),
@@ -73,7 +73,7 @@ fun MultiTypesDialog(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surface)
-                        .clickable { select(item) }
+                        .clickable { toggle(item) }
                 ) {
                     Text(
                         text = "${index + 1}).",
@@ -89,7 +89,7 @@ fun MultiTypesDialog(
                         overflow = TextOverflow.Ellipsis
                     )
                     Checkbox(
-                        checked = selected.contains(item),
+                        checked = item in selected.value,
                         onCheckedChange = null,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )

@@ -25,7 +25,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.repository.ISelectionRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -40,20 +39,16 @@ class SatellitesViewModel(
     private val defaultTypes = selectionRepo.getCurrentTypes()
     private val _uiState = MutableStateFlow(
         SatellitesState(
-            isDialogShown = false,
             isLoading = true,
             shouldSeeWarning = settingsRepo.otherSettings.value.shouldSeeWarning,
-            itemsList = emptyList(),
             currentTypes = defaultTypes,
-            typesList = selectionRepo.getTypesList(),
-            takeAction = ::handleAction
+            typesList = selectionRepo.getTypesList()
         )
     )
     val uiState: StateFlow<SatellitesState> = _uiState
 
     init {
         viewModelScope.launch {
-            delay(1000)
             selectionRepo.setQuery(String())
             selectionRepo.setTypes(defaultTypes)
             selectionRepo.getEntriesFlow().collectLatest { items ->
@@ -67,7 +62,7 @@ class SatellitesViewModel(
         }
     }
 
-    private fun handleAction(action: SatellitesAction) {
+    fun onAction(action: SatellitesAction) {
         when (action) {
             SatellitesAction.DismissWarning -> settingsRepo.setWarningDismissed()
             SatellitesAction.SaveSelection -> saveSelection()
@@ -94,12 +89,11 @@ class SatellitesViewModel(
 
     private fun selectTypes(types: List<String>) = viewModelScope.launch {
         selectionRepo.setTypes(types)
-        _uiState.value = _uiState.value.copy(currentTypes = types, isDialogShown = false)
+        _uiState.update { it.copy(currentTypes = types, isDialogShown = false) }
     }
 
     private fun toggleTypesDialog() {
-        val currentDialogState = _uiState.value.isDialogShown
-        _uiState.value = _uiState.value.copy(isDialogShown = currentDialogState.not())
+        _uiState.update { it.copy(isDialogShown = !it.isDialogShown) }
     }
 
     companion object {

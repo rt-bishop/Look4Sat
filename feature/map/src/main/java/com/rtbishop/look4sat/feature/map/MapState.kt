@@ -23,22 +23,21 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 
 data class MapState(
-    val mapData: MapData?,
-    val isLightUi: Boolean,
-    val isUtc: Boolean,
-    val stationPosition: GeoPos?,
+    val mapData: MapData? = null,
+    val isLightUi: Boolean = false,
+    val isUtc: Boolean = false,
+    val stationPosition: GeoPos? = null,
     val orbitalPass: OrbitalPass,
-    val track: List<List<GeoPos>>?,
-    val footprint: OrbitalPos?,
-    val positions: Map<OrbitalObject, GeoPos>?,
-    val sendAction: (MapAction) -> Unit
+    val track: List<List<GeoPos>>? = null,
+    val footprint: OrbitalPos? = null,
+    val positions: Map<OrbitalObject, GeoPos>? = null
 )
 
 sealed class MapAction {
-    data object SelectPrev: MapAction()
-    data object SelectNext: MapAction()
-    data class SelectItem(val item: OrbitalObject): MapAction()
-    data class SelectDefaultItem(val catnum: Int): MapAction()
+    data object SelectPrev : MapAction()
+    data object SelectNext : MapAction()
+    data class SelectItem(val item: OrbitalObject) : MapAction()
+    data class SelectDefaultItem(val catnum: Int) : MapAction()
 }
 
 data class MapData(

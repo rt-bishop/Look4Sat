@@ -115,15 +115,12 @@ fun NavGraphBuilder.mapDestination() {
         val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val mapView = rememberMapViewWithLifecycle()
-        MapScreen(uiState, mapView)
+        MapScreen(uiState, viewModel::onAction, mapView)
     }
 }
 
 @Composable
-private fun MapScreen(uiState: MapState, mapView: MapView) {
-    val onItemClick = { item: OrbitalObject -> uiState.sendAction(MapAction.SelectItem(item)) }
-    val selectPrev = { uiState.sendAction(MapAction.SelectPrev) }
-    val selectNext = { uiState.sendAction(MapAction.SelectNext) }
+private fun MapScreen(uiState: MapState, onAction: (MapAction) -> Unit, mapView: MapView) {
     val rotateMod = Modifier.rotate(180f)
     val timeString = uiState.mapData?.aosTime ?: "00:00:00"
     val isTimeAos = uiState.mapData?.isTimeAos ?: true
@@ -136,17 +133,17 @@ private fun MapScreen(uiState: MapState, mapView: MapView) {
         val isVertical = isVerticalLayout()
         if (isVertical) {
             TopBar {
-                IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)
+                IconCard(action = { onAction(MapAction.SelectPrev) }, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
-                IconCard(action = selectNext, resId = R.drawable.ic_arrow)
+                IconCard(action = { onAction(MapAction.SelectNext) }, resId = R.drawable.ic_arrow)
             }
             TopBar { NextPassRow(pass = uiState.orbitalPass, isUtc = uiState.isUtc) }
         } else {
             TopBar {
-                IconCard(action = selectPrev, resId = R.drawable.ic_arrow, modifier = rotateMod)
+                IconCard(action = { onAction(MapAction.SelectPrev) }, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
                 NextPassRow(pass = uiState.orbitalPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
-                IconCard(action = selectNext, resId = R.drawable.ic_arrow)
+                IconCard(action = { onAction(MapAction.SelectNext) }, resId = R.drawable.ic_arrow)
             }
         }
         ElevatedCard(modifier = Modifier.weight(1f)) {
@@ -155,7 +152,7 @@ private fun MapScreen(uiState: MapState, mapView: MapView) {
                     uiState.stationPosition?.let { setStationPosition(it, view) }
                     uiState.track?.let { setSatelliteTrack(it, view) }
                     uiState.footprint?.let { setFootprint(it, view) }
-                    uiState.positions?.let { setPositions(it, view, onItemClick) }
+                    uiState.positions?.let { setPositions(it, view) { item -> onAction(MapAction.SelectItem(item)) } }
                     view.invalidate()
                 }
                 uiState.mapData?.let { mapData ->
@@ -369,7 +366,7 @@ private var footprintPoints: ArrayList<GeoPoint>? = null
 private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
     try {
         val rangeCircle = orbitalPos.getRangeCircle()
-        // Lazily initialise the reusable point list and polyline
+        // Lazily initialize the reusable point list and polyline
         var pts = footprintPoints
         if (pts == null || pts.size != rangeCircle.size) {
             pts = ArrayList(rangeCircle.size)

@@ -35,10 +35,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -86,27 +86,31 @@ fun NavGraphBuilder.passesDestination(navigateToRadar: (Int, Long) -> Unit) {
             factory = PassesViewModel.Factory
         )
         val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        PassesScreen(uiState, navigateToRadar)
+        PassesScreen(uiState, viewModel::onAction, navigateToRadar)
     }
 }
 
 @Composable
-private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> Unit) {
-    val refreshList = { uiState.takeAction(PassesAction.RefreshPasses) }
-    val showPassesDialog = { uiState.takeAction(PassesAction.TogglePassesDialog) }
-    val showRadiosDialog = { uiState.takeAction(PassesAction.ToggleRadiosDialog) }
+private fun PassesScreen(
+    uiState: PassesState,
+    onAction: (PassesAction) -> Unit,
+    navigateToRadar: (Int, Long) -> Unit
+) {
     if (uiState.isPassesDialogShown) {
         PassesDialog(
             hours = uiState.hours,
             elevation = uiState.elevation,
-            cancel = showPassesDialog
+            cancel = { onAction(PassesAction.TogglePassesDialog) }
         ) { hours, elevation ->
-            uiState.takeAction(PassesAction.FilterPasses(hours, elevation))
+            onAction(PassesAction.FilterPasses(hours, elevation))
         }
     }
     if (uiState.isRadiosDialogShown) {
-        RadiosDialog(modes = uiState.modes, cancel = showRadiosDialog) { modes ->
-            uiState.takeAction(PassesAction.FilterRadios(modes))
+        RadiosDialog(
+            modes = uiState.modes,
+            cancel = { onAction(PassesAction.ToggleRadiosDialog) }
+        ) { modes ->
+            onAction(PassesAction.FilterRadios(modes))
         }
     }
     if (uiState.shouldSeeWhatsNew) {
@@ -114,7 +118,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
             title = stringResource(R.string.pass_whatsnew_title),
             text = stringResource(R.string.pass_whatsnew_message)
         ) {
-            uiState.takeAction(PassesAction.DismissWhatsNew)
+            onAction(PassesAction.DismissWhatsNew)
         }
     }
     val gridState = rememberLazyGridState()
@@ -123,7 +127,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
             TopBar(
                 isVerticalLayout = isVerticalLayout,
                 startAction = {
-                    IconCard(action = showPassesDialog, resId = R.drawable.ic_filter)
+                    IconCard(action = { onAction(PassesAction.TogglePassesDialog) }, resId = R.drawable.ic_filter)
                 },
                 topInfo = {
                     TimerRow(timeString = uiState.nextTime, isTimeAos = uiState.isNextTimeAos)
@@ -132,7 +136,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
                     NextPassRow(pass = uiState.nextPass, isUtc = uiState.isUtc)
                 },
                 endAction = {
-                    IconCard(action = showRadiosDialog, resId = R.drawable.ic_radios)
+                    IconCard(action = { onAction(PassesAction.ToggleRadiosDialog) }, resId = R.drawable.ic_radios)
                 }
             )
         }
@@ -142,7 +146,7 @@ private fun PassesScreen(uiState: PassesState, navigateToRadar: (Int, Long) -> U
             isUtc = uiState.isUtc,
             passes = uiState.itemsList,
             navigateToRadar = navigateToRadar,
-            refreshPasses = refreshList,
+            refreshPasses = { onAction(PassesAction.RefreshPasses) },
             gridState = gridState
         )
     }
@@ -184,7 +188,7 @@ private fun PassesList(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(items = passes, key = { item -> item.catNum + item.aosTime }) { pass ->
-                        NearEarthPass(
+                        PassItem(
                             pass = pass,
                             navigateToRadar = navigateToRadar,
                             modifier = Modifier.animateItem(),
@@ -204,7 +208,7 @@ private fun DeepSpacePassPreview() {
     val data = OrbitalData("Satellite", 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0)
     val satellite = DeepSpaceObject(data)
     val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
-    MainTheme { NearEarthPass(pass = pass, { _, _ -> }) }
+    MainTheme { PassItem(pass = pass, { _, _ -> }) }
 }
 
 @Preview(showBackground = true)
@@ -213,11 +217,11 @@ private fun NearEarthPassPreview() {
     val data = OrbitalData("Satellite", 0.0, 15.0, 0.0, 0.0, 0.0, 0.0, 0.0, 45000, 0.0)
     val satellite = NearEarthObject(data)
     val pass = OrbitalPass(1L, 180.0, 10L, 360.0, 36650, 45.0, satellite, 0.5f)
-    MainTheme { NearEarthPass(pass = pass, { _, _ -> }) }
+    MainTheme { PassItem(pass = pass, { _, _ -> }) }
 }
 
 @Composable
-private fun NearEarthPass(
+private fun PassItem(
     pass: OrbitalPass,
     navigateToRadar: (Int, Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -235,118 +239,121 @@ private fun NearEarthPass(
     val sdfTime = remember(isUtc) {
         SimpleDateFormat("HH:mm:ss", Locale.ENGLISH).also { it.timeZone = timeZone }
     }
-    // Cache formatted date/time strings — aosTime/losTime never change for a given pass
     val aosDateStr = remember(pass.aosTime, isUtc) { sdfDate.format(Date(pass.aosTime)) }
     val aosTimeStr = remember(pass.aosTime, isUtc) { sdfTime.format(Date(pass.aosTime)) }
     val losTimeStr = remember(pass.losTime, isUtc) { sdfTime.format(Date(pass.losTime)) }
-    Surface(color = MaterialTheme.colorScheme.background, modifier = modifier) {
-        Surface(modifier = Modifier
-            .padding(bottom = 2.dp)
-            .clickable { navigateToRadar(pass.catNum, pass.aosTime) }) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(1.dp),
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = horizontalPadding, vertical = 4.dp)
+
+    Column(
+        modifier = modifier.clickable { navigateToRadar(pass.catNum, pass.aosTime) }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface)
+                .padding(horizontal = horizontalPadding, vertical = 4.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "$passSatId - ",
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = pass.name,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 6.dp)
+                        .infiniteMarquee(),
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_elevation),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${pass.maxElevation}°",
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "$passSatId - ",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = pass.name,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 6.dp)
-                            .infiniteMarquee(),
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (pass.isDeepSpace) {
+                        Text(
+                            text = stringResource(R.string.pass_deep_space),
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    } else {
+                        Text(text = aosDateStr, fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_elevation),
+                        painter = painterResource(id = R.drawable.ic_altitude),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${pass.maxElevation}°",
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Text(text = "${pass.altitude} km", fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
                 }
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (pass.isDeepSpace) {
-                            Text(text = stringResource(R.string.pass_deep_space), fontSize = 15.sp)
-                        } else {
-                            Text(
-                                text = aosDateStr,
-                                fontSize = 15.sp
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_altitude),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${pass.altitude} km",
-                            fontSize = 15.sp
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(
-                                id = R.string.pass_aosLos,
-                                pass.aosAzimuth.toInt(),
-                                pass.losAzimuth.toInt()
-                            ),
-                            fontSize = 15.sp
-                        )
-                    }
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    val defaultTime = "   - - : - -   "
                     Text(
-                        text = if (pass.isDeepSpace) defaultTime else aosTimeStr,
-                        fontSize = 15.sp
-                    )
-                    LinearProgressIndicator(
-                        progress = { if (pass.isDeepSpace) 100f else pass.progress },
-                        drawStopIndicator = {},
-                        modifier = modifier.fillMaxWidth(0.75f)
-                    )
-                    Text(
-                        text = if (pass.isDeepSpace) defaultTime else losTimeStr,
-                        fontSize = 15.sp
+                        text = stringResource(
+                            id = R.string.pass_aosLos,
+                            pass.aosAzimuth.toInt(),
+                            pass.losAzimuth.toInt()
+                        ),
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                val defaultTime = "   - - : - -   "
+                Text(
+                    text = if (pass.isDeepSpace) defaultTime else aosTimeStr,
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                LinearProgressIndicator(
+                    progress = { if (pass.isDeepSpace) 100f else pass.progress },
+                    drawStopIndicator = {},
+                    modifier = Modifier.fillMaxWidth(0.75f)
+                )
+                Text(
+                    text = if (pass.isDeepSpace) defaultTime else losTimeStr,
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
+        HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.background)
     }
 }
