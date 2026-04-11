@@ -1,2 +1,6 @@
-* Fixed track path creation issue for split screens (#199) by londre7
-* Enabled using compass data for landscape orientation (#202) by londre7
+* Switched to short-form commands in NetworkReporter (#206) by theojalba
+* Added CAT radio control for full-duplex SAT operation (#207) by jcmerg
+* Added normalized time for passes AOS/LOS, fixed refresh state bug
+* Added multiple performance tweaks, improved passes calculation
+* Simplified data output code, aligned with HamLib defaults
+* Fixed UTC pass time problem mentioned in issue #201
