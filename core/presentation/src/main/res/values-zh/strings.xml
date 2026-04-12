@@ -1,137 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Commmon -->
-    <string name="btn_accept">确定</string>
-    <string name="btn_cancel">取消</string>
-    <string name="empty_list_message">没有数据可显示</string>
-
+    <string name="btn_accept">Accept</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="empty_list_message">No data to show</string>
     <!-- Navigation -->
-    <string name="nav_sat">卫星</string>
-    <string name="nav_pass">过境</string>
-    <string name="nav_radar">雷达</string>
-    <string name="nav_map">地图</string>
-    <string name="nav_prefs">设置</string>
-
+    <string name="nav_sat">Satellites</string>
+    <string name="nav_pass">Passes</string>
+    <string name="nav_radar">Radar</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_prefs">Settings</string>
     <!-- Satellites screen -->
-    <string name="sat_type_hint">类型：%s</string>
-    <string name="sat_type_title">选择卫星类型</string>
-    <string name="sat_search_hint">Id - 名称</string>
-    <string name="sat_search_clear">清空</string>
-    <string name="sat_clear_all">全部清空</string>
-    <string name="sat_select_all">全选</string>
-    <string name="sat_empty_list_message">请确保您的搜索查询正确且数据库已更新</string>
-    <string name="sat_warning_title">警告\!</string>
-    <string name="sat_warning_message">此应用收录了超过9000颗卫星信息\n同时追踪所有卫星并不现实\n建议始终通过搜索和分类筛选功能仅勾选您感兴趣的卫星</string>
-
+    <string name="sat_type_hint">Type: %s</string>
+    <string name="sat_type_title">Select satellite type</string>
+    <string name="sat_search_hint">Id - Name</string>
+    <string name="sat_search_clear">Clear</string>
+    <string name="sat_clear_all">Clear all</string>
+    <string name="sat_select_all">Select all</string>
+    <string name="sat_empty_list_message">"Make sure your search query is correct and the DB is updated"</string>
+    <string name="sat_warning_title">Warning\!</string>
+    <string name="sat_warning_message">        There are over 9000 satellites listed in this app.
+        It makes no sense to track them all at the same time.
+        \n\nAlways try to narrow down the list to only the ones
+        you\'re interested in via search and types selector.</string>
     <!-- Passes screen -->
-    <string name="pass_filter_title">筛选过境</string>
-    <string name="pass_filter_elev">仰角值</string>
-    <string name="pass_filter_hours">小时数</string>
-    <string name="pass_modes_title">选择调制类型</string>
-    <string name="pass_elevation">仰角：%.1f°</string>
-    <string name="pass_altitude">高度：%d km</string>
-    <string name="pass_empty_list_message">请确保您的过滤器设置正确，并且已选择卫星</string>
-    <string name="pass_error_message">没有即将过境的卫星</string>
-    <string name="pass_welcome_title">欢迎来到 Look4Sat\!</string>
-    <string name="pass_welcome_message">请务必在设置中通过GPS、经纬度或QTH定位您的位置\n建议至少每周更新一次数据库，以确保预测结果的准确性</string>
-
+    <string name="pass_filter_title">Filter passes</string>
+    <string name="pass_filter_elev">Minimal elevation</string>
+    <string name="pass_filter_hours">Hours ahead</string>
+    <string name="pass_modes_title">Select modulation type</string>
+    <string name="pass_elevation">Elevation: %.1f°</string>
+    <string name="pass_altitude">Altitude: %d km</string>
+    <string name="pass_empty_list_message">        Make sure your filters are correct and you have selected satellites</string>
+    <string name="pass_error_message">There are no upcoming satellite passes to display</string>
+    <string name="pass_welcome_title">Welcome to Look4Sat\!</string>
+    <string name="pass_welcome_message">        Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
+        \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <!-- Radar screen -->
-    <string name="radar_back">后退</string>
-    <string name="radar_notify">通知</string>
-    <string name="radar_az_text">方位角</string>
-    <string name="radar_el_text">仰角</string>
-    <string name="radar_alt_text">高度</string>
-    <string name="radar_dist_text">距离</string>
-    <string name="radar_eclipsed">地影中</string>
-    <string name="radar_downlink">下行链路</string>
-    <string name="radar_uplink">上行链路</string>
-    <string name="radar_no_data">这颗卫星没有收发器</string>
-    <string name="radar_add">添加</string>
-    <string name="radar_data">卫星收发器：</string>
-    <string name="radar_inverted">倒置：%s</string>
-    <string name="radar_mode">调制：%s</string>
-    <string name="radar_string_no">否</string>
-    <string name="radar_string_yes">是</string>
-    <string name="radar_visible">日照中</string>
-
+    <string name="radar_back">Back</string>
+    <string name="radar_notify">Notify</string>
+    <string name="radar_az_text">Azimuth</string>
+    <string name="radar_el_text">Elevation</string>
+    <string name="radar_alt_text">Altitude</string>
+    <string name="radar_dist_text">Distance</string>
+    <string name="radar_eclipsed">Eclipsed</string>
+    <string name="radar_downlink">Downlink</string>
+    <string name="radar_uplink">Uplink</string>
+    <string name="radar_no_data">This satellite has no transceivers</string>
+    <string name="radar_add">Add</string>
+    <string name="radar_data">Satellite transceivers:</string>
+    <string name="radar_inverted">Inverted: %s</string>
+    <string name="radar_mode">Mode: %s</string>
+    <string name="radar_string_no">No</string>
+    <string name="radar_string_yes">Yes</string>
+    <string name="radar_visible">Visible</string>
     <!-- Map screen -->
-    <string name="map_prev">上一个</string>
-    <string name="map_next">下一个</string>
-    <string name="map_azimuth">方位角：%.1f°</string>
-    <string name="map_elevation">仰角：%.1f°</string>
-    <string name="map_altitude">高度：%.0f km</string>
-    <string name="map_distance">距离：%.0f km</string>
-    <string name="map_latitude">纬度：%.1f°</string>
-    <string name="map_longitude">经度：%.1f°</string>
-    <string name="map_phase">相位：%.1f°</string>
-    <string name="map_eclipsed">地影中</string>
-    <string name="map_period">周期：% .0f min</string>
-    <string name="map_velocity">速度：%.2f km/s</string>
-    <string name="map_visibility">能见度：%s</string>
-    <string name="map_visible">日照中</string>
-
+    <string name="map_prev">Prev</string>
+    <string name="map_next">Next</string>
+    <string name="map_azimuth">Azimuth: %.1f°</string>
+    <string name="map_elevation">Elevation: %.1f°</string>
+    <string name="map_altitude">Altitude: %.0f km</string>
+    <string name="map_distance">Distance: %.0f km</string>
+    <string name="map_latitude">Latitude: %.1f°</string>
+    <string name="map_longitude">Longitude: %.1f°</string>
+    <string name="map_phase">Phase: %.1f°</string>
+    <string name="map_eclipsed">Eclipsed</string>
+    <string name="map_period">Period: %.0f min</string>
+    <string name="map_velocity">Velocity: %.2f km/s</string>
+    <string name="map_visibility">Visibility: %s</string>
+    <string name="map_visible">Visible</string>
     <!-- Settings screen -->
-    <string name="prefs_donate_title">支持</string>
-    <string name="prefs_privacy_title">隐私政策</string>
-
-    <string name="prefs_updated_title">更新：%s</string>
-    <string name="prefs_updated_time">yyyy MMM d - HH:mm:ss</string>
-
-    <string name="prefs_loc_title">站位</string>
-    <string name="prefs_loc_gps_title">GPS 定位</string>
-    <string name="prefs_loc_gps_error">检查您的位置权限</string>
-    <string name="prefs_loc_input_title">输入位置</string>
-    <string name="prefs_loc_input_error">输入的位置无效</string>
-    <string name="prefs_loc_qth_title">QTH 网格</string>
-    <string name="prefs_loc_qth_error">无效的 QTH 网格</string>
-    <string name="prefs_loc_success">位置更新成功</string>
-    <string name="prefs_station_title">站位设置</string>
-    <string name="prefs_station_lat_text">输入站位的纬度</string>
-    <string name="prefs_station_lon_text">输入站位的经度</string>
-    <string name="prefs_locator_title">QTH 网格</string>
-    <string name="prefs_locator_text">使用梅登黑德网格设置站位</string>
-
-    <string name="prefs_data_title">卫星数据更新</string>
-    <string name="prefs_data_entries">卫星：%s</string>
-    <string name="prefs_data_radios">收发器：%s</string>
-    <string name="prefs_data_update">在线更新</string>
-    <string name="prefs_data_import">导入文件</string>
-    <string name="prefs_data_clear">清空</string>
-    <string name="prefs_data_clear_success">数据清空成功</string>
-    <string name="prefs_data_update_success">更新成功</string>
-
-    <string name="prefs_data_sources_title">自定义数据源</string>
-    <string name="prefs_data_sources_tle_switch">自定义TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">自定义收发器URL</string>
-
-    <string name="prefs_data_output_title">数据输出</string>
-    <string name="prefs_net_output">网络</string>
-    <string name="prefs_bt_output">蓝牙</string>
-
-    <string name="prefs_net_title">网络数据输出</string>
-    <string name="prefs_net_rotator_switch">启用方位俯仰角输出</string>
-    <string name="prefs_net_rotator_address_hint">IP:端口</string>
-    <string name="prefs_net_rotator_format_hint">数据格式</string>
-    <string name="prefs_net_frequency_switch">启用多普勒频率输出</string>
-    <string name="prefs_net_frequency_address_hint">IP:端口</string>
-    <string name="prefs_net_frequency_format_hint">数据格式</string>
-
-    <string name="prefs_bt_title">蓝牙数据输出</string>
-    <string name="prefs_bt_rotator_switch">启用方位俯仰角输出</string>
-    <string name="prefs_bt_rotator_device_hint">蓝牙设备 ID</string>
-    <string name="prefs_bt_rotator_output_hint">数据格式</string>
-    <string name="prefs_bt_frequency_switch">启用多普勒频率输出</string>
-    <string name="prefs_bt_frequency_device_hint">蓝牙设备 ID</string>
-    <string name="prefs_bt_frequency_output_hint">数据格式</string>
-    <string name="prefs_bt_perm_error">请检查蓝牙权限</string>
-
-    <string name="prefs_other_title">其他设置</string>
-    <string name="prefs_other_switch_utc">以 UTC 时间显示</string>
-    <string name="prefs_other_switch_update">启用卫星数据自动更新</string>
-    <string name="prefs_other_switch_sweep">启用雷达扫描动画</string>
-    <string name="prefs_other_switch_sensors">使用传感器旋转雷达视图</string>
-
-    <string name="prefs_outro_title">我要感谢：</string>
-    <string name="prefs_outro_license">该应用程序不提供任何保修.</string>
-
+    <string name="prefs_donate_title">Donate</string>
+    <string name="prefs_privacy_title">Privacy Policy</string>
+    <string name="prefs_updated_title">Updated: %s</string>
+    <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
+    <string name="prefs_loc_title">Station position</string>
+    <string name="prefs_loc_gps_title">GPS</string>
+    <string name="prefs_loc_gps_error">Check your location permissions</string>
+    <string name="prefs_loc_input_title">Input</string>
+    <string name="prefs_loc_input_error">Invalid location entered</string>
+    <string name="prefs_loc_qth_title">QTH</string>
+    <string name="prefs_loc_qth_error">Invalid QTH locator</string>
+    <string name="prefs_loc_success">Position updated successfully</string>
+    <string name="prefs_station_title">Station position settings</string>
+    <string name="prefs_station_lat_text">Set your ground station\'s latitude</string>
+    <string name="prefs_station_lon_text">Set your ground station\'s longitude</string>
+    <string name="prefs_locator_title">QTH locator settings</string>
+    <string name="prefs_locator_text">Set station\'s position using locator</string>
+    <string name="prefs_data_title">Satellite data</string>
+    <string name="prefs_data_entries">Satellites: %s</string>
+    <string name="prefs_data_radios">Transceivers: %s</string>
+    <string name="prefs_data_update">Update</string>
+    <string name="prefs_data_import">Import</string>
+    <string name="prefs_data_clear">Clear</string>
+    <string name="prefs_data_clear_success">Data was cleared successfully</string>
+    <string name="prefs_data_update_success">Update completed successfully</string>
+    <string name="prefs_data_sources_title">Custom data sources</string>
+    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
+    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
+    <string name="prefs_data_output_title">Data output</string>
+    <string name="prefs_net_output">Network</string>
+    <string name="prefs_bt_output">Bluetooth</string>
+    <string name="prefs_cat_output">CAT</string>
+    <!-- Radio Control -->
+    <string name="nav_radiocontrol">Radio Control</string>
+    <string name="rc_settings_title">CAT Radio Control</string>
+    <string name="rc_radio_model">Radio Model</string>
+    <string name="rc_tx_device_hint">TX Radio BT Address</string>
+    <string name="rc_rx_device_hint">RX Radio BT Address</string>
+    <string name="rc_tx_name_hint">TX Radio Name</string>
+    <string name="rc_rx_name_hint">RX Radio Name</string>
+    <string name="rc_enable_switch">Enable CAT Control</string>
+    <string name="prefs_net_title">Network data output</string>
+    <string name="prefs_net_rotator_switch">Enable rotation output</string>
+    <string name="prefs_net_rotator_address_hint">IP:Port</string>
+    <string name="prefs_net_rotator_format_hint">Format</string>
+    <string name="prefs_net_frequency_switch">Enable frequency output</string>
+    <string name="prefs_net_frequency_address_hint">IP:Port</string>
+    <string name="prefs_net_frequency_format_hint">Format</string>
+    <string name="prefs_bt_title">Bluetooth data output</string>
+    <string name="prefs_bt_rotator_switch">Enable rotation output</string>
+    <string name="prefs_bt_rotator_device_hint">Device id</string>
+    <string name="prefs_bt_rotator_output_hint">Data format</string>
+    <string name="prefs_bt_frequency_switch">Enable frequency output</string>
+    <string name="prefs_bt_frequency_device_hint">Device id</string>
+    <string name="prefs_bt_frequency_output_hint">Data format</string>
+    <string name="prefs_bt_perm_error">Check your bluetooth permission</string>
+    <string name="prefs_other_title">Other settings</string>
+    <string name="prefs_other_switch_utc">Show pass time in UTC</string>
+    <string name="prefs_other_switch_update">Enable automatic data update</string>
+    <string name="prefs_other_switch_sweep">Enable radar sweep animation</string>
+    <string name="prefs_other_switch_sensors">Use sensors to rotate radar view</string>
+    <string name="prefs_outro_title">I would like to say thanks to</string>
+    <string name="prefs_outro_license">The app comes with no warranty</string>
 </resources>
