@@ -1,145 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Commmon -->
-    <string name="btn_accept">Прийняти</string>
-    <string name="btn_cancel">Скасувати</string>
-    <string name="empty_list_message">Немає даних для відображення</string>
-
+    <string name="btn_accept">Accept</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="empty_list_message">No data to show</string>
     <!-- Navigation -->
-    <string name="nav_sat">Супутники</string>
-    <string name="nav_pass">Прольоти</string>
-    <string name="nav_radar">Радар</string>
-    <string name="nav_map">Карта</string>
-    <string name="nav_prefs">Налаштування</string>
-
+    <string name="nav_sat">Satellites</string>
+    <string name="nav_pass">Passes</string>
+    <string name="nav_radar">Radar</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_prefs">Settings</string>
     <!-- Satellites screen -->
-    <string name="sat_type_hint">Тип: %s</string>
-    <string name="sat_type_title">Виберіть тип супутника</string>
-    <string name="sat_search_hint">Id - Назва</string>
-    <string name="sat_search_clear">Очистити</string>
-    <string name="sat_clear_all">Очистити всі</string>
-    <string name="sat_select_all">Вибрати всі</string>
-    <string name="sat_empty_list_message">
-        Переконайтеся, що ваш пошуковий запит правильний, а база даних оновлена</string>
-    <string name="sat_warning_title">Увага\!</string>
-    <string name="sat_warning_message">
-        У цьому додатку перелічено понад 9000 супутників.
-        Немає сенсу відстежувати їх усі одночасно.
-        \n\nЗавжди намагайтеся звузити список лише до тих,
-        які вас цікавлять, за допомогою пошуку та селектора типів.</string>
-
+    <string name="sat_type_hint">Type: %s</string>
+    <string name="sat_type_title">Select satellite type</string>
+    <string name="sat_search_hint">Id - Name</string>
+    <string name="sat_search_clear">Clear</string>
+    <string name="sat_clear_all">Clear all</string>
+    <string name="sat_select_all">Select all</string>
+    <string name="sat_empty_list_message">"Make sure your search query is correct and the DB is updated"</string>
+    <string name="sat_warning_title">Warning\!</string>
+    <string name="sat_warning_message">        There are over 9000 satellites listed in this app.
+        It makes no sense to track them all at the same time.
+        \n\nAlways try to narrow down the list to only the ones
+        you\'re interested in via search and types selector.</string>
     <!-- Passes screen -->
-    <string name="pass_filter_title">Фільтр прольотів</string>
-    <string name="pass_filter_elev">Мінімальне піднесення</string>
-    <string name="pass_filter_hours">Кількість годин</string>
-    <string name="pass_modes_title">Виберіть тип модуляції</string>
-    <string name="pass_elevation">Піднес.: %.1f°</string>
-    <string name="pass_altitude">Висота: %.0f км</string>
-    <string name="pass_empty_list_message">
-        Переконайтеся, що ваші фільтри правильні, і ви вибрали супутники</string>
-    <string name="pass_error_message">Немає майбутніх прольотів супутників</string>
-    <string name="pass_welcome_title">Ласкаво просимо до Look4Sat\!</string>
-    <string name="pass_welcome_message">
-        Обов’язково встановіть своє місцезнаходження за допомогою GPS, широти/довготи або QTH у налаштуваннях.
-        \n\nБудь ласка, оновлюйте базу даних принаймні раз на тиждень, щоб отримувати точні прогнози.</string>
-
+    <string name="pass_filter_title">Filter passes</string>
+    <string name="pass_filter_elev">Minimal elevation</string>
+    <string name="pass_filter_hours">Hours ahead</string>
+    <string name="pass_modes_title">Select modulation type</string>
+    <string name="pass_elevation">Elevation: %.1f°</string>
+    <string name="pass_altitude">Altitude: %d km</string>
+    <string name="pass_empty_list_message">        Make sure your filters are correct and you have selected satellites</string>
+    <string name="pass_error_message">There are no upcoming satellite passes to display</string>
+    <string name="pass_welcome_title">Welcome to Look4Sat\!</string>
+    <string name="pass_welcome_message">        Make sure to set your position via GPS, Lat/Lon or QTH in Settings.
+        \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <!-- Radar screen -->
-    <string name="radar_back">Назад</string>
-    <string name="radar_notify">Сповістити</string>
-    <string name="radar_az_text">Азимут</string>
-    <string name="radar_el_text">Піднес.</string>
-    <string name="radar_alt_text">Висота</string>
-    <string name="radar_dist_text">Відстань</string>
-    <string name="radar_eclipsed">В тіні</string>
-    <string name="radar_downlink">Низхідний канал</string>
-    <string name="radar_uplink">Вихідний канал</string>
-    <string name="radar_no_data">Цей супутник не має трансиверів</string>
-    <string name="radar_add">Додати</string>
-    <string name="radar_data">Супутникові трансивери:</string>
-    <string name="radar_inverted">Інверсія: %s</string>
-    <string name="radar_mode">Модуляція: %s</string>
-    <string name="radar_string_no">Ні</string>
-    <string name="radar_string_yes">Так</string>
-    <string name="radar_visible">Видимий</string>
-
+    <string name="radar_back">Back</string>
+    <string name="radar_notify">Notify</string>
+    <string name="radar_az_text">Azimuth</string>
+    <string name="radar_el_text">Elevation</string>
+    <string name="radar_alt_text">Altitude</string>
+    <string name="radar_dist_text">Distance</string>
+    <string name="radar_eclipsed">Eclipsed</string>
+    <string name="radar_downlink">Downlink</string>
+    <string name="radar_uplink">Uplink</string>
+    <string name="radar_no_data">This satellite has no transceivers</string>
+    <string name="radar_add">Add</string>
+    <string name="radar_data">Satellite transceivers:</string>
+    <string name="radar_inverted">Inverted: %s</string>
+    <string name="radar_mode">Mode: %s</string>
+    <string name="radar_string_no">No</string>
+    <string name="radar_string_yes">Yes</string>
+    <string name="radar_visible">Visible</string>
     <!-- Map screen -->
-    <string name="map_prev">Попередній</string>
-    <string name="map_next">Наступний</string>
-    <string name="map_azimuth">Азимут: %.1f°</string>
-    <string name="map_elevation">Піднесення: %.1f°</string>
-    <string name="map_altitude">Висота: %.0f км</string>
-    <string name="map_distance">Дистанція: %.0f км</string>
-    <string name="map_latitude">Широта: %.1f°</string>
-    <string name="map_longitude">Довгота: %.1f°</string>
-    <string name="map_phase">Фаза: %.1f°</string>
-    <string name="map_eclipsed">В тіні</string>
-    <string name="map_period">Період: %.0f хв</string>
-    <string name="map_velocity">Швидкість: %.2f км/с</string>
-    <string name="map_visibility">Видимість: %s</string>
-    <string name="map_visible">Видимий</string>
-
+    <string name="map_prev">Prev</string>
+    <string name="map_next">Next</string>
+    <string name="map_azimuth">Azimuth: %.1f°</string>
+    <string name="map_elevation">Elevation: %.1f°</string>
+    <string name="map_altitude">Altitude: %.0f km</string>
+    <string name="map_distance">Distance: %.0f km</string>
+    <string name="map_latitude">Latitude: %.1f°</string>
+    <string name="map_longitude">Longitude: %.1f°</string>
+    <string name="map_phase">Phase: %.1f°</string>
+    <string name="map_eclipsed">Eclipsed</string>
+    <string name="map_period">Period: %.0f min</string>
+    <string name="map_velocity">Velocity: %.2f km/s</string>
+    <string name="map_visibility">Visibility: %s</string>
+    <string name="map_visible">Visible</string>
     <!-- Settings screen -->
-    <string name="prefs_donate_title">Підтримати</string>
-    <string name="prefs_privacy_title">Політика конфіденційності</string>
-
-    <string name="prefs_updated_title">Оновлено: %s</string>
+    <string name="prefs_donate_title">Donate</string>
+    <string name="prefs_privacy_title">Privacy Policy</string>
+    <string name="prefs_updated_title">Updated: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
-
-    <string name="prefs_loc_title">Місцезнаходження</string>
+    <string name="prefs_loc_title">Station position</string>
     <string name="prefs_loc_gps_title">GPS</string>
-    <string name="prefs_loc_gps_error">Перевірте дозвіл на використання геолокацї</string>
-    <string name="prefs_loc_input_title">Ввести</string>
-    <string name="prefs_loc_input_error">Введено некоректну локацію</string>
+    <string name="prefs_loc_gps_error">Check your location permissions</string>
+    <string name="prefs_loc_input_title">Input</string>
+    <string name="prefs_loc_input_error">Invalid location entered</string>
     <string name="prefs_loc_qth_title">QTH</string>
-    <string name="prefs_loc_qth_error">Некоректний локатор QTH</string>
-    <string name="prefs_loc_success">Позицію успішно оновлено</string>
-    <string name="prefs_station_title">Налаштування місцезнаходження станції</string>
-    <string name="prefs_station_lat_text">Широта місцезнаходження станції</string>
-    <string name="prefs_station_lon_text">Довгота місцезнаходження станції</string>
-    <string name="prefs_locator_title">Налаштування QTH локатора</string>
-    <string name="prefs_locator_text">Задати позицію за QTH локатором</string>
-
-    <string name="prefs_data_title">Супутникові дані</string>
-    <string name="prefs_data_entries">Супутників: %s</string>
-    <string name="prefs_data_radios">Трансиверів: %s</string>
-    <string name="prefs_data_update">Оновити</string>
-    <string name="prefs_data_import">Імпорт</string>
-    <string name="prefs_data_clear">Очистити</string>
-    <string name="prefs_data_clear_success">Дані успішно очищено</string>
-    <string name="prefs_data_update_success">Оновлення успішне</string>
-
+    <string name="prefs_loc_qth_error">Invalid QTH locator</string>
+    <string name="prefs_loc_success">Position updated successfully</string>
+    <string name="prefs_station_title">Station position settings</string>
+    <string name="prefs_station_lat_text">Set your ground station\'s latitude</string>
+    <string name="prefs_station_lon_text">Set your ground station\'s longitude</string>
+    <string name="prefs_locator_title">QTH locator settings</string>
+    <string name="prefs_locator_text">Set station\'s position using locator</string>
+    <string name="prefs_data_title">Satellite data</string>
+    <string name="prefs_data_entries">Satellites: %s</string>
+    <string name="prefs_data_radios">Transceivers: %s</string>
+    <string name="prefs_data_update">Update</string>
+    <string name="prefs_data_import">Import</string>
+    <string name="prefs_data_clear">Clear</string>
+    <string name="prefs_data_clear_success">Data was cleared successfully</string>
+    <string name="prefs_data_update_success">Update completed successfully</string>
     <string name="prefs_data_sources_title">Custom data sources</string>
     <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
-
     <string name="prefs_data_output_title">Data output</string>
     <string name="prefs_net_output">Network</string>
     <string name="prefs_bt_output">Bluetooth</string>
-
-    <string name="prefs_net_title">Вивід мережевих даних</string>
+    <string name="prefs_cat_output">CAT</string>
+    <!-- Radio Control -->
+    <string name="nav_radiocontrol">Radio Control</string>
+    <string name="rc_settings_title">CAT Radio Control</string>
+    <string name="rc_radio_model">Radio Model</string>
+    <string name="rc_tx_device_hint">TX Radio BT Address</string>
+    <string name="rc_rx_device_hint">RX Radio BT Address</string>
+    <string name="rc_tx_name_hint">TX Radio Name</string>
+    <string name="rc_rx_name_hint">RX Radio Name</string>
+    <string name="rc_enable_switch">Enable CAT Control</string>
+    <string name="prefs_net_title">Network data output</string>
     <string name="prefs_net_rotator_switch">Enable rotation output</string>
-    <string name="prefs_net_rotator_address_hint">IP:Порт</string>
-    <string name="prefs_net_rotator_format_hint">Формат даних</string>
+    <string name="prefs_net_rotator_address_hint">IP:Port</string>
+    <string name="prefs_net_rotator_format_hint">Format</string>
     <string name="prefs_net_frequency_switch">Enable frequency output</string>
-    <string name="prefs_net_frequency_address_hint">IP:Порт</string>
-    <string name="prefs_net_frequency_format_hint">Формат даних</string>
-
-    <string name="prefs_bt_title">Вивід даних Bluetooth</string>
+    <string name="prefs_net_frequency_address_hint">IP:Port</string>
+    <string name="prefs_net_frequency_format_hint">Format</string>
+    <string name="prefs_bt_title">Bluetooth data output</string>
     <string name="prefs_bt_rotator_switch">Enable rotation output</string>
-    <string name="prefs_bt_rotator_device_hint">Id пристрою</string>
-    <string name="prefs_bt_rotator_output_hint">Формат даних</string>
+    <string name="prefs_bt_rotator_device_hint">Device id</string>
+    <string name="prefs_bt_rotator_output_hint">Data format</string>
     <string name="prefs_bt_frequency_switch">Enable frequency output</string>
-    <string name="prefs_bt_frequency_device_hint">Id пристрою</string>
-    <string name="prefs_bt_frequency_output_hint">Формат даних</string>
-    <string name="prefs_bt_perm_error">Перевірте дозвіл Bluetooth</string>
-
-    <string name="prefs_other_title">Інші налаштування</string>
-    <string name="prefs_other_switch_utc">Показувати час в UTC</string>
-    <string name="prefs_other_switch_update">Автоматичне оновлення даних</string>
-    <string name="prefs_other_switch_sweep">Показувати анімацію радара</string>
-    <string name="prefs_other_switch_sensors">Використовувати сенсори пристрою</string>
-
-    <string name="prefs_outro_title">Я хотів би подякувати:</string>
-    <string name="prefs_outro_license">Ця програма поставляється без жодних гарантій</string>
-
+    <string name="prefs_bt_frequency_device_hint">Device id</string>
+    <string name="prefs_bt_frequency_output_hint">Data format</string>
+    <string name="prefs_bt_perm_error">Check your bluetooth permission</string>
+    <string name="prefs_other_title">Other settings</string>
+    <string name="prefs_other_switch_utc">Show pass time in UTC</string>
+    <string name="prefs_other_switch_update">Enable automatic data update</string>
+    <string name="prefs_other_switch_sweep">Enable radar sweep animation</string>
+    <string name="prefs_other_switch_sensors">Use sensors to rotate radar view</string>
+    <string name="prefs_outro_title">I would like to say thanks to</string>
+    <string name="prefs_outro_license">The app comes with no warranty</string>
 </resources>
