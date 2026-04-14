@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Commmon -->
+    <string name="app_name" translatable="false">Look4Sat</string>
+    <string name="btn_accept">Kabul et</string>
+    <string name="btn_cancel">İptal</string>
+    <string name="empty_list_message">Gösterilecek veri bulunamadı</string>
+
+    <!-- Navigation -->
+    <string name="nav_sat">Uydular</string>
+    <string name="nav_pass">Geçişler</string>
+    <string name="nav_radar">Radar</string>
+    <string name="nav_map">Harita</string>
+    <string name="nav_prefs">Ayarlar</string>
+
+    <!-- Satellites screen -->
+    <string name="sat_type_hint">Uydu türü: %s</string>
+    <string name="sat_type_title">Uydu türü seçin</string>
+    <string name="sat_search_hint">Id - Ad</string>
+    <string name="sat_search_clear">Temizle</string>
+    <string name="sat_clear_all">Tümünü temizle</string>
+    <string name="sat_select_all">Tümünü seç</string>
+    <string name="sat_empty_list_message">"Arama sorgunuzun doğru olduğundan ve veritabanının güncellendiğinden emin olun"</string>
+    <string name="sat_warning_title">Uyarı\!</string>
+    <string name="sat_warning_message">
+        Bu uygulamada 9000\'den fazla uydu listelenmiştir.
+        Hepsini aynı anda takip etmek anlamsızdır.
+        \n\nListeyi yalnızca ilgilendiğiniz uydularla
+        daraltmak için arama ve tür seçiciyi kullanın.</string>
+
+    <!-- Passes screen -->
+    <string name="pass_filter_title">Geçişleri filtrele</string>
+    <string name="pass_filter_elev">Minimum yükseklik açısı</string>
+    <string name="pass_filter_hours">İlerideki saatler</string>
+    <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
+    <string name="pass_modes_title">Modulasyon türü seçin</string>
+    <string name="pass_satId" translatable="false">%05d</string>
+    <string name="pass_elevation">Yükseklik açısı: %.1f°</string>
+    <string name="pass_deep_space" translatable="false">DeepSpace</string>
+    <string name="pass_altitude">İrtifa: %d km</string>
+    <string name="pass_aosLos" translatable="false">%03d° - %03d°</string>
+    <string name="pass_empty_list_message">
+        Filtrelerinizin doğru olduğundan ve uydu seçtiğinizden emin olun</string>
+    <string name="pass_error_message">Gösterilecek yaklaşan uydu geçişi bulunmuyor</string>
+    <string name="pass_welcome_title">Look4Sat\'a hoş geldiniz\!</string>
+    <string name="pass_welcome_message">
+        Ayarlar\'dan GPS, Enlem/Boylam veya QTH kullanarak konumunuzu belirlediğinizden emin olun.
+        \n\nDoğru tahminler alabilmek için veritabanını en az haftada bir güncelleyin.</string>
+    <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
+    <string name="pass_whatsnew_message" translatable="false">
+        * Switched to short-form commands in NetworkReporter, by theojalba
+        \n* Added CAT radio control for full-duplex SAT operation, by jcmerg
+        \n* Added normalized time for passes AOS/LOS, fixed refresh state bug
+        \n* Added multiple performance tweaks, improved passes calculation
+        \n* Fixed UTC pass time problem mentioned in issue #201
+    </string>
+
+    <!-- Radar screen -->
+    <string name="radar_back">Geri</string>
+    <string name="radar_notify">Bildir</string>
+    <string name="radar_az_text">Azimut</string>
+    <string name="radar_az_value" translatable="false">%.1f°</string>
+    <string name="radar_el_text">Yükseklik açısı</string>
+    <string name="radar_el_value" translatable="false">%.1f°</string>
+    <string name="radar_alt_text">İrtifa</string>
+    <string name="radar_alt_value" translatable="false">%.0f km</string>
+    <string name="radar_dist_text">Mesafe</string>
+    <string name="radar_dist_value" translatable="false">%.0f km</string>
+    <string name="radar_eclipsed">Tutulumda</string>
+    <string name="radar_downlink">Downlink</string>
+    <string name="radar_uplink">Uplink</string>
+    <string name="radar_link_low" translatable="false">%.4f</string>
+    <string name="radar_link_lowHigh" translatable="false">%.4f - %.4f</string>
+    <string name="radar_no_link" translatable="false">- - . - -</string>
+    <string name="radar_no_data">Bu uyduda transceiver bulunmuyor</string>
+    <string name="radar_add">Ekle</string>
+    <string name="radar_data">Uydu transceiver\'ları:</string>
+    <string name="radar_inverted">Ters çevrilmiş: %s</string>
+    <string name="radar_mode">Modülasyon: %s</string>
+    <string name="radar_string_no">Hayır</string>
+    <string name="radar_string_yes">Evet</string>
+    <string name="radar_visible">Görünür</string>
+
+    <!-- Map screen -->
+    <string name="map_prev">Önceki</string>
+    <string name="map_next">Sonraki</string>
+    <string name="map_copyright" translatable="false">© OpenStreetMap contributors</string>
+    <string name="map_azimuth">Azimut: %.1f°</string>
+    <string name="map_elevation">Yükseklik açısı: %.1f°</string>
+    <string name="map_altitude">İrtifa: %.0f km</string>
+    <string name="map_distance">Mesafe: %.0f km</string>
+    <string name="map_latitude">Enlem: %.1f°</string>
+    <string name="map_longitude">Boylam: %.1f°</string>
+    <string name="map_qth" translatable="false">QTH: %s</string>
+    <string name="map_phase">Faz: %.1f°</string>
+    <string name="map_eclipsed">Tutulumda</string>
+    <string name="map_period">Periyot: %.0f dk</string>
+    <string name="map_velocity">Hız: %.2f km/s</string>
+    <string name="map_visibility">Görünürlük: %s</string>
+    <string name="map_visible">Görünür</string>
+
+    <!-- Settings screen -->
+    <string name="prefs_app_title" translatable="false">Look4Sat v%s</string>
+    <string name="prefs_app_url" translatable="false">https://play.google.com/store/apps/details?id=com.rtbishop.look4sat</string>
+    <string name="prefs_donate_title">Bağış yap</string>
+    <string name="prefs_donate_url" translatable="false">https://ko-fi.com/rt_bishop</string>
+    <string name="prefs_fdroid_title" translatable="false">F-Droid</string>
+    <string name="prefs_fdroid_url" translatable="false">https://f-droid.org/en/packages/com.rtbishop.look4sat/</string>
+    <string name="prefs_github_title" translatable="false">GitHub</string>
+    <string name="prefs_github_url" translatable="false">https://github.com/rt-bishop/Look4Sat/</string>
+    <string name="prefs_license_title" translatable="false">GPLv3</string>
+    <string name="prefs_license_url" translatable="false">https://www.gnu.org/licenses/gpl-3.0.html</string>
+    <string name="prefs_privacy_title">Gizlilik Politikası</string>
+    <string name="prefs_privacy_url" translatable="false">https://sites.google.com/view/look4sat-privacy-policy/home</string>
+
+    <string name="prefs_updated_title">Güncellendi: %s</string>
+    <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
+
+    <string name="prefs_loc_title">İstasyon konumu</string>
+    <string name="prefs_loc_gps_title">GPS</string>
+    <string name="prefs_loc_gps_error">Konum izinlerinizi kontrol edin</string>
+    <string name="prefs_loc_input_title">Manuel giriş</string>
+    <string name="prefs_loc_input_error">Geçersiz konum girildi</string>
+    <string name="prefs_loc_qth_title">QTH</string>
+    <string name="prefs_loc_qth_error">Geçersiz QTH konumlandırıcısı</string>
+    <string name="prefs_loc_success">Konum başarıyla güncellendi</string>
+    <string name="prefs_station_title">İstasyon konumu ayarları</string>
+    <string name="prefs_station_lat_text">Yer istasyonunuzun enlemini girin</string>
+    <string name="prefs_station_lon_text">Yer istasyonunuzun boylamını girin</string>
+    <string name="prefs_locator_title">QTH konumlandırıcı ayarları</string>
+    <string name="prefs_locator_text">İstasyon konumunu konumlandırıcı ile ayarlayın</string>
+
+    <string name="prefs_data_title">Uydu verisi</string>
+    <string name="prefs_data_entries">Uydular: %s</string>
+    <string name="prefs_data_radios">Transceiver\'lar: %s</string>
+    <string name="prefs_data_update">Güncelle</string>
+    <string name="prefs_data_import">İçe aktar</string>
+    <string name="prefs_data_clear">Temizle</string>
+    <string name="prefs_data_clear_success">Veriler başarıyla temizlendi</string>
+    <string name="prefs_data_update_success">Güncelleme başarıyla tamamlandı</string>
+
+    <string name="prefs_data_sources_title">Özel veri kaynakları</string>
+    <string name="prefs_data_sources_tle_switch">Özel TLE URL</string>
+    <string name="prefs_data_sources_transceivers_switch">Özel transceiver URL</string>
+    <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
+
+    <string name="prefs_data_output_title">Veri aktarımı</string>
+    <string name="prefs_net_output">Ağ</string>
+    <string name="prefs_bt_output">Bluetooth</string>
+    <string name="prefs_cat_output">CAT</string>
+
+    <!-- Radio Control -->
+    <string name="nav_radiocontrol">Radyo Kontrolü</string>
+    <string name="rc_settings_title">CAT Radyo Kontrolü</string>
+    <string name="rc_radio_model">Radyo Modeli</string>
+    <string name="rc_tx_device_hint">TX Radyo BT Adresi</string>
+    <string name="rc_rx_device_hint">RX Radyo BT Adresi</string>
+    <string name="rc_tx_name_hint">TX Radyo Adı</string>
+    <string name="rc_rx_name_hint">RX Radyo Adı</string>
+    <string name="rc_enable_switch">CAT Kontrolünü Etkinleştir</string>
+
+    <string name="prefs_net_title">Ağ veri çıkışı</string>
+    <string name="prefs_net_rotator_switch">Döndürme çıkışını etkinleştir</string>
+    <string name="prefs_net_rotator_address_hint">IP:Port</string>
+    <string name="prefs_net_rotator_format_hint">Biçim</string>
+    <string name="prefs_net_frequency_switch">Frekans çıkışını etkinleştir</string>
+    <string name="prefs_net_frequency_address_hint">IP:Port</string>
+    <string name="prefs_net_frequency_format_hint">Biçim</string>
+
+    <string name="prefs_bt_title">Bluetooth veri çıkışı</string>
+    <string name="prefs_bt_rotator_switch">Döndürme çıkışını etkinleştir</string>
+    <string name="prefs_bt_rotator_device_hint">Cihaz kimliği</string>
+    <string name="prefs_bt_rotator_output_hint">Veri biçimi</string>
+    <string name="prefs_bt_frequency_switch">Frekans çıkışını etkinleştir</string>
+    <string name="prefs_bt_frequency_device_hint">Cihaz kimliği</string>
+    <string name="prefs_bt_frequency_output_hint">Veri biçimi</string>
+    <string name="prefs_bt_perm_error">Bluetooth izninizi kontrol edin</string>
+
+    <string name="prefs_other_title">Diğer ayarlar</string>
+    <string name="prefs_other_switch_utc">Geçiş saatini UTC olarak göster</string>
+    <string name="prefs_other_switch_update">Otomatik veri güncellemeyi etkinleştir</string>
+    <string name="prefs_other_switch_sweep">Radar taramasını etkinleştir</string>
+    <string name="prefs_other_switch_sensors">Radar görünümünü döndürmek için sensörleri kullan</string>
+
+    <string name="prefs_outro_title">Teşekkür etmek istiyorum</string>
+    <string name="prefs_outro_thanks" translatable="false">
+        • Look4Sat users and contributors!
+        \n• David A. B. Johnson (predict4java)
+        \n• Dave Moten (predict4java)
+        \n• Alexandru Csete (Gpredict)
+        \n• Dr T.S. Kelso (Celestrak)
+        \n• Libre Space Foundation (SatNOGS)</string>
+    <string name="prefs_outro_license">Bu uygulama herhangi bir garanti sunmaz</string>
+
+</resources>
