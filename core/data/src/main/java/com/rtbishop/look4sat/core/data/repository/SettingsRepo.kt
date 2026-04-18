@@ -51,6 +51,7 @@ class SettingsRepo(
     private val keyBluetoothFrequencyState = "bluetoothFrequencyState"
     private val keyBluetoothFrequencyAddress = "bluetoothFrequencyAddress"
     private val keyBluetoothFrequencyFormat = "bluetoothFrequencyFormat"
+    private val keyFilterShowDeepSpace = "filterShowDeepSpace"
     private val keyFilterHoursAhead = "filterHoursAhead"
     private val keyFilterMinElevation = "filterMinElevation"
     private val keyNumberOfRadios = "numberOfRadios"
@@ -121,6 +122,7 @@ class SettingsRepo(
     override val passesSettings: StateFlow<PassesSettings> = _passesSettings
 
     override fun setPassesSettings(settings: PassesSettings) = preferences.edit {
+        putBoolean(keyFilterShowDeepSpace, settings.showDeepSpace)
         putInt(keyFilterHoursAhead, settings.hoursAhead)
         putLong(keyFilterMinElevation, settings.minElevation.toRawBits())
         putString(keySelectedModes, settings.selectedModes.joinToString(separatorComma))
@@ -128,11 +130,12 @@ class SettingsRepo(
     }
 
     private fun getPassesSettings(): PassesSettings {
+        val showDeepSpace = preferences.getBoolean(keyFilterShowDeepSpace, true)
         val hoursAhead = preferences.getInt(keyFilterHoursAhead, 24)
         val minElevation = Double.fromBits(preferences.getLong(keyFilterMinElevation, 16.0.toRawBits()))
         val selectedModesString = preferences.getString(keySelectedModes, null)
         val selectedModes = selectedModesString?.split(separatorComma)?.sorted() ?: emptyList()
-        return PassesSettings(hoursAhead, minElevation, selectedModes)
+        return PassesSettings(showDeepSpace, hoursAhead, minElevation, selectedModes)
     }
     //endregion
 

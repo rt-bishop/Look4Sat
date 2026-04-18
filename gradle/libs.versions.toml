@@ -3,7 +3,7 @@
 appVersionCode = "420"
 #noinspection UnusedVersionCatalogEntry
 appVersionName = "4.2.0"
-#noinspection UnusedVersionCatalogEntry
+#noinspection GradleDependency,UnusedVersionCatalogEntry
 compileSdk = "36"
 #noinspection UnusedVersionCatalogEntry
 minSdk = "24"
@@ -12,7 +12,7 @@ jdkVersion = "17"
 #noinspection UnusedVersionCatalogEntry
 packageName = "com.rtbishop.look4sat"
 
-android-gradle-plugin = "9.1.0"
+android-gradle-plugin = "9.1.1"
 google-ksp = "2.3.6"
 kotlin = "2.3.20"
 

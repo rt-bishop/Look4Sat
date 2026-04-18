@@ -24,6 +24,7 @@ data class DatabaseState(
 )
 
 data class PassesSettings(
+    val showDeepSpace: Boolean = true,
     val hoursAhead: Int,
     val minElevation: Double,
     val selectedModes: List<String>
