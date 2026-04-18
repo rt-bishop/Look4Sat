@@ -32,6 +32,7 @@
     <string name="pass_filter_title">Filter passes</string>
     <string name="pass_filter_elev">Minimal elevation</string>
     <string name="pass_filter_hours">Hours ahead</string>
+    <string name="pass_filter_deep_space">DeepSpace (period >225min)</string>
     <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
     <string name="pass_modes_title">Select modulation type</string>
     <string name="pass_satId" translatable="false">%05d</string>

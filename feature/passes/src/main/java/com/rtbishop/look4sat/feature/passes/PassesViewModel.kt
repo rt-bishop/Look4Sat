@@ -34,7 +34,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -51,6 +50,7 @@ class PassesViewModel(
             nextPass = defaultPass,
             hours = settingsRepo.passesSettings.value.hoursAhead,
             elevation = settingsRepo.passesSettings.value.minElevation,
+            showDeepSpace = settingsRepo.passesSettings.value.showDeepSpace,
             modes = settingsRepo.passesSettings.value.selectedModes,
             shouldSeeWhatsNew = settingsRepo.otherSettings.value.shouldSeeWhatsNew
         )
@@ -58,29 +58,20 @@ class PassesViewModel(
     val uiState: StateFlow<PassesState> = _uiState
 
     init {
-        // Show refreshing indicator whenever the selected satellites list changes
+        // Refresh indicator: mirrors the repo's isCalculating state
         viewModelScope.launch {
-            settingsRepo.selectedIds.collectLatest { selectedIds ->
-                _uiState.update { it.copy(isRefreshing = true) }
-                if (selectedIds.isEmpty()) {
-                    // No satellites selected — show indicator briefly, then stop
-                    delay(1000)
-                    _uiState.update { it.copy(isRefreshing = false) }
-                }
-                // For non-empty selections, the passes collector below will clear isRefreshing
-            }
-        }
-        // Stop refreshing whenever new passes arrive (from initial load, selection change, or filter)
-        viewModelScope.launch {
-            satelliteRepo.passes.drop(1).collect { _ ->
-                _uiState.update { it.copy(isRefreshing = false) }
+            satelliteRepo.isCalculating.collect { calculating ->
+                _uiState.update { it.copy(isRefreshing = calculating) }
             }
         }
         // Local tick loop — computes pass progress and countdown timer every second
         viewModelScope.launch {
             while (isActive) {
                 val timeNow = System.currentTimeMillis()
-                val processed = computePassProgress(satelliteRepo.passes.value, timeNow)
+                val showDeepSpace = _uiState.value.showDeepSpace
+                val allPasses = satelliteRepo.passes.value
+                val filtered = if (showDeepSpace) allPasses else allPasses.filter { !it.isDeepSpace }
+                val processed = computePassProgress(filtered, timeNow)
                 val (nextPass, nextTime, isAos) = resolveNextPass(processed, timeNow)
                 _uiState.update {
                     it.copy(
@@ -108,11 +99,17 @@ class PassesViewModel(
     fun onAction(action: PassesAction) {
         when (action) {
             PassesAction.DismissWhatsNew -> settingsRepo.setWhatsNewDismissed()
-            is PassesAction.FilterPasses -> applyFilter(action.hoursAhead, action.minElevation, _uiState.value.modes)
-            is PassesAction.FilterRadios -> applyFilter(_uiState.value.hours, _uiState.value.elevation, action.modes)
+            is PassesAction.FilterPasses ->
+                applyFilter(action.hoursAhead, action.minElevation, action.showDeepSpace, _uiState.value.modes)
+
+            is PassesAction.FilterRadios ->
+                applyFilter(_uiState.value.hours, _uiState.value.elevation, _uiState.value.showDeepSpace, action.modes)
             PassesAction.RefreshPasses -> refreshPasses()
-            PassesAction.TogglePassesDialog -> _uiState.update { it.copy(isPassesDialogShown = !it.isPassesDialogShown) }
-            PassesAction.ToggleRadiosDialog -> _uiState.update { it.copy(isRadiosDialogShown = !it.isRadiosDialogShown) }
+            PassesAction.TogglePassesDialog ->
+                _uiState.update { it.copy(isPassesDialogShown = !it.isPassesDialogShown) }
+
+            PassesAction.ToggleRadiosDialog ->
+                _uiState.update { it.copy(isRadiosDialogShown = !it.isRadiosDialogShown) }
         }
     }
 
@@ -153,21 +150,23 @@ class PassesViewModel(
         return Triple(defaultPass, "00:00:00", true)
     }
 
-    private fun applyFilter(hoursAhead: Int, minElevation: Double, modes: List<String>) = viewModelScope.launch {
-        _uiState.update { it.copy(isRefreshing = true) }
-        settingsRepo.setPassesSettings(PassesSettings(hoursAhead, minElevation, modes))
-        _uiState.update { it.copy(hours = hoursAhead, elevation = minElevation, modes = modes) }
-        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
-        _uiState.update { it.copy(isRefreshing = false) }
+    private fun applyFilter(
+        hoursAhead: Int,
+        minElevation: Double,
+        showDeepSpace: Boolean,
+        modes: List<String>
+    ) = viewModelScope.launch {
+        settingsRepo.setPassesSettings(PassesSettings(showDeepSpace, hoursAhead, minElevation, modes))
+        _uiState.update {
+            it.copy(hours = hoursAhead, elevation = minElevation, showDeepSpace = showDeepSpace, modes = modes)
+        }
+        if (showDeepSpace) satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
     }
 
     private fun refreshPasses() = viewModelScope.launch {
-        _uiState.update { it.copy(isRefreshing = true) }
-        val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
+        val (_, hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
         satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
-        _uiState.update { it.copy(isRefreshing = false) }
     }
-
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

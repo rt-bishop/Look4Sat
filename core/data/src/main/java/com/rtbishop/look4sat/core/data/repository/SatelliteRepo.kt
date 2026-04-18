@@ -31,6 +31,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -45,6 +46,9 @@ class SatelliteRepo(
     private val _passes = MutableStateFlow<List<OrbitalPass>>(emptyList())
     override val passes: StateFlow<List<OrbitalPass>> = _passes
 
+    private val _isCalculating = MutableStateFlow(false)
+    override val isCalculating: StateFlow<Boolean> = _isCalculating
+
     private val _satellites = MutableStateFlow<List<OrbitalObject>>(emptyList())
     override val satellites: StateFlow<List<OrbitalObject>> = _satellites
 
@@ -53,7 +57,7 @@ class SatelliteRepo(
     override suspend fun initRepository() = withContext(dispatcher) {
         settingsRepo.selectedIds.collect { selectedIds ->
             _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
-            val (hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
+            val (_, hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
             calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
         }
     }
@@ -95,41 +99,40 @@ class SatelliteRepo(
     }
 
     override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>) {
+        _isCalculating.value = true
         // Normalize to the start of the current minute so that coarse 60-second stepping
         // in getLeoPass always begins from the same phase, producing stable AOS/LOS times
         val normalizedTime = time / 60_000L * 60_000L
         val currentSatellites = _satellites.value
-        if (currentSatellites.isNotEmpty()) {
-            withContext(dispatcher) {
-                val idsWithModes = localStorage.getIdsWithModes(modes)
-                val stationPos = settingsRepo.stationPosition.value
-                val filteredSatellites = if (idsWithModes.isEmpty()) {
-                    currentSatellites
-                } else {
-                    currentSatellites.filter { it.data.catnum in idsWithModes }
-                }
-                // Compute passes for each satellite in parallel
-                val passLists = coroutineScope {
-                    filteredSatellites.map { satellite ->
-                        async { satellite.getPasses(stationPos, normalizedTime, hoursAhead) }
-                    }.awaitAll()
-                }
-                // Flatten and filter in a single pass
-                val timeFuture = normalizedTime + (hoursAhead * 60L * 60L * 1000L)
-                val newPasses = ArrayList<OrbitalPass>()
-                for (list in passLists) {
-                    for (pass in list) {
-                        if (pass.losTime > time && pass.aosTime < timeFuture && pass.maxElevation > minElevation) {
-                            newPasses.add(pass)
-                        }
+        withContext(dispatcher) {
+            val idsWithModes = localStorage.getIdsWithModes(modes)
+            val stationPos = settingsRepo.stationPosition.value
+            val filteredSatellites = if (idsWithModes.isEmpty()) {
+                currentSatellites
+            } else {
+                currentSatellites.filter { it.data.catnum in idsWithModes }
+            }
+            // Compute passes for each satellite in parallel
+            val passLists = coroutineScope {
+                filteredSatellites.map { satellite ->
+                    async { satellite.getPasses(stationPos, normalizedTime, hoursAhead) }
+                }.awaitAll()
+            }
+            // Flatten and filter in a single pass
+            val timeFuture = normalizedTime + (hoursAhead * 60L * 60L * 1000L)
+            val newPasses = ArrayList<OrbitalPass>()
+            for (list in passLists) {
+                for (pass in list) {
+                    if (pass.losTime > time && pass.aosTime < timeFuture && pass.maxElevation > minElevation) {
+                        newPasses.add(pass)
                     }
                 }
-                newPasses.sortBy { it.aosTime }
-                _passes.update { newPasses }
             }
-        } else {
-            _passes.update { emptyList() }
+            newPasses.sortBy { it.aosTime }
+            delay(1000) // Simulate loading time for better UX
+            _passes.update { newPasses }
         }
+        _isCalculating.value = false
     }
 
     private fun OrbitalObject.getPasses(pos: GeoPos, time: Long, hours: Int): List<OrbitalPass> {

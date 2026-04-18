@@ -100,9 +100,10 @@ private fun PassesScreen(
         PassesDialog(
             hours = uiState.hours,
             elevation = uiState.elevation,
+            showDeepSpace = uiState.showDeepSpace,
             cancel = { onAction(PassesAction.TogglePassesDialog) }
-        ) { hours, elevation ->
-            onAction(PassesAction.FilterPasses(hours, elevation))
+        ) { hours, elevation, showDeepSpace ->
+            onAction(PassesAction.FilterPasses(hours, elevation, showDeepSpace))
         }
     }
     if (uiState.isRadiosDialogShown) {
