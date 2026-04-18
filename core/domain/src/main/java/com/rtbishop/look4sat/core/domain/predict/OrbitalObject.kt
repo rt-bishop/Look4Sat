@@ -314,14 +314,8 @@ abstract class OrbitalObject(val data: OrbitalData) {
         return 1.0 / value
     }
 
-    // Calculates the modulus of 2 * PI
-    internal fun mod2PI(value: Double): Double {
-        var retVal = value
-        val i = (retVal / TWO_PI).toInt()
-        retVal -= i * TWO_PI
-        if (retVal < 0.0) retVal += TWO_PI
-        return retVal
-    }
+    // Delegates to package-level mod2PI in OrbitalMath.kt
+    internal fun mod2PI(value: Double): Double = com.rtbishop.look4sat.core.domain.predict.mod2PI(value)
 
     // Solves Keplers' Equation
     internal fun converge(temp: DoubleArray, axn: Double, ayn: Double, capu: Double) {
@@ -423,19 +417,8 @@ abstract class OrbitalObject(val data: OrbitalData) {
         return acos(dot(v1, v2) / (v1.w * v2.w))
     }
 
-    /**
-     * The function Delta_ET has been added to allow calculations on the
-     * position of the sun. It provides the difference between UT (approximately
-     * the same as UTC) and ET (now referred to as TDT) This function is based
-     * on the least squares fit of data from 1950 to 1991 and will need to be
-     * updated periodically.
-     *
-     * Values determined using data from 1950-1991 in the 1990 Astronomical
-     * Almanac. See DELTA_ET.WQ1 for details.
-     */
-    private fun deltaEt(year: Double): Double {
-        return 26.465 + 0.747622 * (year - 1950) + (1.886913 * sin(TWO_PI * (year - 1975) / 33))
-    }
+    // Delegates to package-level deltaET in OrbitalMath.kt
+    private fun deltaEt(year: Double): Double = deltaET(year)
 
     private fun radians(degrees: Double): Double {
         return degrees * DEG2RAD
@@ -446,23 +429,13 @@ abstract class OrbitalObject(val data: OrbitalData) {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
     }
 
-    // Returns fractional part of double argument
-    private fun fraction(arg: Double): Double {
-        return arg - floor(arg)
-    }
-
     // Calculates scalar magnitude of a vector4 argument
     private fun magnitude(v: Vector4) {
         v.w = sqrt(sqr(v.x) + sqr(v.y) + sqr(v.z))
     }
 
-    private fun modulus(arg1: Double, arg2: Double = SEC_PER_DAY): Double {
-        var returnValue = arg1
-        val i = floor(returnValue / arg2).toInt()
-        returnValue -= i * arg2
-        if (returnValue < 0.0) returnValue += arg2
-        return returnValue
-    }
+    private fun modulus(arg1: Double, arg2: Double = SEC_PER_DAY): Double =
+        com.rtbishop.look4sat.core.domain.predict.modulus(arg1, arg2)
 
     // Multiplies the vector v1 by the scalar k
     private fun scaleVector(k: Double, v: Vector4) {
@@ -470,13 +443,6 @@ abstract class OrbitalObject(val data: OrbitalData) {
         magnitude(v)
     }
 
-    private fun thetaGJD(theJD: Double): Double {
-        val earthRotPerSidDay = 1.00273790934
-        val ut = fraction(theJD + 0.5)
-        val aJD = theJD - ut
-        val tu = (aJD - 2451545.0) / 36525.0
-        var gmst = 24110.54841 + tu * (8640184.812866 + tu * (0.093104 - tu * 6.2E-6))
-        gmst = modulus(gmst + SEC_PER_DAY * earthRotPerSidDay * ut)
-        return TWO_PI * gmst / SEC_PER_DAY
-    }
+    // Delegates to package-level thetaGJD in OrbitalMath.kt
+    private fun thetaGJD(theJD: Double): Double = com.rtbishop.look4sat.core.domain.predict.thetaGJD(theJD)
 }
