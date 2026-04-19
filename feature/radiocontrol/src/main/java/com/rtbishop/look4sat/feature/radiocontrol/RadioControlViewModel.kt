@@ -44,12 +44,12 @@ class RadioControlViewModel(
     savedStateHandle: SavedStateHandle,
     private val trackingService: IRadioTrackingService,
     private val satelliteRepo: ISatelliteRepo,
-    private val settingsRepo: ISettingsRepo
+    settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
+    private val stationPos = settingsRepo.stationPosition.value
     private var currentPass: OrbitalPass? = null
     private var transponders: List<SatRadio> = emptyList()
-    private val stationPos = settingsRepo.stationPosition.value
 
     private val _uiState = MutableStateFlow(
         RadioControlState(

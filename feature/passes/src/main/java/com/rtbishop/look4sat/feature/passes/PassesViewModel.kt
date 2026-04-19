@@ -160,7 +160,7 @@ class PassesViewModel(
         _uiState.update {
             it.copy(hours = hoursAhead, elevation = minElevation, showDeepSpace = showDeepSpace, modes = modes)
         }
-        if (showDeepSpace) satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
+        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
     }
 
     private fun refreshPasses() = viewModelScope.launch {

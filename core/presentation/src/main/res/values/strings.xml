@@ -49,11 +49,10 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Switched to short-form commands in NetworkReporter, by theojalba
-        \n* Added CAT radio control for full-duplex SAT operation, by jcmerg
-        \n* Added normalized time for passes AOS/LOS, fixed refresh state bug
-        \n* Added multiple performance tweaks, improved passes calculation
-        \n* Fixed UTC pass time problem mentioned in issue #201
+        * Added Turkish translation, by Emre Can Akdaş (TA3ECR)
+        \n* Added DeepSpace passes filter option to the dialog
+        \n* Fixed the radar blip disappearing while eclipsed
+        \n* Fixed (hopefully) the refresh indicator being stuck
     </string>
 
     <!-- Radar screen -->
