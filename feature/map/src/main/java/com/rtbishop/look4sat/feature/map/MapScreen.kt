@@ -60,15 +60,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
@@ -110,13 +107,15 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 }
 private val iconCache = LruCache<String, Drawable>(128)
 
-fun NavGraphBuilder.mapDestination() {
-    composable(Screen.Map.route) {
-        val viewModel = viewModel(MapViewModel::class.java, factory = MapViewModel.Factory)
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        val mapView = rememberMapViewWithLifecycle()
-        MapScreen(uiState, viewModel::onAction, mapView)
-    }
+@Composable
+fun MapDestination() {
+    val viewModel = viewModel(
+        modelClass = MapViewModel::class.java,
+        factory = MapViewModel.Factory
+    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val mapView = rememberMapViewWithLifecycle()
+    MapScreen(uiState, viewModel::onAction, mapView)
 }
 
 @Composable

@@ -17,10 +17,8 @@
  */
 package com.rtbishop.look4sat.feature.radar
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -45,7 +43,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class RadarViewModel(
-    private val savedStateHandle: SavedStateHandle,
+    private val catNum: Int,
+    private val aosTime: Long,
     private val bluetoothReporter: IReporter,
     private val networkReporter: IReporter,
     private val satelliteRepo: ISatelliteRepo,
@@ -85,8 +84,6 @@ class RadarViewModel(
         }
         // Resolve which pass we're tracking and start the tick loop
         viewModelScope.launch {
-            val catNum = savedStateHandle.get<Int>("catNum") ?: 0
-            val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
             val passes = satelliteRepo.passes.value
             val currentPass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
                 ?: passes.firstOrNull()
@@ -105,7 +102,8 @@ class RadarViewModel(
                     val timeNow = System.currentTimeMillis()
                     val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
                     val (time, isAos) = computeTimer(satPass.isDeepSpace, satPass.aosTime, satPass.losTime, timeNow)
-                    _uiState.update { it.copy(currentTime = time, isCurrentTimeAos = isAos, orbitalPos = pos) }
+                    val isLos = !satPass.isDeepSpace && timeNow > satPass.losTime
+                    _uiState.update { it.copy(currentTime = time, isTimeAos = isAos, isLos = isLos, orbitalPos = pos) }
                     processRadios(transmitters, satPass.orbitalObject, timeNow)
                     sendPassData(pos)
                     delay(1000)
@@ -204,18 +202,19 @@ class RadarViewModel(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
+        fun factory(catNum: Int, aosTime: Long): ViewModelProvider.Factory = viewModelFactory {
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as IContainerProvider).getMainContainer()
                 RadarViewModel(
-                    createSavedStateHandle(),
-                    container.provideBluetoothReporter(),
-                    container.provideNetworkReporter(),
-                    container.satelliteRepo,
-                    container.settingsRepo,
-                    container.provideSensorsRepo(),
-                    container.provideAddToCalendar()
+                    catNum = catNum,
+                    aosTime = aosTime,
+                    bluetoothReporter = container.provideBluetoothReporter(),
+                    networkReporter = container.provideNetworkReporter(),
+                    satelliteRepo = container.satelliteRepo,
+                    settingsRepo = container.settingsRepo,
+                    sensorsRepo = container.provideSensorsRepo(),
+                    addToCalendar = container.provideAddToCalendar()
                 )
             }
         }

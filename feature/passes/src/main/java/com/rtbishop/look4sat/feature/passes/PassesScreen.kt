@@ -56,8 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.core.domain.predict.DeepSpaceObject
 import com.rtbishop.look4sat.core.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalData
@@ -68,7 +66,6 @@ import com.rtbishop.look4sat.core.presentation.InfoDialog
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
@@ -79,15 +76,14 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-fun NavGraphBuilder.passesDestination(navigateToRadar: (Int, Long) -> Unit) {
-    composable(Screen.Passes.route) {
-        val viewModel = viewModel(
-            modelClass = PassesViewModel::class.java,
-            factory = PassesViewModel.Factory
-        )
-        val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-        PassesScreen(uiState, viewModel::onAction, navigateToRadar)
-    }
+@Composable
+fun PassesDestination(navigateToRadar: (Int, Long) -> Unit) {
+    val viewModel = viewModel(
+        modelClass = PassesViewModel::class.java,
+        factory = PassesViewModel.Factory
+    )
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    PassesScreen(uiState, viewModel::onAction, navigateToRadar)
 }
 
 @Composable

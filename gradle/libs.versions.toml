@@ -18,10 +18,10 @@ androidx-core-ktx = "1.18.0"
 androidx-core-splashscreen = "1.2.0"
 androidx-room = "2.8.4"
 
-compose-bom = "2026.03.01"
+compose-bom = "2026.04.01"
 compose-activity = "1.13.0"
 compose-lifecycle = "2.10.0"
-compose-navigation = "2.9.7"
+compose-navigation3 = "1.1.1"
 
 google-ksp = "2.3.6"
 
@@ -52,16 +52,16 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 
 #noinspection UnusedVersionCatalogEntry
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-compose-material3-navigation = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
+#noinspection UnusedVersionCatalogEntry
+compose-material3-adaptive = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
-compose-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "compose-lifecycle" }
-compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-lifecycle" }
+#noinspection UnusedVersionCatalogEntry
+compose-navigation3 = { module = "androidx.navigation3:navigation3-ui", version.ref = "compose-navigation3" }
+compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "compose-lifecycle" }
 
 compose-debug-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 compose-debug-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -99,11 +99,7 @@ convention-featurePlugin = { id = "com.rtbishop.look4sat.convention.featurePlugi
 
 [bundles]
 #noinspection UnusedVersionCatalogEntry
-composeAll = [
-    "compose-animation", "compose-runtime", "compose-tooling",
-    "compose-activity", "compose-lifecycle", "compose-material3",
-    "compose-material3-navigation", "compose-navigation", "compose-viewmodel"
-]
+composeAll = ["compose-runtime", "compose-tooling", "compose-activity", "compose-material3", "compose-viewmodel"]
 #noinspection UnusedVersionCatalogEntry
 composeDebug = ["compose-debug-manifest", "compose-debug-tooling"]
 #noinspection UnusedVersionCatalogEntry

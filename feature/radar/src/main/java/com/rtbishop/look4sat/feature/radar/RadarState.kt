@@ -24,7 +24,8 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 data class RadarState(
     val currentPass: OrbitalPass? = null,
     val currentTime: String = "00:00:00",
-    val isCurrentTimeAos: Boolean = true,
+    val isTimeAos: Boolean = true,
+    val isLos: Boolean = false,
     val isUtc: Boolean = false,
     val orientationValues: Pair<Float, Float> = 0f to 0f,
     val orbitalPos: OrbitalPos? = null,

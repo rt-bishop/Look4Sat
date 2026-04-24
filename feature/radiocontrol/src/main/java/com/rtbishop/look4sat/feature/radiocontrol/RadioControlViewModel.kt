@@ -17,10 +17,8 @@
  */
 package com.rtbishop.look4sat.feature.radiocontrol
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -41,7 +39,8 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class RadioControlViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val catNum: Int,
+    private val aosTime: Long,
     private val trackingService: IRadioTrackingService,
     private val satelliteRepo: ISatelliteRepo,
     settingsRepo: ISettingsRepo
@@ -72,9 +71,6 @@ class RadioControlViewModel(
     val uiState: StateFlow<RadioControlState> = _uiState
 
     init {
-        val catNum = savedStateHandle.get<Int>("catNum") ?: 0
-        val aosTime = savedStateHandle.get<Long>("aosTime") ?: 0L
-
         // Resolve pass and load transponders
         viewModelScope.launch {
             val passes = satelliteRepo.passes.value
@@ -190,15 +186,16 @@ class RadioControlViewModel(
             return String.format(Locale.ENGLISH, "%d.%03d.%03d", mhz, khz, hz)
         }
 
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
+        fun factory(catNum: Int, aosTime: Long): ViewModelProvider.Factory = viewModelFactory {
             val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
             initializer {
                 val container = (this[applicationKey] as IContainerProvider).getMainContainer()
                 RadioControlViewModel(
-                    createSavedStateHandle(),
-                    container.radioTrackingService,
-                    container.satelliteRepo,
-                    container.settingsRepo
+                    catNum = catNum,
+                    aosTime = aosTime,
+                    trackingService = container.radioTrackingService,
+                    satelliteRepo = container.satelliteRepo,
+                    settingsRepo = container.settingsRepo
                 )
             }
         }

@@ -24,12 +24,15 @@ import org.gradle.kotlin.dsl.dependencies
 @Suppress("Unused")
 internal class CorePresentationPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
+        applyPlugin(libs.plugins.kotlin.serialization)
         setupAndroidLib()
         setupCompose()
         setupKotlin()
         dependencies {
             implementation(project(":core:domain"))
             implementation(libs.androidx.core.splashscreen)
+            implementation(libs.kotlin.serialization)
+            implementation(libs.compose.material3.adaptive)
         }
     }
 }
