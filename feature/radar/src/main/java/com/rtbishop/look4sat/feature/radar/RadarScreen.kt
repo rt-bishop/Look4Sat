@@ -149,8 +149,8 @@ private fun RadarScreen(
 
 @Composable
 private fun RadarCard(uiState: RadarState, modifier: Modifier = Modifier) {
-    val isEclipsed = uiState.orbitalPos?.eclipsed == true
-    val borderModifier = if (isEclipsed) {
+    val satellitePos = uiState.orbitalPos
+    val borderModifier = if (satellitePos?.aboveHorizon == true && satellitePos.eclipsed) {
         val infiniteTransition = rememberInfiniteTransition(label = "eclipsedBorder")
         val borderAlpha by infiniteTransition.animateFloat(
             initialValue = 1.0f,

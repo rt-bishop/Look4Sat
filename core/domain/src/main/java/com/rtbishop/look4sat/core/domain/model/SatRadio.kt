@@ -17,16 +17,20 @@
  */
 package com.rtbishop.look4sat.core.domain.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class SatRadio(
-    val uuid: String,
-    val info: String,
-    val isAlive: Boolean,
-    var downlinkLow: Long?,
-    var downlinkHigh: Long?,
-    val downlinkMode: String?,
-    var uplinkLow: Long?,
-    var uplinkHigh: Long?,
-    val uplinkMode: String?,
-    val isInverted: Boolean,
-    val catnum: Int?
+    @SerialName("uuid") val uuid: String,
+    @SerialName("description") val info: String,
+    @SerialName("alive") val isAlive: Boolean,
+    @SerialName("downlink_low") val downlinkLow: Long?,
+    @SerialName("downlink_high") val downlinkHigh: Long?,
+    @SerialName("mode") val downlinkMode: String?,
+    @SerialName("uplink_low") val uplinkLow: Long?,
+    @SerialName("uplink_high") val uplinkHigh: Long?,
+    @SerialName("uplink_mode") val uplinkMode: String?,
+    @SerialName("invert") val isInverted: Boolean,
+    @SerialName("norad_cat_id") val catnum: Int?
 )

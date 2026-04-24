@@ -12,9 +12,7 @@ jdkVersion = "17"
 #noinspection UnusedVersionCatalogEntry
 packageName = "com.rtbishop.look4sat"
 
-android-gradle-plugin = "9.1.1"
-google-ksp = "2.3.6"
-kotlin = "2.3.20"
+android-gradle-plugin = "9.2.0"
 
 androidx-core-ktx = "1.18.0"
 androidx-core-splashscreen = "1.2.0"
@@ -25,8 +23,12 @@ compose-activity = "1.13.0"
 compose-lifecycle = "2.10.0"
 compose-navigation = "2.9.7"
 
-other-coroutines = "1.10.2"
-other-json = "20251224"
+google-ksp = "2.3.6"
+
+kotlin = "2.3.20"
+kotlin-coroutines = "1.10.2"
+kotlin-serialization = "1.11.0"
+
 other-okhttp = "5.3.2"
 other-osmdroid = "6.1.20"
 
@@ -64,18 +66,18 @@ compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose",
 compose-debug-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 compose-debug-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 
-kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+#noinspection UnusedVersionCatalogEntry
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+#noinspection UnusedVersionCatalogEntry
+kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 
-#noinspection UnusedVersionCatalogEntry
-other-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "other-coroutines" }
-#noinspection UnusedVersionCatalogEntry
-other-json = { module = "org.json:json", version.ref = "other-json" }
 #noinspection UnusedVersionCatalogEntry
 other-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "other-okhttp" }
 #noinspection UnusedVersionCatalogEntry
 other-osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "other-osmdroid" }
 
-test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "other-coroutines" }
+test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 test-junit4 = { module = "junit:junit", version.ref = "test-junit4" }
 
 androidTest-junit = { module = "androidx.test.ext:junit", version.ref = "androidTest-junit" }
@@ -87,6 +89,7 @@ android-library = { id = "com.android.library", version.ref = "android-gradle-pl
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "google-ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 # plugins defined by this project
 convention-applicationPlugin = { id = "com.rtbishop.look4sat.convention.applicationPlugin" }
 convention-coreDataPlugin = { id = "com.rtbishop.look4sat.convention.coreDataPlugin" }
