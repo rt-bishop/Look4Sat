@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
@@ -177,10 +178,12 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settin
             }
         }
 
-        // 2. Derive footprint and info data from the already-computed selected position
+        // 2. Derive footprint, info data, sun and moon position from already-computed state
         val satPos = selectedSatPos ?: satelliteRepo.getPosition(selected, pos, date.time)
         val footprint = satPos
         val mapData = buildMapData(selected, satPos, date)
+        val sunPos = CelestialComputer.getSunPosition(stationPos, date.time)
+        val moonPos = CelestialComputer.getMoonPosition(stationPos, date.time)
 
         // 3. Single atomic state update — one recomposition per cycle
         _uiState.update {
@@ -188,7 +191,11 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settin
                 positions = positionsMap,
                 footprint = footprint,
                 mapData = mapData.first,
-                orbitalPass = mapData.second
+                orbitalPass = mapData.second,
+                sunLatDeg = sunPos.latitude,
+                sunLonDeg = sunPos.longitude,
+                moonLatDeg = moonPos.declination, // sub-lunar latitude = declination
+                moonLonDeg = if (moonPos.gha <= 180.0) -moonPos.gha else 360.0 - moonPos.gha
             )
         }
     }

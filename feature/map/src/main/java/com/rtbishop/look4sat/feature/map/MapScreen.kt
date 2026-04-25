@@ -83,7 +83,10 @@ private const val OVERLAY_STATION = 0
 private const val OVERLAY_TRACK = 1
 private const val OVERLAY_FOOTPRINT = 2
 private const val OVERLAY_POSITIONS = 3
-private const val OVERLAY_COUNT = 4
+private const val OVERLAY_TERMINATOR = 4
+private const val OVERLAY_SUN = 5
+private const val OVERLAY_MOON = 6
+private const val OVERLAY_COUNT = 7
 
 private val minLat = MapView.getTileSystem().minLatitude
 private val maxLat = MapView.getTileSystem().maxLatitude
@@ -106,6 +109,14 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     setShadowLayer(3f, 3f, 3f, Color.BLACK)
 }
 private val iconCache = LruCache<String, Drawable>(128)
+private val sunIconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    colorFilter =
+        android.graphics.PorterDuffColorFilter("#FFE082".toColorInt(), android.graphics.PorterDuff.Mode.SRC_IN)
+}
+private val moonIconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    colorFilter =
+        android.graphics.PorterDuffColorFilter("#E0E0E0".toColorInt(), android.graphics.PorterDuff.Mode.SRC_IN)
+}
 
 @Composable
 fun MapDestination() {
@@ -152,6 +163,9 @@ private fun MapScreen(uiState: MapState, onAction: (MapAction) -> Unit, mapView:
                     uiState.track?.let { setSatelliteTrack(it, view) }
                     uiState.footprint?.let { setFootprint(it, view) }
                     uiState.positions?.let { setPositions(it, view) { item -> onAction(MapAction.SelectItem(item)) } }
+                    setTerminator(uiState.sunLatDeg, uiState.sunLonDeg, view)
+                    setSubSolarPoint(uiState.sunLatDeg, uiState.sunLonDeg, view)
+                    setMoonPosition(uiState.moonLatDeg, uiState.moonLonDeg, view)
                     view.invalidate()
                 }
                 uiState.mapData?.let { mapData ->
@@ -280,8 +294,6 @@ private fun setPositions(
             lastMapView = mapView
             markerPool.clear()
             iconCache.evictAll()
-            footprintPolyline = null
-            footprintPoints = null
         }
         // Reuse the existing FolderOverlay — creating a new one and replacing it
         // causes osmdroid to detach shared Marker objects, making them invisible.
@@ -365,14 +377,12 @@ private var footprintPoints: ArrayList<GeoPoint>? = null
 private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
     try {
         val rangeCircle = orbitalPos.getRangeCircle()
-        // Lazily initialize the reusable point list and polyline
         var pts = footprintPoints
         if (pts == null || pts.size != rangeCircle.size) {
             pts = ArrayList(rangeCircle.size)
             for (gp in rangeCircle) pts.add(GeoPoint(gp.latitude, gp.longitude))
             footprintPoints = pts
         } else {
-            // Update coordinates in-place — zero allocations
             for (i in rangeCircle.indices) {
                 pts[i].latitude = rangeCircle[i].latitude
                 pts[i].longitude = rangeCircle[i].longitude
@@ -384,6 +394,83 @@ private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
         }
         polyline.setPoints(pts)
         mapView.overlays[OVERLAY_FOOTPRINT] = polyline
+    } catch (e: Exception) {
+        println(e)
+    }
+}
+
+/**
+ * Update the NightOverlay with the current sub-solar position.
+ * The overlay is created once and kept in OVERLAY_TERMINATOR; only its
+ * sunLatDeg/sunLonDeg fields are updated each tick so osmdroid redraws it.
+ */
+private fun setTerminator(sunLatDeg: Double, sunLonDeg: Double, mapView: MapView) {
+    try {
+        val overlay = mapView.overlays[OVERLAY_TERMINATOR]
+        if (overlay is NightOverlay) {
+            overlay.sunLatDeg = sunLatDeg
+            overlay.sunLonDeg = sunLonDeg
+        } else {
+            mapView.overlays[OVERLAY_TERMINATOR] = NightOverlay().apply {
+                this.sunLatDeg = sunLatDeg
+                this.sunLonDeg = sunLonDeg
+            }
+        }
+    } catch (e: Exception) {
+        println(e)
+    }
+}
+
+/** Place an ic_sun icon marker at the sub-solar point. */
+private fun setSubSolarPoint(sunLatDeg: Double, sunLonDeg: Double, mapView: MapView) {
+    try {
+        val overlay = mapView.overlays[OVERLAY_SUN]
+        val sunPos = GeoPoint(sunLatDeg, sunLonDeg)
+        if (overlay is Marker) {
+            overlay.position = sunPos
+        } else {
+            val iconSize = 48
+            val bmp = createBitmap(iconSize, iconSize)
+            ContextCompat.getDrawable(mapView.context, R.drawable.ic_sun)?.apply {
+                setBounds(0, 0, iconSize, iconSize)
+                colorFilter = sunIconPaint.colorFilter
+                draw(Canvas(bmp))
+            }
+            mapView.overlays[OVERLAY_SUN] = Marker(mapView).apply {
+                setInfoWindow(null)
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                icon = bmp.toDrawable(mapView.context.resources)
+                position = sunPos
+            }
+        }
+    } catch (e: Exception) {
+        println(e)
+    }
+}
+
+/** Place an ic_moon icon marker at the sub-lunar point. */
+private fun setMoonPosition(moonLatDeg: Double, moonLonDeg: Double, mapView: MapView) {
+    try {
+        val overlay = mapView.overlays[OVERLAY_MOON]
+        val moonPos = GeoPoint(moonLatDeg, moonLonDeg)
+        if (overlay is Marker) {
+            overlay.position = moonPos
+        } else {
+            val iconSize = 48
+            val bmp = createBitmap(iconSize, iconSize)
+            val c = Canvas(bmp)
+            ContextCompat.getDrawable(mapView.context, R.drawable.ic_moon)?.apply {
+                setBounds(0, 0, iconSize, iconSize)
+                colorFilter = moonIconPaint.colorFilter
+                draw(c)
+            }
+            mapView.overlays[OVERLAY_MOON] = Marker(mapView).apply {
+                setInfoWindow(null)
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                icon = bmp.toDrawable(mapView.context.resources)
+                position = moonPos
+            }
+        }
     } catch (e: Exception) {
         println(e)
     }

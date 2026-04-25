@@ -63,10 +63,8 @@ data class OrbitalPos(
         val sinBeta = sin(beta)
         for (azimuth in 0..720) {
             val rads = azimuth * DEG2RAD
-            val sinRads = sin(rads)
-            val cosRads = cos(rads)
-            val lat = asin(sinLat * cosBeta + cosLat * sinBeta * cosRads)
-            val lon = longitude + atan2(sinRads * sinBeta * cosLat, cosBeta - sinLat * sin(lat))
+            val lat = asin(sinLat * cosBeta + cosLat * sinBeta * cos(rads))
+            val lon = longitude + atan2(sin(rads) * sinBeta * cosLat, cosBeta - sinLat * sin(lat))
             rangeCirclePoints.add(GeoPos(lat * RAD2DEG, lon * RAD2DEG))
         }
         return rangeCirclePoints

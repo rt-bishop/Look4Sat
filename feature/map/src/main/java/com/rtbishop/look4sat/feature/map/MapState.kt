@@ -30,7 +30,11 @@ data class MapState(
     val orbitalPass: OrbitalPass,
     val track: List<List<GeoPos>>? = null,
     val footprint: OrbitalPos? = null,
-    val positions: Map<OrbitalObject, GeoPos>? = null
+    val positions: Map<OrbitalObject, GeoPos>? = null,
+    val sunLatDeg: Double = 0.0,
+    val sunLonDeg: Double = 0.0,
+    val moonLatDeg: Double = 0.0,
+    val moonLonDeg: Double = 0.0
 )
 
 sealed interface MapAction {
