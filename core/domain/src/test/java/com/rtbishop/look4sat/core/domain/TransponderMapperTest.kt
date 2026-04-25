@@ -2,9 +2,9 @@ package com.rtbishop.look4sat.core.domain
 
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.utility.TransponderMapper
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 class TransponderMapperTest {
 

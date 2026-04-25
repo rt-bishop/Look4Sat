@@ -25,10 +25,11 @@ import org.gradle.kotlin.dsl.dependencies
 internal class CoreDomainPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         applyPlugin(libs.plugins.kotlin.jvm)
+        applyPlugin(libs.plugins.kotlin.serialization)
         setupKotlin()
         dependencies {
-            implementation(libs.other.coroutines)
-            implementation(libs.other.json)
+            implementation(libs.kotlin.coroutines)
+            implementation(libs.kotlin.serialization)
         }
     }
 }

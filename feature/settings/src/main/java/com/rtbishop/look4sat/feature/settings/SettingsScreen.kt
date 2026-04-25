@@ -60,8 +60,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import com.rtbishop.look4sat.core.domain.model.OtherSettings
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.presentation.CardButton
@@ -69,7 +67,6 @@ import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.PrimaryIconCard
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
@@ -78,15 +75,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-fun NavGraphBuilder.settingsDestination() {
-    composable(Screen.Settings.route) {
-        val viewModel = viewModel(
-            modelClass = SettingsViewModel::class.java,
-            factory = SettingsViewModel.Factory
-        )
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        SettingsScreen(uiState, viewModel::onAction)
-    }
+@Composable
+fun SettingsDestination() {
+    val viewModel = viewModel(
+        modelClass = SettingsViewModel::class.java,
+        factory = SettingsViewModel.Factory
+    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    SettingsScreen(uiState, viewModel::onAction)
 }
 
 @Composable

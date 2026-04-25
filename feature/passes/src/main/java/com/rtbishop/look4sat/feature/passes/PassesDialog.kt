@@ -32,12 +32,15 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -65,17 +68,29 @@ private val hourSteps = listOf(1, 2, 4, 8, 12, 24, 48, 72, 96, 120, 144, 168, 19
 @Preview
 @Composable
 private fun PassesDialogPreview() {
-    MainTheme { PassesDialog(24, 16.0, {}) { _, _ -> } }
+    MainTheme { PassesDialog(24, 16.0, true, {}) { _, _, _ -> } }
 }
 
 @Composable
-internal fun PassesDialog(hours: Int, elevation: Double, cancel: () -> Unit, accept: (Int, Double) -> Unit) {
+internal fun PassesDialog(
+    hours: Int,
+    elevation: Double,
+    showDeepSpace: Boolean,
+    cancel: () -> Unit,
+    accept: (Int, Double, Boolean) -> Unit
+) {
     val hoursIndex = remember { mutableIntStateOf(hourSteps.indexOfFirst { it >= hours }.coerceAtLeast(0)) }
     val elevationValueNew = remember { mutableDoubleStateOf(elevation) }
+    var deepSpaceEnabled by remember { mutableStateOf(showDeepSpace) }
     val onAccept = {
-        accept(hourSteps[hoursIndex.intValue], elevationValueNew.doubleValue).also { cancel() }
+        accept(hourSteps[hoursIndex.intValue], elevationValueNew.doubleValue, deepSpaceEnabled).also { cancel() }
     }
     SharedDialog(title = stringResource(R.string.pass_filter_title), onCancel = cancel, onAccept = onAccept) {
+        ToggleRow(
+            title = stringResource(R.string.pass_filter_deep_space),
+            checked = deepSpaceEnabled,
+            onCheckedChange = { deepSpaceEnabled = it }
+        )
         SliderRow(
             title = stringResource(R.string.pass_filter_elev),
             value = elevationValueNew.doubleValue,
@@ -186,5 +201,22 @@ internal fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ToggleRow(title: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = LocalSpacing.current.large)
+    ) {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }

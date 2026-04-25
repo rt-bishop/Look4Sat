@@ -74,7 +74,7 @@ internal fun Project.setupAndroidApp() {
         }
         androidResources {
             generateLocaleConfig = true
-            localeFilters.addAll(listOf("en", "es", "ru", "si", "uk", "zh"))
+            localeFilters.addAll(listOf("en", "es", "ru", "si", "tr", "uk", "zh"))
         }
         packaging { resources { excludes += listOf("META-INF/*") } }
     }

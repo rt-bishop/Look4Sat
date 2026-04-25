@@ -1,6 +1,4 @@
-* Switched to short-form commands in NetworkReporter (#206) by theojalba
-* Added CAT radio control for full-duplex SAT operation (#207) by jcmerg
-* Added normalized time for passes AOS/LOS, fixed refresh state bug
-* Added multiple performance tweaks, improved passes calculation
-* Simplified data output code, aligned with HamLib defaults
-* Fixed UTC pass time problem mentioned in issue #201
+* Added Turkish translation, by Emre Can Akdaş (TA3ECR)
+* Added DeepSpace passes filter option to the dialog
+* Fixed the radar blip disappearing while eclipsed
+* Fixed (hopefully) the refresh indicator being stuck

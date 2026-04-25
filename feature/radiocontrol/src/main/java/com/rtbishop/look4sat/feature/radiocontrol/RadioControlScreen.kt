@@ -51,15 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
@@ -67,17 +63,15 @@ import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
 import java.util.Locale
 
-fun NavGraphBuilder.radioControlDestination(navigateUp: () -> Unit) {
-    val route = "${Screen.RadioControl.route}?catNum={catNum}&aosTime={aosTime}"
-    val args = listOf(
-        navArgument("catNum") { defaultValue = 0 },
-        navArgument("aosTime") { defaultValue = 0L }
+@Composable
+fun RadioControlDestination(catNum: Int = 0, aosTime: Long = 0L, navigateUp: () -> Unit) {
+    val viewModel = viewModel(
+        modelClass = RadioControlViewModel::class.java,
+        key = "$catNum-$aosTime",
+        factory = RadioControlViewModel.factory(catNum, aosTime)
     )
-    composable(route, args) {
-        val viewModel = viewModel(RadioControlViewModel::class.java, factory = RadioControlViewModel.Factory)
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        RadioControlScreen(uiState, viewModel::onAction, navigateUp)
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    RadioControlScreen(uiState, viewModel::onAction, navigateUp)
 }
 
 @Composable

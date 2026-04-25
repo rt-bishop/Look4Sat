@@ -31,6 +31,9 @@ interface ISatelliteRepo {
     /** Raw calculated passes (without live progress). Updated on selection/filter change. */
     val passes: StateFlow<List<OrbitalPass>>
 
+    /** Whether the repo is currently calculating passes. */
+    val isCalculating: StateFlow<Boolean>
+
     /** Load satellite objects from DB based on the current selection. */
     suspend fun initRepository()
 

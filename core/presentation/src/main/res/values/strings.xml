@@ -32,6 +32,7 @@
     <string name="pass_filter_title">Filter passes</string>
     <string name="pass_filter_elev">Minimal elevation</string>
     <string name="pass_filter_hours">Hours ahead</string>
+    <string name="pass_filter_deep_space">DeepSpace (period >225min)</string>
     <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
     <string name="pass_modes_title">Select modulation type</string>
     <string name="pass_satId" translatable="false">%05d</string>
@@ -48,11 +49,10 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Switched to short-form commands in NetworkReporter, by theojalba
-        \n* Added CAT radio control for full-duplex SAT operation, by jcmerg
-        \n* Added normalized time for passes AOS/LOS, fixed refresh state bug
-        \n* Added multiple performance tweaks, improved passes calculation
-        \n* Fixed UTC pass time problem mentioned in issue #201
+        * Added Turkish translation, by Emre Can Akdaş (TA3ECR)
+        \n* Added DeepSpace passes filter option to the dialog
+        \n* Fixed the radar blip disappearing while eclipsed
+        \n* Fixed (hopefully) the refresh indicator being stuck
     </string>
 
     <!-- Radar screen -->

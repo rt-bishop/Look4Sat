@@ -21,12 +21,18 @@ import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.decodeFromJsonElement
 import java.io.InputStream
 import kotlin.math.pow
 
 class DataParser(private val dispatcher: CoroutineDispatcher) {
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
 
     suspend fun parseCSVStream(stream: InputStream): List<OrbitalData> = withContext(dispatcher) {
         stream.bufferedReader().useLines { lines ->
@@ -43,8 +49,12 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
 
     suspend fun parseJSONStream(stream: InputStream): List<SatRadio> = withContext(dispatcher) {
         runCatching {
-            val jsonArray = JSONArray(stream.bufferedReader().readText())
-            (0 until jsonArray.length()).mapNotNull { parseJSON(jsonArray.getJSONObject(it)) }
+            val root = json.parseToJsonElement(stream.bufferedReader().readText())
+            (root as? JsonArray)?.mapNotNull { element ->
+                runCatching { json.decodeFromJsonElement<SatRadio>(element) }
+                    .onFailure { println("JSON parsing exception: $it") }
+                    .getOrNull()
+            } ?: emptyList()
         }.getOrDefault(emptyList())
     }
 
@@ -94,26 +104,6 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
             bstar = 1e-5 * line1.substring(53, 59).toDouble() / 10.0.pow(line1.substring(60, 61).toDouble())
         )
     }.onFailure { println("TLE parsing exception: $it") }.getOrNull()
-
-    private fun parseJSON(json: JSONObject): SatRadio? = runCatching {
-        SatRadio(
-            uuid = json.getString("uuid"),
-            info = json.getString("description"),
-            isAlive = json.getBoolean("alive"),
-            downlinkLow = json.optLongOrNull("downlink_low"),
-            downlinkHigh = json.optLongOrNull("downlink_high"),
-            downlinkMode = json.optStringOrNull("mode"),
-            uplinkLow = json.optLongOrNull("uplink_low"),
-            uplinkHigh = json.optLongOrNull("uplink_high"),
-            uplinkMode = json.optStringOrNull("uplink_mode"),
-            isInverted = json.getBoolean("invert"),
-            catnum = json.optIntOrNull("norad_cat_id")
-        )
-    }.onFailure { println("JSON parsing exception: $it") }.getOrNull()
-
-    private fun JSONObject.optStringOrNull(key: String): String? = if (isNull(key)) null else getString(key)
-    private fun JSONObject.optLongOrNull(key: String): Long? = if (isNull(key)) null else getLong(key)
-    private fun JSONObject.optIntOrNull(key: String): Int? = if (isNull(key)) null else getInt(key)
 
     private fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
         val daysInMonth = intArrayOf(31, if (isLeapYear(year)) 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
