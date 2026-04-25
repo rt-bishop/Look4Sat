@@ -32,7 +32,9 @@ data class PassesState(
     val showDeepSpace: Boolean = true,
     val modes: List<String> = emptyList(),
     val itemsList: List<OrbitalPass> = emptyList(),
-    val shouldSeeWhatsNew: Boolean = false
+    val shouldSeeWhatsNew: Boolean = false,
+    // Map of dateLabel -> Pair(sunriseTime, sunsetTime) for each day group
+    val sunTimes: Map<String, Pair<String, String>> = emptyMap()
 )
 
 sealed interface PassesAction {
