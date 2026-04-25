@@ -72,6 +72,7 @@ class SettingsRepo(
     private val keyStateOfSweep = "stateOfSweep"
     private val keyStateOfUtc = "stateOfUtc"
     private val keyStateOfLightTheme = "stateOfLightTheme"
+    private val keyStateOfNightMode = "stateOfNightMode"
     private val keyStationAltitude = "stationAltitude"
     private val keyStationLatitude = "stationLatitude"
     private val keyStationLongitude = "stationLongitude"
@@ -329,6 +330,7 @@ class SettingsRepo(
                 putBoolean(keyStateOfSweep, new.stateOfSweep)
                 putBoolean(keyStateOfUtc, new.stateOfUtc)
                 putBoolean(keyStateOfLightTheme, new.stateOfLightTheme)
+                putBoolean(keyStateOfNightMode, new.stateOfNightMode)
                 putBoolean(keyShouldSeeWarning, new.shouldSeeWarning)
                 putBoolean(keyShouldSeeWhatsNew, new.shouldSeeWhatsNew)
             }
@@ -342,6 +344,7 @@ class SettingsRepo(
         stateOfSweep = preferences.getBoolean(keyStateOfSweep, true),
         stateOfUtc = preferences.getBoolean(keyStateOfUtc, false),
         stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme, false),
+        stateOfNightMode = preferences.getBoolean(keyStateOfNightMode, false),
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
         shouldSeeWhatsNew = preferences.getBoolean(keyShouldSeeWhatsNew, true)
     )

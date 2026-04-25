@@ -54,6 +54,7 @@ data class OtherSettings(
     val stateOfSweep: Boolean,
     val stateOfUtc: Boolean,
     val stateOfLightTheme: Boolean,
+    val stateOfNightMode: Boolean = false,
     val shouldSeeWarning: Boolean,
     val shouldSeeWhatsNew: Boolean
 )
