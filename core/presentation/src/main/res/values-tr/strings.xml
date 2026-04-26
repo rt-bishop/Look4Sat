@@ -31,7 +31,7 @@
     <!-- Passes screen -->
     <string name="pass_filter_title">Geçişleri filtrele</string>
     <string name="pass_filter_elev">Minimum yükseklik açısı</string>
-    <string name="pass_filter_hours">İlerideki saatler</string>
+    <string name="pass_filter_hours">Gösterilecek saat aralığı</string>
     <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
     <string name="pass_modes_title">Modulasyon türü seçin</string>
     <string name="pass_satId" translatable="false">%05d</string>
@@ -66,7 +66,7 @@
     <string name="radar_alt_value" translatable="false">%.0f km</string>
     <string name="radar_dist_text">Mesafe</string>
     <string name="radar_dist_value" translatable="false">%.0f km</string>
-    <string name="radar_eclipsed">Tutulumda</string>
+    <string name="radar_eclipsed">Gölgede</string>
     <string name="radar_downlink">Downlink</string>
     <string name="radar_uplink">Uplink</string>
     <string name="radar_link_low" translatable="false">%.4f</string>
@@ -93,7 +93,7 @@
     <string name="map_longitude">Boylam: %.1f°</string>
     <string name="map_qth" translatable="false">QTH: %s</string>
     <string name="map_phase">Faz: %.1f°</string>
-    <string name="map_eclipsed">Tutulumda</string>
+    <string name="map_eclipsed">Gölgede</string>
     <string name="map_period">Periyot: %.0f dk</string>
     <string name="map_velocity">Hız: %.2f km/s</string>
     <string name="map_visibility">Görünürlük: %s</string>
@@ -182,7 +182,7 @@
     <string name="prefs_other_switch_sweep">Radar taramasını etkinleştir</string>
     <string name="prefs_other_switch_sensors">Radar görünümünü döndürmek için sensörleri kullan</string>
 
-    <string name="prefs_outro_title">Teşekkür etmek istiyorum</string>
+    <string name="prefs_outro_title">Teşekkürler</string>
     <string name="prefs_outro_thanks" translatable="false">
         • Look4Sat users and contributors!
         \n• David A. B. Johnson (predict4java)
