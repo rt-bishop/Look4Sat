@@ -43,7 +43,7 @@ import kotlin.math.sin
  * filled vertical rectangles.  On a 1080-wide screen this means ~270 trig
  * evaluations per row, which is imperceptible.
  */
-class NightOverlay : Overlay() {
+class MapNightOverlay : Overlay() {
 
     /** Sub-solar latitude in degrees. */
     var sunLatDeg: Double = 0.0

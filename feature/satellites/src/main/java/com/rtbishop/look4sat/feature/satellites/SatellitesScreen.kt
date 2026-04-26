@@ -44,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.core.domain.model.SatItem
+import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.presentation.CardLoadingIndicator
 import com.rtbishop.look4sat.core.presentation.EmptyListCard
 import com.rtbishop.look4sat.core.presentation.IconCard
@@ -71,9 +73,11 @@ import com.rtbishop.look4sat.core.presentation.layoutPadding
 
 @Composable
 fun SatellitesDestination(navigateUp: () -> Unit) {
+    val context = LocalContext.current
+    val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val viewModel = viewModel(
         modelClass = SatellitesViewModel::class.java,
-        factory = SatellitesViewModel.Factory
+        factory = SatellitesViewModel.factory(container)
     )
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     SatellitesScreen(uiState, viewModel::onAction, navigateUp)

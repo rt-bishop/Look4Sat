@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.feature.map
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -27,7 +26,7 @@ import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
-import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.core.domain.utility.clipLat
@@ -50,8 +49,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settingsRepo: ISettingsRepo) :
-    ViewModel() {
+class MapViewModel(
+    private val satelliteRepo: ISatelliteRepo,
+    private val settingsRepo: ISettingsRepo
+) : ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
     private val defaultPass = getDefaultPass()
@@ -293,11 +294,12 @@ class MapViewModel(private val satelliteRepo: ISatelliteRepo, private val settin
         /** Number of parallel chunks for satellite position computation */
         private const val PARALLEL_CHUNKS = 4
 
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+        fun factory(container: IMainContainer) = viewModelFactory {
             initializer {
-                val container = (this[applicationKey] as IContainerProvider).getMainContainer()
-                MapViewModel(container.satelliteRepo, container.settingsRepo)
+                MapViewModel(
+                    satelliteRepo = container.satelliteRepo,
+                    settingsRepo = container.settingsRepo
+                )
             }
         }
     }

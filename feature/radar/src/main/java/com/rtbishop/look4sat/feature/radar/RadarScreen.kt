@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.keepScreenOn
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -61,6 +62,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
+import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.presentation.EmptyListCard
 import com.rtbishop.look4sat.core.presentation.IconCard
@@ -81,10 +83,12 @@ fun RadarDestination(
     navigateUp: () -> Unit,
     navigateToRadioControl: (Int, Long) -> Unit = { _, _ -> }
 ) {
+    val context = LocalContext.current
+    val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val viewModel = viewModel(
         modelClass = RadarViewModel::class.java,
         key = "$catNum-$aosTime",
-        factory = RadarViewModel.factory(catNum, aosTime)
+        factory = RadarViewModel.factory(catNum, aosTime, container)
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     RadarScreen(uiState, viewModel::onAction, navigateUp, navigateToRadioControl)

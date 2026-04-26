@@ -63,6 +63,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
+import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
@@ -120,9 +121,11 @@ private val moonIconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 
 @Composable
 fun MapDestination() {
+    val context = LocalContext.current
+    val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val viewModel = viewModel(
         modelClass = MapViewModel::class.java,
-        factory = MapViewModel.Factory
+        factory = MapViewModel.factory(container)
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val mapView = rememberMapViewWithLifecycle()
@@ -407,11 +410,11 @@ private fun setFootprint(orbitalPos: OrbitalPos, mapView: MapView) {
 private fun setTerminator(sunLatDeg: Double, sunLonDeg: Double, mapView: MapView) {
     try {
         val overlay = mapView.overlays[OVERLAY_TERMINATOR]
-        if (overlay is NightOverlay) {
+        if (overlay is MapNightOverlay) {
             overlay.sunLatDeg = sunLatDeg
             overlay.sunLonDeg = sunLonDeg
         } else {
-            mapView.overlays[OVERLAY_TERMINATOR] = NightOverlay().apply {
+            mapView.overlays[OVERLAY_TERMINATOR] = MapNightOverlay().apply {
                 this.sunLatDeg = sunLatDeg
                 this.sunLonDeg = sunLonDeg
             }

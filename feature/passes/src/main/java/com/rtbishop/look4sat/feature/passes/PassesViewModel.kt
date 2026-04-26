@@ -18,14 +18,13 @@
 package com.rtbishop.look4sat.feature.passes
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.model.PassesSettings
 import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.core.domain.utility.round
@@ -200,11 +199,12 @@ class PassesViewModel(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+        fun factory(container: IMainContainer) = viewModelFactory {
             initializer {
-                val container = (this[applicationKey] as IContainerProvider).getMainContainer()
-                PassesViewModel(container.satelliteRepo, container.settingsRepo)
+                PassesViewModel(
+                    satelliteRepo = container.satelliteRepo,
+                    settingsRepo = container.settingsRepo
+                )
             }
         }
     }

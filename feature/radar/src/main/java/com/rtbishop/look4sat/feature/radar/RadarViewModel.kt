@@ -18,7 +18,6 @@
 package com.rtbishop.look4sat.feature.radar
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -26,7 +25,7 @@ import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
-import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.domain.repository.IReporter
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISensorsRepo
@@ -214,10 +213,8 @@ class RadarViewModel(
     }
 
     companion object {
-        fun factory(catNum: Int, aosTime: Long): ViewModelProvider.Factory = viewModelFactory {
-            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+        fun factory(catNum: Int, aosTime: Long, container: IMainContainer) = viewModelFactory {
             initializer {
-                val container = (this[applicationKey] as IContainerProvider).getMainContainer()
                 RadarViewModel(
                     catNum = catNum,
                     aosTime = aosTime,

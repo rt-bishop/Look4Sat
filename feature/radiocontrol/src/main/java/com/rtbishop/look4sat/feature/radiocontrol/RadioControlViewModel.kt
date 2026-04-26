@@ -18,13 +18,12 @@
 package com.rtbishop.look4sat.feature.radiocontrol
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.domain.repository.IRadioTrackingService
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
@@ -173,10 +172,12 @@ class RadioControlViewModel(
 
     companion object {
 
-        val CTCSS_TONES = listOf(67.0, 69.3, 71.9, 74.4, 77.0, 79.7, 82.5, 85.4, 88.5, 91.5,
+        val CTCSS_TONES = listOf(
+            67.0, 69.3, 71.9, 74.4, 77.0, 79.7, 82.5, 85.4, 88.5, 91.5,
             94.8, 97.4, 100.0, 103.5, 107.2, 110.9, 114.8, 118.8, 123.0, 127.3, 131.8, 136.5,
             141.3, 146.2, 151.4, 156.7, 162.2, 167.9, 173.8, 179.9, 186.2, 192.8, 203.5, 210.7,
-            218.1, 225.7, 233.6, 241.8, 250.3)
+            218.1, 225.7, 233.6, 241.8, 250.3
+        )
 
         fun formatFrequency(frequencyHz: Long): String {
             if (frequencyHz <= 0) return "---"
@@ -186,10 +187,8 @@ class RadioControlViewModel(
             return String.format(Locale.ENGLISH, "%d.%03d.%03d", mhz, khz, hz)
         }
 
-        fun factory(catNum: Int, aosTime: Long): ViewModelProvider.Factory = viewModelFactory {
-            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+        fun factory(catNum: Int, aosTime: Long, container: IMainContainer) = viewModelFactory {
             initializer {
-                val container = (this[applicationKey] as IContainerProvider).getMainContainer()
                 RadioControlViewModel(
                     catNum = catNum,
                     aosTime = aosTime,

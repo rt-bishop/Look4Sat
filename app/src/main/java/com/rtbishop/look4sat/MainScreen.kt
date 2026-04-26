@@ -56,8 +56,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.presentation.Screen
@@ -122,6 +124,10 @@ fun MainScreen() {
                 transitionSpec = { fadeTransition },
                 popTransitionSpec = { fadeTransition },
                 predictivePopTransitionSpec = { fadeTransition },
+                entryDecorators = listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator()
+                ),
                 entryProvider = entryProvider {
                     entry<Screen.Satellites> {
                         SatellitesDestination(navigateUp = navigateBack)

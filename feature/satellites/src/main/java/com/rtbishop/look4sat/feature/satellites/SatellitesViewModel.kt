@@ -18,11 +18,10 @@
 package com.rtbishop.look4sat.feature.satellites
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.domain.repository.ISelectionRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -97,11 +96,12 @@ class SatellitesViewModel(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            val applicationKey = ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+        fun factory(container: IMainContainer) = viewModelFactory {
             initializer {
-                val container = (this[applicationKey] as IContainerProvider).getMainContainer()
-                SatellitesViewModel(container.selectionRepo, container.settingsRepo)
+                SatellitesViewModel(
+                    selectionRepo = container.selectionRepo,
+                    settingsRepo = container.settingsRepo
+                )
             }
         }
     }

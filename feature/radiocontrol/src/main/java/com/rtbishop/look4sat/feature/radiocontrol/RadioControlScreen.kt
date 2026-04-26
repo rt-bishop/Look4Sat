@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.keepScreenOn
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.core.domain.model.SatRadio
+import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.NextPassRow
@@ -65,10 +67,12 @@ import java.util.Locale
 
 @Composable
 fun RadioControlDestination(catNum: Int = 0, aosTime: Long = 0L, navigateUp: () -> Unit) {
+    val context = LocalContext.current
+    val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val viewModel = viewModel(
         modelClass = RadioControlViewModel::class.java,
         key = "$catNum-$aosTime",
-        factory = RadioControlViewModel.factory(catNum, aosTime)
+        factory = RadioControlViewModel.factory(catNum, aosTime, container)
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     RadioControlScreen(uiState, viewModel::onAction, navigateUp)
