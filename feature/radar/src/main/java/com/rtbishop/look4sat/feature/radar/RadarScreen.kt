@@ -180,7 +180,9 @@ private fun RadarCard(uiState: RadarState, modifier: Modifier = Modifier) {
                     azimElev = uiState.orientationValues,
                     shouldShowSweep = uiState.shouldShowSweep,
                     shouldUseCompass = uiState.shouldUseCompass,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    sunPosition = uiState.sunPosition,
+                    moonPosition = uiState.moonPosition,
                 )
                 PositionOverlay(position)
             }

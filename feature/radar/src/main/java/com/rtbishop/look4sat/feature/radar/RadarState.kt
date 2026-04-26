@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.feature.radar
 
 import com.rtbishop.look4sat.core.domain.model.SatRadio
+import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 
@@ -32,6 +33,8 @@ data class RadarState(
     val satTrack: List<OrbitalPos> = emptyList(),
     val shouldShowSweep: Boolean = false,
     val shouldUseCompass: Boolean = false,
+    val sunPosition: CelestialComputer.SunPosition? = null,
+    val moonPosition: CelestialComputer.MoonPosition? = null,
     val transmitters: List<SatRadio> = emptyList(),
     val selectedTransmitterUuid: String? = null,
     val selectedFrequency: Long? = null

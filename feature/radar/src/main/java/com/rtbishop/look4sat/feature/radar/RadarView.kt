@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -44,14 +45,19 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.sp
+import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.predict.PI_2
 import com.rtbishop.look4sat.core.domain.utility.toRadians
+import com.rtbishop.look4sat.core.presentation.R
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -66,11 +72,14 @@ fun RadarViewCompose(
     azimElev: Pair<Float, Float>,
     shouldShowSweep: Boolean,
     shouldUseCompass: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sunPosition: CelestialComputer.SunPosition? = null,
+    moonPosition: CelestialComputer.MoonPosition? = null,
 ) {
-    val radarColor = MaterialTheme.colorScheme.secondary
-    val trackColor = MaterialTheme.colorScheme.primary
     val aimColor = MaterialTheme.colorScheme.error
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val radarColor = MaterialTheme.colorScheme.secondary
+    val sunColor = MaterialTheme.colorScheme.primary
     val animTransition = rememberInfiniteTransition(label = "animScale")
     val animScale by animTransition.animateFloat(
         initialValue = 16f,
@@ -79,6 +88,8 @@ fun RadarViewCompose(
         label = "animScale"
     )
     val measurer = rememberTextMeasurer()
+    val sunPainter = painterResource(R.drawable.ic_sun)
+    val moonPainter = painterResource(R.drawable.ic_moon)
     var sweepDegrees by remember { mutableFloatStateOf(0f) }
     var cachedRadius by remember { mutableFloatStateOf(0f) }
     var trackPath by remember { mutableStateOf(Path()) }
@@ -92,13 +103,26 @@ fun RadarViewCompose(
             cachedRadius = radius
         }
         rotate(if (shouldUseCompass) -azimElev.first else 0f) {
-            if (shouldShowSweep) drawSweep(center, sweepDegrees, radius, trackColor)
+            if (shouldShowSweep) drawSweep(center, sweepDegrees, radius, primaryColor)
             drawRadar(radius, radarColor)
-            drawElevationLabels(radius, trackColor, measurer)
+            drawElevationLabels(radius, primaryColor, measurer)
             translate(center.x, center.y) {
-                drawTrack(trackPath, trackEffect, aimColor, trackColor)
+                drawTrack(trackPath, trackEffect, aimColor, primaryColor)
                 if (item.elevation > 0) {
-                    drawPosition(item, radius, animScale, trackColor)
+                    drawPosition(item, radius, animScale, primaryColor)
+                }
+                sunPosition?.let { sun ->
+                    if (sun.elevation > 0) drawBodyIcon(sun.azimuth, sun.elevation, radius, sunColor, sunPainter, 52f)
+                }
+                moonPosition?.let { moon ->
+                    if (moon.elevation > 0) drawBodyIcon(
+                        moon.azimuth,
+                        moon.elevation,
+                        radius,
+                        radarColor,
+                        moonPainter,
+                        52f
+                    )
                 }
                 if (shouldUseCompass) drawAim(azimElev.first, azimElev.second, radius, aimColor)
             }
@@ -178,6 +202,27 @@ private fun createTrackEffect(trackPath: Path): PathEffect {
     }
     val trackLength = PathMeasure().apply { setPath(trackPath, false) }.length
     return PathEffect.stampedPathEffect(shape, trackLength / 2f, trackLength / 4f, StampedPathEffectStyle.Rotate)
+}
+
+private fun DrawScope.drawBodyIcon(
+    azimDeg: Double,
+    elevDeg: Double,
+    radius: Float,
+    color: Color,
+    painter: Painter,
+    iconSize: Float
+) {
+    val azimRad = azimDeg.toRadians()
+    val elevRad = elevDeg.toRadians()
+    val pos = sph2Cart(azimRad, elevRad, radius.toDouble())
+    val half = iconSize / 2f
+    withTransform({
+        translate(pos.x - half, pos.y - half)
+    }) {
+        with(painter) {
+            draw(Size(iconSize, iconSize), colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(color))
+        }
+    }
 }
 
 private fun sph2Cart(azim: Double, elev: Double, r: Double): Offset {

@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.model.SatRadio
+import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
@@ -101,9 +102,20 @@ class RadarViewModel(
                 while (isActive) {
                     val timeNow = System.currentTimeMillis()
                     val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
+                    val sunPos = CelestialComputer.getSunPosition(stationPos, timeNow)
+                    val moonPos = CelestialComputer.getMoonPosition(stationPos, timeNow)
                     val (time, isAos) = computeTimer(satPass.isDeepSpace, satPass.aosTime, satPass.losTime, timeNow)
                     val isLos = !satPass.isDeepSpace && timeNow > satPass.losTime
-                    _uiState.update { it.copy(currentTime = time, isTimeAos = isAos, isLos = isLos, orbitalPos = pos) }
+                    _uiState.update {
+                        it.copy(
+                            currentTime = time,
+                            isTimeAos = isAos,
+                            isLos = isLos,
+                            orbitalPos = pos,
+                            sunPosition = sunPos,
+                            moonPosition = moonPos
+                        )
+                    }
                     processRadios(transmitters, satPass.orbitalObject, timeNow)
                     sendPassData(pos)
                     delay(1000)

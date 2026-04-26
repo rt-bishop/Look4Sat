@@ -114,7 +114,7 @@ object CelestialComputer {
             distance = 1.0 + ((obsSet[2] - ASTRONOMICAL_UNIT) / ASTRONOMICAL_UNIT),
             rangeRate = 1000.0 * obsSet[3],
             latitude = latLon[0].toDegrees(),
-            longitude = 360.0 - latLon[1].toDegrees(),
+            longitude = latLon[1].toDegrees().let { if (it > 180.0) it - 360.0 else it },
             rightAscension = raDec[0].toDegrees(),
             declination = raDec[1].toDegrees()
         )
