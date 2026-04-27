@@ -23,6 +23,7 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.asin
+import kotlin.math.atan
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.floor
@@ -375,47 +376,75 @@ object CelestialComputer {
 
     /**
      * Find the next sunrise and sunset times from [startMillis] for [observer].
-     * Uses the adaptive iteration from PREDICT v2.2.5's PredictSun().
+     * Uses elevation threshold of -0.8333° to match the standard civil definition:
+     * upper limb on geometric horizon with standard atmospheric refraction (~0.57°)
+     * and solar semidiameter (~0.27°) corrections applied, matching USNO/timeanddate.com.
      */
     fun findSunRiseSet(observer: GeoPos, startMillis: Long): RiseSetTimes {
+        // Standard civil threshold: center elevation when upper limb meets geometric horizon
+        // -0.8333° = standard refraction (~0.5667°) + solar semidiameter (~0.2667°)
+        val threshold = 0.8333
         var daynum = millisToDaynum(startMillis)
         var sunPos = getSunPosition(observer, daynumToMillis(daynum))
 
-        // Find sunrise: iterate until sun elevation crosses zero
-        var sunrise = 0.0
-        // If sun is already up, move forward until it sets first
-        if (sunPos.elevation > 0) {
-            while (sunPos.elevation > 0) {
-                daynum += 0.004 * (sin(DEG2RAD * (sunPos.elevation + 0.5)))
+        // Phase 1: if sun is above threshold, fast-forward to well past sunset into night
+        if (sunPos.elevation > -threshold) {
+            var guard = 0
+            while (sunPos.elevation > -threshold && guard++ < 500) {
+                daynum += 0.008  // fixed ~11.5 min steps past the setting sun
                 sunPos = getSunPosition(observer, daynumToMillis(daynum))
             }
-            daynum += 0.4 // advance past night
-        }
-        // Now find next sunrise
-        while (sunrise == 0.0) {
-            if (abs(sunPos.elevation) < 0.03) {
-                sunrise = daynum
-            } else {
-                daynum -= (0.004 * sunPos.elevation)
+            // Now advance until sun is clearly below minimum (deep night)
+            guard = 0
+            while (sunPos.elevation > -12.0 && guard++ < 500) {
+                daynum += 0.02
                 sunPos = getSunPosition(observer, daynumToMillis(daynum))
             }
         }
 
-        // Find sunset from sunrise
+        // Phase 2: advance until sun starts rising toward threshold (elevation increasing)
+        var guard = 0
+        while (sunPos.elevation < -threshold && guard++ < 500) {
+            daynum += 0.008
+            sunPos = getSunPosition(observer, daynumToMillis(daynum))
+        }
+
+        // Phase 3: converge symmetrically on elevation = -threshold (sunrise)
+        var sunrise = 0.0
+        guard = 0
+        while (sunrise == 0.0 && guard++ < 200) {
+            val delta = sunPos.elevation + threshold
+            if (abs(delta) < 0.01) {
+                sunrise = daynum
+            } else {
+                daynum -= 0.004 * delta
+                sunPos = getSunPosition(observer, daynumToMillis(daynum))
+            }
+        }
+        if (sunrise == 0.0) sunrise = daynum
+
+        // Phase 4: fast-forward through the day until sun drops back below threshold
         daynum = sunrise
         sunPos = getSunPosition(observer, daynumToMillis(daynum))
-        // Move forward through the day
-        while (sunPos.elevation > -3) {
-            daynum += 0.04 * (cos(DEG2RAD * (sunPos.elevation + 0.5)))
+        guard = 0
+        while (sunPos.elevation > -threshold && guard++ < 500) {
+            daynum += 0.008
             sunPos = getSunPosition(observer, daynumToMillis(daynum))
         }
-        // Refine sunset
+
+        // Phase 5: converge symmetrically on elevation = -threshold (sunset)
         var sunset = 0.0
-        while (sunset == 0.0) {
-            daynum += 0.004 * (sin(DEG2RAD * (sunPos.elevation + 0.5)))
-            sunPos = getSunPosition(observer, daynumToMillis(daynum))
-            if (sunPos.elevation <= 0) sunset = daynum
+        guard = 0
+        while (sunset == 0.0 && guard++ < 200) {
+            val delta = sunPos.elevation + threshold
+            if (abs(delta) < 0.01) {
+                sunset = daynum
+            } else {
+                daynum += 0.004 * delta
+                sunPos = getSunPosition(observer, daynumToMillis(daynum))
+            }
         }
+        if (sunset == 0.0) sunset = daynum
 
         return RiseSetTimes(daynumToMillis(sunrise), daynumToMillis(sunset))
     }
@@ -429,37 +458,47 @@ object CelestialComputer {
         var moonPos = getMoonPosition(observer, daynumToMillis(daynum))
 
         // If moon is already up, move forward until it sets
+        var guard = 0
         if (moonPos.elevation > 0) {
-            while (moonPos.elevation > 0) {
-                daynum += 0.004 * (sin(DEG2RAD * (moonPos.elevation + 0.5)))
+            while (moonPos.elevation > 0 && guard++ < 1000) {
+                daynum += 0.004 * sin(DEG2RAD * (moonPos.elevation + 0.5))
                 moonPos = getMoonPosition(observer, daynumToMillis(daynum))
             }
             daynum += 0.4
+            moonPos = getMoonPosition(observer, daynumToMillis(daynum))
         }
         // Find moonrise
         var moonrise = 0.0
-        while (moonrise == 0.0) {
+        guard = 0
+        while (moonrise == 0.0 && guard++ < 1000) {
             if (abs(moonPos.elevation) < 0.03) {
                 moonrise = daynum
             } else {
-                daynum -= (0.004 * moonPos.elevation)
+                daynum -= 0.004 * moonPos.elevation
                 moonPos = getMoonPosition(observer, daynumToMillis(daynum))
             }
         }
+        if (moonrise == 0.0) moonrise = daynum
 
         // Find moonset from moonrise
         daynum = moonrise
         moonPos = getMoonPosition(observer, daynumToMillis(daynum))
-        while (moonPos.elevation > -3) {
-            daynum += 0.04 * (cos(DEG2RAD * (moonPos.elevation + 0.5)))
+        guard = 0
+        while (moonPos.elevation > -1 && guard++ < 1000) {
+            daynum += 0.04 * cos(DEG2RAD * (moonPos.elevation + 0.5))
             moonPos = getMoonPosition(observer, daynumToMillis(daynum))
         }
         var moonset = 0.0
-        while (moonset == 0.0) {
-            daynum += 0.004 * (sin(DEG2RAD * (moonPos.elevation + 0.5)))
-            moonPos = getMoonPosition(observer, daynumToMillis(daynum))
-            if (moonPos.elevation <= 0) moonset = daynum
+        guard = 0
+        while (moonset == 0.0 && guard++ < 1000) {
+            if (abs(moonPos.elevation) < 0.03) {
+                moonset = daynum
+            } else {
+                daynum += 0.004 * moonPos.elevation
+                moonPos = getMoonPosition(observer, daynumToMillis(daynum))
+            }
         }
+        if (moonset == 0.0) moonset = daynum
 
         return RiseSetTimes(daynumToMillis(moonrise), daynumToMillis(moonset))
     }
@@ -607,7 +646,8 @@ object CelestialComputer {
         val topZ = cosLat * cosTheta * rx + cosLat * sinTheta * ry + sinLat * rz
 
         // Match north-based convention (0=N, 90=E) used by OrbitalObject.calculateObs
-        var azim = atan2(-topE, topS)
+        // Must use atan(-topE / topS) not atan2(-topE, topS) — they differ in quadrant handling
+        var azim = atan(-topE / topS)
         if (topS > 0.0) azim += PI
         if (azim < 0.0) azim += TWO_PI
         val el = asin(topZ / rMag)

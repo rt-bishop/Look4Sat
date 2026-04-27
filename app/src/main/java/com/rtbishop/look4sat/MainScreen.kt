@@ -78,6 +78,8 @@ fun MainScreen() {
     val currentKey = backStack.lastOrNull()
     val navigateBack: () -> Unit = { backStack.removeAt(backStack.size - 1) }
     val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith fadeOut(animationSpec = tween(350))
+//    val slideInTransition = slideInHorizontally(initialOffsetX = { it }) togetherWith scaleOut(targetScale = 0.9f)
+//    val slideOutTransition = scaleIn(initialScale = 0.9f) togetherWith slideOutHorizontally(targetOffsetX = { it })
     val navItems = listOf(Screen.Satellites, Screen.Passes, Screen.Radar(), Screen.Map, Screen.Settings)
 
     val context = LocalContext.current
@@ -125,7 +127,9 @@ fun MainScreen() {
                 popTransitionSpec = { fadeTransition },
                 predictivePopTransitionSpec = { fadeTransition },
                 entryDecorators = listOf(
+                    // Required for saving Compose state per entry
                     rememberSaveableStateHolderNavEntryDecorator(),
+                    // Required for ViewModel scoping per entry
                     rememberViewModelStoreNavEntryDecorator()
                 ),
                 entryProvider = entryProvider {
