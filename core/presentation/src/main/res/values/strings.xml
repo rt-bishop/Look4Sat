@@ -49,10 +49,12 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Added Turkish translation, by Emre Can Akdaş (TA3ECR)
-        \n* Added DeepSpace passes filter option to the dialog
-        \n* Fixed the radar blip disappearing while eclipsed
-        \n* Fixed (hopefully) the refresh indicator being stuck
+        * Added fixes for Turkish translation, by Emre Can Akdaş (TA3ECR)
+        \n* Added passes sticky header with sunrise/sunset times
+        \n* Added current moon/sun positions to the Radar Screen
+        \n* Added current moon/sun positions to the Map Screen
+        \n* Added red night mode filter overlay for the whole app
+
     </string>
 
     <!-- Radar screen -->

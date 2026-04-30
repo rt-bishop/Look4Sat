@@ -297,6 +297,8 @@ private fun setPositions(
             lastMapView = mapView
             markerPool.clear()
             iconCache.evictAll()
+            footprintPolyline = null
+            footprintPoints = null
         }
         // Reuse the existing FolderOverlay — creating a new one and replacing it
         // causes osmdroid to detach shared Marker objects, making them invisible.
