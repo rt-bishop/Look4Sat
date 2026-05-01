@@ -124,13 +124,20 @@ class PassesViewModel(
         }
     }
 
-    /** Computes sunrise/sunset strings for each unique calendar day in the pass list. */
+    // Computes sunrise/sunset strings for each unique calendar day in the pass list, plus today for Deep Space
     private fun computeSunTimes(passes: List<OrbitalPass>, isUtc: Boolean): Map<String, Pair<String, String>> {
         val stationPos = settingsRepo.stationPosition.value
         val tz = if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault()
         val sdfDate = SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH).also { it.timeZone = tz }
         val sdfTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).also { it.timeZone = tz }
         val result = LinkedHashMap<String, Pair<String, String>>()
+        // Deep Space group always shows today's sun times
+        if (passes.any { it.isDeepSpace }) {
+            val riseSet = CelestialComputer.findSunRiseSet(stationPos, System.currentTimeMillis())
+            val rise = if (riseSet.riseTimeMillis > 0) sdfTime.format(Date(riseSet.riseTimeMillis)) else "--:--"
+            val set = if (riseSet.setTimeMillis > 0) sdfTime.format(Date(riseSet.setTimeMillis)) else "--:--"
+            result["Deep Space"] = rise to set
+        }
         for (pass in passes) {
             if (pass.isDeepSpace) continue
             val label = sdfDate.format(Date(pass.aosTime))
