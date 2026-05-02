@@ -130,8 +130,16 @@
     <string name="prefs_other_switch_update">启用卫星数据自动更新</string>
     <string name="prefs_other_switch_sweep">启用雷达扫描动画</string>
     <string name="prefs_other_switch_sensors">使用传感器旋转雷达视图</string>
+    <string name="prefs_other_switch_night_mode">启用红色夜间模式</string>
 
     <string name="prefs_outro_title">我要感谢：</string>
+    <string name="prefs_outro_thanks" translatable="false">
+        • Look4Sat 所有用户及贡献者!
+        \n• David A. B. Johnson (predict4java)
+        \n• Dave Moten (predict4java)
+        \n• Alexandru Csete (Gpredict)
+        \n• Dr T.S. Kelso (Celestrak)
+        \n• Libre Space Foundation (SatNOGS)</string>
     <string name="prefs_outro_license">该应用程序不提供任何保修.</string>
 
 </resources>
