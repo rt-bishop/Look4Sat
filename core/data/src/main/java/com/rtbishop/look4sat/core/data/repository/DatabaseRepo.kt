@@ -40,28 +40,22 @@ class DatabaseRepo(
     private val settingsRepo: ISettingsRepo
 ) : IDatabaseRepo {
 
-    private companion object {
-        val tleTypes = setOf("Amsat", "R4UAB", "Other")
-        val zippedTleTypes = setOf("McCants", "Classified")
-    }
+    private val customSourceType = "Other"
 
     override suspend fun updateTLEFromFile(uri: String) = withContext(dispatcher) {
         remoteSource.getFileStream(uri)?.let { stream ->
-            val entries = dataParser.parseTLEStream(stream)
+            val entries = dataParser.parseTLEStream(unwrapIfZipped(uri, stream))
             localSource.insertEntries(entries)
-            settingsRepo.setSatelliteTypeIds("Other", entries.map { it.catnum })
+            settingsRepo.setSatelliteTypeIds(customSourceType, entries.map { it.catnum })
         }
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
     override suspend fun updateTransceiversFromFile(uri: String) = withContext(dispatcher) {
-        remoteSource.getFileStream(uri)
-            ?.let { dataParser.parseJSONStream(it) }
-            ?.takeIf { it.isNotEmpty() }
-            ?.let {
-                localSource.deleteRadios()
-                localSource.insertRadios(it)
-            }
+        remoteSource.getFileStream(uri)?.let { stream ->
+            val transceivers = dataParser.parseJSONStream(unwrapIfZipped(uri, stream))
+            localSource.insertRadios(transceivers)
+        }
         setUpdateSuccessful(System.currentTimeMillis())
     }
 
@@ -69,28 +63,26 @@ class DatabaseRepo(
         val dataSourcesSettings = settingsRepo.dataSourcesSettings.value
         val tleUrls = buildMap {
             putAll(Sources.satelliteDataUrls)
-            if (dataSourcesSettings.useCustomTLE) put("Other", dataSourcesSettings.tleUrl)
-        }.filterValues { it.isNotEmpty() }
-
-        val radioUrls = buildList {
-            add(Sources.RADIO_DATA_URL)
-            if (dataSourcesSettings.useCustomTransceivers) add(dataSourcesSettings.transceiversUrl)
-        }
-
+            if (dataSourcesSettings.useCustomTLE) put(customSourceType, dataSourcesSettings.tleUrl)
+        }.filterValues { it.isNotBlank() }
+        val radioUrls = buildMap {
+            putAll(Sources.transceiversDataUrls)
+            if (dataSourcesSettings.useCustomTransceivers) put(customSourceType, dataSourcesSettings.transceiversUrl)
+        }.filterValues { it.isNotBlank() }
         // launch all network requests concurrently
-        val tleJobs = tleUrls.map { (type, url) -> async { type to remoteSource.getNetworkStream(url) } }
-        val radioJobs = radioUrls.map { url -> async { remoteSource.getNetworkStream(url) } }
-
-        // parse satellite data
-        val importedEntries = tleJobs.awaitAll().flatMap { (type, stream) ->
-            stream?.let { parseSatelliteStream(type, it) }.orEmpty().also { satellites ->
-                settingsRepo.setSatelliteTypeIds(type, satellites.map { it.catnum })
+        val tleJobs = tleUrls.values.map { url -> async { url to remoteSource.getNetworkStream(url) } }
+        val radioJobs = radioUrls.values.map { url -> async { url to remoteSource.getNetworkStream(url) } }
+        // parse fetched data concurrently and associate with types
+        val importedEntries = tleJobs.awaitAll().flatMap { (url, stream) ->
+            val type = tleUrls.entries.find { it.value == url }?.key ?: customSourceType
+            stream?.let { parseSatelliteStream(url, unwrapIfZipped(url, it)) }.orEmpty().also { entries ->
+                settingsRepo.setSatelliteTypeIds(type, entries.map { it.catnum })
             }
         }
-
-        // parse radio data
-        val importedRadios = radioJobs.awaitAll().filterNotNull().flatMap { dataParser.parseJSONStream(it) }
-
+        val importedRadios = radioJobs.awaitAll().flatMap { (url, stream) ->
+            stream?.let { dataParser.parseJSONStream(unwrapIfZipped(url, it)) }.orEmpty()
+        }
+        // insert parsed data into the database
         localSource.insertEntries(importedEntries)
         localSource.insertRadios(importedRadios)
         setUpdateSuccessful(System.currentTimeMillis())
@@ -102,10 +94,9 @@ class DatabaseRepo(
         setUpdateSuccessful(0L)
     }
 
-    private suspend fun parseSatelliteStream(type: String, stream: InputStream): List<OrbitalData> = when (type) {
-        in tleTypes -> dataParser.parseTLEStream(stream)
-        in zippedTleTypes -> dataParser.parseTLEStream(ZipInputStream(stream).apply { nextEntry })
-        else -> dataParser.parseCSVStream(stream)
+    private suspend fun parseSatelliteStream(url: String, stream: InputStream): List<OrbitalData> = when {
+        url.contains("FORMAT=csv", ignoreCase = true) -> dataParser.parseCSVStream(stream)
+        else -> dataParser.parseTLEStream(stream)
     }
 
     private suspend fun setUpdateSuccessful(timestamp: Long) {
@@ -113,4 +104,7 @@ class DatabaseRepo(
             DatabaseState(localSource.getRadiosTotal(), localSource.getEntriesTotal(), timestamp)
         )
     }
+
+    private fun unwrapIfZipped(url: String, stream: InputStream): InputStream =
+        if (url.endsWith(".zip", ignoreCase = true)) ZipInputStream(stream).apply { nextEntry } else stream
 }

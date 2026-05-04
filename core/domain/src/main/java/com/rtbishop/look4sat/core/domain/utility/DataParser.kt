@@ -58,8 +58,6 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         }.getOrDefault(emptyList())
     }
 
-    fun isLeapYear(year: Int): Boolean = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
-
     private fun parseCSV(values: List<String>): OrbitalData? = runCatching {
         val name = values[0]
         val timestamp = values[2]
@@ -106,7 +104,8 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
     }.onFailure { println("TLE parsing exception: $it") }.getOrNull()
 
     private fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
-        val daysInMonth = intArrayOf(31, if (isLeapYear(year)) 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        val isLeapYear = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
+        val daysInMonth = intArrayOf(31, if (isLeapYear) 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
         return daysInMonth.take(month - 1).sum() + dayOfMonth
     }
 }
