@@ -242,7 +242,8 @@ object CelestialComputer {
         t = (jd - 2451545.0) / 36525.0
         var teg = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + (0.000387933 * t - t * t / 38710000.0) * t
         while (teg > 360.0) teg -= 360.0
-        val th = fixAngle((teg - observer.longitude) * DEG2RAD)
+        // LST = GMST + east longitude (positive east convention)
+        val th = mod2PI((teg + observer.longitude) * DEG2RAD)
         val h = th - ra
         val azVal = atan2(sin(h), cos(h) * sin(n) - tan(dec) * cos(n)) + PI
         val el = asin(sin(n) * sin(dec) + cos(n) * cos(dec) * cos(h))
@@ -563,9 +564,9 @@ object CelestialComputer {
     // ── Internal helpers ──
 
     private fun observerGeodetic(pos: GeoPos): DoubleArray {
-        // [lat_rad, lon_rad, alt_km]  — longitude negated so that
-        // mod2PI(thetaGJD + obsGeo[1]) == mod2PI(thetaGJD + lon_rad)
-        return doubleArrayOf(pos.latitude * DEG2RAD, -pos.longitude * DEG2RAD, pos.altitude / 1000.0)
+        // [lat_rad, lon_rad, alt_km] — longitude positive east, matching OrbitalObject convention.
+        // LST = thetaGJD(julUtc) + obsGeo[1] = GMST + lon_rad (correct).
+        return doubleArrayOf(pos.latitude * DEG2RAD, pos.longitude * DEG2RAD, pos.altitude / 1000.0)
     }
 
     /**

@@ -1,8 +1,8 @@
 [versions]
 #noinspection UnusedVersionCatalogEntry
-appVersionCode = "430"
+appVersionCode = "431"
 #noinspection UnusedVersionCatalogEntry
-appVersionName = "4.3.0"
+appVersionName = "4.3.1"
 #noinspection GradleDependency,UnusedVersionCatalogEntry
 compileSdk = "36"
 #noinspection UnusedVersionCatalogEntry

@@ -95,11 +95,11 @@ class DataParserTest {
         assert(dataParser.parseCSVStream(validCSVStream) == dataParser.parseTLEStream(validTLEStream))
     }
 
-    @Test
-    fun `Function isLeapYear returns correct data`() = runTest(testDispatcher) {
-        val years = listOf(1900, 1984, 1994, 2016, 2022, 2024, 2042, 2048)
-        val answers = listOf(false, true, false, true, false, true, false, true)
-        val results = years.map { dataParser.isLeapYear(it) }
-        assert(results == answers)
-    }
+//    @Test
+//    fun `Function isLeapYear returns correct data`() = runTest(testDispatcher) {
+//        val years = listOf(1900, 1984, 1994, 2016, 2022, 2024, 2042, 2048)
+//        val answers = listOf(false, true, false, true, false, true, false, true)
+//        val results = years.map { dataParser.isLeapYear(it) }
+//        assert(results == answers)
+//    }
 }

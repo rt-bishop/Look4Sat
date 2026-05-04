@@ -1,5 +1,4 @@
-* Added fixes for Turkish translation, by Emre Can Akdaş (TA3ECR)
-* Added passes sticky header with sunrise/sunset times
-* Added current moon/sun positions to the Radar Screen
-* Added current moon/sun positions to the Map Screen
-* Added red night mode filter overlay for the whole app
+* Added fixes for Chinese translation, by Mubi-Baihua (#216)
+* Added zipped data sources handling to DatabaseRepo
+* Tweaked Passes list to show DeepSpace ones at the top
+* Tweaked RadarView to display sun/moon positions correctly
