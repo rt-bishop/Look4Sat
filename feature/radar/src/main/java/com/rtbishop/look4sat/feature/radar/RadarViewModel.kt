@@ -43,8 +43,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class RadarViewModel(
-    private val catNum: Int,
-    private val aosTime: Long,
     private val bluetoothReporter: IReporter,
     private val networkReporter: IReporter,
     private val satelliteRepo: ISatelliteRepo,
@@ -85,26 +83,24 @@ class RadarViewModel(
         // Resolve which pass we're tracking and start the tick loop
         viewModelScope.launch {
             val passes = satelliteRepo.passes.value
-            val currentPass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
-                ?: passes.firstOrNull()
-            currentPass?.let { satPass ->
-                _uiState.update { it.copy(currentPass = satPass) }
-                val transmitters = satelliteRepo.getRadiosWithId(satPass.catNum)
+            val (catNum, aosTime) = satelliteRepo.selectedPass.value
+            val satPass = passes.find { it.catNum == catNum && it.aosTime == aosTime } ?: passes.firstOrNull()
+            satPass?.let { pass ->
+                _uiState.update { it.copy(currentPass = pass) }
+                val transmitters = satelliteRepo.getRadiosWithId(pass.catNum)
                 // Compute track once (it doesn't change for a given pass)
-                if (!satPass.isDeepSpace) {
-                    val track = satelliteRepo.getTrack(
-                        satPass.orbitalObject, stationPos, satPass.aosTime, satPass.losTime
-                    )
+                if (!pass.isDeepSpace) {
+                    val track = satelliteRepo.getTrack(pass.orbitalObject, stationPos, pass.aosTime, pass.losTime)
                     _uiState.update { it.copy(satTrack = track) }
                 }
                 // Tick loop — position, timer, and radio updates every second
                 while (isActive) {
                     val timeNow = System.currentTimeMillis()
-                    val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
+                    val pos = satelliteRepo.getPosition(pass.orbitalObject, stationPos, timeNow)
                     val sunPos = CelestialComputer.getSunPosition(stationPos, timeNow)
                     val moonPos = CelestialComputer.getMoonPosition(stationPos, timeNow)
-                    val (time, isAos) = computeTimer(satPass.isDeepSpace, satPass.aosTime, satPass.losTime, timeNow)
-                    val isLos = !satPass.isDeepSpace && timeNow > satPass.losTime
+                    val (time, isAos) = computeTimer(pass.isDeepSpace, pass.aosTime, pass.losTime, timeNow)
+                    val isLos = !pass.isDeepSpace && timeNow > pass.losTime
                     _uiState.update {
                         it.copy(
                             currentTime = time,
@@ -115,7 +111,7 @@ class RadarViewModel(
                             moonPosition = moonPos
                         )
                     }
-                    processRadios(transmitters, satPass.orbitalObject, timeNow)
+                    processRadios(transmitters, pass.orbitalObject, timeNow)
                     sendPassData(pos)
                     delay(1000)
                 }
@@ -213,11 +209,9 @@ class RadarViewModel(
     }
 
     companion object {
-        fun factory(catNum: Int, aosTime: Long, container: IMainContainer) = viewModelFactory {
+        fun factory(container: IMainContainer) = viewModelFactory {
             initializer {
                 RadarViewModel(
-                    catNum = catNum,
-                    aosTime = aosTime,
                     bluetoothReporter = container.provideBluetoothReporter(),
                     networkReporter = container.provideNetworkReporter(),
                     satelliteRepo = container.satelliteRepo,

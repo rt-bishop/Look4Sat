@@ -81,10 +81,7 @@ import java.util.Locale
 fun SettingsDestination() {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
-    val viewModel = viewModel(
-        modelClass = SettingsViewModel::class.java,
-        factory = SettingsViewModel.factory(container)
-    )
+    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.factory(container))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingsScreen(uiState, viewModel::onAction)
 }

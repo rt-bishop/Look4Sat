@@ -123,10 +123,7 @@ private val moonIconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 fun MapDestination() {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
-    val viewModel = viewModel(
-        modelClass = MapViewModel::class.java,
-        factory = MapViewModel.factory(container)
-    )
+    val viewModel: MapViewModel = viewModel(factory = MapViewModel.factory(container))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val mapView = rememberMapViewWithLifecycle()
     MapScreen(uiState, viewModel::onAction, mapView)

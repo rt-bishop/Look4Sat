@@ -38,8 +38,6 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class RadioControlViewModel(
-    private val catNum: Int,
-    private val aosTime: Long,
     private val trackingService: IRadioTrackingService,
     private val satelliteRepo: ISatelliteRepo,
     settingsRepo: ISettingsRepo
@@ -73,27 +71,23 @@ class RadioControlViewModel(
         // Resolve pass and load transponders
         viewModelScope.launch {
             val passes = satelliteRepo.passes.value
-            val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime }
-                ?: passes.firstOrNull()
-            currentPass = pass
-            pass?.let { satPass ->
-                val allRadios = satelliteRepo.getRadiosWithId(satPass.catNum)
+            val (catNum, aosTime) = satelliteRepo.selectedPass.value
+            val satPass = passes.find { it.catNum == catNum && it.aosTime == aosTime } ?: passes.firstOrNull()
+            currentPass = satPass
+            satPass?.let { pass ->
+                val allRadios = satelliteRepo.getRadiosWithId(pass.catNum)
                 transponders = allRadios.filter { it.downlinkLow != null }
-                _uiState.update {
-                    it.copy(currentPass = satPass, transponders = transponders)
-                }
+                _uiState.update { it.copy(currentPass = pass, transponders = transponders) }
                 // If service is already tracking this pass, sync the selected transponder
                 val svcState = trackingService.state.value
-                if (svcState.isActive && svcState.currentPass?.catNum == satPass.catNum) {
-                    _uiState.update {
-                        it.copy(selectedTransponderUuid = svcState.selectedTransponder?.uuid)
-                    }
+                if (svcState.isActive && svcState.currentPass?.catNum == pass.catNum) {
+                    _uiState.update { it.copy(selectedTransponderUuid = svcState.selectedTransponder?.uuid) }
                 }
                 // Tick loop — timer and satellite position updates every second
                 while (isActive) {
                     val timeNow = System.currentTimeMillis()
-                    val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, timeNow)
-                    val (timeStr, isAos) = computeTimer(satPass.isDeepSpace, satPass.aosTime, satPass.losTime, timeNow)
+                    val pos = satelliteRepo.getPosition(pass.orbitalObject, stationPos, timeNow)
+                    val (timeStr, isAos) = computeTimer(pass.isDeepSpace, pass.aosTime, pass.losTime, timeNow)
                     _uiState.update { state ->
                         state.copy(
                             currentTime = timeStr,
@@ -187,11 +181,9 @@ class RadioControlViewModel(
             return String.format(Locale.ENGLISH, "%d.%03d.%03d", mhz, khz, hz)
         }
 
-        fun factory(catNum: Int, aosTime: Long, container: IMainContainer) = viewModelFactory {
+        fun factory(container: IMainContainer) = viewModelFactory {
             initializer {
                 RadioControlViewModel(
-                    catNum = catNum,
-                    aosTime = aosTime,
                     trackingService = container.radioTrackingService,
                     satelliteRepo = container.satelliteRepo,
                     settingsRepo = container.settingsRepo

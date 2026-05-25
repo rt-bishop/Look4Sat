@@ -86,10 +86,7 @@ import java.util.TimeZone
 fun PassesDestination(navigateToRadar: (Int, Long) -> Unit) {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
-    val viewModel = viewModel(
-        modelClass = PassesViewModel::class.java,
-        factory = PassesViewModel.factory(container)
-    )
+    val viewModel: PassesViewModel = viewModel(factory = PassesViewModel.factory(container))
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     PassesScreen(uiState, viewModel::onAction, navigateToRadar)
 }

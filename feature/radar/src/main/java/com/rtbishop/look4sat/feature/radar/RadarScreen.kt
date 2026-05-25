@@ -42,7 +42,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,42 +76,23 @@ import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
 
 @Composable
-fun RadarDestination(
-    catNum: Int = 0,
-    aosTime: Long = 0L,
-    navigateUp: () -> Unit,
-    navigateToRadioControl: (Int, Long) -> Unit = { _, _ -> }
-) {
+fun RadarDestination(navigateToRadioControl: () -> Unit = {}) {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
-    val viewModel = viewModel(
-        modelClass = RadarViewModel::class.java,
-        key = "$catNum-$aosTime",
-        factory = RadarViewModel.factory(catNum, aosTime, container)
-    )
+    val viewModel: RadarViewModel = viewModel(factory = RadarViewModel.factory(container))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    RadarScreen(uiState, viewModel::onAction, navigateUp, navigateToRadioControl)
+    RadarScreen(uiState, viewModel::onAction, navigateToRadioControl)
 }
 
 @Composable
 private fun RadarScreen(
     uiState: RadarState,
     onAction: (RadarAction) -> Unit,
-    navigateUp: () -> Unit,
-    navigateToRadioControl: (Int, Long) -> Unit
+    navigateToRadioControl: () -> Unit
 ) {
     val upcomingPass = uiState.currentPass ?: getDefaultPass()
-    LaunchedEffect(uiState.isLos) { if (uiState.isLos) navigateUp() }
-
     val addToCalendar: () -> Unit = {
-        uiState.currentPass?.let { pass ->
-            onAction(RadarAction.AddToCalendar(pass.name, pass.aosTime, pass.losTime))
-        }
-    }
-    val openRadioControl: () -> Unit = {
-        uiState.currentPass?.let { pass ->
-            navigateToRadioControl(pass.catNum, pass.aosTime)
-        }
+        uiState.currentPass?.let { onAction(RadarAction.AddToCalendar(it.name, it.aosTime, it.losTime)) }
     }
     Column(
         modifier = Modifier
@@ -125,7 +105,7 @@ private fun RadarScreen(
             TopBar {
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isTimeAos)
-                IconCard(action = openRadioControl, resId = R.drawable.ic_radios)
+                IconCard(action = navigateToRadioControl, resId = R.drawable.ic_radios)
             }
             TopBar { NextPassRow(pass = upcomingPass, isUtc = uiState.isUtc) }
         } else {
@@ -133,7 +113,7 @@ private fun RadarScreen(
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isTimeAos)
                 NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
-                IconCard(action = openRadioControl, resId = R.drawable.ic_radios)
+                IconCard(action = navigateToRadioControl, resId = R.drawable.ic_radios)
             }
         }
         if (isVertical) {

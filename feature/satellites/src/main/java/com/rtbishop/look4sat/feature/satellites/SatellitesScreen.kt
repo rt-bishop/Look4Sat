@@ -75,10 +75,7 @@ import com.rtbishop.look4sat.core.presentation.layoutPadding
 fun SatellitesDestination(navigateUp: () -> Unit) {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
-    val viewModel = viewModel(
-        modelClass = SatellitesViewModel::class.java,
-        factory = SatellitesViewModel.factory(container)
-    )
+    val viewModel: SatellitesViewModel = viewModel(factory = SatellitesViewModel.factory(container))
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     SatellitesScreen(uiState, viewModel::onAction, navigateUp)
 }

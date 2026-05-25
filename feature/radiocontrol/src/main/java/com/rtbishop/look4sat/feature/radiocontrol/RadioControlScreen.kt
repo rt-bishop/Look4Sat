@@ -66,14 +66,10 @@ import com.rtbishop.look4sat.core.presentation.layoutPadding
 import java.util.Locale
 
 @Composable
-fun RadioControlDestination(catNum: Int = 0, aosTime: Long = 0L, navigateUp: () -> Unit) {
+fun RadioControlDestination(navigateUp: () -> Unit) {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
-    val viewModel = viewModel(
-        modelClass = RadioControlViewModel::class.java,
-        key = "$catNum-$aosTime",
-        factory = RadioControlViewModel.factory(catNum, aosTime, container)
-    )
+    val viewModel: RadioControlViewModel = viewModel(factory = RadioControlViewModel.factory(container))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     RadioControlScreen(uiState, viewModel::onAction, navigateUp)
 }

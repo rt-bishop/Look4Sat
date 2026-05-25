@@ -52,6 +52,13 @@ class SatelliteRepo(
     private val _satellites = MutableStateFlow<List<OrbitalObject>>(emptyList())
     override val satellites: StateFlow<List<OrbitalObject>> = _satellites
 
+    private val _selectedPass = MutableStateFlow(0 to 0L)
+    override val selectedPass: StateFlow<Pair<Int, Long>> = _selectedPass
+
+    override fun selectPass(catNum: Int, aosTime: Long) {
+        _selectedPass.value = catNum to aosTime
+    }
+
     override suspend fun getRadiosWithId(id: Int) = localStorage.getRadiosWithId(id)
 
     override suspend fun initRepository() = withContext(dispatcher) {

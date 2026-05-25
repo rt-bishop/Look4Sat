@@ -80,7 +80,7 @@ fun MainScreen() {
     val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith fadeOut(animationSpec = tween(350))
 //    val slideInTransition = slideInHorizontally(initialOffsetX = { it }) togetherWith scaleOut(targetScale = 0.9f)
 //    val slideOutTransition = scaleIn(initialScale = 0.9f) togetherWith slideOutHorizontally(targetOffsetX = { it })
-    val navItems = listOf(Screen.Satellites, Screen.Passes, Screen.Radar(), Screen.Map, Screen.Settings)
+    val navItems = listOf(Screen.Satellites, Screen.Passes, Screen.Radar, Screen.Map, Screen.Settings)
 
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
@@ -138,25 +138,15 @@ fun MainScreen() {
                     }
                     entry<Screen.Passes> {
                         PassesDestination { catNum, aosTime ->
-                            backStack.add(Screen.Radar(catNum, aosTime))
+                            container.satelliteRepo.selectPass(catNum, aosTime)
+                            backStack.add(Screen.Radar)
                         }
                     }
-                    entry<Screen.Radar> { route ->
-                        RadarDestination(
-                            catNum = route.catNum,
-                            aosTime = route.aosTime,
-                            navigateUp = navigateBack,
-                            navigateToRadioControl = { catNum, aosTime ->
-                                backStack.add(Screen.RadioControl(catNum, aosTime))
-                            }
-                        )
+                    entry<Screen.Radar> {
+                        RadarDestination(navigateToRadioControl = { backStack.add(Screen.RadioControl) })
                     }
-                    entry<Screen.RadioControl> { route ->
-                        RadioControlDestination(
-                            catNum = route.catNum,
-                            aosTime = route.aosTime,
-                            navigateUp = navigateBack
-                        )
+                    entry<Screen.RadioControl> {
+                        RadioControlDestination(navigateUp = navigateBack)
                     }
                     entry<Screen.Map> {
                         MapDestination()
@@ -184,7 +174,8 @@ fun MainScreen() {
                         .clickable {
                             val pass = trackingState.currentPass
                             if (pass != null) {
-                                backStack.add(Screen.RadioControl(pass.catNum, pass.aosTime))
+                                container.satelliteRepo.selectPass(pass.catNum, pass.aosTime)
+                                backStack.add(Screen.RadioControl)
                             }
                         }
                         .padding(horizontal = 12.dp, vertical = 6.dp)

@@ -34,6 +34,12 @@ interface ISatelliteRepo {
     /** Whether the repo is currently calculating passes. */
     val isCalculating: StateFlow<Boolean>
 
+    /** Currently selected pass (catNum + aosTime), persisted across screen navigations. */
+    val selectedPass: StateFlow<Pair<Int, Long>>
+
+    /** Set the currently selected pass. */
+    fun selectPass(catNum: Int, aosTime: Long)
+
     /** Load satellite objects from DB based on the current selection. */
     suspend fun initRepository()
 

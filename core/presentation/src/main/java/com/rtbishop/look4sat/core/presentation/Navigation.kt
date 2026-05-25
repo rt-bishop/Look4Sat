@@ -30,10 +30,10 @@ sealed class Screen(val iconResId: Int, val titleResId: Int) : NavKey {
     data object Passes : Screen(R.drawable.ic_passes, R.string.nav_pass)
 
     @Serializable
-    data class Radar(val catNum: Int = 0, val aosTime: Long = 0L) : Screen(R.drawable.ic_radar, R.string.nav_radar)
+    data object Radar : Screen(R.drawable.ic_radar, R.string.nav_radar)
 
     @Serializable
-    data class RadioControl(val catNum: Int = 0, val aosTime: Long = 0L) : Screen(0, 0)
+    data object RadioControl : Screen(0, 0)
 
     @Serializable
     data object Map : Screen(R.drawable.ic_map, R.string.nav_map)

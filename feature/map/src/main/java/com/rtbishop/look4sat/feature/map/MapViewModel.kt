@@ -76,7 +76,8 @@ class MapViewModel(
                 _uiState.update { it.copy(isUtc = settings.stateOfUtc) }
             }
         }
-        selectDefaultSatellite(-1)
+        val (selectedCatNum, _) = satelliteRepo.selectedPass.value
+        selectDefaultSatellite(if (selectedCatNum != 0) selectedCatNum else -1)
     }
 
     fun onAction(action: MapAction) {
