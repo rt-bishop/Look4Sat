@@ -12,21 +12,21 @@ jdkVersion = "17"
 #noinspection UnusedVersionCatalogEntry
 packageName = "com.rtbishop.look4sat"
 
-android-gradle-plugin = "9.2.0"
+android-gradle-plugin = "9.2.1"
 
 androidx-core-ktx = "1.18.0"
 androidx-core-splashscreen = "1.2.0"
 androidx-room = "2.8.4"
 
-compose-bom = "2026.04.01"
+compose-bom = "2026.05.01"
 compose-activity = "1.13.0"
 compose-lifecycle = "2.10.0"
-compose-navigation3 = "1.1.1"
+compose-navigation3 = "1.1.2"
 
-google-ksp = "2.3.6"
+google-ksp = "2.3.7"
 
 kotlin = "2.3.21"
-kotlin-coroutines = "1.10.2"
+kotlin-coroutines = "1.11.0"
 kotlin-serialization = "1.11.0"
 
 other-okhttp = "5.3.2"

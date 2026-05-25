@@ -32,9 +32,10 @@ data class PassesState(
     val showDeepSpace: Boolean = true,
     val modes: List<String> = emptyList(),
     val itemsList: List<OrbitalPass> = emptyList(),
+    val groupedPasses: Map<String, List<OrbitalPass>> = emptyMap(),
     val shouldSeeWhatsNew: Boolean = false,
-    // Map of dateLabel -> Pair(sunriseTime, sunsetTime) for each day group
-    val sunTimes: Map<String, Pair<String, String>> = emptyMap()
+    val sunTimes: Map<String, Pair<String, String>> = emptyMap(),
+    val focusedCatNum: Int? = null
 )
 
 sealed interface PassesAction {
@@ -44,4 +45,6 @@ sealed interface PassesAction {
     data object RefreshPasses : PassesAction
     data object TogglePassesDialog : PassesAction
     data object ToggleRadiosDialog : PassesAction
+    data class FocusCatNum(val catNum: Int) : PassesAction
+    data object ClearFocus : PassesAction
 }

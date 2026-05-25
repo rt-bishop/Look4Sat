@@ -17,6 +17,11 @@
  */
 package com.rtbishop.look4sat.feature.passes
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +72,7 @@ import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
+import com.rtbishop.look4sat.core.presentation.SwipeableItem
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
@@ -143,9 +149,11 @@ private fun PassesScreen(
             isRefreshing = uiState.isRefreshing,
             isUtc = uiState.isUtc,
             passes = uiState.itemsList,
+            groupedPasses = uiState.groupedPasses,
+            sunTimes = uiState.sunTimes,
+            focusedCatNum = uiState.focusedCatNum,
             navigateToRadar = navigateToRadar,
-            refreshPasses = { onAction(PassesAction.RefreshPasses) },
-            sunTimes = uiState.sunTimes
+            onAction = onAction
         )
     }
 }
@@ -156,33 +164,19 @@ private fun PassesList(
     isRefreshing: Boolean,
     isUtc: Boolean,
     passes: List<OrbitalPass>,
+    groupedPasses: Map<String, List<OrbitalPass>>,
+    sunTimes: Map<String, Pair<String, String>>,
+    focusedCatNum: Int?,
     navigateToRadar: (Int, Long) -> Unit,
-    refreshPasses: () -> Unit,
-    sunTimes: Map<String, Pair<String, String>>
+    onAction: (PassesAction) -> Unit
 ) {
     val isVerticalLayout = isVerticalLayout()
     val refreshState = rememberPullToRefreshState()
-    val timeZone = remember(isUtc) { if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault() }
-    val sdfDate = remember(isUtc) {
-        SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH).also { it.timeZone = timeZone }
-    }
-
-    // Deep Space first, then date-grouped timed passes
-    val groupedPasses = remember(passes, isUtc) {
-        val ordered = LinkedHashMap<String, List<OrbitalPass>>()
-        val deepSpace = passes.filter { it.isDeepSpace }
-        if (deepSpace.isNotEmpty()) ordered["Deep Space"] = deepSpace
-        passes.filter { !it.isDeepSpace }
-            .groupByTo(LinkedHashMap()) { sdfDate.format(Date(it.aosTime)) }
-            .forEach { (k, v) -> ordered[k] = v }
-        ordered
-    }
-
     ElevatedCard(modifier = Modifier.fillMaxSize()) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             state = refreshState,
-            onRefresh = refreshPasses,
+            onRefresh = { onAction(PassesAction.RefreshPasses) },
             indicator = {
                 PullToRefreshDefaults.Indicator(
                     state = refreshState,
@@ -196,20 +190,36 @@ private fun PassesList(
             if (passes.isEmpty()) {
                 EmptyListCard(message = stringResource(R.string.pass_empty_list_message))
             } else {
-                LazyVerticalGrid(columns = GridCells.Adaptive(320.dp), modifier = Modifier.fillMaxSize()) {
-                    for ((dateLabel, dayPasses) in groupedPasses) {
-                        stickyHeader(key = "header_$dateLabel") {
-                            val (rise, set) = sunTimes[dateLabel] ?: ("--:--" to "--:--")
-                            StickyDateHeader(label = dateLabel, sunriseTime = rise, sunsetTime = set)
-                        }
-                        items(items = dayPasses, key = { item -> item.catNum + item.aosTime }) { pass ->
-                            PassItem(
-                                pass = pass,
-                                navigateToRadar = navigateToRadar,
-                                modifier = Modifier.animateItem(),
-                                isVerticalLayout = isVerticalLayout,
-                                isUtc = isUtc
-                            )
+                AnimatedContent(
+                    targetState = focusedCatNum,
+                    transitionSpec = { fadeIn(tween(200)) togetherWith fadeOut(tween(200)) },
+                    label = "PassesFocusTransition"
+                ) { targetFocus ->
+                    LazyVerticalGrid(columns = GridCells.Adaptive(320.dp), modifier = Modifier.fillMaxSize()) {
+                        for ((dateLabel, dayPasses) in groupedPasses) {
+                            val headerVisible = targetFocus == null || dayPasses.any { it.catNum == targetFocus }
+                            if (headerVisible) {
+                                stickyHeader(key = "header_$dateLabel") {
+                                    val (rise, set) = sunTimes[dateLabel] ?: ("--:--" to "--:--")
+                                    StickyDateHeader(label = dateLabel, sunriseTime = rise, sunsetTime = set)
+                                }
+                            }
+                            val visiblePasses = if (targetFocus == null) dayPasses
+                            else dayPasses.filter { it.catNum == targetFocus }
+                            items(items = visiblePasses, key = { item -> item.catNum + item.aosTime }) { pass ->
+                                SwipeableItem(
+                                    onSwipeRight = { onAction(PassesAction.FocusCatNum(pass.catNum)) },
+                                    onSwipeLeft = { onAction(PassesAction.ClearFocus) }
+                                ) {
+                                    PassItem(
+                                        pass = pass,
+                                        navigateToRadar = navigateToRadar,
+                                        modifier = Modifier.animateItem(),
+                                        isVerticalLayout = isVerticalLayout,
+                                        isUtc = isUtc
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -361,13 +371,6 @@ private fun PassItem(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_altitude),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(text = "${pass.altitude} km", fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
                 }
                 Row(

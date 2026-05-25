@@ -178,12 +178,6 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier, isUtc
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_altitude),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(text = "${pass.altitude} km", fontSize = 15.sp)
                 }
                 Text(
