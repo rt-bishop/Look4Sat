@@ -1,4 +1,0 @@
-* Added fixes for Chinese translation, by Mubi-Baihua (#216)
-* Added zipped data sources handling to DatabaseRepo
-* Tweaked Passes list to show DeepSpace ones at the top
-* Tweaked RadarView to display sun/moon positions correctly

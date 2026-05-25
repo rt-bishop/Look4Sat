@@ -25,50 +25,42 @@ jobs:
           java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Assemble Artifacts
-        run: |
-          ./gradlew assembleRelease
-          ./gradlew bundleRelease
+        run: ./gradlew assembleRelease bundleRelease
 
       - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
-        id: sign_apk
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEY_STORE }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "36.0.0"
-
-      - name: Sign Bundle
-        uses: r0adkll/sign-android-release@v1
-        id: sign_bundle
-        with:
-          releaseDirectory: app/build/outputs/bundle/release
-          signingKeyBase64: ${{ secrets.KEY_STORE }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "36.0.0"
-
-      - name: Rename Artifacts
         run: |
-          mv ${{steps.sign_apk.outputs.signedReleaseFile}} app/build/outputs/apk/release/look4sat.apk
-          mv ${{steps.sign_bundle.outputs.signedReleaseFile}} app/build/outputs/apk/release/look4sat.aab
+          echo "${{ secrets.KEY_STORE }}" | base64 -d > keystore.jks
+          APK=$(find app/build/outputs/apk/release -name "*.apk" -not -name "*unsigned*" | head -1)
+          BUILD_TOOLS=$(ls -d ${ANDROID_HOME}/build-tools/*/ | sort -V | tail -1)
+          ${BUILD_TOOLS}apksigner sign \
+            --ks keystore.jks \
+            --ks-pass pass:${{ secrets.KEY_STORE_PASSWORD }} \
+            --ks-key-alias ${{ secrets.KEY_ALIAS }} \
+            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+            --out app/build/outputs/apk/release/look4sat.apk \
+            "$APK"
+          rm keystore.jks
 
-      - name: Deploy Bundle
-        uses: r0adkll/upload-google-play@v1
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          serviceAccountJsonPlainText: ${{secrets.SERVICE_ACCOUNT_JSON}}
-          packageName: com.rtbishop.look4sat
-          releaseFiles: app/build/outputs/apk/release/look4sat.aab
-          track: production
-          whatsNewDirectory: fastlane/metadata/android/en-US/whatsnew
+          ruby-version: '3.3'
+
+      - name: Deploy Bundle to Google Play
+        run: |
+          gem install fastlane --no-document
+          AAB=$(find app/build/outputs/bundle/release -name "*.aab" | head -1)
+          echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+          fastlane supply \
+            --aab "$AAB" \
+            --json_key service_account.json \
+            --package_name com.rtbishop.look4sat \
+            --track production \
+            --metadata_path fastlane/metadata/android
+          rm service_account.json
 
       - name: Create Release
         run: |
