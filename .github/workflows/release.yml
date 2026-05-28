@@ -33,7 +33,7 @@ jobs:
       - name: Sign APK
         run: |
           echo "${{ secrets.KEY_STORE }}" | base64 -d > keystore.jks
-          APK=$(find app/build/outputs/apk/release -name "*.apk" -not -name "*unsigned*" | head -1)
+          APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
           BUILD_TOOLS=$(ls -d ${ANDROID_HOME}/build-tools/*/ | sort -V | tail -1)
           ${BUILD_TOOLS}apksigner sign \
             --ks keystore.jks \
@@ -42,6 +42,17 @@ jobs:
             --key-pass pass:${{ secrets.KEY_PASSWORD }} \
             --out app/build/outputs/apk/release/look4sat.apk \
             "$APK"
+          rm keystore.jks
+
+      - name: Sign Bundle
+        run: |
+          echo "${{ secrets.KEY_STORE }}" | base64 -d > keystore.jks
+          AAB=$(find app/build/outputs/bundle/release -name "*.aab" | head -1)
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore keystore.jks \
+            -storepass ${{ secrets.KEY_STORE_PASSWORD }} \
+            -keypass ${{ secrets.KEY_PASSWORD }} \
+            "$AAB" ${{ secrets.KEY_ALIAS }}
           rm keystore.jks
 
       - name: Setup Ruby
@@ -59,7 +70,8 @@ jobs:
             --json_key service_account.json \
             --package_name com.rtbishop.look4sat \
             --track production \
-            --metadata_path fastlane/metadata/android
+            --skip_upload_images true \
+            --skip_upload_screenshots true \
           rm service_account.json
 
       - name: Create Release

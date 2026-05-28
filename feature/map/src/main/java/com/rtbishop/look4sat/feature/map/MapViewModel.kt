@@ -127,10 +127,16 @@ class MapViewModel(
                 val dateNow = Date()
                 getStationPosition()
                 getSatTrack(orbitalObject, stationPos, dateNow)
+                // Scale update interval based on satellite count to avoid excessive CPU usage
+                val effectiveRate = when {
+                    allSatellites.size > 5000 -> maxOf(updateFreq, 3000L)
+                    allSatellites.size > 1000 -> maxOf(updateFreq, 2000L)
+                    else -> updateFreq
+                }
                 while (isActive) {
                     dateNow.time = System.currentTimeMillis()
                     updateMapState(orbitalObject, allSatellites, stationPos, dateNow)
-                    delay(updateFreq)
+                    delay(effectiveRate)
                 }
             }
         }

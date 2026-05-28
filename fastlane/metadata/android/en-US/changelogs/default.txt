@@ -1,4 +1,2 @@
-* Added fixes for Chinese translation, by Mubi-Baihua (#216)
-* Added zipped data sources handling to DatabaseRepo
-* Tweaked Passes list to show DeepSpace ones at the top
-* Tweaked RadarView to display sun/moon positions correctly
+* Implemented Swipe-to-Focus behavior for passes - swipe right on a pass to focus it, and left - to unfocus
+* Implemented preserving the pass selection between the Radar and Map screens. Not every satellite has a pass overhead every day, so this should make it only slightly easier to keep track of certain satellites.

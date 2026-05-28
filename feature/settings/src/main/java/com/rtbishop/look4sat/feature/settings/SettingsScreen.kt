@@ -185,32 +185,63 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
     val gitHubUrl = stringResource(R.string.prefs_github_url)
     val licenseUrl = stringResource(R.string.prefs_license_url)
     val privacyUrl = stringResource(R.string.prefs_privacy_url)
+    val safeOpenUri: (String) -> Unit = { url ->
+        try { uriHandler.openUri(url) } catch (_: Exception) {}
+    }
 
     ScreenColumn(
         topBar = { isVerticalLayout ->
             if (isVerticalLayout) {
                 TopBar {
-                    TopCard(onClick = { uriHandler.openUri(appUrl) }, version = uiState.appVersionName, modifier = Modifier.weight(1f))
-                    PrimaryIconCard(onClick = { uriHandler.openUri(donateUrl) }, resId = R.drawable.ic_pound)
+                    TopCard(
+                        onClick = { safeOpenUri(appUrl) },
+                        version = uiState.appVersionName,
+                        modifier = Modifier.weight(1f)
+                    )
+                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_pound)
                 }
                 TopBar {
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        BotCard(onClick = { uriHandler.openUri(fdroidUrl) }, R.drawable.ic_fdroid, fdroidTitle, modifier = Modifier.weight(1f))
-                        BotCard(onClick = { uriHandler.openUri(gitHubUrl) }, R.drawable.ic_github, gitHubTitle, modifier = Modifier.weight(1f))
+                        BotCard(
+                            onClick = { safeOpenUri(fdroidUrl) },
+                            resId = R.drawable.ic_fdroid,
+                            text = fdroidTitle,
+                            modifier = Modifier.weight(1f)
+                        )
+                        BotCard(
+                            onClick = { safeOpenUri(gitHubUrl) },
+                            resId = R.drawable.ic_github,
+                            text = gitHubTitle,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
-                    IconCard(action = { uriHandler.openUri(licenseUrl) }, resId = R.drawable.ic_license)
-                    IconCard(action = { uriHandler.openUri(privacyUrl) }, resId = R.drawable.ic_policy)
+                    IconCard(action = { safeOpenUri(licenseUrl) }, resId = R.drawable.ic_license)
+                    IconCard(action = { safeOpenUri(privacyUrl) }, resId = R.drawable.ic_policy)
                 }
             } else {
                 TopBar {
-                    PrimaryIconCard(onClick = { uriHandler.openUri(donateUrl) }, resId = R.drawable.ic_pound)
-                    TopCard(onClick = { uriHandler.openUri(appUrl) }, version = uiState.appVersionName, modifier = Modifier.weight(1f))
+                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_pound)
+                    TopCard(
+                        onClick = { safeOpenUri(appUrl) },
+                        version = uiState.appVersionName,
+                        modifier = Modifier.weight(1f)
+                    )
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        BotCard(onClick = { uriHandler.openUri(fdroidUrl) }, R.drawable.ic_fdroid, fdroidTitle, modifier = Modifier.weight(1f))
-                        BotCard(onClick = { uriHandler.openUri(gitHubUrl) }, R.drawable.ic_github, gitHubTitle, modifier = Modifier.weight(1f))
+                        BotCard(
+                            onClick = { safeOpenUri(fdroidUrl) },
+                            resId = R.drawable.ic_fdroid,
+                            text = fdroidTitle,
+                            modifier = Modifier.weight(1f)
+                        )
+                        BotCard(
+                            onClick = { safeOpenUri(gitHubUrl) },
+                            resId = R.drawable.ic_github,
+                            text = gitHubTitle,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
-                    IconCard(action = { uriHandler.openUri(licenseUrl) }, resId = R.drawable.ic_license)
-                    IconCard(action = { uriHandler.openUri(privacyUrl) }, resId = R.drawable.ic_policy)
+                    IconCard(action = { safeOpenUri(licenseUrl) }, resId = R.drawable.ic_license)
+                    IconCard(action = { safeOpenUri(privacyUrl) }, resId = R.drawable.ic_policy)
                 }
             }
         }

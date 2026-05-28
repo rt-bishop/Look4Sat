@@ -49,10 +49,9 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Added fixes for Chinese translation, by Mubi-Baihua (#216)
-        \n* Added zipped data sources handling to DatabaseRepo
-        \n* Tweaked Passes list to show DeepSpace ones at the top
-        \n* Tweaked RadarView to display sun/moon positions correctly
+        * Implemented Swipe-to-Focus behavior for passes - swipe right on a pass to focus it, and left - to unfocus
+        \n\n* Implemented preserving the pass selection between the Radar and Map screens. Not every satellite has
+        a pass overhead every day, so this should make it only slightly easier to keep track of certain satellites.
     </string>
 
     <!-- Radar screen -->

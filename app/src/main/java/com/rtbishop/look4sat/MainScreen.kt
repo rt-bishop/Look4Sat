@@ -76,7 +76,7 @@ import com.rtbishop.look4sat.feature.settings.SettingsDestination
 fun MainScreen() {
     val backStack = rememberNavBackStack(Screen.Passes)
     val currentKey = backStack.lastOrNull()
-    val navigateBack: () -> Unit = { backStack.removeAt(backStack.size - 1) }
+    val navigateBack: () -> Unit = { if (backStack.size > 1) backStack.removeAt(backStack.size - 1) }
     val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith fadeOut(animationSpec = tween(350))
 //    val slideInTransition = slideInHorizontally(initialOffsetX = { it }) togetherWith scaleOut(targetScale = 0.9f)
 //    val slideOutTransition = scaleIn(initialScale = 0.9f) togetherWith slideOutHorizontally(targetOffsetX = { it })
