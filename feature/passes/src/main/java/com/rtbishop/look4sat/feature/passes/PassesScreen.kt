@@ -75,6 +75,7 @@ import com.rtbishop.look4sat.core.presentation.ScreenColumn
 import com.rtbishop.look4sat.core.presentation.SwipeableItem
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
+import com.rtbishop.look4sat.core.presentation.elevationColor
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import java.text.SimpleDateFormat
@@ -331,16 +332,17 @@ private fun PassItem(
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                val elevColor = elevationColor(pass.maxElevation)
                 Icon(
                     painter = painterResource(id = R.drawable.ic_elevation),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = elevColor,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${pass.maxElevation}°",
-                    color = MaterialTheme.colorScheme.primary
+                    color = elevColor
                 )
             }
             Row(

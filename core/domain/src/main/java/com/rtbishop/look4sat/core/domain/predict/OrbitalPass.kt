@@ -25,9 +25,10 @@ data class OrbitalPass(
     val altitude: Int = 1000,
     val maxElevation: Double = 75.0,
     val orbitalObject: OrbitalObject,
-    val progress: Float = 0.0f
+    val progress: Float = 0.0f,
+    val hasDecayed: Boolean = false
 ) {
     val catNum: Int = orbitalObject.data.catnum
-    val name: String = orbitalObject.data.name
+    val name: String = if (hasDecayed) "${orbitalObject.data.name} (decayed?)" else orbitalObject.data.name
     val isDeepSpace: Boolean = orbitalObject.data.isDeepSpace
 }

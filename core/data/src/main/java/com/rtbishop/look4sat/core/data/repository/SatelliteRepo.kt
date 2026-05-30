@@ -146,17 +146,18 @@ class SatelliteRepo(
         val passes = mutableListOf<OrbitalPass>()
         val endDate = time + hours * 60L * 60L * 1000L
         val quarterOrbitMin = (this.data.orbitalPeriod / 4.0).toInt()
+        val decayed = this.data.hasDecayed(time)
         var startDate = time
         var shouldRewind = true
         var lastAosDate: Long
         var count = 0
         if (this.willBeSeen(pos)) {
             if (this.data.isDeepSpace) {
-                passes.add(getGeoPass(this, pos, time))
+                passes.add(getGeoPass(this, pos, time, decayed))
             } else {
                 do {
                     if (count > 0) shouldRewind = false
-                    val pass = getLeoPass(this, pos, startDate, shouldRewind)
+                    val pass = getLeoPass(this, pos, startDate, shouldRewind, decayed)
                     lastAosDate = pass.aosTime
                     passes.add(pass)
                     startDate = pass.losTime + (quarterOrbitMin * 3) * 60L * 1000L
@@ -167,17 +168,17 @@ class SatelliteRepo(
         return passes
     }
 
-    private fun getGeoPass(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPass {
+    private fun getGeoPass(sat: OrbitalObject, pos: GeoPos, time: Long, decayed: Boolean): OrbitalPass {
         val satPos = sat.getPosition(pos, time)
         val aos = time - 24 * 60L * 60L * 1000L
         val los = time + 24 * 60L * 60L * 1000L // val tca = (aos + los) / 2
         val az = satPos.azimuth.toDegrees().round(1)
         val elev = satPos.elevation.toDegrees().round(1)
         val alt = satPos.altitude
-        return OrbitalPass(aos, az, los, az, alt.toInt(), elev, sat)
+        return OrbitalPass(aos, az, los, az, alt.toInt(), elev, sat, hasDecayed = decayed)
     }
 
-    private fun getLeoPass(sat: OrbitalObject, pos: GeoPos, time: Long, rewind: Boolean): OrbitalPass {
+    private fun getLeoPass(sat: OrbitalObject, pos: GeoPos, time: Long, rewind: Boolean, decayed: Boolean): OrbitalPass {
         val quarterOrbitMin = (sat.data.orbitalPeriod / 4.0).toInt()
         var calendarTimeMillis = time
         var elevation: Double
@@ -241,6 +242,6 @@ class SatelliteRepo(
         val alt = tcaPos.altitude
 
         val elev = maxElevation.toDegrees().round(1)
-        return OrbitalPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat)
+        return OrbitalPass(aos, aosAz, los, losAz, alt.toInt(), elev, sat, hasDecayed = decayed)
     }
 }

@@ -48,6 +48,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -151,16 +152,17 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier, isUtc
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                val elevColor = elevationColor(pass.maxElevation)
                 Icon(
                     painter = painterResource(R.drawable.ic_elevation),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = elevColor,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${pass.maxElevation}°",
-                    color = MaterialTheme.colorScheme.primary
+                    color = elevColor
                 )
             }
             Row(
@@ -377,5 +379,14 @@ fun TopBar(
         TopBar { bottomInfo() }
     } else {
         TopBar { startAction(); topInfo(); bottomInfo(); endAction() }
+    }
+}
+
+@Composable
+fun elevationColor(elevation: Double): Color {
+    return when {
+        elevation < 15.0 -> Color(0xFFEF5350) // soft red for low elevation
+        elevation < 45.0 -> MaterialTheme.colorScheme.primary // accent yellow for normal
+        else -> Color(0xFF66BB6A) // soft green for high elevation
     }
 }

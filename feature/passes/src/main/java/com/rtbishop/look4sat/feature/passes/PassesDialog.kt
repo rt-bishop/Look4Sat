@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +55,7 @@ import com.rtbishop.look4sat.core.presentation.LocalSpacing
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.SharedDialog
+import com.rtbishop.look4sat.core.presentation.elevationColor
 
 private val allModes = listOf(
     "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
@@ -96,7 +98,8 @@ internal fun PassesDialog(
             value = elevationValueNew.doubleValue,
             displayValue = "${elevationValueNew.doubleValue.toInt()}°",
             valueResId = R.drawable.ic_elevation,
-            valueRange = 0f..60f
+            valueRange = 0f..60f,
+            accentColor = elevationColor(elevationValueNew.doubleValue)
         ) { elevationValueNew.doubleValue = it.toDouble() }
         SliderRow(
             title = stringResource(R.string.pass_filter_hours),
@@ -117,6 +120,7 @@ private fun SliderRow(
     valueResId: Int,
     valueRange: ClosedFloatingPointRange<Float>,
     steps: Int = 0,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
     onChange: (Float) -> Unit
 ) {
     Column(
@@ -137,14 +141,14 @@ private fun SliderRow(
             Icon(
                 painter = painterResource(id = valueResId),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = accentColor,
                 modifier = Modifier.size(20.dp)
             )
             Text(
                 text = displayValue,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.primary
+                color = accentColor
             )
         }
         Slider(value = value.toFloat(), onValueChange = onChange, valueRange = valueRange, steps = steps)

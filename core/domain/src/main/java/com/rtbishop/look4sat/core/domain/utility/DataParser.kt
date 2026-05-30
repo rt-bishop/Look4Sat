@@ -82,7 +82,8 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
             argper = values[7].toDouble(),
             meanan = values[8].toDouble(),
             catnum = values[11].toInt(),
-            bstar = values[14].toDouble()
+            bstar = values[14].toDouble(),
+            ndot = values[15].toDouble()
         )
     }.onFailure { println("CSV parsing exception: $it") }.getOrNull()
 
@@ -99,13 +100,15 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
             argper = line2.substring(34, 42).toDouble(),
             meanan = line2.substring(43, 51).toDouble(),
             catnum = line1.substring(2, 7).trim().toInt(),
-            bstar = 1e-5 * line1.substring(53, 59).toDouble() / 10.0.pow(line1.substring(60, 61).toDouble())
+            bstar = 1e-5 * line1.substring(53, 59).toDouble() / 10.0.pow(line1.substring(60, 61).toDouble()),
+            ndot = line1.substring(33, 43).trim().toDouble()
         )
     }.onFailure { println("TLE parsing exception: $it") }.getOrNull()
 
-    private fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
-        val isLeapYear = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
-        val daysInMonth = intArrayOf(31, if (isLeapYear) 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+    fun isLeapYear(year: Int): Boolean = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
+
+    fun getDayOfYear(year: Int, month: Int, dayOfMonth: Int): Int {
+        val daysInMonth = intArrayOf(31, if (isLeapYear(year)) 29 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
         return daysInMonth.take(month - 1).sum() + dayOfMonth
     }
 }

@@ -27,7 +27,8 @@ data class OrbitalData(
     val argper: Double,
     val meanan: Double,
     val catnum: Int,
-    val bstar: Double
+    val bstar: Double,
+    val ndot: Double = 0.0
 ) {
     val xincl: Double = incl * DEG2RAD
     val xnodeo: Double = raan * DEG2RAD
@@ -37,4 +38,29 @@ data class OrbitalData(
     val orbitalPeriod: Double = MIN_PER_DAY / meanmo
     val isDeepSpace: Boolean = orbitalPeriod >= 225.0 // NearEarth (period < 225 min) or DeepSpace (period >= 225 min)
     fun getObject(): OrbitalObject = if (isDeepSpace) DeepSpaceObject(this) else NearEarthObject(this)
+
+    /** Check if satellite has likely decayed by the given time. */
+    fun hasDecayed(currentTimeMillis: Long): Boolean {
+        if (ndot == 0.0) return false
+        val currentDaynum = (currentTimeMillis - 315446400000L) / 86400000.0
+        val epochDaynum = epochToDaynum(epoch)
+        return CelestialComputer.hasDecayed(meanmo, ndot, epochDaynum, currentDaynum)
+    }
+
+    private fun epochToDaynum(epoch: Double): Double {
+        var year = kotlin.math.floor(epoch * 1E-3)
+        val day = (epoch * 1E-3 - year) * 1000.0
+        year = if (year < 57) year + 2000 else year + 1900
+        // daynum = days since 31 Dec 1979, Julian date of 31Dec79 = 2444238.5
+        val jan1Jd = julianDateOfYear(year)
+        return jan1Jd + day - 2444238.5
+    }
+
+    private fun julianDateOfYear(theYear: Double): Double {
+        val aYear = theYear - 1
+        val a = kotlin.math.floor(aYear / 100).toLong()
+        val b = 2 - a + a / 4
+        val i = kotlin.math.floor(365.25 * aYear).toLong()
+        return i + (30.6001 * 14).toLong() + 1720994.5 + b
+    }
 }
