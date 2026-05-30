@@ -33,9 +33,6 @@ sealed class Screen(val iconResId: Int, val titleResId: Int) : NavKey {
     data object Radar : Screen(R.drawable.ic_radar, R.string.nav_radar)
 
     @Serializable
-    data object RadioControl : Screen(0, 0)
-
-    @Serializable
     data object Map : Screen(R.drawable.ic_map, R.string.nav_map)
 
     @Serializable

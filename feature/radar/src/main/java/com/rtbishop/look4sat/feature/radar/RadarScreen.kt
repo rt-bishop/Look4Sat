@@ -23,9 +23,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,62 +31,59 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.keepScreenOn
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.presentation.EmptyListCard
 import com.rtbishop.look4sat.core.presentation.IconCard
-import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
-import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
+import kotlinx.coroutines.launch
+
+private enum class RadarPage(val title: String) {
+    Transceivers("Transceivers"),
+    Sstv("SSTV")
+}
 
 @Composable
-fun RadarDestination(navigateToRadioControl: () -> Unit = {}) {
+fun RadarDestination(navigateUp: () -> Unit) {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val viewModel: RadarViewModel = viewModel(factory = RadarViewModel.factory(container))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    RadarScreen(uiState, viewModel::onAction, navigateToRadioControl)
+    RadarScreen(uiState, viewModel::onAction, navigateUp)
 }
 
 @Composable
 private fun RadarScreen(
     uiState: RadarState,
     onAction: (RadarAction) -> Unit,
-    navigateToRadioControl: () -> Unit
+    navigateUp: () -> Unit
 ) {
     val upcomingPass = uiState.currentPass ?: getDefaultPass()
     val addToCalendar: () -> Unit = {
@@ -103,27 +98,91 @@ private fun RadarScreen(
         val isVertical = isVerticalLayout()
         if (isVertical) {
             TopBar {
-                IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isTimeAos)
-                IconCard(action = navigateToRadioControl, resId = R.drawable.ic_radios)
+                IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
             TopBar { NextPassRow(pass = upcomingPass, isUtc = uiState.isUtc) }
         } else {
             TopBar {
-                IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
+                IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isTimeAos)
                 NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
-                IconCard(action = navigateToRadioControl, resId = R.drawable.ic_radios)
+                IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
         }
         if (isVertical) {
             RadarCard(uiState, Modifier.weight(1f))
-            TransmittersCard(uiState.transmitters, uiState.selectedTransmitterUuid, onAction, Modifier.weight(1f))
+            PagerCard(uiState, onAction, Modifier.weight(1f))
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 RadarCard(uiState, Modifier.weight(1f))
-                TransmittersCard(uiState.transmitters, uiState.selectedTransmitterUuid, onAction, Modifier.weight(1f))
+                PagerCard(uiState, onAction, Modifier.weight(1f))
             }
+        }
+    }
+}
+
+@Composable
+private fun PagerCard(
+    uiState: RadarState,
+    onAction: (RadarAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val pages = RadarPage.entries
+    val pagerState = rememberPagerState(pageCount = { pages.size })
+    val coroutineScope = rememberCoroutineScope()
+
+    ElevatedCard(modifier = modifier) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
+                pages.forEachIndexed { index, page ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+                        text = { Text(text = page.title, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                    )
+                }
+            }
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { pageIndex ->
+                when (pages[pageIndex]) {
+                    RadarPage.Transceivers -> TransceiversPage(
+                        transceivers = uiState.transmitters,
+                        selectedUuid = uiState.selectedTransmitterUuid,
+                        radioControl = uiState.radioControl,
+                        onAction = onAction
+                    )
+                    RadarPage.Sstv -> SstvPlaceholderPage()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SstvPlaceholderPage() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(text = "🚧", fontSize = 48.sp)
+            Text(
+                text = "SSTV Decoder",
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Coming soon",
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -237,180 +296,3 @@ private fun RadarLabel(
     }
 }
 
-@Composable
-private fun TransmittersCard(
-    transmitters: List<SatRadio>,
-    selectedUuid: String?,
-    onAction: (RadarAction) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ElevatedCard(modifier = modifier) {
-        if (transmitters.isEmpty()) {
-            EmptyTransmittersContent()
-        } else {
-            TransmittersList(
-                transmitters = transmitters,
-                selectedUuid = selectedUuid,
-                onSelect = { uuid ->
-                    if (selectedUuid != null) {
-                        onAction(RadarAction.SelectTransmitter(uuid))
-                    }
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyTransmittersContent() {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Text(text = """¯\_(ツ)_/¯""", fontSize = 32.sp)
-            Text(
-                text = stringResource(R.string.empty_list_message),
-                fontSize = 21.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = stringResource(R.string.radar_no_data),
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-@Composable
-private fun TransmittersList(
-    transmitters: List<SatRadio>,
-    selectedUuid: String?,
-    onSelect: (String) -> Unit
-) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(items = transmitters, key = { it.uuid }) { radio ->
-            TransmitterItem(
-                radio = radio,
-                isClickable = selectedUuid != null,
-                isSelected = radio.uuid == selectedUuid,
-                onClick = { onSelect(radio.uuid) }
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun TransmitterItemPreview() {
-    val transmitter = SatRadio(
-        "", "Extremely powerful transmitter", true, 10000000000L, 10000000000L,
-        null, 10000000000L, 10000000000L, "FSK AX.100 Mode 5", true, 0
-    )
-    MainTheme { TransmitterItem(transmitter, isClickable = true, isSelected = true, onClick = {}) }
-}
-
-@Composable
-private fun TransmitterItem(
-    radio: SatRadio,
-    isClickable: Boolean,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val title = if (radio.isInverted) "INVERTED: ${radio.info}" else radio.info
-    val fullTitle = "$title - (${radio.downlinkMode ?: "--"}/${radio.uplinkMode ?: "--"})"
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(if (isClickable) Modifier.clickable { onClick() } else Modifier)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 8.dp, vertical = 6.dp)
-        ) {
-            Box {
-                Text(
-                    text = fullTitle,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 6.dp)
-                        .infiniteMarquee()
-                )
-                if (isSelected) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_radios),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.background(color = MaterialTheme.colorScheme.surface)
-                    )
-                }
-            }
-            FrequencyRow(radio = radio, isDownlink = true)
-            FrequencyRow(radio = radio, isDownlink = false)
-        }
-        HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.background)
-    }
-}
-
-@Composable
-private fun FrequencyRow(radio: SatRadio, isDownlink: Boolean) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        val desc = if (isDownlink) stringResource(R.string.radar_downlink)
-        else stringResource(R.string.radar_uplink)
-        Text(
-            text = if (isDownlink) "D:" else "U:",
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .size(24.dp)
-                .semantics { contentDescription = desc }
-        )
-        FrequencyText(
-            frequency = if (isDownlink) radio.downlinkLow else radio.uplinkLow,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = "-",
-            textAlign = TextAlign.Center,
-            fontSize = 21.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        FrequencyText(
-            frequency = if (isDownlink) radio.downlinkHigh else radio.uplinkHigh,
-            modifier = Modifier.weight(1f)
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.ic_arrow),
-            tint = MaterialTheme.colorScheme.onSurface,
-            contentDescription = null,
-            modifier = Modifier
-                .rotate(if (isDownlink) 90f else -90f)
-                .size(24.dp)
-        )
-    }
-}
-
-@Composable
-private fun FrequencyText(frequency: Long?, modifier: Modifier = Modifier) {
-    val text = frequency?.let {
-        stringResource(id = R.string.radar_link_low, it / 1000000f)
-    } ?: stringResource(R.string.radar_no_link)
-    Text(
-        text = text,
-        textAlign = TextAlign.Center,
-        fontSize = 21.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = modifier
-    )
-}

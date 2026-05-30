@@ -22,6 +22,25 @@ import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 
+data class RadioPanelState(
+    val label: String = "",
+    val isConnected: Boolean = false,
+    val frequencyHz: Long? = null,
+    val frequencyDisplay: String = "---",
+    val mode: String? = null
+)
+
+data class RadioControlSubState(
+    val txPanel: RadioPanelState = RadioPanelState("TX (Uplink)"),
+    val rxPanel: RadioPanelState = RadioPanelState("RX (Downlink)"),
+    val transponders: List<SatRadio> = emptyList(),
+    val selectedTransponderUuid: String? = null,
+    val txBaseFrequencyHz: Long? = null,
+    val ctcssTone: Double? = null,
+    val isTracking: Boolean = false,
+    val errorMessage: String? = null
+)
+
 data class RadarState(
     val currentPass: OrbitalPass? = null,
     val currentTime: String = "00:00:00",
@@ -37,10 +56,20 @@ data class RadarState(
     val moonPosition: CelestialComputer.MoonPosition? = null,
     val transmitters: List<SatRadio> = emptyList(),
     val selectedTransmitterUuid: String? = null,
-    val selectedFrequency: Long? = null
+    val selectedFrequency: Long? = null,
+    val radioControl: RadioControlSubState = RadioControlSubState()
 )
 
 sealed interface RadarAction {
     data class AddToCalendar(val name: String, val aosTime: Long, val losTime: Long) : RadarAction
     data class SelectTransmitter(val uuid: String) : RadarAction
+
+    // Radio control actions
+    data class SelectTransponder(val uuid: String) : RadarAction
+    data class SetTxFrequency(val frequencyHz: Long) : RadarAction
+    data class AdjustTxFrequency(val deltaHz: Long) : RadarAction
+    data class SetCtcssTone(val toneHz: Double?) : RadarAction
+    data object ToggleTracking : RadarAction
+    data object ConnectRadios : RadarAction
+    data object DisconnectRadios : RadarAction
 }

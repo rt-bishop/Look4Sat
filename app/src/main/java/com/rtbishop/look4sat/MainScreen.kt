@@ -68,7 +68,6 @@ import com.rtbishop.look4sat.core.presentation.hasEnoughWidth
 import com.rtbishop.look4sat.feature.map.MapDestination
 import com.rtbishop.look4sat.feature.passes.PassesDestination
 import com.rtbishop.look4sat.feature.radar.RadarDestination
-import com.rtbishop.look4sat.feature.radiocontrol.RadioControlDestination
 import com.rtbishop.look4sat.feature.satellites.SatellitesDestination
 import com.rtbishop.look4sat.feature.settings.SettingsDestination
 
@@ -143,10 +142,7 @@ fun MainScreen() {
                         }
                     }
                     entry<Screen.Radar> {
-                        RadarDestination(navigateToRadioControl = { backStack.add(Screen.RadioControl) })
-                    }
-                    entry<Screen.RadioControl> {
-                        RadioControlDestination(navigateUp = navigateBack)
+                        RadarDestination(navigateUp = navigateBack)
                     }
                     entry<Screen.Map> {
                         MapDestination()
@@ -175,7 +171,7 @@ fun MainScreen() {
                             val pass = trackingState.currentPass
                             if (pass != null) {
                                 container.satelliteRepo.selectPass(pass.catNum, pass.aosTime)
-                                backStack.add(Screen.RadioControl)
+                                backStack.add(Screen.Radar)
                             }
                         }
                         .padding(horizontal = 12.dp, vertical = 6.dp)

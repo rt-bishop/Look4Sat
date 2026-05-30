@@ -64,7 +64,7 @@ class RadioTrackingService(
         Log.i(tag, "Connecting TX=$txAddr RX=$rxAddr")
 
         if (txAddr.isBlank() && rxAddr.isBlank()) {
-            _state.update { it.copy(errorMessage = "No radio addresses configured. Set them in Settings → FT-817.") }
+            _state.update { it.copy(errorMessage = "No radio addresses configured in Settings") }
             return
         }
 
