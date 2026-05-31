@@ -38,3 +38,33 @@ sealed class Screen(val iconResId: Int, val titleResId: Int) : NavKey {
     @Serializable
     data object Settings : Screen(R.drawable.ic_settings, R.string.nav_prefs)
 }
+
+@Serializable
+data object RadarDestination : NavKey
+
+interface IDeeplinkMatcher {
+    fun match(deeplink: String): NavKey?
+}
+
+object PassDetailsMatcher : IDeeplinkMatcher {
+    val passDetailsRegex = """https://github.com/rt-bishop/Look4Sat/passes/(.*)""".toRegex()
+
+    override fun match(deeplink: String): NavKey? {
+        val passMatch = passDetailsRegex.find(deeplink)
+        passMatch?.let { match ->
+            val passId = match.groupValues[1]
+            if (passId.isNotEmpty()) return RadarDestination
+        }
+        return null
+    }
+}
+
+class DeeplinkResolver(private val fallbackDestination: NavKey = Screen.Passes) {
+
+    private val matchers: List<IDeeplinkMatcher> = listOf(PassDetailsMatcher)
+
+    fun resolve(deeplink: String): NavKey {
+        matchers.forEach { it.match(deeplink)?.let { match -> return match } }
+        return fallbackDestination
+    }
+}

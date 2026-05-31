@@ -25,6 +25,10 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +36,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,11 +44,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +69,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.presentation.DeeplinkResolver
+import com.rtbishop.look4sat.core.presentation.RadarDestination
 import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.hasEnoughHeight
 import com.rtbishop.look4sat.core.presentation.hasEnoughWidth
@@ -72,13 +81,47 @@ import com.rtbishop.look4sat.feature.satellites.SatellitesDestination
 import com.rtbishop.look4sat.feature.settings.SettingsDestination
 
 @Composable
-fun MainScreen() {
+fun NavRoot(deeplink: String? = null) {
+    val rootBackStack = rememberNavBackStack(Screen.Passes)
+    val deeplinkResolver = DeeplinkResolver()
+    LaunchedEffect(deeplink) {
+        deeplink?.let {
+            val destination = deeplinkResolver.resolve(it) // rootBackStack.clear()
+            rootBackStack.add(destination)
+        }
+    }
+    val navigateBack: () -> Unit = { rootBackStack.removeLastOrNull() }
+    val slideInTransition = slideInHorizontally(initialOffsetX = { it }) togetherWith scaleOut(targetScale = 0.9f)
+    val slideOutTransition = scaleIn(initialScale = 0.9f) togetherWith slideOutHorizontally(targetOffsetX = { it })
+    NavDisplay(
+        modifier = Modifier.fillMaxSize(),
+        backStack = rootBackStack,
+        onBack = navigateBack,
+        transitionSpec = { slideInTransition },
+        popTransitionSpec = { slideOutTransition },
+        predictivePopTransitionSpec = { slideOutTransition },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(), // Required for saving Compose state per entry
+            rememberViewModelStoreNavEntryDecorator() // Required for ViewModel scoping per entry
+        ),
+        entryProvider = entryProvider {
+            entry<Screen.Passes> { MainScreen(navigateToRadar = { rootBackStack.add(RadarDestination) }) }
+            entry<RadarDestination> {
+                Scaffold { innerPadding ->
+                    RadarDestination(navigateUp = navigateBack)
+                    innerPadding.calculateTopPadding()
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun MainScreen(navigateToRadar: () -> Unit = {}) {
     val backStack = rememberNavBackStack(Screen.Passes)
     val currentKey = backStack.lastOrNull()
-    val navigateBack: () -> Unit = { if (backStack.size > 1) backStack.removeAt(backStack.size - 1) }
+    val navigateBack: () -> Unit = { backStack.removeLastOrNull() }
     val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith fadeOut(animationSpec = tween(350))
-//    val slideInTransition = slideInHorizontally(initialOffsetX = { it }) togetherWith scaleOut(targetScale = 0.9f)
-//    val slideOutTransition = scaleIn(initialScale = 0.9f) togetherWith slideOutHorizontally(targetOffsetX = { it })
     val navItems = listOf(Screen.Satellites, Screen.Passes, Screen.Radar, Screen.Map, Screen.Settings)
 
     val context = LocalContext.current
@@ -139,6 +182,7 @@ fun MainScreen() {
                         PassesDestination { catNum, aosTime ->
                             container.satelliteRepo.selectPass(catNum, aosTime)
                             backStack.add(Screen.Radar)
+//                            navigateToRadar()
                         }
                     }
                     entry<Screen.Radar> {
