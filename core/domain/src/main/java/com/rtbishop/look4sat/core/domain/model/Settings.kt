@@ -56,7 +56,8 @@ data class OtherSettings(
     val stateOfLightTheme: Boolean,
     val stateOfNightMode: Boolean = false,
     val shouldSeeWarning: Boolean,
-    val shouldSeeWhatsNew: Boolean
+    val shouldSeeWhatsNew: Boolean,
+    val sstvMode: String = "Auto"
 )
 
 data class DataSourcesSettings(

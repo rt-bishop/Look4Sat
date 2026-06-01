@@ -17,6 +17,10 @@
  */
 package com.rtbishop.look4sat.feature.radar
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -39,6 +43,7 @@ import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -49,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
@@ -76,14 +82,27 @@ fun RadarDestination(navigateUp: () -> Unit) {
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val viewModel: RadarViewModel = viewModel(factory = RadarViewModel.factory(container))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    RadarScreen(uiState, viewModel::onAction, navigateUp)
+    // Sync actual permission state on every recomposition so it survives screen re-entry
+    val hasPermission = ContextCompat.checkSelfPermission(
+        context, Manifest.permission.RECORD_AUDIO
+    ) == PackageManager.PERMISSION_GRANTED
+    LaunchedEffect(hasPermission) {
+        viewModel.onAction(RadarAction.SstvPermissionResult(hasPermission))
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted -> viewModel.onAction(RadarAction.SstvPermissionResult(granted)) }
+    RadarScreen(uiState, viewModel::onAction, navigateUp, requestMicPermission = {
+        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+    })
 }
 
 @Composable
 private fun RadarScreen(
     uiState: RadarState,
     onAction: (RadarAction) -> Unit,
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
+    requestMicPermission: () -> Unit
 ) {
     val upcomingPass = uiState.currentPass ?: getDefaultPass()
     val addToCalendar: () -> Unit = {
@@ -113,11 +132,11 @@ private fun RadarScreen(
         }
         if (isVertical) {
             RadarCard(uiState, Modifier.weight(1f))
-            PagerCard(uiState, onAction, Modifier.weight(1f))
+            PagerCard(uiState, onAction, requestMicPermission, Modifier.weight(1f))
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 RadarCard(uiState, Modifier.weight(1f))
-                PagerCard(uiState, onAction, Modifier.weight(1f))
+                PagerCard(uiState, onAction, requestMicPermission, Modifier.weight(1f))
             }
         }
     }
@@ -127,6 +146,7 @@ private fun RadarScreen(
 private fun PagerCard(
     uiState: RadarState,
     onAction: (RadarAction) -> Unit,
+    requestMicPermission: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pages = RadarPage.entries
@@ -155,34 +175,13 @@ private fun PagerCard(
                         radioControl = uiState.radioControl,
                         onAction = onAction
                     )
-                    RadarPage.Sstv -> SstvPlaceholderPage()
+                    RadarPage.Sstv -> SstvPage(
+                        sstv = uiState.sstv,
+                        onAction = onAction,
+                        requestMicPermission = requestMicPermission
+                    )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun SstvPlaceholderPage() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(text = "🚧", fontSize = 48.sp)
-            Text(
-                text = "SSTV Decoder",
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = "Coming soon",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

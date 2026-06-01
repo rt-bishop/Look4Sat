@@ -21,6 +21,7 @@ import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
+import com.rtbishop.look4sat.core.domain.sstv.SstvFrame
 
 data class RadioPanelState(
     val label: String = "",
@@ -57,7 +58,18 @@ data class RadarState(
     val transmitters: List<SatRadio> = emptyList(),
     val selectedTransmitterUuid: String? = null,
     val selectedFrequency: Long? = null,
-    val radioControl: RadioControlSubState = RadioControlSubState()
+    val radioControl: RadioControlSubState = RadioControlSubState(),
+    val sstv: SstvSubState = SstvSubState()
+)
+
+enum class SstvStatus { Idle, Recording, Saving }
+
+data class SstvSubState(
+    val status: SstvStatus = SstvStatus.Idle,
+    val hasPermission: Boolean = false,
+    val selectedMode: String = "Auto",
+    val supportedModes: List<String> = emptyList(),
+    val currentFrame: SstvFrame? = null
 )
 
 sealed interface RadarAction {
@@ -72,4 +84,12 @@ sealed interface RadarAction {
     data object ToggleTracking : RadarAction
     data object ConnectRadios : RadarAction
     data object DisconnectRadios : RadarAction
+
+    // SSTV actions
+    data object SstvStartRecording : RadarAction
+    data object SstvStopRecording : RadarAction
+    data object SstvSaveImage : RadarAction
+    data object SstvReset : RadarAction
+    data class SstvSelectMode(val modeName: String) : RadarAction
+    data class SstvPermissionResult(val granted: Boolean) : RadarAction
 }

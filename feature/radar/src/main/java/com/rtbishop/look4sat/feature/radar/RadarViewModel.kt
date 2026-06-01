@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
+import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.domain.repository.IRadioTrackingService
@@ -31,10 +32,15 @@ import com.rtbishop.look4sat.core.domain.repository.IReporter
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.core.domain.sstv.SstvDecoder
+import com.rtbishop.look4sat.core.domain.usecase.IAudioCapture
 import com.rtbishop.look4sat.core.domain.usecase.IAddToCalendar
+import com.rtbishop.look4sat.core.domain.usecase.ISaveImage
+import com.rtbishop.look4sat.core.domain.usecase.IShowToast
 import com.rtbishop.look4sat.core.domain.utility.round
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.domain.utility.toTimerString
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,91 +57,100 @@ class RadarViewModel(
     private val settingsRepo: ISettingsRepo,
     private val sensorsRepo: ISensorsRepo,
     private val addToCalendar: IAddToCalendar,
-    private val trackingService: IRadioTrackingService
+    private val trackingService: IRadioTrackingService,
+    private val audioCapture: IAudioCapture,
+    private val saveImage: ISaveImage,
+    private val showToast: IShowToast
 ) : ViewModel() {
 
     private val stationPos = settingsRepo.stationPosition.value
     private val magDeclination = sensorsRepo.getMagDeclination(stationPos)
     private var transponders: List<SatRadio> = emptyList()
+    private var sstvDecoder: SstvDecoder? = null
+    private var sstvRecordingJob: Job? = null
 
     private val _uiState = MutableStateFlow(
         RadarState(
             isUtc = settingsRepo.otherSettings.value.stateOfUtc,
             orientationValues = sensorsRepo.orientation.value,
             shouldShowSweep = settingsRepo.otherSettings.value.stateOfSweep,
-            shouldUseCompass = settingsRepo.otherSettings.value.stateOfSensors
+            shouldUseCompass = settingsRepo.otherSettings.value.stateOfSensors,
+            sstv = SstvSubState(selectedMode = settingsRepo.otherSettings.value.sstvMode)
         )
     )
     val uiState: StateFlow<RadarState> = _uiState
 
     init {
-        // Compass sensor collection
-        if (settingsRepo.otherSettings.value.stateOfSensors) {
-            viewModelScope.launch {
-                sensorsRepo.enableSensor()
-                sensorsRepo.orientation.collect { data ->
-                    val orientationValues = (data.first + magDeclination) to data.second
-                    _uiState.update { it.copy(orientationValues = orientationValues) }
-                }
+        collectCompassSensor()
+        collectSettingsChanges()
+        collectPassAndStartTickLoop()
+        collectRadioTrackingState()
+    }
+
+    private fun collectCompassSensor() {
+        if (!settingsRepo.otherSettings.value.stateOfSensors) return
+        viewModelScope.launch {
+            sensorsRepo.enableSensor()
+            sensorsRepo.orientation.collect { data ->
+                val orientationValues = (data.first + magDeclination) to data.second
+                _uiState.update { it.copy(orientationValues = orientationValues) }
             }
         }
-        // React to UTC setting changes
+    }
+
+    private fun collectSettingsChanges() {
         viewModelScope.launch {
             settingsRepo.otherSettings.collectLatest { settings ->
                 _uiState.update { it.copy(isUtc = settings.stateOfUtc) }
             }
         }
-        // Resolve which pass we're tracking and start the tick loop
+    }
+
+    private fun collectPassAndStartTickLoop() {
         viewModelScope.launch {
             val passes = satelliteRepo.passes.value
             val (catNum, aosTime) = satelliteRepo.selectedPass.value
-            val satPass = passes.find { it.catNum == catNum && it.aosTime == aosTime } ?: passes.firstOrNull()
-            satPass?.let { pass ->
-                _uiState.update { it.copy(currentPass = pass) }
-                val transmittersList = satelliteRepo.getRadiosWithId(pass.catNum)
-                // Load transponders for radio control (ones that have downlink)
-                transponders = transmittersList.filter { it.downlinkLow != null }
-                _uiState.update { state ->
-                    state.copy(radioControl = state.radioControl.copy(transponders = transponders))
-                }
-                // Auto-expand the first item so users discover the expandable UI
-                if (transmittersList.isNotEmpty()) {
-                    val firstUuid = transmittersList.first().uuid
-                    _uiState.update { it.copy(selectedTransmitterUuid = firstUuid) }
-                    transponders.find { it.uuid == firstUuid }?.let {
-                        trackingService.setTransponder(it)
-                    }
-                }
-                // Compute track once (it doesn't change for a given pass)
-                if (!pass.isDeepSpace) {
-                    val track = satelliteRepo.getTrack(pass.orbitalObject, stationPos, pass.aosTime, pass.losTime)
-                    _uiState.update { it.copy(satTrack = track) }
-                }
-                // Tick loop — position, timer, and radio updates every second
-                while (isActive) {
-                    val timeNow = System.currentTimeMillis()
-                    val pos = satelliteRepo.getPosition(pass.orbitalObject, stationPos, timeNow)
-                    val sunPos = CelestialComputer.getSunPosition(stationPos, timeNow)
-                    val moonPos = CelestialComputer.getMoonPosition(stationPos, timeNow)
-                    val (time, isAos) = computeTimer(pass.isDeepSpace, pass.aosTime, pass.losTime, timeNow)
-                    val isLos = !pass.isDeepSpace && timeNow > pass.losTime
-                    _uiState.update {
-                        it.copy(
-                            currentTime = time,
-                            isTimeAos = isAos,
-                            isLos = isLos,
-                            orbitalPos = pos,
-                            sunPosition = sunPos,
-                            moonPosition = moonPos
-                        )
-                    }
-                    processRadios(transmittersList, pass.orbitalObject, timeNow)
-                    sendPassData(pos)
-                    delay(1000)
-                }
+            val pass = passes.find { it.catNum == catNum && it.aosTime == aosTime } ?: passes.firstOrNull() ?: return@launch
+            _uiState.update { it.copy(currentPass = pass) }
+            val transmittersList = satelliteRepo.getRadiosWithId(pass.catNum)
+            transponders = transmittersList.filter { it.downlinkLow != null }
+            _uiState.update { state ->
+                state.copy(radioControl = state.radioControl.copy(transponders = transponders))
+            }
+            if (transmittersList.isNotEmpty()) {
+                val firstUuid = transmittersList.first().uuid
+                _uiState.update { it.copy(selectedTransmitterUuid = firstUuid) }
+                transponders.find { it.uuid == firstUuid }?.let { trackingService.setTransponder(it) }
+            }
+            if (!pass.isDeepSpace) {
+                val track = satelliteRepo.getTrack(pass.orbitalObject, stationPos, pass.aosTime, pass.losTime)
+                _uiState.update { it.copy(satTrack = track) }
+            }
+            while (isActive) {
+                tickPass(pass, transmittersList)
+                delay(1000)
             }
         }
-        // Observe radio tracking service state
+    }
+
+    private suspend fun tickPass(pass: OrbitalPass, transmittersList: List<SatRadio>) {
+        val timeNow = System.currentTimeMillis()
+        val pos = satelliteRepo.getPosition(pass.orbitalObject, stationPos, timeNow)
+        val sunPos = CelestialComputer.getSunPosition(stationPos, timeNow)
+        val moonPos = CelestialComputer.getMoonPosition(stationPos, timeNow)
+        val (time, isAos) = computeTimer(pass.isDeepSpace, pass.aosTime, pass.losTime, timeNow)
+        val isLos = !pass.isDeepSpace && timeNow > pass.losTime
+        _uiState.update {
+            it.copy(
+                currentTime = time, isTimeAos = isAos, isLos = isLos,
+                orbitalPos = pos, sunPosition = sunPos, moonPosition = moonPos
+            )
+        }
+        processRadios(transmittersList, pass.orbitalObject, timeNow)
+        sendPassData(pos)
+    }
+
+    private fun collectRadioTrackingState() {
         viewModelScope.launch {
             trackingService.state.collect { svc ->
                 _uiState.update { state ->
@@ -210,6 +225,33 @@ class RadarViewModel(
             }
             RadarAction.ConnectRadios -> viewModelScope.launch { trackingService.connectRadios() }
             RadarAction.DisconnectRadios -> viewModelScope.launch { trackingService.disconnectRadios() }
+
+            // SSTV actions
+            is RadarAction.SstvPermissionResult -> {
+                _uiState.update { it.copy(sstv = it.sstv.copy(hasPermission = action.granted)) }
+                if (action.granted) initSstvDecoder()
+            }
+            RadarAction.SstvStartRecording -> startSstvRecording()
+            RadarAction.SstvStopRecording -> stopSstvRecording()
+            RadarAction.SstvSaveImage -> {
+                val frame = _uiState.value.sstv.currentFrame ?: return
+                val pixels = frame.imagePixels ?: return
+                _uiState.update { it.copy(sstv = it.sstv.copy(status = SstvStatus.Saving)) }
+                viewModelScope.launch {
+                    saveImage(pixels, frame.imageWidth, frame.imageHeight, frame.modeName)
+                    _uiState.update { it.copy(sstv = it.sstv.copy(status = SstvStatus.Idle)) }
+                    showToast("Image saved")
+                }
+            }
+            is RadarAction.SstvSelectMode -> {
+                sstvDecoder?.lockMode(action.modeName)
+                _uiState.update { it.copy(sstv = it.sstv.copy(selectedMode = action.modeName)) }
+                settingsRepo.updateOtherSettings { it.copy(sstvMode = action.modeName) }
+            }
+            RadarAction.SstvReset -> {
+                sstvDecoder?.clearPixels() // Keep decoder alive, just reset pixels
+                _uiState.update { it.copy(sstv = it.sstv.copy(currentFrame = null)) }
+            }
         }
     }
 
@@ -281,6 +323,36 @@ class RadarViewModel(
         }
     }
 
+    private fun initSstvDecoder() {
+        if (sstvDecoder == null) {
+            val decoder = SstvDecoder(sampleRate = audioCapture.sampleRate)
+            sstvDecoder = decoder
+            _uiState.update { it.copy(sstv = it.sstv.copy(supportedModes = decoder.supportedModes)) }
+            viewModelScope.launch {
+                decoder.frames.collect { frame ->
+                    _uiState.update { it.copy(sstv = it.sstv.copy(currentFrame = frame)) }
+                }
+            }
+        }
+    }
+
+    private fun startSstvRecording() {
+        if (sstvRecordingJob?.isActive == true) return
+        initSstvDecoder()
+        _uiState.update { it.copy(sstv = it.sstv.copy(status = SstvStatus.Recording)) }
+        sstvRecordingJob = viewModelScope.launch {
+            audioCapture.audioFlow().collect { buffer ->
+                sstvDecoder?.feedSamples(buffer)
+            }
+        }
+    }
+
+    private fun stopSstvRecording() {
+        sstvRecordingJob?.cancel()
+        sstvRecordingJob = null
+        _uiState.update { it.copy(sstv = it.sstv.copy(status = SstvStatus.Idle)) }
+    }
+
     companion object {
 
         val CTCSS_TONES = listOf(
@@ -307,7 +379,10 @@ class RadarViewModel(
                     settingsRepo = container.settingsRepo,
                     sensorsRepo = container.provideSensorsRepo(),
                     addToCalendar = container.provideAddToCalendar(),
-                    trackingService = container.radioTrackingService
+                    trackingService = container.radioTrackingService,
+                    audioCapture = container.provideAudioCapture(),
+                    saveImage = container.provideSaveImage(),
+                    showToast = container.provideShowToast()
                 )
             }
         }

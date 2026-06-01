@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -220,7 +221,7 @@ private fun DrawScope.drawBodyIcon(
         translate(pos.x - half, pos.y - half)
     }) {
         with(painter) {
-            draw(Size(iconSize, iconSize), colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(color))
+            draw(Size(iconSize, iconSize), colorFilter = ColorFilter.tint(color))
         }
     }
 }

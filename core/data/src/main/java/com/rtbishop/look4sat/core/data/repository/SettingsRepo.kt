@@ -81,6 +81,7 @@ class SettingsRepo(
     private val keyUpdateTimestamp = "updateTimestamp"
     private val keyShouldSeeWarning = "shouldSeeWarning"
     private val keyShouldSeeWhatsNew = "shouldSeeWhatsNew_v$appVersionName"
+    private val keySstvMode = "sstvMode"
     private val keyUseCustomTle = "useCustomTle"
     private val keyUseCustomTransceivers = "useCustomTransceivers"
     private val keyTleUrl = "tleUrl"
@@ -333,6 +334,7 @@ class SettingsRepo(
                 putBoolean(keyStateOfNightMode, new.stateOfNightMode)
                 putBoolean(keyShouldSeeWarning, new.shouldSeeWarning)
                 putBoolean(keyShouldSeeWhatsNew, new.shouldSeeWhatsNew)
+                putString(keySstvMode, new.sstvMode)
             }
             new
         }
@@ -346,7 +348,8 @@ class SettingsRepo(
         stateOfLightTheme = preferences.getBoolean(keyStateOfLightTheme, false),
         stateOfNightMode = preferences.getBoolean(keyStateOfNightMode, false),
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
-        shouldSeeWhatsNew = preferences.getBoolean(keyShouldSeeWhatsNew, true)
+        shouldSeeWhatsNew = preferences.getBoolean(keyShouldSeeWhatsNew, true),
+        sstvMode = preferences.getString(keySstvMode, null) ?: "Auto"
     )
     //endregion
 

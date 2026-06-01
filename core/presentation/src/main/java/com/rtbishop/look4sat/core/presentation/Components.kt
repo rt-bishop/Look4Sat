@@ -208,14 +208,11 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier) {
-    ElevatedCard(modifier = Modifier.size(48.dp)) {
-        Box(
-            modifier = Modifier
-                .clickable(onClick = action)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) { Icon(painter = painterResource(resId), contentDescription = null, modifier = modifier) }
+fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    ElevatedCard(modifier = Modifier.size(48.dp), enabled = enabled, onClick = action) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(painter = painterResource(resId), contentDescription = null, modifier = modifier)
+        }
     }
 }
 
