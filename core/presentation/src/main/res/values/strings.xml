@@ -49,9 +49,9 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Implemented Swipe-to-Focus behavior for passes - swipe right on a pass to focus it, and left - to unfocus
-        \n\n* Implemented preserving the pass selection between the Radar and Map screens. Not every satellite has
-        a pass overhead every day, so this should make it only slightly easier to keep track of certain satellites.
+        * Merged RadarScreen and RadioControlScreen functionality
+        \n\n* Added SSTV image decoding functionality to RadarScreen
+        \n\n* Added colored elevation and decay check to satellite passes
     </string>
 
     <!-- Radar screen -->
@@ -184,12 +184,14 @@
 
     <string name="prefs_outro_title">I would like to say thanks to</string>
     <string name="prefs_outro_thanks" translatable="false">
-        • Look4Sat users and contributors!
-        \n• David A. B. Johnson (predict4java)
-        \n• Dave Moten (predict4java)
-        \n• Alexandru Csete (Gpredict)
-        \n• Dr T.S. Kelso (Celestrak)
-        \n• Libre Space Foundation (SatNOGS)</string>
+        * Look4Sat users and contributors!
+        \n* David A. B. Johnson (predict4java)
+        \n* Dave Moten (predict4java)
+        \n* Alexandru Csete (Gpredict)
+        \n* Dr T.S. Kelso (Celestrak)
+        \n* Libre Space Foundation (SatNOGS)
+        \n* xdsopl and Robot36 contributors!
+    </string>
     <string name="prefs_outro_license">The app comes with no warranty</string>
 
 </resources>

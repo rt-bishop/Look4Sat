@@ -1,2 +1,3 @@
-* Implemented Swipe-to-Focus behavior for passes - swipe right on a pass to focus it, and left - to unfocus
-* Implemented preserving the pass selection between the Radar and Map screens. Not every satellite has a pass overhead every day, so this should make it only slightly easier to keep track of certain satellites.
+* Merged RadarScreen and RadioControlScreen functionality
+* Added SSTV image decoding functionality to RadarScreen
+* Added colored elevation and decay check to satellite passes
