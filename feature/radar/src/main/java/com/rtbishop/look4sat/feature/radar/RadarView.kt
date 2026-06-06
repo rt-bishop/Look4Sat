@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.feature.radar
 
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -64,7 +65,7 @@ import kotlin.math.sin
 
 private const val CIRCLES = 3
 private const val STROKE_WIDTH = 6f
-private const val SWEEP_INCREMENT = 360f / 12f / 60f
+private const val SWEEP_DURATION_MS = 8_000
 
 @Composable
 fun RadarViewCompose(
@@ -88,23 +89,44 @@ fun RadarViewCompose(
         animationSpec = infiniteRepeatable(tween(1000)),
         label = "animScale"
     )
+    // Drive the sweep from the animation framework to eliminate state mutation inside the draw block
+    val sweepTransition = rememberInfiniteTransition(label = "sweep")
+    val sweepDegrees by sweepTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(SWEEP_DURATION_MS, easing = LinearEasing)),
+        label = "sweepDegrees"
+    )
     val measurer = rememberTextMeasurer()
     val sunPainter = painterResource(R.drawable.ic_sun)
     val moonPainter = painterResource(R.drawable.ic_moon)
-    var sweepDegrees by remember { mutableFloatStateOf(0f) }
+    // Track path cache — keyed by both canvas size and items reference so it rebuilds
+    // when the satellite track data arrives asynchronously after the first composition
     var cachedRadius by remember { mutableFloatStateOf(0f) }
+    var cachedItemsRef by remember { mutableStateOf<List<OrbitalPos>>(emptyList()) }
+    var cachedSweepColor by remember { mutableStateOf(Color.Unspecified) }
     var trackPath by remember { mutableStateOf(Path()) }
     var trackEffect by remember { mutableStateOf(PathEffect.cornerPathEffect(0f)) }
+    // ShaderBrush is cached to avoid allocating a new GPU shader object every frame
+    var cachedSweepBrush by remember { mutableStateOf<ShaderBrush?>(null) }
 
     Canvas(modifier = modifier.aspectRatio(1f)) {
         val radius = size.minDimension / 2f * 0.95f
-        if (radius != cachedRadius) {
+        // Rebuild track path and sweep brush when canvas size or track data changes
+        if (radius != cachedRadius || items !== cachedItemsRef) {
             trackPath = createTrackPath(items, radius)
             trackEffect = createTrackEffect(trackPath)
+            cachedSweepBrush = makeSweepBrush(center, primaryColor)
             cachedRadius = radius
+            cachedItemsRef = items
+            cachedSweepColor = primaryColor
+        } else if (primaryColor != cachedSweepColor) {
+            // Rebuild brush on theme change without waiting for a size change
+            cachedSweepBrush = makeSweepBrush(center, primaryColor)
+            cachedSweepColor = primaryColor
         }
         rotate(if (shouldUseCompass) -azimElev.first else 0f) {
-            if (shouldShowSweep) drawSweep(center, sweepDegrees, radius, primaryColor)
+            if (shouldShowSweep) cachedSweepBrush?.let { drawSweep(center, sweepDegrees, radius, it) }
             drawRadar(radius, radarColor)
             drawElevationLabels(radius, primaryColor, measurer)
             translate(center.x, center.y) {
@@ -127,7 +149,6 @@ fun RadarViewCompose(
                 }
                 if (shouldUseCompass) drawAim(azimElev.first, azimElev.second, radius, aimColor)
             }
-            sweepDegrees = (sweepDegrees + SWEEP_INCREMENT) % 360f
         }
     }
 }
@@ -172,10 +193,13 @@ private fun DrawScope.drawAim(azim: Float, elev: Float, radius: Float, color: Co
     drawCircle(color, size / 2, pos, style = Stroke(STROKE_WIDTH))
 }
 
-private fun DrawScope.drawSweep(center: Offset, degrees: Float, radius: Float, color: Color) {
+private fun makeSweepBrush(center: Offset, color: Color): ShaderBrush {
     val colors = listOf(Color.Transparent, color.copy(alpha = 0.5f), color)
     val colorStops = listOf(0.64f, 0.995f, 1f)
-    val brush = ShaderBrush(SweepGradientShader(center, colors, colorStops))
+    return ShaderBrush(SweepGradientShader(center, colors, colorStops))
+}
+
+private fun DrawScope.drawSweep(center: Offset, degrees: Float, radius: Float, brush: ShaderBrush) {
     rotate(-90 + degrees, center) { drawCircle(brush, radius, style = Fill) }
 }
 

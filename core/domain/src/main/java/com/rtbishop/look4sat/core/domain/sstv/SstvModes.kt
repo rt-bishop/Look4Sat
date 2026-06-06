@@ -257,9 +257,16 @@ internal class Robot36Mode(sampleRate: Int) : SstvMode {
             val lPos = lumBegin + (i * lumSamples) / width
             val cPos = chromBegin + (i * chromSamples) / width
             if (even) {
+                // Even line: store Y in the red channel slot and Cr in the blue slot,
+                // using ColorConverter.rgb() as a convenient 3×byte packer (not RGB).
+                // The odd line will read these back and combine with its own Cb to
+                // produce the final YUV→RGB conversion for both rows.
                 pixelBuffer.pixels[i] = ColorConverter.rgb(scratch[lPos], 0f, scratch[cPos])
             } else {
                 val evenYuv = pixelBuffer.pixels[i]
+                // Even pixel packing: 0xAARRGGBB → Y=RR, Cb=GG(unused), Cr=BB
+                // Odd pixel:  Y=lPos, Cb=cPos, Cr=(borrowed from even's BB slot)
+                // Merge: take Y+Cr from even row (bits 0x00ff00ff) and Cb from odd (0x0000ff00).
                 val oddYuv = ColorConverter.rgb(scratch[lPos], scratch[cPos], 0f)
                 pixelBuffer.pixels[i] = ColorConverter.yuv2rgb((evenYuv and 0x00ff00ff) or (oddYuv and 0x0000ff00))
                 pixelBuffer.pixels[i + width] =
@@ -385,53 +392,6 @@ internal class PdMode(
                 ColorConverter.yuv2rgb(scratch[pos + yOddBegin], scratch[pos + uAvgBegin], scratch[pos + vAvgBegin])
         }
         pixelBuffer.width = hPixels; pixelBuffer.height = 2
-        return true
-    }
-}
-
-internal class HfFaxMode(private val sampleRate: Int) : SstvMode {
-    override val name = "HF Fax"
-    override val visCode = -1
-    override val width = 640
-    override val height = 1200
-    override val firstPixelSampleIndex = 0
-    override val firstSyncPulseIndex = -1
-    override val scanLineSamples get() = sampleRate / 2
-
-    private val ema = Ema()
-    private val cumulated = FloatArray(width)
-
-    var horizontalShift = 0; private set
-
-    override fun decodeScanLine(
-        pixelBuffer: PixelBuffer,
-        scratch: FloatArray,
-        scanLine: FloatArray,
-        scopeWidth: Int,
-        syncPulseIndex: Int,
-        lineSamples: Int,
-        freqOffset: Float
-    ): Boolean {
-        if (syncPulseIndex < 0 || syncPulseIndex + lineSamples > scanLine.size) return false
-        ema.setCutoff(width.toDouble(), (2 * lineSamples).toDouble(), 2); ema.reset()
-        for (i in 0 until lineSamples) scratch[i] = ema.process(scanLine[syncPulseIndex + i])
-        ema.reset()
-        for (i in lineSamples - 1 downTo 0) scratch[i] = freqToLevel(ema.process(scratch[i]), freqOffset)
-        var bestIdx = 0
-        var bestVal = 0f
-        for (i in 0 until width) {
-            val pos = (i * lineSamples) / width
-            val color = ColorConverter.gray(scratch[pos])
-            pixelBuffer.pixels[i] = color
-            // Grayscale: R==G==B, so luminance is simply the channel value normalized
-            val gray = (color and 0xFF) / 255f
-            cumulated[i] = cumulated[i] * 0.99f + gray * 0.01f
-            if (cumulated[i] > bestVal) {
-                bestIdx = i; bestVal = cumulated[i]
-            }
-        }
-        horizontalShift = bestIdx
-        pixelBuffer.width = width; pixelBuffer.height = 1
         return true
     }
 }

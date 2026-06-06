@@ -47,11 +47,12 @@ class SstvDecoder(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val frames: SharedFlow<SstvFrame> = _frames
-    val supportedModes: List<String> = buildList {
-        add("Raw"); add("HF Fax"); decoder.allModes.mapTo(this) { it.name }
-    }
+    val supportedModes: List<String> = decoder.allModes.map { it.name }
 
     suspend fun feedSamples(samples: FloatArray) = withContext(Dispatchers.Default) {
+        // Normalize to a fixed RMS before processing so that both direct audio
+        // coupling and air-coupled microphone input decode with equal reliability.
+        normalise(samples)
         val hasNewLines = decoder.process(samples, channelSelect)
         if (hasNewLines) emitFrame()
     }
@@ -64,11 +65,30 @@ class SstvDecoder(
     }
 
     private fun emitFrame() {
-        val imagePixels = if (imageBuffer.line > 0) imageBuffer.pixels.copyOf() else null
         val imageWidth = imageBuffer.width
         val imageHeight = imageBuffer.height
+        // Copy only the active image region — imageBuffer.pixels is pre-allocated
+        // at the maximum possible size (PD-290: 800×616), so we must not copyOf()
+        // the entire array and send padding pixels to the observer.
+        val imagePixels = if (imageBuffer.line > 0) imageBuffer.pixels.copyOf(imageWidth * imageHeight) else null
         val modeName = decoder.currentMode.name
         _frames.tryEmit(SstvFrame(imagePixels, imageWidth, imageHeight, modeName))
+    }
+
+    // Target RMS level for the normalizer. 0.25 leaves headroom while keeping the
+    // FM demodulator well above its noise floor regardless of input gain.
+    private val targetRms = 0.25f
+
+    // Bring the buffer to a fixed RMS so that microphone and direct-coupled inputs
+    // both decode reliably. The guard prevents amplifying pure silence into noise.
+    private fun normalise(buffer: FloatArray) {
+        var sumSq = 0f
+        for (s in buffer) sumSq += s * s
+        val rms = sqrt(sumSq / buffer.size)
+        if (rms > 1e-6f) {
+            val gain = targetRms / rms
+            for (i in buffer.indices) buffer[i] *= gain
+        }
     }
 }
 
@@ -136,6 +156,10 @@ internal class SyncPulseDetector(sampleRate: Int) {
     fun process(buffer: FloatArray, channelSelect: Int): Boolean {
         var detected = false
         val channels = if (channelSelect > 0) 2 else 1
+        // NOTE: buffer[i] is overwritten in-place with the FM-demodulated frequency
+        // value for every mono sample (channelSelect == 0). DecoderEngine.process()
+        // reads back these values to populate scanLineBuffer. Callers must not reuse
+        // the buffer after this call.
         for (i in 0 until buffer.size / channels) {
             when (channelSelect) {
                 1 -> baseBand.set(buffer[2 * i])
@@ -200,7 +224,6 @@ internal class DecoderEngine(
     private val visBitLen: Int
     private val visLen: Int
     private val rawMode: SstvMode
-    private val hfFaxMode: SstvMode
     private val modes5ms: ArrayList<SstvMode>
     private val modes9ms: ArrayList<SstvMode>
     private val modes20ms: ArrayList<SstvMode>
@@ -217,6 +240,10 @@ internal class DecoderEngine(
 
     init {
         imageBuffer.line = -1
+        // Pre-allocate for the largest possible mode (PD-290: 800×616 = 492 800 ints)
+        // so that handleHeader/processPulse can reuse the array with a fill(0) instead
+        // of allocating a fresh IntArray on every new image, reducing GC pressure.
+        imageBuffer.pixels = IntArray(800 * 616)
         val pfLen = round(0.0025 * sampleRate).toInt() or 1
         pulseFilterDelay = (pfLen - 1) / 2
         pulseFilter = MovingAverage(pfLen)
@@ -231,7 +258,6 @@ internal class DecoderEngine(
         syncTolerance = round(0.03 * sampleRate).toInt()
         lineTolerance = round(0.001 * sampleRate).toInt()
         rawMode = RawMode(rawName, sampleRate)
-        hfFaxMode = HfFaxMode(sampleRate)
         val robot36 = Robot36Mode(sampleRate)
         currentMode = robot36
         curLineSamples = robot36.scanLineSamples
@@ -301,11 +327,7 @@ internal class DecoderEngine(
     }
 
     fun setMode(name: String) {
-        if (rawMode.name == name) {
-            lockMode = true; imageBuffer.line = -1; currentMode = rawMode; return
-        }
-        var mode = allModes.firstOrNull { it.name == name }
-        if (mode == null && hfFaxMode.name == name) mode = hfFaxMode
+        val mode = allModes.firstOrNull { it.name == name }
         if (mode == currentMode) {
             lockMode = true; return
         }
@@ -335,6 +357,10 @@ internal class DecoderEngine(
         return best
     }
 
+    // scopeBuffer is twice the display height. Each decoded scan line is written
+    // to both the current rolling position (top half, wraps at height/2) and the
+    // same row offset in the bottom half. The UI displays a window that always
+    // spans the half-height boundary, giving a seamless non-wrapping scroll effect.
     private fun copyUnscaled() {
         val w = minOf(scopeBuffer.width, pixelBuffer.width)
         for (row in 0 until pixelBuffer.height) {
@@ -424,6 +450,9 @@ internal class DecoderEngine(
         if ((amount <= 0) || (amount > sample)) return
         sample -= amount; leaderBreak -= amount; lastSync -= amount
         adjust(sync5ms, amount); adjust(sync9ms, amount); adjust(sync20ms, amount)
+        // Discard already-decoded samples by sliding the live region back to index 0.
+        // System.arraycopy handles the overlapping regions correctly and is a native
+        // memcpy on JVM, so this is fast despite moving the full remaining window.
         scanLineBuffer.copyInto(scanLineBuffer, 0, amount, amount + sample)
     }
 
@@ -494,7 +523,7 @@ internal class DecoderEngine(
         if (lockMode && mode != currentMode) return false
         mode.resetState()
         imageBuffer.width = mode.width; imageBuffer.height = mode.height
-        imageBuffer.pixels = IntArray(mode.width * mode.height); imageBuffer.line = 0
+        imageBuffer.pixels.fill(0, 0, mode.width * mode.height); imageBuffer.line = 0
         currentMode = mode
         lastSync = sIdx + mode.firstSyncPulseIndex; curLineSamples = mode.scanLineSamples; lastOffset = ldrOffset
         var oldest = lastSync - (pulses.size - 1) * curLineSamples
@@ -527,6 +556,15 @@ internal class DecoderEngine(
         var changed = false
         if (lockMode || imageBuffer.line in 0 until imageBuffer.height) {
             if (currentMode != rawMode && abs(lineSamples - currentMode.scanLineSamples) > lineTolerance) return false
+            // Try continuous decoding
+            if (lockMode && imageBuffer.line == -1 && currentMode != rawMode) {
+                currentMode.resetState()
+                imageBuffer.width = currentMode.width
+                imageBuffer.height = currentMode.height
+                imageBuffer.pixels.fill(0, 0, currentMode.width * currentMode.height)
+                imageBuffer.line = 0
+                drawLines(0xff000000.toInt(), 10); drawLines(0xffffff00.toInt(), 8); drawLines(0xff000000.toInt(), 10)
+            }
         } else {
             val prev = currentMode; currentMode = detectMode(modes, lineSamples)
             changed =

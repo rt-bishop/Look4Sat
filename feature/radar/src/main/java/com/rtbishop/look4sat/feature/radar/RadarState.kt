@@ -34,7 +34,6 @@ data class RadioPanelState(
 data class RadioControlSubState(
     val txPanel: RadioPanelState = RadioPanelState("TX (Uplink)"),
     val rxPanel: RadioPanelState = RadioPanelState("RX (Downlink)"),
-    val transponders: List<SatRadio> = emptyList(),
     val selectedTransponderUuid: String? = null,
     val txBaseFrequencyHz: Long? = null,
     val ctcssTone: Double? = null,
@@ -42,11 +41,16 @@ data class RadioControlSubState(
     val errorMessage: String? = null
 )
 
+data class TransceiverSubState(
+    val transmitters: List<SatRadio> = emptyList(),
+    val selectedUuid: String? = null,
+    val selectedFrequency: Long? = null,
+)
+
 data class RadarState(
     val currentPass: OrbitalPass? = null,
     val currentTime: String = "00:00:00",
     val isTimeAos: Boolean = true,
-    val isLos: Boolean = false,
     val isUtc: Boolean = false,
     val orientationValues: Pair<Float, Float> = 0f to 0f,
     val orbitalPos: OrbitalPos? = null,
@@ -55,17 +59,16 @@ data class RadarState(
     val shouldUseCompass: Boolean = false,
     val sunPosition: CelestialComputer.SunPosition? = null,
     val moonPosition: CelestialComputer.MoonPosition? = null,
-    val transmitters: List<SatRadio> = emptyList(),
-    val selectedTransmitterUuid: String? = null,
-    val selectedFrequency: Long? = null,
+    val transceivers: TransceiverSubState = TransceiverSubState(),
     val radioControl: RadioControlSubState = RadioControlSubState(),
     val sstv: SstvSubState = SstvSubState()
 )
 
-enum class SstvStatus { Idle, Recording, Saving }
+enum class SstvStatus { Idle, Recording }
 
 data class SstvSubState(
     val status: SstvStatus = SstvStatus.Idle,
+    val isSaving: Boolean = false,
     val hasPermission: Boolean = false,
     val selectedMode: String = "Auto",
     val supportedModes: List<String> = emptyList(),
@@ -77,7 +80,6 @@ sealed interface RadarAction {
     data class SelectTransmitter(val uuid: String) : RadarAction
 
     // Radio control actions
-    data class SelectTransponder(val uuid: String) : RadarAction
     data class SetTxFrequency(val frequencyHz: Long) : RadarAction
     data class AdjustTxFrequency(val deltaHz: Long) : RadarAction
     data class SetCtcssTone(val toneHz: Double?) : RadarAction

@@ -55,12 +55,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.rtbishop.look4sat.core.presentation.IconCard
+import com.rtbishop.look4sat.core.presentation.OutlinedText
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 
 @Composable
 internal fun SstvPage(
     sstv: SstvSubState,
+    dopplerFrequency: String?,
     onAction: (RadarAction) -> Unit,
     requestMicPermission: () -> Unit
 ) {
@@ -180,59 +182,74 @@ internal fun SstvPage(
             )
         }
         // Bottom control bar — dark, blends with the black canvas
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            // Mode button — opens dialog
-            ElevatedCard(
-                modifier = Modifier.weight(1f).height(48.dp),
-                onClick = { showModeDialog.value = true },
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+            // Doppler-corrected downlink frequency hint
+            if (dopplerFrequency != null) {
+                OutlinedText(
+                    text = "RX: $dopplerFrequency Hz",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fillColor = MaterialTheme.colorScheme.primary,
+                    outlineColor = MaterialTheme.colorScheme.background,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "Mode: ${sstv.selectedMode}",
-                        fontSize = 14.sp,
-                        maxLines = 1,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.infiniteMarquee()
+                // Mode button — opens dialog
+                ElevatedCard(
+                    modifier = Modifier.weight(1f).height(48.dp),
+                    onClick = { showModeDialog.value = true },
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
                     )
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Mode: ${sstv.selectedMode}",
+                            fontSize = 14.sp,
+                            maxLines = 1,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.infiniteMarquee()
+                        )
+                    }
                 }
-            }
-            // Reset button — clears decoder state and image
-            IconCard(
-                action = { onAction(RadarAction.SstvReset) },
-                resId = R.drawable.ic_delete
-            )
-            // Save button — always visible, enabled when there are pixels
-            IconCard(
-                action = { onAction(RadarAction.SstvSaveImage) },
-                resId = R.drawable.ic_save,
-                enabled = sstv.currentFrame?.imagePixels != null
-            )
-            // Record / Stop button
-            val playAction = {
-                when (sstv.status) {
-                    SstvStatus.Idle -> onAction(RadarAction.SstvStartRecording)
-                    SstvStatus.Recording -> onAction(RadarAction.SstvStopRecording)
-                    SstvStatus.Saving -> {}
+                // Reset button — clears decoder state and image
+                IconCard(
+                    action = { onAction(RadarAction.SstvReset) },
+                    resId = R.drawable.ic_delete
+                )
+                // Save button — always visible, enabled when there are pixels
+                IconCard(
+                    action = { onAction(RadarAction.SstvSaveImage) },
+                    resId = R.drawable.ic_save,
+                    enabled = sstv.currentFrame?.imagePixels != null && !sstv.isSaving
+                )
+                // Record / Stop button
+                val playAction = {
+                    when (sstv.status) {
+                        SstvStatus.Idle -> onAction(RadarAction.SstvStartRecording)
+                        SstvStatus.Recording -> onAction(RadarAction.SstvStopRecording)
+                    }
                 }
-            }
-            val playColors = CardDefaults.elevatedCardColors(
-                containerColor = if (sstv.status == SstvStatus.Recording) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.surface
-            )
-            val playIcon = if (sstv.status == SstvStatus.Recording) R.drawable.ic_pause else R.drawable.ic_play
-            ElevatedCard(modifier = Modifier.size(48.dp), onClick = playAction, colors = playColors) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(painter = painterResource(playIcon), contentDescription = null)
+                val playColors = CardDefaults.elevatedCardColors(
+                    containerColor = if (sstv.status == SstvStatus.Recording) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.surface
+                )
+                val playIcon = if (sstv.status == SstvStatus.Recording) R.drawable.ic_pause else R.drawable.ic_play
+                ElevatedCard(modifier = Modifier.size(48.dp), onClick = playAction, colors = playColors) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(painter = painterResource(playIcon), contentDescription = null)
+                    }
                 }
             }
         }

@@ -62,8 +62,10 @@ import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.R
+import com.rtbishop.look4sat.core.presentation.formatFrequency
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun TransceiversPage(
@@ -82,7 +84,7 @@ fun TransceiversPage(
             if (selectedUuid != null) {
                 val index = transceivers.indexOfFirst { it.uuid == selectedUuid }
                 if (index >= 0) {
-                    kotlinx.coroutines.delay(300)
+                    kotlinx.coroutines.delay(300.milliseconds)
                     listState.animateScrollToItem(index)
                 }
             }
@@ -325,7 +327,7 @@ private fun ExpandedRadioControl(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${RadarViewModel.formatFrequency(radioControl.txBaseFrequencyHz)} MHz",
+                        text = "${formatFrequency(radioControl.txBaseFrequencyHz)} MHz",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -335,7 +337,7 @@ private fun ExpandedRadioControl(
                 val upHigh = radio.uplinkHigh
                 if (upLow != null && upHigh != null && upLow != upHigh) {
                     Text(
-                        text = "(${RadarViewModel.formatFrequency(upLow)} – ${RadarViewModel.formatFrequency(upHigh)})",
+                        text = "(${formatFrequency(upLow)} – ${formatFrequency(upHigh)})",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

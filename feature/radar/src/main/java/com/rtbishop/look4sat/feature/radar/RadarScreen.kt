@@ -66,6 +66,7 @@ import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
+import com.rtbishop.look4sat.core.presentation.formatFrequency
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
@@ -170,13 +171,14 @@ private fun PagerCard(
             ) { pageIndex ->
                 when (pages[pageIndex]) {
                     RadarPage.Transceivers -> TransceiversPage(
-                        transceivers = uiState.transmitters,
-                        selectedUuid = uiState.selectedTransmitterUuid,
+                        transceivers = uiState.transceivers.transmitters,
+                        selectedUuid = uiState.transceivers.selectedUuid,
                         radioControl = uiState.radioControl,
                         onAction = onAction
                     )
                     RadarPage.Sstv -> SstvPage(
                         sstv = uiState.sstv,
+                        dopplerFrequency = uiState.transceivers.selectedFrequency?.let { formatFrequency(it) },
                         onAction = onAction,
                         requestMicPermission = requestMicPermission
                     )
@@ -189,25 +191,26 @@ private fun PagerCard(
 @Composable
 private fun RadarCard(uiState: RadarState, modifier: Modifier = Modifier) {
     val satellitePos = uiState.orbitalPos
-    val borderModifier = if (satellitePos?.aboveHorizon == true && satellitePos.eclipsed) {
-        val infiniteTransition = rememberInfiniteTransition(label = "eclipsedBorder")
-        val borderAlpha by infiniteTransition.animateFloat(
-            initialValue = 1.0f,
-            targetValue = 0.0f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 1000, delayMillis = 25, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "eclipsedBorderAlpha"
-        )
+    val shouldAnimateBorder = satellitePos?.aboveHorizon == true && satellitePos.eclipsed
+    // Always call these composables unconditionally — conditional composable calls violate
+    // Compose's slot-table stability rules and can crash or produce incorrect state
+    val infiniteTransition = rememberInfiniteTransition(label = "eclipsedBorder")
+    val borderAlpha by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 0.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, delayMillis = 25, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "eclipsedBorderAlpha"
+    )
+    val borderModifier = if (shouldAnimateBorder) {
         Modifier.border(
             width = 0.5.dp,
             color = MaterialTheme.colorScheme.primary.copy(alpha = borderAlpha),
             shape = MaterialTheme.shapes.medium
         )
-    } else {
-        Modifier
-    }
+    } else Modifier
     ElevatedCard(modifier = modifier.then(borderModifier)) {
         Box(contentAlignment = Alignment.Center) {
             val position = uiState.orbitalPos
@@ -294,4 +297,3 @@ private fun RadarLabel(
         }
     }
 }
-
