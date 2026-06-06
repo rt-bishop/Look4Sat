@@ -1,8 +1,8 @@
 [versions]
 #noinspection UnusedVersionCatalogEntry
-appVersionCode = "440"
+appVersionCode = "441"
 #noinspection UnusedVersionCatalogEntry
-appVersionName = "4.4.0"
+appVersionName = "4.4.1"
 #noinspection GradleDependency,UnusedVersionCatalogEntry
 compileSdk = "36"
 #noinspection UnusedVersionCatalogEntry
@@ -25,7 +25,7 @@ compose-navigation3 = "1.1.2"
 
 google-ksp = "2.3.7"
 
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 kotlin-coroutines = "1.11.0"
 kotlin-serialization = "1.11.0"
 

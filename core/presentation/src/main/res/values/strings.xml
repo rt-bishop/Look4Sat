@@ -49,9 +49,9 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Merged RadarScreen and RadioControlScreen functionality
-        \n\n* Added SSTV image decoding functionality to RadarScreen
-        \n\n* Added colored elevation and decay check to satellite passes
+        * Enabled continuous SSTV decoding for manually selected types (Play button enables/disables decoding)
+        \n\n* Added selected transceiver\'s frequency display to SSTV page
+        \n\n* Fixed Reset/Save/Play buttons behavior and states on SSTV page
     </string>
 
     <!-- Radar screen -->

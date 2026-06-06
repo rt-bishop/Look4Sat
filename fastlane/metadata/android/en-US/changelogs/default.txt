@@ -1,3 +1,3 @@
-* Merged RadarScreen and RadioControlScreen functionality
-* Added SSTV image decoding functionality to RadarScreen
-* Added colored elevation and decay check to satellite passes
+* Enabled continuous SSTV decoding for manually selected types (Play button enables/disables decoding)
+* Added selected transceiver\'s frequency display to SSTV page
+* Fixed Reset/Save/Play buttons behavior and states on SSTV page
