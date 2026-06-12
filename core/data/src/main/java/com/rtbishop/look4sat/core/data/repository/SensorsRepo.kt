@@ -22,8 +22,9 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.hardware.display.DisplayManager
+import android.view.Display
 import android.view.Surface
-import android.view.WindowManager
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.RAD2DEG
 import com.rtbishop.look4sat.core.domain.repository.ISensorsRepo
@@ -31,13 +32,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.round
 
+private const val SMOOTHING_FACTOR = 0.15f
+private const val SENSOR_RATE_US = 16_000
+
 class SensorsRepo(
     private val sensorManager: SensorManager,
-    private val sensor: Sensor?,
-    private val windowManager: WindowManager
-) : SensorEventListener, ISensorsRepo {
+    private val displayManager: DisplayManager?
+) : ISensorsRepo, SensorEventListener {
 
-    private val _orientation = MutableStateFlow(Pair(0f, 0f))
+    private val _sensorData = MutableStateFlow(Pair(0f, 0f))
+    private val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
     private val rotationMatrix = FloatArray(9)
     private val tempMatrix = FloatArray(9)
     private val orientationValues = FloatArray(3)
@@ -45,11 +49,7 @@ class SensorsRepo(
     private var smoothPitch = 0f
     private var hasInitialReading = false
 
-    companion object {
-        private const val SMOOTHING_FACTOR = 0.15f
-    }
-
-    override val orientation: StateFlow<Pair<Float, Float>> = _orientation
+    override val sensorData: StateFlow<Pair<Float, Float>> = _sensorData
 
     override fun getMagDeclination(geoPos: GeoPos, time: Long): Float {
         return GeomagneticField(
@@ -62,7 +62,7 @@ class SensorsRepo(
 
     override fun enableSensor() {
         hasInitialReading = false
-        sensor?.let { sensorManager.registerListener(this, it, 8000) }
+        sensor?.let { sensorManager.registerListener(this, it, SENSOR_RATE_US) }
     }
 
     override fun disableSensor() = sensorManager.unregisterListener(this)
@@ -70,16 +70,11 @@ class SensorsRepo(
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) = Unit
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor == sensor) updateOrientation(event.values)
+        if (event.sensor.type == Sensor.TYPE_ROTATION_VECTOR) handleSensorEvent(event)
     }
 
     private fun getDisplayRotation(): Int {
-        return try {
-            @Suppress("DEPRECATION")
-            windowManager.defaultDisplay.rotation
-        } catch (_: Exception) {
-            Surface.ROTATION_0
-        }
+        return displayManager?.getDisplay(Display.DEFAULT_DISPLAY)?.rotation ?: Surface.ROTATION_0
     }
 
     private fun remapForRotation(rotation: Int) {
@@ -101,30 +96,23 @@ class SensorsRepo(
         if (remapped) System.arraycopy(tempMatrix, 0, rotationMatrix, 0, 9)
     }
 
-    private fun updateOrientation(rotationVector: FloatArray) {
-        SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationVector)
+    private fun handleSensorEvent(event: SensorEvent) {
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
         remapForRotation(getDisplayRotation())
         SensorManager.getOrientation(rotationMatrix, orientationValues)
-        val azimuth = (orientationValues[0] * RAD2DEG).toFloat()
+        val azimuth = normalizeAzimuth((orientationValues[0] * RAD2DEG).toFloat())
         val pitch = (orientationValues[1] * RAD2DEG).toFloat()
-        val magneticAzimuth = (azimuth + 360f) % 360f
-
         if (!hasInitialReading) {
-            smoothAzimuth = magneticAzimuth
+            smoothAzimuth = azimuth
             smoothPitch = pitch
             hasInitialReading = true
         } else {
-            smoothAzimuth = lowPassAngle(smoothAzimuth, magneticAzimuth)
+            smoothAzimuth = lowPassAngle(smoothAzimuth, azimuth)
             smoothPitch = lowPass(smoothPitch, pitch)
         }
-
-        _orientation.value = Pair(
-            round(smoothAzimuth * 10) / 10,
-            round(smoothPitch * 10) / 10
-        )
+        _sensorData.value = Pair(round(smoothAzimuth * 10) / 10, round(smoothPitch * 10) / 10)
     }
 
-    /** Standard exponential low-pass filter. */
     private fun lowPass(previous: Float, current: Float): Float {
         return previous + SMOOTHING_FACTOR * (current - previous)
     }
@@ -135,9 +123,10 @@ class SensorsRepo(
      */
     private fun lowPassAngle(previous: Float, current: Float): Float {
         var delta = current - previous
-        // Normalise delta into the range (-180, 180]
         while (delta > 180f) delta -= 360f
         while (delta <= -180f) delta += 360f
-        return (previous + SMOOTHING_FACTOR * delta + 360f) % 360f
+        return normalizeAzimuth(previous + SMOOTHING_FACTOR * delta)
     }
+
+    private fun normalizeAzimuth(value: Float): Float = (value + 360f) % 360f
 }

@@ -19,10 +19,9 @@ package com.rtbishop.look4sat.core.data.injection
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.hardware.display.DisplayManager
 import android.location.LocationManager
-import android.view.WindowManager
 import androidx.room.Room
 import com.rtbishop.look4sat.core.data.database.Look4SatDb
 import com.rtbishop.look4sat.core.data.framework.BluetoothReporter
@@ -120,9 +119,8 @@ class MainContainer(private val context: Context) : IMainContainer {
 
     override fun provideSensorsRepo(): ISensorsRepo {
         val manager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val sensor = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
-        val window = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        return SensorsRepo(manager,sensor,window)
+        val displayManager = context.getSystemService(DisplayManager::class.java)
+        return SensorsRepo(manager, displayManager)
     }
 
     private fun provideDatabaseRepo(): IDatabaseRepo {
