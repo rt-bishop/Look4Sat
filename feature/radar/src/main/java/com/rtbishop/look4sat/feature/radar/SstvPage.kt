@@ -190,16 +190,14 @@ internal fun SstvPage(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             // Doppler-corrected downlink frequency hint
-            if (dopplerFrequency != null) {
-                OutlinedText(
-                    text = "RX: $dopplerFrequency Hz",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    fillColor = MaterialTheme.colorScheme.primary,
-                    outlineColor = MaterialTheme.colorScheme.background,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            }
+            OutlinedText(
+                text = dopplerFrequency?.let { "RX: $it Hz" } ?: "No transceiver selected",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                fillColor = MaterialTheme.colorScheme.primary,
+                outlineColor = MaterialTheme.colorScheme.background,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

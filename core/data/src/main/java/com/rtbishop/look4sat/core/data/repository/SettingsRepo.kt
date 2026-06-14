@@ -113,8 +113,8 @@ class SettingsRepo(
     }
 
     private fun getSelectedTypes(): List<String> {
-        val typesString = preferences.getString(keySelectedTypes, null)
-        if (typesString.isNullOrEmpty()) return listOf("Amateur")
+        val typesString = preferences.getString(keySelectedTypes, "Amateur")
+        if (typesString.isNullOrEmpty()) return emptyList()
         return typesString.split(separatorComma)
     }
     //endregion

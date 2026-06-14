@@ -320,10 +320,8 @@ class RadarViewModel(
 
     private suspend fun processRadios(radios: List<SatRadio>, orbitalObject: OrbitalObject, time: Long) {
         val transmitters = satelliteRepo.getRadios(orbitalObject, stationPos, radios, time)
-        val isFreqEnabled =
-            settingsRepo.rcSettings.value.frequencyState || settingsRepo.rcSettings.value.bluetoothFrequencyState
         _uiState.update { state ->
-            val freq = if (isFreqEnabled && state.transceivers.selectedUuid != null) {
+            val freq = if (state.transceivers.selectedUuid != null) {
                 val selectedRadio = transmitters.firstOrNull { it.uuid == state.transceivers.selectedUuid }
                 selectedRadio?.let { radio ->
                     val low = radio.downlinkLow
