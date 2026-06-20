@@ -1,3 +1,3 @@
-* Enabled continuous SSTV decoding for manually selected types (Play button enables/disables decoding)
-* Added selected transceiver\'s frequency display to SSTV page
-* Fixed Reset/Save/Play buttons behavior and states on SSTV page
+* Fixed transceivers retention on a failed fetch from server
+* Fixed SSTV frequency display, no transceiver selected hint
+* Fixed All satellite category retention on Satellites screen

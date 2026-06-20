@@ -8,5 +8,6 @@ plugins {
 }
 
 tasks.register("clean", Delete::class.java) {
+    description = "Cleans the build directory"
     delete(rootProject.layout.buildDirectory)
 }
