@@ -111,3 +111,12 @@ transition to OMM/CSV automatically.
 - SSTV decoding in `feature:radar` is experimental; image quality depends on signal strength during satellite pass.
 - `build-logic/convention/` contains all shared Gradle configuration — edit there, not in individual modules.
 - ProGuard is enabled for release builds — don't add reflection-based libs or any other dependencies without asking.
+
+## Copilot Working Mode: Code-Only
+
+- Default to code changes only. Provide explanations in chat only.
+- If documentation seems useful, ask first before creating files.
+- Do NOT create any `.md` documentation files unless explicitly requested.
+- Do NOT add README, guides, summaries, migration notes, or how-to files unless asked.
+- Prefer minimal diffs focused on requested implementation.
+- Default validation is static checks (`get_errors`). Do NOT run Gradle compile/test tasks unless explicitly requested.
