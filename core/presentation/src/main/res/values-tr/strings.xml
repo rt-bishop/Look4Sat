@@ -175,6 +175,7 @@
     <string name="prefs_bt_frequency_device_hint">Cihaz kimliği</string>
     <string name="prefs_bt_frequency_output_hint">Veri biçimi</string>
     <string name="prefs_bt_perm_error">Bluetooth izninizi kontrol edin</string>
+    <string name="prefs_net_perm_error">Ağ izninizi kontrol edin</string>
 
     <string name="prefs_other_title">Diğer ayarlar</string>
     <string name="prefs_other_switch_utc">Geçiş saatini UTC olarak göster</string>

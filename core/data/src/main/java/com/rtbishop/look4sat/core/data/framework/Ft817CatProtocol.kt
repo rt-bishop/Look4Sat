@@ -17,6 +17,9 @@
  */
 package com.rtbishop.look4sat.core.data.framework
 
+import java.util.Locale
+import kotlin.math.roundToLong
+
 object Ft817CatProtocol {
 
     const val CMD_SET_FREQ: Byte = 0x01
@@ -50,7 +53,7 @@ object Ft817CatProtocol {
     fun encodeFrequencyBcd(frequencyHz: Long): ByteArray {
         val freq10Hz = frequencyHz / 10
         val bcd = ByteArray(4)
-        val digits = String.format("%08d", freq10Hz)
+        val digits = String.format(Locale.US, "%08d", freq10Hz)
         for (i in 0 until 4) {
             val high = digits[i * 2] - '0'
             val low = digits[i * 2 + 1] - '0'
@@ -78,8 +81,8 @@ object Ft817CatProtocol {
      * 67.0 Hz → 670 (in 0.1 Hz) → BCD [0x06, 0x70]
      */
     fun encodeCtcssToneBcd(toneHz: Double): ByteArray {
-        val tone01Hz = (toneHz * 10).toLong()
-        val digits = String.format("%04d", tone01Hz)
+        val tone01Hz = (toneHz * 10).roundToLong()
+        val digits = String.format(Locale.US, "%04d", tone01Hz)
         val bcd = ByteArray(2)
         for (i in 0 until 2) {
             val high = digits[i * 2] - '0'
@@ -95,7 +98,7 @@ object Ft817CatProtocol {
     }
 
     fun buildSetModeCommand(mode: String): ByteArray? {
-        val modeByte = MODE_TO_BYTE[mode.uppercase()] ?: return null
+        val modeByte = MODE_TO_BYTE[mode.uppercase(Locale.US)] ?: return null
         return byteArrayOf(modeByte, 0x00, 0x00, 0x00, CMD_SET_MODE)
     }
 

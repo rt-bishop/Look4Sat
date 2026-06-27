@@ -131,6 +131,7 @@
     <string name="prefs_bt_frequency_device_hint">Id устройства</string>
     <string name="prefs_bt_frequency_output_hint">Формат</string>
     <string name="prefs_bt_perm_error">Нет разрешения использовать bluetooth</string>
+    <string name="prefs_net_perm_error">Нет разрешения использовать сеть</string>
 
     <string name="prefs_other_title">Другие настройки</string>
     <string name="prefs_other_switch_utc">Показывать время по UTC</string>

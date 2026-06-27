@@ -91,7 +91,8 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
     val dialogs = rememberDialogVisibility()
     val permissions = rememberSettingsPermissions(
         sendAction = onAction,
-        onBluetoothGranted = { dialogs.bluetooth = true }
+        onBluetoothGranted = { dialogs.bluetooth = true },
+        onNetworkGranted = { dialogs.network = true }
     )
 
     // Dialogs
@@ -273,7 +274,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 OutputCard(
-                    onNetworkClick = { dialogs.network = true },
+                    onNetworkClick = permissions.launchNetwork,
                     onBluetoothClick = permissions.launchBluetooth,
                     onRadioControlClick = { dialogs.radioControl = true }
                 )
@@ -651,13 +652,15 @@ private class SettingsPermissions(
     val launchLocation: () -> Unit,
     val launchTleImport: () -> Unit,
     val launchTransceiverImport: () -> Unit,
-    val launchBluetooth: () -> Unit
+    val launchBluetooth: () -> Unit,
+    val launchNetwork: () -> Unit
 )
 
 @Composable
 private fun rememberSettingsPermissions(
     sendAction: (SettingsAction) -> Unit,
-    onBluetoothGranted: () -> Unit
+    onBluetoothGranted: () -> Unit,
+    onNetworkGranted: () -> Unit
 ): SettingsPermissions {
     val locationError = stringResource(R.string.prefs_loc_gps_error)
     val locationRequest = rememberLauncherForActivityResult(
@@ -685,6 +688,12 @@ private fun rememberSettingsPermissions(
         else sendAction(SettingsAction.ShowToast(bluetoothError))
     }
 
+    val networkError = stringResource(R.string.prefs_net_perm_error)
+    val networkRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) onNetworkGranted()
+        else sendAction(SettingsAction.ShowToast(networkError))
+    }
+
     return remember {
         SettingsPermissions(
             launchLocation = {
@@ -694,7 +703,14 @@ private fun rememberSettingsPermissions(
             },
             launchTleImport = { tleRequest.launch("*/*") },
             launchTransceiverImport = { transceiversRequest.launch("*/*") },
-            launchBluetooth = { bluetoothRequest.launch(bluetoothPerm) }
+            launchBluetooth = { bluetoothRequest.launch(bluetoothPerm) },
+            launchNetwork = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+                    networkRequest.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                } else {
+                    onNetworkGranted()
+                }
+            }
         )
     }
 }

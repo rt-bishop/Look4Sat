@@ -32,6 +32,7 @@ import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.core.domain.utility.clipLat
 import com.rtbishop.look4sat.core.domain.utility.clipLon
 import com.rtbishop.look4sat.core.domain.utility.positionToQth
+import com.rtbishop.look4sat.core.domain.utility.toMapGeoPos
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
@@ -166,9 +167,7 @@ class MapViewModel(
                     var localSelectedPos: OrbitalPos? = null
                     for (satellite in chunk) {
                         val satPos = satelliteRepo.getPosition(satellite, pos, date.time)
-                        val osmLat = clipLat(satPos.latitude.toDegrees())
-                        val osmLon = clipLon(satPos.longitude.toDegrees())
-                        localPositions.add(satellite to GeoPos(osmLat, osmLon))
+                        localPositions.add(satellite to satPos.toMapGeoPos())
                         if (satellite === selected) {
                             localSelectedPos = satPos
                         }
@@ -242,9 +241,7 @@ class MapViewModel(
             }
         val azimuth = satPos.azimuth.toDegrees()
         val elevation = satPos.elevation.toDegrees()
-        val osmLat = clipLat(satPos.latitude.toDegrees())
-        val osmLon = clipLon(satPos.longitude.toDegrees())
-        val osmPos = GeoPos(osmLat, osmLon)
+        val osmPos = satPos.toMapGeoPos()
         val qthLoc = positionToQth(osmPos.latitude, osmPos.longitude) ?: "-- --"
         val velocity = satPos.getOrbitalVelocity()
         val phase = satPos.phase.toDegrees()
@@ -274,18 +271,16 @@ class MapViewModel(
         val endDate = Date(date.time + (orbitalObject.data.orbitalPeriod * 2.4 * 60000L).toLong())
         var oldLongitude = 0.0
         satelliteRepo.getTrack(orbitalObject, pos, date.time, endDate.time).forEach { satPos ->
-            val osmLat = clipLat(satPos.latitude.toDegrees())
-            val osmLon = clipLon(satPos.longitude.toDegrees())
-            val currentPosition = GeoPos(osmLat, osmLon)
+            val currentPosition = satPos.toMapGeoPos()
             if (oldLongitude < -170.0 && currentPosition.longitude > 170.0) {
                 // adding left terminal position
-                currentTrack.add(GeoPos(osmLat, -180.0))
+                currentTrack.add(GeoPos(currentPosition.latitude, -180.0))
                 val finishedTrack = mutableListOf<GeoPos>().apply { addAll(currentTrack) }
                 satTracks.add(finishedTrack)
                 currentTrack.clear()
             } else if (oldLongitude > 170.0 && currentPosition.longitude < -170.0) {
                 // adding right terminal position
-                currentTrack.add(GeoPos(osmLat, 180.0))
+                currentTrack.add(GeoPos(currentPosition.latitude, 180.0))
                 val finishedTrack = mutableListOf<GeoPos>().apply { addAll(currentTrack) }
                 satTracks.add(finishedTrack)
                 currentTrack.clear()

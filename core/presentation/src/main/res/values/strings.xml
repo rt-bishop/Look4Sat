@@ -49,9 +49,8 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Fixed transceivers retention on a failed fetch from server
-        \n\n* Fixed SSTV frequency display, no transceiver selected hint
-        \n\n* Fixed All satellite category retention on Satellites screen
+        * Added required tweaks to support Android 17 (API 37)
+        \n\n* Added ACCESS_LOCAL_NETWORK permission check to support network data output
     </string>
 
     <!-- Radar screen -->
@@ -174,6 +173,7 @@
     <string name="prefs_bt_frequency_device_hint">Device id</string>
     <string name="prefs_bt_frequency_output_hint">Data format</string>
     <string name="prefs_bt_perm_error">Check your bluetooth permission</string>
+    <string name="prefs_net_perm_error">Check your network permission</string>
 
     <string name="prefs_other_title">Other settings</string>
     <string name="prefs_other_switch_utc">Show pass time in UTC</string>

@@ -29,6 +29,7 @@ import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 class Ft817Controller(
     private val bluetoothManager: BluetoothManager,
@@ -39,10 +40,12 @@ class Ft817Controller(
     private val sppId: UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
     private val ioMutex = Mutex()
     private val commandDelayMs = 200L
+    private val maxAckReadFailures = 3
 
     private var socket: BluetoothSocket? = null
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
+    private var ackReadFailureCount = 0
 
     override var isConnected: Boolean = false
         private set
@@ -57,6 +60,7 @@ class Ft817Controller(
             socket = btSocket
             outputStream = btSocket.outputStream
             inputStream = btSocket.inputStream
+            ackReadFailureCount = 0
             isConnected = true
             Log.i(tag, "Connected to $deviceAddress")
             true
@@ -79,6 +83,7 @@ class Ft817Controller(
                 inputStream = null
                 outputStream = null
                 socket = null
+                ackReadFailureCount = 0
                 isConnected = false
                 Log.i(tag, "Disconnected from $deviceAddress")
             }
@@ -112,8 +117,8 @@ class Ft817Controller(
         ioMutex.withLock {
             val sent = sendCommand(Ft817CatProtocol.buildReadFreqModeCommand())
             if (!sent) return@withContext null
-            delay(commandDelayMs)
-            val response = readResponse(5) ?: return@withContext null
+            delay(commandDelayMs.milliseconds)
+            val response = readResponse() ?: return@withContext null
             Ft817CatProtocol.parseReadResponse(response)
         }
     }
@@ -127,44 +132,76 @@ class Ft817Controller(
     }
 
     private suspend fun sendCommand(bytes: ByteArray): Boolean {
-        return try {
-            outputStream?.write(bytes) ?: return false
-            outputStream?.flush()
-            delay(commandDelayMs)
-            true
-        } catch (e: Exception) {
-            Log.e(tag, "Send error: ${e.message}")
-            isConnected = false
-            false
+        return withContext(Dispatchers.IO) {
+            try {
+                outputStream?.write(bytes) ?: return@withContext false
+                outputStream?.flush()
+                delay(commandDelayMs.milliseconds)
+                true
+            } catch (e: Exception) {
+                Log.e(tag, "Send error: ${e.message}")
+                isConnected = false
+                false
+            }
         }
     }
 
     /** Send command and read the 1-byte ACK response (0x00 = OK). */
     private suspend fun sendCommandWithAck(bytes: ByteArray): Boolean {
         if (!sendCommand(bytes)) return false
-        return try {
-            val ack = inputStream?.read() ?: return false
-            ack == 0x00
-        } catch (e: Exception) {
-            Log.e(tag, "ACK read error: ${e.message}")
-            true // command was sent, ACK read failed - continue anyway
+        return withContext(Dispatchers.IO) {
+            try {
+                val ack = inputStream?.read() ?: run {
+                    ackReadFailureCount = 0
+                    isConnected = false
+                    return@withContext false
+                }
+                if (ack < 0) {
+                    ackReadFailureCount = 0
+                    Log.i(tag, "ACK stream closed by remote device")
+                    isConnected = false
+                    return@withContext false
+                }
+                ackReadFailureCount = 0
+                ack == 0x00
+            } catch (e: Exception) {
+                ackReadFailureCount += 1
+                Log.w(tag, "ACK read error (${ackReadFailureCount}/$maxAckReadFailures): ${e.message}")
+                if (ackReadFailureCount >= maxAckReadFailures) {
+                    Log.e(tag, "Too many ACK read errors, marking radio disconnected")
+                    isConnected = false
+                    false
+                } else {
+                    true // Command was sent, treat transient ACK read failures as best-effort
+                }
+            }
         }
     }
 
-    private fun readResponse(length: Int): ByteArray? {
-        return try {
-            val buffer = ByteArray(length)
-            var read = 0
-            while (read < length) {
-                val count = inputStream?.read(buffer, read, length - read) ?: return null
-                if (count < 0) return null
-                read += count
+    private suspend fun readResponse(): ByteArray? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val responseSize = 5
+                val buffer = ByteArray(responseSize)
+                var read = 0
+                while (read < responseSize) {
+                    val count = inputStream?.read(buffer, read, responseSize - read) ?: run {
+                        isConnected = false
+                        return@withContext null
+                    }
+                    if (count < 0) {
+                        Log.i(tag, "Response stream closed by remote device")
+                        isConnected = false
+                        return@withContext null
+                    }
+                    read += count
+                }
+                buffer
+            } catch (e: Exception) {
+                Log.e(tag, "Read error: ${e.message}")
+                isConnected = false
+                null
             }
-            buffer
-        } catch (e: Exception) {
-            Log.e(tag, "Read error: ${e.message}")
-            isConnected = false
-            null
         }
     }
 }

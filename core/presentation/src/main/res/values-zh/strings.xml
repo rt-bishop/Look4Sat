@@ -124,6 +124,7 @@
     <string name="prefs_bt_frequency_device_hint">蓝牙设备 ID</string>
     <string name="prefs_bt_frequency_output_hint">数据格式</string>
     <string name="prefs_bt_perm_error">请检查蓝牙权限</string>
+    <string name="prefs_net_perm_error">请检查网络权限</string>
 
     <string name="prefs_other_title">其他设置</string>
     <string name="prefs_other_switch_utc">以 UTC 时间显示</string>

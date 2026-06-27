@@ -132,6 +132,7 @@
     <string name="prefs_bt_frequency_device_hint">Id пристрою</string>
     <string name="prefs_bt_frequency_output_hint">Формат даних</string>
     <string name="prefs_bt_perm_error">Перевірте дозвіл Bluetooth</string>
+    <string name="prefs_net_perm_error">Перевірте дозвіл мережі</string>
 
     <string name="prefs_other_title">Інші налаштування</string>
     <string name="prefs_other_switch_utc">Показувати час в UTC</string>

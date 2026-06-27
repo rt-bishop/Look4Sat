@@ -132,6 +132,7 @@
     <string name="prefs_bt_frequency_device_hint">උපාංග id</string>
     <string name="prefs_bt_frequency_output_hint">දත්ත අකාරය</string>
     <string name="prefs_bt_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
+    <string name="prefs_net_perm_error">Network අවසර පරික්‍ෂා කරන්න</string>
 
     <string name="prefs_other_title">වෙනත් සැකසුම්</string>
     <string name="prefs_other_switch_utc">පසුකර වේලාවන් UTC මගින්</string>

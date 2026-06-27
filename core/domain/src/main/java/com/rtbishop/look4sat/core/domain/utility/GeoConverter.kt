@@ -17,7 +17,9 @@
  */
 package com.rtbishop.look4sat.core.domain.utility
 
+import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.DEG2RAD
+import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.predict.RAD2DEG
 import kotlin.math.acos
 import kotlin.math.atan2
@@ -83,6 +85,13 @@ fun clipLon(longitude: Double): Double {
     while (result < MIN_LONGITUDE) result += 360.0
     while (result > MAX_LONGITUDE) result -= 360.0
     return clip(result, MIN_LONGITUDE, MAX_LONGITUDE)
+}
+
+fun OrbitalPos.toMapGeoPos(): GeoPos {
+    return GeoPos(
+        latitude = clipLat(latitude.toDegrees()),
+        longitude = clipLon(longitude.toDegrees())
+    )
 }
 
 private fun clip(currentValue: Double, minValue: Double, maxValue: Double): Double {

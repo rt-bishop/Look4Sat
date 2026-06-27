@@ -132,6 +132,7 @@
     <string name="prefs_bt_frequency_device_hint">Id dispositivo</string>
     <string name="prefs_bt_frequency_output_hint">Formato de datos</string>
     <string name="prefs_bt_perm_error">Revisa los permisos de Bluetooth</string>
+    <string name="prefs_net_perm_error">Revisa los permisos de red</string>
 
     <string name="prefs_other_title">Otros ajustes</string>
     <string name="prefs_other_switch_utc">Mostrar tiempos de pase en UTC</string>

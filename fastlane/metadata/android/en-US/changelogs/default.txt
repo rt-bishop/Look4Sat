@@ -1,3 +1,2 @@
-* Fixed transceivers retention on a failed fetch from server
-* Fixed SSTV frequency display, no transceiver selected hint
-* Fixed All satellite category retention on Satellites screen
+* Added required tweaks to support Android 17 (API 37)
+* Added ACCESS_LOCAL_NETWORK permission check to support network data output
