@@ -58,6 +58,7 @@ import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.OutlinedText
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
+import kotlin.math.roundToInt
 
 @Composable
 internal fun SstvPage(
@@ -181,6 +182,19 @@ internal fun SstvPage(
                 modifier = Modifier.align(Alignment.Center)
             )
         }
+
+        val qualityText = frame?.let {
+            val syncPct = (it.syncHitRate * 100f).roundToInt()
+            val gainX10 = (it.appliedGain * 10f).roundToInt() / 10f
+            val inputRmsX1000 = (it.inputRms * 1000f).roundToInt() / 1000f
+            val scope = if (it.scopePixels != null) " | Scope ${it.scopeWidth}x${it.scopeHeight}" else ""
+            val complete = if (it.imageComplete) " | Complete" else ""
+            "RMS $inputRmsX1000 | Gain x$gainX10 | Sync $syncPct% | Pred ${it.predictedLineBursts}/${it.maxPredictedStreak} | Err ${it.timingErrorSamples}$scope$complete"
+        } ?: sstv.diagnosticsMetrics?.let {
+            val syncPct = (it.syncHitRate * 100f).roundToInt()
+            "Sync $syncPct% | Pred ${it.predictedLineBursts}/${it.maxPredictedStreak} | Err ${it.timingErrorSamples}"
+        }
+
         // Bottom control bar — dark, blends with the black canvas
         Column(
             modifier = Modifier
@@ -198,6 +212,15 @@ internal fun SstvPage(
                 outlineColor = MaterialTheme.colorScheme.background,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
+            if (qualityText != null) {
+                OutlinedText(
+                    text = qualityText,
+                    fontSize = 12.sp,
+                    fillColor = MaterialTheme.colorScheme.onSurface,
+                    outlineColor = MaterialTheme.colorScheme.background,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -32,6 +32,7 @@ import com.rtbishop.look4sat.core.domain.repository.IReporter
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISensorsRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.core.domain.sstv.LineRecoveryStrategy
 import com.rtbishop.look4sat.core.domain.sstv.SstvDecoder
 import com.rtbishop.look4sat.core.domain.usecase.IAudioCapture
 import com.rtbishop.look4sat.core.domain.usecase.IAddToCalendar
@@ -213,7 +214,6 @@ class RadarViewModel(
 
     override fun onCleared() {
         sensorsRepo.disableSensor()
-        super.onCleared()
     }
 
     fun onAction(action: RadarAction) {
@@ -344,13 +344,32 @@ class RadarViewModel(
 
     private fun initSstvDecoder() {
         if (sstvDecoder == null) {
-            val decoder = SstvDecoder(sampleRate = audioCapture.sampleRate)
+            val decoder = SstvDecoder(
+                sampleRate = audioCapture.sampleRate,
+                targetRmsLevel = SSTV_TARGET_RMS,
+                includeScopeData = SSTV_INCLUDE_SCOPE,
+                enableRmsNormalization = SSTV_ENABLE_RMS_NORMALIZATION,
+                preFilterCutoffHz = SSTV_PREFILTER_CUTOFF_HZ,
+                enablePreFilter = SSTV_ENABLE_PREFILTER,
+                enableDiagnosticsHandle = SSTV_ENABLE_DIAGNOSTICS_HANDLE,
+                lineRecoveryStrategy = SSTV_LINE_RECOVERY_STRATEGY
+            )
             sstvDecoder = decoder
             decoder.lockMode(_uiState.value.sstv.selectedMode)
             _uiState.update { it.copy(sstv = it.sstv.copy(supportedModes = decoder.supportedModes)) }
             viewModelScope.launch {
                 decoder.frames.collect { frame ->
-                    _uiState.update { it.copy(sstv = it.sstv.copy(currentFrame = frame)) }
+                    val metrics = decoder.getQualityMetrics()
+                    _uiState.update {
+                        it.copy(sstv = it.sstv.copy(currentFrame = frame, diagnosticsMetrics = metrics))
+                    }
+                }
+            }
+            decoder.getDiagnosticsHandle()?.let { handle ->
+                viewModelScope.launch {
+                    handle.metrics.collectLatest { metrics ->
+                        _uiState.update { it.copy(sstv = it.sstv.copy(diagnosticsMetrics = metrics)) }
+                    }
                 }
             }
         }
@@ -374,6 +393,39 @@ class RadarViewModel(
     }
 
     companion object {
+        // SSTV Decoder Tuning Parameters
+        // ==============================
+        // SSTV_TARGET_RMS: Normalized signal level before FM demodulation.
+        //   - 0.25: Aggressive (original default), amplifies noise; use only for clean inputs
+        //   - 0.35-0.40: RECOMMENDED for typical phone/mic inputs
+        //   - 0.50-0.60: Conservative, best for noisy environments
+        private const val SSTV_TARGET_RMS = 0.40f  // Changed from 0.25 to safer default
+
+        // Enable/disable RMS normalization entirely. Set false for direct receiver outputs.
+        private const val SSTV_ENABLE_RMS_NORMALIZATION = true
+
+        // High-pass pre-filter to remove DC offset and subsonic noise before RMS normalization.
+        // Improves weak signal robustness by cleaning the noise floor estimate.
+        private const val SSTV_PREFILTER_CUTOFF_HZ = 500.0  // Removes everything below 500 Hz
+
+        // Enable pre-filtering. Set false to skip (minimal CPU cost if disabled).
+        private const val SSTV_ENABLE_PREFILTER = true
+
+        // Diagnostics handle can be enabled temporarily to capture field reports.
+        // Interpretation notes for noisy recordings:
+        //   - syncHitRate < 0.30: weak/noisy signal path or mistuned gain
+        //   - predictedLineBursts rising quickly: frequent sync loss and likely vertical collapse
+        //   - maxPredictedStreak > 3 in Robot36 mode: noisy path and synthetic line flooding
+        private const val SSTV_ENABLE_DIAGNOSTICS_HANDLE = false
+
+        // Line recovery policy:
+        //   - Look4SatLimited: caps predicted lines to reduce visible vertical collapse.
+        //   - Robot36Compatible: unlimited predicted lines (legacy Robot36 behavior).
+        // Ask users to compare both if they report line-skipping/compression artifacts.
+        private val SSTV_LINE_RECOVERY_STRATEGY = LineRecoveryStrategy.Look4SatLimited
+
+        // Debug: Return scope visualization in frames (increases per-frame memory usage).
+        private const val SSTV_INCLUDE_SCOPE = false
 
         val CTCSS_TONES = listOf(
             67.0, 69.3, 71.9, 74.4, 77.0, 79.7, 82.5, 85.4, 88.5, 91.5,

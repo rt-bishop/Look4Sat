@@ -22,6 +22,7 @@ import com.rtbishop.look4sat.core.domain.predict.CelestialComputer
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.sstv.SstvFrame
+import com.rtbishop.look4sat.core.domain.sstv.SstvQualityMetrics
 
 data class RadioPanelState(
     val label: String = "",
@@ -72,7 +73,8 @@ data class SstvSubState(
     val hasPermission: Boolean = false,
     val selectedMode: String = "Auto",
     val supportedModes: List<String> = emptyList(),
-    val currentFrame: SstvFrame? = null
+    val currentFrame: SstvFrame? = null,
+    val diagnosticsMetrics: SstvQualityMetrics? = null
 )
 
 sealed interface RadarAction {

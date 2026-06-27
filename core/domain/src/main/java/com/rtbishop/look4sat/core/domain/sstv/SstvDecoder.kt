@@ -20,39 +20,94 @@ package com.rtbishop.look4sat.core.domain.sstv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.math.sqrt
 
 class SstvFrame(
+    val scopePixels: IntArray?,
+    val scopeWidth: Int,
+    val scopeHeight: Int,
     val imagePixels: IntArray?,
     val imageWidth: Int,
     val imageHeight: Int,
-    val modeName: String
+    val modeName: String,
+    val imageComplete: Boolean,
+    val inputRms: Float,
+    val appliedGain: Float,
+    val syncHitRate: Float,
+    val predictedLineBursts: Int,
+    val maxPredictedStreak: Int,
+    val timingErrorSamples: Int
+)
+
+/**
+ * Decoder quality metrics for diagnostics and logging. Useful for profiling decode
+ * performance on noisy recordings.
+ */
+data class SstvQualityMetrics(
+    val syncHitRate: Float,
+    val predictedLineBursts: Int,
+    val maxPredictedStreak: Int,
+    val timingErrorSamples: Int
+)
+
+enum class LineRecoveryStrategy {
+    Look4SatLimited,
+    Robot36Compatible
+}
+
+class SstvDiagnosticsHandle internal constructor(
+    val enabled: Boolean,
+    val metrics: StateFlow<SstvQualityMetrics?>
 )
 
 class SstvDecoder(
     sampleRate: Int = 44100,
     scopeWidth: Int = 320,
     scopeHeight: Int = 256,
-    private val channelSelect: Int = 0
+    private val channelSelect: Int = 0,
+    targetRmsLevel: Float = 0.25f,
+    private val includeScopeData: Boolean = false,
+    private val enableRmsNormalization: Boolean = true,
+    preFilterCutoffHz: Double = 500.0,
+    enablePreFilter: Boolean = true,
+    private val enableDiagnosticsHandle: Boolean = false,
+    lineRecoveryStrategy: LineRecoveryStrategy = LineRecoveryStrategy.Look4SatLimited
 ) {
     private val scopeBuffer = PixelBuffer(scopeWidth, scopeHeight * 2)
     private val imageBuffer = PixelBuffer(scopeWidth, scopeHeight)
-    private val decoder = DecoderEngine(scopeBuffer, imageBuffer, "Raw", sampleRate)
+    private val decoder = DecoderEngine(scopeBuffer, imageBuffer, "Raw", sampleRate, lineRecoveryStrategy)
     private val _frames = MutableSharedFlow<SstvFrame>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    private var lastInputRms = 0f
+    private var lastAppliedGain = 1f
+    private val _qualityMetrics = MutableStateFlow<SstvQualityMetrics?>(null)
+    private val preFilter = if (enablePreFilter) HighPassFilter(preFilterCutoffHz, sampleRate.toDouble()) else null
+    private val diagnosticsHandle = SstvDiagnosticsHandle(enableDiagnosticsHandle, _qualityMetrics)
     val frames: SharedFlow<SstvFrame> = _frames
     val supportedModes: List<String> = decoder.allModes.map { it.name }
 
     suspend fun feedSamples(samples: FloatArray) = withContext(Dispatchers.Default) {
-        // Normalize to a fixed RMS before processing so that both direct audio
-        // coupling and air-coupled microphone input decode with equal reliability.
-        normalise(samples)
+        // Optional pre-filtering: remove DC offset and subsonic noise that can mask
+        // weak signals and corrupt the RMS normalization baseline.
+        preFilter?.apply(samples)
+
+        // Optional RMS normalization: bring input to a consistent level so the
+        // FM demodulator operates in a predictable region. However, this amplifies
+        // noise proportionally. Aggressive RMS targets (e.g., 0.25) can hurt weak
+        // signals by boosting noise floor. Safer defaults: 0.35-0.50 for noisy inputs.
+        // Disable entirely for direct line-level inputs (e.g., receiver discriminator).
+        val gain = if (enableRmsNormalization) normalise(samples) else GainInfo(0f, 1f)
+        lastInputRms = gain.inputRms
+        lastAppliedGain = gain.appliedGain
         val hasNewLines = decoder.process(samples, channelSelect)
         if (hasNewLines) emitFrame()
     }
@@ -62,35 +117,133 @@ class SstvDecoder(
     fun clearPixels() {
         imageBuffer.line = -1
         imageBuffer.pixels.fill(0)
+        decoder.resetQuality()
+        if (enableDiagnosticsHandle) _qualityMetrics.value = null
+    }
+
+    fun getDiagnosticsHandle(): SstvDiagnosticsHandle? = diagnosticsHandle.takeIf { it.enabled }
+
+    /**
+     * Export quality metrics for logging/diagnostics. Useful for profiling decode
+     * performance on noisy recordings. Returns null before first frame is emitted.
+     */
+    @Suppress("unused")
+    fun getQualityMetrics(): SstvQualityMetrics? {
+        if (enableDiagnosticsHandle) return _qualityMetrics.value
+        val q = decoder.quality()
+        return SstvQualityMetrics(
+            syncHitRate = q.syncHitRate,
+            predictedLineBursts = q.predictedLineBursts,
+            maxPredictedStreak = q.maxPredictedStreak,
+            timingErrorSamples = q.timingErrorSamples
+        )
     }
 
     private fun emitFrame() {
         val imageWidth = imageBuffer.width
         val imageHeight = imageBuffer.height
+        val quality = decoder.quality()
+        if (enableDiagnosticsHandle) {
+            _qualityMetrics.value = SstvQualityMetrics(
+                syncHitRate = quality.syncHitRate,
+                predictedLineBursts = quality.predictedLineBursts,
+                maxPredictedStreak = quality.maxPredictedStreak,
+                timingErrorSamples = quality.timingErrorSamples
+            )
+        }
+        val imageComplete = imageBuffer.line >= imageHeight && imageBuffer.line > 0
         // Copy only the active image region — imageBuffer.pixels is pre-allocated
         // at the maximum possible size (PD-290: 800×616), so we must not copyOf()
         // the entire array and send padding pixels to the observer.
         val imagePixels = if (imageBuffer.line > 0) imageBuffer.pixels.copyOf(imageWidth * imageHeight) else null
         val modeName = decoder.currentMode.name
-        _frames.tryEmit(SstvFrame(imagePixels, imageWidth, imageHeight, modeName))
+        val scopePixels = if (includeScopeData) scopeBuffer.pixels.copyOf() else null
+        val scopeWidth = if (includeScopeData) scopeBuffer.width else 0
+        val scopeHeight = if (includeScopeData) scopeBuffer.height else 0
+        _frames.tryEmit(
+            SstvFrame(
+                scopePixels = scopePixels,
+                scopeWidth = scopeWidth,
+                scopeHeight = scopeHeight,
+                imagePixels = imagePixels,
+                imageWidth = imageWidth,
+                imageHeight = imageHeight,
+                modeName = modeName,
+                imageComplete = imageComplete,
+                inputRms = lastInputRms,
+                appliedGain = lastAppliedGain,
+                syncHitRate = quality.syncHitRate,
+                predictedLineBursts = quality.predictedLineBursts,
+                maxPredictedStreak = quality.maxPredictedStreak,
+                timingErrorSamples = quality.timingErrorSamples
+            )
+        )
     }
 
     // Target RMS level for the normalizer. 0.25 leaves headroom while keeping the
     // FM demodulator well above its noise floor regardless of input gain.
-    private val targetRms = 0.25f
+    // TUNING GUIDE:
+    //   - 0.20-0.25: Aggressive, best for clean direct-coupled inputs, worst for mic noise
+    //   - 0.35-0.40: Moderate, good balance for typical phone/mic inputs (RECOMMENDED)
+    //   - 0.50-0.60: Conservative, best for noisy environments, reduces amplitude resolution
+    // Disable RMS normalization entirely if using a professional receiver discriminator output.
+    private val targetRms = targetRmsLevel.coerceIn(0.05f, 0.8f)
+
+    private class GainInfo(
+        val inputRms: Float,
+        val appliedGain: Float
+    )
 
     // Bring the buffer to a fixed RMS so that microphone and direct-coupled inputs
     // both decode reliably. The guard prevents amplifying pure silence into noise.
-    private fun normalise(buffer: FloatArray) {
+    private fun normalise(buffer: FloatArray): GainInfo {
         var sumSq = 0f
         for (s in buffer) sumSq += s * s
         val rms = sqrt(sumSq / buffer.size)
         if (rms > 1e-6f) {
             val gain = targetRms / rms
             for (i in buffer.indices) buffer[i] *= gain
+            return GainInfo(rms, gain)
+        }
+        return GainInfo(rms, 1f)
+    }
+}
+
+/**
+ * Simple high-pass filter to remove DC offset and subsonic interference before RMS
+ * normalization. Improves noise floor estimation and prevents low-freq noise from
+ * corrupting the gain calculation.
+ *
+ * Design: First-order butterworth (pole at cutoff frequency). Fast, minimal latency,
+ * suitable for real-time preprocessing.
+ */
+internal class HighPassFilter(cutoffHz: Double, sampleRateHz: Double) {
+    private val alpha: Float
+    private var prevInput = 0f
+    private var prevOutput = 0f
+
+    init {
+        // First-order pole placement: alpha = wc / (wc + ws) where wc = 2*pi*fc, ws = 2*pi*fs
+        val omega = 2f * PI.toFloat() * (cutoffHz / sampleRateHz).toFloat()
+        alpha = omega / (omega + 1f)
+    }
+
+    fun apply(buffer: FloatArray) {
+        for (i in buffer.indices) {
+            val input = buffer[i]
+            prevOutput = alpha * (prevOutput + input - prevInput)
+            buffer[i] = prevOutput
+            prevInput = input
         }
     }
 }
+
+internal class DecoderQuality(
+    val syncHitRate: Float,
+    val predictedLineBursts: Int,
+    val maxPredictedStreak: Int,
+    val timingErrorSamples: Int
+)
 
 internal enum class SyncPulseWidth { FiveMs, NineMs, TwentyMs }
 
@@ -197,7 +350,8 @@ internal class DecoderEngine(
     private val scopeBuffer: PixelBuffer,
     private val imageBuffer: PixelBuffer,
     rawName: String,
-    sampleRate: Int
+    sampleRate: Int,
+    lineRecoveryStrategy: LineRecoveryStrategy
 ) {
     private val pixelBuffer = PixelBuffer(800, 2)
     private val detector = SyncPulseDetector(sampleRate)
@@ -237,6 +391,19 @@ internal class DecoderEngine(
     private var lastSync = 0
     private var curLineSamples: Int
     private var lastOffset = 0f
+    private var syncChecks = 0
+    private var syncHits = 0
+    private var predictedLineBursts = 0
+    private var predictedStreak = 0
+    private var maxPredictedStreak = 0
+    private var timingErrorSamples = 0
+
+    // Look4Sat strategy limits synthetic lines to avoid visible vertical collapse.
+    // Robot36 strategy preserves legacy behavior by allowing unlimited synthesis.
+    private val maxConsecutivePredictedLines = when (lineRecoveryStrategy) {
+        LineRecoveryStrategy.Look4SatLimited -> 2
+        LineRecoveryStrategy.Robot36Compatible -> Int.MAX_VALUE
+    }
 
     init {
         imageBuffer.line = -1
@@ -286,6 +453,11 @@ internal class DecoderEngine(
     fun process(recordBuffer: FloatArray, channelSelect: Int): Boolean {
         var newLines = false
         val detected = detector.process(recordBuffer, channelSelect)
+        syncChecks++
+        if (detected) {
+            syncHits++
+            predictedStreak = 0
+        }
         var syncIdx = sample + detector.pulseOffset
         val channels = if (channelSelect > 0) 2 else 1
         for (j in 0 until recordBuffer.size / channels) {
@@ -308,20 +480,10 @@ internal class DecoderEngine(
                 }
             }
         } else if (handleHeader()) {
+            predictedStreak = 0
             newLines = true
         } else if (sample > lastSync + (curLineSamples * 5) / 4) {
-            copyLines(
-                currentMode.decodeScanLine(
-                    pixelBuffer,
-                    scratch,
-                    scanLineBuffer,
-                    scopeBuffer.width,
-                    lastSync,
-                    curLineSamples,
-                    lastOffset
-                )
-            )
-            lastSync += curLineSamples; newLines = true
+            newLines = decodePredictedLine()
         }
         return newLines
     }
@@ -335,6 +497,25 @@ internal class DecoderEngine(
             lockMode = true; imageBuffer.line = -1; currentMode = mode; curLineSamples = mode.scanLineSamples; return
         }
         lockMode = false
+    }
+
+    fun quality(): DecoderQuality {
+        val hitRate = if (syncChecks > 0) syncHits.toFloat() / syncChecks else 0f
+        return DecoderQuality(
+            syncHitRate = hitRate,
+            predictedLineBursts = predictedLineBursts,
+            maxPredictedStreak = maxPredictedStreak,
+            timingErrorSamples = timingErrorSamples
+        )
+    }
+
+    fun resetQuality() {
+        syncChecks = 0
+        syncHits = 0
+        predictedLineBursts = 0
+        predictedStreak = 0
+        maxPredictedStreak = 0
+        timingErrorSamples = 0
     }
 
     private fun mean(a: IntArray): Double = a.sumOf { it.toDouble() } / a.size
@@ -424,6 +605,29 @@ internal class DecoderEngine(
         val scale = scopeBuffer.width / pixelBuffer.width
         if (scale <= 1) copyUnscaled() else copyScaled(scale)
         if (finish) drawLines(0xff000000.toInt(), 10)
+    }
+
+    private fun decodePredictedLine(): Boolean {
+        // Avoid long streaks of synthetic lines; once we exceed the cap we wait for
+        // real sync to reduce visible vertical compression on weak/noisy signals.
+        if (predictedStreak >= maxConsecutivePredictedLines) return false
+        val expectedSync = lastSync + curLineSamples
+        timingErrorSamples = sample - expectedSync
+        val decoded = currentMode.decodeScanLine(
+            pixelBuffer,
+            scratch,
+            scanLineBuffer,
+            scopeBuffer.width,
+            lastSync,
+            curLineSamples,
+            lastOffset
+        )
+        copyLines(decoded)
+        lastSync = expectedSync
+        predictedLineBursts++
+        predictedStreak++
+        if (predictedStreak > maxPredictedStreak) maxPredictedStreak = predictedStreak
+        return decoded
     }
 
     private fun drawLines(color: Int, count: Int) {
@@ -542,6 +746,7 @@ internal class DecoderEngine(
         lineLen: IntArray,
         latest: Int
     ): Boolean {
+        predictedStreak = 0
         for (i in 1 until syncPulses.size) syncPulses[i - 1] = syncPulses[i]
         syncPulses[syncPulses.size - 1] = latest
         for (i in 1 until lineLen.size) lineLen[i - 1] = lineLen[i]
