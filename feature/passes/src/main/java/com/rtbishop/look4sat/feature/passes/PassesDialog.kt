@@ -21,8 +21,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -31,6 +34,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -55,7 +59,10 @@ import com.rtbishop.look4sat.core.presentation.LocalSpacing
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.SharedDialog
+import com.rtbishop.look4sat.core.presentation.ElevationHighColor
+import com.rtbishop.look4sat.core.presentation.ElevationLowColor
 import com.rtbishop.look4sat.core.presentation.elevationColor
+import kotlin.math.roundToInt
 
 private val allModes = listOf(
     "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
@@ -66,33 +73,81 @@ private val allModes = listOf(
 )
 
 private val hourSteps = listOf(1, 2, 4, 8, 12, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240)
+private const val dayMinutes = 24 * 60
+private const val minuteStep = 15
+private const val endOfDayMinute = dayMinutes - 1
+private const val quarterHourSlots = dayMinutes / minuteStep
+
+data class PassFilterParams(
+    val hours: Int,
+    val elevation: Double,
+    val lowElevation: Double,
+    val highElevation: Double,
+    val aosStartMinute: Int,
+    val aosEndMinute: Int,
+    val invertAosTimeWindow: Boolean,
+    val showDeepSpace: Boolean
+)
 
 @Preview
 @Composable
 private fun PassesDialogPreview() {
-    MainTheme { PassesDialog(24, 16.0, true, {}) { _, _, _ -> } }
+    MainTheme {
+        PassesFilterDialog(
+            hours = 24,
+            elevation = 16.0,
+            lowElevation = 16.0,
+            highElevation = 65.0,
+            aosStartMinute = 0,
+            aosEndMinute = 23 * 60 + 59,
+            invertAosTimeWindow = false,
+            showDeepSpace = true,
+            cancel = {},
+            accept = {}
+        )
+    }
 }
 
 @Composable
-internal fun PassesDialog(
+internal fun PassesFilterDialog(
     hours: Int,
     elevation: Double,
+    lowElevation: Double,
+    highElevation: Double,
+    aosStartMinute: Int,
+    aosEndMinute: Int,
+    invertAosTimeWindow: Boolean,
     showDeepSpace: Boolean,
     cancel: () -> Unit,
-    accept: (Int, Double, Boolean) -> Unit
+    accept: (PassFilterParams) -> Unit
 ) {
     val hoursIndex = remember { mutableIntStateOf(hourSteps.indexOfFirst { it >= hours }.coerceAtLeast(0)) }
     val elevationValueNew = remember { mutableDoubleStateOf(elevation) }
+    val highlightBounds = 0f..90f
+    var highlightRange by remember(lowElevation, highElevation) {
+        mutableStateOf(lowElevation.toFloat()..highElevation.toFloat())
+    }
+    var aosRangeValue by remember {
+        mutableStateOf(minuteToSlot(aosStartMinute).toFloat()..minuteToSlot(aosEndMinute).toFloat())
+    }
+    var invertedAosRange by remember { mutableStateOf(invertAosTimeWindow) }
     var deepSpaceEnabled by remember { mutableStateOf(showDeepSpace) }
     val onAccept = {
-        accept(hourSteps[hoursIndex.intValue], elevationValueNew.doubleValue, deepSpaceEnabled).also { cancel() }
+        accept(
+            PassFilterParams(
+                hours = hourSteps[hoursIndex.intValue],
+                elevation = elevationValueNew.doubleValue,
+                lowElevation = highlightRange.start.roundToInt().toDouble(),
+                highElevation = highlightRange.endInclusive.roundToInt().toDouble(),
+                aosStartMinute = slotToMinute(aosRangeValue.start),
+                aosEndMinute = slotToMinute(aosRangeValue.endInclusive),
+                invertAosTimeWindow = invertedAosRange,
+                showDeepSpace = deepSpaceEnabled
+            )
+        )
+        cancel()
     }
     SharedDialog(title = stringResource(R.string.pass_filter_title), onCancel = cancel, onAccept = onAccept) {
-        ToggleRow(
-            title = stringResource(R.string.pass_filter_deep_space),
-            checked = deepSpaceEnabled,
-            onCheckedChange = { deepSpaceEnabled = it }
-        )
         SliderRow(
             title = stringResource(R.string.pass_filter_elev),
             value = elevationValueNew.doubleValue,
@@ -104,24 +159,74 @@ internal fun PassesDialog(
         SliderRow(
             title = stringResource(R.string.pass_filter_hours),
             value = hoursIndex.intValue.toDouble(),
-            displayValue = "${hourSteps[hoursIndex.intValue]}h",
+            displayValue = formatHoursLabel(hourSteps[hoursIndex.intValue]),
             valueResId = R.drawable.ic_clock,
             valueRange = 0f..(hourSteps.size - 1).toFloat(),
             steps = hourSteps.size - 2
         ) { hoursIndex.intValue = it.toInt().coerceIn(0, hourSteps.size - 1) }
+        ToggleRow(
+            title = stringResource(R.string.pass_filter_deep_space),
+            checked = deepSpaceEnabled,
+            onCheckedChange = { deepSpaceEnabled = it }
+        )
+        ElevationColorsRangeSliderRow(
+            title = stringResource(R.string.prefs_highlight_title),
+            range = highlightRange,
+            valueRange = highlightBounds
+        ) { highlightRange = it }
+        TimeRangeSliderRow(
+            title = stringResource(R.string.pass_filter_aos_time),
+            range = aosRangeValue,
+            displayValue = formatTimeRange(aosRangeValue, invertedAosRange),
+            valueResId = R.drawable.ic_clock,
+            valueRange = 0f..quarterHourSlots.toFloat(),
+        ) { aosRangeValue = it }
+        ToggleRow(
+            title = stringResource(R.string.pass_filter_invert_time),
+            checked = invertedAosRange,
+            onCheckedChange = { invertedAosRange = it }
+        )
+        Spacer(modifier = Modifier.height(0.dp))
     }
 }
 
+private fun slotToMinute(value: Float): Int {
+    val slot = value.roundToInt().coerceIn(0, quarterHourSlots)
+    return if (slot == quarterHourSlots) endOfDayMinute else slot * minuteStep
+}
+
+private fun minuteToSlot(minute: Int): Int {
+    if (minute >= endOfDayMinute) return quarterHourSlots
+    return ((minute + minuteStep / 2) / minuteStep).coerceIn(0, quarterHourSlots)
+}
+
+private fun formatMinuteOfDay(minute: Int): String {
+    val hourPart = minute / 60
+    val minutePart = minute % 60
+    return "%02d:%02d".format(hourPart, minutePart)
+}
+
+private fun formatHoursLabel(hours: Int): String {
+    if (hours < 24) return "${hours}h"
+    val days = hours / 24
+    val remainder = hours % 24
+    return if (remainder == 0) "${days}d" else "${days}d ${remainder}h"
+}
+
+private fun formatTimeRange(
+    range: ClosedFloatingPointRange<Float>,
+    inverted: Boolean
+): String {
+    val start = formatMinuteOfDay(slotToMinute(range.start))
+    val end = formatMinuteOfDay(slotToMinute(range.endInclusive))
+    return if (inverted) "$end - $start" else "$start - $end"
+}
+
 @Composable
-private fun SliderRow(
+private fun SliderSection(
     title: String,
-    value: Double,
-    displayValue: String,
-    valueResId: Int,
-    valueRange: ClosedFloatingPointRange<Float>,
-    steps: Int = 0,
-    accentColor: Color = MaterialTheme.colorScheme.primary,
-    onChange: (Float) -> Unit
+    trailingContent: @Composable () -> Unit,
+    sliderContent: @Composable () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -138,6 +243,26 @@ private fun SliderRow(
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onSurface
             )
+            trailingContent()
+        }
+        sliderContent()
+    }
+}
+
+@Composable
+private fun SliderRow(
+    title: String,
+    value: Double,
+    displayValue: String,
+    valueResId: Int,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int = 0,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
+    onChange: (Float) -> Unit
+) {
+    SliderSection(
+        title = title,
+        trailingContent = {
             Icon(
                 painter = painterResource(id = valueResId),
                 contentDescription = null,
@@ -151,7 +276,86 @@ private fun SliderRow(
                 color = accentColor
             )
         }
+    ) {
         Slider(value = value.toFloat(), onValueChange = onChange, valueRange = valueRange, steps = steps)
+    }
+}
+
+@Composable
+private fun TimeRangeSliderRow(
+    title: String,
+    range: ClosedFloatingPointRange<Float>,
+    displayValue: String,
+    valueResId: Int,
+    valueRange: ClosedFloatingPointRange<Float>,
+    onChange: (ClosedFloatingPointRange<Float>) -> Unit
+) {
+    SliderSection(
+        title = title,
+        trailingContent = {
+            Icon(
+                painter = painterResource(id = valueResId),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = displayValue,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    ) {
+        RangeSlider(
+            value = range,
+            onValueChange = { onChange(it.start..it.endInclusive) },
+            valueRange = valueRange,
+            steps = 0,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun ElevationColorsRangeSliderRow(
+    title: String,
+    range: ClosedFloatingPointRange<Float>,
+    valueRange: ClosedFloatingPointRange<Float>,
+    onChange: (ClosedFloatingPointRange<Float>) -> Unit
+) {
+    val low = range.start.roundToInt()
+    val high = range.endInclusive.roundToInt()
+    SliderSection(
+        title = title,
+        trailingContent = {
+            Text(
+                text = "$low°",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = ElevationLowColor
+            )
+            Text(
+                text = "..",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "$high°",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = ElevationHighColor
+            )
+        }
+    ) {
+        RangeSlider(
+            value = range,
+            onValueChange = { onChange(it.start..it.endInclusive) },
+            valueRange = valueRange,
+            steps = 0,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

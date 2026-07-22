@@ -31,7 +31,10 @@
     <!-- Passes screen -->
     <string name="pass_filter_title">Filtrar pases</string>
     <string name="pass_filter_elev">Elevación mínima</string>
-    <string name="pass_filter_hours">Horas por delante</string>
+    <string name="pass_filter_hours">Tiempo por delante</string>
+    <string name="pass_filter_aos_time">Ventana AOS</string>
+    <string name="pass_filter_invert_time">Invertir ventana AOS</string>
+    <string name="pass_filter_deep_space">DeepSpace (período &gt;225min)</string>
     <string name="pass_modes_title">Tipo de modulación</string>
     <string name="pass_elevation">Elevación: %.1f°</string>
     <string name="pass_altitude">Altitud: %.0f km</string>
@@ -139,6 +142,12 @@
     <string name="prefs_other_switch_update">Habilitar auto actualización de datos</string>
     <string name="prefs_other_switch_sweep">Habilitar animaciones radar</string>
     <string name="prefs_other_switch_sensors">Usar sensores para rotar vista de radar</string>
+    <string name="prefs_other_switch_night_mode">Activar filtro nocturno rojo</string>
+
+    <string name="prefs_highlight_title">Resaltado de elevación</string>
+    <string name="prefs_highlight_low">Baja &lt; %1$d°</string>
+    <string name="prefs_highlight_mid">Media %1$d-%2$d°</string>
+    <string name="prefs_highlight_high">Alta &gt; %1$d°</string>
 
     <string name="prefs_outro_title">Me gustaría dar las gracias a:</string>
     <string name="prefs_outro_license">La app viene sin garantías de ningún tipo.</string>

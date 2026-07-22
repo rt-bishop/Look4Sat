@@ -53,10 +53,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.OutlinedText
 import com.rtbishop.look4sat.core.presentation.R
+import com.rtbishop.look4sat.core.presentation.SharedDialog
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import kotlin.math.roundToInt
 
@@ -95,53 +95,44 @@ internal fun SstvPage(
 
     if (showModeDialog.value) {
         val allModes = remember(sstv.supportedModes) { listOf("Auto") + sstv.supportedModes }
-        Dialog(onDismissRequest = { showModeDialog.value = false }) {
-            ElevatedCard {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(vertical = 16.dp)
-                ) {
-                    Text(
-                        text = "SSTV Mode",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                    LazyColumn(
+        val dismiss = { showModeDialog.value = false }
+        SharedDialog(
+            title = "SSTV Mode",
+            onDismissRequest = dismiss,
+            onAccept = dismiss
+        ) { _ ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxHeight(0.7f)
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                items(allModes) { mode ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .fillMaxHeight(0.5f)
-                            .background(MaterialTheme.colorScheme.background),
-                        verticalArrangement = Arrangement.spacedBy(1.dp)
-                    ) {
-                        items(allModes) { mode ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .clickable {
-                                        onAction(RadarAction.SstvSelectMode(mode))
-                                        showModeDialog.value = false
-                                    }
-                            ) {
-                                Text(
-                                    text = mode,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 16.dp)
-                                )
-                                RadioButton(
-                                    selected = mode == sstv.selectedMode,
-                                    onClick = null,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-                                )
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface)
+                            .clickable {
+                                onAction(RadarAction.SstvSelectMode(mode))
+                                showModeDialog.value = false
                             }
-                        }
+                    ) {
+                        Text(
+                            text = mode,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 16.dp)
+                        )
+                        RadioButton(
+                            selected = mode == sstv.selectedMode,
+                            onClick = null,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                        )
                     }
                 }
             }

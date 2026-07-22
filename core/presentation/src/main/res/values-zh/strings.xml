@@ -26,7 +26,10 @@
     <!-- Passes screen -->
     <string name="pass_filter_title">筛选过境</string>
     <string name="pass_filter_elev">仰角值</string>
-    <string name="pass_filter_hours">小时数</string>
+    <string name="pass_filter_hours">提前时间</string>
+    <string name="pass_filter_aos_time">AOS 时间段</string>
+    <string name="pass_filter_invert_time">反选 AOS 时间段</string>
+    <string name="pass_filter_deep_space">DeepSpace（周期 &gt;225分钟）</string>
     <string name="pass_modes_title">选择调制类型</string>
     <string name="pass_elevation">仰角：%.1f°</string>
     <string name="pass_altitude">高度：%d km</string>
@@ -132,6 +135,11 @@
     <string name="prefs_other_switch_sweep">启用雷达扫描动画</string>
     <string name="prefs_other_switch_sensors">使用传感器旋转雷达视图</string>
     <string name="prefs_other_switch_night_mode">启用红色夜间模式</string>
+
+    <string name="prefs_highlight_title">仰角高亮</string>
+    <string name="prefs_highlight_low">低 &lt; %1$d°</string>
+    <string name="prefs_highlight_mid">中 %1$d-%2$d°</string>
+    <string name="prefs_highlight_high">高 &gt; %1$d°</string>
 
     <string name="prefs_outro_title">我要感谢：</string>
     <string name="prefs_outro_thanks" translatable="false">

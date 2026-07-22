@@ -67,11 +67,11 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.presentation.EmptyListCard
 import com.rtbishop.look4sat.core.presentation.IconCard
-import com.rtbishop.look4sat.core.presentation.InfoDialog
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
+import com.rtbishop.look4sat.core.presentation.SharedDialog
 import com.rtbishop.look4sat.core.presentation.SwipeableItem
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
@@ -99,14 +99,31 @@ private fun PassesScreen(
     navigateToRadar: (Int, Long) -> Unit
 ) {
     if (uiState.isPassesDialogShown) {
-        PassesDialog(
+        PassesFilterDialog(
             hours = uiState.hours,
             elevation = uiState.elevation,
+            lowElevation = uiState.lowElevation,
+            highElevation = uiState.highElevation,
+            aosStartMinute = uiState.aosStartMinute,
+            aosEndMinute = uiState.aosEndMinute,
+            invertAosTimeWindow = uiState.invertAosTimeWindow,
             showDeepSpace = uiState.showDeepSpace,
-            cancel = { onAction(PassesAction.TogglePassesDialog) }
-        ) { hours, elevation, showDeepSpace ->
-            onAction(PassesAction.FilterPasses(hours, elevation, showDeepSpace))
-        }
+            cancel = { onAction(PassesAction.TogglePassesDialog) },
+            accept = { params ->
+                onAction(
+                    PassesAction.FilterPasses(
+                        hoursAhead = params.hours,
+                        minElevation = params.elevation,
+                        lowElevation = params.lowElevation,
+                        highElevation = params.highElevation,
+                        aosStartMinute = params.aosStartMinute,
+                        aosEndMinute = params.aosEndMinute,
+                        invertAosTimeWindow = params.invertAosTimeWindow,
+                        showDeepSpace = params.showDeepSpace
+                    )
+                )
+            }
+        )
     }
     if (uiState.isRadiosDialogShown) {
         RadiosDialog(
@@ -117,11 +134,19 @@ private fun PassesScreen(
         }
     }
     if (uiState.shouldSeeWhatsNew) {
-        InfoDialog(
+        val dismiss = { onAction(PassesAction.DismissWhatsNew) }
+        SharedDialog(
             title = stringResource(R.string.pass_whatsnew_title),
-            text = stringResource(R.string.pass_whatsnew_message)
-        ) {
-            onAction(PassesAction.DismissWhatsNew)
+            onDismissRequest = dismiss,
+            onAccept = dismiss,
+            titleFontSize = 18
+        ) { padding ->
+            Text(
+                text = stringResource(R.string.pass_whatsnew_message),
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = padding)
+            )
         }
     }
     ScreenColumn(

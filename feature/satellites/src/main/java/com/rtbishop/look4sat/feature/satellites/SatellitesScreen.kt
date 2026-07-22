@@ -62,10 +62,10 @@ import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.presentation.CardLoadingIndicator
 import com.rtbishop.look4sat.core.presentation.EmptyListCard
 import com.rtbishop.look4sat.core.presentation.IconCard
-import com.rtbishop.look4sat.core.presentation.InfoDialog
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.PrimaryIconCard
 import com.rtbishop.look4sat.core.presentation.R
+import com.rtbishop.look4sat.core.presentation.SharedDialog
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
@@ -95,11 +95,19 @@ private fun SatellitesScreen(
         )
     }
     if (uiState.shouldSeeWarning) {
-        InfoDialog(
-            stringResource(R.string.sat_warning_title),
-            stringResource(R.string.sat_warning_message)
-        ) {
-            onAction(SatellitesAction.DismissWarning)
+        val dismiss = { onAction(SatellitesAction.DismissWarning) }
+        SharedDialog(
+            title = stringResource(R.string.sat_warning_title),
+            onDismissRequest = dismiss,
+            onAccept = dismiss,
+            titleFontSize = 18
+        ) { padding ->
+            Text(
+                text = stringResource(R.string.sat_warning_message),
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = padding)
+            )
         }
     }
 

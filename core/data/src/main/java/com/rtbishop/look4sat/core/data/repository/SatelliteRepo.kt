@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
+import java.util.TimeZone
 
 class SatelliteRepo(
     private val dispatcher: CoroutineDispatcher,
@@ -64,8 +65,16 @@ class SatelliteRepo(
     override suspend fun initRepository() = withContext(dispatcher) {
         settingsRepo.selectedIds.collect { selectedIds ->
             _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
-            val (_, hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
-            calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
+            val settings = settingsRepo.passesSettings.value
+            calculatePasses(
+                time = System.currentTimeMillis(),
+                hoursAhead = settings.hoursAhead,
+                minElevation = settings.minElevation,
+                aosStartMinute = settings.aosStartMinute,
+                aosEndMinute = settings.aosEndMinute,
+                invertAosTimeWindow = settings.invertAosTimeWindow,
+                modes = settings.selectedModes
+            )
         }
     }
 
@@ -105,7 +114,15 @@ class SatelliteRepo(
         }
     }
 
-    override suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>) {
+    override suspend fun calculatePasses(
+        time: Long,
+        hoursAhead: Int,
+        minElevation: Double,
+        aosStartMinute: Int,
+        aosEndMinute: Int,
+        invertAosTimeWindow: Boolean,
+        modes: List<String>
+    ) {
         _isCalculating.value = true
         // Normalize to the start of the current minute so that coarse 60-second stepping
         // in getLeoPass always begins from the same phase, producing stable AOS/LOS times
@@ -130,7 +147,12 @@ class SatelliteRepo(
             val newPasses = ArrayList<OrbitalPass>()
             for (list in passLists) {
                 for (pass in list) {
-                    if (pass.losTime > time && pass.aosTime < timeFuture && pass.maxElevation > minElevation) {
+                    if (
+                        pass.losTime > time
+                        && pass.aosTime < timeFuture
+                        && pass.maxElevation > minElevation
+                        && (pass.isDeepSpace || isAosInRange(pass.aosTime, aosStartMinute, aosEndMinute, invertAosTimeWindow))
+                    ) {
                         newPasses.add(pass)
                     }
                 }
@@ -140,6 +162,23 @@ class SatelliteRepo(
             _passes.update { newPasses }
         }
         _isCalculating.value = false
+    }
+
+    private fun isAosInRange(
+        aosTime: Long,
+        aosStartMinute: Int,
+        aosEndMinute: Int,
+        invertAosTimeWindow: Boolean
+    ): Boolean {
+        val offsetMillis = TimeZone.getDefault().getOffset(aosTime).toLong()
+        val localMillis = Math.floorMod(aosTime + offsetMillis, 24L * 60L * 60L * 1000L)
+        val aosMinute = (localMillis / 60_000L).toInt()
+        val inRange = if (aosStartMinute <= aosEndMinute) {
+            aosMinute in aosStartMinute..aosEndMinute
+        } else {
+            aosMinute >= aosStartMinute || aosMinute <= aosEndMinute
+        }
+        return if (invertAosTimeWindow) !inRange else inRange
     }
 
     private fun OrbitalObject.getPasses(pos: GeoPos, time: Long, hours: Int): List<OrbitalPass> {

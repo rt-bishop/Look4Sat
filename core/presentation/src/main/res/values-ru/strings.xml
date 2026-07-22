@@ -30,7 +30,10 @@
     <!-- Passes screen -->
     <string name="pass_filter_title">Фильтровать пролеты</string>
     <string name="pass_filter_elev">Минимальная элевация</string>
-    <string name="pass_filter_hours">Количество часов</string>
+    <string name="pass_filter_hours">Период расчёта</string>
+    <string name="pass_filter_aos_time">Окно AOS</string>
+    <string name="pass_filter_invert_time">Инвертировать окно AOS</string>
+    <string name="pass_filter_deep_space">DeepSpace (период &gt;225мин)</string>
     <string name="pass_modes_title">Выберите тип модуляции</string>
     <string name="pass_elevation">Элевация: %.1f°</string>
     <string name="pass_altitude">Высота: %d км</string>
@@ -138,6 +141,12 @@
     <string name="prefs_other_switch_update">Обновлять данные автоматически</string>
     <string name="prefs_other_switch_sweep">Показывать анимацию радара</string>
     <string name="prefs_other_switch_sensors">Использовать сенсоры устройства</string>
+    <string name="prefs_other_switch_night_mode">Включить красный ночной фильтр</string>
+
+    <string name="prefs_highlight_title">Подсветка высоты</string>
+    <string name="prefs_highlight_low">Низко &lt; %1$d°</string>
+    <string name="prefs_highlight_mid">Средне %1$d-%2$d°</string>
+    <string name="prefs_highlight_high">Высоко &gt; %1$d°</string>
 
     <string name="prefs_outro_title">Я хотел бы сказать спасибо:</string>
     <string name="prefs_outro_license">Это ПО поставляется без гарантий.</string>

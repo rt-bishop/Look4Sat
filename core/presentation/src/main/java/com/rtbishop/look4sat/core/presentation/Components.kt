@@ -39,18 +39,26 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.hideFromAccessibility
@@ -64,10 +72,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.rtbishop.look4sat.core.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalData
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
@@ -278,55 +287,87 @@ fun getDefaultPass(): OrbitalPass = OrbitalPass(
 fun SharedDialog(
     title: String, onCancel: () -> Unit, onAccept: () -> Unit, content: @Composable () -> Unit
 ) {
-    DialogShell(title = title, titleFontSize = 16, onDismissRequest = onCancel) {
+    SharedDialog(title = title, onDismissRequest = onCancel, onCancel = onCancel, onAccept = onAccept) { _ ->
         content()
-        Row(modifier = Modifier.padding(start = it, bottom = it, end = it)) {
-            CardButton(onClick = onCancel, text = stringResource(R.string.btn_cancel))
-            Spacer(modifier = Modifier.weight(1f))
-            CardButton(onClick = onAccept, text = stringResource(R.string.btn_accept))
-        }
     }
 }
 
 @Composable
-fun InfoDialog(title: String, text: String, onDismiss: () -> Unit) {
-    DialogShell(title = title, titleFontSize = 18, onDismissRequest = {}) {
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(horizontal = it)
-        )
-        Row(modifier = Modifier.padding(start = it, bottom = it, end = it)) {
-            Spacer(modifier = Modifier.weight(1f))
-            CardButton(onClick = onDismiss, text = stringResource(R.string.btn_accept))
+fun SharedDialog(
+    title: String,
+    onDismissRequest: () -> Unit,
+    onCancel: (() -> Unit)? = null,
+    onAccept: (() -> Unit)? = null,
+    titleFontSize: Int = 16,
+    titleTextAlign: TextAlign = if (onCancel != null && onAccept != null) TextAlign.Center else TextAlign.Start,
+    content: @Composable (padding: Dp) -> Unit
+) {
+    DialogShell(onDismissRequest = onDismissRequest) { padding ->
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = padding, top = padding, end = padding)
+        ) {
+            if (onCancel != null) {
+                CardButton(onClick = onCancel, text = stringResource(R.string.btn_cancel))
+            }
+            Text(
+                text = title,
+                fontSize = titleFontSize.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = titleTextAlign,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = if (onCancel != null && onAccept != null) padding else 0.dp)
+            )
+            if (onAccept != null) {
+                CardButton(onClick = onAccept, text = stringResource(R.string.btn_accept))
+            }
         }
+        content(padding)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DialogShell(
-    title: String,
-    titleFontSize: Int,
     onDismissRequest: () -> Unit,
-    content: @Composable (padding: androidx.compose.ui.unit.Dp) -> Unit
+    content: @Composable (padding: Dp) -> Unit
 ) {
     val padding = LocalSpacing.current.large
-    Dialog(onDismissRequest = onDismissRequest) {
-        ElevatedCard {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(padding)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = titleFontSize.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(start = padding, top = padding, end = padding)
-                )
-                content(padding)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val stopSheetFling = remember {
+        object : NestedScrollConnection {
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                return available
             }
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset = Offset.Zero
+        }
+    }
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        dragHandle = null,
+        shape = MaterialTheme.shapes.medium,
+        scrimColor = Color.Black.copy(alpha = 0.64f)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(padding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .nestedScroll(stopSheetFling)
+        ) {
+            content(padding)
         }
     }
 }
@@ -391,12 +432,25 @@ fun TopBar(
 
 @Composable
 fun elevationColor(elevation: Double): Color {
+    val thresholds = LocalElevationThresholds.current
     return when {
-        elevation < 15.0 -> Color(0xFFEF5350) // soft red for low elevation
-        elevation < 45.0 -> MaterialTheme.colorScheme.primary // accent yellow for normal
-        else -> Color(0xFF66BB6A) // soft green for high elevation
+        elevation < thresholds.low -> ElevationLowColor // soft red for low elevation
+        elevation < thresholds.high -> MaterialTheme.colorScheme.primary // accent yellow for normal
+        else -> ElevationHighColor // soft green for high elevation
     }
 }
+
+/** User-configurable elevation highlight thresholds (in degrees). */
+data class ElevationThresholds(val low: Double = 15.0, val high: Double = 45.0)
+
+/** Provided at the app root from settings; defaults keep the original 15°/45° behavior. */
+val LocalElevationThresholds = compositionLocalOf { ElevationThresholds() }
+
+/** Soft red used for elevations below the low threshold. */
+val ElevationLowColor = Color(0xFFEF5350)
+
+/** Soft green used for elevations above the high threshold. */
+val ElevationHighColor = Color(0xFF66BB6A)
 
 @Composable
 fun OutlinedText(

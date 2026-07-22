@@ -31,7 +31,9 @@
     <!-- Passes screen -->
     <string name="pass_filter_title">Filter passes</string>
     <string name="pass_filter_elev">Minimal elevation</string>
-    <string name="pass_filter_hours">Hours ahead</string>
+    <string name="pass_filter_hours">Time ahead</string>
+    <string name="pass_filter_aos_time">AOS window</string>
+    <string name="pass_filter_invert_time">Invert AOS window</string>
     <string name="pass_filter_deep_space">DeepSpace (period >225min)</string>
     <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
     <string name="pass_modes_title">Select modulation type</string>
@@ -181,6 +183,11 @@
     <string name="prefs_other_switch_sweep">Enable radar sweep animation</string>
     <string name="prefs_other_switch_sensors">Use sensors to rotate radar view</string>
     <string name="prefs_other_switch_night_mode">Enable red night mode filter</string>
+
+    <string name="prefs_highlight_title">Elevation highlight</string>
+    <string name="prefs_highlight_low">Low &lt; %1$d°</string>
+    <string name="prefs_highlight_mid">Mid %1$d–%2$d°</string>
+    <string name="prefs_highlight_high">High &gt; %1$d°</string>
 
     <string name="prefs_outro_title">I would like to say thanks to</string>
     <string name="prefs_outro_thanks" translatable="false">

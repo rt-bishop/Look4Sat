@@ -50,6 +50,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaul
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -70,6 +71,8 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
 import com.rtbishop.look4sat.core.presentation.DeeplinkResolver
+import com.rtbishop.look4sat.core.presentation.ElevationThresholds
+import com.rtbishop.look4sat.core.presentation.LocalElevationThresholds
 import com.rtbishop.look4sat.core.presentation.RadarDestination
 import com.rtbishop.look4sat.core.presentation.Screen
 import com.rtbishop.look4sat.core.presentation.hasEnoughHeight
@@ -127,120 +130,128 @@ fun MainScreen(navigateToRadar: () -> Unit = {}) {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val trackingState by container.radioTrackingService.state.collectAsStateWithLifecycle()
+    val otherSettings by container.settingsRepo.otherSettings.collectAsStateWithLifecycle()
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            navItems.forEach { screen ->
-                val isSelected = when (currentKey) {
-                    is Screen.Satellites -> screen is Screen.Satellites
-                    is Screen.Passes -> screen is Screen.Passes
-                    is Screen.Radar -> screen is Screen.Radar
-                    is Screen.Map -> screen is Screen.Map
-                    is Screen.Settings -> screen is Screen.Settings
-                    else -> false
-                }
-                item(
-                    icon = { Icon(painterResource(screen.iconResId), stringResource(screen.titleResId)) },
-                    label = { Text(stringResource(screen.titleResId)) },
-                    selected = isSelected,
-                    onClick = {
-                        if (isSelected) return@item
-                        while (backStack.size > 1) backStack.removeAt(backStack.size - 1)
-                        if (screen !is Screen.Passes) backStack.add(screen)
-                    }
-                )
-            }
-        },
-        navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationRailContainerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
-        layoutType = when {
-            !hasEnoughHeight() && hasEnoughWidth() -> NavigationSuiteType.NavigationRail
-            !hasEnoughWidth() -> NavigationSuiteType.ShortNavigationBarCompact
-            else -> NavigationSuiteType.ShortNavigationBarMedium
-        }
+    CompositionLocalProvider(
+        LocalElevationThresholds provides ElevationThresholds(
+            low = otherSettings.lowElevation,
+            high = otherSettings.highElevation
+        )
     ) {
-        Column {
-            NavDisplay(
-                backStack = backStack,
-                modifier = Modifier.weight(1f),
-                onBack = navigateBack,
-                transitionSpec = { fadeTransition },
-                popTransitionSpec = { fadeTransition },
-                predictivePopTransitionSpec = { fadeTransition },
-                entryDecorators = listOf(
-                    // Required for saving Compose state per entry
-                    rememberSaveableStateHolderNavEntryDecorator(),
-                    // Required for ViewModel scoping per entry
-                    rememberViewModelStoreNavEntryDecorator()
-                ),
-                entryProvider = entryProvider {
-                    entry<Screen.Satellites> {
-                        SatellitesDestination(navigateUp = navigateBack)
+        NavigationSuiteScaffold(
+            navigationSuiteItems = {
+                navItems.forEach { screen ->
+                    val isSelected = when (currentKey) {
+                        is Screen.Satellites -> screen is Screen.Satellites
+                        is Screen.Passes -> screen is Screen.Passes
+                        is Screen.Radar -> screen is Screen.Radar
+                        is Screen.Map -> screen is Screen.Map
+                        is Screen.Settings -> screen is Screen.Settings
+                        else -> false
                     }
-                    entry<Screen.Passes> {
-                        PassesDestination { catNum, aosTime ->
-                            container.satelliteRepo.selectPass(catNum, aosTime)
-                            backStack.add(Screen.Radar)
-//                            navigateToRadar()
+                    item(
+                        icon = { Icon(painterResource(screen.iconResId), stringResource(screen.titleResId)) },
+                        label = { Text(stringResource(screen.titleResId)) },
+                        selected = isSelected,
+                        onClick = {
+                            if (isSelected) return@item
+                            while (backStack.size > 1) backStack.removeAt(backStack.size - 1)
+                            if (screen !is Screen.Passes) backStack.add(screen)
                         }
-                    }
-                    entry<Screen.Radar> {
-                        RadarDestination(navigateUp = navigateBack)
-                    }
-                    entry<Screen.Map> {
-                        MapDestination()
-                    }
-                    entry<Screen.Settings> {
-                        SettingsDestination()
-                    }
+                    )
                 }
-            )
-            // Radio tracking status banner
-            if (trackingState.isActive) {
-                val infiniteTransition = rememberInfiniteTransition(label = "trackingPulse")
-                val alpha by infiniteTransition.animateFloat(
-                    initialValue = 1f, targetValue = 0.4f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(1000, easing = LinearEasing),
-                        repeatMode = RepeatMode.Reverse
-                    ), label = "pulseAlpha"
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .clickable {
-                            val pass = trackingState.currentPass
-                            if (pass != null) {
-                                container.satelliteRepo.selectPass(pass.catNum, pass.aosTime)
+            },
+            navigationSuiteColors = NavigationSuiteDefaults.colors(
+                navigationRailContainerColor = MaterialTheme.colorScheme.surfaceContainer
+            ),
+            layoutType = when {
+                !hasEnoughHeight() && hasEnoughWidth() -> NavigationSuiteType.NavigationRail
+                !hasEnoughWidth() -> NavigationSuiteType.ShortNavigationBarCompact
+                else -> NavigationSuiteType.ShortNavigationBarMedium
+            }
+        ) {
+            Column {
+                NavDisplay(
+                    backStack = backStack,
+                    modifier = Modifier.weight(1f),
+                    onBack = navigateBack,
+                    transitionSpec = { fadeTransition },
+                    popTransitionSpec = { fadeTransition },
+                    predictivePopTransitionSpec = { fadeTransition },
+                    entryDecorators = listOf(
+                        // Required for saving Compose state per entry
+                        rememberSaveableStateHolderNavEntryDecorator(),
+                        // Required for ViewModel scoping per entry
+                        rememberViewModelStoreNavEntryDecorator()
+                    ),
+                    entryProvider = entryProvider {
+                        entry<Screen.Satellites> {
+                            SatellitesDestination(navigateUp = navigateBack)
+                        }
+                        entry<Screen.Passes> {
+                            PassesDestination { catNum, aosTime ->
+                                container.satelliteRepo.selectPass(catNum, aosTime)
                                 backStack.add(Screen.Radar)
+//                            navigateToRadar()
                             }
                         }
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Box(
+                        entry<Screen.Radar> {
+                            RadarDestination(navigateUp = navigateBack)
+                        }
+                        entry<Screen.Map> {
+                            MapDestination()
+                        }
+                        entry<Screen.Settings> {
+                            SettingsDestination()
+                        }
+                    }
+                )
+                // Radio tracking status banner
+                if (trackingState.isActive) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "trackingPulse")
+                    val alpha by infiniteTransition.animateFloat(
+                        initialValue = 1f, targetValue = 0.4f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1000, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ), label = "pulseAlpha"
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF4CAF50).copy(alpha = alpha))
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Tracking: ${trackingState.currentPass?.name ?: ""}",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.weight(1f)
-                    )
-                    val txOk = if (trackingState.txConnected) "TX" else ""
-                    val rxOk = if (trackingState.rxConnected) "RX" else ""
-                    Text(
-                        text = listOf(txOk, rxOk).filter { it.isNotBlank() }.joinToString("/"),
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .clickable {
+                                val pass = trackingState.currentPass
+                                if (pass != null) {
+                                    container.satelliteRepo.selectPass(pass.catNum, pass.aosTime)
+                                    backStack.add(Screen.Radar)
+                                }
+                            }
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF4CAF50).copy(alpha = alpha))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Tracking: ${trackingState.currentPass?.name ?: ""}",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.weight(1f)
+                        )
+                        val txOk = if (trackingState.txConnected) "TX" else ""
+                        val rxOk = if (trackingState.rxConnected) "RX" else ""
+                        Text(
+                            text = listOf(txOk, rxOk).filter { it.isNotBlank() }.joinToString("/"),
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
                 }
             }
         }

@@ -44,7 +44,15 @@ interface ISatelliteRepo {
     suspend fun initRepository()
 
     /** Recalculate passes with the given filter parameters. */
-    suspend fun calculatePasses(time: Long, hoursAhead: Int, minElevation: Double, modes: List<String>)
+    suspend fun calculatePasses(
+        time: Long,
+        hoursAhead: Int,
+        minElevation: Double,
+        aosStartMinute: Int,
+        aosEndMinute: Int,
+        invertAosTimeWindow: Boolean,
+        modes: List<String>
+    )
 
     /** Get the current position of a single satellite. */
     suspend fun getPosition(sat: OrbitalObject, pos: GeoPos, time: Long): OrbitalPos

@@ -27,6 +27,9 @@ data class PassesSettings(
     val showDeepSpace: Boolean = true,
     val hoursAhead: Int,
     val minElevation: Double,
+    val aosStartMinute: Int = 0,
+    val aosEndMinute: Int = 23 * 60 + 59,
+    val invertAosTimeWindow: Boolean = false,
     val selectedModes: List<String>
 )
 
@@ -57,7 +60,9 @@ data class OtherSettings(
     val stateOfNightMode: Boolean = false,
     val shouldSeeWarning: Boolean,
     val shouldSeeWhatsNew: Boolean,
-    val sstvMode: String = "Auto"
+    val sstvMode: String = "Auto",
+    val lowElevation: Double = 15.0,
+    val highElevation: Double = 45.0
 )
 
 data class DataSourcesSettings(

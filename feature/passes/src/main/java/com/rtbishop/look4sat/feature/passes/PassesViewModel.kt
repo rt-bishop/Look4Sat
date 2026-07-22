@@ -54,6 +54,11 @@ class PassesViewModel(
             nextPass = defaultPass,
             hours = settingsRepo.passesSettings.value.hoursAhead,
             elevation = settingsRepo.passesSettings.value.minElevation,
+            lowElevation = settingsRepo.otherSettings.value.lowElevation,
+            highElevation = settingsRepo.otherSettings.value.highElevation,
+            aosStartMinute = settingsRepo.passesSettings.value.aosStartMinute,
+            aosEndMinute = settingsRepo.passesSettings.value.aosEndMinute,
+            invertAosTimeWindow = settingsRepo.passesSettings.value.invertAosTimeWindow,
             showDeepSpace = settingsRepo.passesSettings.value.showDeepSpace,
             modes = settingsRepo.passesSettings.value.selectedModes,
             shouldSeeWhatsNew = settingsRepo.otherSettings.value.shouldSeeWhatsNew
@@ -71,7 +76,14 @@ class PassesViewModel(
         // React to settings changes: update UTC flag and whatsNew
         viewModelScope.launch {
             settingsRepo.otherSettings.collectLatest { settings ->
-                _uiState.update { it.copy(isUtc = settings.stateOfUtc, shouldSeeWhatsNew = settings.shouldSeeWhatsNew) }
+                _uiState.update {
+                    it.copy(
+                        isUtc = settings.stateOfUtc,
+                        shouldSeeWhatsNew = settings.shouldSeeWhatsNew,
+                        lowElevation = settings.lowElevation,
+                        highElevation = settings.highElevation
+                    )
+                }
             }
         }
         // Main tick loop: reacts to new passes, then ticks every second
@@ -107,9 +119,29 @@ class PassesViewModel(
         when (action) {
             PassesAction.DismissWhatsNew -> settingsRepo.setWhatsNewDismissed()
             is PassesAction.FilterPasses ->
-                applyFilter(action.hoursAhead, action.minElevation, action.showDeepSpace, _uiState.value.modes)
+                applyFilter(
+                    hoursAhead = action.hoursAhead,
+                    minElevation = action.minElevation,
+                    lowElevation = action.lowElevation,
+                    highElevation = action.highElevation,
+                    aosStartMinute = action.aosStartMinute,
+                    aosEndMinute = action.aosEndMinute,
+                    invertAosTimeWindow = action.invertAosTimeWindow,
+                    showDeepSpace = action.showDeepSpace,
+                    modes = _uiState.value.modes
+                )
             is PassesAction.FilterRadios ->
-                applyFilter(_uiState.value.hours, _uiState.value.elevation, _uiState.value.showDeepSpace, action.modes)
+                applyFilter(
+                    hoursAhead = _uiState.value.hours,
+                    minElevation = _uiState.value.elevation,
+                    lowElevation = _uiState.value.lowElevation,
+                    highElevation = _uiState.value.highElevation,
+                    aosStartMinute = _uiState.value.aosStartMinute,
+                    aosEndMinute = _uiState.value.aosEndMinute,
+                    invertAosTimeWindow = _uiState.value.invertAosTimeWindow,
+                    showDeepSpace = _uiState.value.showDeepSpace,
+                    modes = action.modes
+                )
             PassesAction.RefreshPasses -> refreshPasses()
             PassesAction.TogglePassesDialog ->
                 _uiState.update { it.copy(isPassesDialogShown = !it.isPassesDialogShown) }
@@ -198,19 +230,61 @@ class PassesViewModel(
     private fun applyFilter(
         hoursAhead: Int,
         minElevation: Double,
+        lowElevation: Double,
+        highElevation: Double,
+        aosStartMinute: Int,
+        aosEndMinute: Int,
+        invertAosTimeWindow: Boolean,
         showDeepSpace: Boolean,
         modes: List<String>
     ) = viewModelScope.launch {
-        settingsRepo.setPassesSettings(PassesSettings(showDeepSpace, hoursAhead, minElevation, modes))
+        settingsRepo.setPassesSettings(
+            PassesSettings(
+                showDeepSpace,
+                hoursAhead,
+                minElevation,
+                aosStartMinute,
+                aosEndMinute,
+                invertAosTimeWindow,
+                modes
+            )
+        )
+        settingsRepo.updateOtherSettings { it.copy(lowElevation = lowElevation, highElevation = highElevation) }
         _uiState.update {
-            it.copy(hours = hoursAhead, elevation = minElevation, showDeepSpace = showDeepSpace, modes = modes)
+            it.copy(
+                hours = hoursAhead,
+                elevation = minElevation,
+                lowElevation = lowElevation,
+                highElevation = highElevation,
+                aosStartMinute = aosStartMinute,
+                aosEndMinute = aosEndMinute,
+                invertAosTimeWindow = invertAosTimeWindow,
+                showDeepSpace = showDeepSpace,
+                modes = modes
+            )
         }
-        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
+        satelliteRepo.calculatePasses(
+            time = System.currentTimeMillis(),
+            hoursAhead = hoursAhead,
+            minElevation = minElevation,
+            aosStartMinute = aosStartMinute,
+            aosEndMinute = aosEndMinute,
+            invertAosTimeWindow = invertAosTimeWindow,
+            modes = modes
+        )
     }
 
     private fun refreshPasses() = viewModelScope.launch {
-        val (_, hoursAhead, minElevation, modes) = settingsRepo.passesSettings.value
-        satelliteRepo.calculatePasses(System.currentTimeMillis(), hoursAhead, minElevation, modes)
+        val settings = settingsRepo.passesSettings.value
+        satelliteRepo.calculatePasses(
+            time = System.currentTimeMillis(),
+            hoursAhead = settings.hoursAhead,
+            minElevation = settings.minElevation,
+            aosStartMinute = settings.aosStartMinute,
+            aosEndMinute = settings.aosEndMinute,
+            invertAosTimeWindow = settings.invertAosTimeWindow,
+            modes = settings.selectedModes
+        )
     }
 
     companion object {

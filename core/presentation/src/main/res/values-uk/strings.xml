@@ -30,8 +30,11 @@
 
     <!-- Passes screen -->
     <string name="pass_filter_title">Фільтр прольотів</string>
-    <string name="pass_filter_elev">Мінімальне піднесення</string>
-    <string name="pass_filter_hours">Кількість годин</string>
+    <string name="pass_filter_elev">Мінімальне піднесень</string>
+    <string name="pass_filter_hours">Час вперед</string>
+    <string name="pass_filter_aos_time">Вікно AOS</string>
+    <string name="pass_filter_invert_time">Інвертувати вікно AOS</string>
+    <string name="pass_filter_deep_space">DeepSpace (період &gt;225хв)</string>
     <string name="pass_modes_title">Виберіть тип модуляції</string>
     <string name="pass_elevation">Піднес.: %.1f°</string>
     <string name="pass_altitude">Висота: %.0f км</string>
@@ -66,7 +69,7 @@
     <string name="map_prev">Попередній</string>
     <string name="map_next">Наступний</string>
     <string name="map_azimuth">Азимут: %.1f°</string>
-    <string name="map_elevation">Піднесення: %.1f°</string>
+    <string name="map_elevation">Піднесень: %.1f°</string>
     <string name="map_altitude">Висота: %.0f км</string>
     <string name="map_distance">Дистанція: %.0f км</string>
     <string name="map_latitude">Широта: %.1f°</string>
@@ -139,6 +142,12 @@
     <string name="prefs_other_switch_update">Автоматичне оновлення даних</string>
     <string name="prefs_other_switch_sweep">Показувати анімацію радара</string>
     <string name="prefs_other_switch_sensors">Використовувати сенсори пристрою</string>
+    <string name="prefs_other_switch_night_mode">Увімкнути червоний нічний фільтр</string>
+
+    <string name="prefs_highlight_title">Підсвічування висоти</string>
+    <string name="prefs_highlight_low">Низько &lt; %1$d°</string>
+    <string name="prefs_highlight_mid">Середньо %1$d-%2$d°</string>
+    <string name="prefs_highlight_high">Високо &gt; %1$d°</string>
 
     <string name="prefs_outro_title">Я хотів би подякувати:</string>
     <string name="prefs_outro_license">Ця програма поставляється без жодних гарантій</string>

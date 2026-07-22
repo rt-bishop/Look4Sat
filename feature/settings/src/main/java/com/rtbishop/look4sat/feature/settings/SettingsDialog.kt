@@ -69,13 +69,16 @@ fun PositionDialog(lat: Double, lon: Double, dismiss: () -> Unit, save: (Double,
         OutlinedTextField(
             value = latValue.value,
             onValueChange = { latValue.value = it },
-            label = { Text(text = stringResource(id = R.string.prefs_station_lat_text)) }
+            label = { Text(text = stringResource(id = R.string.prefs_station_lat_text)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalSpacing.current.large),
         )
         OutlinedTextField(
             value = lonValue.value,
             onValueChange = { lonValue.value = it },
-            label = { Text(text = stringResource(id = R.string.prefs_station_lon_text)) }
+            label = { Text(text = stringResource(id = R.string.prefs_station_lon_text)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalSpacing.current.large),
         )
+        Spacer(modifier = Modifier.height(0.dp))
     }
 }
 
@@ -101,8 +104,10 @@ fun LocatorDialog(qthLocator: String, dismiss: () -> Unit, save: (String) -> Uni
         OutlinedTextField(
             value = locator.value,
             onValueChange = { locator.value = it },
-            label = { Text(text = stringResource(id = R.string.prefs_locator_text)) }
+            label = { Text(text = stringResource(id = R.string.prefs_locator_text)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalSpacing.current.large),
         )
+        Spacer(modifier = Modifier.height(0.dp))
     }
 }
 
@@ -208,6 +213,7 @@ fun DataSourcesDialog(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = isEnabledCustomTransceivers.value,
             )
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
@@ -298,6 +304,7 @@ fun NetworkOutputDialog(
                 onFormatChange = { frequencyFormat.value = it },
                 formatLabel = stringResource(R.string.prefs_net_frequency_format_hint)
             )
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
@@ -391,6 +398,7 @@ fun BluetoothOutputDialog(
                 onFormatChange = { frequencyFormat.value = it },
                 formatLabel = stringResource(R.string.prefs_bt_frequency_output_hint)
             )
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
@@ -642,6 +650,7 @@ fun RadioControlDialog(
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(6.dp))
         }
     }
 }

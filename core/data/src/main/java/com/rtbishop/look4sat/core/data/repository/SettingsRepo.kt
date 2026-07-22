@@ -54,6 +54,9 @@ class SettingsRepo(
     private val keyFilterShowDeepSpace = "filterShowDeepSpace"
     private val keyFilterHoursAhead = "filterHoursAhead"
     private val keyFilterMinElevation = "filterMinElevation"
+    private val keyFilterAosStartMinute = "filterAosStartMinute"
+    private val keyFilterAosEndMinute = "filterAosEndMinute"
+    private val keyFilterAosInvert = "filterAosInvert"
     private val keyNumberOfRadios = "numberOfRadios"
     private val keyNumberOfSatellites = "numberOfSatellites"
     private val keyRotatorAddress = "rotatorAddress"
@@ -82,6 +85,8 @@ class SettingsRepo(
     private val keyShouldSeeWarning = "shouldSeeWarning"
     private val keyShouldSeeWhatsNew = "shouldSeeWhatsNew_v$appVersionName"
     private val keySstvMode = "sstvMode"
+    private val keyLowElevation = "lowElevation"
+    private val keyHighElevation = "highElevation"
     private val keyUseCustomTle = "useCustomTle"
     private val keyUseCustomTransceivers = "useCustomTransceivers"
     private val keyTleUrl = "tleUrl"
@@ -127,6 +132,9 @@ class SettingsRepo(
         putBoolean(keyFilterShowDeepSpace, settings.showDeepSpace)
         putInt(keyFilterHoursAhead, settings.hoursAhead)
         putLong(keyFilterMinElevation, settings.minElevation.toRawBits())
+        putInt(keyFilterAosStartMinute, settings.aosStartMinute)
+        putInt(keyFilterAosEndMinute, settings.aosEndMinute)
+        putBoolean(keyFilterAosInvert, settings.invertAosTimeWindow)
         putString(keySelectedModes, settings.selectedModes.joinToString(separatorComma))
         _passesSettings.value = settings
     }
@@ -135,9 +143,20 @@ class SettingsRepo(
         val showDeepSpace = preferences.getBoolean(keyFilterShowDeepSpace, true)
         val hoursAhead = preferences.getInt(keyFilterHoursAhead, 24)
         val minElevation = Double.fromBits(preferences.getLong(keyFilterMinElevation, 16.0.toRawBits()))
+        val aosStartMinute = preferences.getInt(keyFilterAosStartMinute, 0).coerceIn(0, 23 * 60 + 59)
+        val aosEndMinute = preferences.getInt(keyFilterAosEndMinute, 23 * 60 + 59).coerceIn(0, 23 * 60 + 59)
+        val invertAosTimeWindow = preferences.getBoolean(keyFilterAosInvert, false)
         val selectedModesString = preferences.getString(keySelectedModes, null)
         val selectedModes = selectedModesString?.split(separatorComma)?.sorted() ?: emptyList()
-        return PassesSettings(showDeepSpace, hoursAhead, minElevation, selectedModes)
+        return PassesSettings(
+            showDeepSpace,
+            hoursAhead,
+            minElevation,
+            aosStartMinute,
+            aosEndMinute,
+            invertAosTimeWindow,
+            selectedModes
+        )
     }
     //endregion
 
@@ -335,6 +354,8 @@ class SettingsRepo(
                 putBoolean(keyShouldSeeWarning, new.shouldSeeWarning)
                 putBoolean(keyShouldSeeWhatsNew, new.shouldSeeWhatsNew)
                 putString(keySstvMode, new.sstvMode)
+                putLong(keyLowElevation, new.lowElevation.toRawBits())
+                putLong(keyHighElevation, new.highElevation.toRawBits())
             }
             new
         }
@@ -349,7 +370,9 @@ class SettingsRepo(
         stateOfNightMode = preferences.getBoolean(keyStateOfNightMode, false),
         shouldSeeWarning = preferences.getBoolean(keyShouldSeeWarning, true),
         shouldSeeWhatsNew = preferences.getBoolean(keyShouldSeeWhatsNew, true),
-        sstvMode = preferences.getString(keySstvMode, null) ?: "Auto"
+        sstvMode = preferences.getString(keySstvMode, null) ?: "Auto",
+        lowElevation = Double.fromBits(preferences.getLong(keyLowElevation, 15.0.toRawBits())),
+        highElevation = Double.fromBits(preferences.getLong(keyHighElevation, 45.0.toRawBits()))
     )
     //endregion
 

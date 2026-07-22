@@ -31,7 +31,10 @@
     <!-- Passes screen -->
     <string name="pass_filter_title">පසුකිරිම් පිරිපහදුව</string>
     <string name="pass_filter_elev">අවම උත්තෝලනය</string>
-    <string name="pass_filter_hours">ඉදිරි පැය</string>
+    <string name="pass_filter_hours">ඉදිරි කාලය</string>
+    <string name="pass_filter_aos_time">AOS කවුළුව</string>
+    <string name="pass_filter_invert_time">AOS කවුළුව ප්‍රතිවිරුද්ධ කරන්න</string>
+    <string name="pass_filter_deep_space">DeepSpace (කාලය &gt;225min)</string>
     <string name="pass_modes_title">මූර්ජන ආකාරය තෝරන්න</string>
     <string name="pass_elevation">උත්තෝලනය: %.1f°</string>
     <string name="pass_altitude">උන්නතාශය: %d km</string>
@@ -139,6 +142,12 @@
     <string name="prefs_other_switch_update">ස්වයං දත්ත යාවත්කාලීනය</string>
     <string name="prefs_other_switch_sweep">radar sweep සජීවිකරණය සබල කරන්න</string>
     <string name="prefs_other_switch_sensors">Radar දර්ශනය කරකැවීමට සංවේදක භාවිතා කරන්න </string>
+    <string name="prefs_other_switch_night_mode">රතු රාත්‍රී පෙරහන සබල කරන්න</string>
+
+    <string name="prefs_highlight_title">උස් උද්දීපනය</string>
+    <string name="prefs_highlight_low">අඩු &lt; %1$d°</string>
+    <string name="prefs_highlight_mid">මධ්‍ය %1$d-%2$d°</string>
+    <string name="prefs_highlight_high">ඉහළ &gt; %1$d°</string>
 
     <string name="prefs_outro_title">මම ස්තුති කිරීමට කැමති:</string>
     <string name="prefs_outro_license">මෘදුකාංගය වගකීමක් සමග නොලැබේ</string>

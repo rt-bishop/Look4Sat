@@ -29,6 +29,11 @@ data class PassesState(
     val isNextTimeAos: Boolean = true,
     val hours: Int = 24,
     val elevation: Double = 16.0,
+    val lowElevation: Double = 16.0,
+    val highElevation: Double = 65.0,
+    val aosStartMinute: Int = 0,
+    val aosEndMinute: Int = 23 * 60 + 59,
+    val invertAosTimeWindow: Boolean = false,
     val showDeepSpace: Boolean = true,
     val modes: List<String> = emptyList(),
     val itemsList: List<OrbitalPass> = emptyList(),
@@ -40,7 +45,16 @@ data class PassesState(
 
 sealed interface PassesAction {
     data object DismissWhatsNew : PassesAction
-    data class FilterPasses(val hoursAhead: Int, val minElevation: Double, val showDeepSpace: Boolean) : PassesAction
+    data class FilterPasses(
+        val hoursAhead: Int,
+        val minElevation: Double,
+        val lowElevation: Double,
+        val highElevation: Double,
+        val aosStartMinute: Int,
+        val aosEndMinute: Int,
+        val invertAosTimeWindow: Boolean,
+        val showDeepSpace: Boolean
+    ) : PassesAction
     data class FilterRadios(val modes: List<String>) : PassesAction
     data object RefreshPasses : PassesAction
     data object TogglePassesDialog : PassesAction

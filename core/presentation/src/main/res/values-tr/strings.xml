@@ -31,7 +31,10 @@
     <!-- Passes screen -->
     <string name="pass_filter_title">Geçişleri filtrele</string>
     <string name="pass_filter_elev">Minimum yükseklik açısı</string>
-    <string name="pass_filter_hours">Gösterilecek saat aralığı</string>
+    <string name="pass_filter_hours">Gösterilecek zaman</string>
+    <string name="pass_filter_aos_time">AOS aralığı</string>
+    <string name="pass_filter_invert_time">AOS aralığını tersine çevir</string>
+    <string name="pass_filter_deep_space">DeepSpace (periyot &gt;225dk)</string>
     <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
     <string name="pass_modes_title">Modulasyon türü seçin</string>
     <string name="pass_satId" translatable="false">%05d</string>
@@ -182,6 +185,12 @@
     <string name="prefs_other_switch_update">Otomatik veri güncellemeyi etkinleştir</string>
     <string name="prefs_other_switch_sweep">Radar taramasını etkinleştir</string>
     <string name="prefs_other_switch_sensors">Radar görünümünü döndürmek için sensörleri kullan</string>
+    <string name="prefs_other_switch_night_mode">Kırmızı gece filtresini etkinleştir</string>
+
+    <string name="prefs_highlight_title">Elevasyon vurgusu</string>
+    <string name="prefs_highlight_low">Düşük &lt; %1$d°</string>
+    <string name="prefs_highlight_mid">Orta %1$d-%2$d°</string>
+    <string name="prefs_highlight_high">Yüksek &gt; %1$d°</string>
 
     <string name="prefs_outro_title">Teşekkürler</string>
     <string name="prefs_outro_thanks" translatable="false">
