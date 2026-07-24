@@ -96,7 +96,8 @@ object IcomCivProtocol {
         "WFM"    to 0x06,
         "CW-R"   to 0x07,
         "RTTY-R" to 0x08,
-        "DV"     to 0x12
+        "DV"     to 0x12,
+        "AFSK"   to 0x05  // AFSK uses FM modulation
     )
 
     val BYTE_TO_MODE: Map<Byte, String> = MODE_TO_BYTE.entries.associate { it.value to it.key }
