@@ -151,37 +151,18 @@ class Ic705Controller(
     }
 
     override suspend fun pttOn(): Boolean = withContext(Dispatchers.IO) {
-        Log.w(tag, "pttOn: PTT control not used for IC-705 (radio is master)")
+        Log.w(tag, "pttOn: not used for IC-705")
         true
     }
 
     override suspend fun pttOff(): Boolean = withContext(Dispatchers.IO) {
-        Log.w(tag, "pttOff: PTT control not used for IC-705 (radio is master)")
+        Log.w(tag, "pttOff: not used for IC-705")
         true
     }
 
     // ── IRadioController – IC-705 extended operations ───────────────────────
 
-    /**
-     * Read the current PTT (TX/RX) status from the radio.
-     * Returns **true** if the radio is currently transmitting, **false** if
-     * receiving, **null** on error.
-     */
-    override suspend fun readPttStatus(): Boolean? = withContext(Dispatchers.IO) {
-        ioMutex.withLock {
-            val cmd = IcomCivProtocol.buildReadTxStatusCommand()
-            Log.d(tag, "CMD readPTT → ${IcomCivProtocol.toHex(cmd)}")
-            val payload = sendAndReadResponse(cmd, IcomCivProtocol.CMD_TX_STATUS) ?: return@withContext null
-            IcomCivProtocol.parseTxStatus(payload).also {
-                Log.d(tag, "PTT status: ${if (it == true) "TX" else if (it == false) "RX" else "unknown"}")
-            }
-        }
-    }
-
-    /**
-     * Select VFO-A (main) or VFO-B (sub).
-     * @param vfoA true → VFO-A, false → VFO-B
-     */
+    /** Select VFO-A (main/RX) or VFO-B (sub/TX). */
     override suspend fun setVfo(vfoA: Boolean): Boolean = withContext(Dispatchers.IO) {
         val cmd = if (vfoA) IcomCivProtocol.buildSelectVfoACommand()
                   else      IcomCivProtocol.buildSelectVfoBCommand()
@@ -212,7 +193,7 @@ class Ic705Controller(
 
     /**
      * Set TX VFO frequency via CMD 0x25 sub 0x01 (unselected VFO).
-     * Used in split mode while PTT is pressed.
+     * Sent every tracking cycle in split mode alongside [setWorkingFrequency].
      */
     override suspend fun setTxVfoFrequency(frequencyHz: Long): Boolean = withContext(Dispatchers.IO) {
         Log.d(tag, "setTxVfoFrequency (0x25/01): ${frequencyHz}Hz")

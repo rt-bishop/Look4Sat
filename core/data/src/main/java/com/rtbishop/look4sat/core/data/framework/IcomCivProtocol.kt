@@ -57,9 +57,7 @@ object IcomCivProtocol {
     const val CMD_CTCSS_TONE: Byte          = 0x1B
     /** Read/write misc settings (used for enabling CTCSS encode). */
     const val CMD_MISC_SETTING: Byte        = 0x16
-    /** Read/write TX-inhibit / transmit status. */
-    const val CMD_TX_STATUS: Byte           = 0x1C
-    /** Read/write selected-VFO frequency (cmd 0x25, sub 0x00). */
+    /** Read/write selected-VFO frequency (cmd 0x25). */
     const val CMD_SELECTED_VFO_FREQ: Byte   = 0x25
 
     // ── Sub-command bytes ──────────────────────────────────────────────────
@@ -71,8 +69,6 @@ object IcomCivProtocol {
     const val SUB_SPLIT_OFF: Byte = 0x00
     /** Sub for CMD_DUPLEX_SPLIT: SPLIT ON. */
     const val SUB_SPLIT_ON: Byte  = 0x01
-    /** Sub for CMD_TX_STATUS: query TX/RX state. */
-    const val SUB_TX_STATE: Byte  = 0x00
     /** Sub for CMD_SELECTED_VFO_FREQ: selected (active) VFO frequency. */
     const val SUB_SELECTED_VFO: Byte = 0x00
     /** Sub for CMD_SELECTED_VFO_FREQ: unselected (inactive / TX in split) VFO frequency. */
@@ -200,9 +196,6 @@ object IcomCivProtocol {
         return frame(CMD_DUPLEX_SPLIT, sub)
     }
 
-    /** Query TX/RX status (CMD 0x1C sub 0x00). Radio replies with 0x00=RX, 0x01=TX. */
-    fun buildReadTxStatusCommand(): ByteArray = frame(CMD_TX_STATUS, SUB_TX_STATE)
-
     /**
      * Enable/disable CTCSS encode (CMD 0x16 sub 0x42).
      * 0x01 = CTCSS encoder ON, 0x00 = OFF.
@@ -291,26 +284,6 @@ object IcomCivProtocol {
         val freqHz = decodeFrequencyBcd(payload.copyOfRange(0, 5))
         val mode   = BYTE_TO_MODE[payload[5]] ?: return null
         return freqHz to mode
-    }
-
-    /**
-     * Parse TX status from a CMD_TX_STATUS reply payload.
-     *
-     * The IC-705 responds to a `1C 00` query with:
-     *   FE FE E0 A4  1C  00  <status>  FD
-     * After [parseResponse] strips the frame header the payload is:
-     *   payload[0] = 0x00  (sub-command echo)
-     *   payload[1] = status byte (0x00 = RX, 0x01 = TX)
-     *
-     * Returns true if transmitting, false if receiving, null on error.
-     */
-    fun parseTxStatus(payload: ByteArray): Boolean? {
-        if (payload.size < 2) return null
-        return when (payload[1]) {
-            0x00.toByte() -> false  // RX
-            0x01.toByte() -> true   // TX
-            else           -> null
-        }
     }
 
     /** Hex dump of bytes, useful for debug logging. */

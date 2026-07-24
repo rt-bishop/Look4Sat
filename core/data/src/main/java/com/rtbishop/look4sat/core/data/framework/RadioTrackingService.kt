@@ -380,33 +380,17 @@ class RadioTrackingService(
             val rxRadioFreq = rxBaseCalc?.let { pos.getDownlinkFreq(it) }
 
             if (radio.isConnected) {
-                // Query PTT state — don't assume silence; filter broadcast noise
-                val isPtt = radio.readPttStatus()
-                Log.d(tag, "Split loop: isPTT=$isPtt txFreq=$txRadioFreq rxFreq=$rxRadioFreq")
-
-                when (isPtt) {
-                    true -> {
-                        // PTT ON → radio's active VFO is VFO-B (TX)
-                        // Use 0x25/01 (unselected VFO) to target VFO-B directly
-                        if (txRadioFreq != null) {
-                            Log.d(tag, "Split loop TX update (0x25/01): ${txRadioFreq}Hz")
-                            radio.setTxVfoFrequency(txRadioFreq)
-                        }
+                    // Update both VFOs every cycle — no PTT polling needed.
+                    // 0x25/00 = active (RX) VFO, 0x25/01 = inactive (TX) VFO.
+                    if (rxRadioFreq != null) {
+                        Log.d(tag, "Split loop RX (0x25/00): ${rxRadioFreq}Hz")
+                        radio.setWorkingFrequency(rxRadioFreq)
                     }
-                    false -> {
-                        // PTT OFF → radio's active VFO is VFO-A (RX)
-                        // Use 0x25/00 (selected/active VFO) to update RX
-                        if (rxRadioFreq != null) {
-                            Log.d(tag, "Split loop RX update (0x25/00): ${rxRadioFreq}Hz")
-                            radio.setWorkingFrequency(rxRadioFreq)
-                        }
-                    }
-                    null -> {
-                        // Could not read PTT (broadcast noise race) — skip this tick
-                        Log.d(tag, "Split loop: PTT read failed, skipping tick")
+                    if (txRadioFreq != null) {
+                        Log.d(tag, "Split loop TX (0x25/01): ${txRadioFreq}Hz")
+                        radio.setTxVfoFrequency(txRadioFreq)
                     }
                 }
-            }
 
             _state.update {
                 it.copy(
