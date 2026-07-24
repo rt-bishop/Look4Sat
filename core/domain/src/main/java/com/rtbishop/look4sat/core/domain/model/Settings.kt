@@ -74,12 +74,20 @@ data class RadioControlSettings(
     val rxRadioAddress: String,
     val txRadioName: String,
     val rxRadioName: String,
-    val baudRate: Int
+    val baudRate: Int,
+    /** IC-705 only: use single-radio split-VFO mode instead of two radios. */
+    val splitMode: Boolean = false
 ) {
     companion object {
-        val SUPPORTED_RADIOS = listOf(
-            "Yaesu FT-817/818",
-            "Yaesu FT-857/897"
-        )
+        const val MODEL_YAESU_FT817   = "Yaesu FT-817/818"
+        const val MODEL_YAESU_FT857   = "Yaesu FT-857/897"
+        const val MODEL_ICOM_IC705    = "Icom IC-705"
+
+        val SUPPORTED_RADIOS = listOf(MODEL_YAESU_FT817, MODEL_YAESU_FT857, MODEL_ICOM_IC705)
+
+        /** Baud rates available for Yaesu radios. */
+        val BAUD_RATES_YAESU = listOf(4800, 9600, 38400)
+        /** Baud rates available for Icom IC-705 (higher speeds supported via CI-V USB/BT). */
+        val BAUD_RATES_ICOM  = listOf(4800, 9600, 19200, 38400, 57600, 115200)
     }
 }

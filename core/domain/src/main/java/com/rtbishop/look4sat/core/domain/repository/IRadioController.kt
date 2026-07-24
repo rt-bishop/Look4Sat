@@ -38,4 +38,34 @@ interface IRadioController {
     suspend fun pttOn(): Boolean
 
     suspend fun pttOff(): Boolean
+
+    // ── Extended operations (IC-705 / CI-V) ──────────────────────────────
+
+    /**
+     * Read the current PTT status from the radio.
+     * Returns true if transmitting, false if receiving, null on error.
+     * Default: not supported.
+     */
+    suspend fun readPttStatus(): Boolean? = null
+
+    /**
+     * Select the active VFO.
+     * @param vfoA true → VFO-A (main/RX), false → VFO-B (sub/TX in split).
+     * Default: no-op.
+     */
+    suspend fun setVfo(vfoA: Boolean): Boolean = false
+
+    /**
+     * Enable or disable SPLIT mode (TX on sub-VFO, RX on main VFO).
+     * Default: not supported.
+     */
+    suspend fun setSplitMode(enabled: Boolean): Boolean = false
+
+    /**
+     * Set the frequency of the currently active VFO.
+     * On radios that support it (IC-705: CMD 0x25 sub 0x00) this updates
+     * the active VFO without switching.
+     * Default: delegates to [setFrequency].
+     */
+    suspend fun setWorkingFrequency(frequencyHz: Long): Boolean = setFrequency(frequencyHz)
 }
