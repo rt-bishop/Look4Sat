@@ -73,8 +73,10 @@ object IcomCivProtocol {
     const val SUB_SPLIT_ON: Byte  = 0x01
     /** Sub for CMD_TX_STATUS: query TX/RX state. */
     const val SUB_TX_STATE: Byte  = 0x00
-    /** Sub for CMD_SELECTED_VFO_FREQ: selected VFO frequency. */
+    /** Sub for CMD_SELECTED_VFO_FREQ: selected (active) VFO frequency. */
     const val SUB_SELECTED_VFO: Byte = 0x00
+    /** Sub for CMD_SELECTED_VFO_FREQ: unselected (inactive / TX in split) VFO frequency. */
+    const val SUB_UNSELECTED_VFO: Byte = 0x01
     /** Sub for CMD_MISC_SETTING: CTCSS/DTCS tone squelch. */
     const val SUB_CTCSS_SETTING: Byte = 0x42.toByte()
 
@@ -165,6 +167,16 @@ object IcomCivProtocol {
      */
     fun buildSetWorkingFreqCommand(frequencyHz: Long): ByteArray {
         return frame(CMD_SELECTED_VFO_FREQ, SUB_SELECTED_VFO, *encodeFrequencyBcd(frequencyHz))
+    }
+
+    /**
+     * Set unselected-VFO frequency via CMD 0x25 sub 0x01.
+     * In split mode while PTT is pressed the IC-705 makes VFO-B active, so
+     * this command targets VFO-A (the RX VFO) — and vice-versa when in RX.
+     * Use this to update the TX VFO when PTT is on.
+     */
+    fun buildSetUnselectedVfoFreqCommand(frequencyHz: Long): ByteArray {
+        return frame(CMD_SELECTED_VFO_FREQ, SUB_UNSELECTED_VFO, *encodeFrequencyBcd(frequencyHz))
     }
 
     /** Read operating frequency (CMD 0x03). */

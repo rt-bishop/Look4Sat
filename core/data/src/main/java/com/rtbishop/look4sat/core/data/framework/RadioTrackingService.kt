@@ -387,17 +387,17 @@ class RadioTrackingService(
                 when (isPtt) {
                     true -> {
                         // PTT ON → radio's active VFO is VFO-B (TX)
-                        // Update TX frequency on active VFO only
+                        // Use 0x25/01 (unselected VFO) to target VFO-B directly
                         if (txRadioFreq != null) {
-                            Log.d(tag, "Split loop TX update: ${txRadioFreq}Hz")
-                            radio.setWorkingFrequency(txRadioFreq)
+                            Log.d(tag, "Split loop TX update (0x25/01): ${txRadioFreq}Hz")
+                            radio.setTxVfoFrequency(txRadioFreq)
                         }
                     }
                     false -> {
                         // PTT OFF → radio's active VFO is VFO-A (RX)
-                        // Update RX frequency on active VFO only
+                        // Use 0x25/00 (selected/active VFO) to update RX
                         if (rxRadioFreq != null) {
-                            Log.d(tag, "Split loop RX update: ${rxRadioFreq}Hz")
+                            Log.d(tag, "Split loop RX update (0x25/00): ${rxRadioFreq}Hz")
                             radio.setWorkingFrequency(rxRadioFreq)
                         }
                     }

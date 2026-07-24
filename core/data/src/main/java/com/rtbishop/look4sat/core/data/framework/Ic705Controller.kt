@@ -204,9 +204,20 @@ class Ic705Controller(
      * always writing to the active VFO is the correct strategy.
      */
     override suspend fun setWorkingFrequency(frequencyHz: Long): Boolean = withContext(Dispatchers.IO) {
-        Log.d(tag, "setWorkingFrequency: ${frequencyHz}Hz")
+        Log.d(tag, "setWorkingFrequency (0x25/00): ${frequencyHz}Hz")
         val cmd = IcomCivProtocol.buildSetWorkingFreqCommand(frequencyHz)
         Log.d(tag, "CMD setWorkingFreq → ${IcomCivProtocol.toHex(cmd)}")
+        ioMutex.withLock { sendAndWaitAck(cmd) }
+    }
+
+    /**
+     * Set TX VFO frequency via CMD 0x25 sub 0x01 (unselected VFO).
+     * Used in split mode while PTT is pressed.
+     */
+    override suspend fun setTxVfoFrequency(frequencyHz: Long): Boolean = withContext(Dispatchers.IO) {
+        Log.d(tag, "setTxVfoFrequency (0x25/01): ${frequencyHz}Hz")
+        val cmd = IcomCivProtocol.buildSetUnselectedVfoFreqCommand(frequencyHz)
+        Log.d(tag, "CMD setTxVfoFreq → ${IcomCivProtocol.toHex(cmd)}")
         ioMutex.withLock { sendAndWaitAck(cmd) }
     }
 

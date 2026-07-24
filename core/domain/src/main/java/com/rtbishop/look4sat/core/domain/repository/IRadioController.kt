@@ -62,10 +62,16 @@ interface IRadioController {
     suspend fun setSplitMode(enabled: Boolean): Boolean = false
 
     /**
-     * Set the frequency of the currently active VFO.
-     * On radios that support it (IC-705: CMD 0x25 sub 0x00) this updates
-     * the active VFO without switching.
+     * Set the frequency of the currently active VFO (CMD 0x25 sub 0x00).
      * Default: delegates to [setFrequency].
      */
     suspend fun setWorkingFrequency(frequencyHz: Long): Boolean = setFrequency(frequencyHz)
+
+    /**
+     * Set the frequency of the inactive (TX) VFO via CMD 0x25 sub 0x01.
+     * Used in split mode when PTT is pressed: the radio has made VFO-B
+     * the active VFO, so sub 0x01 targets it directly.
+     * Default: delegates to [setWorkingFrequency].
+     */
+    suspend fun setTxVfoFrequency(frequencyHz: Long): Boolean = setWorkingFrequency(frequencyHz)
 }
