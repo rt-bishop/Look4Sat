@@ -75,7 +75,12 @@ class Ic705Controller(
             outputStream = btSocket.outputStream
             inputStream  = btSocket.inputStream
             isConnected  = true
-            Log.i(tag, "Connected to $deviceAddress")
+            // Enter VFO mode — frequency/mode commands return FA if the radio
+            // is in memory-channel mode. Safe to send regardless of current state.
+            Log.i(tag, "Connected to $deviceAddress — entering VFO mode")
+            val vfoCmd = IcomCivProtocol.buildEnterVfoModeCommand()
+            Log.d(tag, "CMD enterVfoMode → ${IcomCivProtocol.toHex(vfoCmd)}")
+            ioMutex.withLock { sendAndWaitAck(vfoCmd) }
             true
         } catch (e: Exception) {
             Log.e(tag, "Connect error: ${e.message}")
@@ -161,6 +166,16 @@ class Ic705Controller(
     }
 
     // ── IRadioController – IC-705 extended operations ───────────────────────
+
+    /** Select the band for [frequencyHz] via CMD 0x1A sub 0x00 (band stacking register). */
+    override suspend fun setBand(frequencyHz: Long): Boolean = withContext(Dispatchers.IO) {
+        val cmd = IcomCivProtocol.buildBandSelectCommand(frequencyHz) ?: run {
+            Log.w(tag, "setBand: no band code for ${frequencyHz}Hz — skipping")
+            return@withContext false
+        }
+        Log.d(tag, "CMD setBand (${frequencyHz}Hz) → ${IcomCivProtocol.toHex(cmd)}")
+        ioMutex.withLock { sendAndWaitAck(cmd) }
+    }
 
     /** Select VFO-A (main/RX) or VFO-B (sub/TX). */
     override suspend fun setVfo(vfoA: Boolean): Boolean = withContext(Dispatchers.IO) {

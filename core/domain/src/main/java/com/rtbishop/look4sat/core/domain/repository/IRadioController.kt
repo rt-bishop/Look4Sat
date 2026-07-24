@@ -42,9 +42,15 @@ interface IRadioController {
     // ── Extended operations (IC-705 / CI-V) ──────────────────────────────
 
     /**
+     * Select the band matching [frequencyHz] via the band stacking register.
+     * Must be called before [setFrequency] and [setMode] when first tracking.
+     * Default: no-op (Yaesu radios auto-switch band via frequency).
+     */
+    suspend fun setBand(frequencyHz: Long): Boolean = false
+
+    /**
      * Select the active VFO.
      * @param vfoA true → VFO-A (main/RX), false → VFO-B (sub/TX in split).
-     * Default: no-op.
      */
     suspend fun setVfo(vfoA: Boolean): Boolean = false
 

@@ -51,8 +51,16 @@ object IcomCivProtocol {
     const val CMD_SET_MODE: Byte            = 0x06
     /** Select VFO / memory. */
     const val CMD_SELECT_VFO: Byte          = 0x07
+    /**
+     * Select operating mode (VFO vs memory-channel).
+     * Sub 0x00 = VFO mode. Must be sent after connect if the radio is in
+     * memory-channel mode — frequency/mode commands return FA until it is.
+     */
+    const val CMD_SELECT_OP_MODE: Byte      = 0x08
     /** Set repeater duplex / SPLIT. */
     const val CMD_DUPLEX_SPLIT: Byte        = 0x0F
+    /** Band stacking register / band select (sub 0x00 = select, data = BCD band number). */
+    const val CMD_BAND_SELECT: Byte         = 0x1A
     /** Read/write CTCSS tone frequency. */
     const val CMD_CTCSS_TONE: Byte          = 0x1B
     /** Read/write misc settings (used for enabling CTCSS encode). */
@@ -178,10 +186,41 @@ object IcomCivProtocol {
     /** Read operating frequency (CMD 0x03). */
     fun buildReadFreqCommand(): ByteArray = frame(CMD_READ_FREQ)
 
-    /** Set operating mode (CMD 0x06). Filter byte 0x00 = keep current filter. */
+    /**
+     * Select band via CMD 0x1A sub 0x00.
+     * Band codes are BCD-numbered: 1=160m, 2=80m, …, 9=10m, 0x10=6m, 0x11=2m, 0x12=70cm, 0x13=23cm.
+     * Returns null if [frequencyHz] doesn't fall in a known amateur band.
+     */
+    fun buildBandSelectCommand(frequencyHz: Long): ByteArray? {
+        val code = bandCodeForFrequency(frequencyHz) ?: return null
+        return frame(CMD_BAND_SELECT, 0x00, code)
+    }
+
+    /**
+     * Map a frequency in Hz to the IC-705 band stacking register code.
+     * Codes are BCD (band number in decimal expressed as hex nibbles).
+     */
+    fun bandCodeForFrequency(frequencyHz: Long): Byte? = when {
+        frequencyHz in 1_800_000L     ..1_999_999L     -> 0x01 // 160 m
+        frequencyHz in 3_500_000L     ..3_999_999L     -> 0x02 // 80 m
+        frequencyHz in 7_000_000L     ..7_299_999L     -> 0x03 // 40 m
+        frequencyHz in 10_100_000L    ..10_149_999L    -> 0x04 // 30 m
+        frequencyHz in 14_000_000L    ..14_349_999L    -> 0x05 // 20 m
+        frequencyHz in 18_068_000L    ..18_167_999L    -> 0x06 // 17 m
+        frequencyHz in 21_000_000L    ..21_449_999L    -> 0x07 // 15 m
+        frequencyHz in 24_890_000L    ..24_989_999L    -> 0x08 // 12 m
+        frequencyHz in 28_000_000L    ..29_699_999L    -> 0x09 // 10 m
+        frequencyHz in 50_000_000L    ..53_999_999L    -> 0x10 // 6 m  (BCD 10)
+        frequencyHz in 144_000_000L   ..147_999_999L   -> 0x11 // 2 m  (BCD 11)
+        frequencyHz in 420_000_000L   ..449_999_999L   -> 0x12 // 70 cm (BCD 12)
+        frequencyHz in 1_240_000_000L ..1_299_999_999L -> 0x13 // 23 cm (BCD 13)
+        else -> null
+    }
+
+    /** Set operating mode (CMD 0x06). Filter byte is omitted — radio uses its default filter for the mode. */
     fun buildSetModeCommand(mode: String): ByteArray? {
         val modeByte = MODE_TO_BYTE[mode.uppercase(Locale.US)] ?: return null
-        return frame(CMD_SET_MODE, modeByte, 0x00)
+        return frame(CMD_SET_MODE, modeByte)
     }
 
     /** Select VFO-A (CMD 0x07 sub 0x00). */
@@ -189,6 +228,13 @@ object IcomCivProtocol {
 
     /** Select VFO-B (CMD 0x07 sub 0x01). */
     fun buildSelectVfoBCommand(): ByteArray = frame(CMD_SELECT_VFO, SUB_VFO_B)
+
+    /**
+     * Enter VFO operating mode (CMD 0x08 sub 0x00).
+     * Sent after connect — if the radio is in memory-channel mode frequency
+     * and mode commands return FA until this is issued.
+     */
+    fun buildEnterVfoModeCommand(): ByteArray = frame(CMD_SELECT_OP_MODE, 0x00)
 
     /** Enable or disable SPLIT mode (CMD 0x0F). */
     fun buildSplitModeCommand(enable: Boolean): ByteArray {

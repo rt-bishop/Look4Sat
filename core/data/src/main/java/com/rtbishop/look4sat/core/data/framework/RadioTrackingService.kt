@@ -47,6 +47,8 @@ class RadioTrackingService(
 ) : IRadioTrackingService {
 
     private val tag = "RadioTracking"
+    /** Delay between each step of the split-mode init sequence (ms). */
+    private val INIT_STEP_DELAY_MS = 200L
     private val _state = MutableStateFlow(RadioTrackingState())
     override val state: StateFlow<RadioTrackingState> = _state
 
@@ -316,10 +318,15 @@ class RadioTrackingService(
         Log.i(tag, "IC-705 split setup: txBase=${txBase}Hz rxNominal=${rxNominal}Hz txMode=$txMode rxMode=$rxMode")
 
         // ── Initial setup sequence ──────────────────────────────────────────
-        // 1. Select VFO-A (will be RX VFO), set downlink frequency and mode
+        // Sequence per IC-705: explicitly select VFO, then band → freq → mode.
+        // ACK from each command gates the next — no fixed delays needed.
+
+        // VFO-A = RX (downlink)
         Log.d(tag, "Split init: selecting VFO-A for RX (downlink)")
         radio.setVfo(vfoA = true)
         if (rxNominal != null) {
+            Log.d(tag, "Split init: VFO-A band for ${rxNominal}Hz")
+            radio.setBand(rxNominal)
             Log.d(tag, "Split init: VFO-A freq=${rxNominal}Hz")
             radio.setFrequency(rxNominal)
         }
@@ -328,10 +335,12 @@ class RadioTrackingService(
             radio.setMode(rxMode)
         }
 
-        // 2. Select VFO-B (will be TX VFO), set uplink frequency, mode, and CTCSS
+        // VFO-B = TX (uplink)
         Log.d(tag, "Split init: selecting VFO-B for TX (uplink)")
         radio.setVfo(vfoA = false)
         if (txBase != null) {
+            Log.d(tag, "Split init: VFO-B band for ${txBase}Hz")
+            radio.setBand(txBase)
             Log.d(tag, "Split init: VFO-B freq=${txBase}Hz")
             radio.setFrequency(txBase)
         }
@@ -340,19 +349,20 @@ class RadioTrackingService(
             radio.setMode(txMode)
         }
         if (txMode?.uppercase() == "FM") {
-            _state.value.ctcssTone?.let { tone ->
+            val tone = _state.value.ctcssTone
+            if (tone != null) {
                 Log.d(tag, "Split init: CTCSS=${tone}Hz")
                 radio.setCtcssTone(tone)
                 radio.setCtcssMode(true)
+            } else {
+                radio.setCtcssMode(false)
             }
         }
 
-        // 3. Enable SPLIT — radio will now TX on VFO-B while listening on VFO-A
-        Log.d(tag, "Split init: enabling SPLIT mode")
-        radio.setSplitMode(enabled = true)
-
-        // Return to VFO-A so the display shows RX frequency
+        // Enable SPLIT on VFO-A (return display to RX VFO first)
+        Log.d(tag, "Split init: returning to VFO-A, then enabling SPLIT mode")
         radio.setVfo(vfoA = true)
+        radio.setSplitMode(enabled = true)
 
         _state.update { it.copy(txMode = txMode, rxMode = rxMode, txBaseFrequencyHz = txBase) }
         Log.i(tag, "IC-705 split init done — entering tracking loop")
