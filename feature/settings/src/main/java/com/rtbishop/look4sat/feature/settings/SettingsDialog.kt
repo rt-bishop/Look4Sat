@@ -473,12 +473,14 @@ fun RadioControlDialog(
     // If current baud rate is not in the new list, default to the first available
     if (baudRate.intValue !in baudRates) baudRate.intValue = baudRates.first()
 
-    val pairedDevices = remember {
-        try {
-            val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-            manager.adapter?.bondedDevices?.map { it.name ?: "Unknown" to it.address } ?: emptyList()
-        } catch (_: SecurityException) {
-            emptyList()
+    val pairedDevices: List<Pair<String, String>> = remember {
+        buildList {
+            try {
+                val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                manager.adapter?.bondedDevices?.forEach {
+                    add(Pair(it.name ?: "Unknown", it.address ?: ""))
+                }
+            } catch (_: SecurityException) { }
         }
     }
 

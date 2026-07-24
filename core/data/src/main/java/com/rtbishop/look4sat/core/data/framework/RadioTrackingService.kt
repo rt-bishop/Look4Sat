@@ -31,6 +31,7 @@ import com.rtbishop.look4sat.core.domain.repository.RadioTrackingState
 import com.rtbishop.look4sat.core.domain.utility.TransponderMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -189,7 +190,7 @@ class RadioTrackingService(
         var lastReadFreq  = 0L
         var stableCount   = 0
 
-        while (isActive) {
+        while (currentCoroutineContext().isActive) {
             val currentState = _state.value
             if (!currentState.isActive) break
 
@@ -360,7 +361,7 @@ class RadioTrackingService(
         // After initial setup we never change VFO or band.
         // We only update the active-VFO frequency using CMD 0x25 sub 0x00.
         // The IC-705 automatically makes VFO-B active while PTT is pressed.
-        while (isActive) {
+        while (currentCoroutineContext().isActive) {
             val currentState = _state.value
             if (!currentState.isActive) break
 

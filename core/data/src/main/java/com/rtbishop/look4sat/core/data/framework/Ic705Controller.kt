@@ -84,19 +84,21 @@ class Ic705Controller(
         }
     }
 
-    override suspend fun disconnect() = withContext(Dispatchers.IO) {
-        try {
-            inputStream?.close()
-            outputStream?.close()
-            socket?.close()
-        } catch (e: Exception) {
-            Log.e(tag, "Disconnect error: ${e.message}")
-        } finally {
-            inputStream  = null
-            outputStream = null
-            socket       = null
-            isConnected  = false
-            Log.i(tag, "Disconnected from $deviceAddress")
+    override suspend fun disconnect() {
+        withContext(Dispatchers.IO) {
+            try {
+                inputStream?.close()
+                outputStream?.close()
+                socket?.close()
+            } catch (e: Exception) {
+                Log.e(tag, "Disconnect error: ${e.message}")
+            } finally {
+                inputStream  = null
+                outputStream = null
+                socket       = null
+                isConnected  = false
+                Log.i(tag, "Disconnected from $deviceAddress")
+            }
         }
     }
 
