@@ -367,20 +367,76 @@ class RadioTrackingService(
         _state.update { it.copy(txMode = txMode, rxMode = rxMode, txBaseFrequencyHz = txBase) }
         Log.i(tag, "IC-705 split init done — entering tracking loop")
 
-        // ── Tracking loop ───────────────────────────────────────────────────
-        // After initial setup we never change VFO or band.
-        // We only update the active-VFO frequency using CMD 0x25 sub 0x00.
-        // The IC-705 automatically makes VFO-B active while PTT is pressed.
+        // ── Tracking loop with tuning detection ─────────────────────────────
+        var lastSetTxFreq = 0.0
+        var lastSetRxFreq = 0.0
+        var tuningRadio   = ""  // "tx" or "rx" when manual tuning detected
+        var lastReadFreq  = 0L
+        var stableCount   = 0
+
         while (currentCoroutineContext().isActive) {
             val currentState = _state.value
             if (!currentState.isActive) break
 
             val satPass = currentState.currentPass ?: break
             val xpdr    = currentState.selectedTransponder ?: break
-            val txBaseFreq = currentState.txBaseFrequencyHz
+            var txBaseFreq = currentState.txBaseFrequencyHz
             val stationPos = settingsRepo.stationPosition.value
             val pos = satelliteRepo.getPosition(satPass.orbitalObject, stationPos, System.currentTimeMillis())
             val v = pos.distanceRate * 1000.0
+
+            if (tuningRadio.isNotEmpty()) {
+                // User is tuning — wait for frequency to stabilize
+                val readFreq = if (tuningRadio == "tx") radio.readTxVfoFrequency() else radio.readWorkingFrequency()
+                if (readFreq != null) {
+                    if (kotlin.math.abs(readFreq - lastReadFreq) <= 20) stableCount++
+                    else { stableCount = 0; lastReadFreq = readFreq }
+
+                    if (stableCount >= 2) {
+                        // Frequency stable — reverse-calculate base frequency
+                        if (tuningRadio == "tx" && txBaseFreq != null) {
+                            val newBase = (readFreq.toDouble() * SPEED_OF_LIGHT / (SPEED_OF_LIGHT + v)).toLong()
+                            if (newBase > 0) {
+                                txBaseFreq = newBase
+                                _state.update { it.copy(txBaseFrequencyHz = newBase) }
+                                Log.i(tag, "Split TX tuning done → base=$newBase")
+                            }
+                        } else if (tuningRadio == "rx") {
+                            val rxNominal = (readFreq.toDouble() * SPEED_OF_LIGHT / (SPEED_OF_LIGHT - v)).toLong()
+                            val newTxBase = TransponderMapper.mapDownlinkToUplink(rxNominal, xpdr)
+                            if (newTxBase != null && newTxBase > 0) {
+                                txBaseFreq = newTxBase
+                                _state.update { it.copy(txBaseFrequencyHz = newTxBase) }
+                                Log.i(tag, "Split RX tuning done → txBase=$newTxBase")
+                            }
+                        }
+                        tuningRadio   = ""
+                        stableCount   = 0
+                        lastSetTxFreq = 0.0
+                        lastSetRxFreq = 0.0
+                    }
+                }
+            } else {
+                // Detect manual dial changes
+                if (txBaseFreq != null && lastSetTxFreq > 0.0) {
+                    val readTx = radio.readTxVfoFrequency()
+                    if (readTx != null && kotlin.math.abs(readTx - lastSetTxFreq) >= 20.0) {
+                        tuningRadio  = "tx"
+                        lastReadFreq = readTx
+                        stableCount  = 0
+                        Log.i(tag, "Split TX tuning detected (read=${readTx}, lastSet=$lastSetTxFreq)")
+                    }
+                }
+                if (tuningRadio.isEmpty() && lastSetRxFreq > 0.0) {
+                    val readRx = radio.readWorkingFrequency()
+                    if (readRx != null && kotlin.math.abs(readRx - lastSetRxFreq) >= 20.0) {
+                        tuningRadio  = "rx"
+                        lastReadFreq = readRx
+                        stableCount  = 0
+                        Log.i(tag, "Split RX tuning detected (read=${readRx}, lastSet=$lastSetRxFreq)")
+                    }
+                }
+            }
 
             // Determine Doppler-corrected frequencies
             val txRadioFreq = txBaseFreq?.let { pos.getUplinkFreq(it) }
@@ -389,18 +445,20 @@ class RadioTrackingService(
             } else xpdr.downlinkLow
             val rxRadioFreq = rxBaseCalc?.let { pos.getDownlinkFreq(it) }
 
-            if (radio.isConnected) {
-                    // Update both VFOs every cycle — no PTT polling needed.
-                    // 0x25/00 = active (RX) VFO, 0x25/01 = inactive (TX) VFO.
-                    if (rxRadioFreq != null) {
-                        Log.d(tag, "Split loop RX (0x25/00): ${rxRadioFreq}Hz")
-                        radio.setWorkingFrequency(rxRadioFreq)
-                    }
-                    if (txRadioFreq != null) {
-                        Log.d(tag, "Split loop TX (0x25/01): ${txRadioFreq}Hz")
-                        radio.setTxVfoFrequency(txRadioFreq)
-                    }
+            if (radio.isConnected && tuningRadio.isEmpty()) {
+                // Update both VFOs every cycle — no PTT polling needed.
+                // 0x25/00 = active (RX) VFO, 0x25/01 = inactive (TX) VFO.
+                if (rxRadioFreq != null) {
+                    Log.d(tag, "Split loop RX (0x25/00): ${rxRadioFreq}Hz")
+                    radio.setWorkingFrequency(rxRadioFreq)
+                    lastSetRxFreq = rxRadioFreq.toDouble()
                 }
+                if (txRadioFreq != null) {
+                    Log.d(tag, "Split loop TX (0x25/01): ${txRadioFreq}Hz")
+                    radio.setTxVfoFrequency(txRadioFreq)
+                    lastSetTxFreq = txRadioFreq.toDouble()
+                }
+            }
 
             _state.update {
                 it.copy(

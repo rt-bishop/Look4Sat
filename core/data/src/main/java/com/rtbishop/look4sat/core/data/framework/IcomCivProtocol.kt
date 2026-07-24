@@ -187,6 +187,12 @@ object IcomCivProtocol {
     /** Read operating frequency (CMD 0x03). */
     fun buildReadFreqCommand(): ByteArray = frame(CMD_READ_FREQ)
 
+    /** Read selected (active) VFO frequency (CMD 0x25 sub 0x00). */
+    fun buildReadWorkingFreqCommand(): ByteArray = frame(CMD_SELECTED_VFO_FREQ, SUB_SELECTED_VFO)
+
+    /** Read unselected (inactive/TX in split) VFO frequency (CMD 0x25 sub 0x01). */
+    fun buildReadTxVfoFreqCommand(): ByteArray = frame(CMD_SELECTED_VFO_FREQ, SUB_UNSELECTED_VFO)
+
     /**
      * Select band via CMD 0x1A sub 0x00.
      * Band codes are BCD-numbered: 1=160m, 2=80m, …, 9=10m, 0x10=6m, 0x11=2m, 0x12=70cm, 0x13=23cm.

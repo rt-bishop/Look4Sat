@@ -72,4 +72,17 @@ interface IRadioController {
      * Default: delegates to [setWorkingFrequency].
      */
     suspend fun setTxVfoFrequency(frequencyHz: Long): Boolean = setWorkingFrequency(frequencyHz)
+
+    /**
+     * Read the frequency of the currently active VFO (IC-705: CMD 0x25 sub 0x00).
+     * Default: delegates to [readFrequencyAndMode].
+     */
+    suspend fun readWorkingFrequency(): Long? = readFrequencyAndMode()?.first
+
+    /**
+     * Read the frequency of the inactive/TX VFO (IC-705: CMD 0x25 sub 0x01).
+     * Used for tuning detection in split mode.
+     * Default: delegates to [readWorkingFrequency].
+     */
+    suspend fun readTxVfoFrequency(): Long? = readWorkingFrequency()
 }

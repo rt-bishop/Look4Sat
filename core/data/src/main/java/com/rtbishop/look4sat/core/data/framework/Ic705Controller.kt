@@ -217,6 +217,50 @@ class Ic705Controller(
         ioMutex.withLock { sendAndWaitAck(cmd) }
     }
 
+    /**
+     * Read the frequency of the currently active VFO (CMD 0x25 sub 0x00).
+     * Used for tuning detection in split mode.
+     */
+    override suspend fun readWorkingFrequency(): Long? = withContext(Dispatchers.IO) {
+        ioMutex.withLock {
+            val cmd = IcomCivProtocol.buildReadWorkingFreqCommand()
+            Log.d(tag, "CMD readWorkingFreq → ${IcomCivProtocol.toHex(cmd)}")
+            val payload = sendAndReadResponse(cmd, IcomCivProtocol.CMD_SELECTED_VFO_FREQ) ?: return@withContext null
+            // Response payload: [sub] [5 freq bytes] — CMD byte already stripped by parseResponse
+            Log.d(tag, "readWorkingFreq: got ${payload.size} bytes: ${IcomCivProtocol.toHex(payload)}")
+            if (payload.size < 6) {
+                Log.w(tag, "readWorkingFreq: payload too short (${payload.size} bytes)")
+                return@withContext null
+            }
+            val freqBcd = payload.sliceArray(1..5)
+            val freq = IcomCivProtocol.decodeFrequencyBcd(freqBcd)
+            Log.d(tag, "readWorkingFreq: ${freq}Hz")
+            freq
+        }
+    }
+
+    /**
+     * Read the frequency of the inactive/TX VFO (CMD 0x25 sub 0x01).
+     * Used for tuning detection in split mode.
+     */
+    override suspend fun readTxVfoFrequency(): Long? = withContext(Dispatchers.IO) {
+        ioMutex.withLock {
+            val cmd = IcomCivProtocol.buildReadTxVfoFreqCommand()
+            Log.d(tag, "CMD readTxVfoFreq → ${IcomCivProtocol.toHex(cmd)}")
+            val payload = sendAndReadResponse(cmd, IcomCivProtocol.CMD_SELECTED_VFO_FREQ) ?: return@withContext null
+            // Response payload: [sub] [5 freq bytes] — CMD byte already stripped by parseResponse
+            Log.d(tag, "readTxVfoFreq: got ${payload.size} bytes: ${IcomCivProtocol.toHex(payload)}")
+            if (payload.size < 6) {
+                Log.w(tag, "readTxVfoFreq: payload too short (${payload.size} bytes)")
+                return@withContext null
+            }
+            val freqBcd = payload.sliceArray(1..5)
+            val freq = IcomCivProtocol.decodeFrequencyBcd(freqBcd)
+            Log.d(tag, "readTxVfoFreq: ${freq}Hz")
+            freq
+        }
+    }
+
     // ── Internal I/O helpers ────────────────────────────────────────────────
 
     /**
