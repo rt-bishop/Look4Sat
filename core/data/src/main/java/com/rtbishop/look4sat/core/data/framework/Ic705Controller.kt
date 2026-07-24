@@ -244,19 +244,25 @@ class Ic705Controller(
 
     /**
      * Drain whatever bytes the radio has buffered within a [timeoutMs] window.
-     * Uses non-blocking `available()` polling to avoid blocking indefinitely.
+     * Exits early as soon as a complete CI-V frame addressed to us is present
+     * in the buffer (i.e., FE FE E0 A4 … FD), so we don't waste the remaining
+     * timeout on responses that already arrived.
      */
     private suspend fun drainWithTimeout(timeoutMs: Long): ByteArray {
-        val result    = mutableListOf<Byte>()
-        val deadline  = System.currentTimeMillis() + timeoutMs
-        val stream    = inputStream ?: return ByteArray(0)
+        val result   = mutableListOf<Byte>()
+        val deadline = System.currentTimeMillis() + timeoutMs
+        val stream   = inputStream ?: return ByteArray(0)
         while (System.currentTimeMillis() < deadline) {
             try {
                 val available = stream.available()
                 if (available > 0) {
                     val chunk = ByteArray(available)
                     val read  = stream.read(chunk)
-                    if (read > 0) result.addAll(chunk.take(read))
+                    if (read > 0) {
+                        result.addAll(chunk.take(read))
+                        // Exit early once we have a complete frame for us
+                        if (hasCompleteFrameForUs(result)) break
+                    }
                 } else {
                     delay(POLL_INTERVAL_MS)
                 }
@@ -267,6 +273,30 @@ class Ic705Controller(
             }
         }
         return result.toByteArray()
+    }
+
+    /**
+     * Returns true if [buf] contains a complete CI-V frame addressed to the
+     * controller (FE FE [ADDR_CTRL] [ADDR_IC705] … FD).
+     * CI-V data bytes cannot be 0xFD, so the first 0xFD after the header is
+     * always the frame terminator.
+     */
+    private fun hasCompleteFrameForUs(buf: List<Byte>): Boolean {
+        var i = 0
+        while (i < buf.size - 4) {
+            if (buf[i]     == IcomCivProtocol.PREAMBLE    &&
+                buf[i + 1] == IcomCivProtocol.PREAMBLE    &&
+                buf[i + 2] == IcomCivProtocol.ADDR_CTRL   &&
+                buf[i + 3] == IcomCivProtocol.ADDR_IC705
+            ) {
+                for (k in i + 4 until buf.size) {
+                    if (buf[k] == IcomCivProtocol.END_OF_MSG) return true
+                }
+                return false  // header found but no FD yet
+            }
+            i++
+        }
+        return false
     }
 
     private fun write(bytes: ByteArray): Boolean {

@@ -283,11 +283,18 @@ object IcomCivProtocol {
 
     /**
      * Parse TX status from a CMD_TX_STATUS reply payload.
+     *
+     * The IC-705 responds to a `1C 00` query with:
+     *   FE FE E0 A4  1C  00  <status>  FD
+     * After [parseResponse] strips the frame header the payload is:
+     *   payload[0] = 0x00  (sub-command echo)
+     *   payload[1] = status byte (0x00 = RX, 0x01 = TX)
+     *
      * Returns true if transmitting, false if receiving, null on error.
      */
     fun parseTxStatus(payload: ByteArray): Boolean? {
-        if (payload.isEmpty()) return null
-        return when (payload[0]) {
+        if (payload.size < 2) return null
+        return when (payload[1]) {
             0x00.toByte() -> false  // RX
             0x01.toByte() -> true   // TX
             else           -> null
