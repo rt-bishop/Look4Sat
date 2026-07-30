@@ -28,7 +28,10 @@ data class PositionSettings(
 )
 
 data class DataSettings(
-    val isUpdating: Boolean, val entriesTotal: Int, val radiosTotal: Int, val timestamp: Long
+    val isUpdating: Boolean,
+    val entriesTotal: Int,
+    val radiosTotal: Int,
+    val timestamp: Long
 )
 
 data class SettingsState(
@@ -50,8 +53,8 @@ sealed interface SettingsAction {
 
     // Data
     data object UpdateFromWeb : SettingsAction
-    data class UpdateTLEFromFile(val uri: String) : SettingsAction
-    data class UpdateTransceiversFromFile(val uri: String) : SettingsAction
+    data class UpdateTLEFromFile(val uri: String, val invalidFileMessage: String) : SettingsAction
+    data class UpdateTransceiversFromFile(val uri: String, val invalidFileMessage: String) : SettingsAction
     data object ClearAllData : SettingsAction
 
     // Toggles

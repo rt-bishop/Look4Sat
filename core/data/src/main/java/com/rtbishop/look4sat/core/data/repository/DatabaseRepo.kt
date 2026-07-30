@@ -42,21 +42,27 @@ class DatabaseRepo(
 
     private val customSourceType = "Other"
 
-    override suspend fun updateTLEFromFile(uri: String) = withContext(dispatcher) {
+    override suspend fun updateTLEFromFile(uri: String): Int = withContext(dispatcher) {
+        var importedCount = 0
         remoteSource.getFileStream(uri)?.let { stream ->
-            val entries = dataParser.parseTLEStream(unwrapIfZipped(uri, stream))
+            val entries = parseSatelliteStream(uri, unwrapIfZipped(uri, stream))
             localSource.insertEntries(entries)
             settingsRepo.setSatelliteTypeIds(customSourceType, entries.map { it.catnum })
+            importedCount = entries.size
         }
         setUpdateSuccessful(System.currentTimeMillis())
+        importedCount
     }
 
-    override suspend fun updateTransceiversFromFile(uri: String) = withContext(dispatcher) {
+    override suspend fun updateTransceiversFromFile(uri: String): Int = withContext(dispatcher) {
+        var importedCount = 0
         remoteSource.getFileStream(uri)?.let { stream ->
             val transceivers = dataParser.parseJSONStream(unwrapIfZipped(uri, stream))
             localSource.insertRadios(transceivers)
+            importedCount = transceivers.size
         }
         setUpdateSuccessful(System.currentTimeMillis())
+        importedCount
     }
 
     override suspend fun updateFromRemote() = withContext(dispatcher) {
@@ -94,9 +100,31 @@ class DatabaseRepo(
         setUpdateSuccessful(0L)
     }
 
-    private suspend fun parseSatelliteStream(url: String, stream: InputStream): List<OrbitalData> = when {
-        url.contains("FORMAT=csv", ignoreCase = true) -> dataParser.parseCSVStream(stream)
-        else -> dataParser.parseTLEStream(stream)
+    private suspend fun parseSatelliteStream(url: String, stream: InputStream): List<OrbitalData> {
+        val bufferedStream = stream.buffered()
+        return when {
+            hasCsvHint(url) || looksLikeCsv(bufferedStream) -> dataParser.parseCSVStream(bufferedStream)
+            else -> dataParser.parseTLEStream(bufferedStream)
+        }
+    }
+
+    private fun hasCsvHint(url: String): Boolean {
+        return url.contains("FORMAT=csv", ignoreCase = true) ||
+            url.endsWith(".csv", ignoreCase = true) ||
+            url.endsWith(".csv.zip", ignoreCase = true)
+    }
+
+    private fun looksLikeCsv(stream: InputStream): Boolean {
+        if (!stream.markSupported()) return false
+        stream.mark(4096)
+        val preview = ByteArray(4096)
+        val length = stream.read(preview)
+        stream.reset()
+        if (length <= 0) return false
+        val line = preview.decodeToString(0, length).lineSequence().firstOrNull()?.trim().orEmpty()
+        return line.contains("OBJECT_NAME", ignoreCase = true) ||
+            line.contains("NORAD_CAT_ID", ignoreCase = true) ||
+            line.count { it == ',' } >= 4
     }
 
     private suspend fun setUpdateSuccessful(timestamp: Long) {

@@ -138,6 +138,8 @@
     <string name="prefs_data_clear">Clear</string>
     <string name="prefs_data_clear_success">Data was cleared successfully</string>
     <string name="prefs_data_update_success">Update completed successfully</string>
+    <string name="prefs_data_import_satellites_error">No satellites imported. Select a valid TLE/3LE (.txt) or OMM (.csv) file.</string>
+    <string name="prefs_data_import_transceivers_error">No transceivers imported. Select a valid SatNOGS (.json) file.</string>
 
     <string name="prefs_data_sources_title">Custom data sources</string>
     <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>

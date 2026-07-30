@@ -357,7 +357,7 @@ private fun LocationCard(
 @Composable
 private fun DataCardPreview() = MainTheme {
     val settings = DataSettings(true, 5000, 2500, 0L)
-    DataCard(settings = settings, {}, {}, {})
+    DataCard(settings = settings, updateFromWeb = {}, clearAllData = {}, showDataSourcesDialog = {})
 }
 
 @Composable
@@ -672,12 +672,15 @@ private fun rememberSettingsPermissions(
         else sendAction(SettingsAction.ShowToast(locationError))
     }
 
+    val satellitesImportError = stringResource(R.string.prefs_data_import_satellites_error)
+    val transceiversImportError = stringResource(R.string.prefs_data_import_transceivers_error)
+
     val tleRequest = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { sendAction(SettingsAction.UpdateTLEFromFile(it.toString())) }
+        uri?.let { sendAction(SettingsAction.UpdateTLEFromFile(it.toString(), satellitesImportError)) }
     }
 
     val transceiversRequest = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { sendAction(SettingsAction.UpdateTransceiversFromFile(it.toString())) }
+        uri?.let { sendAction(SettingsAction.UpdateTransceiversFromFile(it.toString(), transceiversImportError)) }
     }
 
     val bluetoothError = stringResource(R.string.prefs_bt_perm_error)
