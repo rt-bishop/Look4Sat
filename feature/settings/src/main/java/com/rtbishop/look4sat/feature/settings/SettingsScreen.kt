@@ -89,10 +89,22 @@ fun SettingsDestination() {
 @Composable
 private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) -> Unit) {
     val dialogs = rememberDialogVisibility()
+    val pendingCustomSourcesGrant = remember { mutableStateOf<(() -> Unit)?>(null) }
+    val pendingCustomSourcesDeny = remember { mutableStateOf<(() -> Unit)?>(null) }
     val permissions = rememberSettingsPermissions(
         sendAction = onAction,
         onBluetoothGranted = { dialogs.bluetooth = true },
-        onNetworkGranted = { dialogs.network = true }
+        onNetworkGranted = { dialogs.network = true },
+        onCustomSourcesPermissionGranted = {
+            pendingCustomSourcesGrant.value?.invoke()
+            pendingCustomSourcesGrant.value = null
+            pendingCustomSourcesDeny.value = null
+        },
+        onCustomSourcesPermissionDenied = {
+            pendingCustomSourcesDeny.value?.invoke()
+            pendingCustomSourcesGrant.value = null
+            pendingCustomSourcesDeny.value = null
+        }
     )
 
     // Dialogs
@@ -117,6 +129,11 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
             useCustomTransceivers = uiState.dataSourcesSettings.useCustomTransceivers,
             tleUrl = uiState.dataSourcesSettings.tleUrl,
             transceiversUrl = uiState.dataSourcesSettings.transceiversUrl,
+            requestCustomSourcesPermission = { onGranted, onDenied ->
+                pendingCustomSourcesGrant.value = onGranted
+                pendingCustomSourcesDeny.value = onDenied
+                permissions.launchCustomSourcesPermission()
+            },
             onImportTle = { permissions.launchTleImport(); dialogs.dataSources = false },
             onImportTransceivers = { permissions.launchTransceiverImport(); dialogs.dataSources = false },
             onDismiss = { dialogs.dataSources = false },
@@ -129,7 +146,9 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
                     transceiversUrl = if (!useCustomTransceivers || transceiversUrl.isNotBlank()) transceiversUrl else current.transceiversUrl
                 )
                 if (newSettings != current) onAction(SettingsAction.UpdateDataSources(newSettings))
-                if (useCustomTle || useCustomTransceivers) onAction(SettingsAction.UpdateFromWeb)
+                if (newSettings.useCustomTLE || newSettings.useCustomTransceivers) {
+                    onAction(SettingsAction.UpdateFromWeb)
+                }
             }
         )
     }
@@ -653,14 +672,17 @@ private class SettingsPermissions(
     val launchTleImport: () -> Unit,
     val launchTransceiverImport: () -> Unit,
     val launchBluetooth: () -> Unit,
-    val launchNetwork: () -> Unit
+    val launchNetwork: () -> Unit,
+    val launchCustomSourcesPermission: () -> Unit
 )
 
 @Composable
 private fun rememberSettingsPermissions(
     sendAction: (SettingsAction) -> Unit,
     onBluetoothGranted: () -> Unit,
-    onNetworkGranted: () -> Unit
+    onNetworkGranted: () -> Unit,
+    onCustomSourcesPermissionGranted: () -> Unit,
+    onCustomSourcesPermissionDenied: () -> Unit
 ): SettingsPermissions {
     val locationError = stringResource(R.string.prefs_loc_gps_error)
     val locationRequest = rememberLauncherForActivityResult(
@@ -697,6 +719,15 @@ private fun rememberSettingsPermissions(
         else sendAction(SettingsAction.ShowToast(networkError))
     }
 
+    val customSourcesRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            onCustomSourcesPermissionGranted()
+        } else {
+            onCustomSourcesPermissionDenied()
+            sendAction(SettingsAction.ShowToast(networkError))
+        }
+    }
+
     return remember {
         SettingsPermissions(
             launchLocation = {
@@ -712,6 +743,13 @@ private fun rememberSettingsPermissions(
                     networkRequest.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
                 } else {
                     onNetworkGranted()
+                }
+            },
+            launchCustomSourcesPermission = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+                    customSourcesRequest.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                } else {
+                    onCustomSourcesPermissionGranted()
                 }
             }
         )

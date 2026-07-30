@@ -120,6 +120,7 @@ private fun TransceiversDialogPreview() {
             useCustomTransceivers = true,
             tleUrl = "https://example.com/tle.txt",
             transceiversUrl = "https://example.com/tx.json",
+            requestCustomSourcesPermission = { onGranted, _ -> onGranted() },
             onImportTle = {},
             onImportTransceivers = {},
             onDismiss = {},
@@ -134,6 +135,7 @@ fun DataSourcesDialog(
     useCustomTransceivers: Boolean,
     tleUrl: String,
     transceiversUrl: String,
+    requestCustomSourcesPermission: (onGranted: () -> Unit, onDenied: () -> Unit) -> Unit,
     onImportTle: () -> Unit,
     onImportTransceivers: () -> Unit,
     onDismiss: () -> Unit,
@@ -182,7 +184,16 @@ fun DataSourcesDialog(
                 Text(text = stringResource(id = R.string.prefs_data_sources_tle_switch))
                 Switch(
                     checked = isEnabledCustomTle.value,
-                    onCheckedChange = { isEnabledCustomTle.value = it }
+                    onCheckedChange = { enabled ->
+                        if (!enabled) {
+                            isEnabledCustomTle.value = false
+                        } else {
+                            requestCustomSourcesPermission(
+                                { isEnabledCustomTle.value = true },
+                                { isEnabledCustomTle.value = false }
+                            )
+                        }
+                    }
                 )
             }
             OutlinedTextField(
@@ -202,7 +213,16 @@ fun DataSourcesDialog(
                 Text(text = stringResource(id = R.string.prefs_data_sources_transceivers_switch))
                 Switch(
                     checked = isEnabledCustomTransceivers.value,
-                    onCheckedChange = { isEnabledCustomTransceivers.value = it }
+                    onCheckedChange = { enabled ->
+                        if (!enabled) {
+                            isEnabledCustomTransceivers.value = false
+                        } else {
+                            requestCustomSourcesPermission(
+                                { isEnabledCustomTransceivers.value = true },
+                                { isEnabledCustomTransceivers.value = false }
+                            )
+                        }
+                    }
                 )
             }
             OutlinedTextField(
