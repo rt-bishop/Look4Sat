@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -357,7 +358,7 @@ private fun DialogShell(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = null,
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         scrimColor = Color.Black.copy(alpha = 0.64f)
     ) {
         Column(

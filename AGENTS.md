@@ -8,16 +8,15 @@ All assistant-specific files (`CLAUDE.md`, `.github/copilot-instructions.md`) po
 ## Project Overview
 
 Look4Sat is an open-source, fully offline Android satellite tracker and pass predictor. It tracks 9000+ active
-satellites using TLE/OMM data from Celestrak/SatNOGS, calculates orbital positions via SGP4/SDP4 models, and displays
-passes relative to the user's location. Features include polar radar visualization, SSTV image decoding, satellite
-ground track mapping, and pass predictions up to 10 days ahead. No ads, no tracking, no network required after initial
-data download.
+satellites using Celestrak/SatNOGS orbital data, calculates positions via SGP4/SDP4, and predicts passes relative to
+the user's location. Features include polar radar visualization, SSTV image decoding, and ground track mapping. No ads,
+no tracking, no network required after initial data download.
 
-## Architecture
+## Architecture & Design
 
 **MVI (Model-View-Intent)** with unidirectional data flow:
-- `State` data class → exposed via `StateFlow` from ViewModel
-- `Action` sealed interface → user intents dispatched to ViewModel's `onAction()`
+- `State` data class (named `<Feature>State`) exposed via `StateFlow` from ViewModel
+- `Action` sealed interface (named `<Feature>Action`) dispatched to ViewModel's `onAction()`
 - Jetpack Compose UI observes state and recomposes reactively
 
 **Clean Architecture layers:**
@@ -34,9 +33,11 @@ data download.
 | `feature:satellites` | Satellite list, filtering, selection                                |
 | `feature:settings`   | User preferences                                                    |
 
-- `feature:*` modules depend only on `core:domain` + `core:presentation`. Features never depend on each other.
+**Feature isolation:**
+- `feature:*` modules depend only on `core:domain` and `core:presentation`.
+- No feature-to-feature dependencies; cross-feature communication goes through core layers.
 
-## Build & Run
+## Build & Platform
 
 ```shell
 # Debug build
@@ -50,54 +51,55 @@ data download.
 ```
 
 - **Min SDK**: 24 | **Target SDK**: 36 | **JDK**: 17
-- **Gradle**: Uses version catalog (`gradle/libs.versions.toml`) + convention plugins in `build-logic/`
+- **Gradle**: Version catalog in `gradle/libs.versions.toml` + convention plugins in `build-logic/`
 
-## Key Libraries
+## Tech Stack
 
 - **Compose** (BOM 2026.05.01) + Material3 Adaptive
-- **Navigation3** (type-safe, uses `@Serializable` NavKeys)
-- **Room** (KSP code generation) for local satellite/TLE storage
-- **OkHttp** 5.x for TLE downloads
+- **Navigation3**: Type-safe navigation with `@Serializable` nav keys
+- **Room** (KSP code generation) for local satellite/orbital storage
+- **OkHttp** 5.x for data downloads
 - **OSMDroid** for map rendering
-- **Kotlin Serialization** for navigation args and data parsing
+- **Kotlin Serialization** for navigation args and parsing
 - **Coroutines** + `StateFlow` for async/reactive patterns
-
-## Conventions
-
-- **Minimal dependencies**: Avoid adding libraries when a simple manual solution exists. Fewer deps = less maintenance.
-- **DI**: Manual — ViewModels use companion `factory()` methods with `IMainContainer` interface.
-- **Navigation**: Type-safe Compose Navigation3 with `@Serializable` data classes as nav keys.
-- **State naming**: `<Feature>State` data class + `<Feature>Action` sealed interface per feature.
-- **No feature-to-feature deps**: All cross-feature communication goes through core layers.
-- **Localization**: 7 languages (en, es, ru, si, tr, uk, zh).
+- **Localization**: 7 languages (en, es, ru, si, tr, uk, zh)
 
 ## Data Formats & Migration
 
-**TLE vs. OMM/CSV format:**
+Look4Sat supports both TLE and OMM (Orbit Mean-Elements Message) CSV formats:
 
-Look4Sat supports both TLE and OMM (Orbit Mean-Elements Message) formats for backward compatibility:
+- **TLE format**: Legacy 3-line element format limited by 5-digit NORAD IDs
+- **OMM/CSV format**: Successor format with ISO 8601 timestamps and larger NORAD ID support
+- New 5-digit NORAD IDs are exhausted; TLE is officially deprecated and OMM/CSV is the clear default
+- `DataParser.kt` supports both via `parseTLEStream()` and `parseCSVStream()`
+- Downloads auto-detect format; both produce identical `OrbitalData` objects
+- Existing code already supports transparent source transition without feature changes
+- Refresh orbital data weekly for accurate pass prediction (orbital decay)
 
-- **TLE format**: Traditional 3-line element format (deprecated). NORAD catalog numbers are 5-digit integers, which
-  are running out of space. Celestrak has signaled that TLE format will eventually be phased out.
-- **OMM/CSV format**: The future standard. CSV files contain the same orbital parameters as TLE but use ISO 8601
-  timestamps and support larger NORAD IDs. Celestrak and SatNOGS already provide OMM data in CSV format.
+## Engineering Heuristics (Lazy = Efficient)
 
-**Current implementation:**
-- `DataParser.kt` handles both `parseTLEStream()` and `parseCSVStream()` seamlessly
-- TLE data is downloaded from configured sources and stored in Room database
-- When downloading satellite data, the app automatically detects format and parses accordingly
-- Both formats produce identical `OrbitalData` objects, ensuring transparent format switching
+- Treat "lazy" as efficient, not careless: the best code is the code never written.
+- First understand the task and trace the real flow end-to-end, then climb this ladder:
+  1. Does this need to be built now? (YAGNI)
+  2. Does it already exist in this codebase? Reuse helpers/patterns before rewriting.
+  3. Does Kotlin/Java stdlib already solve it?
+  4. Does the Android/platform API already solve it?
+  5. Does an already-installed dependency solve it?
+  6. Can this be simpler (including one-liner simple)?
+  7. Only then: write the minimum code that works.
+- Prefer deletion to addition, boring over clever, and the fewest touched files.
+- Avoid new abstractions, dependencies, and boilerplate unless explicitly requested.
+- Manual DI only: ViewModels use companion `factory()` methods with `IMainContainer`.
+- Release builds use ProGuard: avoid reflection-heavy libraries unless explicitly approved.
+- When two options are similar in size, choose the edge-case-correct one.
+- If you keep a deliberate simplification (for example O(n^2) scan or global lock), leave a short comment with the ceiling and upgrade path.
+- For complex asks, challenge scope when appropriate: "Do you need X, or does Y already cover it?"
 
-**Migration path:**
-As NORAD catalog space becomes constrained, OMM/CSV will become the primary format. Look4Sat is already positioned
-to handle this transition without code changes — existing users can continue using TLE files while new sources
-transition to OMM/CSV automatically.
+## Bug-Fix Policy
 
-## Code Style
-
-- Prefer **short, focused functions** — single responsibility, easy to read.
-- **Exceptions**: Composable functions and math-heavy algorithms (SGP4/SDP4) may be longer.
-- Strict code style — no dead code, no unused imports, consistent formatting.
+- Fix root cause, not just the reported symptom.
+- If touching a shared function, inspect callers and prefer one shared fix over per-caller patches.
+- The smallest correct diff wins only after behavior is understood.
 
 ## Roadmap
 
@@ -105,12 +107,9 @@ transition to OMM/CSV automatically.
 
 ## Gotchas
 
-- Orbital math lives in `core:domain/predict/` — it's dense vector math (SGP4/SDP4). Tread carefully.
-- TLE/OMM data must be refreshed weekly for accurate predictions (satellite orbits decay). TLE format is legacy and
-  will eventually be deprecated in favor of OMM/CSV as NORAD catalog numbers approach the 5-digit limit.
+- Orbital math lives in `core:domain/predict/` — dense vector math (SGP4/SDP4). Tread carefully.
 - SSTV decoding in `feature:radar` is experimental; image quality depends on signal strength during satellite pass.
-- `build-logic/convention/` contains all shared Gradle configuration — edit there, not in individual modules.
-- ProGuard is enabled for release builds — don't add reflection-based libs or any other dependencies without asking.
+- `build-logic/convention/` contains shared Gradle configuration — edit there, not in individual modules.
 
 ## Copilot Working Mode: Code-Only
 

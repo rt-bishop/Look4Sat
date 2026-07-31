@@ -14,7 +14,7 @@
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">Тип: %s</string>
-    <string name="sat_type_title">Виберіть тип супутника</string>
+    <string name="sat_type_title">Виберіть типи</string>
     <string name="sat_search_hint">Id - Назва</string>
     <string name="sat_search_clear">Очистити</string>
     <string name="sat_clear_all">Очистити всі</string>
@@ -35,7 +35,7 @@
     <string name="pass_filter_aos_time">Вікно AOS</string>
     <string name="pass_filter_invert_time">Інвертувати вікно AOS</string>
     <string name="pass_filter_deep_space">DeepSpace (період &gt;225хв)</string>
-    <string name="pass_modes_title">Виберіть тип модуляції</string>
+    <string name="pass_modes_title">Виберіть режими</string>
     <string name="pass_elevation">Піднес.: %.1f°</string>
     <string name="pass_altitude">Висота: %.0f км</string>
     <string name="pass_empty_list_message">
@@ -96,11 +96,11 @@
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Некоректний локатор QTH</string>
     <string name="prefs_loc_success">Позицію успішно оновлено</string>
-    <string name="prefs_station_title">Налаштування місцезнаходження станції</string>
-    <string name="prefs_station_lat_text">Широта місцезнаходження станції</string>
-    <string name="prefs_station_lon_text">Довгота місцезнаходження станції</string>
-    <string name="prefs_locator_title">Налаштування QTH локатора</string>
-    <string name="prefs_locator_text">Задати позицію за QTH локатором</string>
+    <string name="prefs_station_title">Позиція станції</string>
+    <string name="prefs_station_lat_text">Широта станції</string>
+    <string name="prefs_station_lon_text">Довгота станції</string>
+    <string name="prefs_locator_title">Локатор QTH</string>
+    <string name="prefs_locator_text">Позиція за локатором</string>
 
     <string name="prefs_data_title">Супутникові дані</string>
     <string name="prefs_data_entries">Супутників: %s</string>
@@ -110,39 +110,52 @@
     <string name="prefs_data_clear">Очистити</string>
     <string name="prefs_data_clear_success">Дані успішно очищено</string>
     <string name="prefs_data_update_success">Оновлення успішне</string>
+    <string name="prefs_data_import_satellites_error">Супутники не імпортовано. Потрібен TLE/3LE (.txt) або OMM (.csv).</string>
+    <string name="prefs_data_import_transceivers_error">Трансивери не імпортовано. Потрібен SatNOGS (.json).</string>
 
-    <string name="prefs_data_sources_title">Custom data sources</string>
-    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
+    <string name="prefs_data_sources_title">Власні джерела</string>
+    <string name="prefs_data_sources_tle_switch">URL TLE</string>
+    <string name="prefs_data_sources_transceivers_switch">URL трансиверів</string>
+    <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
 
-    <string name="prefs_data_output_title">Data output</string>
-    <string name="prefs_net_output">Network</string>
+    <string name="prefs_data_output_title">Вивід даних</string>
+    <string name="prefs_net_output">Мережа</string>
     <string name="prefs_bt_output">Bluetooth</string>
+    <string name="prefs_cat_output">CAT</string>
 
-    <string name="prefs_net_title">Вивід мережевих даних</string>
-    <string name="prefs_net_rotator_switch">Enable rotation output</string>
+    <string name="nav_radiocontrol">Керування радіо</string>
+    <string name="rc_settings_title">CAT керування</string>
+    <string name="rc_radio_model">Модель радіо</string>
+    <string name="rc_tx_device_hint">BT адреса TX</string>
+    <string name="rc_rx_device_hint">BT адреса RX</string>
+    <string name="rc_tx_name_hint">Назва радіо TX</string>
+    <string name="rc_rx_name_hint">Назва радіо RX</string>
+    <string name="rc_enable_switch">Увімкнути CAT</string>
+
+    <string name="prefs_net_title">Мережевий вивід</string>
+    <string name="prefs_net_rotator_switch">Увімкнути вивід повороту</string>
     <string name="prefs_net_rotator_address_hint">IP:Порт</string>
     <string name="prefs_net_rotator_format_hint">Формат даних</string>
-    <string name="prefs_net_frequency_switch">Enable frequency output</string>
+    <string name="prefs_net_frequency_switch">Увімкнути вивід частоти</string>
     <string name="prefs_net_frequency_address_hint">IP:Порт</string>
     <string name="prefs_net_frequency_format_hint">Формат даних</string>
 
-    <string name="prefs_bt_title">Вивід даних Bluetooth</string>
-    <string name="prefs_bt_rotator_switch">Enable rotation output</string>
-    <string name="prefs_bt_rotator_device_hint">Id пристрою</string>
+    <string name="prefs_bt_title">Вивід Bluetooth</string>
+    <string name="prefs_bt_rotator_switch">Увімкнути вивід повороту</string>
+    <string name="prefs_bt_rotator_device_hint">ID пристрою</string>
     <string name="prefs_bt_rotator_output_hint">Формат даних</string>
-    <string name="prefs_bt_frequency_switch">Enable frequency output</string>
-    <string name="prefs_bt_frequency_device_hint">Id пристрою</string>
+    <string name="prefs_bt_frequency_switch">Увімкнути вивід частоти</string>
+    <string name="prefs_bt_frequency_device_hint">ID пристрою</string>
     <string name="prefs_bt_frequency_output_hint">Формат даних</string>
     <string name="prefs_bt_perm_error">Перевірте дозвіл Bluetooth</string>
     <string name="prefs_net_perm_error">Перевірте дозвіл мережі</string>
 
-    <string name="prefs_other_title">Інші налаштування</string>
-    <string name="prefs_other_switch_utc">Показувати час в UTC</string>
-    <string name="prefs_other_switch_update">Автоматичне оновлення даних</string>
-    <string name="prefs_other_switch_sweep">Показувати анімацію радара</string>
-    <string name="prefs_other_switch_sensors">Використовувати сенсори пристрою</string>
-    <string name="prefs_other_switch_night_mode">Увімкнути червоний нічний фільтр</string>
+    <string name="prefs_other_title">Інше</string>
+    <string name="prefs_other_switch_utc">Час в UTC</string>
+    <string name="prefs_other_switch_update">Автооновлення даних</string>
+    <string name="prefs_other_switch_sweep">Анімація радара</string>
+    <string name="prefs_other_switch_sensors">Сенсори для радара</string>
+    <string name="prefs_other_switch_night_mode">Червоний нічний фільтр</string>
 
     <string name="prefs_highlight_title">Підсвічування висоти</string>
     <string name="prefs_highlight_low">Низько &lt; %1$d°</string>

@@ -135,6 +135,13 @@ class MainContainer(private val context: Context) : IMainContainer {
         return SensorsRepo(manager, displayManager)
     }
 
+    override fun providePairedBluetoothDevices(): List<Pair<String, String>> = buildList {
+        try {
+            val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+            manager.adapter?.bondedDevices?.forEach { add(Pair(it.name ?: "Unknown", it.address ?: "")) }
+        } catch (_: SecurityException) {}
+    }
+
     private fun provideDatabaseRepo(): IDatabaseRepo {
         val dbDispatcher = Dispatchers.Default
         val dataParser = DataParser(dbDispatcher)

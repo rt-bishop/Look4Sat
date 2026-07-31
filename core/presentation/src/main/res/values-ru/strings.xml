@@ -14,7 +14,7 @@
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">Тип: %s</string>
-    <string name="sat_type_title">Выберите тип спутника</string>
+    <string name="sat_type_title">Выберите типы</string>
     <string name="sat_search_hint">Id - Название</string>
     <string name="sat_search_clear">Очистить</string>
     <string name="sat_clear_all">Очистить</string>
@@ -34,7 +34,7 @@
     <string name="pass_filter_aos_time">Окно AOS</string>
     <string name="pass_filter_invert_time">Инвертировать окно AOS</string>
     <string name="pass_filter_deep_space">DeepSpace (период &gt;225мин)</string>
-    <string name="pass_modes_title">Выберите тип модуляции</string>
+    <string name="pass_modes_title">Выберите режимы</string>
     <string name="pass_elevation">Элевация: %.1f°</string>
     <string name="pass_altitude">Высота: %d км</string>
     <string name="pass_empty_list_message">
@@ -95,11 +95,11 @@
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Неправильный локатор QTH</string>
     <string name="prefs_loc_success">Позиция успешно обновлена</string>
-    <string name="prefs_station_title">Настройки местоположения</string>
-    <string name="prefs_station_lat_text">Введите широту наземной станции</string>
-    <string name="prefs_station_lon_text">Введите долготу наземной станции</string>
-    <string name="prefs_locator_title">Настройки локатора QTH</string>
-    <string name="prefs_locator_text">Введите позицию через локатор</string>
+    <string name="prefs_station_title">Положение станции</string>
+    <string name="prefs_station_lat_text">Широта станции</string>
+    <string name="prefs_station_lon_text">Долгота станции</string>
+    <string name="prefs_locator_title">Локатор QTH</string>
+    <string name="prefs_locator_text">Позиция по локатору</string>
 
     <string name="prefs_data_title">Данные спутников</string>
     <string name="prefs_data_entries">Спутников: %s</string>
@@ -109,16 +109,30 @@
     <string name="prefs_data_clear">Очистить</string>
     <string name="prefs_data_clear_success">Очистка прошла успешно</string>
     <string name="prefs_data_update_success">Обновление прошло успешно</string>
+    <string name="prefs_data_import_satellites_error">Спутники не импортированы. Нужен TLE/3LE (.txt) или OMM (.csv).</string>
+    <string name="prefs_data_import_transceivers_error">Трансиверы не импортированы. Нужен SatNOGS (.json).</string>
 
-    <string name="prefs_data_sources_title">Свои источники данных</string>
-    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">Custom Transceivers URL</string>
+    <string name="prefs_data_sources_title">Свои источники</string>
+    <string name="prefs_data_sources_tle_switch">URL TLE</string>
+    <string name="prefs_data_sources_transceivers_switch">URL трансиверов</string>
+    <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
 
-    <string name="prefs_data_output_title">Вывод данных</string>
+    <string name="prefs_data_output_title">Вывод</string>
     <string name="prefs_net_output">Сеть</string>
     <string name="prefs_bt_output">Bluetooth</string>
+    <string name="prefs_cat_output">CAT</string>
 
-    <string name="prefs_net_title">Вывод сетевых данных</string>
+    <string name="nav_radiocontrol">Управление радио</string>
+
+    <string name="rc_settings_title">CAT управление</string>
+    <string name="rc_radio_model">Модель радио</string>
+    <string name="rc_tx_device_hint">BT адрес TX</string>
+    <string name="rc_rx_device_hint">BT адрес RX</string>
+    <string name="rc_tx_name_hint">Имя радио TX</string>
+    <string name="rc_rx_name_hint">Имя радио RX</string>
+    <string name="rc_enable_switch">Включить CAT</string>
+
+    <string name="prefs_net_title">Сетевой вывод</string>
     <string name="prefs_net_rotator_switch">Включить вывод ротатора</string>
     <string name="prefs_net_rotator_address_hint">IP:Порт</string>
     <string name="prefs_net_rotator_format_hint">Формат</string>
@@ -126,22 +140,22 @@
     <string name="prefs_net_frequency_address_hint">IP:Порт</string>
     <string name="prefs_net_frequency_format_hint">Формат</string>
 
-    <string name="prefs_bt_title">Вывод данных Bluetooth</string>
+    <string name="prefs_bt_title">Вывод Bluetooth</string>
     <string name="prefs_bt_rotator_switch">Включить вывод ротатора</string>
-    <string name="prefs_bt_rotator_device_hint">Id устройства</string>
+    <string name="prefs_bt_rotator_device_hint">ID устройства</string>
     <string name="prefs_bt_rotator_output_hint">Формат</string>
     <string name="prefs_bt_frequency_switch">Включить вывод частоты</string>
-    <string name="prefs_bt_frequency_device_hint">Id устройства</string>
+    <string name="prefs_bt_frequency_device_hint">ID устройства</string>
     <string name="prefs_bt_frequency_output_hint">Формат</string>
     <string name="prefs_bt_perm_error">Нет разрешения использовать bluetooth</string>
     <string name="prefs_net_perm_error">Нет разрешения использовать сеть</string>
 
-    <string name="prefs_other_title">Другие настройки</string>
-    <string name="prefs_other_switch_utc">Показывать время по UTC</string>
-    <string name="prefs_other_switch_update">Обновлять данные автоматически</string>
-    <string name="prefs_other_switch_sweep">Показывать анимацию радара</string>
-    <string name="prefs_other_switch_sensors">Использовать сенсоры устройства</string>
-    <string name="prefs_other_switch_night_mode">Включить красный ночной фильтр</string>
+    <string name="prefs_other_title">Прочее</string>
+    <string name="prefs_other_switch_utc">Время в UTC</string>
+    <string name="prefs_other_switch_update">Автообновление данных</string>
+    <string name="prefs_other_switch_sweep">Анимация радара</string>
+    <string name="prefs_other_switch_sensors">Сенсоры для радара</string>
+    <string name="prefs_other_switch_night_mode">Красный ночной фильтр</string>
 
     <string name="prefs_highlight_title">Подсветка высоты</string>
     <string name="prefs_highlight_low">Низко &lt; %1$d°</string>

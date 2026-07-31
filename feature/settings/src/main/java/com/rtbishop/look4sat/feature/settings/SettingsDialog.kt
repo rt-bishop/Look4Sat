@@ -17,12 +17,9 @@
  */
 package com.rtbishop.look4sat.feature.settings
 
-import android.bluetooth.BluetoothManager
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,18 +27,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,18 +64,27 @@ fun PositionDialog(lat: Double, lon: Double, dismiss: () -> Unit, save: (Double,
     val titleText = stringResource(id = R.string.prefs_station_title)
     val onAccept = { saveValues(latValue.value, lonValue.value, save).also { dismiss() } }
     SharedDialog(title = titleText, onCancel = dismiss, onAccept = onAccept) {
-        OutlinedTextField(
-            value = latValue.value,
-            onValueChange = { latValue.value = it },
-            label = { Text(text = stringResource(id = R.string.prefs_station_lat_text)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalSpacing.current.large),
-        )
-        OutlinedTextField(
-            value = lonValue.value,
-            onValueChange = { lonValue.value = it },
-            label = { Text(text = stringResource(id = R.string.prefs_station_lon_text)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalSpacing.current.large),
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LocalSpacing.current.large)
+        ) {
+            OutlinedTextField(
+                value = latValue.value,
+                onValueChange = { latValue.value = it },
+                label = { Text(text = stringResource(id = R.string.prefs_station_lat_text)) },
+                singleLine = true,
+                modifier = Modifier.weight(1f),
+            )
+            OutlinedTextField(
+                value = lonValue.value,
+                onValueChange = { lonValue.value = it },
+                label = { Text(text = stringResource(id = R.string.prefs_station_lon_text)) },
+                singleLine = true,
+                modifier = Modifier.weight(1f),
+            )
+        }
         Spacer(modifier = Modifier.height(0.dp))
     }
 }
@@ -100,12 +107,18 @@ private fun LocatorDialogPreview() {
 fun LocatorDialog(qthLocator: String, dismiss: () -> Unit, save: (String) -> Unit) {
     val locator = rememberSaveable { mutableStateOf(qthLocator) }
     val onAccept = { save(locator.value).also { dismiss() } }
-    SharedDialog(title = stringResource(R.string.prefs_locator_title), onCancel = dismiss, onAccept = onAccept) {
+    SharedDialog(
+        title = stringResource(R.string.prefs_locator_title),
+        onCancel = dismiss,
+        onAccept = onAccept
+    ) {
         OutlinedTextField(
             value = locator.value,
             onValueChange = { locator.value = it },
             label = { Text(text = stringResource(id = R.string.prefs_locator_text)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = LocalSpacing.current.large),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = LocalSpacing.current.large),
         )
         Spacer(modifier = Modifier.height(0.dp))
     }
@@ -147,7 +160,12 @@ fun DataSourcesDialog(
     val urlTle = rememberSaveable { mutableStateOf(tleUrl) }
     val urlTransceivers = rememberSaveable { mutableStateOf(transceiversUrl) }
     val onAccept = {
-        onSave(isEnabledCustomTle.value, isEnabledCustomTransceivers.value, urlTle.value, urlTransceivers.value)
+        onSave(
+            isEnabledCustomTle.value,
+            isEnabledCustomTransceivers.value,
+            urlTle.value,
+            urlTransceivers.value
+        )
         onDismiss()
     }
     val onCancel = { onDismiss() }
@@ -377,11 +395,15 @@ fun BluetoothOutputDialog(
 ) {
     val padding = LocalSpacing.current.large
     val rotatorState = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorState) }
-    val rotatorAddress = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorAddress) }
+    val rotatorAddress =
+        rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorAddress) }
     val rotatorFormat = rememberSaveable { mutableStateOf(initialSettings.bluetoothRotatorFormat) }
-    val frequencyState = rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyState) }
-    val frequencyAddress = rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyAddress) }
-    val frequencyFormat = rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyFormat) }
+    val frequencyState =
+        rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyState) }
+    val frequencyAddress =
+        rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyAddress) }
+    val frequencyFormat =
+        rememberSaveable { mutableStateOf(initialSettings.bluetoothFrequencyFormat) }
     val onAccept = {
         onSave(
             rotatorState.value, rotatorAddress.value, rotatorFormat.value,
@@ -470,23 +492,22 @@ private fun OutputChannelSection(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RadioControlDialog(
     initialSettings: RadioControlSettings,
+    pairedBluetoothDevices: List<Pair<String, String>>,
     onDismiss: () -> Unit,
     onSave: (RadioControlSettings) -> Unit
 ) {
-    val context    = androidx.compose.ui.platform.LocalContext.current
-    val padding    = LocalSpacing.current.large
-    val enabled    = rememberSaveable { mutableStateOf(initialSettings.enabled) }
+    val padding = LocalSpacing.current.large
+    val enabled = rememberSaveable { mutableStateOf(initialSettings.enabled) }
     val radioModel = rememberSaveable { mutableStateOf(initialSettings.radioModel) }
-    val splitMode  = rememberSaveable { mutableStateOf(initialSettings.splitMode) }
-    val txAddress  = rememberSaveable { mutableStateOf(initialSettings.txRadioAddress) }
-    val rxAddress  = rememberSaveable { mutableStateOf(initialSettings.rxRadioAddress) }
-    val txName     = rememberSaveable { mutableStateOf(initialSettings.txRadioName) }
-    val rxName     = rememberSaveable { mutableStateOf(initialSettings.rxRadioName) }
-    val baudRate   = rememberSaveable { mutableIntStateOf(initialSettings.baudRate) }
+    val splitMode = rememberSaveable { mutableStateOf(initialSettings.splitMode) }
+    val txAddress = rememberSaveable { mutableStateOf(initialSettings.txRadioAddress) }
+    val rxAddress = rememberSaveable { mutableStateOf(initialSettings.rxRadioAddress) }
+    val txName = rememberSaveable { mutableStateOf(initialSettings.txRadioName) }
+    val rxName = rememberSaveable { mutableStateOf(initialSettings.rxRadioName) }
+    val baudRate = rememberSaveable { mutableIntStateOf(initialSettings.baudRate) }
     val selectingFor = rememberSaveable { mutableStateOf("") } // "tx", "rx", or ""
 
     val isIcom = radioModel.value == RadioControlSettings.MODEL_ICOM_IC705
@@ -496,157 +517,157 @@ fun RadioControlDialog(
     if (!isIcom && splitMode.value) splitMode.value = false
 
     val baudRates = if (isIcom) RadioControlSettings.BAUD_RATES_ICOM
-                   else         RadioControlSettings.BAUD_RATES_YAESU
+    else RadioControlSettings.BAUD_RATES_YAESU
 
     // If current baud rate is not in the new list, default to the first available
     if (baudRate.intValue !in baudRates) baudRate.intValue = baudRates.first()
 
-    val pairedDevices: List<Pair<String, String>> = remember {
-        buildList {
-            try {
-                val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-                manager.adapter?.bondedDevices?.forEach {
-                    add(Pair(it.name ?: "Unknown", it.address ?: ""))
-                }
-            } catch (_: SecurityException) { }
-        }
-    }
-
     val onAccept = {
         onSave(
             RadioControlSettings(
-                enabled        = enabled.value,
-                radioModel     = radioModel.value,
+                enabled = enabled.value,
+                radioModel = radioModel.value,
                 txRadioAddress = txAddress.value,
                 rxRadioAddress = if (isSingleRadio) "" else rxAddress.value,
-                txRadioName    = txName.value,
-                rxRadioName    = if (isSingleRadio) "" else rxName.value,
-                baudRate       = baudRate.intValue,
-                splitMode      = splitMode.value
+                txRadioName = txName.value,
+                rxRadioName = if (isSingleRadio) "" else rxName.value,
+                baudRate = baudRate.intValue,
+                splitMode = splitMode.value
             )
         )
         onDismiss()
     }
 
     SharedDialog(
-        title    = stringResource(R.string.rc_settings_title),
+        title = stringResource(R.string.rc_settings_title),
         onCancel = onDismiss,
         onAccept = onAccept
     ) {
         Column(modifier = Modifier.padding(horizontal = padding)) {
 
-            // Enable switch
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically,
-                modifier              = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.rc_enable_switch))
                 Switch(checked = enabled.value, onCheckedChange = { enabled.value = it })
             }
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Radio model — FlowRow so chips wrap on small screens
             Text(
-                text       = stringResource(R.string.rc_radio_model),
+                text = stringResource(R.string.rc_radio_model),
                 fontWeight = FontWeight.Medium,
-                color      = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary
             )
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 RadioControlSettings.SUPPORTED_RADIOS.forEach { model ->
                     FilterChip(
                         selected = radioModel.value == model,
-                        onClick  = { radioModel.value = model },
-                        label    = { Text(model, fontSize = 12.sp) },
-                        enabled  = enabled.value
+                        onClick = { radioModel.value = model },
+                        label = {
+                            Text(
+                                text = compactRadioModelLabel(model),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        enabled = enabled.value,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
             Spacer(modifier = Modifier.height(6.dp))
 
-            // IC-705 split-mode toggle (only shown for IC-705)
-            if (isIcom) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment     = Alignment.CenterVertically,
-                    modifier              = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("Split mode (single radio)", fontWeight = FontWeight.Medium)
-                        Text(
-                            text     = "Use VFO-A/B split on one IC-705 instead of two radios",
-                            fontSize = 12.sp,
-                            color    = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked         = splitMode.value,
-                        onCheckedChange = { splitMode.value = it },
-                        enabled         = enabled.value
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
+            val isSplitModeAvailable = enabled.value && isIcom
+            val splitModeLabelColor = if (isSplitModeAvailable) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.56f)
             }
-
-            // TX Radio (always shown; in split mode this is the single IC-705)
-            val txLabel = if (isSingleRadio) "Radio (IC-705)" else "TX Radio (Uplink)"
-            Text(txLabel, fontWeight = FontWeight.Medium)
-            if (txAddress.value.isNotBlank()) {
-                Text("${txName.value} — ${txAddress.value}", fontSize = 13.sp)
-            }
-            CardButton(
-                onClick  = { selectingFor.value = "tx" },
-                text     = if (isSingleRadio) "Select Device" else "Select TX Device",
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+                Text(
+                    text = "Split mode (IC-705 only)",
+                    fontWeight = FontWeight.Medium,
+                    color = splitModeLabelColor
+                )
+                Switch(
+                    checked = splitMode.value,
+                    onCheckedChange = { splitMode.value = it },
+                    enabled = isSplitModeAvailable
+                )
+            }
             Spacer(modifier = Modifier.height(6.dp))
 
-            // RX Radio (hidden in split mode — the same radio handles both)
-            if (!isSingleRadio) {
-                Text("RX Radio (Downlink)", fontWeight = FontWeight.Medium)
-                if (rxAddress.value.isNotBlank()) {
-                    Text("${rxName.value} — ${rxAddress.value}", fontSize = 13.sp)
-                }
+            Text("Radio devices", fontWeight = FontWeight.Medium)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 CardButton(
-                    onClick  = { selectingFor.value = "rx" },
-                    text     = "Select RX Device",
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = { selectingFor.value = "tx" },
+                    text = if (isSingleRadio) "Select Radio" else "Select TX",
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                CardButton(
+                    onClick = { if (!isSingleRadio) selectingFor.value = "rx" },
+                    text = if (isSingleRadio) "RX = TX" else "Select RX",
+                    modifier = Modifier.weight(1f)
+                )
             }
+            if (txAddress.value.isNotBlank()) {
+                Text("TX: ${txName.value} — ${txAddress.value}", fontSize = 13.sp)
+            }
+            if (isSingleRadio && txAddress.value.isNotBlank()) {
+                Text("RX: same as TX", fontSize = 13.sp)
+            } else if (rxAddress.value.isNotBlank()) {
+                Text("RX: ${rxName.value} — ${rxAddress.value}", fontSize = 13.sp)
+            }
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // Paired device picker (inline, shown while selecting)
             if (selectingFor.value.isNotBlank()) {
                 Text(
-                    text       = "Paired Bluetooth Devices:",
+                    text = "Paired Bluetooth Devices:",
                     fontWeight = FontWeight.Medium,
-                    color      = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                if (pairedDevices.isEmpty()) {
+                if (pairedBluetoothDevices.isEmpty()) {
                     Text(
                         "No paired devices found. Pair your BT adapter in Android Bluetooth settings first.",
                         fontSize = 13.sp
                     )
                 } else {
-                    pairedDevices.forEach { (name, address) ->
+                    pairedBluetoothDevices.forEach { (name, address) ->
                         androidx.compose.material3.Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
                                     if (selectingFor.value == "tx") {
                                         txAddress.value = address
-                                        txName.value    = name
+                                        txName.value = name
+                                        if (isSingleRadio) {
+                                            rxAddress.value = address
+                                            rxName.value = name
+                                        }
                                     } else {
                                         rxAddress.value = address
-                                        rxName.value    = name
+                                        rxName.value = name
                                     }
                                     selectingFor.value = ""
                                 }
                                 .padding(vertical = 4.dp)
                         ) {
                             Row(
-                                modifier              = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(name, modifier = Modifier.weight(1f))
@@ -658,19 +679,47 @@ fun RadioControlDialog(
                 Spacer(modifier = Modifier.height(6.dp))
             }
 
-            // Baud rate — FlowRow so all chips fit on narrow screens
             Text("Baud Rate:", fontWeight = FontWeight.Medium)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                maxItemsInEachRow = 6,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 baudRates.forEach { rate ->
                     FilterChip(
                         selected = rate == baudRate.intValue,
-                        onClick  = { baudRate.intValue = rate },
-                        label    = { Text(rate.toString(), fontSize = 12.sp) },
-                        enabled  = enabled.value
+                        onClick = { baudRate.intValue = rate },
+                        label = {
+                            Text(
+                                text = baudLabel(rate),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        enabled = enabled.value,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
             Spacer(modifier = Modifier.height(6.dp))
         }
     }
+}
+
+private fun compactRadioModelLabel(model: String): String = when (model) {
+    RadioControlSettings.MODEL_YAESU_FT817 -> "FT-817/818"
+    RadioControlSettings.MODEL_YAESU_FT857 -> "FT-857/897"
+    RadioControlSettings.MODEL_ICOM_IC705 -> "IC-705"
+    else -> model
+}
+
+private fun baudLabel(rate: Int): String = when (rate) {
+    4800 -> "4k"
+    9600 -> "9k"
+    19200 -> "19k"
+    38400 -> "38k"
+    57600 -> "57k"
+    115200 -> "115k"
+    else -> rate.toString()
 }

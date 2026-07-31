@@ -108,6 +108,7 @@ private fun SatellitesScreen(
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = padding)
             )
+            Spacer(modifier = Modifier.height(0.dp))
         }
     }
 

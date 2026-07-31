@@ -190,6 +190,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
     if (dialogs.radioControl) {
         RadioControlDialog(
             initialSettings = uiState.radioControlSettings,
+            pairedBluetoothDevices = uiState.pairedBluetoothDevices,
             onDismiss = { dialogs.radioControl = false },
             onSave = { onAction(SettingsAction.UpdateRadioControl(it)) }
         )

@@ -41,7 +41,8 @@ data class SettingsState(
     val otherSettings: OtherSettings,
     val rcSettings: RCSettings,
     val radioControlSettings: RadioControlSettings,
-    val dataSourcesSettings: DataSourcesSettings
+    val dataSourcesSettings: DataSourcesSettings,
+    val pairedBluetoothDevices: List<Pair<String, String>> = emptyList()
 )
 
 sealed interface SettingsAction {

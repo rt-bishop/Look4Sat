@@ -14,7 +14,7 @@
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">වර්ගය: %s</string>
-    <string name="sat_type_title">චන්ද්‍රිකා ආකාරය තෝරන්න</string>
+    <string name="sat_type_title">ආකාර තෝරන්න</string>
     <string name="sat_search_hint">Id - නම</string>
     <string name="sat_search_clear">පිරිසිදු ක°</string>
     <string name="sat_clear_all">සියල්ල පිරිසිදු ක°</string>
@@ -35,7 +35,7 @@
     <string name="pass_filter_aos_time">AOS කවුළුව</string>
     <string name="pass_filter_invert_time">AOS කවුළුව ප්‍රතිවිරුද්ධ කරන්න</string>
     <string name="pass_filter_deep_space">DeepSpace (කාලය &gt;225min)</string>
-    <string name="pass_modes_title">මූර්ජන ආකාරය තෝරන්න</string>
+    <string name="pass_modes_title">මූර්ජන තෝරන්න</string>
     <string name="pass_elevation">උත්තෝලනය: %.1f°</string>
     <string name="pass_altitude">උන්නතාශය: %d km</string>
     <string name="pass_empty_list_message">
@@ -96,11 +96,11 @@
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">QTH locator වලංගු නොවේ</string>
     <string name="prefs_loc_success">පිහිටීම යාවත්කාලීනය සාර්ථකයි</string>
-    <string name="prefs_station_title">පොළෙහි පිහිටීම් පසුතල</string>
-    <string name="prefs_station_lat_text">ඔබගේ පොළෙහි අක්‍ෂාංශය සකසන්න</string>
-    <string name="prefs_station_lon_text">ඔබගේ පොළෙහි දේශාංශය සකසන්න</string>
-    <string name="prefs_locator_title">QTH locator පසුතල</string>
-    <string name="prefs_locator_text"> ඔබගේ locator භාවිතා කර පොළහි පිහිටීම සකසන්න</string>
+    <string name="prefs_station_title">පොළ පිහිටීම</string>
+    <string name="prefs_station_lat_text">පොළ අක්‍ෂාංශය</string>
+    <string name="prefs_station_lon_text">පොළ දේශාංශය</string>
+    <string name="prefs_locator_title">QTH locator</string>
+    <string name="prefs_locator_text">locator මඟින් පොළ පිහිටීම සකසන්න</string>
 
     <string name="prefs_data_title">චන්ද්‍රිකා දත්ත</string>
     <string name="prefs_data_entries">චන්ද්‍රිකා: %s</string>
@@ -110,39 +110,52 @@
     <string name="prefs_data_clear">පිරිසිදු ක°</string>
     <string name="prefs_data_clear_success">දත්ත ඉවත් කිරීම සාර්ථකයි</string>
     <string name="prefs_data_update_success">යාවත්කාලීනය සම්පූර්ණ කිරීම සාර්ථකයි</string>
+    <string name="prefs_data_import_satellites_error">චන්ද්‍රිකා ආයාත නොවීය. වලංගු TLE/3LE (.txt) හෝ OMM (.csv) ගොනුවක් තෝරන්න.</string>
+    <string name="prefs_data_import_transceivers_error">සම්ප්‍රේෂක ආයාත නොවීය. වලංගු SatNOGS (.json) ගොනුවක් තෝරන්න.</string>
 
-    <string name="prefs_data_sources_title">Custom data sources</string>
-    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
+    <string name="prefs_data_sources_title">අභිරුචි මූලාශ්‍ර</string>
+    <string name="prefs_data_sources_tle_switch">TLE URL</string>
+    <string name="prefs_data_sources_transceivers_switch">Transceivers URL</string>
+    <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
 
-    <string name="prefs_data_output_title">Data output</string>
-    <string name="prefs_net_output">Network</string>
+    <string name="prefs_data_output_title">දත්ත ප්‍රතිදානය</string>
+    <string name="prefs_net_output">ජාලය</string>
     <string name="prefs_bt_output">Bluetooth</string>
+    <string name="prefs_cat_output">CAT</string>
+
+    <string name="nav_radiocontrol">රේඩියෝ පාලනය</string>
+    <string name="rc_settings_title">CAT පාලනය</string>
+    <string name="rc_radio_model">රේඩියෝ මාදිලිය</string>
+    <string name="rc_tx_device_hint">TX BT ලිපිනය</string>
+    <string name="rc_rx_device_hint">RX BT ලිපිනය</string>
+    <string name="rc_tx_name_hint">TX රේඩියෝ නම</string>
+    <string name="rc_rx_name_hint">RX රේඩියෝ නම</string>
+    <string name="rc_enable_switch">CAT සබල කරන්න</string>
 
     <string name="prefs_net_title">ජාල ප්‍රතිදානය</string>
-    <string name="prefs_net_rotator_switch">Enable rotation output</string>
+    <string name="prefs_net_rotator_switch">Rotation ප්‍රතිදානය සබල කරන්න</string>
     <string name="prefs_net_rotator_address_hint">IP:Port</string>
-    <string name="prefs_net_rotator_format_hint">දත්ත අකාරය</string>
-    <string name="prefs_net_frequency_switch">Enable frequency output</string>
+    <string name="prefs_net_rotator_format_hint">දත්ත ආකෘතිය</string>
+    <string name="prefs_net_frequency_switch">Frequency ප්‍රතිදානය සබල කරන්න</string>
     <string name="prefs_net_frequency_address_hint">IP:Port</string>
-    <string name="prefs_net_frequency_format_hint">දත්ත අකාරය</string>
+    <string name="prefs_net_frequency_format_hint">දත්ත ආකෘතිය</string>
 
-    <string name="prefs_bt_title">Bluetooth දත්ත ප්‍රතිදානය</string>
-    <string name="prefs_bt_rotator_switch">Enable rotation output</string>
-    <string name="prefs_bt_rotator_device_hint">උපාංග id</string>
-    <string name="prefs_bt_rotator_output_hint">දත්ත අකාරය</string>
-    <string name="prefs_bt_frequency_switch">Enable frequency output</string>
-    <string name="prefs_bt_frequency_device_hint">උපාංග id</string>
-    <string name="prefs_bt_frequency_output_hint">දත්ත අකාරය</string>
+    <string name="prefs_bt_title">Bluetooth ප්‍රතිදානය</string>
+    <string name="prefs_bt_rotator_switch">Rotation ප්‍රතිදානය සබල කරන්න</string>
+    <string name="prefs_bt_rotator_device_hint">උපාංග ID</string>
+    <string name="prefs_bt_rotator_output_hint">දත්ත ආකෘතිය</string>
+    <string name="prefs_bt_frequency_switch">Frequency ප්‍රතිදානය සබල කරන්න</string>
+    <string name="prefs_bt_frequency_device_hint">උපාංග ID</string>
+    <string name="prefs_bt_frequency_output_hint">දත්ත ආකෘතිය</string>
     <string name="prefs_bt_perm_error">Bluetooth අවසර පරික්‍ෂා ක°</string>
     <string name="prefs_net_perm_error">Network අවසර පරික්‍ෂා කරන්න</string>
 
-    <string name="prefs_other_title">වෙනත් සැකසුම්</string>
-    <string name="prefs_other_switch_utc">පසුකර වේලාවන් UTC මගින්</string>
-    <string name="prefs_other_switch_update">ස්වයං දත්ත යාවත්කාලීනය</string>
-    <string name="prefs_other_switch_sweep">radar sweep සජීවිකරණය සබල කරන්න</string>
-    <string name="prefs_other_switch_sensors">Radar දර්ශනය කරකැවීමට සංවේදක භාවිතා කරන්න </string>
-    <string name="prefs_other_switch_night_mode">රතු රාත්‍රී පෙරහන සබල කරන්න</string>
+    <string name="prefs_other_title">වෙනත්</string>
+    <string name="prefs_other_switch_utc">UTC වේලාව පෙන්වන්න</string>
+    <string name="prefs_other_switch_update">දත්ත ස්වයං යාවත්කාලීන</string>
+    <string name="prefs_other_switch_sweep">Radar sweep සජීවිකරණය</string>
+    <string name="prefs_other_switch_sensors">Radar සඳහා සංවේදක භාවිතා කරන්න</string>
+    <string name="prefs_other_switch_night_mode">රතු රාත්‍රී පෙරහන</string>
 
     <string name="prefs_highlight_title">උස් උද්දීපනය</string>
     <string name="prefs_highlight_low">අඩු &lt; %1$d°</string>

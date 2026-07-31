@@ -369,10 +369,11 @@ private fun ExpandedRadioControl(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    maxItemsInEachRow = 5,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    val chipModifier = Modifier.width(64.dp)
+                    val chipModifier = Modifier.weight(1f)
                     FilterChip(
                         selected = radioControl.ctcssTone == null,
                         onClick = { onAction(RadarAction.SetCtcssTone(null)) },

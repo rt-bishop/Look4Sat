@@ -14,7 +14,7 @@
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">Tipo: %s</string>
-    <string name="sat_type_title">Seleccionar tipo de satélite</string>
+    <string name="sat_type_title">Seleccionar tipos</string>
     <string name="sat_search_hint">Id - Nombre</string>
     <string name="sat_search_clear">Vaciar</string>
     <string name="sat_clear_all">Vaciar todo</string>
@@ -35,7 +35,7 @@
     <string name="pass_filter_aos_time">Ventana AOS</string>
     <string name="pass_filter_invert_time">Invertir ventana AOS</string>
     <string name="pass_filter_deep_space">DeepSpace (período &gt;225min)</string>
-    <string name="pass_modes_title">Tipo de modulación</string>
+    <string name="pass_modes_title">Seleccionar modos</string>
     <string name="pass_elevation">Elevación: %.1f°</string>
     <string name="pass_altitude">Altitud: %.0f km</string>
     <string name="pass_empty_list_message">
@@ -96,11 +96,11 @@
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Ubicación QTH no válida</string>
     <string name="prefs_loc_success">Ubicación actualizada con éxito</string>
-    <string name="prefs_station_title">Ajustar ubicaicón de la estación</string>
-    <string name="prefs_station_lat_text">Latitud de tu estación terrestre</string>
-    <string name="prefs_station_lon_text">Longitud de tu estación terrestre</string>
-    <string name="prefs_locator_title">Ajustes ubicación QTH</string>
-    <string name="prefs_locator_text">Ajustar posición de la estación con tu ubicación</string>
+    <string name="prefs_station_title">Ubicación de la estación</string>
+    <string name="prefs_station_lat_text">Latitud de estación</string>
+    <string name="prefs_station_lon_text">Longitud de estación</string>
+    <string name="prefs_locator_title">Localizador QTH</string>
+    <string name="prefs_locator_text">Posición por localizador</string>
 
     <string name="prefs_data_title">Datos satelitales</string>
     <string name="prefs_data_entries">Satélites: %s</string>
@@ -110,39 +110,52 @@
     <string name="prefs_data_clear">Vaciar</string>
     <string name="prefs_data_clear_success">Datos eliminados con éxito</string>
     <string name="prefs_data_update_success">Actualización completada con éxito</string>
+    <string name="prefs_data_import_satellites_error">No se importaron satélites. Usa un TLE/3LE (.txt) u OMM (.csv) válido.</string>
+    <string name="prefs_data_import_transceivers_error">No se importaron transceptores. Usa un SatNOGS (.json) válido.</string>
 
-    <string name="prefs_data_sources_title">Custom data sources</string>
-    <string name="prefs_data_sources_tle_switch">Custom TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">Custom transceivers URL</string>
+    <string name="prefs_data_sources_title">Fuentes personalizadas</string>
+    <string name="prefs_data_sources_tle_switch">URL TLE</string>
+    <string name="prefs_data_sources_transceivers_switch">URL transceptores</string>
+    <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
 
-    <string name="prefs_data_output_title">Data output</string>
-    <string name="prefs_net_output">Network</string>
+    <string name="prefs_data_output_title">Salida de datos</string>
+    <string name="prefs_net_output">Red</string>
     <string name="prefs_bt_output">Bluetooth</string>
+    <string name="prefs_cat_output">CAT</string>
 
-    <string name="prefs_net_title">Salida de datos de red</string>
-    <string name="prefs_net_rotator_switch">Enable rotation output</string>
+    <string name="nav_radiocontrol">Control de radio</string>
+    <string name="rc_settings_title">Control CAT</string>
+    <string name="rc_radio_model">Modelo de radio</string>
+    <string name="rc_tx_device_hint">Dirección BT TX</string>
+    <string name="rc_rx_device_hint">Dirección BT RX</string>
+    <string name="rc_tx_name_hint">Nombre radio TX</string>
+    <string name="rc_rx_name_hint">Nombre radio RX</string>
+    <string name="rc_enable_switch">Activar CAT</string>
+
+    <string name="prefs_net_title">Salida de red</string>
+    <string name="prefs_net_rotator_switch">Activar salida de rotación</string>
     <string name="prefs_net_rotator_address_hint">IP:Puerto</string>
     <string name="prefs_net_rotator_format_hint">Formato de datos</string>
-    <string name="prefs_net_frequency_switch">Enable frequency output</string>
+    <string name="prefs_net_frequency_switch">Activar salida de frecuencia</string>
     <string name="prefs_net_frequency_address_hint">IP:Puerto</string>
     <string name="prefs_net_frequency_format_hint">Formato de datos</string>
 
-    <string name="prefs_bt_title">Salida por Bluetooth</string>
-    <string name="prefs_bt_rotator_switch">Enable rotation output</string>
-    <string name="prefs_bt_rotator_device_hint">Id dispositivo</string>
-    <string name="prefs_bt_rotator_output_hint">Formato de datos</string>
-    <string name="prefs_bt_frequency_switch">Enable frequency output</string>
-    <string name="prefs_bt_frequency_device_hint">Id dispositivo</string>
-    <string name="prefs_bt_frequency_output_hint">Formato de datos</string>
+    <string name="prefs_bt_title">Salida Bluetooth</string>
+    <string name="prefs_bt_rotator_switch">Activar salida de rotación</string>
+    <string name="prefs_bt_rotator_device_hint">ID dispositivo</string>
+    <string name="prefs_bt_rotator_output_hint">Formato</string>
+    <string name="prefs_bt_frequency_switch">Activar salida de frecuencia</string>
+    <string name="prefs_bt_frequency_device_hint">ID dispositivo</string>
+    <string name="prefs_bt_frequency_output_hint">Formato</string>
     <string name="prefs_bt_perm_error">Revisa los permisos de Bluetooth</string>
     <string name="prefs_net_perm_error">Revisa los permisos de red</string>
 
-    <string name="prefs_other_title">Otros ajustes</string>
-    <string name="prefs_other_switch_utc">Mostrar tiempos de pase en UTC</string>
-    <string name="prefs_other_switch_update">Habilitar auto actualización de datos</string>
-    <string name="prefs_other_switch_sweep">Habilitar animaciones radar</string>
-    <string name="prefs_other_switch_sensors">Usar sensores para rotar vista de radar</string>
-    <string name="prefs_other_switch_night_mode">Activar filtro nocturno rojo</string>
+    <string name="prefs_other_title">Otros</string>
+    <string name="prefs_other_switch_utc">Mostrar hora UTC</string>
+    <string name="prefs_other_switch_update">Actualización automática</string>
+    <string name="prefs_other_switch_sweep">Animación de radar</string>
+    <string name="prefs_other_switch_sensors">Sensores para radar</string>
+    <string name="prefs_other_switch_night_mode">Filtro nocturno rojo</string>
 
     <string name="prefs_highlight_title">Resaltado de elevación</string>
     <string name="prefs_highlight_low">Baja &lt; %1$d°</string>

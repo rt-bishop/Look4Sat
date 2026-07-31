@@ -62,7 +62,7 @@ class SelectionRepo(
     override fun getCurrentTypes() = currentTypes.value
 
     override fun getTypesList() = Sources.satelliteDataUrls.keys.sorted().toMutableList().apply {
-        removeAt(0)
+        remove("All")
     }
 
     override suspend fun getEntriesFlow() = withContext(dispatcher) {

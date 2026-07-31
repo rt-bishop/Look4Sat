@@ -15,7 +15,7 @@
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">Uydu türü: %s</string>
-    <string name="sat_type_title">Uydu türü seçin</string>
+    <string name="sat_type_title">Türleri seçin</string>
     <string name="sat_search_hint">Id - Ad</string>
     <string name="sat_search_clear">Temizle</string>
     <string name="sat_clear_all">Tümünü temizle</string>
@@ -36,7 +36,7 @@
     <string name="pass_filter_invert_time">AOS aralığını tersine çevir</string>
     <string name="pass_filter_deep_space">DeepSpace (periyot &gt;225dk)</string>
     <string name="pass_time_placeholder" translatable="false"> -- : -- : -- </string>
-    <string name="pass_modes_title">Modulasyon türü seçin</string>
+    <string name="pass_modes_title">Modları seçin</string>
     <string name="pass_satId" translatable="false">%05d</string>
     <string name="pass_elevation">Yükseklik açısı: %.1f°</string>
     <string name="pass_deep_space" translatable="false">DeepSpace</string>
@@ -127,11 +127,11 @@
     <string name="prefs_loc_qth_title">QTH</string>
     <string name="prefs_loc_qth_error">Geçersiz QTH konumlandırıcısı</string>
     <string name="prefs_loc_success">Konum başarıyla güncellendi</string>
-    <string name="prefs_station_title">İstasyon konumu ayarları</string>
-    <string name="prefs_station_lat_text">Yer istasyonunuzun enlemini girin</string>
-    <string name="prefs_station_lon_text">Yer istasyonunuzun boylamını girin</string>
-    <string name="prefs_locator_title">QTH konumlandırıcı ayarları</string>
-    <string name="prefs_locator_text">İstasyon konumunu konumlandırıcı ile ayarlayın</string>
+    <string name="prefs_station_title">İstasyon konumu</string>
+    <string name="prefs_station_lat_text">İstasyon enlemi</string>
+    <string name="prefs_station_lon_text">İstasyon boylamı</string>
+    <string name="prefs_locator_title">QTH konumlandırıcı</string>
+    <string name="prefs_locator_text">Konumu lokatörle ayarla</string>
 
     <string name="prefs_data_title">Uydu verisi</string>
     <string name="prefs_data_entries">Uydular: %s</string>
@@ -141,28 +141,30 @@
     <string name="prefs_data_clear">Temizle</string>
     <string name="prefs_data_clear_success">Veriler başarıyla temizlendi</string>
     <string name="prefs_data_update_success">Güncelleme başarıyla tamamlandı</string>
+    <string name="prefs_data_import_satellites_error">Uydu içe aktarılmadı. Geçerli bir TLE/3LE (.txt) veya OMM (.csv) dosyası seçin.</string>
+    <string name="prefs_data_import_transceivers_error">Transceiver içe aktarılmadı. Geçerli bir SatNOGS (.json) dosyası seçin.</string>
 
-    <string name="prefs_data_sources_title">Özel veri kaynakları</string>
-    <string name="prefs_data_sources_tle_switch">Özel TLE URL</string>
-    <string name="prefs_data_sources_transceivers_switch">Özel transceiver URL</string>
+    <string name="prefs_data_sources_title">Özel kaynaklar</string>
+    <string name="prefs_data_sources_tle_switch">TLE URL</string>
+    <string name="prefs_data_sources_transceivers_switch">Transceiver URL</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
 
-    <string name="prefs_data_output_title">Veri aktarımı</string>
+    <string name="prefs_data_output_title">Veri çıkışı</string>
     <string name="prefs_net_output">Ağ</string>
     <string name="prefs_bt_output">Bluetooth</string>
     <string name="prefs_cat_output">CAT</string>
 
     <!-- Radio Control -->
     <string name="nav_radiocontrol">Radyo Kontrolü</string>
-    <string name="rc_settings_title">CAT Radyo Kontrolü</string>
+    <string name="rc_settings_title">CAT kontrolü</string>
     <string name="rc_radio_model">Radyo Modeli</string>
-    <string name="rc_tx_device_hint">TX Radyo BT Adresi</string>
-    <string name="rc_rx_device_hint">RX Radyo BT Adresi</string>
+    <string name="rc_tx_device_hint">TX BT adresi</string>
+    <string name="rc_rx_device_hint">RX BT adresi</string>
     <string name="rc_tx_name_hint">TX Radyo Adı</string>
     <string name="rc_rx_name_hint">RX Radyo Adı</string>
-    <string name="rc_enable_switch">CAT Kontrolünü Etkinleştir</string>
+    <string name="rc_enable_switch">CAT\'i etkinleştir</string>
 
-    <string name="prefs_net_title">Ağ veri çıkışı</string>
+    <string name="prefs_net_title">Ağ çıkışı</string>
     <string name="prefs_net_rotator_switch">Döndürme çıkışını etkinleştir</string>
     <string name="prefs_net_rotator_address_hint">IP:Port</string>
     <string name="prefs_net_rotator_format_hint">Biçim</string>
@@ -170,22 +172,22 @@
     <string name="prefs_net_frequency_address_hint">IP:Port</string>
     <string name="prefs_net_frequency_format_hint">Biçim</string>
 
-    <string name="prefs_bt_title">Bluetooth veri çıkışı</string>
+    <string name="prefs_bt_title">Bluetooth çıkışı</string>
     <string name="prefs_bt_rotator_switch">Döndürme çıkışını etkinleştir</string>
     <string name="prefs_bt_rotator_device_hint">Cihaz kimliği</string>
-    <string name="prefs_bt_rotator_output_hint">Veri biçimi</string>
+    <string name="prefs_bt_rotator_output_hint">Biçim</string>
     <string name="prefs_bt_frequency_switch">Frekans çıkışını etkinleştir</string>
     <string name="prefs_bt_frequency_device_hint">Cihaz kimliği</string>
-    <string name="prefs_bt_frequency_output_hint">Veri biçimi</string>
+    <string name="prefs_bt_frequency_output_hint">Biçim</string>
     <string name="prefs_bt_perm_error">Bluetooth izninizi kontrol edin</string>
     <string name="prefs_net_perm_error">Ağ izninizi kontrol edin</string>
 
-    <string name="prefs_other_title">Diğer ayarlar</string>
-    <string name="prefs_other_switch_utc">Geçiş saatini UTC olarak göster</string>
-    <string name="prefs_other_switch_update">Otomatik veri güncellemeyi etkinleştir</string>
-    <string name="prefs_other_switch_sweep">Radar taramasını etkinleştir</string>
-    <string name="prefs_other_switch_sensors">Radar görünümünü döndürmek için sensörleri kullan</string>
-    <string name="prefs_other_switch_night_mode">Kırmızı gece filtresini etkinleştir</string>
+    <string name="prefs_other_title">Diğer</string>
+    <string name="prefs_other_switch_utc">UTC saatini göster</string>
+    <string name="prefs_other_switch_update">Veriyi otomatik güncelle</string>
+    <string name="prefs_other_switch_sweep">Radar tarama animasyonu</string>
+    <string name="prefs_other_switch_sensors">Radar için sensör kullan</string>
+    <string name="prefs_other_switch_night_mode">Kırmızı gece filtresi</string>
 
     <string name="prefs_highlight_title">Elevasyon vurgusu</string>
     <string name="prefs_highlight_low">Düşük &lt; %1$d°</string>

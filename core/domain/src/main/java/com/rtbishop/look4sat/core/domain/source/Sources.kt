@@ -46,6 +46,7 @@ object Sources {
         "Classified" to "https://www.mmccants.org/tles/classfd.zip",
         "McCants" to "https://www.mmccants.org/tles/inttles.zip",
         "R4UAB" to "https://r4uab.ru/satonline.txt",
+        "ARISS" to "https://live.ariss.org/iss.txt",
         "Other" to "" // key for sats filter
     )
     val transceiversDataUrls = mapOf(

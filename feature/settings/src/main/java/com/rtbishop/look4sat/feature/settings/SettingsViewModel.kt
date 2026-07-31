@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
+    private val container: IMainContainer,
     private val databaseRepo: IDatabaseRepo,
     private val settingsRepo: ISettingsRepo,
     private val showToast: IShowToast
@@ -47,7 +48,8 @@ class SettingsViewModel(
             otherSettings = settingsRepo.otherSettings.value,
             rcSettings = settingsRepo.rcSettings.value,
             radioControlSettings = settingsRepo.radioControlSettings.value,
-            dataSourcesSettings = settingsRepo.dataSourcesSettings.value
+            dataSourcesSettings = settingsRepo.dataSourcesSettings.value,
+            pairedBluetoothDevices = container.providePairedBluetoothDevices()
         )
     )
 
@@ -204,6 +206,7 @@ class SettingsViewModel(
         fun factory(container: IMainContainer) = viewModelFactory {
             initializer {
                 SettingsViewModel(
+                    container = container,
                     databaseRepo = container.databaseRepo,
                     settingsRepo = container.settingsRepo,
                     showToast = container.provideShowToast()
