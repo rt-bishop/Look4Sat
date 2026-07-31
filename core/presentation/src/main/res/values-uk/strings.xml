@@ -13,12 +13,16 @@
     <string name="nav_prefs">Налаштування</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">Тип: %s</string>
-    <string name="sat_type_title">Виберіть типи</string>
+    <string name="sat_type_hint">Режими: %s</string>
+    <string name="sat_type_title">Виберіть режими</string>
     <string name="sat_search_hint">Id - Назва</string>
     <string name="sat_search_clear">Очистити</string>
     <string name="sat_clear_all">Очистити всі</string>
     <string name="sat_select_all">Вибрати всі</string>
+    <string name="sat_group_selected">Обрані</string>
+    <string name="sat_group_available">Доступні</string>
+    <string name="sat_group_selected_count">Обрані (%1$d)</string>
+    <string name="sat_group_available_count">Доступні (%1$d)</string>
     <string name="sat_empty_list_message">
         Переконайтеся, що ваш пошуковий запит правильний, а база даних оновлена</string>
     <string name="sat_warning_title">Увага\!</string>
@@ -26,7 +30,7 @@
         У цьому додатку перелічено понад 9000 супутників.
         Немає сенсу відстежувати їх усі одночасно.
         \n\nЗавжди намагайтеся звузити список лише до тих,
-        які вас цікавлять, за допомогою пошуку та селектора типів.</string>
+        які вас цікавлять, за допомогою пошуку та вибору режимів.</string>
 
     <!-- Passes screen -->
     <string name="pass_filter_title">Фільтр прольотів</string>

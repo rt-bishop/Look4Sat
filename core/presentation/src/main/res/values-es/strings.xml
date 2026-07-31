@@ -13,12 +13,16 @@
     <string name="nav_prefs">Ajustes</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">Tipo: %s</string>
-    <string name="sat_type_title">Seleccionar tipos</string>
+    <string name="sat_type_hint">Modos: %s</string>
+    <string name="sat_type_title">Seleccionar modos</string>
     <string name="sat_search_hint">Id - Nombre</string>
     <string name="sat_search_clear">Vaciar</string>
     <string name="sat_clear_all">Vaciar todo</string>
     <string name="sat_select_all">Seleccionar todo</string>
+    <string name="sat_group_selected">Seleccionados</string>
+    <string name="sat_group_available">Disponibles</string>
+    <string name="sat_group_selected_count">Seleccionados (%1$d)</string>
+    <string name="sat_group_available_count">Disponibles (%1$d)</string>
     <string name="sat_empty_list_message">
         Asegúrese de que su consulta de búsqueda sea correcta y que la base de datos esté actualizada</string>
     <string name="sat_warning_title">Alarma\!</string>
@@ -26,7 +30,7 @@
         Esta aplicación incluye más de 9000 satélites.
         No tiene sentido rastrearlos todos a la vez.
         \n\nIntenta siempre limitar la lista a los que te
-        interesen mediante la búsqueda y el selector de tipos.</string>
+        interesen mediante la búsqueda y el selector de modos.</string>
 
     <!-- Passes screen -->
     <string name="pass_filter_title">Filtrar pases</string>

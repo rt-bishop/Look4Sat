@@ -35,13 +35,13 @@ class SatellitesViewModel(
     private val settingsRepo: ISettingsRepo
 ) : ViewModel() {
 
-    private val defaultTypes = selectionRepo.getCurrentTypes()
+    private val defaultModes = selectionRepo.getCurrentModes()
     private val _uiState = MutableStateFlow(
         SatellitesState(
             isLoading = true,
             shouldSeeWarning = settingsRepo.otherSettings.value.shouldSeeWarning,
-            currentTypes = defaultTypes,
-            typesList = selectionRepo.getTypesList()
+            currentModes = defaultModes,
+            modesList = selectionRepo.getModesList()
         )
     )
     val uiState: StateFlow<SatellitesState> = _uiState
@@ -49,7 +49,7 @@ class SatellitesViewModel(
     init {
         viewModelScope.launch {
             selectionRepo.setQuery(String())
-            selectionRepo.setTypes(defaultTypes)
+            selectionRepo.setModes(defaultModes)
             selectionRepo.getEntriesFlow().collectLatest { items ->
                 _uiState.update { it.copy(isLoading = false, itemsList = items) }
             }
@@ -68,8 +68,8 @@ class SatellitesViewModel(
             is SatellitesAction.SearchFor -> searchFor(action.query)
             SatellitesAction.SelectAll -> selectAll(true)
             is SatellitesAction.SelectSingle -> selectSingle(action.id, action.isTicked)
-            is SatellitesAction.SelectTypes -> selectTypes(action.types)
-            SatellitesAction.ToggleTypesDialog -> toggleTypesDialog()
+            is SatellitesAction.SelectModes -> selectModes(action.modes)
+            SatellitesAction.ToggleModesDialog -> toggleModesDialog()
             SatellitesAction.UnselectAll -> selectAll(false)
         }
     }
@@ -86,12 +86,12 @@ class SatellitesViewModel(
         selectionRepo.setSelection(listOf(id), isTicked.not())
     }
 
-    private fun selectTypes(types: List<String>) = viewModelScope.launch {
-        selectionRepo.setTypes(types)
-        _uiState.update { it.copy(currentTypes = types, isDialogShown = false) }
+    private fun selectModes(modes: List<String>) = viewModelScope.launch {
+        selectionRepo.setModes(modes)
+        _uiState.update { it.copy(currentModes = modes, isDialogShown = false) }
     }
 
-    private fun toggleTypesDialog() {
+    private fun toggleModesDialog() {
         _uiState.update { it.copy(isDialogShown = !it.isDialogShown) }
     }
 

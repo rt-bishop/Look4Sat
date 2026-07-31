@@ -87,11 +87,11 @@ private fun SatellitesScreen(
     navigateUp: () -> Unit
 ) {
     if (uiState.isDialogShown) {
-        MultiTypesDialog(
-            allTypes = uiState.typesList,
-            types = uiState.currentTypes,
-            cancel = { onAction(SatellitesAction.ToggleTypesDialog) },
-            accept = { onAction(SatellitesAction.SelectTypes(it)) }
+        MultiModesDialog(
+            allModes = uiState.modesList,
+            modes = uiState.currentModes,
+            cancel = { onAction(SatellitesAction.ToggleModesDialog) },
+            accept = { onAction(SatellitesAction.SelectModes(it)) }
         )
     }
     if (uiState.shouldSeeWarning) {
@@ -123,9 +123,9 @@ private fun SatellitesScreen(
     Column(modifier = Modifier.layoutPadding(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (isVerticalLayout()) {
             TopBar {
-                TypeCard(
-                    types = uiState.currentTypes,
-                    onClick = { onAction(SatellitesAction.ToggleTypesDialog) },
+                ModeCard(
+                    modes = uiState.currentModes,
+                    onClick = { onAction(SatellitesAction.ToggleModesDialog) },
                     modifier = Modifier.weight(1f)
                 )
                 PrimaryIconCard(
@@ -157,9 +157,9 @@ private fun SatellitesScreen(
                     resId = R.drawable.ic_done,
                     modifier = Modifier.semantics { contentDescription = primCardCd }
                 )
-                TypeCard(
-                    types = uiState.currentTypes,
-                    onClick = { onAction(SatellitesAction.ToggleTypesDialog) },
+                ModeCard(
+                    modes = uiState.currentModes,
+                    onClick = { onAction(SatellitesAction.ToggleModesDialog) },
                     modifier = Modifier.weight(1f)
                 )
                 SearchBar(
@@ -241,8 +241,8 @@ private fun SearchBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modi
 }
 
 @Composable
-private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val typesText = if (types.isEmpty()) "All" else types.joinToString(", ")
+private fun ModeCard(modes: List<String>, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val modesText = if (modes.isEmpty()) "All" else modes.joinToString(", ")
     ElevatedCard(modifier = modifier) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -252,12 +252,12 @@ private fun TypeCard(types: List<String>, onClick: () -> Unit, modifier: Modifie
                 .clickable { onClick() }) {
             Spacer(Modifier)
             Icon(
-                painter = painterResource(id = R.drawable.ic_tags),
+                painter = painterResource(id = R.drawable.ic_radios),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = stringResource(R.string.sat_type_hint, typesText),
+                text = stringResource(R.string.sat_type_hint, modesText),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
@@ -323,9 +323,54 @@ private fun SatellitesPreview() {
 
 @Composable
 private fun SatellitesCard(items: List<SatItem>, onSelected: (Int, Boolean) -> Unit) {
+    val selectedItems = items.filter { it.isSelected }
+    val availableItems = items.filterNot { it.isSelected }
+
     LazyVerticalGrid(columns = GridCells.Adaptive(320.dp)) {
-        items(items = items, key = { item -> item.catnum }) { entry ->
-            Satellite(entry, onSelected, Modifier.animateItem())
+        stickyHeader(key = "sat_summary_header") {
+            SummaryHeader(
+                selectedText = stringResource(R.string.sat_group_selected_count, selectedItems.size),
+                availableText = stringResource(R.string.sat_group_available_count, availableItems.size)
+            )
+        }
+
+        if (selectedItems.isNotEmpty()) {
+            items(items = selectedItems, key = { item -> item.catnum }) { entry ->
+                Satellite(entry, onSelected, Modifier.animateItem())
+            }
+        }
+
+        if (availableItems.isNotEmpty()) {
+            items(items = availableItems, key = { item -> item.catnum }) { entry ->
+                Satellite(entry, onSelected, Modifier.animateItem())
+            }
         }
     }
 }
+
+@Composable
+private fun SummaryHeader(selectedText: String, availableText: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = selectedText,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = availableText,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+

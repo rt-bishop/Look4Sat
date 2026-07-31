@@ -47,7 +47,6 @@ class DatabaseRepo(
         remoteSource.getFileStream(uri)?.let { stream ->
             val entries = parseSatelliteStream(uri, unwrapIfZipped(uri, stream))
             localSource.insertEntries(entries)
-            settingsRepo.setSatelliteTypeIds(customSourceType, entries.map { it.catnum })
             importedCount = entries.size
         }
         setUpdateSuccessful(System.currentTimeMillis())
@@ -78,12 +77,9 @@ class DatabaseRepo(
         // launch all network requests concurrently
         val tleJobs = tleUrls.values.map { url -> async { url to remoteSource.getNetworkStream(url) } }
         val radioJobs = radioUrls.values.map { url -> async { url to remoteSource.getNetworkStream(url) } }
-        // parse fetched data concurrently and associate with types
+        // parse fetched data concurrently
         val importedEntries = tleJobs.awaitAll().flatMap { (url, stream) ->
-            val type = tleUrls.entries.find { it.value == url }?.key ?: customSourceType
-            stream?.let { parseSatelliteStream(url, unwrapIfZipped(url, it)) }.orEmpty().also { entries ->
-                settingsRepo.setSatelliteTypeIds(type, entries.map { it.catnum })
-            }
+            stream?.let { parseSatelliteStream(url, unwrapIfZipped(url, it)) }.orEmpty()
         }
         val importedRadios = radioJobs.awaitAll().flatMap { (url, stream) ->
             stream?.let { dataParser.parseJSONStream(unwrapIfZipped(url, it)) }.orEmpty()

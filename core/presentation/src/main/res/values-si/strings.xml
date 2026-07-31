@@ -13,19 +13,23 @@
     <string name="nav_prefs">පසුතල</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">වර්ගය: %s</string>
-    <string name="sat_type_title">ආකාර තෝරන්න</string>
+    <string name="sat_type_hint">මාදිලි: %s</string>
+    <string name="sat_type_title">මාදිලි තෝරන්න</string>
     <string name="sat_search_hint">Id - නම</string>
     <string name="sat_search_clear">පිරිසිදු ක°</string>
     <string name="sat_clear_all">සියල්ල පිරිසිදු ක°</string>
     <string name="sat_select_all">සියල්ල තෝරන්න</string>
+    <string name="sat_group_selected">තෝරාගත්</string>
+    <string name="sat_group_available">තිබෙන</string>
+    <string name="sat_group_selected_count">තෝරාගත් (%1$d)</string>
+    <string name="sat_group_available_count">තිබෙන (%1$d)</string>
     <string name="sat_empty_list_message">
         ඔබගේ සෙවුම් විමසුම නිවැරදි බවත් දත්ත සමුදාය යාවත්කාලීන කර ඇති බවත් සහතික කර ගන්න</string>
     <string name="sat_warning_title">අවවාදයයි\!</string>
     <string name="sat_warning_message">
         මෙම යෙදුමේ ලැයිස්තුගත කර ඇති චන්ද්‍රිකා 9000 කට වඩා තිබේ.
         ඒවා සියල්ලම එකවර නිරීක්ෂණය කිරීම තේරුමක් නැති දෙයක්.
-        \n\nසෙවීම සහ වර්ග තේරීම හරහා ඔබ උනන්දුවක් දක්වන
+        \n\nසෙවීම සහ මාදිලි තේරීම හරහා ඔබ උනන්දුවක් දක්වන
         ඒවාට පමණක් ලැයිස්තුව පටු කිරීමට සැමවිටම උත්සාහ කරන්න.</string>
 
     <!-- Passes screen -->

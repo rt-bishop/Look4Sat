@@ -32,9 +32,9 @@ interface ISettingsRepo {
 
     //region # Satellites selection settings
     val selectedIds: StateFlow<List<Int>>
-    val selectedTypes: StateFlow<List<String>>
+    val selectedSatModes: StateFlow<List<String>>
     fun setSelectedIds(ids: List<Int>)
-    fun setSelectedTypes(types: List<String>)
+    fun setSelectedSatModes(modes: List<String>)
     //endregion
 
     //region # Passes filter settings
@@ -51,8 +51,6 @@ interface ISettingsRepo {
 
     //region # Database update settings
     val databaseState: StateFlow<DatabaseState>
-    fun getSatelliteTypesIds(types: List<String>): List<Int>
-    fun setSatelliteTypeIds(type: String, ids: List<Int>)
     fun updateDatabaseState(state: DatabaseState)
     //endregion
 

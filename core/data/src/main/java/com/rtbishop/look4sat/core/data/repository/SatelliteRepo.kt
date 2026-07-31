@@ -73,7 +73,7 @@ class SatelliteRepo(
                 aosStartMinute = settings.aosStartMinute,
                 aosEndMinute = settings.aosEndMinute,
                 invertAosTimeWindow = settings.invertAosTimeWindow,
-                modes = settings.selectedModes
+                modes = settingsRepo.selectedSatModes.value
             )
         }
     }

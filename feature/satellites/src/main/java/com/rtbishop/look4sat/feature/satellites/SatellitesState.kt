@@ -24,8 +24,8 @@ data class SatellitesState(
     val isLoading: Boolean = true,
     val shouldSeeWarning: Boolean = false,
     val itemsList: List<SatItem> = emptyList(),
-    val currentTypes: List<String> = emptyList(),
-    val typesList: List<String> = emptyList()
+    val currentModes: List<String> = emptyList(),
+    val modesList: List<String> = emptyList()
 )
 
 sealed interface SatellitesAction {
@@ -34,7 +34,7 @@ sealed interface SatellitesAction {
     data class SearchFor(val query: String) : SatellitesAction
     data object SelectAll : SatellitesAction
     data class SelectSingle(val id: Int, val isTicked: Boolean) : SatellitesAction
-    data class SelectTypes(val types: List<String>) : SatellitesAction
-    data object ToggleTypesDialog : SatellitesAction
+    data class SelectModes(val modes: List<String>) : SatellitesAction
+    data object ToggleModesDialog : SatellitesAction
     data object UnselectAll : SatellitesAction
 }

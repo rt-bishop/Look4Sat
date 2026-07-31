@@ -62,7 +62,6 @@ class DatabaseRepoTest {
 
         assertEquals(1, localSource.insertedEntries.size)
         assertEquals(25544, localSource.insertedEntries.first().catnum)
-        assertEquals(listOf(25544), settingsRepo.satelliteTypeIdsByType["Other"])
         assertTrue(settingsRepo.databaseState.value.numberOfSatellites > 0)
     }
 
@@ -102,7 +101,6 @@ class DatabaseRepoTest {
         repository.updateFromRemote()
 
         assertTrue(localSource.insertedEntries.any { it.catnum == 25544 })
-        assertEquals(listOf(25544), settingsRepo.satelliteTypeIdsByType["Other"])
     }
 
     private fun validCsvStream(): InputStream = """
@@ -165,10 +163,10 @@ private class FakeSettingsRepo(dataSources: DataSourcesSettings = defaultDataSou
 
     override val selectedIds: StateFlow<List<Int>> = MutableStateFlow(emptyList())
 
-    override val selectedTypes: StateFlow<List<String>> = MutableStateFlow(emptyList())
+    override val selectedSatModes: StateFlow<List<String>> = MutableStateFlow(emptyList())
 
     override val passesSettings: StateFlow<PassesSettings> = MutableStateFlow(
-        PassesSettings(hoursAhead = 24, minElevation = 0.0, selectedModes = emptyList())
+        PassesSettings(hoursAhead = 24, minElevation = 0.0)
     )
 
     override val stationPosition: StateFlow<GeoPos> = MutableStateFlow(GeoPos(0.0, 0.0))
@@ -189,11 +187,9 @@ private class FakeSettingsRepo(dataSources: DataSourcesSettings = defaultDataSou
         RadioControlSettings(false, RadioControlSettings.MODEL_YAESU_FT817, "", "", "", "", 9600)
     )
 
-    val satelliteTypeIdsByType = mutableMapOf<String, List<Int>>()
-
     override fun setSelectedIds(ids: List<Int>) = Unit
 
-    override fun setSelectedTypes(types: List<String>) = Unit
+    override fun setSelectedSatModes(modes: List<String>) = Unit
 
     override fun setPassesSettings(settings: PassesSettings) = Unit
 
@@ -203,11 +199,6 @@ private class FakeSettingsRepo(dataSources: DataSourcesSettings = defaultDataSou
 
     override fun setStationPosition(locator: String): Boolean = true
 
-    override fun getSatelliteTypesIds(types: List<String>): List<Int> = emptyList()
-
-    override fun setSatelliteTypeIds(type: String, ids: List<Int>) {
-        satelliteTypeIdsByType[type] = ids
-    }
 
     override fun updateDatabaseState(state: DatabaseState) {
         databaseState.value = state

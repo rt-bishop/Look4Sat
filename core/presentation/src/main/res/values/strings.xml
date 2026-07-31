@@ -14,19 +14,23 @@
     <string name="nav_prefs">Settings</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">Type: %s</string>
-    <string name="sat_type_title">Select types</string>
+    <string name="sat_type_hint">Modes: %s</string>
+    <string name="sat_type_title">Select modes</string>
     <string name="sat_search_hint">Id - Name</string>
     <string name="sat_search_clear">Clear</string>
     <string name="sat_clear_all">Clear all</string>
     <string name="sat_select_all">Select all</string>
+    <string name="sat_group_selected">Selected</string>
+    <string name="sat_group_available">Available</string>
+    <string name="sat_group_selected_count">Selected (%1$d)</string>
+    <string name="sat_group_available_count">Available (%1$d)</string>
     <string name="sat_empty_list_message">"Make sure your search query is correct and the DB is updated"</string>
     <string name="sat_warning_title">Warning\!</string>
     <string name="sat_warning_message">
         There are over 9000 satellites listed in this app.
         It makes no sense to track them all at the same time.
         \n\nAlways try to narrow down the list to only the ones
-        you\'re interested in via search and types selector.</string>
+        you\'re interested in via search and the modes selector.</string>
 
     <!-- Passes screen -->
     <string name="pass_filter_title">Filter passes</string>

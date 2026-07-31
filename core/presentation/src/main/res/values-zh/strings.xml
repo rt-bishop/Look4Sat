@@ -13,15 +13,19 @@
     <string name="nav_prefs">设置</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">类型：%s</string>
-    <string name="sat_type_title">选择类型</string>
+    <string name="sat_type_hint">模式：%s</string>
+    <string name="sat_type_title">选择模式</string>
     <string name="sat_search_hint">Id - 名称</string>
     <string name="sat_search_clear">清空</string>
     <string name="sat_clear_all">全部清空</string>
     <string name="sat_select_all">全选</string>
+    <string name="sat_group_selected">已选择</string>
+    <string name="sat_group_available">可用</string>
+    <string name="sat_group_selected_count">已选择（%1$d）</string>
+    <string name="sat_group_available_count">可用（%1$d）</string>
     <string name="sat_empty_list_message">请确保您的搜索查询正确且数据库已更新</string>
     <string name="sat_warning_title">警告\!</string>
-    <string name="sat_warning_message">此应用收录了超过9000颗卫星信息\n同时追踪所有卫星并不现实\n建议始终通过搜索和分类筛选功能仅勾选您感兴趣的卫星</string>
+    <string name="sat_warning_message">此应用收录了超过9000颗卫星信息\n同时追踪所有卫星并不现实\n建议始终通过搜索和模式筛选功能仅勾选您感兴趣的卫星</string>
 
     <!-- Passes screen -->
     <string name="pass_filter_title">筛选过境</string>

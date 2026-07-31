@@ -62,15 +62,8 @@ import com.rtbishop.look4sat.core.presentation.SharedDialog
 import com.rtbishop.look4sat.core.presentation.ElevationHighColor
 import com.rtbishop.look4sat.core.presentation.ElevationLowColor
 import com.rtbishop.look4sat.core.presentation.elevationColor
+import com.rtbishop.look4sat.core.domain.source.Sources
 import kotlin.math.roundToInt
-
-private val allModes = listOf(
-    "AFSK", "AFSK S-Net", "AFSK SALSAT", "AHRPT", "AM", "APT", "BPSK", "BPSK PMT-A3",
-    "CERTO", "CW", "DQPSK", "DSTAR", "DUV", "FFSK", "FM", "FMN", "FSK", "FSK AX.100 Mode 5",
-    "FSK AX.100 Mode 6", "FSK AX.25 G3RUH", "GFSK", "GFSK Rktr", "GMSK", "HRPT", "LoRa",
-    "LRPT", "LSB", "MFSK", "MSK", "MSK AX.100 Mode 5", "MSK AX.100 Mode 6", "OFDM", "OQPSK",
-    "PSK", "PSK31", "PSK63", "QPSK", "QPSK31", "QPSK63", "SSTV", "USB", "WSJT"
-)
 
 private val hourSteps = listOf(1, 2, 4, 8, 12, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240)
 private const val dayMinutes = 24 * 60
@@ -381,7 +374,7 @@ internal fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List
             horizontalArrangement = Arrangement.spacedBy(1.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
-            itemsIndexed(allModes) { index, item ->
+            itemsIndexed(Sources.satelliteModes) { index, item ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier

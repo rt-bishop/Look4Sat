@@ -38,16 +38,16 @@ class SelectionRepo(
 ) : ISelectionRepo {
 
     private val currentItems = MutableStateFlow<List<SatItem>>(emptyList())
-    private val currentTypes = MutableStateFlow(settingsRepo.selectedTypes.value)
+    private val currentModes = MutableStateFlow(settingsRepo.selectedSatModes.value)
     private val currentQuery = MutableStateFlow("")
 
-    // Resolve type IDs once when types change, then filter items reactively.
+    // Resolve sat IDs once when modes change, then filter items reactively.
     // The HashSet gives O(1) catnum lookups instead of O(n) with a List.
-    private val itemsWithTypes = currentTypes.flatMapLatest { types: List<String> ->
-        val catnumSet: Set<Int>? = if (types.isEmpty()) {
+    private val itemsWithModes = currentModes.flatMapLatest { modes: List<String> ->
+        val catnumSet: Set<Int>? = if (modes.isEmpty()) {
             null // null = no filtering
         } else {
-            val ids = settingsRepo.getSatelliteTypesIds(types)
+            val ids = localSource.getIdsWithModes(modes)
             if (ids.isEmpty()) null else ids.toHashSet()
         }
         currentItems.map { items ->
@@ -56,14 +56,18 @@ class SelectionRepo(
     }
 
     private val itemsWithQuery = currentQuery.flatMapLatest { query ->
-        itemsWithTypes.map { items -> filterByQuery(items, query) }
+        itemsWithModes.map { items ->
+            filterByQuery(items, query).sortedWith(
+                compareByDescending<SatItem> { it.isSelected }
+                    .thenBy { it.name }
+                    .thenBy { it.catnum }
+            )
+        }
     }
 
-    override fun getCurrentTypes() = currentTypes.value
+    override fun getCurrentModes() = currentModes.value
 
-    override fun getTypesList() = Sources.satelliteDataUrls.keys.sorted().toMutableList().apply {
-        remove("All")
-    }
+    override fun getModesList() = Sources.satelliteModes
 
     override suspend fun getEntriesFlow() = withContext(dispatcher) {
         val selectedIds = settingsRepo.selectedIds.value.toHashSet()
@@ -73,9 +77,9 @@ class SelectionRepo(
         return@withContext itemsWithQuery
     }
 
-    override suspend fun setTypes(types: List<String>) {
-        currentTypes.value = types
-        settingsRepo.setSelectedTypes(types)
+    override suspend fun setModes(modes: List<String>) {
+        currentModes.value = modes
+        settingsRepo.setSelectedSatModes(modes)
     }
 
     override suspend fun setQuery(query: String) {

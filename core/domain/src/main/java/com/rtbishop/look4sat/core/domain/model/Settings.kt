@@ -29,8 +29,7 @@ data class PassesSettings(
     val minElevation: Double,
     val aosStartMinute: Int = 0,
     val aosEndMinute: Int = 23 * 60 + 59,
-    val invertAosTimeWindow: Boolean = false,
-    val selectedModes: List<String>
+    val invertAosTimeWindow: Boolean = false
 )
 
 data class RCSettings(

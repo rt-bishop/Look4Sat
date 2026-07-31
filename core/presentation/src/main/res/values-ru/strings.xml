@@ -13,19 +13,23 @@
     <string name="nav_prefs">Настройки</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">Тип: %s</string>
-    <string name="sat_type_title">Выберите типы</string>
+    <string name="sat_type_hint">Режимы: %s</string>
+    <string name="sat_type_title">Выберите режимы</string>
     <string name="sat_search_hint">Id - Название</string>
     <string name="sat_search_clear">Очистить</string>
     <string name="sat_clear_all">Очистить</string>
     <string name="sat_select_all">Выбрать</string>
+    <string name="sat_group_selected">Выбранные</string>
+    <string name="sat_group_available">Доступные</string>
+    <string name="sat_group_selected_count">Выбранные (%1$d)</string>
+    <string name="sat_group_available_count">Доступные (%1$d)</string>
     <string name="sat_empty_list_message">Убедитесь, что ваш поисковый запрос верен и база данных обновлена</string>
     <string name="sat_warning_title">Внимание\!</string>
     <string name="sat_warning_message">
         В этом приложении перечислено более 9000 спутников.
         Отслеживать их все одновременно бессмысленно.
         \n\nВсегда старайтесь сузить список до тех,
-        которые вас интересуют, используя поиск и селектор типов.</string>
+        которые вас интересуют, используя поиск и выбор режимов.</string>
 
     <!-- Passes screen -->
     <string name="pass_filter_title">Фильтровать пролеты</string>

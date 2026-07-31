@@ -60,7 +60,7 @@ class PassesViewModel(
             aosEndMinute = settingsRepo.passesSettings.value.aosEndMinute,
             invertAosTimeWindow = settingsRepo.passesSettings.value.invertAosTimeWindow,
             showDeepSpace = settingsRepo.passesSettings.value.showDeepSpace,
-            modes = settingsRepo.passesSettings.value.selectedModes,
+            modes = settingsRepo.selectedSatModes.value,
             shouldSeeWhatsNew = settingsRepo.otherSettings.value.shouldSeeWhatsNew
         )
     )
@@ -84,6 +84,11 @@ class PassesViewModel(
                         highElevation = settings.highElevation
                     )
                 }
+            }
+        }
+        viewModelScope.launch {
+            settingsRepo.selectedSatModes.collectLatest { modes ->
+                _uiState.update { it.copy(modes = modes) }
             }
         }
         // Main tick loop: reacts to new passes, then ticks every second
@@ -127,21 +132,9 @@ class PassesViewModel(
                     aosStartMinute = action.aosStartMinute,
                     aosEndMinute = action.aosEndMinute,
                     invertAosTimeWindow = action.invertAosTimeWindow,
-                    showDeepSpace = action.showDeepSpace,
-                    modes = _uiState.value.modes
+                    showDeepSpace = action.showDeepSpace
                 )
-            is PassesAction.FilterRadios ->
-                applyFilter(
-                    hoursAhead = _uiState.value.hours,
-                    minElevation = _uiState.value.elevation,
-                    lowElevation = _uiState.value.lowElevation,
-                    highElevation = _uiState.value.highElevation,
-                    aosStartMinute = _uiState.value.aosStartMinute,
-                    aosEndMinute = _uiState.value.aosEndMinute,
-                    invertAosTimeWindow = _uiState.value.invertAosTimeWindow,
-                    showDeepSpace = _uiState.value.showDeepSpace,
-                    modes = action.modes
-                )
+            is PassesAction.FilterRadios -> setModesFilter(action.modes)
             PassesAction.RefreshPasses -> refreshPasses()
             PassesAction.TogglePassesDialog ->
                 _uiState.update { it.copy(isPassesDialogShown = !it.isPassesDialogShown) }
@@ -235,8 +228,7 @@ class PassesViewModel(
         aosStartMinute: Int,
         aosEndMinute: Int,
         invertAosTimeWindow: Boolean,
-        showDeepSpace: Boolean,
-        modes: List<String>
+        showDeepSpace: Boolean
     ) = viewModelScope.launch {
         settingsRepo.setPassesSettings(
             PassesSettings(
@@ -245,8 +237,7 @@ class PassesViewModel(
                 minElevation,
                 aosStartMinute,
                 aosEndMinute,
-                invertAosTimeWindow,
-                modes
+                invertAosTimeWindow
             )
         )
         settingsRepo.updateOtherSettings { it.copy(lowElevation = lowElevation, highElevation = highElevation) }
@@ -259,10 +250,10 @@ class PassesViewModel(
                 aosStartMinute = aosStartMinute,
                 aosEndMinute = aosEndMinute,
                 invertAosTimeWindow = invertAosTimeWindow,
-                showDeepSpace = showDeepSpace,
-                modes = modes
+                showDeepSpace = showDeepSpace
             )
         }
+        val modes = settingsRepo.selectedSatModes.value
         satelliteRepo.calculatePasses(
             time = System.currentTimeMillis(),
             hoursAhead = hoursAhead,
@@ -270,6 +261,20 @@ class PassesViewModel(
             aosStartMinute = aosStartMinute,
             aosEndMinute = aosEndMinute,
             invertAosTimeWindow = invertAosTimeWindow,
+            modes = modes
+        )
+    }
+
+    private fun setModesFilter(modes: List<String>) = viewModelScope.launch {
+        settingsRepo.setSelectedSatModes(modes)
+        _uiState.update { it.copy(modes = modes) }
+        satelliteRepo.calculatePasses(
+            time = System.currentTimeMillis(),
+            hoursAhead = _uiState.value.hours,
+            minElevation = _uiState.value.elevation,
+            aosStartMinute = _uiState.value.aosStartMinute,
+            aosEndMinute = _uiState.value.aosEndMinute,
+            invertAosTimeWindow = _uiState.value.invertAosTimeWindow,
             modes = modes
         )
     }
@@ -283,7 +288,7 @@ class PassesViewModel(
             aosStartMinute = settings.aosStartMinute,
             aosEndMinute = settings.aosEndMinute,
             invertAosTimeWindow = settings.invertAosTimeWindow,
-            modes = settings.selectedModes
+            modes = settingsRepo.selectedSatModes.value
         )
     }
 

@@ -68,8 +68,7 @@ class SettingsRepo(
     private val keyFrequencyPort = "frequencyPort"
     private val keyFrequencyFormat = "frequencyFormat"
     private val keySelectedIds = "selectedIds"
-    private val keySelectedTypes = "selectedTypes"
-    private val keySelectedModes = "selectedModes"
+    private val keySelectedSatModes = "selectedSatModes"
     private val keyStateOfAutoUpdate = "stateOfAutoUpdate"
     private val keyStateOfSensors = "stateOfSensors"
     private val keyStateOfSweep = "stateOfSweep"
@@ -95,9 +94,9 @@ class SettingsRepo(
 
     //region # Satellites selection settings
     private val _satelliteSelection = MutableStateFlow(getSelectedIds())
-    private val _typesSelection = MutableStateFlow(getSelectedTypes())
+    private val _satelliteModeSelection = MutableStateFlow(getSelectedSatModes())
     override val selectedIds: StateFlow<List<Int>> = _satelliteSelection
-    override val selectedTypes: StateFlow<List<String>> = _typesSelection
+    override val selectedSatModes: StateFlow<List<String>> = _satelliteModeSelection
 
     override fun setSelectedIds(ids: List<Int>) {
         val selectionString = ids.joinToString(separatorComma)
@@ -105,10 +104,10 @@ class SettingsRepo(
         _satelliteSelection.value = ids
     }
 
-    override fun setSelectedTypes(types: List<String>) {
-        val typesString = types.joinToString(separatorComma)
-        preferences.edit { putString(keySelectedTypes, typesString) }
-        _typesSelection.value = types
+    override fun setSelectedSatModes(modes: List<String>) {
+        val modesString = modes.joinToString(separatorComma)
+        preferences.edit { putString(keySelectedSatModes, modesString) }
+        _satelliteModeSelection.value = modes
     }
 
     private fun getSelectedIds(): List<Int> {
@@ -117,10 +116,10 @@ class SettingsRepo(
         return selectionString.split(separatorComma).map { it.toInt() }
     }
 
-    private fun getSelectedTypes(): List<String> {
-        val typesString = preferences.getString(keySelectedTypes, "Amateur")
-        if (typesString.isNullOrEmpty()) return emptyList()
-        return typesString.split(separatorComma)
+    private fun getSelectedSatModes(): List<String> {
+        val modesString = preferences.getString(keySelectedSatModes, null)
+        if (modesString.isNullOrEmpty()) return emptyList()
+        return modesString.split(separatorComma).sorted()
     }
     //endregion
 
@@ -135,7 +134,6 @@ class SettingsRepo(
         putInt(keyFilterAosStartMinute, settings.aosStartMinute)
         putInt(keyFilterAosEndMinute, settings.aosEndMinute)
         putBoolean(keyFilterAosInvert, settings.invertAosTimeWindow)
-        putString(keySelectedModes, settings.selectedModes.joinToString(separatorComma))
         _passesSettings.value = settings
     }
 
@@ -146,16 +144,13 @@ class SettingsRepo(
         val aosStartMinute = preferences.getInt(keyFilterAosStartMinute, 0).coerceIn(0, 23 * 60 + 59)
         val aosEndMinute = preferences.getInt(keyFilterAosEndMinute, 23 * 60 + 59).coerceIn(0, 23 * 60 + 59)
         val invertAosTimeWindow = preferences.getBoolean(keyFilterAosInvert, false)
-        val selectedModesString = preferences.getString(keySelectedModes, null)
-        val selectedModes = selectedModesString?.split(separatorComma)?.sorted() ?: emptyList()
         return PassesSettings(
             showDeepSpace,
             hoursAhead,
             minElevation,
             aosStartMinute,
             aosEndMinute,
-            invertAosTimeWindow,
-            selectedModes
+            invertAosTimeWindow
         )
     }
     //endregion
@@ -235,25 +230,6 @@ class SettingsRepo(
     private val _databaseState = MutableStateFlow(getDatabaseState())
     override val databaseState: StateFlow<DatabaseState> = _databaseState
 
-    override fun getSatelliteTypesIds(types: List<String>): List<Int> {
-        val idsSet = mutableSetOf<Int>()
-        types.forEach { type ->
-            val typeString = preferences.getString("type$type", null)
-            val typeIds = if (typeString.isNullOrBlank()) {
-                emptyList()
-            } else {
-                typeString.split(separatorComma).map { it.toInt() }
-            }
-            idsSet.addAll(typeIds)
-        }
-        return idsSet.toList()
-    }
-
-    override fun setSatelliteTypeIds(type: String, ids: List<Int>) {
-        if (type == "All") return
-        val typesString = ids.joinToString(separatorComma)
-        preferences.edit { putString("type$type", typesString) }
-    }
 
     override fun updateDatabaseState(state: DatabaseState) = preferences.edit {
         putInt(keyNumberOfSatellites, state.numberOfSatellites)

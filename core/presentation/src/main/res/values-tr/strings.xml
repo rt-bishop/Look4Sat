@@ -14,19 +14,23 @@
     <string name="nav_prefs">Ayarlar</string>
 
     <!-- Satellites screen -->
-    <string name="sat_type_hint">Uydu türü: %s</string>
-    <string name="sat_type_title">Türleri seçin</string>
+    <string name="sat_type_hint">Modlar: %s</string>
+    <string name="sat_type_title">Modları seçin</string>
     <string name="sat_search_hint">Id - Ad</string>
     <string name="sat_search_clear">Temizle</string>
     <string name="sat_clear_all">Tümünü temizle</string>
     <string name="sat_select_all">Tümünü seç</string>
+    <string name="sat_group_selected">Seçilenler</string>
+    <string name="sat_group_available">Kullanılabilir</string>
+    <string name="sat_group_selected_count">Seçilenler (%1$d)</string>
+    <string name="sat_group_available_count">Kullanılabilir (%1$d)</string>
     <string name="sat_empty_list_message">"Arama sorgunuzun doğru olduğundan ve veritabanının güncellendiğinden emin olun"</string>
     <string name="sat_warning_title">Uyarı\!</string>
     <string name="sat_warning_message">
         Bu uygulamada 9000\'den fazla uydu listelenmiştir.
         Hepsini aynı anda takip etmek anlamsızdır.
         \n\nListeyi yalnızca ilgilendiğiniz uydularla
-        daraltmak için arama ve tür seçiciyi kullanın.</string>
+        daraltmak için arama ve mod seçiciyi kullanın.</string>
 
     <!-- Passes screen -->
     <string name="pass_filter_title">Geçişleri filtrele</string>
