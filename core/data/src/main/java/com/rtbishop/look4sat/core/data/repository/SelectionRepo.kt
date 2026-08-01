@@ -38,16 +38,16 @@ class SelectionRepo(
 ) : ISelectionRepo {
 
     private val currentItems = MutableStateFlow<List<SatItem>>(emptyList())
-    private val currentModes = MutableStateFlow(settingsRepo.selectedSatModes.value)
     private val currentQuery = MutableStateFlow("")
 
     // Resolve sat IDs once when modes change, then filter items reactively.
     // The HashSet gives O(1) catnum lookups instead of O(n) with a List.
-    private val itemsWithModes = currentModes.flatMapLatest { modes: List<String> ->
-        val catnumSet: Set<Int>? = if (modes.isEmpty()) {
+    // Directly observe settingsRepo.selectedSatModes to ensure real-time sync across screens.
+    private val itemsWithModes = settingsRepo.selectedSatModes.flatMapLatest { list: List<String> ->
+        val catnumSet: Set<Int>? = if (list.isEmpty()) {
             null // null = no filtering
         } else {
-            val ids = localSource.getIdsWithModes(modes)
+            val ids = localSource.getIdsWithModes(list)
             if (ids.isEmpty()) null else ids.toHashSet()
         }
         currentItems.map { items ->
@@ -65,7 +65,7 @@ class SelectionRepo(
         }
     }
 
-    override fun getCurrentModes() = currentModes.value
+    override fun getCurrentModes() = settingsRepo.selectedSatModes.value
 
     override fun getModesList() = Sources.satelliteModes
 
@@ -78,7 +78,6 @@ class SelectionRepo(
     }
 
     override suspend fun setModes(modes: List<String>) {
-        currentModes.value = modes
         settingsRepo.setSelectedSatModes(modes)
     }
 

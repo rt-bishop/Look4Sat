@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import java.util.TimeZone
+import kotlin.time.Duration.Companion.milliseconds
 
 class SatelliteRepo(
     private val dispatcher: CoroutineDispatcher,
@@ -158,7 +159,7 @@ class SatelliteRepo(
                 }
             }
             newPasses.sortBy { it.aosTime }
-            delay(1000) // Simulate loading time for better UX
+            delay(1000.milliseconds) // Simulate loading time for better UX
             _passes.update { newPasses }
         }
         _isCalculating.value = false
@@ -176,7 +177,7 @@ class SatelliteRepo(
         val inRange = if (aosStartMinute <= aosEndMinute) {
             aosMinute in aosStartMinute..aosEndMinute
         } else {
-            aosMinute >= aosStartMinute || aosMinute <= aosEndMinute
+            aosMinute !in (aosEndMinute + 1)..<aosStartMinute
         }
         return if (invertAosTimeWindow) !inRange else inRange
     }

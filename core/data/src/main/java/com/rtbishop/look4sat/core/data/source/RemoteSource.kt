@@ -24,7 +24,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.ByteArrayInputStream
 import java.io.InputStream
 
 class RemoteSource(
@@ -46,10 +45,14 @@ class RemoteSource(
     override suspend fun getNetworkStream(url: String): InputStream? = withContext(dispatcher) {
         try {
             val networkRequest = Request.Builder().url(url).build()
-            httpClient.newCall(networkRequest).execute().use { response ->
-                if (!response.isSuccessful) return@withContext null
-                ByteArrayInputStream(response.body.bytes())
+            val response = httpClient.newCall(networkRequest).execute()
+            if (!response.isSuccessful) {
+                response.close()
+                return@withContext null
             }
+            // Return the body stream directly as the caller is responsible for closing it
+            // That returns the connection to OkHttp's pool
+            response.body.byteStream().buffered()
         } catch (exception: Exception) {
             println("RemoteSource network stream exception: $exception")
             null

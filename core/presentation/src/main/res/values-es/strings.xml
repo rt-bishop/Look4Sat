@@ -155,11 +155,11 @@
     <string name="prefs_net_perm_error">Revisa los permisos de red</string>
 
     <string name="prefs_other_title">Otros</string>
-    <string name="prefs_other_switch_utc">Mostrar hora UTC</string>
+    <string name="prefs_other_switch_utc">Hora UTC</string>
     <string name="prefs_other_switch_update">Actualización automática</string>
-    <string name="prefs_other_switch_sweep">Animación de radar</string>
-    <string name="prefs_other_switch_sensors">Sensores para radar</string>
-    <string name="prefs_other_switch_night_mode">Filtro nocturno rojo</string>
+    <string name="prefs_other_switch_sweep">Animación radar</string>
+    <string name="prefs_other_switch_sensors">Sensores</string>
+    <string name="prefs_other_switch_night_mode">Filtro nocturno</string>
 
     <string name="prefs_highlight_title">Resaltado de elevación</string>
     <string name="prefs_highlight_low">Baja &lt; %1$d°</string>

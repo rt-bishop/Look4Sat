@@ -1,2 +1,8 @@
-* Added required tweaks to support Android 17 (API 37)
-* Added ACCESS_LOCAL_NETWORK permission check to support network data output
+* Added ARISS source, tweaked SSTV sensitivity #225
+* Implemented AOS window and elev filter #226
+* Added cleartext traffic support for TLEs #227
+* Fixed OMM import, tweaked error messages #228
+* Added support for Icom CAT by ruilvo #229
+* Added tweakable Radar offset by qwqtoday #230
+* Localized date/time formats by atsunatsu #231
+* Added linear radio Doppler calc by atsunatsu #232

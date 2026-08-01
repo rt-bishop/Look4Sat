@@ -25,10 +25,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -220,7 +222,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
                         version = uiState.appVersionName,
                         modifier = Modifier.weight(1f)
                     )
-                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_pound)
+                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_like)
                 }
                 TopBar {
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -242,7 +244,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
                 }
             } else {
                 TopBar {
-                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_pound)
+                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_like)
                     TopCard(
                         onClick = { safeOpenUri(appUrl) },
                         version = uiState.appVersionName,
@@ -300,8 +302,22 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
                     onRadioControlClick = { dialogs.radioControl = true }
                 )
             }
-            item { OtherCard(uiState.otherSettings, onAction) }
-            item { CardCredits() }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                if (isVerticalLayout) {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        OtherCard(uiState.otherSettings, onAction)
+                        CardCredits()
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
+                    ) {
+                        OtherCard(uiState.otherSettings, onAction, modifier = Modifier.weight(1f).fillMaxHeight())
+                        CardCredits(modifier = Modifier.weight(1f).fillMaxHeight())
+                    }
+                }
+            }
         }
     }
 }
@@ -480,46 +496,56 @@ private fun OtherCardPreview() = MainTheme {
         shouldSeeWarning = false,
         shouldSeeWhatsNew = false
     )
-    OtherCard(settings = values) {}
+    OtherCard(settings = values, onAction = {})
 }
 
 @Composable
-private fun OtherCard(settings: OtherSettings, onAction: (SettingsAction) -> Unit) {
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(404.dp)
-    ) {
+private fun OtherCard(settings: OtherSettings, onAction: (SettingsAction) -> Unit, modifier: Modifier = Modifier) {
+    ElevatedCard(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Text(
                 text = stringResource(id = R.string.prefs_other_title),
                 color = MaterialTheme.colorScheme.primary
             )
-            SwitchRow(R.string.prefs_other_switch_utc, settings.stateOfUtc) {
-                onAction(SettingsAction.ToggleUtc(it))
+            Spacer(modifier = Modifier.height(4.dp))
+            // Display preferences: UTC clock + night filter
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SwitchTile(R.string.prefs_other_switch_utc, settings.stateOfUtc) {
+                    onAction(SettingsAction.ToggleUtc(it))
+                }
+                SwitchTile(R.string.prefs_other_switch_night_mode, settings.stateOfNightMode) {
+                    onAction(SettingsAction.ToggleNightMode(it))
+                }
             }
+            Spacer(modifier = Modifier.height(4.dp))
+            // Radar behavior: sweep animation + sensor control
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SwitchTile(R.string.prefs_other_switch_sweep, settings.stateOfSweep) {
+                    onAction(SettingsAction.ToggleSweep(it))
+                }
+                SwitchTile(R.string.prefs_other_switch_sensors, settings.stateOfSensors) {
+                    onAction(SettingsAction.ToggleSensor(it))
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            // Data management (full width)
             SwitchRow(R.string.prefs_other_switch_update, settings.stateOfAutoUpdate) {
                 onAction(SettingsAction.ToggleUpdate(it))
             }
-            SwitchRow(R.string.prefs_other_switch_sweep, settings.stateOfSweep) {
-                onAction(SettingsAction.ToggleSweep(it))
-            }
-            SwitchRow(R.string.prefs_other_switch_sensors, settings.stateOfSensors) {
-                onAction(SettingsAction.ToggleSensor(it))
-            }
+            Spacer(modifier = Modifier.height(4.dp))
+            // Compass calibration sliders at the bottom
             CompassOffsetRow(
                 labelResId = R.string.prefs_other_compass_offset,
                 value = settings.radarCompassOffset,
                 range = -180f..180f
             ) { onAction(SettingsAction.SetRadarCompassOffset(it)) }
+            Spacer(modifier = Modifier.height(4.dp))
             CompassOffsetRow(
                 labelResId = R.string.prefs_other_compass_offset_elev,
                 value = settings.radarCompassOffsetElev,
                 range = -90f..90f
             ) { onAction(SettingsAction.SetRadarCompassOffsetElev(it)) }
-            SwitchRow(R.string.prefs_other_switch_night_mode, settings.stateOfNightMode) {
-                onAction(SettingsAction.ToggleNightMode(it))
-            }
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
@@ -539,6 +565,7 @@ private fun CompassOffsetRow(
         Text(text = stringResource(id = labelResId))
         Text(text = "${value.toInt()}°")
     }
+    Spacer(modifier = Modifier.height(4.dp))
     Slider(
         value = value,
         onValueChange = onValueChange,
@@ -554,6 +581,21 @@ private fun SwitchRow(labelResId: Int, checked: Boolean, onCheckedChange: (Boole
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(text = stringResource(id = labelResId))
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+@Composable
+private fun RowScope.SwitchTile(labelResId: Int, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.weight(1f)
+    ) {
+        Text(
+            text = stringResource(id = labelResId),
+            modifier = Modifier.weight(1f)
+        )
         Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
@@ -592,7 +634,6 @@ private fun CardCredits(modifier: Modifier = Modifier) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .height(404.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,

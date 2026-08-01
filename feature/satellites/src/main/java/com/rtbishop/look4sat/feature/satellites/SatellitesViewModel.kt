@@ -59,6 +59,11 @@ class SatellitesViewModel(
                 _uiState.update { it.copy(shouldSeeWarning = settings.shouldSeeWarning) }
             }
         }
+        viewModelScope.launch {
+            settingsRepo.selectedSatModes.collectLatest { modes ->
+                _uiState.update { it.copy(currentModes = modes) }
+            }
+        }
     }
 
     fun onAction(action: SatellitesAction) {

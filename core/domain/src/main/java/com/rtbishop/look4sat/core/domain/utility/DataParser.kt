@@ -91,7 +91,7 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         val line1 = tle[1]
         val line2 = tle[2]
         OrbitalData(
-            name = tle[0].trim(),
+            name = tle[0].trim().removePrefix("0 "),
             epoch = line1.substring(18, 32).toDouble(),
             meanmo = line2.substring(52, 63).toDouble(),
             eccn = line2.substring(26, 33).toDouble() / 1e7,

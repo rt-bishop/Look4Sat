@@ -19,10 +19,10 @@ package com.rtbishop.look4sat.core.domain.source
 
 object Sources {
     val satelliteDataUrls = mapOf(
-        "All" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-        "Amsat" to "https://amsat.org/tle/current/nasabare.txt",
-        "Classified" to "https://www.mmccants.org/tles/classfd.zip",
-        "McCants" to "https://www.mmccants.org/tles/inttles.zip",
+        "CelesTrak" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
+        "AMSAT" to "https://amsat.org/tle/current/nasabare.txt",
+        "McCants Classified" to "https://www.mmccants.org/tles/classfd.zip",
+        "McCants Integrated" to "https://www.mmccants.org/tles/inttles.zip",
         "R4UAB" to "https://r4uab.ru/satonline.txt",
         "SatNOGS" to "https://db.satnogs.org/api/tle/?format=3le",
         "ARISS" to "https://live.ariss.org/iss.txt",

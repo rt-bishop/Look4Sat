@@ -72,6 +72,7 @@ class RadarViewModel(
     private var transponders: List<SatRadio> = emptyList()
     private var sstvDecoder: SstvDecoder? = null
     private var sstvRecordingJob: Job? = null
+    private var sensorCollectionJob: Job? = null
 
     // Celestial positions change slowly, recompute at most once per minute
     private var lastCelestialUpdateMs = 0L
@@ -90,15 +91,15 @@ class RadarViewModel(
     val uiState: StateFlow<RadarState> = _uiState
 
     init {
-        collectCompassSensor()
-        collectSettingsChanges()
+        collectSettingsChanges()  // also handles initial sensor subscription
         collectPassAndStartTickLoop()
         collectRadioTrackingState()
     }
 
-    private fun collectCompassSensor() {
-        if (!settingsRepo.otherSettings.value.stateOfSensors) return
-        viewModelScope.launch {
+    // Starts sensor collection if not already running.
+    private fun startSensorCollection() {
+        if (sensorCollectionJob?.isActive == true) return
+        sensorCollectionJob = viewModelScope.launch {
             sensorsRepo.enableSensor()
             sensorsRepo.sensorData.collect { data ->
                 val orientationValues =
@@ -108,9 +109,16 @@ class RadarViewModel(
         }
     }
 
+    // Stops sensor collection and disables the hardware sensor.
+    private fun stopSensorCollection() {
+        sensorCollectionJob?.cancel()
+        sensorCollectionJob = null
+        sensorsRepo.disableSensor()
+    }
+
     private fun collectSettingsChanges() {
         viewModelScope.launch {
-            settingsRepo.otherSettings.collectLatest { settings ->
+            settingsRepo.otherSettings.collect { settings ->
                 compassOffset = settings.radarCompassOffset
                 compassOffsetElev = settings.radarCompassOffsetElev
                 _uiState.update {
@@ -120,6 +128,11 @@ class RadarViewModel(
                         shouldUseCompass = settings.stateOfSensors,
                         shouldFlipRadar = settings.radarCompassOffsetElev < 0f
                     )
+                }
+                // Reactively wire sensor hardware to the compass setting
+                when {
+                    settings.stateOfSensors -> startSensorCollection()
+                    else -> stopSensorCollection()
                 }
             }
         }
@@ -219,7 +232,7 @@ class RadarViewModel(
     }
 
     override fun onCleared() {
-        sensorsRepo.disableSensor()
+        stopSensorCollection()
     }
 
     fun onAction(action: RadarAction) {
@@ -405,7 +418,7 @@ class RadarViewModel(
         //   - 0.25: Aggressive (original default), amplifies noise; use only for clean inputs
         //   - 0.35-0.40: RECOMMENDED for typical phone/mic inputs
         //   - 0.50-0.60: Conservative, best for noisy environments
-        private const val SSTV_TARGET_RMS = 0.40f  // Changed from 0.25 to safer default
+        private const val SSTV_TARGET_RMS = 0.45f  // Changed from 0.25 to safer default
 
         // Enable/disable RMS normalization entirely. Set false for direct receiver outputs.
         private const val SSTV_ENABLE_RMS_NORMALIZATION = true
@@ -428,7 +441,7 @@ class RadarViewModel(
         //   - Look4SatLimited: caps predicted lines to reduce visible vertical collapse.
         //   - Robot36Compatible: unlimited predicted lines (legacy Robot36 behavior).
         // Ask users to compare both if they report line-skipping/compression artifacts.
-        private val SSTV_LINE_RECOVERY_STRATEGY = LineRecoveryStrategy.Look4SatLimited
+        private val SSTV_LINE_RECOVERY_STRATEGY = LineRecoveryStrategy.Robot36Compatible
 
         // Debug: Return scope visualization in frames (increases per-frame memory usage).
         private const val SSTV_INCLUDE_SCOPE = false
@@ -439,7 +452,6 @@ class RadarViewModel(
             141.3, 146.2, 151.4, 156.7, 162.2, 167.9, 173.8, 179.9, 186.2, 192.8, 203.5, 210.7,
             218.1, 225.7, 233.6, 241.8, 250.3
         )
-
 
         fun factory(container: IMainContainer) = viewModelFactory {
             initializer {

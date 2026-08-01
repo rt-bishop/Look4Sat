@@ -187,11 +187,11 @@
     <string name="prefs_net_perm_error">Ağ izninizi kontrol edin</string>
 
     <string name="prefs_other_title">Diğer</string>
-    <string name="prefs_other_switch_utc">UTC saatini göster</string>
+    <string name="prefs_other_switch_utc">UTC saati</string>
     <string name="prefs_other_switch_update">Veriyi otomatik güncelle</string>
-    <string name="prefs_other_switch_sweep">Radar tarama animasyonu</string>
-    <string name="prefs_other_switch_sensors">Radar için sensör kullan</string>
-    <string name="prefs_other_switch_night_mode">Kırmızı gece filtresi</string>
+    <string name="prefs_other_switch_sweep">Radar taraması</string>
+    <string name="prefs_other_switch_sensors">Sensör</string>
+    <string name="prefs_other_switch_night_mode">Gece filtresi</string>
 
     <string name="prefs_highlight_title">Elevasyon vurgusu</string>
     <string name="prefs_highlight_low">Düşük &lt; %1$d°</string>
