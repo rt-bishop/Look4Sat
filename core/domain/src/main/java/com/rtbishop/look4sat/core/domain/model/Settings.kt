@@ -61,7 +61,9 @@ data class OtherSettings(
     val shouldSeeWhatsNew: Boolean,
     val sstvMode: String = "Auto",
     val lowElevation: Double = 15.0,
-    val highElevation: Double = 45.0
+    val highElevation: Double = 45.0,
+    val radarCompassOffset: Float = 0f,
+    val radarCompassOffsetElev: Float = 0f
 )
 
 data class DataSourcesSettings(

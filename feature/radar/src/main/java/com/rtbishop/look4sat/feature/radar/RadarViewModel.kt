@@ -67,6 +67,8 @@ class RadarViewModel(
 
     private val stationPos = settingsRepo.stationPosition.value
     private val magDeclination = sensorsRepo.getMagDeclination(stationPos)
+    private var compassOffset = settingsRepo.otherSettings.value.radarCompassOffset
+    private var compassOffsetElev = settingsRepo.otherSettings.value.radarCompassOffsetElev
     private var transponders: List<SatRadio> = emptyList()
     private var sstvDecoder: SstvDecoder? = null
     private var sstvRecordingJob: Job? = null
@@ -99,7 +101,8 @@ class RadarViewModel(
         viewModelScope.launch {
             sensorsRepo.enableSensor()
             sensorsRepo.sensorData.collect { data ->
-                val orientationValues = (data.first + magDeclination) to data.second
+                val orientationValues =
+                    (data.first + magDeclination + compassOffset) to (data.second + compassOffsetElev)
                 _uiState.update { it.copy(orientationValues = orientationValues) }
             }
         }
@@ -108,11 +111,14 @@ class RadarViewModel(
     private fun collectSettingsChanges() {
         viewModelScope.launch {
             settingsRepo.otherSettings.collectLatest { settings ->
+                compassOffset = settings.radarCompassOffset
+                compassOffsetElev = settings.radarCompassOffsetElev
                 _uiState.update {
                     it.copy(
                         isUtc = settings.stateOfUtc,
                         shouldShowSweep = settings.stateOfSweep,
-                        shouldUseCompass = settings.stateOfSensors
+                        shouldUseCompass = settings.stateOfSensors,
+                        shouldFlipRadar = settings.radarCompassOffsetElev < 0f
                     )
                 }
             }

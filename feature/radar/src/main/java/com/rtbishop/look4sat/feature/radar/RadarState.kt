@@ -58,6 +58,7 @@ data class RadarState(
     val satTrack: List<OrbitalPos> = emptyList(),
     val shouldShowSweep: Boolean = false,
     val shouldUseCompass: Boolean = false,
+    val shouldFlipRadar: Boolean = false,
     val sunPosition: CelestialComputer.SunPosition? = null,
     val moonPosition: CelestialComputer.MoonPosition? = null,
     val transceivers: TransceiverSubState = TransceiverSubState(),

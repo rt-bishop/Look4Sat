@@ -86,6 +86,8 @@ class SettingsRepo(
     private val keySstvMode = "sstvMode"
     private val keyLowElevation = "lowElevation"
     private val keyHighElevation = "highElevation"
+    private val keyRadarCompassOffset = "radarCompassOffset"
+    private val keyRadarCompassOffsetElev = "radarCompassOffsetElev"
     private val keyUseCustomTle = "useCustomTle"
     private val keyUseCustomTransceivers = "useCustomTransceivers"
     private val keyTleUrl = "tleUrl"
@@ -332,6 +334,8 @@ class SettingsRepo(
                 putString(keySstvMode, new.sstvMode)
                 putLong(keyLowElevation, new.lowElevation.toRawBits())
                 putLong(keyHighElevation, new.highElevation.toRawBits())
+                putFloat(keyRadarCompassOffset, new.radarCompassOffset)
+                putFloat(keyRadarCompassOffsetElev, new.radarCompassOffsetElev)
             }
             new
         }
@@ -348,7 +352,9 @@ class SettingsRepo(
         shouldSeeWhatsNew = preferences.getBoolean(keyShouldSeeWhatsNew, true),
         sstvMode = preferences.getString(keySstvMode, null) ?: "Auto",
         lowElevation = Double.fromBits(preferences.getLong(keyLowElevation, 15.0.toRawBits())),
-        highElevation = Double.fromBits(preferences.getLong(keyHighElevation, 45.0.toRawBits()))
+        highElevation = Double.fromBits(preferences.getLong(keyHighElevation, 45.0.toRawBits())),
+        radarCompassOffset = preferences.getFloat(keyRadarCompassOffset, 0f),
+        radarCompassOffsetElev = preferences.getFloat(keyRadarCompassOffsetElev, 0f)
     )
     //endregion
 

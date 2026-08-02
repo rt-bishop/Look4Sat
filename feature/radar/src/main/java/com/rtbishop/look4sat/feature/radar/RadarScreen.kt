@@ -225,6 +225,7 @@ private fun RadarCard(uiState: RadarState, modifier: Modifier = Modifier) {
                     azimElev = uiState.orientationValues,
                     shouldShowSweep = uiState.shouldShowSweep,
                     shouldUseCompass = uiState.shouldUseCompass,
+                    shouldFlipRadar = uiState.shouldFlipRadar,
                     modifier = Modifier.align(Alignment.Center),
                     sunPosition = uiState.sunPosition,
                     moonPosition = uiState.moonPosition,

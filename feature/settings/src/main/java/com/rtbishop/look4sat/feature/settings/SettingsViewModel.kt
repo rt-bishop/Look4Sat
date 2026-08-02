@@ -123,6 +123,8 @@ class SettingsViewModel(
             is SettingsAction.ToggleSensor -> settingsRepo.updateOtherSettings { it.copy(stateOfSensors = action.value) }
             is SettingsAction.ToggleLightTheme -> settingsRepo.updateOtherSettings { it.copy(stateOfLightTheme = action.value) }
             is SettingsAction.ToggleNightMode -> settingsRepo.updateOtherSettings { it.copy(stateOfNightMode = action.value) }
+            is SettingsAction.SetRadarCompassOffset -> settingsRepo.updateOtherSettings { it.copy(radarCompassOffset = action.value) }
+            is SettingsAction.SetRadarCompassOffsetElev -> settingsRepo.updateOtherSettings { it.copy(radarCompassOffsetElev = action.value) }
             // Remote control & data sources
             is SettingsAction.UpdateRC -> settingsRepo.updateRCSettings(action.settings)
             is SettingsAction.UpdateRadioControl -> settingsRepo.updateRadioControlSettings(action.settings)
