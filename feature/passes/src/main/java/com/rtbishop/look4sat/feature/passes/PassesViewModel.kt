@@ -145,12 +145,28 @@ class PassesViewModel(
         }
     }
 
+    private fun displayLocale(): Locale {
+        val locale = Locale.getDefault()
+        return if (locale.language == Locale.CHINESE.language) locale else Locale.ENGLISH
+    }
+
+    /** Returns the visible pass-date format. Keep non-Chinese locales identical to upstream. */
+    private fun dateFormat(tz: TimeZone): SimpleDateFormat {
+        val locale = displayLocale()
+        val pattern = if (locale.language == Locale.CHINESE.language) {
+            "yyyy'年'M'月'd'日' EEEE"
+        } else {
+            "EEE, dd MMM yyyy"
+        }
+        return SimpleDateFormat(pattern, locale).also { it.timeZone = tz }
+    }
+
     // Computes sunrise/sunset strings for each unique calendar day in the pass list, plus today for DeepSpace
     private fun computeSunTimes(passes: List<OrbitalPass>, isUtc: Boolean): Map<String, Pair<String, String>> {
         val stationPos = settingsRepo.stationPosition.value
         val tz = if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault()
-        val sdfDate = SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH).also { it.timeZone = tz }
-        val sdfTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).also { it.timeZone = tz }
+        val sdfDate = dateFormat(tz)
+        val sdfTime = SimpleDateFormat("HH:mm", displayLocale()).also { it.timeZone = tz }
         val result = LinkedHashMap<String, Pair<String, String>>()
         // DeepSpace group always shows today's sun times
         if (passes.any { it.isDeepSpace }) {
@@ -173,7 +189,7 @@ class PassesViewModel(
 
     private fun groupPasses(passes: List<OrbitalPass>, isUtc: Boolean): Map<String, List<OrbitalPass>> {
         val tz = if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault()
-        val sdfDate = SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH).also { it.timeZone = tz }
+        val sdfDate = dateFormat(tz)
         val ordered = LinkedHashMap<String, List<OrbitalPass>>()
         val deepSpace = passes.filter { it.isDeepSpace }
         if (deepSpace.isNotEmpty()) ordered["DeepSpace (period >225min)"] = deepSpace
