@@ -39,14 +39,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,11 +60,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.core.domain.model.SatRadio
+import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
+import com.rtbishop.look4sat.core.domain.utility.DopplerFrequencyCalculator
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.formatFrequency
@@ -100,6 +108,69 @@ fun TransceiversPage(
                     onToggle = { onAction(RadarAction.SelectTransmitter(radio.uuid)) }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun CalculatorPage(
+    transceivers: List<SatRadio>,
+    selectedUuid: String?,
+    orbitalPos: OrbitalPos?,
+    onAction: (RadarAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val calculatorTransceivers = remember(transceivers) {
+        transceivers.filter(DopplerFrequencyCalculator::isNamedLinearTransponder)
+    }
+    val selectedTransceiver = remember(calculatorTransceivers, selectedUuid) {
+        calculatorTransceivers.firstOrNull { it.uuid == selectedUuid }
+            ?: calculatorTransceivers.firstOrNull()
+    }
+
+    if (selectedTransceiver == null) {
+        EmptyTransceiversContent(modifier)
+        return
+    }
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        if (calculatorTransceivers.size > 1) {
+            item {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    calculatorTransceivers.forEach { radio ->
+                        FilterChip(
+                            selected = radio.uuid == selectedTransceiver.uuid,
+                            onClick = {
+                                if (radio.uuid != selectedUuid) onAction(RadarAction.SelectTransmitter(radio.uuid))
+                            },
+                            label = {
+                                Text(
+                                    text = transceiverTitle(radio),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            DopplerCalculatorPanel(
+                transponder = selectedTransceiver,
+                orbitalPos = orbitalPos,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -172,12 +243,8 @@ private fun TransceiverItem(
                             .rotate(if (isExpanded) 270f else 90f)
                     )
                 }
-                // Title with mode
-                val title = if (radio.isInverted) "INV: ${radio.info}" else radio.info
-                val mode = "${radio.downlinkMode ?: "--"}/${radio.uplinkMode ?: "--"}"
-                val fullTitle = "$title ($mode)"
                 Text(
-                    text = fullTitle,
+                    text = transceiverTitle(radio),
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -438,6 +505,108 @@ private fun ExpandedRadioControl(
 }
 
 @Composable
+private fun DopplerCalculatorPanel(
+    transponder: SatRadio,
+    orbitalPos: OrbitalPos?,
+    modifier: Modifier = Modifier
+) {
+    if (orbitalPos == null || !DopplerFrequencyCalculator.isLinearTransponder(transponder)) return
+
+    var txInputMHz by remember(transponder.uuid) { mutableStateOf("") }
+    var rxInputMHz by remember(transponder.uuid) { mutableStateOf("") }
+    var offsetKHz by remember(transponder.uuid) { mutableStateOf("") }
+    var lastEditedBy by remember(transponder.uuid) { mutableStateOf(EditedField.TX) }
+
+    fun offsetHz(text: String): Long = text.toDoubleOrNull()?.let { (it * 1000).toLong() } ?: 0L
+    fun formatHz(hz: Long): String = String.format(Locale.ENGLISH, "%.6f", hz / 1_000_000.0)
+    fun mhzToHz(text: String): Long? = text.toDoubleOrNull()
+        ?.takeIf { it > 0.0 }
+        ?.let { (it * 1_000_000).toLong() }
+
+    fun calculateDownlink(txText: String, offsetText: String): String? {
+        val txHz = mhzToHz(txText) ?: return null
+        return DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+            uplinkHz = txHz,
+            transponder = transponder,
+            orbitalPos = orbitalPos,
+            offsetHz = offsetHz(offsetText)
+        )?.let(::formatHz)
+    }
+
+    fun calculateUplink(rxText: String, offsetText: String): String? {
+        val rxHz = mhzToHz(rxText) ?: return null
+        return DopplerFrequencyCalculator.computeUplinkFromDownlinkWithOffset(
+            downlinkHz = rxHz,
+            transponder = transponder,
+            orbitalPos = orbitalPos,
+            offsetHz = offsetHz(offsetText)
+        )?.let(::formatHz)
+    }
+
+    LaunchedEffect(orbitalPos, transponder.uuid) {
+        if (lastEditedBy == EditedField.TX) {
+            calculateDownlink(txInputMHz, offsetKHz)?.let { rxInputMHz = it }
+        } else {
+            calculateUplink(rxInputMHz, offsetKHz)?.let { txInputMHz = it }
+        }
+    }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        OutlinedTextField(
+            value = offsetKHz,
+            onValueChange = { newValue ->
+                offsetKHz = newValue
+                if (lastEditedBy == EditedField.TX) {
+                    calculateDownlink(txInputMHz, newValue)?.let { rxInputMHz = it }
+                } else {
+                    calculateUplink(rxInputMHz, newValue)?.let { txInputMHz = it }
+                }
+            },
+            label = { Text(stringResource(R.string.radar_doppler_offset_hint)) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = txInputMHz,
+                onValueChange = { newValue ->
+                    txInputMHz = newValue
+                    lastEditedBy = EditedField.TX
+                    rxInputMHz = calculateDownlink(newValue, offsetKHz) ?: if (newValue.isEmpty()) "" else rxInputMHz
+                },
+                label = { Text(stringResource(R.string.radar_doppler_tx_hint)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.weight(1f)
+            )
+
+            OutlinedTextField(
+                value = rxInputMHz,
+                onValueChange = { newValue ->
+                    rxInputMHz = newValue
+                    lastEditedBy = EditedField.RX
+                    txInputMHz = calculateUplink(newValue, offsetKHz) ?: if (newValue.isEmpty()) "" else txInputMHz
+                },
+                label = { Text(stringResource(R.string.radar_doppler_rx_hint)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+private enum class EditedField { TX, RX }
+
+@Composable
 private fun FrequencyText(frequency: Long?, modifier: Modifier = Modifier) {
     val text = frequency?.let {
         stringResource(id = R.string.radar_link_low, it / 1000000f)
@@ -450,6 +619,12 @@ private fun FrequencyText(frequency: Long?, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier
     )
+}
+
+private fun transceiverTitle(radio: SatRadio): String {
+    val title = if (radio.isInverted) "INV: ${radio.info}" else radio.info
+    val mode = "${radio.downlinkMode ?: "--"}/${radio.uplinkMode ?: "--"}"
+    return "$title ($mode)"
 }
 
 private val FREQ_ADJUSTMENTS =
