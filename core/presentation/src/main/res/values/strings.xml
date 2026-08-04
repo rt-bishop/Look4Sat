@@ -84,6 +84,9 @@
     <string name="radar_string_no">No</string>
     <string name="radar_string_yes">Yes</string>
     <string name="radar_visible">Visible</string>
+    <string name="radar_doppler_tx_hint">Enter TX freq (MHz)</string>
+    <string name="radar_doppler_rx_hint">Enter RX freq (MHz)</string>
+    <string name="radar_doppler_offset_hint">Offset (kHz)</string>
 
     <!-- Map screen -->
     <string name="map_prev">Prev</string>

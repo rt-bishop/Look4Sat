@@ -60,6 +60,9 @@
     <string name="radar_string_no">否</string>
     <string name="radar_string_yes">是</string>
     <string name="radar_visible">日照中</string>
+    <string name="radar_doppler_tx_hint">输入上行频率 (MHz)</string>
+    <string name="radar_doppler_rx_hint">输入下行频率 (MHz)</string>
+    <string name="radar_doppler_offset_hint">偏移 (kHz)</string>
 
     <!-- Map screen -->
     <string name="map_prev">上一个</string>

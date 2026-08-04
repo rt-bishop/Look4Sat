@@ -45,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.utility.DopplerFrequencyCalculator
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.presentation.EmptyListCard
 import com.rtbishop.look4sat.core.presentation.IconCard
@@ -74,6 +76,7 @@ import kotlinx.coroutines.launch
 
 private enum class RadarPage(val title: String) {
     Transceivers("Transceivers"),
+    Calculator("Calculator"),
     Sstv("SSTV")
 }
 
@@ -150,16 +153,31 @@ private fun PagerCard(
     requestMicPermission: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val pages = RadarPage.entries
+    val hasCalculatorPage = remember(uiState.transceivers.transmitters) {
+        uiState.transceivers.transmitters.any(DopplerFrequencyCalculator::isNamedLinearTransponder)
+    }
+    val pages = remember(hasCalculatorPage) {
+        buildList {
+            add(RadarPage.Transceivers)
+            if (hasCalculatorPage) add(RadarPage.Calculator)
+            add(RadarPage.Sstv)
+        }
+    }
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(pages.size) {
+        val lastPage = pages.lastIndex
+        if (pagerState.currentPage > lastPage) pagerState.scrollToPage(lastPage)
+    }
+
     ElevatedCard(modifier = modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
-            PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
+            val selectedTabIndex = pagerState.currentPage.coerceIn(0, pages.lastIndex)
+            PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
                 pages.forEachIndexed { index, page ->
                     Tab(
-                        selected = pagerState.currentPage == index,
+                        selected = selectedTabIndex == index,
                         onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                         text = { Text(text = page.title, maxLines = 1, overflow = TextOverflow.Ellipsis) }
                     )
@@ -174,6 +192,12 @@ private fun PagerCard(
                         transceivers = uiState.transceivers.transmitters,
                         selectedUuid = uiState.transceivers.selectedUuid,
                         radioControl = uiState.radioControl,
+                        onAction = onAction
+                    )
+                    RadarPage.Calculator -> CalculatorPage(
+                        transceivers = uiState.transceivers.transmitters,
+                        selectedUuid = uiState.transceivers.selectedUuid,
+                        orbitalPos = uiState.orbitalPos,
                         onAction = onAction
                     )
                     RadarPage.Sstv -> SstvPage(
