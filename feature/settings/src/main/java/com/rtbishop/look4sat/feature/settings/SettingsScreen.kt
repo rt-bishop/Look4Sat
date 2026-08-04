@@ -38,6 +38,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -487,7 +488,7 @@ private fun OtherCard(settings: OtherSettings, onAction: (SettingsAction) -> Uni
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .height(268.dp)
+            .height(404.dp)
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Text(
@@ -506,11 +507,43 @@ private fun OtherCard(settings: OtherSettings, onAction: (SettingsAction) -> Uni
             SwitchRow(R.string.prefs_other_switch_sensors, settings.stateOfSensors) {
                 onAction(SettingsAction.ToggleSensor(it))
             }
+            CompassOffsetRow(
+                labelResId = R.string.prefs_other_compass_offset,
+                value = settings.radarCompassOffset,
+                range = -180f..180f
+            ) { onAction(SettingsAction.SetRadarCompassOffset(it)) }
+            CompassOffsetRow(
+                labelResId = R.string.prefs_other_compass_offset_elev,
+                value = settings.radarCompassOffsetElev,
+                range = -90f..90f
+            ) { onAction(SettingsAction.SetRadarCompassOffsetElev(it)) }
             SwitchRow(R.string.prefs_other_switch_night_mode, settings.stateOfNightMode) {
                 onAction(SettingsAction.ToggleNightMode(it))
             }
         }
     }
+}
+
+@Composable
+private fun CompassOffsetRow(
+    labelResId: Int,
+    value: Float,
+    range: ClosedFloatingPointRange<Float>,
+    onValueChange: (Float) -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(text = stringResource(id = labelResId))
+        Text(text = "${value.toInt()}°")
+    }
+    Slider(
+        value = value,
+        onValueChange = onValueChange,
+        valueRange = range
+    )
 }
 
 @Composable
@@ -559,7 +592,7 @@ private fun CardCredits(modifier: Modifier = Modifier) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .height(268.dp)
+            .height(404.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceBetween,

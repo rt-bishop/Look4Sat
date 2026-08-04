@@ -189,6 +189,8 @@
     <string name="prefs_other_switch_sweep">Radar sweep animation</string>
     <string name="prefs_other_switch_sensors">Use sensors for radar</string>
     <string name="prefs_other_switch_night_mode">Red night filter</string>
+    <string name="prefs_other_compass_offset">Radar compass offset</string>
+    <string name="prefs_other_compass_offset_elev">Radar compass offset (elev)</string>
 
     <string name="prefs_highlight_title">Elevation highlight</string>
     <string name="prefs_highlight_low">Low &lt; %1$d°</string>

@@ -74,6 +74,7 @@ fun RadarViewCompose(
     azimElev: Pair<Float, Float>,
     shouldShowSweep: Boolean,
     shouldUseCompass: Boolean,
+    shouldFlipRadar: Boolean,
     modifier: Modifier = Modifier,
     sunPosition: CelestialComputer.SunPosition? = null,
     moonPosition: CelestialComputer.MoonPosition? = null,
@@ -125,7 +126,9 @@ fun RadarViewCompose(
             cachedSweepBrush = makeSweepBrush(center, primaryColor)
             cachedSweepColor = primaryColor
         }
-        rotate(if (shouldUseCompass) -azimElev.first else 0f) {
+        val baseRotation = if (shouldUseCompass) -azimElev.first else 0f
+        val rotation = if (shouldFlipRadar) baseRotation + 180f else baseRotation
+        rotate(rotation) {
             if (shouldShowSweep) cachedSweepBrush?.let { drawSweep(center, sweepDegrees, radius, it) }
             drawRadar(radius, radarColor)
             drawElevationLabels(radius, primaryColor, measurer)
