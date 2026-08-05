@@ -106,17 +106,18 @@ class PassesViewModel(
                 .collectLatest { (allPasses, isUtc, showDeepSpace) ->
                     val filtered = if (showDeepSpace) allPasses
                     else allPasses.filter { !it.isDeepSpace }
-                    // Expensive: recompute once per pass-list/UTC change, not every second
+                    // Expensive: recompute sun times once per items/UTC change, not every second
                     val sunTimes = computeSunTimes(filtered, isUtc)
-                    val grouped = groupPasses(filtered, isUtc)
-                    _uiState.update { it.copy(sunTimes = sunTimes, groupedPasses = grouped) }
+                    _uiState.update { it.copy(sunTimes = sunTimes) }
                     while (isActive) {
                         val timeNow = System.currentTimeMillis()
                         val processed = computePassProgress(filtered, timeNow)
+                        val grouped = groupPasses(processed, isUtc)
                         val (nextPass, nextTime, isAos) = resolveNextPass(processed, timeNow)
                         _uiState.update {
                             it.copy(
                                 itemsList = processed,
+                                groupedPasses = grouped,
                                 nextPass = nextPass,
                                 nextTime = nextTime,
                                 isNextTimeAos = isAos
