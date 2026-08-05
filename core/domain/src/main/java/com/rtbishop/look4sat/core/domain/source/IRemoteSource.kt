@@ -22,4 +22,6 @@ import java.io.InputStream
 interface IRemoteSource {
     suspend fun getFileStream(uri: String): InputStream?
     suspend fun getNetworkStream(url: String): InputStream?
+    suspend fun getAmSatCatalog(): String?
+    suspend fun getAmSatReports(hours: Int, limit: Int): String?
 }
