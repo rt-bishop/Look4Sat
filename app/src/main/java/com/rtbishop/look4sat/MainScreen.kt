@@ -126,7 +126,7 @@ fun MainScreen(navigateToRadar: () -> Unit = {}) {
     val currentKey = backStack.lastOrNull()
     val navigateBack: () -> Unit = { backStack.removeLastOrNull() }
     val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith fadeOut(animationSpec = tween(350))
-    val navItems = listOf(Screen.Satellites, Screen.Passes, Screen.Radar, Screen.AmSat, Screen.Map, Screen.Settings)
+    val navItems = listOf(Screen.Satellites, Screen.Passes, Screen.AmSat, Screen.Map, Screen.Settings)
 
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()

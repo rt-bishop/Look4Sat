@@ -22,7 +22,4 @@ import java.io.InputStream
 interface IRemoteSource {
     suspend fun getFileStream(uri: String): InputStream?
     suspend fun getNetworkStream(url: String): InputStream?
-
-    /** Fetch the AMSAT satellite status page HTML (null on failure) */
-    suspend fun getStatusHtml(): String?
 }

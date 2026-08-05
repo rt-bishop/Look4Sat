@@ -1,6 +1,6 @@
 package com.rtbishop.look4sat.core.domain.model
 
-/** 单条卫星状态报告(AMSAT 网站 tooltip 数据) */
+/** One satellite status report (AMSAT site tooltip data) */
 data class SatReport(
     val id: String,          // 报告 ID(a885153)
     val statusText: String,  // Heard / Telemetry Only / Not Heard ...
@@ -10,26 +10,26 @@ data class SatReport(
     val timeUtc: String      // 2:46-:59 UTC
 )
 
-/** 单个 2 小时槽的状态 */
+/** State of one 2-hour slot */
 data class SatSlot(
     val statusColor: Long,   // ARGB 状态色(-1 = 无报告)
     val count: Int,          // 报告数量(0 = 无)
     val reportIds: List<String> = emptyList() // 该槽报告 ID 列表
 )
 
-/** 卫星一天的状态(12 个 2 小时槽) */
+/** One satellite day (12 two-hour slots) */
 data class SatDay(
     val dateLabel: String,   // "Aug 4"
     val slots: List<SatSlot> // 12 槽(00-02 ... 22-24)
 )
 
-/** 单个卫星 6 天状态 */
+/** One satellite, 6 days of state */
 data class SatStatus(
     val name: String,        // "AO-123_[FM]"
     val days: List<SatDay>   // 6 天(新→旧)
 )
 
-/** 页面整体解析结果 */
+/** Overall page parse result */
 data class SatStatusPage(
     val fetchedAtUtcMs: Long,
     val statuses: List<SatStatus>,

@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -55,7 +58,7 @@ import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.presentation.R
 import java.util.Calendar
 
-// ========== 官网状态色(amsat.org/status 原色) ==========
+// ========== Official status colors (amsat.org/status originals) ==========
 val ActiveBlue = Color(0xFF648FFF)
 val TlmOrange = Color(0xFFFFB000)
 val NotHeardPink = Color(0xFFDC267F)
@@ -72,8 +75,14 @@ fun SatStatusScreen(container: IMainContainer) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedDay by remember { mutableStateOf<Pair<SatStatus, SatDay>?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
-        // 顶部: 图例 + 刷新
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(horizontal = 8.dp)
+    ) {
+        // Top: legend + refresh
         StatusHeader(
             fetchedAtUtcMs = uiState.fetchedAtUtcMs,
             isRefreshing = uiState.isRefreshing,
@@ -96,11 +105,14 @@ fun SatStatusScreen(container: IMainContainer) {
                 }
             }
             else -> {
-                // 表头
+                // Header
                 HeaderRow(statuses = uiState.statuses)
                 HorizontalDivider(thickness = 1.dp)
-                // 行
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                // Row
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
                     items(uiState.statuses, key = { it.name }) { status ->
                         StatusRow(
                             status = status,
@@ -122,7 +134,7 @@ fun SatStatusScreen(container: IMainContainer) {
     }
 }
 
-/** 顶部: 更新时间 + 刷新按钮(加载中旋转动画) */
+/** Top: update time + refresh button (spinner while loading) */
 @Composable
 private fun StatusHeader(
     fetchedAtUtcMs: Long,
@@ -168,7 +180,7 @@ private fun StatusHeader(
     }
 }
 
-/** 图例(官网四色) */
+/** Legend (official four colors) */
 @Composable
 private fun LegendRow() {
     val legend = listOf(
@@ -196,7 +208,7 @@ private fun LegendRow() {
     }
 }
 
-/** 表头: 卫星名 + 6 天日期 */
+/** Header: satellite name + 6 day dates */
 @Composable
 private fun HeaderRow(statuses: List<SatStatus>) {
     val dates = statuses.firstOrNull()?.days?.map { it.dateLabel } ?: emptyList()
@@ -224,7 +236,7 @@ private fun HeaderRow(statuses: List<SatStatus>) {
     }
 }
 
-/** 卫星行: 名称 + 6 天色块(官网色 + 报告数) */
+/** Satellite row: name + 6 day color blocks (official colors + report counts) */
 @Composable
 private fun StatusRow(status: SatStatus, onClickDay: (SatDay) -> Unit) {
     Row(
@@ -251,7 +263,7 @@ private fun StatusRow(status: SatStatus, onClickDay: (SatDay) -> Unit) {
     }
 }
 
-/** 单天色块: 取当天 12 槽中最新的有报告状态; 无报告则灰 */
+/** Day block: newest reported status among the day's 12 slots; gray when none */
 @Composable
 private fun DayCell(slot: SatSlot, modifier: Modifier, onClick: () -> Unit) {
     val color = Color(slot.statusColor)
@@ -274,7 +286,7 @@ private fun DayCell(slot: SatSlot, modifier: Modifier, onClick: () -> Unit) {
     }
 }
 
-/** 报告详情弹窗(3 级: 呼号/日期/时间/网格) */
+/** Report detail dialog (3 levels: callsign/date/time/grid) */
 @Composable
 private fun ReportDialog(
     statusName: String,
