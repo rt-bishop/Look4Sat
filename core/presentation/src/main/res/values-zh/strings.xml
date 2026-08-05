@@ -11,6 +11,17 @@
     <string name="nav_radar">雷达</string>
     <string name="nav_map">地图</string>
     <string name="nav_prefs">设置</string>
+    <string name="nav_amsat">AMSAT</string>
+    <string name="amsat_title">AMSAT 卫星状态</string>
+    <string name="amsat_updated">更新:</string>
+    <string name="amsat_active">活跃</string>
+    <string name="amsat_tlm">仅遥测</string>
+    <string name="amsat_not_heard">未听到</string>
+    <string name="amsat_conflict">矛盾</string>
+    <string name="amsat_name">Name</string>
+    <string name="amsat_load_failed">加载失败,请检查网络后重试</string>
+    <string name="amsat_no_reports">该时段无报告</string>
+    <string name="amsat_close">关闭</string>
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">模式：%s</string>

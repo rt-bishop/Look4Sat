@@ -36,6 +36,7 @@ internal class ApplicationPlugin : Plugin<Project> {
             implementation(project(":feature:radar"))
             implementation(project(":feature:satellites"))
             implementation(project(":feature:settings"))
+            implementation(project(":feature:status"))
             implementation(libs.androidx.core.splashscreen)
             implementation(libs.compose.material3.adaptive)
             implementation(libs.compose.navigation3)

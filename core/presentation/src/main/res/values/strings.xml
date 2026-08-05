@@ -12,6 +12,17 @@
     <string name="nav_radar">Radar</string>
     <string name="nav_map">Map</string>
     <string name="nav_prefs">Settings</string>
+    <string name="nav_amsat">AMSAT</string>
+    <string name="amsat_title">AMSAT Satellite Status</string>
+    <string name="amsat_updated">Updated:</string>
+    <string name="amsat_active">Active</string>
+    <string name="amsat_tlm">TLM/Beacon</string>
+    <string name="amsat_not_heard">Not Heard</string>
+    <string name="amsat_conflict">Conflicting</string>
+    <string name="amsat_name">Name</string>
+    <string name="amsat_load_failed">Load failed - check network and retry</string>
+    <string name="amsat_no_reports">No reports for this period</string>
+    <string name="amsat_close">Close</string>
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">Modes: %s</string>

@@ -42,6 +42,22 @@ class RemoteSource(
         }
     }
 
+    override suspend fun getStatusHtml(): String? = withContext(dispatcher) {
+        try {
+            val request = okhttp3.Request.Builder()
+                .url("https://amsat.org/status/")
+                .header("User-Agent", "Mozilla/5.0 (Linux; Android 13) Look4Sat/4.4")
+                .build()
+            httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@use null
+                response.body?.string()
+            }
+        } catch (exception: Exception) {
+            println("RemoteSource amsat status exception: $exception")
+            null
+        }
+    }
+
     override suspend fun getNetworkStream(url: String): InputStream? = withContext(dispatcher) {
         try {
             val networkRequest = Request.Builder().url(url).build()

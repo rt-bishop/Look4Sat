@@ -12,6 +12,17 @@
     <string name="nav_radar">Radar</string>
     <string name="nav_map">Harita</string>
     <string name="nav_prefs">Ayarlar</string>
+    <string name="nav_amsat">AMSAT</string>
+    <string name="amsat_title">AMSAT Uydu Durumu</string>
+    <string name="amsat_updated">Güncellendi:</string>
+    <string name="amsat_active">Aktif</string>
+    <string name="amsat_tlm">TLM/işaret</string>
+    <string name="amsat_not_heard">Duyulmadı</string>
+    <string name="amsat_conflict">Çelişkili</string>
+    <string name="amsat_name">Name</string>
+    <string name="amsat_load_failed">Yükleme başarısız - ağı kontrol edip tekrar deneyin</string>
+    <string name="amsat_no_reports">Bu dönem için rapor yok</string>
+    <string name="amsat_close">Kapat</string>
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">Modlar: %s</string>
