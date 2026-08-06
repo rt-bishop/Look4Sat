@@ -87,7 +87,7 @@
     <string name="prefs_updated_title">更新：%s</string>
     <string name="prefs_updated_time">yyyy MMM d - HH:mm:ss</string>
 
-    <string name="prefs_loc_title">站位</string>
+    <string name="prefs_loc_title">站点位置</string>
     <string name="prefs_loc_gps_title">GPS 定位</string>
     <string name="prefs_loc_gps_error">检查您的位置权限</string>
     <string name="prefs_loc_input_title">输入位置</string>
@@ -95,11 +95,11 @@
     <string name="prefs_loc_qth_title">QTH 网格</string>
     <string name="prefs_loc_qth_error">无效的 QTH 网格</string>
     <string name="prefs_loc_success">位置更新成功</string>
-    <string name="prefs_station_title">站位</string>
-    <string name="prefs_station_lat_text">站位纬度</string>
-    <string name="prefs_station_lon_text">站位经度</string>
+    <string name="prefs_station_title">站点位置</string>
+    <string name="prefs_station_lat_text">站点纬度</string>
+    <string name="prefs_station_lon_text">站点经度</string>
     <string name="prefs_locator_title">QTH 定位</string>
-    <string name="prefs_locator_text">通过 QTH 设置站位</string>
+    <string name="prefs_locator_text">通过 QTH 设置站点位置</string>
 
     <string name="prefs_data_title">卫星数据更新</string>
     <string name="prefs_data_entries">卫星：%s</string>
