@@ -155,6 +155,8 @@
     <string name="prefs_other_switch_sweep">雷达扫描动画</string>
     <string name="prefs_other_switch_sensors">传感器控制雷达</string>
     <string name="prefs_other_switch_night_mode">红色夜间模式</string>
+    <string name="prefs_other_compass_offset">雷达罗盘水平偏移量</string>
+    <string name="prefs_other_compass_offset_elev">雷达罗盘俯仰偏移量</string>
 
     <string name="prefs_highlight_title">仰角高亮</string>
     <string name="prefs_highlight_low">低 &lt; %1$d°</string>
