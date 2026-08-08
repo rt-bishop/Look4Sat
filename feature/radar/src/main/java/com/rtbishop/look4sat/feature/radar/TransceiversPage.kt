@@ -21,14 +21,18 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,16 +43,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,6 +67,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -68,6 +77,7 @@ import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.core.domain.model.SatRadio
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 import com.rtbishop.look4sat.core.domain.utility.DopplerFrequencyCalculator
+import com.rtbishop.look4sat.core.domain.utility.TransponderMapper
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.formatFrequency
@@ -167,7 +177,7 @@ fun CalculatorPage(
         }
 
         item {
-            DopplerCalculatorPanel(
+            DopplerFrequencyCalculator(
                 transponder = selectedTransceiver,
                 orbitalPos = orbitalPos,
                 modifier = Modifier.fillMaxWidth()
@@ -505,107 +515,360 @@ private fun ExpandedRadioControl(
     }
 }
 
+private enum class EditedField { TX, PASSBAND, RX }
+
 @Composable
-private fun DopplerCalculatorPanel(
+private fun DopplerFrequencyCalculator(
     transponder: SatRadio,
     orbitalPos: OrbitalPos?,
     modifier: Modifier = Modifier
 ) {
     if (orbitalPos == null || !DopplerFrequencyCalculator.isLinearTransponder(transponder)) return
 
-    var txInputMHz by remember(transponder.uuid) { mutableStateOf("") }
-    var rxInputMHz by remember(transponder.uuid) { mutableStateOf("") }
-    var offsetKHz by remember(transponder.uuid) { mutableStateOf("") }
-    var lastEditedBy by remember(transponder.uuid) { mutableStateOf(EditedField.TX) }
+    var lastEditedField by remember { mutableStateOf(EditedField.TX) }
+    var txFrequencyHz by remember { mutableStateOf(0L) }
+    var rxFrequencyHz by remember { mutableStateOf(0L) }
+    var passbandPosition by remember { mutableStateOf(0.5f) }
+    var offsetKHz by remember { mutableStateOf("") }
+    var stepSizeKHz by remember { mutableIntStateOf(1) }
 
-    fun offsetHz(text: String): Long = text.toDoubleOrNull()?.let { (it * 1000).toLong() } ?: 0L
-    fun formatHz(hz: Long): String = String.format(Locale.ENGLISH, "%.6f", hz / 1_000_000.0)
-    fun mhzToHz(text: String): Long? = text.toDoubleOrNull()
-        ?.takeIf { it > 0.0 }
-        ?.let { (it * 1_000_000).toLong() }
+    val offsetHz = offsetKHz.toDoubleOrNull()?.let { it * 1000 }?.toLong() ?: 0L
 
-    fun calculateDownlink(txText: String, offsetText: String): String? {
-        val txHz = mhzToHz(txText) ?: return null
-        return DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
-            uplinkHz = txHz,
-            transponder = transponder,
-            orbitalPos = orbitalPos,
-            offsetHz = offsetHz(offsetText)
-        )?.let(::formatHz)
+    val txLow = transponder.uplinkLow ?: return
+    val txHigh = transponder.uplinkHigh ?: return
+    val rxLow = transponder.downlinkLow ?: return
+    val rxHigh = transponder.downlinkHigh ?: return
+    val txRange = txHigh - txLow
+    val rxRange = rxHigh - rxLow
+    if (txRange <= 0L || rxRange <= 0L) return
+
+    // 原始转发器值（逆转多普勒），用于 passband 映射计算
+    val rawTxLow = orbitalPos.getDownlinkFreq(txLow)
+    val rawTxHigh = orbitalPos.getDownlinkFreq(txHigh)
+    val rawRxLow = orbitalPos.getUplinkFreq(rxLow)
+    val rawRxHigh = orbitalPos.getUplinkFreq(rxHigh)
+    val rawTxRange = rawTxHigh - rawTxLow
+    val rawRxRange = rawRxHigh - rawRxLow
+    val rawTransponder = transponder.copy(
+        uplinkLow = rawTxLow, uplinkHigh = rawTxHigh,
+        downlinkLow = rawRxLow, downlinkHigh = rawRxHigh
+    )
+
+    // 初始化
+    LaunchedEffect(Unit) {
+        if (txFrequencyHz == 0L) {
+            txFrequencyHz = txLow + txRange / 2
+            rxFrequencyHz = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+                txFrequencyHz, rawTransponder, orbitalPos, offsetHz
+            ) ?: (rxLow + rxRange / 2)
+        }
     }
 
-    fun calculateUplink(rxText: String, offsetText: String): String? {
-        val rxHz = mhzToHz(rxText) ?: return null
-        return DopplerFrequencyCalculator.computeUplinkFromDownlinkWithOffset(
-            downlinkHz = rxHz,
-            transponder = transponder,
-            orbitalPos = orbitalPos,
-            offsetHz = offsetHz(offsetText)
-        )?.let(::formatHz)
+    // 实时重算：卫星移动时，锚点侧不变，重算另一侧
+    LaunchedEffect(orbitalPos) {
+        if (lastEditedField == EditedField.TX) {
+            // TX 是锚点，不变；重算 RX
+            rxFrequencyHz = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+                txFrequencyHz, rawTransponder, orbitalPos, offsetHz
+            ) ?: rxFrequencyHz
+        } else if (lastEditedField == EditedField.RX) {
+            // RX 是锚点，不变；重算 TX
+            txFrequencyHz = DopplerFrequencyCalculator.computeUplinkFromDownlinkWithOffset(
+                rxFrequencyHz, rawTransponder, orbitalPos, offsetHz
+            ) ?: txFrequencyHz
+        } else if (lastEditedField == EditedField.PASSBAND) {
+            // 相对位置不变（passbandPosition），TX 用地面频率，RX 经 Transceiver 完整路径计算
+            txFrequencyHz = txLow + (passbandPosition * txRange).toLong()
+            rxFrequencyHz = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+                txFrequencyHz, rawTransponder, orbitalPos, offsetHz
+            ) ?: rxFrequencyHz
+        }
     }
 
-    LaunchedEffect(orbitalPos, transponder.uuid) {
-        if (lastEditedBy == EditedField.TX) {
-            calculateDownlink(txInputMHz, offsetKHz)?.let { rxInputMHz = it }
-        } else {
-            calculateUplink(rxInputMHz, offsetKHz)?.let { txInputMHz = it }
+    val txSliderValue = if (lastEditedField == EditedField.PASSBAND) {
+        passbandPosition
+    } else {
+        ((txFrequencyHz - txLow).toFloat() / txRange).coerceIn(0f, 1f)
+    }
+    val rxSliderValue = if (lastEditedField == EditedField.PASSBAND) {
+        ((rxFrequencyHz - rxLow).toFloat() / rxRange).coerceIn(0f, 1f)
+    } else {
+        ((rxFrequencyHz - rxLow).toFloat() / rxRange).coerceIn(0f, 1f)
+    }
+
+    fun updateTx(newTxHz: Long) {
+        when (lastEditedField) {
+            EditedField.PASSBAND -> {
+                // Passband 模式：滑块位置 → passbandPosition → 地面频率，RX 经 Transceiver 计算
+                val pos = ((newTxHz - txLow).toFloat() / txRange).coerceIn(0f, 1f)
+                passbandPosition = pos
+                txFrequencyHz = txLow + (pos * txRange).toLong()
+                rxFrequencyHz = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+                    txFrequencyHz, rawTransponder, orbitalPos, offsetHz
+                ) ?: rxFrequencyHz
+            }
+            else -> {
+                txFrequencyHz = newTxHz.coerceIn(txLow, txHigh)
+                rxFrequencyHz = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+                    txFrequencyHz, rawTransponder, orbitalPos, offsetHz
+                ) ?: rxFrequencyHz
+            }
+        }
+    }
+
+    fun updateRx(newRxHz: Long) {
+        when (lastEditedField) {
+            EditedField.PASSBAND -> {
+                // Passband 模式：从 RX 反推 TX 位置，TX 用地面频率
+                val pos = ((newRxHz - rxLow).toFloat() / rxRange).coerceIn(0f, 1f)
+                val txFromRx = TransponderMapper.mapDownlinkToUplink(newRxHz, rawTransponder)
+                passbandPosition = if (txFromRx != null) {
+                    ((txFromRx - rawTxLow).toFloat() / rawTxRange).coerceIn(0f, 1f)
+                } else pos
+                txFrequencyHz = txLow + (passbandPosition * txRange).toLong()
+                rxFrequencyHz = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+                    txFrequencyHz, rawTransponder, orbitalPos, offsetHz
+                ) ?: rxFrequencyHz
+            }
+            else -> {
+                rxFrequencyHz = newRxHz.coerceIn(rxLow, rxHigh)
+                txFrequencyHz = DopplerFrequencyCalculator.computeUplinkFromDownlinkWithOffset(
+                    rxFrequencyHz, rawTransponder, orbitalPos, offsetHz
+                ) ?: txFrequencyHz
+            }
         }
     }
 
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier.fillMaxWidth().padding(top = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        OutlinedTextField(
-            value = offsetKHz,
-            onValueChange = { newValue ->
-                offsetKHz = newValue
-                if (lastEditedBy == EditedField.TX) {
-                    calculateDownlink(txInputMHz, newValue)?.let { rxInputMHz = it }
-                } else {
-                    calculateUplink(rxInputMHz, newValue)?.let { txInputMHz = it }
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                // 左半边: TX + RX 按钮
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilterChip(
+                        selected = lastEditedField == EditedField.TX,
+                        onClick = {
+                            when (lastEditedField) {
+                                EditedField.TX -> {
+                                    passbandPosition = ((txFrequencyHz - txLow).toFloat() / txRange).coerceIn(0f, 1f)
+                                    lastEditedField = EditedField.PASSBAND
+                                    rxFrequencyHz = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+                                        txFrequencyHz, rawTransponder, orbitalPos, offsetHz
+                                    ) ?: rxFrequencyHz
+                                }
+                                EditedField.PASSBAND -> { lastEditedField = EditedField.TX }
+                                else -> { lastEditedField = EditedField.TX }
+                            }
+                        },
+                        label = {
+                            Text("TX", fontSize = 13.sp, textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
+                        },
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                    )
+                    FilterChip(
+                        selected = lastEditedField == EditedField.RX,
+                        onClick = {
+                            when (lastEditedField) {
+                                EditedField.RX -> {
+                                    txFrequencyHz = DopplerFrequencyCalculator.computeUplinkFromDownlinkWithOffset(
+                                        rxFrequencyHz, rawTransponder, orbitalPos, offsetHz
+                                    ) ?: txFrequencyHz
+                                    passbandPosition = ((txFrequencyHz - txLow).toFloat() / txRange).coerceIn(0f, 1f)
+                                    lastEditedField = EditedField.PASSBAND
+                                }
+                                EditedField.PASSBAND -> {
+                                    lastEditedField = EditedField.RX
+                                    txFrequencyHz = DopplerFrequencyCalculator.computeUplinkFromDownlinkWithOffset(
+                                        rxFrequencyHz, rawTransponder, orbitalPos, offsetHz
+                                    ) ?: txFrequencyHz
+                                }
+                                else -> { lastEditedField = EditedField.RX }
+                            }
+                        },
+                        label = {
+                            Text("RX", fontSize = 13.sp, textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth())
+                        },
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                    )
                 }
-            },
-            label = { Text(stringResource(R.string.radar_doppler_offset_hint)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            modifier = Modifier.fillMaxWidth()
-        )
+                // 右半边: Offset 输入框（带细线边框）
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                        .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BasicTextField(
+                        value = offsetKHz,
+                        onValueChange = { offsetKHz = it },
+                        singleLine = true,
+                        textStyle = TextStyle(
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        decorationBox = { innerTextField ->
+                            if (offsetKHz.isEmpty()) {
+                                Text(
+                                    text = "Offset (kHz)",
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+                }
+            }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            OutlinedTextField(
-                value = txInputMHz,
-                onValueChange = { newValue ->
-                    txInputMHz = newValue
-                    lastEditedBy = EditedField.TX
-                    rxInputMHz = calculateDownlink(newValue, offsetKHz) ?: if (newValue.isEmpty()) "" else rxInputMHz
-                },
-                label = { Text(stringResource(R.string.radar_doppler_tx_hint)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.weight(1f)
+            // TX 行
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(
+                        onClick = { updateTx(txFrequencyHz - stepSizeKHz * 1000L) },
+                        modifier = Modifier.width(32.dp).height(28.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) { Text("−", fontSize = 14.sp) }
+
+                    Slider(
+                        value = txSliderValue,
+                        onValueChange = { norm ->
+                            val rawFreq = txLow + (txRange * norm).toLong()
+                            val snapped = ((rawFreq + 500) / 1000L) * 1000L
+                            updateTx(snapped.coerceIn(txLow, txHigh))
+                        },
+                        valueRange = 0f..1f,
+                        modifier = Modifier.weight(1f).height(20.dp).padding(horizontal = 4.dp)
+                    )
+
+                    OutlinedButton(
+                        onClick = { updateTx(txFrequencyHz + stepSizeKHz * 1000L) },
+                        modifier = Modifier.width(32.dp).height(28.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) { Text("+", fontSize = 14.sp) }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = String.format(Locale.ENGLISH, "%.4f", txLow / 1_000_000.0),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = String.format(Locale.ENGLISH, "%.6f", txFrequencyHz / 1_000_000.0),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = " MHz",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Text(
+                        text = String.format(Locale.ENGLISH, "%.4f", txHigh / 1_000_000.0),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
+
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
             )
 
-            OutlinedTextField(
-                value = rxInputMHz,
-                onValueChange = { newValue ->
-                    rxInputMHz = newValue
-                    lastEditedBy = EditedField.RX
-                    txInputMHz = calculateUplink(newValue, offsetKHz) ?: if (newValue.isEmpty()) "" else txInputMHz
-                },
-                label = { Text(stringResource(R.string.radar_doppler_rx_hint)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.weight(1f)
-            )
+            // RX 行
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(
+                        onClick = { updateRx(rxFrequencyHz - stepSizeKHz * 1000L) },
+                        modifier = Modifier.width(32.dp).height(28.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) { Text("−", fontSize = 14.sp) }
+
+                    Slider(
+                        value = rxSliderValue,
+                        onValueChange = { norm ->
+                            val rawFreq = rxLow + (rxRange * norm).toLong()
+                            val snapped = ((rawFreq + 500) / 1000L) * 1000L
+                            updateRx(snapped.coerceIn(rxLow, rxHigh))
+                        },
+                        valueRange = 0f..1f,
+                        modifier = Modifier.weight(1f).height(20.dp).padding(horizontal = 4.dp)
+                    )
+
+                    OutlinedButton(
+                        onClick = { updateRx(rxFrequencyHz + stepSizeKHz * 1000L) },
+                        modifier = Modifier.width(32.dp).height(28.dp),
+                        contentPadding = PaddingValues(0.dp),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) { Text("+", fontSize = 14.sp) }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = String.format(Locale.ENGLISH, "%.4f", rxLow / 1_000_000.0),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = String.format(Locale.ENGLISH, "%.6f", rxFrequencyHz / 1_000_000.0),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = " MHz",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Text(
+                        text = String.format(Locale.ENGLISH, "%.4f", rxHigh / 1_000_000.0),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
         }
-    }
 }
-
-private enum class EditedField { TX, RX }
 
 @Composable
 private fun FrequencyText(frequency: Long?, modifier: Modifier = Modifier) {
@@ -630,3 +893,4 @@ private fun transceiverTitle(radio: SatRadio): String {
 
 private val FREQ_ADJUSTMENTS =
     listOf(-10_000L to "-10k", -1_000L to "-1k", -100L to "-100", 100L to "+100", 1_000L to "+1k", 10_000L to "+10k")
+
