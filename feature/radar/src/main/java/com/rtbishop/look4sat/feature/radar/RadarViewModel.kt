@@ -65,8 +65,8 @@ class RadarViewModel(
     private val showToast: IShowToast
 ) : ViewModel() {
 
-    private val stationPos = settingsRepo.stationPosition.value
-    private val magDeclination = sensorsRepo.getMagDeclination(stationPos)
+    private var stationPos = settingsRepo.stationPosition.value
+    private var magDeclination = sensorsRepo.getMagDeclination(stationPos)
     private var compassOffset = settingsRepo.otherSettings.value.radarCompassOffset
     private var compassOffsetElev = settingsRepo.otherSettings.value.radarCompassOffsetElev
     private var transponders: List<SatRadio> = emptyList()
@@ -92,6 +92,7 @@ class RadarViewModel(
 
     init {
         collectSettingsChanges()  // also handles initial sensor subscription
+        collectStationPositionChanges()
         collectPassAndStartTickLoop()
         collectRadioTrackingState()
     }
@@ -133,6 +134,23 @@ class RadarViewModel(
                 when {
                     settings.stateOfSensors -> startSensorCollection()
                     else -> stopSensorCollection()
+                }
+            }
+        }
+    }
+
+    private fun collectStationPositionChanges() {
+        viewModelScope.launch {
+            settingsRepo.stationPosition.collect { newPos ->
+                if (stationPos != newPos) {
+                    stationPos = newPos
+                    magDeclination = sensorsRepo.getMagDeclination(stationPos)
+                    lastCelestialUpdateMs = 0L // force celestial recompute on next tick
+                    val pass = _uiState.value.currentPass ?: return@collect
+                    if (!pass.isDeepSpace) {
+                        val track = satelliteRepo.getTrack(pass.orbitalObject, stationPos, pass.aosTime, pass.losTime)
+                        _uiState.update { it.copy(satTrack = track) }
+                    }
                 }
             }
         }
