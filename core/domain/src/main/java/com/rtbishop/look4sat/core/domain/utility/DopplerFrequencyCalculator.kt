@@ -112,11 +112,30 @@ object DopplerFrequencyCalculator {
         val modes = listOfNotNull(transponder.downlinkMode, transponder.uplinkMode)
             .joinToString(separator = " ")
             .lowercase(Locale.ENGLISH)
-        val hasLinearName = info.contains("linear")
+        val hasLinearName = info.contains("linear") || info.contains(" lin") || info.startsWith("lin")
         val hasTransponderName = info.contains("transponder") || info.contains("transp") ||
                 info.contains("xponder") || info.contains("xpdr")
         val hasLinearMode = listOf("ssb", "usb", "lsb", "cw").any { modes.contains(it) }
 
-        return (hasLinearName && hasTransponderName) || (hasTransponderName && hasLinearMode)
+        return (hasLinearName && hasTransponderName) || (hasTransponderName && hasLinearMode) ||
+                (hasLinearName && hasLinearMode)
+    }
+
+    /**
+     * Removes duplicate transponder entries that describe the same physical
+     * transponder with different mode labels (e.g. SatNOGS lists AO-7's Mode A
+     * as both "Lin SSB" and "Lin CW", and JO-97's U/V transponder as both
+     * "CW Transponder" and "SSB Transponder").
+     *
+     * Entries sharing the same uplink/downlink frequency range are considered
+     * the same transponder. The non-CW entry is preferred because its invert
+     * flag is more reliable (e.g. JO-97's CW entry wrongly has invert=false).
+     */
+    fun deduplicateTransponders(radios: List<SatRadio>): List<SatRadio> {
+        return radios.groupBy { radio ->
+            listOf(radio.uplinkLow, radio.uplinkHigh, radio.downlinkLow, radio.downlinkHigh)
+        }.values.map { group ->
+            group.firstOrNull { it.downlinkMode?.equals("CW", ignoreCase = true) != true } ?: group.first()
+        }
     }
 }
