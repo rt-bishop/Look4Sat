@@ -122,6 +122,7 @@ fun CalculatorPage(
 ) {
     val calculatorTransceivers = remember(transceivers) {
         transceivers.filter(DopplerFrequencyCalculator::isNamedLinearTransponder)
+            .let(DopplerFrequencyCalculator::deduplicateTransponders)
     }
     val selectedTransceiver = remember(calculatorTransceivers, selectedUuid) {
         calculatorTransceivers.firstOrNull { it.uuid == selectedUuid }
