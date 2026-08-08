@@ -67,6 +67,21 @@
         \n* Replaced the types selection dialog with modes selection to avoid confusion
     </string>
 
+    <!-- AMSAT Status screen -->
+    <string name="nav_amsat">AMSAT</string>
+    <string name="amsat_title">AMSAT Satellite Status</string>
+    <string name="amsat_refresh">Refresh</string>
+    <string name="amsat_retry">Retry</string>
+    <string name="amsat_updated">Updated:</string>
+    <string name="amsat_active">Active</string>
+    <string name="amsat_tlm">TLM/Beacon</string>
+    <string name="amsat_not_heard">Not Heard</string>
+    <string name="amsat_conflict">Conflicting</string>
+    <string name="amsat_name">Name</string>
+    <string name="amsat_load_failed">Load failed - check network and retry</string>
+    <string name="amsat_no_reports">No reports for this period</string>
+    <string name="amsat_close">Close</string>
+
     <!-- Radar screen -->
     <string name="radar_back">Back</string>
     <string name="radar_notify">Notify</string>

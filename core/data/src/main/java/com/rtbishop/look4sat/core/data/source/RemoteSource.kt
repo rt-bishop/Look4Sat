@@ -58,4 +58,36 @@ class RemoteSource(
             null
         }
     }
+
+    override suspend fun getAmSatCatalog(): String? = withContext(dispatcher) {
+        try {
+            val request = Request.Builder()
+                .url("https://www.amsat.org/status/api/v1/catalog.php")
+                .header("User-Agent", "Look4Sat")
+                .build()
+            httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@use null
+                response.body.string()
+            }
+        } catch (exception: Exception) {
+            println("RemoteSource getAmSatCatalog exception: $exception")
+            null
+        }
+    }
+
+    override suspend fun getAmSatReports(hours: Int, limit: Int): String? = withContext(dispatcher) {
+        try {
+            val request = Request.Builder()
+                .url("https://www.amsat.org/status/api/v1/reports.php?hours=$hours&limit=$limit")
+                .header("User-Agent", "Look4Sat")
+                .build()
+            httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@use null
+                response.body.string()
+            }
+        } catch (exception: Exception) {
+            println("RemoteSource getAmSatReports exception: $exception")
+            null
+        }
+    }
 }

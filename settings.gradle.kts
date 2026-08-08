@@ -25,5 +25,6 @@ include(
     ":feature:passes",
     ":feature:radar",
     ":feature:satellites",
-    ":feature:settings"
+    ":feature:settings",
+    ":feature:status"
 )

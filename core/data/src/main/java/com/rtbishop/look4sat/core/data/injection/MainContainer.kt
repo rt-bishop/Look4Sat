@@ -29,6 +29,7 @@ import com.rtbishop.look4sat.core.data.framework.Ft817Controller
 import com.rtbishop.look4sat.core.data.framework.Ic705Controller
 import com.rtbishop.look4sat.core.data.framework.NetworkReporter
 import com.rtbishop.look4sat.core.data.framework.RadioTrackingService
+import com.rtbishop.look4sat.core.data.repository.AmSatRepository
 import com.rtbishop.look4sat.core.data.repository.DatabaseRepo
 import com.rtbishop.look4sat.core.data.repository.SatelliteRepo
 import com.rtbishop.look4sat.core.data.repository.SelectionRepo
@@ -66,12 +67,14 @@ import okhttp3.OkHttpClient
 class MainContainer(private val context: Context) : IMainContainer {
 
     private val localSource = provideLocalSource()
+    private val remoteSource = provideRemoteSource()
     private val mainHandler = CoroutineExceptionHandler { _, error -> println("MainHandler: $error") }
     override val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + mainHandler)
     override val settingsRepo = provideSettingsRepo()
     override val selectionRepo = provideSelectionRepo()
     override val satelliteRepo = provideSatelliteRepo()
     override val databaseRepo = provideDatabaseRepo()
+    override val amSatRepo by lazy { AmSatRepository(remoteSource) }
     override val radioTrackingService: IRadioTrackingService by lazy {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         RadioTrackingService(appScope, manager, satelliteRepo, settingsRepo)
