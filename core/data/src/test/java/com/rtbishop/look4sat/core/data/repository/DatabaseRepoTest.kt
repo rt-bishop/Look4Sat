@@ -213,6 +213,10 @@ private class FakeSettingsRepo(dataSources: DataSourcesSettings = defaultDataSou
     }
 
     override fun updateRadioControlSettings(settings: RadioControlSettings) = Unit
+
+    override fun getSatelliteOffset(catnum: Int): String = ""
+
+    override fun setSatelliteOffset(catnum: Int, offset: String) = Unit
 }
 
 private fun defaultDataSourcesSettings(): DataSourcesSettings {

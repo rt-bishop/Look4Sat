@@ -63,7 +63,8 @@ data class RadarState(
     val moonPosition: CelestialComputer.MoonPosition? = null,
     val transceivers: TransceiverSubState = TransceiverSubState(),
     val radioControl: RadioControlSubState = RadioControlSubState(),
-    val sstv: SstvSubState = SstvSubState()
+    val sstv: SstvSubState = SstvSubState(),
+    val calculatorOffsetKHz: String = ""
 )
 
 enum class SstvStatus { Idle, Recording }
@@ -97,4 +98,7 @@ sealed interface RadarAction {
     data object SstvReset : RadarAction
     data class SstvSelectMode(val modeName: String) : RadarAction
     data class SstvPermissionResult(val granted: Boolean) : RadarAction
+
+    // Calculator actions
+    data class ChangeCalculatorOffset(val offsetKHz: String) : RadarAction
 }
