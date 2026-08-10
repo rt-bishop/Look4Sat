@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rtbishop.look4sat.core.domain.model.SatReport
 import com.rtbishop.look4sat.core.domain.model.SatStatus
+import com.rtbishop.look4sat.core.domain.repository.IAmSatRepository
 import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +23,7 @@ data class SatStatusUiState(
 )
 
 class SatStatusViewModel(
-    private val container: IMainContainer
+    private val amSatRepo: IAmSatRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SatStatusUiState(isLoading = true))
@@ -36,7 +37,7 @@ class SatStatusViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val page = container.amSatRepo.fetchStatus()
+                val page = amSatRepo.fetchStatus()
                 if (page != null && page.statuses.isNotEmpty()) {
                     _uiState.update {
                         it.copy(
@@ -65,7 +66,7 @@ class SatStatusViewModel(
         _uiState.update { it.copy(isRefreshing = true, error = null) }
         viewModelScope.launch {
             try {
-                val page = container.amSatRepo.fetchStatus()
+                val page = amSatRepo.fetchStatus()
                 if (page != null && page.statuses.isNotEmpty()) {
                     _uiState.update {
                         it.copy(
@@ -87,7 +88,7 @@ class SatStatusViewModel(
     companion object {
         fun factory(container: IMainContainer) = viewModelFactory {
             initializer {
-                SatStatusViewModel(container)
+                SatStatusViewModel(container.amSatRepo)
             }
         }
     }

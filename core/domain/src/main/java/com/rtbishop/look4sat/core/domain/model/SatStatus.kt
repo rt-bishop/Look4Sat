@@ -23,10 +23,10 @@ data class SatDay(
     val slots: List<SatSlot> // 12 槽(00-02 ... 22-24)
 )
 
-/** One satellite, 6 days of state */
+/** One satellite, 5 days of state */
 data class SatStatus(
     val name: String,        // "AO-123_[FM]"
-    val days: List<SatDay>   // 6 天(新→旧)
+    val days: List<SatDay>   // 5 天(新→旧)
 )
 
 /** Overall page parse result */

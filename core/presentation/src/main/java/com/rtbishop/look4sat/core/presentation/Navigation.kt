@@ -24,13 +24,13 @@ import kotlinx.serialization.Serializable
 sealed class Screen(val iconResId: Int, val titleResId: Int) : NavKey {
 
     @Serializable
-    data object Satellites : Screen(R.drawable.ic_satellites, R.string.nav_sat)
+    data object Satellites : Screen(R.drawable.ic_sputnik, R.string.nav_sat)
 
     @Serializable
     data object Passes : Screen(R.drawable.ic_passes, R.string.nav_pass)
 
     @Serializable
-    data object Radar : Screen(R.drawable.ic_radar, R.string.nav_radar)
+    data object Status : Screen(R.drawable.ic_satellite, R.string.nav_status)
 
     @Serializable
     data object Map : Screen(R.drawable.ic_map, R.string.nav_map)

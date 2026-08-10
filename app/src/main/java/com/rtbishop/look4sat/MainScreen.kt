@@ -25,8 +25,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -44,7 +42,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -70,6 +68,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.domain.repository.RadioTrackingState
 import com.rtbishop.look4sat.core.presentation.DeeplinkResolver
 import com.rtbishop.look4sat.core.presentation.ElevationThresholds
 import com.rtbishop.look4sat.core.presentation.LocalElevationThresholds
@@ -82,37 +81,42 @@ import com.rtbishop.look4sat.feature.passes.PassesDestination
 import com.rtbishop.look4sat.feature.radar.RadarDestination
 import com.rtbishop.look4sat.feature.satellites.SatellitesDestination
 import com.rtbishop.look4sat.feature.settings.SettingsDestination
+import com.rtbishop.look4sat.feature.status.SatStatusDestination
 
 @Composable
 fun NavRoot(deeplink: String? = null) {
     val rootBackStack = rememberNavBackStack(Screen.Passes)
     val deeplinkResolver = DeeplinkResolver()
     LaunchedEffect(deeplink) {
-        deeplink?.let {
-            val destination = deeplinkResolver.resolve(it) // rootBackStack.clear()
-            rootBackStack.add(destination)
-        }
+        deeplink?.let { rootBackStack.add(deeplinkResolver.resolve(it)) }
     }
     val navigateBack: () -> Unit = { rootBackStack.removeLastOrNull() }
-    val slideInTransition = slideInHorizontally(initialOffsetX = { it }) togetherWith scaleOut(targetScale = 0.9f)
-    val slideOutTransition = scaleIn(initialScale = 0.9f) togetherWith slideOutHorizontally(targetOffsetX = { it })
+    val navigateToRadar: () -> Unit = { rootBackStack.add(RadarDestination) }
+    // Incoming screen slides in from the right, outgoing drifts left at 1/3 speed (API35+ style)
+    val pushTransition = slideInHorizontally(tween(350)) { it } togetherWith
+        slideOutHorizontally(tween(350)) { -it / 3 }
+    // Reverse: outgoing slides out to the right, incoming drifts in from the left
+    val popTransition = slideInHorizontally(tween(350)) { -it / 3 } togetherWith
+        slideOutHorizontally(tween(350)) { it }
     NavDisplay(
         modifier = Modifier.fillMaxSize(),
         backStack = rootBackStack,
         onBack = navigateBack,
-        transitionSpec = { slideInTransition },
-        popTransitionSpec = { slideOutTransition },
-        predictivePopTransitionSpec = { slideOutTransition },
+        transitionSpec = { pushTransition },
+        popTransitionSpec = { popTransition },
+        predictivePopTransitionSpec = { popTransition },
         entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(), // Required for saving Compose state per entry
-            rememberViewModelStoreNavEntryDecorator() // Required for ViewModel scoping per entry
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Screen.Passes> { MainScreen(navigateToRadar = { rootBackStack.add(RadarDestination) }) }
+            entry<Screen.Passes> { MainScreen(navigateToRadar = navigateToRadar) }
             entry<RadarDestination> {
-                Scaffold { innerPadding ->
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     RadarDestination(navigateUp = navigateBack)
-                    innerPadding.calculateTopPadding()
                 }
             }
         }
@@ -120,17 +124,19 @@ fun NavRoot(deeplink: String? = null) {
 }
 
 @Composable
-fun MainScreen(navigateToRadar: () -> Unit = {}) {
-    val backStack = rememberNavBackStack(Screen.Passes)
-    val currentKey = backStack.lastOrNull()
-    val navigateBack: () -> Unit = { backStack.removeLastOrNull() }
-    val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith fadeOut(animationSpec = tween(350))
-    val navItems = listOf(Screen.Satellites, Screen.Passes, Screen.Radar, Screen.Map, Screen.Settings)
-
+private fun MainScreen(navigateToRadar: () -> Unit = {}) {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val trackingState by container.radioTrackingService.state.collectAsStateWithLifecycle()
     val otherSettings by container.settingsRepo.otherSettings.collectAsStateWithLifecycle()
+
+    val backStack = rememberNavBackStack(Screen.Passes)
+    val currentKey = backStack.lastOrNull()
+    val navigateBack: () -> Unit = { backStack.removeLastOrNull() }
+    val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith
+        fadeOut(animationSpec = tween(350))
+    val navItems =
+        listOf(Screen.Satellites, Screen.Passes, Screen.Status, Screen.Map, Screen.Settings)
 
     CompositionLocalProvider(
         LocalElevationThresholds provides ElevationThresholds(
@@ -144,13 +150,18 @@ fun MainScreen(navigateToRadar: () -> Unit = {}) {
                     val isSelected = when (currentKey) {
                         is Screen.Satellites -> screen is Screen.Satellites
                         is Screen.Passes -> screen is Screen.Passes
-                        is Screen.Radar -> screen is Screen.Radar
+                        is Screen.Status -> screen is Screen.Status
                         is Screen.Map -> screen is Screen.Map
                         is Screen.Settings -> screen is Screen.Settings
                         else -> false
                     }
                     item(
-                        icon = { Icon(painterResource(screen.iconResId), stringResource(screen.titleResId)) },
+                        icon = {
+                            Icon(
+                                painter = painterResource(screen.iconResId),
+                                contentDescription = stringResource(screen.titleResId)
+                            )
+                        },
                         label = { Text(stringResource(screen.titleResId)) },
                         selected = isSelected,
                         onClick = {
@@ -179,9 +190,7 @@ fun MainScreen(navigateToRadar: () -> Unit = {}) {
                     popTransitionSpec = { fadeTransition },
                     predictivePopTransitionSpec = { fadeTransition },
                     entryDecorators = listOf(
-                        // Required for saving Compose state per entry
                         rememberSaveableStateHolderNavEntryDecorator(),
-                        // Required for ViewModel scoping per entry
                         rememberViewModelStoreNavEntryDecorator()
                     ),
                     entryProvider = entryProvider {
@@ -191,69 +200,71 @@ fun MainScreen(navigateToRadar: () -> Unit = {}) {
                         entry<Screen.Passes> {
                             PassesDestination { catNum, aosTime ->
                                 container.satelliteRepo.selectPass(catNum, aosTime)
-                                backStack.add(Screen.Radar)
-//                            navigateToRadar()
+                                navigateToRadar()
                             }
                         }
-                        entry<Screen.Radar> {
-                            RadarDestination(navigateUp = navigateBack)
-                        }
-                        entry<Screen.Map> {
-                            MapDestination()
-                        }
-                        entry<Screen.Settings> {
-                            SettingsDestination()
-                        }
+                        entry<Screen.Status> { SatStatusDestination() }
+                        entry<Screen.Map> { MapDestination() }
+                        entry<Screen.Settings> { SettingsDestination() }
                     }
                 )
-                // Radio tracking status banner
                 if (trackingState.isActive) {
-                    val infiniteTransition = rememberInfiniteTransition(label = "trackingPulse")
-                    val alpha by infiniteTransition.animateFloat(
-                        initialValue = 1f, targetValue = 0.4f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(1000, easing = LinearEasing),
-                            repeatMode = RepeatMode.Reverse
-                        ), label = "pulseAlpha"
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .clickable {
-                                val pass = trackingState.currentPass
-                                if (pass != null) {
-                                    container.satelliteRepo.selectPass(pass.catNum, pass.aosTime)
-                                    backStack.add(Screen.Radar)
-                                }
+                    TrackingBanner(
+                        state = trackingState,
+                        onClick = {
+                            val pass = trackingState.currentPass
+                            if (pass != null) {
+                                container.satelliteRepo.selectPass(pass.catNum, pass.aosTime)
+                                navigateToRadar()
                             }
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF4CAF50).copy(alpha = alpha))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Tracking: ${trackingState.currentPass?.name ?: ""}",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.weight(1f)
-                        )
-                        val txOk = if (trackingState.txConnected) "TX" else ""
-                        val rxOk = if (trackingState.rxConnected) "RX" else ""
-                        Text(
-                            text = listOf(txOk, rxOk).filter { it.isNotBlank() }.joinToString("/"),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
+                        }
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TrackingBanner(state: RadioTrackingState, onClick: () -> Unit) {
+    val infiniteTransition = rememberInfiniteTransition(label = "trackingPulse")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing), repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulseAlpha"
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF4CAF50).copy(alpha = alpha))
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Tracking: ${state.currentPass?.name ?: ""}",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            modifier = Modifier.weight(1f)
+        )
+        val connections = listOfNotNull(
+            "TX".takeIf { state.txConnected }, "RX".takeIf { state.rxConnected }
+        )
+        Text(
+            text = connections.joinToString("/"),
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
     }
 }

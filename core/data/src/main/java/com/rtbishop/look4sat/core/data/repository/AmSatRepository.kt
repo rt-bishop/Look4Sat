@@ -35,13 +35,15 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
     override suspend fun fetchStatus(): SatStatusPage? = withContext(Dispatchers.IO) {
         val nowSec = System.currentTimeMillis() / 1000
         val catalogJson = remoteSource.getAmSatCatalog() ?: return@withContext null
-        val reportsJson = remoteSource.getAmSatReports(hours = 168, limit = 500) ?: return@withContext null
-        
+        // 72h = 3 days; API hard cap is limit=500 regardless of what we send.
+        // 500 records across ~100 catalog satellites ≈ ~1-5 reports/satellite/day — enough for 3 days.
+        // Upgrade path: paginate or request AMSAT to raise the cap if catalog grows beyond ~200 sats.
+        val reportsJson = remoteSource.getAmSatReports(hours = 72, limit = 500) ?: return@withContext null
         val names = parseCatalog(catalogJson)
         val reports = parseReports(reportsJson)
-        
+
         if (names.isEmpty() && reports.isEmpty()) return@withContext null
-        
+
         val statuses = buildStatuses(names, reports, nowSec)
         val reportMap = reports.associate { it.id to toSatReport(it) }
         SatStatusPage(System.currentTimeMillis(), statuses, reportMap)
@@ -52,7 +54,7 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
         return try {
             val arr = JSONObject(json).getJSONArray("data")
             (0 until arr.length()).map { arr.getJSONObject(it).getString("name") }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -73,7 +75,7 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
                     reportedTimeUtcSec = parseIsoUtcSec(iso)
                 )
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -82,22 +84,22 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
     private fun parseIsoUtcSec(iso: String): Long {
         return try {
             (isoUtcFormat.parse(iso)?.time ?: 0L) / 1000
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0L
         }
     }
 
-    /** Build one SatStatus (6 days x 12 slots) per catalog satellite, slotting reports by age. */
+    /** Build one SatStatus (5 days x 12 slots) per catalog satellite, slotting reports by age. */
     private fun buildStatuses(names: List<String>, reports: List<ApiReport>, nowSec: Long): List<SatStatus> {
         val byName = reports.groupBy { it.name }
         val monthAbbr = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
         val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        val labels = (0 until 6).map { d ->
+        val labels = (0 until 3).map { d ->
             utc.timeInMillis = (nowSec - d * 86400L) * 1000
             "${monthAbbr[utc.get(Calendar.MONTH)]} ${utc.get(Calendar.DAY_OF_MONTH)}"
         }
         return names.map { name ->
-            val slots = (0 until 72).map { slotIdx ->
+            val slots = (0 until 36).map { slotIdx ->
                 val slotStart = nowSec - (slotIdx + 1) * 7200L
                 val slotEnd = nowSec - slotIdx * 7200L
                 val inSlot = byName[name].orEmpty().filter { it.reportedTimeUtcSec in slotStart until slotEnd }
@@ -112,7 +114,7 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
                     )
                 }
             }
-            val days = (0 until 6).map { d ->
+            val days = (0 until 3).map { d ->
                 SatDay(dateLabel = labels[d], slots = slots.subList(d * 12, (d + 1) * 12))
             }
             SatStatus(name = name, days = days)

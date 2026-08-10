@@ -667,7 +667,7 @@ private fun TopCard(onClick: () -> Unit, modifier: Modifier = Modifier, version:
                 .clickable { onClick() }) {
             Spacer(Modifier)
             Icon(
-                painter = painterResource(id = R.drawable.ic_satellites),
+                painter = painterResource(id = R.drawable.ic_sputnik),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
             )

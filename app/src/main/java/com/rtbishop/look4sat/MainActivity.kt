@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         observeNightFilterState()
         setContent {
-            MainTheme(isDarkTheme = true) { MainScreen() }
+            MainTheme(isDarkTheme = true) { NavRoot() }
         }
     }
 

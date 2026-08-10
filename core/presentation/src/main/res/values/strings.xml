@@ -12,6 +12,7 @@
     <string name="nav_radar">Radar</string>
     <string name="nav_map">Map</string>
     <string name="nav_prefs">Settings</string>
+    <string name="nav_status" translatable="false">AMSAT</string>
 
     <!-- Satellites screen -->
     <string name="sat_type_hint">Modes: %s</string>
