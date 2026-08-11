@@ -37,6 +37,7 @@ import com.rtbishop.look4sat.core.domain.utility.round
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import org.json.JSONObject
 
 class SettingsRepo(
     private val locationManager: LocationManager,
@@ -417,5 +418,27 @@ class SettingsRepo(
         baudRate = preferences.getInt(keyRadioBaudRate, 4800),
         splitMode = preferences.getBoolean(keyRadioSplitMode, false)
     )
-    //endregion
+
+    private val keySatelliteOffsets = "satelliteOffsets"
+
+    override fun getSatelliteOffset(catnum: Int): String {
+        val json = preferences.getString(keySatelliteOffsets, "{}") ?: "{}"
+        return try {
+            JSONObject(json).optString(catnum.toString(), "")
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    override fun setSatelliteOffset(catnum: Int, offset: String) {
+        val json = preferences.getString(keySatelliteOffsets, "{}") ?: "{}"
+        val updated = try {
+            val obj = JSONObject(json)
+            if (offset.isEmpty()) obj.remove(catnum.toString()) else obj.put(catnum.toString(), offset)
+            obj.toString()
+        } catch (e: Exception) {
+            """{"$catnum": "$offset"}"""
+        }
+        preferences.edit { putString(keySatelliteOffsets, updated) }
+    }
 }

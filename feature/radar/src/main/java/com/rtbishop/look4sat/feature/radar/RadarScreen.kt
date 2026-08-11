@@ -198,7 +198,8 @@ private fun PagerCard(
                         transceivers = uiState.transceivers.transmitters,
                         selectedUuid = uiState.transceivers.selectedUuid,
                         orbitalPos = uiState.orbitalPos,
-                        onAction = onAction
+                        onAction = onAction,
+                        calculatorOffsetKHz = uiState.calculatorOffsetKHz
                     )
                     RadarPage.Sstv -> SstvPage(
                         sstv = uiState.sstv,

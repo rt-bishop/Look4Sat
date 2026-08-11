@@ -75,4 +75,9 @@ interface ISettingsRepo {
     val radioControlSettings: StateFlow<RadioControlSettings>
     fun updateRadioControlSettings(settings: RadioControlSettings)
     //endregion
+
+    //region # Per-satellite calculator offset settings
+    fun getSatelliteOffset(catnum: Int): String
+    fun setSatelliteOffset(catnum: Int, offset: String)
+    //endregion
 }

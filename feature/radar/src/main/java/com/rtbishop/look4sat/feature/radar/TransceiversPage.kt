@@ -128,6 +128,7 @@ fun CalculatorPage(
     selectedUuid: String?,
     orbitalPos: OrbitalPos?,
     onAction: (RadarAction) -> Unit,
+    calculatorOffsetKHz: String = "",
     modifier: Modifier = Modifier
 ) {
     val calculatorTransceivers = remember(transceivers) {
@@ -180,6 +181,8 @@ fun CalculatorPage(
             DopplerFrequencyCalculator(
                 transponder = selectedTransceiver,
                 orbitalPos = orbitalPos,
+                offsetKHz = calculatorOffsetKHz,
+                onOffsetChange = { onAction(RadarAction.ChangeCalculatorOffset(it)) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -521,6 +524,8 @@ private enum class EditedField { TX, PASSBAND, RX }
 private fun DopplerFrequencyCalculator(
     transponder: SatRadio,
     orbitalPos: OrbitalPos?,
+    offsetKHz: String = "",
+    onOffsetChange: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     if (orbitalPos == null || !DopplerFrequencyCalculator.isLinearTransponder(transponder)) return
@@ -529,7 +534,6 @@ private fun DopplerFrequencyCalculator(
     var txFrequencyHz by remember { mutableStateOf(0L) }
     var rxFrequencyHz by remember { mutableStateOf(0L) }
     var passbandPosition by remember { mutableStateOf(0.5f) }
-    var offsetKHz by remember { mutableStateOf("") }
     var stepSizeKHz by remember { mutableIntStateOf(1) }
 
     val offsetHz = offsetKHz.toDoubleOrNull()?.let { it * 1000 }?.toLong() ?: 0L
@@ -712,7 +716,7 @@ private fun DopplerFrequencyCalculator(
                 ) {
                     BasicTextField(
                         value = offsetKHz,
-                        onValueChange = { offsetKHz = it },
+                        onValueChange = onOffsetChange,
                         singleLine = true,
                         textStyle = TextStyle(
                             fontSize = 16.sp,

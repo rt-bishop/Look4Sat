@@ -167,6 +167,10 @@ class SelectionRepoTest {
         override fun updateDataSourcesSettings(settings: DataSourcesSettings) = Unit
 
         override fun updateRadioControlSettings(settings: RadioControlSettings) = Unit
+
+        override fun getSatelliteOffset(catnum: Int): String = ""
+
+        override fun setSatelliteOffset(catnum: Int, offset: String) = Unit
     }
 }
 
