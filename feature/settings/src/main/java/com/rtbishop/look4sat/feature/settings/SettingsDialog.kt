@@ -49,7 +49,7 @@ import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.LocalSpacing
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.SharedDialog
+import com.rtbishop.look4sat.core.presentation.ConfirmDialog
 
 @Preview(showBackground = true)
 @Composable
@@ -63,7 +63,7 @@ fun PositionDialog(lat: Double, lon: Double, dismiss: () -> Unit, save: (Double,
     val lonValue = rememberSaveable { mutableStateOf(lon.toString()) }
     val titleText = stringResource(id = R.string.prefs_station_title)
     val onAccept = { saveValues(latValue.value, lonValue.value, save).also { dismiss() } }
-    SharedDialog(title = titleText, onCancel = dismiss, onAccept = onAccept) {
+    ConfirmDialog(title = titleText, onCancel = dismiss, onAccept = onAccept) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
@@ -107,7 +107,7 @@ private fun LocatorDialogPreview() {
 fun LocatorDialog(qthLocator: String, dismiss: () -> Unit, save: (String) -> Unit) {
     val locator = rememberSaveable { mutableStateOf(qthLocator) }
     val onAccept = { save(locator.value).also { dismiss() } }
-    SharedDialog(
+    ConfirmDialog(
         title = stringResource(R.string.prefs_locator_title),
         onCancel = dismiss,
         onAccept = onAccept
@@ -169,7 +169,7 @@ fun DataSourcesDialog(
         onDismiss()
     }
     val onCancel = { onDismiss() }
-    SharedDialog(
+    ConfirmDialog(
         title = stringResource(id = R.string.prefs_data_sources_title),
         onCancel = onCancel,
         onAccept = onAccept,
@@ -313,7 +313,7 @@ fun NetworkOutputDialog(
         )
         onDismiss()
     }
-    SharedDialog(
+    ConfirmDialog(
         title = stringResource(R.string.prefs_net_title),
         onCancel = onDismiss,
         onAccept = onAccept
@@ -411,7 +411,7 @@ fun BluetoothOutputDialog(
         )
         onDismiss()
     }
-    SharedDialog(
+    ConfirmDialog(
         title = stringResource(R.string.prefs_bt_title),
         onCancel = onDismiss,
         onAccept = onAccept
@@ -538,7 +538,7 @@ fun RadioControlDialog(
         onDismiss()
     }
 
-    SharedDialog(
+    ConfirmDialog(
         title = stringResource(R.string.rc_settings_title),
         onCancel = onDismiss,
         onAccept = onAccept

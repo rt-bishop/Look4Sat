@@ -27,11 +27,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,7 +51,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -73,6 +76,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -291,52 +296,81 @@ fun getDefaultPass(): OrbitalPass = OrbitalPass(
 )
 
 @Composable
-fun SharedDialog(
-    title: String, onCancel: () -> Unit, onAccept: () -> Unit, content: @Composable () -> Unit
-) {
-    SharedDialog(title = title, onDismissRequest = onCancel, onCancel = onCancel, onAccept = onAccept) { _ ->
-        content()
-    }
-}
-
-@Composable
-fun SharedDialog(
+fun InfoDialog(
     title: String,
-    onDismissRequest: () -> Unit,
-    onCancel: (() -> Unit)? = null,
-    onAccept: (() -> Unit)? = null,
-    titleFontSize: Int = 16,
-    titleTextAlign: TextAlign = if (onCancel != null && onAccept != null) TextAlign.Center else TextAlign.Start,
-    content: @Composable (padding: Dp) -> Unit
+    onDismiss: () -> Unit,
+    onAccept: () -> Unit,
+    content: @Composable () -> Unit
 ) {
-    val dismissible = onCancel != null
-    DialogShell(onDismissRequest = onDismissRequest, dismissible = dismissible) { padding ->
+    DialogShell(onDismissRequest = onDismiss) { padding ->
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = padding, top = padding, end = padding)
         ) {
-            if (onCancel != null) {
-                CardButton(onClick = onCancel, text = stringResource(R.string.btn_cancel))
-            }
             Text(
                 text = title,
-                fontSize = titleFontSize.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.primary,
-                textAlign = titleTextAlign,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            CardButton(onClick = onAccept, text = stringResource(R.string.btn_accept))
+        }
+        content()
+    }
+}
+
+@Composable
+fun ConfirmDialog(
+    title: String,
+    onCancel: () -> Unit,
+    onAccept: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    DialogShell(onDismissRequest = onCancel) { padding ->
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = padding, top = padding, end = padding)
+        ) {
+            CardButton(onClick = onCancel, text = stringResource(R.string.btn_cancel))
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = if (onCancel != null && onAccept != null) padding else 0.dp)
+                    .padding(horizontal = padding)
             )
-            if (onAccept != null) {
-                CardButton(onClick = onAccept, text = stringResource(R.string.btn_accept))
-            }
+            CardButton(onClick = onAccept, text = stringResource(R.string.btn_accept))
         }
-        content(padding)
+        content()
+    }
+}
+
+@Composable
+fun WhatsNewDialog(onDismiss: () -> Unit) {
+    InfoDialog(
+        title = stringResource(R.string.pass_whatsnew_title),
+        onDismiss = onDismiss,
+        onAccept = onDismiss
+    ) {
+        Text(
+            text = stringResource(R.string.pass_whatsnew_message),
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = LocalSpacing.current.large)
+        )
+        Spacer(modifier = Modifier.height(0.dp))
     }
 }
 
@@ -344,14 +378,13 @@ fun SharedDialog(
 @Composable
 private fun DialogShell(
     onDismissRequest: () -> Unit,
-    dismissible: Boolean = true,
     content: @Composable (padding: Dp) -> Unit
 ) {
     val padding = LocalSpacing.current.large
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-        confirmValueChange = { if (dismissible) true else it != SheetValue.Hidden }
-    )
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val containerHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+    val maxSheetHeight = containerHeight - statusBarHeight
     val stopSheetFling = remember {
         object : NestedScrollConnection {
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
@@ -366,10 +399,10 @@ private fun DialogShell(
         }
     }
     ModalBottomSheet(
-        onDismissRequest = if (dismissible) onDismissRequest else { {} },
+        onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = null,
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
         scrimColor = Color.Black.copy(alpha = 0.64f)
     ) {
         Column(
@@ -377,6 +410,7 @@ private fun DialogShell(
             verticalArrangement = Arrangement.spacedBy(padding),
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(max = maxSheetHeight)
                 .nestedScroll(stopSheetFling)
         ) {
             content(padding)

@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -72,10 +71,10 @@ import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.NextPassRow
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
-import com.rtbishop.look4sat.core.presentation.SharedDialog
 import com.rtbishop.look4sat.core.presentation.SwipeableItem
 import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
+import com.rtbishop.look4sat.core.presentation.WhatsNewDialog
 import com.rtbishop.look4sat.core.presentation.elevationColor
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
@@ -136,20 +135,7 @@ private fun PassesScreen(
     }
     if (uiState.shouldSeeWhatsNew) {
         val dismiss = { onAction(PassesAction.DismissWhatsNew) }
-        SharedDialog(
-            title = stringResource(R.string.pass_whatsnew_title),
-            onDismissRequest = dismiss,
-            onAccept = dismiss,
-            titleFontSize = 18
-        ) { padding ->
-            Text(
-                text = stringResource(R.string.pass_whatsnew_message),
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(horizontal = padding)
-            )
-            Spacer(modifier = Modifier.height(0.dp))
-        }
+        WhatsNewDialog(onDismiss = dismiss)
     }
     ScreenColumn(
         topBar = { isVerticalLayout ->

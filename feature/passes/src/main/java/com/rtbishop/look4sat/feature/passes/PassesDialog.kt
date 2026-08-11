@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.core.presentation.LocalSpacing
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.SharedDialog
+import com.rtbishop.look4sat.core.presentation.ConfirmDialog
 import com.rtbishop.look4sat.core.presentation.ElevationHighColor
 import com.rtbishop.look4sat.core.presentation.ElevationLowColor
 import com.rtbishop.look4sat.core.presentation.elevationColor
@@ -140,7 +140,7 @@ internal fun PassesFilterDialog(
         )
         cancel()
     }
-    SharedDialog(title = stringResource(R.string.pass_filter_title), onCancel = cancel, onAccept = onAccept) {
+    ConfirmDialog(title = stringResource(R.string.pass_filter_title), onCancel = cancel, onAccept = onAccept) {
         SliderRow(
             title = stringResource(R.string.pass_filter_elev),
             value = elevationValueNew.doubleValue,
@@ -365,7 +365,7 @@ internal fun RadiosDialog(modes: List<String>, cancel: () -> Unit, accept: (List
         selected.value = if (mode in selected.value) selected.value - mode else selected.value + mode
     }
     val onAccept = { accept(selected.value.toList()).also { cancel() } }
-    SharedDialog(title = stringResource(R.string.pass_modes_title), onCancel = cancel, onAccept = onAccept) {
+    ConfirmDialog(title = stringResource(R.string.pass_modes_title), onCancel = cancel, onAccept = onAccept) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(240.dp),
             modifier = Modifier

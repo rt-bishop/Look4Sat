@@ -74,6 +74,7 @@ import com.rtbishop.look4sat.core.presentation.PrimaryIconCard
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
 import com.rtbishop.look4sat.core.presentation.TopBar
+import com.rtbishop.look4sat.core.presentation.WhatsNewDialog
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import java.text.SimpleDateFormat
@@ -198,6 +199,9 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
             onSave = { onAction(SettingsAction.UpdateRadioControl(it)) }
         )
     }
+    if (dialogs.whatsNew) {
+        WhatsNewDialog(onDismiss = { dialogs.whatsNew = false })
+    }
 
     // URLs for top bar
     val uriHandler = LocalUriHandler.current
@@ -218,7 +222,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
             if (isVerticalLayout) {
                 TopBar {
                     TopCard(
-                        onClick = { safeOpenUri(appUrl) },
+                        onClick = { dialogs.whatsNew = true },
                         version = uiState.appVersionName,
                         modifier = Modifier.weight(1f)
                     )
@@ -246,7 +250,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
                 TopBar {
                     PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_like)
                     TopCard(
-                        onClick = { safeOpenUri(appUrl) },
+                        onClick = { dialogs.whatsNew = true },
                         version = uiState.appVersionName,
                         modifier = Modifier.weight(1f)
                     )
@@ -718,6 +722,7 @@ private class DialogVisibility {
     var network by mutableStateOf(false)
     var bluetooth by mutableStateOf(false)
     var radioControl by mutableStateOf(false)
+    var whatsNew by mutableStateOf(false)
 }
 
 @Composable
@@ -725,12 +730,12 @@ private fun rememberDialogVisibility(): DialogVisibility {
     return rememberSaveable(saver = run {
         androidx.compose.runtime.saveable.Saver(
             save = {
-                listOf(it.position, it.locator, it.dataSources, it.network, it.bluetooth, it.radioControl)
+                listOf(it.position, it.locator, it.dataSources, it.network, it.bluetooth, it.radioControl, it.whatsNew)
             },
             restore = {
                 DialogVisibility().apply {
                     position = it[0]; locator = it[1]; dataSources = it[2]
-                    network = it[3]; bluetooth = it[4]; radioControl = it[5]
+                    network = it[3]; bluetooth = it[4]; radioControl = it[5]; whatsNew = it[6]
                 }
             }
         )

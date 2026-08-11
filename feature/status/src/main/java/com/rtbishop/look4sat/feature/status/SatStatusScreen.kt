@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -50,8 +51,8 @@ import com.rtbishop.look4sat.core.domain.model.SatReport
 import com.rtbishop.look4sat.core.domain.model.SatSlot
 import com.rtbishop.look4sat.core.domain.model.SatStatus
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.presentation.ConfirmDialog
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.SharedDialog
 import com.rtbishop.look4sat.core.presentation.layoutPadding
 import java.util.Calendar
 
@@ -279,12 +280,12 @@ private fun DayCell(slot: SatSlot, modifier: Modifier, onClick: () -> Unit) {
 @Composable
 private fun ReportDialog(statusName: String, day: SatDay, reports: Map<String, SatReport>, onDismiss: () -> Unit) {
     val dayReports = day.slots.flatMap { it.reportIds }.mapNotNull { reports[it] }
-    SharedDialog(title = "$statusName · ${day.dateLabel}", onCancel = onDismiss, onAccept = onDismiss) {
+    ConfirmDialog(title = "$statusName · ${day.dateLabel}", onCancel = onDismiss, onAccept = onDismiss) {
         if (dayReports.isEmpty()) {
             Text(stringResource(id = R.string.amsat_no_reports))
             Spacer(modifier = Modifier.height(8.dp))
         } else {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.heightIn(max = 480.dp)) {
                 items(dayReports) { report ->
                     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {

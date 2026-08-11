@@ -39,9 +39,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.rtbishop.look4sat.core.presentation.ConfirmDialog
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.SharedDialog
 
 @Preview(showBackground = true)
 @Composable
@@ -59,7 +59,7 @@ internal fun MultiModesDialog(
         selected.value = if (mode in selected.value) selected.value - mode else selected.value + mode
     }
     val onAccept = { accept(selected.value.toList()) }
-    SharedDialog(title = stringResource(R.string.sat_type_title), onCancel = cancel, onAccept = onAccept) {
+    ConfirmDialog(title = stringResource(R.string.sat_type_title), onCancel = cancel, onAccept = onAccept) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(240.dp),
             modifier = Modifier

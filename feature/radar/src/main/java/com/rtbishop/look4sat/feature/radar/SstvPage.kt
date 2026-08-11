@@ -53,10 +53,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rtbishop.look4sat.core.presentation.ConfirmDialog
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.OutlinedText
 import com.rtbishop.look4sat.core.presentation.R
-import com.rtbishop.look4sat.core.presentation.SharedDialog
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import kotlin.math.roundToInt
 
@@ -96,14 +96,14 @@ internal fun SstvPage(
     if (showModeDialog.value) {
         val allModes = remember(sstv.supportedModes) { listOf("Auto") + sstv.supportedModes }
         val dismiss = { showModeDialog.value = false }
-        SharedDialog(
+        ConfirmDialog(
             title = "SSTV Mode",
-            onDismissRequest = dismiss,
-            onAccept = dismiss
-        ) { _ ->
+            onAccept = dismiss,
+            onCancel = dismiss
+        ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxHeight(0.7f)
+                    .fillMaxHeight(0.69f)
                     .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
