@@ -29,6 +29,7 @@ import com.rtbishop.look4sat.core.domain.model.OtherSettings
 import com.rtbishop.look4sat.core.domain.model.PassesSettings
 import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
+import com.rtbishop.look4sat.core.domain.model.Constants
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.core.domain.source.Sources
@@ -69,6 +70,7 @@ class SettingsRepo(
     private val keyFrequencyAddress = "frequencyAddress"
     private val keyFrequencyPort = "frequencyPort"
     private val keyFrequencyFormat = "frequencyFormat"
+    private val keyFrequencyOffsetHz = "frequencyOffsetHz"
     private val keySelectedIds = "selectedIds"
     private val keySelectedSatModes = "selectedSatModes"
     private val keyStateOfAutoUpdate = "stateOfAutoUpdate"
@@ -277,6 +279,10 @@ class SettingsRepo(
     override val rcSettings: StateFlow<RCSettings> = _rcSettings
 
     override fun updateRCSettings(settings: RCSettings) {
+        val clampedFreqOffsetHz = settings.frequencyOffsetHz.coerceIn(
+            Constants.FREQ_OFFSET_MIN_HZ,
+            Constants.FREQ_OFFSET_MAX_HZ
+        )
         preferences.edit {
             putBoolean(keyRotatorState, settings.rotatorState)
             putString(keyRotatorAddress, settings.rotatorAddress)
@@ -286,6 +292,7 @@ class SettingsRepo(
             putString(keyFrequencyAddress, settings.frequencyAddress)
             putString(keyFrequencyPort, settings.frequencyPort)
             putString(keyFrequencyFormat, settings.frequencyFormat)
+            putLong(keyFrequencyOffsetHz, clampedFreqOffsetHz)
             putBoolean(keyBluetoothRotatorState, settings.bluetoothRotatorState)
             putString(keyBluetoothRotatorFormat, settings.bluetoothRotatorFormat)
             putString(keyBluetoothRotatorName, settings.bluetoothRotatorName)
@@ -294,7 +301,7 @@ class SettingsRepo(
             putString(keyBluetoothFrequencyFormat, settings.bluetoothFrequencyFormat)
             putString(keyBluetoothFrequencyAddress, settings.bluetoothFrequencyAddress)
         }
-        _rcSettings.value = settings
+        _rcSettings.value = settings.copy(frequencyOffsetHz = clampedFreqOffsetHz)
     }
 
     private fun getRCSettings(): RCSettings = RCSettings(
@@ -306,6 +313,8 @@ class SettingsRepo(
         frequencyAddress = preferences.getString(keyFrequencyAddress, null) ?: "127.0.0.1",
         frequencyPort = preferences.getString(keyFrequencyPort, null) ?: "4532",
         frequencyFormat = preferences.getString(keyFrequencyFormat, null) ?: $$"F $FREQ",
+        frequencyOffsetHz = preferences.getLong(keyFrequencyOffsetHz, 0L)
+            .coerceIn(Constants.FREQ_OFFSET_MIN_HZ, Constants.FREQ_OFFSET_MAX_HZ),
         bluetoothRotatorState = preferences.getBoolean(keyBluetoothRotatorState, false),
         bluetoothRotatorFormat = preferences.getString(keyBluetoothRotatorFormat, null) ?: $$"P $AZ $EL",
         bluetoothRotatorName = preferences.getString(keyBluetoothRotatorName, null) ?: "Default",
@@ -425,7 +434,7 @@ class SettingsRepo(
         val json = preferences.getString(keySatelliteOffsets, "{}") ?: "{}"
         return try {
             JSONObject(json).optString(catnum.toString(), "")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             ""
         }
     }
@@ -436,7 +445,7 @@ class SettingsRepo(
             val obj = JSONObject(json)
             if (offset.isEmpty()) obj.remove(catnum.toString()) else obj.put(catnum.toString(), offset)
             obj.toString()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             """{"$catnum": "$offset"}"""
         }
         preferences.edit { putString(keySatelliteOffsets, updated) }

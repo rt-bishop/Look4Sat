@@ -18,6 +18,7 @@
 package com.rtbishop.look4sat.core.domain
 
 import com.rtbishop.look4sat.core.domain.utility.DataParser
+import com.rtbishop.look4sat.core.domain.utility.aprsPasscode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -238,5 +239,11 @@ class DataParserTest {
     fun `getDayOfYear returns correct day for November 16th`() {
         // Matches the CSV test data epoch: 2021-11-16 → day 320
         assert(dataParser.getDayOfYear(2021, 11, 16) == 320)
+    }
+
+    @Test
+    fun `check APRS passcode calculation`() {
+        assert("M7LNB".aprsPasscode() == 12443)
+        assert("N0CALL".aprsPasscode() == 13023)
     }
 }

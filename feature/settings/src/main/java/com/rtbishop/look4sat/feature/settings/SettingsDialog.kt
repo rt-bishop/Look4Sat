@@ -39,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
+import com.rtbishop.look4sat.core.domain.model.Constants
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.LocalSpacing
@@ -295,6 +297,7 @@ fun PreviewNetworkOutputDialog() {
                 frequencyAddress = "127.0.0.1",
                 frequencyPort = "4532",
                 frequencyFormat = $$"F $FREQ",
+                frequencyOffsetHz = 0L,
                 bluetoothRotatorState = false,
                 bluetoothRotatorFormat = $$"P $AZ $EL",
                 bluetoothRotatorName = "Default",
@@ -304,7 +307,7 @@ fun PreviewNetworkOutputDialog() {
                 bluetoothFrequencyFormat = $$"F $FREQ"
             ),
             onDismiss = {},
-            onSave = { _, _, _, _, _, _, _, _ -> }
+            onSave = { _, _, _, _, _, _, _, _, _ -> }
         )
     }
 }
@@ -315,7 +318,7 @@ fun NetworkOutputDialog(
     onDismiss: () -> Unit,
     onSave: (
         Boolean, String, String, String,
-        Boolean, String, String, String
+        Boolean, String, String, String, Long
     ) -> Unit
 ) {
     val padding = LocalSpacing.current.large
@@ -329,12 +332,15 @@ fun NetworkOutputDialog(
         mutableStateOf("${initialSettings.frequencyAddress}:${initialSettings.frequencyPort}")
     }
     val frequencyFormat = rememberSaveable { mutableStateOf(initialSettings.frequencyFormat) }
+    val frequencyOffsetHz = rememberSaveable { mutableStateOf(initialSettings.frequencyOffsetHz.toString()) }
     val onAccept = {
         val (rotIp, rotPort) = splitAddress(rotatorAddress.value)
         val (freqIp, freqPort) = splitAddress(frequencyAddress.value)
+        val offsetHz = (frequencyOffsetHz.value.trim().toLongOrNull() ?: 0L)
+            .coerceIn(Constants.FREQ_OFFSET_MIN_HZ, Constants.FREQ_OFFSET_MAX_HZ)
         onSave(
             rotatorState.value, rotIp, rotPort, rotatorFormat.value,
-            frequencyState.value, freqIp, freqPort, frequencyFormat.value
+            frequencyState.value, freqIp, freqPort, frequencyFormat.value, offsetHz
         )
         onDismiss()
     }
@@ -367,6 +373,27 @@ fun NetworkOutputDialog(
                 onFormatChange = { frequencyFormat.value = it },
                 formatLabel = stringResource(R.string.prefs_net_frequency_format_hint)
             )
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = frequencyOffsetHz.value,
+                onValueChange = { frequencyOffsetHz.value = it },
+                singleLine = true,
+                label = { Text(stringResource(R.string.prefs_net_frequency_offset_hint)) },
+                supportingText = { Text(stringResource(R.string.prefs_net_frequency_offset_help)) },
+                trailingIcon = {
+                    IconButton(
+                        onClick = { frequencyOffsetHz.value = "0" },
+                        enabled = frequencyState.value && frequencyOffsetHz.value != "0"
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close),
+                            contentDescription = null
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = frequencyState.value
+            )
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
@@ -395,6 +422,7 @@ fun PreviewBluetoothOutputDialog() {
                 frequencyAddress = "127.0.0.1",
                 frequencyPort = "4532",
                 frequencyFormat = $$"F $FREQ",
+                frequencyOffsetHz = 0L,
                 bluetoothRotatorState = false,
                 bluetoothRotatorFormat = $$"P $AZ $EL",
                 bluetoothRotatorName = "Default",

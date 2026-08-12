@@ -41,6 +41,21 @@ fun Double.round(decimals: Int): Double {
     return kotlin.math.round(this * multiplier) / multiplier
 }
 
+fun String.aprsPasscode(): Int {
+    val callsign = this.trim().uppercase().substringBefore('-') // commonly strip SSID
+    var hash = 0x73E2
+    var i = 0
+    while (i < callsign.length) {
+        hash = hash xor (callsign[i].code shl 8)
+        i++
+        if (i < callsign.length) {
+            hash = hash xor callsign[i].code
+            i++
+        }
+    }
+    return hash and 0x7FFF
+}
+
 //fun String.getHash(type: String = "SHA-256"): String {
 //    val hexChars = "0123456789ABCDEF"
 //    val bytes = MessageDigest.getInstance(type).digest(this.toByteArray())

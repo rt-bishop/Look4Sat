@@ -106,7 +106,8 @@ class MainContainer(private val context: Context) : IMainContainer {
             rc.rotatorAddress,
             rc.rotatorPort.toIntOrNull() ?: 0,
             rc.frequencyAddress,
-            rc.frequencyPort.toIntOrNull() ?: 0
+            rc.frequencyPort.toIntOrNull() ?: 0,
+            rc.frequencyOffsetHz
         )
     }
 

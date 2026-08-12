@@ -41,6 +41,7 @@ data class RCSettings(
     val frequencyAddress: String,
     val frequencyPort: String,
     val frequencyFormat: String,
+    val frequencyOffsetHz: Long = 0L,
     val bluetoothRotatorState: Boolean,
     val bluetoothRotatorFormat: String,
     val bluetoothRotatorName: String,

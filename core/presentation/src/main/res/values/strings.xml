@@ -196,6 +196,8 @@
     <string name="prefs_net_frequency_switch">Enable frequency output</string>
     <string name="prefs_net_frequency_address_hint">IP:Port</string>
     <string name="prefs_net_frequency_format_hint">Format</string>
+    <string name="prefs_net_frequency_offset_hint" translatable="false">Frequency offset (Hz)</string>
+    <string name="prefs_net_frequency_offset_help" translatable="false">Range: -50000 to 50000 Hz. Positive values increase reported frequency; negative values decrease it.</string>
 
     <string name="prefs_bt_title">Bluetooth output</string>
     <string name="prefs_bt_rotator_switch">Enable rotation output</string>

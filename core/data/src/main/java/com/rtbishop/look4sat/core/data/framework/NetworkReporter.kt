@@ -17,8 +17,10 @@
  */
 package com.rtbishop.look4sat.core.data.framework
 
+import com.rtbishop.look4sat.core.domain.model.Constants
 import com.rtbishop.look4sat.core.domain.repository.IReporter
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -31,18 +33,30 @@ class NetworkReporter(
     private val rotatorServer: String,
     private val rotatorPort: Int,
     private val frequencyServer: String,
-    private val frequencyPort: Int
+    private val frequencyPort: Int,
+    private val frequencyOffsetHz: Long = 0L
 ) : IReporter {
 
     private val writeMutex = Mutex()
+    private val connectionMutex = Mutex()
+    private val frequencyCommands = Channel<String>(Channel.CONFLATED)
 
     private var rotatorSocket: SocketChannel? = null
     private var rotatorConnected = false
-    private var rotatorConnecting = false
 
     private var frequencySocket: SocketChannel? = null
     private var frequencyConnected = false
-    private var frequencyConnecting = false
+
+    init {
+        // Keep only the latest frequency command to avoid stale backlog and effective lag.
+        reporterScope.launch {
+            for (command in frequencyCommands) {
+                ensureFrequencyConnected()
+                if (!frequencyConnected) continue
+                write(frequencySocket, command) { resetFrequencyConnection() }
+            }
+        }
+    }
 
     override fun reportRotation(format: String, azimuth: Double, elevation: Double) {
         reporterScope.launch {
@@ -58,46 +72,43 @@ class NetworkReporter(
     }
 
     override fun reportFrequency(format: String, frequency: Long) {
-        reporterScope.launch {
-            ensureFrequencyConnected()
-            if (!frequencyConnected) return@launch
-            val command = format
-                .replace($$"$FREQ", frequency.toString())
-                .unescapeControlChars()
-            write(frequencySocket, command) { frequencyConnected = false }
-        }
+        val clampedOffset = frequencyOffsetHz.coerceIn(
+            Constants.FREQ_OFFSET_MIN_HZ,
+            Constants.FREQ_OFFSET_MAX_HZ
+        )
+        val correctedFreq = frequency.coerceAtLeast(0L).safeAdd(clampedOffset).coerceAtLeast(0L)
+        val command = format
+            .replace($$"$FREQ", correctedFreq.toString())
+            .unescapeControlChars()
+        frequencyCommands.trySend(command)
     }
 
-    private fun ensureRotatorConnected() {
-        if (rotatorConnected || rotatorConnecting || rotatorServer.isBlank()) return
-        reporterScope.launch {
+    private suspend fun ensureRotatorConnected() {
+        connectionMutex.withLock {
+            if (rotatorConnected || rotatorServer.isBlank()) return
             try {
-                rotatorConnecting = true
+                resetRotatorConnection()
                 rotatorSocket = SocketChannel.open(InetSocketAddress(rotatorServer, rotatorPort))
                 rotatorConnected = true
                 println("NetworkReporter: Rotator connected to $rotatorServer:$rotatorPort")
             } catch (e: Exception) {
                 println("NetworkReporter rotator connect error: ${e.message}")
-                rotatorConnected = false
-            } finally {
-                rotatorConnecting = false
+                resetRotatorConnection()
             }
         }
     }
 
-    private fun ensureFrequencyConnected() {
-        if (frequencyConnected || frequencyConnecting || frequencyServer.isBlank()) return
-        reporterScope.launch {
+    private suspend fun ensureFrequencyConnected() {
+        connectionMutex.withLock {
+            if (frequencyConnected || frequencyServer.isBlank()) return
             try {
-                frequencyConnecting = true
+                resetFrequencyConnection()
                 frequencySocket = SocketChannel.open(InetSocketAddress(frequencyServer, frequencyPort))
                 frequencyConnected = true
                 println("NetworkReporter: Frequency connected to $frequencyServer:$frequencyPort")
             } catch (e: Exception) {
                 println("NetworkReporter frequency connect error: ${e.message}")
-                frequencyConnected = false
-            } finally {
-                frequencyConnecting = false
+                resetFrequencyConnection()
             }
         }
     }
@@ -106,11 +117,39 @@ class NetworkReporter(
         try {
             writeMutex.withLock {
                 val buffer = ByteBuffer.wrap("$command\n".toByteArray())
-                socket?.write(buffer)
+                while (buffer.hasRemaining()) {
+                    socket?.write(buffer)
+                }
             }
         } catch (e: Exception) {
             println("NetworkReporter write error: ${e.message}")
             onError()
+        }
+    }
+
+    private fun resetRotatorConnection() {
+        rotatorConnected = false
+        closeQuietly(rotatorSocket)
+        rotatorSocket = null
+    }
+
+    private fun resetFrequencyConnection() {
+        frequencyConnected = false
+        closeQuietly(frequencySocket)
+        frequencySocket = null
+    }
+
+    private fun closeQuietly(socket: SocketChannel?) {
+        try {
+            socket?.close()
+        } catch (_: Exception) {}
+    }
+
+    private fun Long.safeAdd(delta: Long): Long {
+        return when {
+            delta > 0 && this > Long.MAX_VALUE - delta -> Long.MAX_VALUE
+            delta < 0 && this < Long.MIN_VALUE - delta -> Long.MIN_VALUE
+            else -> this + delta
         }
     }
 

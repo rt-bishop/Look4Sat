@@ -134,14 +134,15 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
         NetworkOutputDialog(
             initialSettings = uiState.rcSettings,
             onDismiss = { dialogs.network = false },
-            onSave = { rotState, rotAddr, rotPort, rotFmt, freqState, freqAddr, freqPort, freqFmt ->
+            onSave = { rotState, rotAddr, rotPort, rotFmt, freqState, freqAddr, freqPort, freqFmt, freqOffsetHz ->
                 onAction(
                     SettingsAction.UpdateRC(
                         uiState.rcSettings.copy(
                             rotatorState = rotState, rotatorAddress = rotAddr,
                             rotatorPort = rotPort, rotatorFormat = rotFmt,
                             frequencyState = freqState, frequencyAddress = freqAddr,
-                            frequencyPort = freqPort, frequencyFormat = freqFmt
+                            frequencyPort = freqPort, frequencyFormat = freqFmt,
+                            frequencyOffsetHz = freqOffsetHz
                         )
                     )
                 )
