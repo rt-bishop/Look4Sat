@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rtbishop.look4sat.core.domain.model.DataSourcesSettings
 import com.rtbishop.look4sat.core.domain.model.OtherSettings
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
@@ -93,22 +94,10 @@ fun SettingsDestination() {
 @Composable
 private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) -> Unit) {
     val dialogs = rememberDialogVisibility()
-    val pendingCustomSourcesGrant = remember { mutableStateOf<(() -> Unit)?>(null) }
-    val pendingCustomSourcesDeny = remember { mutableStateOf<(() -> Unit)?>(null) }
     val permissions = rememberSettingsPermissions(
         sendAction = onAction,
         onBluetoothGranted = { dialogs.bluetooth = true },
-        onNetworkGranted = { dialogs.network = true },
-        onCustomSourcesPermissionGranted = {
-            pendingCustomSourcesGrant.value?.invoke()
-            pendingCustomSourcesGrant.value = null
-            pendingCustomSourcesDeny.value = null
-        },
-        onCustomSourcesPermissionDenied = {
-            pendingCustomSourcesDeny.value?.invoke()
-            pendingCustomSourcesGrant.value = null
-            pendingCustomSourcesDeny.value = null
-        }
+        onNetworkGranted = { dialogs.network = true }
     )
 
     // Dialogs
@@ -129,30 +118,15 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
     }
     if (dialogs.dataSources) {
         DataSourcesDialog(
-            useCustomTle = uiState.dataSourcesSettings.useCustomTLE,
-            useCustomTransceivers = uiState.dataSourcesSettings.useCustomTransceivers,
-            tleUrl = uiState.dataSourcesSettings.tleUrl,
-            transceiversUrl = uiState.dataSourcesSettings.transceiversUrl,
-            requestCustomSourcesPermission = { onGranted, onDenied ->
-                pendingCustomSourcesGrant.value = onGranted
-                pendingCustomSourcesDeny.value = onDenied
-                permissions.launchCustomSourcesPermission()
-            },
+            satelliteUrls = uiState.dataSourcesSettings.satelliteUrls,
+            transceiversUrls = uiState.dataSourcesSettings.transceiversUrls,
             onImportTle = { permissions.launchTleImport(); dialogs.dataSources = false },
             onImportTransceivers = { permissions.launchTransceiverImport(); dialogs.dataSources = false },
             onDismiss = { dialogs.dataSources = false },
-            onSave = { useCustomTle, useCustomTransceivers, tleUrl, transceiversUrl ->
-                val current = uiState.dataSourcesSettings
-                val newSettings = current.copy(
-                    useCustomTLE = if (!useCustomTle || tleUrl.isNotBlank()) useCustomTle else current.useCustomTLE,
-                    tleUrl = if (!useCustomTle || tleUrl.isNotBlank()) tleUrl else current.tleUrl,
-                    useCustomTransceivers = if (!useCustomTransceivers || transceiversUrl.isNotBlank()) useCustomTransceivers else current.useCustomTransceivers,
-                    transceiversUrl = if (!useCustomTransceivers || transceiversUrl.isNotBlank()) transceiversUrl else current.transceiversUrl
-                )
-                if (newSettings != current) onAction(SettingsAction.UpdateDataSources(newSettings))
-                if (newSettings.useCustomTLE || newSettings.useCustomTransceivers) {
-                    onAction(SettingsAction.UpdateFromWeb)
-                }
+            onSave = { satUrls, txUrls ->
+                val newSettings = DataSourcesSettings(satelliteUrls = satUrls, transceiversUrls = txUrls)
+                if (newSettings != uiState.dataSourcesSettings) onAction(SettingsAction.UpdateDataSources(newSettings))
+                onAction(SettingsAction.UpdateFromWeb)
             }
         )
     }
@@ -752,17 +726,14 @@ private class SettingsPermissions(
     val launchTleImport: () -> Unit,
     val launchTransceiverImport: () -> Unit,
     val launchBluetooth: () -> Unit,
-    val launchNetwork: () -> Unit,
-    val launchCustomSourcesPermission: () -> Unit
+    val launchNetwork: () -> Unit
 )
 
 @Composable
 private fun rememberSettingsPermissions(
     sendAction: (SettingsAction) -> Unit,
     onBluetoothGranted: () -> Unit,
-    onNetworkGranted: () -> Unit,
-    onCustomSourcesPermissionGranted: () -> Unit,
-    onCustomSourcesPermissionDenied: () -> Unit
+    onNetworkGranted: () -> Unit
 ): SettingsPermissions {
     val locationError = stringResource(R.string.prefs_loc_gps_error)
     val locationRequest = rememberLauncherForActivityResult(
@@ -799,15 +770,6 @@ private fun rememberSettingsPermissions(
         else sendAction(SettingsAction.ShowToast(networkError))
     }
 
-    val customSourcesRequest = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) {
-            onCustomSourcesPermissionGranted()
-        } else {
-            onCustomSourcesPermissionDenied()
-            sendAction(SettingsAction.ShowToast(networkError))
-        }
-    }
-
     return remember {
         SettingsPermissions(
             launchLocation = {
@@ -823,13 +785,6 @@ private fun rememberSettingsPermissions(
                     networkRequest.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
                 } else {
                     onNetworkGranted()
-                }
-            },
-            launchCustomSourcesPermission = {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
-                    customSourcesRequest.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
-                } else {
-                    onCustomSourcesPermissionGranted()
                 }
             }
         )

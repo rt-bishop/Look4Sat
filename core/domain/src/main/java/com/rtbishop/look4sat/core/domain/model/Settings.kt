@@ -67,10 +67,8 @@ data class OtherSettings(
 )
 
 data class DataSourcesSettings(
-    val useCustomTLE: Boolean,
-    val useCustomTransceivers: Boolean,
-    val tleUrl: String,
-    val transceiversUrl: String
+    val satelliteUrls: List<String>,
+    val transceiversUrls: List<String>
 )
 
 data class RadioControlSettings(

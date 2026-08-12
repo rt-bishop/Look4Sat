@@ -135,7 +135,7 @@ class SelectionRepoTest {
         )
 
         override val dataSourcesSettings: StateFlow<DataSourcesSettings> = MutableStateFlow(
-            DataSourcesSettings(false, false, "", "")
+            DataSourcesSettings(emptyList(), emptyList())
         )
 
         override val radioControlSettings: StateFlow<RadioControlSettings> = MutableStateFlow(

@@ -239,8 +239,13 @@ fun CardButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun IconCard(action: () -> Unit, resId: Int, modifier: Modifier = Modifier, enabled: Boolean = true) {
-    ElevatedCard(modifier = Modifier.size(48.dp), enabled = enabled, onClick = action) {
+fun IconCard(
+    action: () -> Unit, resId: Int, modifier: Modifier = Modifier,
+    enabled: Boolean = true, containerColor: Color = Color.Unspecified
+) {
+    val colors = if (containerColor == Color.Unspecified) CardDefaults.elevatedCardColors()
+    else CardDefaults.elevatedCardColors(containerColor = containerColor)
+    ElevatedCard(modifier = Modifier.size(48.dp), enabled = enabled, onClick = action, colors = colors) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(painter = painterResource(resId), contentDescription = null, modifier = modifier)
         }

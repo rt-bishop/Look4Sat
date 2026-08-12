@@ -90,10 +90,8 @@ class DatabaseRepoTest {
         }
         val settingsRepo = FakeSettingsRepo(
             dataSources = DataSourcesSettings(
-                useCustomTLE = true,
-                useCustomTransceivers = false,
-                tleUrl = customCsvUrl,
-                transceiversUrl = ""
+                satelliteUrls = listOf(customCsvUrl),
+                transceiversUrls = emptyList()
             )
         )
         val repository = DatabaseRepo(dispatcher, dataParser, localSource, remoteSource, settingsRepo)
@@ -221,9 +219,7 @@ private class FakeSettingsRepo(dataSources: DataSourcesSettings = defaultDataSou
 
 private fun defaultDataSourcesSettings(): DataSourcesSettings {
     return DataSourcesSettings(
-        useCustomTLE = false,
-        useCustomTransceivers = false,
-        tleUrl = "",
-        transceiversUrl = ""
+        satelliteUrls = emptyList(),
+        transceiversUrls = emptyList()
     )
 }

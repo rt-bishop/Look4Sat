@@ -18,18 +18,17 @@
 package com.rtbishop.look4sat.core.domain.source
 
 object Sources {
-    val satelliteDataUrls = mapOf(
-        "CelesTrak" to "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-        "AMSAT" to "https://amsat.org/tle/current/nasabare.txt",
-        "McCants Classified" to "https://www.mmccants.org/tles/classfd.zip",
-        "McCants Integrated" to "https://www.mmccants.org/tles/inttles.zip",
-        "R4UAB" to "https://r4uab.ru/satonline.txt",
-        "SatNOGS" to "https://db.satnogs.org/api/tle/?format=3le",
-        "ARISS" to "https://live.ariss.org/iss.txt",
-        "Other" to "" // key for sats filter
+    val satelliteDataUrls = listOf(
+        "celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
+        "db.satnogs.org/api/tle/?format=3le",
+        "amsat.org/tle/current/nasabare.txt",
+        "mmccants.org/tles/classfd.zip",
+        "r4uab.ru/satonline.txt",
+        "live.ariss.org/iss.txt"
     )
-    val transceiversDataUrls = mapOf(
-        "SatNOGS" to "https://db.satnogs.org/api/transmitters/?format=json&status=active"
+    val transceiversDataUrls = listOf(
+        "db.satnogs.org/api/transmitters/?format=json&status=active",
+        "r4uab.ru/transmitters.json"
     )
     val satelliteModes = listOf(
         "4FSK", "64-QAM", "AFSK", "AFSK TUBiX10", "AHRPT", "AM", "APT", "ASK", "BPSK",

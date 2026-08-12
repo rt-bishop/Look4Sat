@@ -31,6 +31,7 @@ import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
+import com.rtbishop.look4sat.core.domain.source.Sources
 import com.rtbishop.look4sat.core.domain.utility.positionToQth
 import com.rtbishop.look4sat.core.domain.utility.qthToPosition
 import com.rtbishop.look4sat.core.domain.utility.round
@@ -89,11 +90,10 @@ class SettingsRepo(
     private val keyHighElevation = "highElevation"
     private val keyRadarCompassOffset = "radarCompassOffset"
     private val keyRadarCompassOffsetElev = "radarCompassOffsetElev"
-    private val keyUseCustomTle = "useCustomTle"
-    private val keyUseCustomTransceivers = "useCustomTransceivers"
-    private val keyTleUrl = "tleUrl"
-    private val keyTransceiversUrl = "transceiversUrl"
+    private val keySatelliteUrls = "satelliteUrls"
+    private val keyTransceiversUrls = "transceiversUrls"
     private val separatorComma = ","
+    private val separatorUrl = "\n"
 
     //region # Satellites selection settings
     private val _satelliteSelection = MutableStateFlow(getSelectedIds())
@@ -365,19 +365,19 @@ class SettingsRepo(
 
     override fun updateDataSourcesSettings(settings: DataSourcesSettings) {
         preferences.edit {
-            putBoolean(keyUseCustomTle, settings.useCustomTLE)
-            putBoolean(keyUseCustomTransceivers, settings.useCustomTransceivers)
-            putString(keyTleUrl, settings.tleUrl)
-            putString(keyTransceiversUrl, settings.transceiversUrl)
+            putString(keySatelliteUrls, settings.satelliteUrls.joinToString(separatorUrl))
+            putString(keyTransceiversUrls, settings.transceiversUrls.joinToString(separatorUrl))
         }
         _dataSourcesSettings.value = settings
     }
 
     private fun getDataSourcesSettings(): DataSourcesSettings = DataSourcesSettings(
-        useCustomTLE = preferences.getBoolean(keyUseCustomTle, false),
-        useCustomTransceivers = preferences.getBoolean(keyUseCustomTransceivers, false),
-        tleUrl = preferences.getString(keyTleUrl, "https://example.com/tle.txt") ?: "",
-        transceiversUrl = preferences.getString(keyTransceiversUrl, "https://example.com/radio.json") ?: ""
+        satelliteUrls = preferences.getString(keySatelliteUrls, null)
+            ?.split(separatorUrl)?.filter { it.isNotBlank() }
+            ?: Sources.satelliteDataUrls,
+        transceiversUrls = preferences.getString(keyTransceiversUrls, null)
+            ?.split(separatorUrl)?.filter { it.isNotBlank() }
+            ?: Sources.transceiversDataUrls
     )
     //endregion
 

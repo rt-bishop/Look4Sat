@@ -23,7 +23,6 @@ import com.rtbishop.look4sat.core.domain.repository.IDatabaseRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
 import com.rtbishop.look4sat.core.domain.source.ILocalSource
 import com.rtbishop.look4sat.core.domain.source.IRemoteSource
-import com.rtbishop.look4sat.core.domain.source.Sources
 import com.rtbishop.look4sat.core.domain.utility.DataParser
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
@@ -40,7 +39,6 @@ class DatabaseRepo(
     private val settingsRepo: ISettingsRepo
 ) : IDatabaseRepo {
 
-    private val customSourceType = "Other"
 
     override suspend fun updateTLEFromFile(uri: String): Int = withContext(dispatcher) {
         var importedCount = 0
@@ -65,18 +63,13 @@ class DatabaseRepo(
     }
 
     override suspend fun updateFromRemote() = withContext(dispatcher) {
-        val dataSourcesSettings = settingsRepo.dataSourcesSettings.value
-        val tleUrls = buildMap {
-            putAll(Sources.satelliteDataUrls)
-            if (dataSourcesSettings.useCustomTLE) put(customSourceType, dataSourcesSettings.tleUrl)
-        }.filterValues { it.isNotBlank() }
-        val radioUrls = buildMap {
-            putAll(Sources.transceiversDataUrls)
-            if (dataSourcesSettings.useCustomTransceivers) put(customSourceType, dataSourcesSettings.transceiversUrl)
-        }.filterValues { it.isNotBlank() }
+        val settings = settingsRepo.dataSourcesSettings.value
+        fun normalizeUrl(url: String) = if (url.startsWith("http")) url else "https://$url"
+        val tleUrls = settings.satelliteUrls.filter { it.isNotBlank() }.map(::normalizeUrl)
+        val radioUrls = settings.transceiversUrls.filter { it.isNotBlank() }.map(::normalizeUrl)
         // launch all network requests concurrently
-        val tleJobs = tleUrls.values.map { url -> async { url to remoteSource.getNetworkStream(url) } }
-        val radioJobs = radioUrls.values.map { url -> async { url to remoteSource.getNetworkStream(url) } }
+        val tleJobs = tleUrls.map { url -> async { url to remoteSource.getNetworkStream(url) } }
+        val radioJobs = radioUrls.map { url -> async { url to remoteSource.getNetworkStream(url) } }
         // parse fetched data concurrently
         val importedEntries = tleJobs.awaitAll().flatMap { (url, stream) ->
             stream?.let { parseSatelliteStream(url, unwrapIfZipped(url, it)) }.orEmpty()
