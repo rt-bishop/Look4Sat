@@ -56,16 +56,13 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Added small tweaks to Sources and strings. Added official ISS source (#225)
-        \n* Implemented AOS window and elevation highlight filters (#226)
-        \n* Added cleartext traffic support for custom TLE URLs (#227)
-        \n* Fixed manual OMM (.csv) data import, tweaked error messaging (#228)
-        \n* Added support for Icom IC-705 CAT by ruilvo (#229)
-        \n* Added configurable Radar offset to the sensors output by qwqtoday (#230)
-        \n* Localized pass date and time formats for Chinese by atsunatsu (#231)
-        \n* Added linear transponder Doppler calculator by atsunatsu (#232)
-        \n* Added a few tweaks to SSTV sensitivity and reception, similar to Robot36
-        \n* Replaced the types selection dialog with modes selection to avoid confusion
+        * Added AMSAT status tracking page by MCKero6423 (#234)
+        \n* Tweaked Radar track on reposition by atsunatsu (#235)
+        \n* Tweaked linear transponder calc by atsunatsu (#236)
+        \n* Added saving per-sat doppler offset by atsunatsu (#237)
+        \n* Added custom freq offset setting to network reporting
+        \n* Added ability to customize data sources via import
+        \n* Fixed star chart in README by PingouinFerreux (#240)
     </string>
 
     <!-- AMSAT Status screen -->

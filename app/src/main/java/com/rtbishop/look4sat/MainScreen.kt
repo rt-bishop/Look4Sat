@@ -93,11 +93,11 @@ fun NavRoot(deeplink: String? = null) {
     val navigateBack: () -> Unit = { rootBackStack.removeLastOrNull() }
     val navigateToRadar: () -> Unit = { rootBackStack.add(RadarDestination) }
     // Incoming screen slides in from the right, outgoing drifts left at 1/3 speed (API35+ style)
-    val pushTransition = slideInHorizontally(tween(350)) { it } togetherWith
-        slideOutHorizontally(tween(350)) { -it / 3 }
+    val pushTransition = slideInHorizontally(tween(300)) { it } togetherWith
+        slideOutHorizontally(tween(300)) { -it / 3 }
     // Reverse: outgoing slides out to the right, incoming drifts in from the left
-    val popTransition = slideInHorizontally(tween(350)) { -it / 3 } togetherWith
-        slideOutHorizontally(tween(350)) { it }
+    val popTransition = slideInHorizontally(tween(300)) { -it / 3 } togetherWith
+        slideOutHorizontally(tween(300)) { it }
     NavDisplay(
         modifier = Modifier.fillMaxSize(),
         backStack = rootBackStack,
@@ -133,8 +133,8 @@ private fun MainScreen(navigateToRadar: () -> Unit = {}) {
     val backStack = rememberNavBackStack(Screen.Passes)
     val currentKey = backStack.lastOrNull()
     val navigateBack: () -> Unit = { backStack.removeLastOrNull() }
-    val fadeTransition = fadeIn(animationSpec = tween(350)) togetherWith
-        fadeOut(animationSpec = tween(350))
+    val fadeTransition = fadeIn(animationSpec = tween(300)) togetherWith
+        fadeOut(animationSpec = tween(300))
     val navItems =
         listOf(Screen.Satellites, Screen.Passes, Screen.Status, Screen.Map, Screen.Settings)
 

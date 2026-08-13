@@ -51,7 +51,7 @@ import com.rtbishop.look4sat.core.domain.model.SatReport
 import com.rtbishop.look4sat.core.domain.model.SatSlot
 import com.rtbishop.look4sat.core.domain.model.SatStatus
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
-import com.rtbishop.look4sat.core.presentation.ConfirmDialog
+import com.rtbishop.look4sat.core.presentation.InfoDialog
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.layoutPadding
 import java.util.Calendar
@@ -280,7 +280,7 @@ private fun DayCell(slot: SatSlot, modifier: Modifier, onClick: () -> Unit) {
 @Composable
 private fun ReportDialog(statusName: String, day: SatDay, reports: Map<String, SatReport>, onDismiss: () -> Unit) {
     val dayReports = day.slots.flatMap { it.reportIds }.mapNotNull { reports[it] }
-    ConfirmDialog(title = "$statusName · ${day.dateLabel}", onCancel = onDismiss, onAccept = onDismiss) {
+    InfoDialog(title = "$statusName · ${day.dateLabel}", onDismiss = onDismiss, onAccept = onDismiss) {
         if (dayReports.isEmpty()) {
             Text(stringResource(id = R.string.amsat_no_reports))
             Spacer(modifier = Modifier.height(8.dp))
