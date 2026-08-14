@@ -44,6 +44,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -290,6 +291,8 @@ private fun LazyListScope.sourceSection(
     }
     itemsIndexed(urls, key = { _, entry -> "$sectionKey-${entry.first}" }) { index, (id, url) ->
         val enabledTint = MaterialTheme.colorScheme.onSurfaceVariant
+        val offsetY = remember { mutableFloatStateOf(0f) }
+        val isDragging = draggedId.value == id
         OutlinedTextField(
             value = url,
             onValueChange = { onUrlChange(index, it) },
@@ -301,7 +304,7 @@ private fun LazyListScope.sourceSection(
                     tint = enabledTint,
                     modifier = Modifier
                         .padding(4.dp)
-                        .reorderable(listState, sectionKey, id, urls, draggedId, onMove)
+                        .dragHandle(listState, sectionKey, id, urls, draggedId, offsetY, onMove)
                 )
             },
             trailingIcon = {
@@ -315,53 +318,53 @@ private fun LazyListScope.sourceSection(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
+                .draggedVisual(isDragging, offsetY)
                 .animateItem(fadeInSpec = spring(), fadeOutSpec = spring())
         )
     }
 }
 
 /**
- * Long-press drag handle that reorders its entry within a LazyColumn section.
- * Rows are located via their stable LazyColumn item key ("$sectionKey-$entryId")
- * so the drag works regardless of how many header items precede the section.
+ * Drag handle gesture that accumulates the vertical drag offset while dragging.
+ * Rendering of the whole field (see [draggedVisual]) is applied on the field itself
+ * so the entire row follows the finger, not just the handle icon.
  */
 @Composable
-private fun Modifier.reorderable(
+private fun Modifier.dragHandle(
     listState: LazyListState,
     sectionKey: String,
     entryId: Long,
     urls: List<Pair<Long, String>>,
     draggedId: MutableState<Long>,
+    offsetY: MutableFloatState,
     onMove: (from: Int, to: Int) -> Unit
-): Modifier {
-    val isDragging = draggedId.value == entryId
-    val offsetY = remember { mutableFloatStateOf(0f) }
-    return this
-        .then(if (isDragging) Modifier.zIndex(1f) else Modifier)
+): Modifier = pointerInput(entryId, sectionKey) {
+    detectDragGesturesAfterLongPress(
+        onDragStart = { draggedId.value = entryId },
+        onDragEnd = {
+            reorderEntry(listState, sectionKey, entryId, urls, offsetY.floatValue, onMove)
+            offsetY.floatValue = 0f
+            draggedId.value = -1L
+        },
+        onDragCancel = {
+            offsetY.floatValue = 0f
+            draggedId.value = -1L
+        }
+    ) { change, dragAmount ->
+        change.consume()
+        if (draggedId.value == entryId) offsetY.floatValue += dragAmount.y
+    }
+}
+
+@Composable
+private fun Modifier.draggedVisual(isDragging: Boolean, offsetY: MutableFloatState): Modifier =
+    then(if (isDragging) Modifier.zIndex(1f) else Modifier)
         .graphicsLayer {
             if (isDragging) {
                 translationY = offsetY.floatValue
                 scaleX = 1.03f
             }
         }
-        .pointerInput(entryId, sectionKey) {
-            detectDragGesturesAfterLongPress(
-                onDragStart = { draggedId.value = entryId },
-                onDragEnd = {
-                    reorderEntry(listState, sectionKey, entryId, urls, offsetY.floatValue, onMove)
-                    offsetY.floatValue = 0f
-                    draggedId.value = -1L
-                },
-                onDragCancel = {
-                    offsetY.floatValue = 0f
-                    draggedId.value = -1L
-                }
-            ) { change, dragAmount ->
-                change.consume()
-                if (draggedId.value == entryId) offsetY.floatValue += dragAmount.y
-            }
-        }
-}
 
 private fun reorderEntry(
     listState: LazyListState,
