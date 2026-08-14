@@ -424,8 +424,12 @@ object CelestialComputer {
         }
         if (sunrise == 0.0) sunrise = daynum
 
-        // Phase 4: fast-forward through the day until sun drops back below threshold
-        daynum = sunrise
+        // Phase 4: fast-forward through the day until sun drops back below threshold.
+        // Start from just after sunrise (small offset) so the sun is clearly above
+        // the threshold. This prevents a bug where Phase 3 converges to a point
+        // slightly below -threshold, causing Phase 4 to skip and Phase 5 to converge
+        // to the same time as sunrise, producing identical sunrise/sunset times.
+        daynum = sunrise + 0.001
         sunPos = getSunPosition(observer, daynumToMillis(daynum))
         guard = 0
         while (sunPos.elevation > -threshold && guard++ < 500) {
