@@ -401,16 +401,17 @@ private fun reorderEntry(
     val myLayout = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == myLazyKey }
     if (myLayout == null || myIndex !in urls.indices) return
     val myCenterY = myLayout.offset + myLayout.size / 2f + offsetY
-    val targetKey = listState.layoutInfo.visibleItemsInfo
+    val visibleItems = listState.layoutInfo.visibleItemsInfo
+    val targetKey = visibleItems
         .asSequence()
         .mapNotNull { it.key as? String }
         .filter { it.startsWith("$sectionKey-") && it != myLazyKey }
         .sortedBy { key ->
-            listState.layoutInfo.visibleItemsInfo.first { it.key == key }
-                .let { it.offset + it.size / 2f }
+            visibleItems.firstOrNull { it.key == key }
+                ?.let { it.offset + it.size / 2f } ?: Float.MAX_VALUE
         }
         .firstOrNull { key ->
-            val layout = listState.layoutInfo.visibleItemsInfo.first { it.key == key }
+            val layout = visibleItems.firstOrNull { it.key == key } ?: return@firstOrNull false
             myCenterY < layout.offset + layout.size / 2f
         }
     val targetIndex = if (targetKey != null) {
