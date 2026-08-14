@@ -20,6 +20,7 @@ package com.rtbishop.look4sat.feature.settings
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
@@ -68,6 +70,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.delay
 import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.model.Constants
@@ -304,19 +307,25 @@ private fun LazyListScope.sourceSection(
     itemsIndexed(urls, key = { _, entry -> "$sectionKey-${entry.first}" }) { index, (id, url) ->
         val enabledTint = MaterialTheme.colorScheme.onSurfaceVariant
         val offsetY = remember { mutableFloatStateOf(0f) }
+        val scrollComp = remember { mutableFloatStateOf(0f) }
+        val startCenterY = remember { mutableFloatStateOf(0f) }
         val isDragging = draggedId.value == id
+        LaunchedEffect(isDragging) {
+            if (!isDragging) return@LaunchedEffect
+            autoScroll(listState, startCenterY, offsetY, scrollComp)
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .draggedVisual(isDragging, offsetY)
+                .draggedVisual(isDragging, offsetY.floatValue + scrollComp.floatValue)
                 .animateItem(fadeInSpec = spring(), fadeOutSpec = spring())
         ) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(40.dp)
-                    .dragHandle(listState, sectionKey, id, urls, draggedId, offsetY, onMove)
+                    .dragHandle(listState, sectionKey, id, urls, draggedId, offsetY, scrollComp, startCenterY, onMove)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_drag_handle),
@@ -359,17 +368,29 @@ private fun Modifier.dragHandle(
     urls: List<Pair<Long, String>>,
     draggedId: MutableState<Long>,
     offsetY: MutableFloatState,
+    scrollComp: MutableFloatState,
+    startCenterY: MutableFloatState,
     onMove: (from: Int, to: Int) -> Unit
 ): Modifier = pointerInput(entryId, sectionKey) {
+    var itemHeight = 0f
     detectDragGesturesAfterLongPress(
-        onDragStart = { draggedId.value = entryId },
-        onDragEnd = {
-            reorderEntry(listState, sectionKey, entryId, urls, offsetY.floatValue, onMove)
+        onDragStart = {
+            val layout = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == "$sectionKey-$entryId" }
+            itemHeight = layout?.size?.toFloat() ?: 0f
+            startCenterY.floatValue = (layout?.offset ?: 0) + (layout?.size ?: 0) / 2f
             offsetY.floatValue = 0f
+            scrollComp.floatValue = 0f
+            draggedId.value = entryId
+        },
+        onDragEnd = {
+            reorderEntry(entryId, urls, offsetY.floatValue, itemHeight, onMove)
+            offsetY.floatValue = 0f
+            scrollComp.floatValue = 0f
             draggedId.value = -1L
         },
         onDragCancel = {
             offsetY.floatValue = 0f
+            scrollComp.floatValue = 0f
             draggedId.value = -1L
         }
     ) { change, dragAmount ->
@@ -379,47 +400,58 @@ private fun Modifier.dragHandle(
 }
 
 @Composable
-private fun Modifier.draggedVisual(isDragging: Boolean, offsetY: MutableFloatState): Modifier =
+private fun Modifier.draggedVisual(isDragging: Boolean, translationY: Float): Modifier =
     then(if (isDragging) Modifier.zIndex(1f) else Modifier)
         .graphicsLayer {
             if (isDragging) {
-                translationY = offsetY.floatValue
+                this.translationY = translationY
                 scaleX = 1.03f
             }
         }
 
 private fun reorderEntry(
-    listState: LazyListState,
-    sectionKey: String,
     entryId: Long,
     urls: List<Pair<Long, String>>,
     offsetY: Float,
+    itemHeight: Float,
     onMove: (Int, Int) -> Unit
 ) {
-    val myLazyKey = "$sectionKey-$entryId"
     val myIndex = urls.indexOfFirst { it.first == entryId }
-    val myLayout = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == myLazyKey }
-    if (myLayout == null || myIndex !in urls.indices) return
-    val myCenterY = myLayout.offset + myLayout.size / 2f + offsetY
-    val visibleItems = listState.layoutInfo.visibleItemsInfo
-    val targetKey = visibleItems
-        .asSequence()
-        .mapNotNull { it.key as? String }
-        .filter { it.startsWith("$sectionKey-") && it != myLazyKey }
-        .sortedBy { key ->
-            visibleItems.firstOrNull { it.key == key }
-                ?.let { it.offset + it.size / 2f } ?: Float.MAX_VALUE
+    if (myIndex !in urls.indices || itemHeight <= 0f) return
+    // Assume entries have roughly equal height: convert the accumulated finger drag into a
+    // slot delta truncated toward zero, then clamp into the section bounds.
+    val step = itemHeight.coerceAtLeast(1f)
+    val targetIndex = (myIndex + (offsetY / step).toInt()).coerceIn(0, urls.lastIndex)
+    if (targetIndex != myIndex) onMove(myIndex, targetIndex)
+}
+
+/**
+ * Scrolls the list while dragging so the entry follows the finger past the viewport edges.
+ * The visual center is tracked independently of the entry's layout slot (which can scroll out
+ * of [LazyListState.layoutInfo.visibleItemsInfo] during a long drag); [startCenterY] is the
+ * entry's viewport center captured at drag start and [offsetY] is the raw finger delta.
+ */
+private suspend fun autoScroll(
+    listState: LazyListState,
+    startCenterY: MutableFloatState,
+    offsetY: MutableFloatState,
+    scrollComp: MutableFloatState
+) {
+    val threshold = 48f
+    val maxSpeed = 24f
+    while (true) {
+        val info = listState.layoutInfo
+        val center = startCenterY.floatValue + offsetY.floatValue
+        val top = info.viewportStartOffset + threshold
+        val bottom = info.viewportEndOffset - threshold
+        val delta = when {
+            center < top -> -(top - center).coerceAtMost(maxSpeed)
+            center > bottom -> (center - bottom).coerceAtMost(maxSpeed)
+            else -> 0f
         }
-        .firstOrNull { key ->
-            val layout = visibleItems.firstOrNull { it.key == key } ?: return@firstOrNull false
-            myCenterY < layout.offset + layout.size / 2f
-        }
-    val targetIndex = if (targetKey != null) {
-        urls.indexOfFirst { it.first == targetKey.removePrefix("$sectionKey-").toLong() }
-    } else {
-        urls.lastIndex
+        if (delta != 0f) scrollComp.floatValue += listState.scrollBy(delta)
+        delay(16L)
     }
-    if (targetIndex in urls.indices && targetIndex != myIndex) onMove(myIndex, targetIndex)
 }
 
 private fun statusLabel(code: Int): String = if (code == NetworkResult.CONNECTION_ERROR) "ERR" else code.toString()

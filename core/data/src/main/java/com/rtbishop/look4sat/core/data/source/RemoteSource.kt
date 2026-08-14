@@ -54,7 +54,11 @@ class RemoteSource(
             }
             // Return the body stream directly as the caller is responsible for closing it
             // That returns the connection to OkHttp's pool
-            val body = response.body ?: return@withContext NetworkResult(response.code, null)
+            val body = response.body
+            if (body == null) {
+                response.close()
+                return@withContext NetworkResult(response.code, null)
+            }
             NetworkResult(response.code, body.byteStream().buffered())
         } catch (exception: Exception) {
             println("RemoteSource network stream exception: $exception")

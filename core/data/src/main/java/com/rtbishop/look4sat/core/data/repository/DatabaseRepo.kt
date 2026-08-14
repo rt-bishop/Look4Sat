@@ -83,7 +83,7 @@ class DatabaseRepo(
         }.distinctBy { it.catnum }
         val importedRadios = radioResults.flatMap { (url, result) ->
             result.stream?.let { val nUrl = normalizeUrl(url); dataParser.parseJSONStream(unwrapIfZipped(nUrl, it)) }.orEmpty()
-        }.distinctBy { it.uuid }
+        }.filter { it.uuid.isNotBlank() }.distinctBy { it.uuid }
         // insert parsed data into the database
         localSource.insertEntries(importedEntries)
         localSource.insertRadios(importedRadios)
