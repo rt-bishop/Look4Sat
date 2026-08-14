@@ -18,11 +18,8 @@
 package com.rtbishop.look4sat.feature.settings
 
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.longPressDraggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -58,6 +55,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -201,6 +199,7 @@ fun DataSourcesDialog(
                 (Sources.satelliteDataUrls.size + i).toLong() to url
             }
         )
+        Unit
     }
     val onAccept = { onSave(satUrls.map { it.second }, txUrls.map { it.second }); onDismiss() }
     ConfirmDialog(
@@ -326,7 +325,6 @@ private fun LazyListScope.sourceSection(
  * Rows are located via their stable LazyColumn item key ("$sectionKey-$entryId")
  * so the drag works regardless of how many header items precede the section.
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Modifier.reorderable(
     listState: LazyListState,
@@ -346,45 +344,56 @@ private fun Modifier.reorderable(
                 scaleX = 1.03f
             }
         }
-        .longPressDraggable(
-            state = rememberDraggableState { delta ->
-                if (draggedId.value == entryId) offsetY.floatValue += delta
-            },
-            orientation = Orientation.Vertical,
-            onDragStarted = { draggedId.value = entryId },
-            onDragStopped = {
-                val myLazyKey = "$sectionKey-$entryId"
-                val myIndex = urls.indexOfFirst { it.first == entryId }
-                val myLayout = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == myLazyKey }
-                if (myLayout != null && myIndex in urls.indices) {
-                    val myCenterY = myLayout.offset + myLayout.size / 2f + offsetY.floatValue
-                    val targetKey = listState.layoutInfo.visibleItemsInfo
-                        .asSequence()
-                        .mapNotNull { it.key as? String }
-                        .filter { it.startsWith("$sectionKey-") && it != myLazyKey }
-                        .sortedBy { key ->
-                            listState.layoutInfo.visibleItemsInfo.first { it.key == key }
-                                .let { it.offset + it.size / 2f }
-                        }
-                        .firstOrNull { key ->
-                            val layout = listState.layoutInfo.visibleItemsInfo.first { it.key == key }
-                            myCenterY < layout.offset + layout.size / 2f
-                        }
-                    val targetIndex = if (targetKey != null) {
-                        urls.indexOfFirst { it.first == targetKey.removePrefix("$sectionKey-").toLong() }
-                    } else {
-                        urls.lastIndex
-                    }
-                    if (targetIndex in urls.indices && targetIndex != myIndex) onMove(myIndex, targetIndex)
+        .pointerInput(entryId, sectionKey) {
+            detectDragGesturesAfterLongPress(
+                onDragStart = { draggedId.value = entryId },
+                onDragEnd = {
+                    reorderEntry(listState, sectionKey, entryId, urls, offsetY.floatValue, onMove)
+                    offsetY.floatValue = 0f
+                    draggedId.value = -1L
+                },
+                onDragCancel = {
+                    offsetY.floatValue = 0f
+                    draggedId.value = -1L
                 }
-                offsetY.floatValue = 0f
-                draggedId.value = -1L
-            },
-            onDragCancelled = {
-                offsetY.floatValue = 0f
-                draggedId.value = -1L
+            ) { change, dragAmount ->
+                change.consume()
+                if (draggedId.value == entryId) offsetY.floatValue += dragAmount.y
             }
-        )
+        }
+}
+
+private fun reorderEntry(
+    listState: LazyListState,
+    sectionKey: String,
+    entryId: Long,
+    urls: List<Pair<Long, String>>,
+    offsetY: Float,
+    onMove: (Int, Int) -> Unit
+) {
+    val myLazyKey = "$sectionKey-$entryId"
+    val myIndex = urls.indexOfFirst { it.first == entryId }
+    val myLayout = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == myLazyKey }
+    if (myLayout == null || myIndex !in urls.indices) return
+    val myCenterY = myLayout.offset + myLayout.size / 2f + offsetY
+    val targetKey = listState.layoutInfo.visibleItemsInfo
+        .asSequence()
+        .mapNotNull { it.key as? String }
+        .filter { it.startsWith("$sectionKey-") && it != myLazyKey }
+        .sortedBy { key ->
+            listState.layoutInfo.visibleItemsInfo.first { it.key == key }
+                .let { it.offset + it.size / 2f }
+        }
+        .firstOrNull { key ->
+            val layout = listState.layoutInfo.visibleItemsInfo.first { it.key == key }
+            myCenterY < layout.offset + layout.size / 2f
+        }
+    val targetIndex = if (targetKey != null) {
+        urls.indexOfFirst { it.first == targetKey.removePrefix("$sectionKey-").toLong() }
+    } else {
+        urls.lastIndex
+    }
+    if (targetIndex in urls.indices && targetIndex != myIndex) onMove(myIndex, targetIndex)
 }
 
 @Preview(showBackground = true)
