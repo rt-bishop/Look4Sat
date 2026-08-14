@@ -71,6 +71,11 @@ interface ISettingsRepo {
     fun updateDataSourcesSettings(settings: DataSourcesSettings)
     //endregion
 
+    //region # Data sources status
+    val dataSourcesStatus: StateFlow<Map<String, Int>>
+    fun updateDataSourcesStatus(status: Map<String, Int>)
+    //endregion
+
     //region # Radio control settings
     val radioControlSettings: StateFlow<RadioControlSettings>
     fun updateRadioControlSettings(settings: RadioControlSettings)

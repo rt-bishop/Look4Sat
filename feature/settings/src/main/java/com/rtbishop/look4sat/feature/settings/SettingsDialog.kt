@@ -19,7 +19,9 @@ package com.rtbishop.look4sat.feature.settings
 
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -29,9 +31,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +46,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +57,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,9 +67,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.model.Constants
+import com.rtbishop.look4sat.core.domain.source.NetworkResult
+import com.rtbishop.look4sat.core.domain.source.Sources
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.LocalSpacing
@@ -152,6 +165,10 @@ private fun TransceiversDialogPreview() {
             transceiversUrls = listOf(
                 "db.satnogs.org/api/transmitters/?format=json&status=active"
             ),
+            statusCodes = mapOf(
+                "celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv" to 200,
+                "amsat.org/tle/current/nasabare.txt" to 404
+            ),
             onImportTle = {},
             onImportTransceivers = {},
             onDismiss = {},
@@ -164,6 +181,7 @@ private fun TransceiversDialogPreview() {
 fun DataSourcesDialog(
     satelliteUrls: List<String>,
     transceiversUrls: List<String>,
+    statusCodes: Map<String, Int>,
     onImportTle: () -> Unit,
     onImportTransceivers: () -> Unit,
     onDismiss: () -> Unit,
@@ -178,6 +196,21 @@ fun DataSourcesDialog(
     val txUrls = remember {
         transceiversUrls.mapIndexed { i, url -> (satelliteUrls.size + i).toLong() to url }.toMutableStateList()
     }
+    val listState = rememberLazyListState()
+    val satDraggedId = remember { mutableStateOf(-1L) }
+    val txDraggedId = remember { mutableStateOf(-1L) }
+    val onRestoreDefaults = {
+        nextId.longValue = (Sources.satelliteDataUrls.size + Sources.transceiversDataUrls.size).toLong()
+        satUrls.clear()
+        satUrls.addAll(Sources.satelliteDataUrls.mapIndexed { i, url -> i.toLong() to url })
+        txUrls.clear()
+        txUrls.addAll(
+            Sources.transceiversDataUrls.mapIndexed { i, url ->
+                (Sources.satelliteDataUrls.size + i).toLong() to url
+            }
+        )
+        Unit
+    }
     val onAccept = { onSave(satUrls.map { it.second }, txUrls.map { it.second }); onDismiss() }
     ConfirmDialog(
         title = stringResource(id = R.string.prefs_data_sources_title),
@@ -185,6 +218,7 @@ fun DataSourcesDialog(
         onAccept = onAccept,
     ) {
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxHeight(0.84f)
                 .padding(horizontal = padding),
@@ -208,12 +242,22 @@ fun DataSourcesDialog(
                     )
                 }
             }
+            item {
+                CardButton(
+                    onClick = onRestoreDefaults,
+                    text = stringResource(R.string.prefs_data_sources_restore),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             sourceSection(
                 sectionKey = "sat",
                 label = "Satellites data",
                 urls = satUrls,
+                listState = listState,
+                draggedId = satDraggedId,
+                statusCodes = statusCodes,
                 onAdd = { satUrls.add(nextId.longValue++ to "") },
-                onMoveUp = { i -> if (i > 0) satUrls.add(i - 1, satUrls.removeAt(i)) },
+                onMove = { from, to -> satUrls.add(to, satUrls.removeAt(from)) },
                 onRemove = { i -> satUrls.removeAt(i) },
                 onUrlChange = { i, v -> satUrls[i] = satUrls[i].first to v }
             )
@@ -221,8 +265,11 @@ fun DataSourcesDialog(
                 sectionKey = "tx",
                 label = "Transceivers data",
                 urls = txUrls,
+                listState = listState,
+                draggedId = txDraggedId,
+                statusCodes = statusCodes,
                 onAdd = { txUrls.add(nextId.longValue++ to "") },
-                onMoveUp = { i -> if (i > 0) txUrls.add(i - 1, txUrls.removeAt(i)) },
+                onMove = { from, to -> txUrls.add(to, txUrls.removeAt(from)) },
                 onRemove = { i -> txUrls.removeAt(i) },
                 onUrlChange = { i, v -> txUrls[i] = txUrls[i].first to v }
             )
@@ -234,8 +281,11 @@ private fun LazyListScope.sourceSection(
     sectionKey: String,
     label: String,
     urls: List<Pair<Long, String>>,
+    listState: LazyListState,
+    draggedId: MutableState<Long>,
+    statusCodes: Map<String, Int>,
     onAdd: () -> Unit,
-    onMoveUp: (Int) -> Unit,
+    onMove: (Int, Int) -> Unit,
     onRemove: (Int) -> Unit,
     onUrlChange: (Int, String) -> Unit
 ) {
@@ -251,36 +301,133 @@ private fun LazyListScope.sourceSection(
             IconCard(action = onAdd, resId = R.drawable.ic_add, containerColor = MaterialTheme.colorScheme.surfaceVariant)
         }
     }
-    itemsIndexed(urls, key = { _, entry -> "$sectionKey-${entry.first}" }) { index, (_, url) ->
+    itemsIndexed(urls, key = { _, entry -> "$sectionKey-${entry.first}" }) { index, (id, url) ->
         val enabledTint = MaterialTheme.colorScheme.onSurfaceVariant
-        OutlinedTextField(
-            value = url,
-            onValueChange = { onUrlChange(index, it) },
-            label = { Text("Source URL") },
-            leadingIcon = {
-                IconButton(onClick = { onMoveUp(index) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow),
-                        contentDescription = null,
-                        tint = if (index > 0) enabledTint else enabledTint.copy(alpha = 0.32f),
-                        modifier = Modifier.rotate(270f)
-                    )
-                }
-            },
-            trailingIcon = {
-                IconButton(onClick = { onRemove(index) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_delete),
-                        contentDescription = null
-                    )
-                }
-            },
-            singleLine = true,
+        val offsetY = remember { mutableFloatStateOf(0f) }
+        val isDragging = draggedId.value == id
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .draggedVisual(isDragging, offsetY)
                 .animateItem(fadeInSpec = spring(), fadeOutSpec = spring())
-        )
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(40.dp)
+                    .dragHandle(listState, sectionKey, id, urls, draggedId, offsetY, onMove)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_drag_handle),
+                    contentDescription = null,
+                    tint = enabledTint
+                )
+            }
+            OutlinedTextField(
+                value = url,
+                onValueChange = { onUrlChange(index, it) },
+                label = { Text("Source URL") },
+                supportingText = statusCodes[url]?.let { code ->
+                    { Text(statusLabel(code), color = statusColor(code), fontSize = 12.sp) }
+                },
+                trailingIcon = {
+                    IconButton(onClick = { onRemove(index) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete),
+                            contentDescription = null
+                        )
+                    }
+                },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
+}
+
+/**
+ * Drag handle gesture that accumulates the vertical drag offset while dragging.
+ * Rendering of the whole field (see [draggedVisual]) is applied on the field itself
+ * so the entire row follows the finger, not just the handle icon.
+ */
+@Composable
+private fun Modifier.dragHandle(
+    listState: LazyListState,
+    sectionKey: String,
+    entryId: Long,
+    urls: List<Pair<Long, String>>,
+    draggedId: MutableState<Long>,
+    offsetY: MutableFloatState,
+    onMove: (from: Int, to: Int) -> Unit
+): Modifier = pointerInput(entryId, sectionKey) {
+    detectDragGesturesAfterLongPress(
+        onDragStart = { draggedId.value = entryId },
+        onDragEnd = {
+            reorderEntry(listState, sectionKey, entryId, urls, offsetY.floatValue, onMove)
+            offsetY.floatValue = 0f
+            draggedId.value = -1L
+        },
+        onDragCancel = {
+            offsetY.floatValue = 0f
+            draggedId.value = -1L
+        }
+    ) { change, dragAmount ->
+        change.consume()
+        if (draggedId.value == entryId) offsetY.floatValue += dragAmount.y
+    }
+}
+
+@Composable
+private fun Modifier.draggedVisual(isDragging: Boolean, offsetY: MutableFloatState): Modifier =
+    then(if (isDragging) Modifier.zIndex(1f) else Modifier)
+        .graphicsLayer {
+            if (isDragging) {
+                translationY = offsetY.floatValue
+                scaleX = 1.03f
+            }
+        }
+
+private fun reorderEntry(
+    listState: LazyListState,
+    sectionKey: String,
+    entryId: Long,
+    urls: List<Pair<Long, String>>,
+    offsetY: Float,
+    onMove: (Int, Int) -> Unit
+) {
+    val myLazyKey = "$sectionKey-$entryId"
+    val myIndex = urls.indexOfFirst { it.first == entryId }
+    val myLayout = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == myLazyKey }
+    if (myLayout == null || myIndex !in urls.indices) return
+    val myCenterY = myLayout.offset + myLayout.size / 2f + offsetY
+    val targetKey = listState.layoutInfo.visibleItemsInfo
+        .asSequence()
+        .mapNotNull { it.key as? String }
+        .filter { it.startsWith("$sectionKey-") && it != myLazyKey }
+        .sortedBy { key ->
+            listState.layoutInfo.visibleItemsInfo.first { it.key == key }
+                .let { it.offset + it.size / 2f }
+        }
+        .firstOrNull { key ->
+            val layout = listState.layoutInfo.visibleItemsInfo.first { it.key == key }
+            myCenterY < layout.offset + layout.size / 2f
+        }
+    val targetIndex = if (targetKey != null) {
+        urls.indexOfFirst { it.first == targetKey.removePrefix("$sectionKey-").toLong() }
+    } else {
+        urls.lastIndex
+    }
+    if (targetIndex in urls.indices && targetIndex != myIndex) onMove(myIndex, targetIndex)
+}
+
+private fun statusLabel(code: Int): String = if (code == NetworkResult.CONNECTION_ERROR) "ERR" else code.toString()
+
+@Composable
+private fun statusColor(code: Int): Color = when {
+    code == NetworkResult.CONNECTION_ERROR -> MaterialTheme.colorScheme.error
+    code in 200..299 -> Color(0xFF66BB6A)
+    else -> MaterialTheme.colorScheme.error
 }
 
 @Preview(showBackground = true)

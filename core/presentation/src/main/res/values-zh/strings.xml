@@ -113,6 +113,7 @@
     <string name="prefs_data_import_transceivers_error">未导入收发器。请选择有效的 SatNOGS (.json) 文件。</string>
 
     <string name="prefs_data_sources_title">自定义源</string>
+    <string name="prefs_data_sources_restore">恢复默认源</string>
     <string name="prefs_data_sources_tle_switch">TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">收发器 URL</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>

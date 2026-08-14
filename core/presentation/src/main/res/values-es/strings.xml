@@ -118,6 +118,7 @@
     <string name="prefs_data_import_transceivers_error">No se importaron transceptores. Usa un SatNOGS (.json) válido.</string>
 
     <string name="prefs_data_sources_title">Fuentes personalizadas</string>
+    <string name="prefs_data_sources_restore">Restaurar fuentes predeterminadas</string>
     <string name="prefs_data_sources_tle_switch">URL TLE</string>
     <string name="prefs_data_sources_transceivers_switch">URL transceptores</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>

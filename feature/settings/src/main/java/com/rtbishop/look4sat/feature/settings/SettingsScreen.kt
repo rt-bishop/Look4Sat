@@ -120,6 +120,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
         DataSourcesDialog(
             satelliteUrls = uiState.dataSourcesSettings.satelliteUrls,
             transceiversUrls = uiState.dataSourcesSettings.transceiversUrls,
+            statusCodes = uiState.dataSourcesStatus,
             onImportTle = { permissions.launchTleImport(); dialogs.dataSources = false },
             onImportTransceivers = { permissions.launchTransceiverImport(); dialogs.dataSources = false },
             onDismiss = { dialogs.dataSources = false },

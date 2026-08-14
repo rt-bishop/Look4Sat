@@ -49,6 +49,7 @@ class SettingsViewModel(
             rcSettings = settingsRepo.rcSettings.value,
             radioControlSettings = settingsRepo.radioControlSettings.value,
             dataSourcesSettings = settingsRepo.dataSourcesSettings.value,
+            dataSourcesStatus = settingsRepo.dataSourcesStatus.value,
             pairedBluetoothDevices = container.providePairedBluetoothDevices()
         )
     )
@@ -90,6 +91,11 @@ class SettingsViewModel(
         viewModelScope.launch {
             settingsRepo.dataSourcesSettings.collect { settings ->
                 _uiState.update { it.copy(dataSourcesSettings = settings) }
+            }
+        }
+        viewModelScope.launch {
+            settingsRepo.dataSourcesStatus.collect { status ->
+                _uiState.update { it.copy(dataSourcesStatus = status) }
             }
         }
         viewModelScope.launch {
