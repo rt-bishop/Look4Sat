@@ -76,13 +76,14 @@ class DatabaseRepo(
         settingsRepo.updateDataSourcesStatus(
             (tleResults + radioResults).associate { (url, result) -> url to result.code }
         )
-        // parse fetched data concurrently
+        // parse fetched data concurrently, keeping the first occurrence per primary key
+        // so sources listed higher in the dialog take priority over lower ones
         val importedEntries = tleResults.flatMap { (url, result) ->
             result.stream?.let { parseSatelliteStream(normalizeUrl(url), unwrapIfZipped(normalizeUrl(url), it)) }.orEmpty()
-        }
+        }.distinctBy { it.catnum }
         val importedRadios = radioResults.flatMap { (url, result) ->
             result.stream?.let { dataParser.parseJSONStream(unwrapIfZipped(normalizeUrl(url), it)) }.orEmpty()
-        }
+        }.distinctBy { it.uuid }
         // insert parsed data into the database
         localSource.insertEntries(importedEntries)
         localSource.insertRadios(importedRadios)
