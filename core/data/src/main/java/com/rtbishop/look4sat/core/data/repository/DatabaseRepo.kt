@@ -65,17 +65,23 @@ class DatabaseRepo(
     override suspend fun updateFromRemote() = withContext(dispatcher) {
         val settings = settingsRepo.dataSourcesSettings.value
         fun normalizeUrl(url: String) = if (url.startsWith("http")) url else "https://$url"
-        val tleUrls = settings.satelliteUrls.filter { it.isNotBlank() }.map(::normalizeUrl)
-        val radioUrls = settings.transceiversUrls.filter { it.isNotBlank() }.map(::normalizeUrl)
-        // launch all network requests concurrently
-        val tleJobs = tleUrls.map { url -> async { url to remoteSource.getNetworkStream(url) } }
-        val radioJobs = radioUrls.map { url -> async { url to remoteSource.getNetworkStream(url) } }
+        val tleUrls = settings.satelliteUrls.filter { it.isNotBlank() }
+        val radioUrls = settings.transceiversUrls.filter { it.isNotBlank() }
+        // launch all network requests concurrently, keeping the raw url as key for status reporting
+        val tleJobs = tleUrls.map { url -> async { url to remoteSource.getNetworkStream(normalizeUrl(url)) } }
+        val radioJobs = radioUrls.map { url -> async { url to remoteSource.getNetworkStream(normalizeUrl(url)) } }
+        val tleResults = tleJobs.awaitAll()
+        val radioResults = radioJobs.awaitAll()
+        // report the HTTP status code of every source (200, 404, ...)
+        settingsRepo.updateDataSourcesStatus(
+            (tleResults + radioResults).associate { (url, result) -> url to result.code }
+        )
         // parse fetched data concurrently
-        val importedEntries = tleJobs.awaitAll().flatMap { (url, stream) ->
-            stream?.let { parseSatelliteStream(url, unwrapIfZipped(url, it)) }.orEmpty()
+        val importedEntries = tleResults.flatMap { (url, result) ->
+            result.stream?.let { parseSatelliteStream(normalizeUrl(url), unwrapIfZipped(normalizeUrl(url), it)) }.orEmpty()
         }
-        val importedRadios = radioJobs.awaitAll().flatMap { (url, stream) ->
-            stream?.let { dataParser.parseJSONStream(unwrapIfZipped(url, it)) }.orEmpty()
+        val importedRadios = radioResults.flatMap { (url, result) ->
+            result.stream?.let { dataParser.parseJSONStream(unwrapIfZipped(normalizeUrl(url), it)) }.orEmpty()
         }
         // insert parsed data into the database
         localSource.insertEntries(importedEntries)
