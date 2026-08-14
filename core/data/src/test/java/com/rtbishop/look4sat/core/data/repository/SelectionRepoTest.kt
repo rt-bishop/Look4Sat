@@ -138,6 +138,8 @@ class SelectionRepoTest {
             DataSourcesSettings(emptyList(), emptyList())
         )
 
+        override val dataSourcesStatus: StateFlow<Map<String, Int>> = MutableStateFlow(emptyMap())
+
         override val radioControlSettings: StateFlow<RadioControlSettings> = MutableStateFlow(
             RadioControlSettings(false, RadioControlSettings.MODEL_YAESU_FT817, "", "", "", "", 9600)
         )
@@ -165,6 +167,8 @@ class SelectionRepoTest {
         override fun updateOtherSettings(transform: (OtherSettings) -> OtherSettings) = Unit
 
         override fun updateDataSourcesSettings(settings: DataSourcesSettings) = Unit
+
+        override fun updateDataSourcesStatus(status: Map<String, Int>) = Unit
 
         override fun updateRadioControlSettings(settings: RadioControlSettings) = Unit
 

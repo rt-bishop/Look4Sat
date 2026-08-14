@@ -19,9 +19,17 @@ package com.rtbishop.look4sat.core.domain.source
 
 import java.io.InputStream
 
+/** Result of a network download: the HTTP status code and the response body stream. */
+data class NetworkResult(val code: Int, val stream: InputStream?) {
+    companion object {
+        /** Code used when a request fails before any HTTP response is received. */
+        const val CONNECTION_ERROR = -1
+    }
+}
+
 interface IRemoteSource {
     suspend fun getFileStream(uri: String): InputStream?
-    suspend fun getNetworkStream(url: String): InputStream?
+    suspend fun getNetworkStream(url: String): NetworkResult
     suspend fun getAmSatCatalog(): String?
     suspend fun getAmSatReports(hours: Int, limit: Int): String?
 }

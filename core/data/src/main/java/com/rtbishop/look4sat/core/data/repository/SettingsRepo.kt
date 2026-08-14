@@ -390,6 +390,15 @@ class SettingsRepo(
     )
     //endregion
 
+    //region # Data sources status
+    private val _dataSourcesStatus = MutableStateFlow<Map<String, Int>>(emptyMap())
+    override val dataSourcesStatus: StateFlow<Map<String, Int>> = _dataSourcesStatus
+
+    override fun updateDataSourcesStatus(status: Map<String, Int>) {
+        _dataSourcesStatus.value = status
+    }
+    //endregion
+
     //region # Radio control settings
     private val keyRadioControlEnabled = "radioControlEnabled"
     private val keyRadioModel = "radioModel"

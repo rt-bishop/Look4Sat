@@ -57,6 +57,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -70,6 +71,7 @@ import androidx.compose.ui.zIndex
 import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.model.Constants
+import com.rtbishop.look4sat.core.domain.source.NetworkResult
 import com.rtbishop.look4sat.core.domain.source.Sources
 import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.IconCard
@@ -163,6 +165,10 @@ private fun TransceiversDialogPreview() {
             transceiversUrls = listOf(
                 "db.satnogs.org/api/transmitters/?format=json&status=active"
             ),
+            statusCodes = mapOf(
+                "celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv" to 200,
+                "amsat.org/tle/current/nasabare.txt" to 404
+            ),
             onImportTle = {},
             onImportTransceivers = {},
             onDismiss = {},
@@ -175,6 +181,7 @@ private fun TransceiversDialogPreview() {
 fun DataSourcesDialog(
     satelliteUrls: List<String>,
     transceiversUrls: List<String>,
+    statusCodes: Map<String, Int>,
     onImportTle: () -> Unit,
     onImportTransceivers: () -> Unit,
     onDismiss: () -> Unit,
@@ -248,6 +255,7 @@ fun DataSourcesDialog(
                 urls = satUrls,
                 listState = listState,
                 draggedId = satDraggedId,
+                statusCodes = statusCodes,
                 onAdd = { satUrls.add(nextId.longValue++ to "") },
                 onMove = { from, to -> satUrls.add(to, satUrls.removeAt(from)) },
                 onRemove = { i -> satUrls.removeAt(i) },
@@ -259,6 +267,7 @@ fun DataSourcesDialog(
                 urls = txUrls,
                 listState = listState,
                 draggedId = txDraggedId,
+                statusCodes = statusCodes,
                 onAdd = { txUrls.add(nextId.longValue++ to "") },
                 onMove = { from, to -> txUrls.add(to, txUrls.removeAt(from)) },
                 onRemove = { i -> txUrls.removeAt(i) },
@@ -274,6 +283,7 @@ private fun LazyListScope.sourceSection(
     urls: List<Pair<Long, String>>,
     listState: LazyListState,
     draggedId: MutableState<Long>,
+    statusCodes: Map<String, Int>,
     onAdd: () -> Unit,
     onMove: (Int, Int) -> Unit,
     onRemove: (Int) -> Unit,
@@ -318,6 +328,9 @@ private fun LazyListScope.sourceSection(
                 value = url,
                 onValueChange = { onUrlChange(index, it) },
                 label = { Text("Source URL") },
+                supportingText = statusCodes[url]?.let { code ->
+                    { Text(statusLabel(code), color = statusColor(code), fontSize = 12.sp) }
+                },
                 trailingIcon = {
                     IconButton(onClick = { onRemove(index) }) {
                         Icon(
@@ -406,6 +419,15 @@ private fun reorderEntry(
         urls.lastIndex
     }
     if (targetIndex in urls.indices && targetIndex != myIndex) onMove(myIndex, targetIndex)
+}
+
+private fun statusLabel(code: Int): String = if (code == NetworkResult.CONNECTION_ERROR) "ERR" else code.toString()
+
+@Composable
+private fun statusColor(code: Int): Color = when {
+    code == NetworkResult.CONNECTION_ERROR -> MaterialTheme.colorScheme.error
+    code in 200..299 -> Color(0xFF66BB6A)
+    else -> MaterialTheme.colorScheme.error
 }
 
 @Preview(showBackground = true)
