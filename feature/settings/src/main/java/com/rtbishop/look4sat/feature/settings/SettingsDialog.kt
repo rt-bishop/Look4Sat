@@ -21,6 +21,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -293,34 +295,41 @@ private fun LazyListScope.sourceSection(
         val enabledTint = MaterialTheme.colorScheme.onSurfaceVariant
         val offsetY = remember { mutableFloatStateOf(0f) }
         val isDragging = draggedId.value == id
-        OutlinedTextField(
-            value = url,
-            onValueChange = { onUrlChange(index, it) },
-            label = { Text("Source URL") },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_drag_handle),
-                    contentDescription = null,
-                    tint = enabledTint,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .dragHandle(listState, sectionKey, id, urls, draggedId, offsetY, onMove)
-                )
-            },
-            trailingIcon = {
-                IconButton(onClick = { onRemove(index) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_delete),
-                        contentDescription = null
-                    )
-                }
-            },
-            singleLine = true,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .draggedVisual(isDragging, offsetY)
                 .animateItem(fadeInSpec = spring(), fadeOutSpec = spring())
-        )
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(40.dp)
+                    .dragHandle(listState, sectionKey, id, urls, draggedId, offsetY, onMove)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_drag_handle),
+                    contentDescription = null,
+                    tint = enabledTint
+                )
+            }
+            OutlinedTextField(
+                value = url,
+                onValueChange = { onUrlChange(index, it) },
+                label = { Text("Source URL") },
+                trailingIcon = {
+                    IconButton(onClick = { onRemove(index) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete),
+                            contentDescription = null
+                        )
+                    }
+                },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
