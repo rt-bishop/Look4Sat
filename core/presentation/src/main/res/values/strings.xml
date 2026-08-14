@@ -170,6 +170,7 @@
     <string name="prefs_data_import_transceivers_error">No transceivers imported. Select a valid SatNOGS (.json) file.</string>
 
     <string name="prefs_data_sources_title">Data sources</string>
+    <string name="prefs_data_sources_restore">Restore default sources</string>
 
     <string name="prefs_data_output_title">Data output</string>
     <string name="prefs_net_output">Network</string>
