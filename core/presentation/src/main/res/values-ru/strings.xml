@@ -118,6 +118,8 @@
 
     <string name="prefs_data_sources_title">Свои источники</string>
     <string name="prefs_data_sources_restore">Восстановить источники по умолчанию</string>
+    <string name="prefs_data_sources_sat_title">Данные спутников</string>
+    <string name="prefs_data_sources_transceivers_title">Данные трансиверов</string>
     <string name="prefs_data_sources_tle_switch">URL TLE</string>
     <string name="prefs_data_sources_transceivers_switch">URL трансиверов</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>

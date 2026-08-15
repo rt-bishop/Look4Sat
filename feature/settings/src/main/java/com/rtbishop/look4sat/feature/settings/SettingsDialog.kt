@@ -215,6 +215,8 @@ fun DataSourcesDialog(
         Unit
     }
     val onAccept = { onSave(satUrls.map { it.second }, txUrls.map { it.second }); onDismiss() }
+    val satTitle = stringResource(R.string.prefs_data_sources_sat_title)
+    val transceiversTitle = stringResource(R.string.prefs_data_sources_transceivers_title)
     ConfirmDialog(
         title = stringResource(id = R.string.prefs_data_sources_title),
         onCancel = onDismiss,
@@ -254,7 +256,7 @@ fun DataSourcesDialog(
             }
             sourceSection(
                 sectionKey = "sat",
-                label = "Satellites data",
+                label = satTitle,
                 urls = satUrls,
                 listState = listState,
                 draggedId = satDraggedId,
@@ -266,7 +268,7 @@ fun DataSourcesDialog(
             )
             sourceSection(
                 sectionKey = "tx",
-                label = "Transceivers data",
+                label = transceiversTitle,
                 urls = txUrls,
                 listState = listState,
                 draggedId = txDraggedId,

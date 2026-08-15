@@ -119,6 +119,8 @@
 
     <string name="prefs_data_sources_title">Fuentes personalizadas</string>
     <string name="prefs_data_sources_restore">Restaurar fuentes predeterminadas</string>
+    <string name="prefs_data_sources_sat_title">Datos de satélites</string>
+    <string name="prefs_data_sources_transceivers_title">Datos de transceptores</string>
     <string name="prefs_data_sources_tle_switch">URL TLE</string>
     <string name="prefs_data_sources_transceivers_switch">URL transceptores</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>

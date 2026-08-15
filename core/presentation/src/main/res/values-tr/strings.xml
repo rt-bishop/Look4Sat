@@ -150,6 +150,8 @@
 
     <string name="prefs_data_sources_title">Özel kaynaklar</string>
     <string name="prefs_data_sources_restore">Varsayılan kaynakları geri yükle</string>
+    <string name="prefs_data_sources_sat_title">Uydu verileri</string>
+    <string name="prefs_data_sources_transceivers_title">Transceiver verileri</string>
     <string name="prefs_data_sources_tle_switch">TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">Transceiver URL</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
