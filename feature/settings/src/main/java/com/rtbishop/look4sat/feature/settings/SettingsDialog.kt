@@ -233,13 +233,18 @@ fun DataSourcesDialog(
         Unit
     }
     val onAccept = {
-        onSave(
-            satUrls.map { it.second },
-            txUrls.map { it.second },
-            satUrls.map { satEnabled[it.first] ?: true },
-            txUrls.map { txEnabled[it.first] ?: true }
-        )
-        onDismiss()
+        val satFiltered = satUrls.filter { it.second.isNotBlank() }
+        val txFiltered = txUrls.filter { it.second.isNotBlank() }
+        try {
+            onSave(
+                satFiltered.map { it.second },
+                txFiltered.map { it.second },
+                satFiltered.map { satEnabled[it.first] ?: true },
+                txFiltered.map { txEnabled[it.first] ?: true }
+            )
+        } finally {
+            onDismiss()
+        }
     }
     val satTitle = stringResource(R.string.prefs_data_sources_sat_title)
     val transceiversTitle = stringResource(R.string.prefs_data_sources_transceivers_title)
