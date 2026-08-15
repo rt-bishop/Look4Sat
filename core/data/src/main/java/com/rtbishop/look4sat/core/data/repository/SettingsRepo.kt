@@ -94,6 +94,8 @@ class SettingsRepo(
     private val keyRadarCompassOffsetElev = "radarCompassOffsetElev"
     private val keySatelliteUrls = "satelliteUrls"
     private val keyTransceiversUrls = "transceiversUrls"
+    private val keySatelliteEnabled = "satelliteEnabled"
+    private val keyTransceiversEnabled = "transceiversEnabled"
     private val separatorComma = ","
     private val separatorUrl = "\n"
 
@@ -376,18 +378,49 @@ class SettingsRepo(
         preferences.edit {
             putString(keySatelliteUrls, settings.satelliteUrls.joinToString(separatorUrl))
             putString(keyTransceiversUrls, settings.transceiversUrls.joinToString(separatorUrl))
+            putString(keySatelliteEnabled, settings.satelliteEnabled.joinToString(separatorComma))
+            putString(keyTransceiversEnabled, settings.transceiversEnabled.joinToString(separatorComma))
         }
         _dataSourcesSettings.value = settings
     }
 
-    private fun getDataSourcesSettings(): DataSourcesSettings = DataSourcesSettings(
-        satelliteUrls = preferences.getString(keySatelliteUrls, null)
-            ?.split(separatorUrl)?.filter { it.isNotBlank() }
-            ?: Sources.satelliteDataUrls,
-        transceiversUrls = preferences.getString(keyTransceiversUrls, null)
-            ?.split(separatorUrl)?.filter { it.isNotBlank() }
-            ?: Sources.transceiversDataUrls
-    )
+    private fun getDataSourcesSettings(): DataSourcesSettings {
+        val (satUrls, satEnabled) = parseSources(
+            preferences.getString(keySatelliteUrls, null),
+            preferences.getString(keySatelliteEnabled, null),
+            Sources.satelliteDataUrls
+        )
+        val (txUrls, txEnabled) = parseSources(
+            preferences.getString(keyTransceiversUrls, null),
+            preferences.getString(keyTransceiversEnabled, null),
+            Sources.transceiversDataUrls
+        )
+        return DataSourcesSettings(
+            satelliteUrls = satUrls,
+            transceiversUrls = txUrls,
+            satelliteEnabled = satEnabled,
+            transceiversEnabled = txEnabled
+        )
+    }
+
+    private fun parseSources(
+        storedUrls: String?,
+        storedEnabled: String?,
+        defaults: List<String>
+    ): Pair<List<String>, List<Boolean>> {
+        if (storedUrls == null) return defaults to defaults.map { true }
+        val urls = storedUrls.split(separatorUrl)
+        val flags = storedEnabled?.split(separatorComma).orEmpty()
+        val filteredUrls = mutableListOf<String>()
+        val filteredFlags = mutableListOf<Boolean>()
+        urls.forEachIndexed { index, url ->
+            if (url.isNotBlank()) {
+                filteredUrls.add(url)
+                filteredFlags.add(flags.getOrNull(index)?.toBoolean() ?: true)
+            }
+        }
+        return filteredUrls to filteredFlags
+    }
     //endregion
 
     //region # Data sources status

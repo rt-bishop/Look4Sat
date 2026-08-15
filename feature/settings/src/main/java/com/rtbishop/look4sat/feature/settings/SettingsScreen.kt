@@ -120,12 +120,19 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
         DataSourcesDialog(
             satelliteUrls = uiState.dataSourcesSettings.satelliteUrls,
             transceiversUrls = uiState.dataSourcesSettings.transceiversUrls,
+            satelliteEnabled = uiState.dataSourcesSettings.satelliteEnabled,
+            transceiversEnabled = uiState.dataSourcesSettings.transceiversEnabled,
             statusCodes = uiState.dataSourcesStatus,
             onImportTle = { permissions.launchTleImport(); dialogs.dataSources = false },
             onImportTransceivers = { permissions.launchTransceiverImport(); dialogs.dataSources = false },
             onDismiss = { dialogs.dataSources = false },
-            onSave = { satUrls, txUrls ->
-                val newSettings = DataSourcesSettings(satelliteUrls = satUrls, transceiversUrls = txUrls)
+            onSave = { satUrls, txUrls, satEnabled, txEnabled ->
+                val newSettings = DataSourcesSettings(
+                    satelliteUrls = satUrls,
+                    transceiversUrls = txUrls,
+                    satelliteEnabled = satEnabled,
+                    transceiversEnabled = txEnabled
+                )
                 if (newSettings != uiState.dataSourcesSettings) onAction(SettingsAction.UpdateDataSources(newSettings))
                 onAction(SettingsAction.UpdateFromWeb)
             }

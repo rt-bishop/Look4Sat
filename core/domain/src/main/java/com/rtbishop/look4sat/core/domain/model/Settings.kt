@@ -69,8 +69,13 @@ data class OtherSettings(
 
 data class DataSourcesSettings(
     val satelliteUrls: List<String>,
-    val transceiversUrls: List<String>
-)
+    val transceiversUrls: List<String>,
+    val satelliteEnabled: List<Boolean> = emptyList(),
+    val transceiversEnabled: List<Boolean> = emptyList()
+) {
+    fun isSatelliteEnabled(index: Int): Boolean = satelliteEnabled.getOrElse(index) { true }
+    fun isTransceiverEnabled(index: Int): Boolean = transceiversEnabled.getOrElse(index) { true }
+}
 
 data class RadioControlSettings(
     val enabled: Boolean,
