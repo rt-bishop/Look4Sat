@@ -375,13 +375,20 @@ class SettingsRepo(
     override val dataSourcesSettings: StateFlow<DataSourcesSettings> = _dataSourcesSettings
 
     override fun updateDataSourcesSettings(settings: DataSourcesSettings) {
+        // Normalize the enabled lists so they are positionally aligned with the URL lists.
+        // Missing entries default to enabled (true), keeping the persisted "one flag per URL"
+        // invariant intact even when a default empty list is used to construct the model.
+        val normalized = settings.copy(
+            satelliteEnabled = alignFlags(settings.satelliteUrls, settings.satelliteEnabled),
+            transceiversEnabled = alignFlags(settings.transceiversUrls, settings.transceiversEnabled)
+        )
         preferences.edit {
-            putString(keySatelliteUrls, settings.satelliteUrls.joinToString(separatorUrl))
-            putString(keyTransceiversUrls, settings.transceiversUrls.joinToString(separatorUrl))
-            putString(keySatelliteEnabled, settings.satelliteEnabled.joinToString(separatorComma))
-            putString(keyTransceiversEnabled, settings.transceiversEnabled.joinToString(separatorComma))
+            putString(keySatelliteUrls, normalized.satelliteUrls.joinToString(separatorUrl))
+            putString(keyTransceiversUrls, normalized.transceiversUrls.joinToString(separatorUrl))
+            putString(keySatelliteEnabled, normalized.satelliteEnabled.joinToString(separatorComma))
+            putString(keyTransceiversEnabled, normalized.transceiversEnabled.joinToString(separatorComma))
         }
-        _dataSourcesSettings.value = settings
+        _dataSourcesSettings.value = normalized
     }
 
     private fun getDataSourcesSettings(): DataSourcesSettings {
@@ -410,7 +417,7 @@ class SettingsRepo(
     ): Pair<List<String>, List<Boolean>> {
         if (storedUrls == null) return defaults to defaults.map { true }
         val urls = storedUrls.split(separatorUrl)
-        val flags = storedEnabled?.split(separatorComma).orEmpty()
+        val flags = if (storedEnabled.isNullOrEmpty()) emptyList() else storedEnabled.split(separatorComma)
         val filteredUrls = mutableListOf<String>()
         val filteredFlags = mutableListOf<Boolean>()
         urls.forEachIndexed { index, url ->
@@ -420,6 +427,11 @@ class SettingsRepo(
             }
         }
         return filteredUrls to filteredFlags
+    }
+
+    private fun alignFlags(urls: List<String>, flags: List<Boolean>): List<Boolean> {
+        if (flags.size >= urls.size) return flags.take(urls.size)
+        return flags + List(urls.size - flags.size) { true }
     }
     //endregion
 
