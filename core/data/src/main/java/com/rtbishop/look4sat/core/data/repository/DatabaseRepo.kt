@@ -65,8 +65,8 @@ class DatabaseRepo(
     override suspend fun updateFromRemote() = withContext(dispatcher) {
         val settings = settingsRepo.dataSourcesSettings.value
         fun normalizeUrl(url: String) = if (url.startsWith("http")) url else "https://$url"
-        val tleUrls = settings.satelliteUrls.filter { it.isNotBlank() }
-        val radioUrls = settings.transceiversUrls.filter { it.isNotBlank() }
+        val tleUrls = settings.satelliteUrls.filterIndexed { i, url -> url.isNotBlank() && settings.isSatelliteEnabled(i) }
+        val radioUrls = settings.transceiversUrls.filterIndexed { i, url -> url.isNotBlank() && settings.isTransceiverEnabled(i) }
         // launch all network requests concurrently, keeping the raw url as key for status reporting
         val tleJobs = tleUrls.map { url -> async { url to remoteSource.getNetworkStream(normalizeUrl(url)) } }
         val radioJobs = radioUrls.map { url -> async { url to remoteSource.getNetworkStream(normalizeUrl(url)) } }

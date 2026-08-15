@@ -38,6 +38,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +55,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.toMutableStateList
@@ -168,6 +170,8 @@ private fun TransceiversDialogPreview() {
             transceiversUrls = listOf(
                 "db.satnogs.org/api/transmitters/?format=json&status=active"
             ),
+            satelliteEnabled = listOf(true, false),
+            transceiversEnabled = listOf(true),
             statusCodes = mapOf(
                 "celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv" to 200,
                 "amsat.org/tle/current/nasabare.txt" to 404
@@ -175,7 +179,7 @@ private fun TransceiversDialogPreview() {
             onImportTle = {},
             onImportTransceivers = {},
             onDismiss = {},
-            onSave = { _, _ -> }
+            onSave = { _, _, _, _ -> }
         )
     }
 }
@@ -184,11 +188,13 @@ private fun TransceiversDialogPreview() {
 fun DataSourcesDialog(
     satelliteUrls: List<String>,
     transceiversUrls: List<String>,
+    satelliteEnabled: List<Boolean>,
+    transceiversEnabled: List<Boolean>,
     statusCodes: Map<String, Int>,
     onImportTle: () -> Unit,
     onImportTransceivers: () -> Unit,
     onDismiss: () -> Unit,
-    onSave: (List<String>, List<String>) -> Unit
+    onSave: (List<String>, List<String>, List<Boolean>, List<Boolean>) -> Unit
 ) {
     val padding = LocalSpacing.current.large
     // Use stable Long IDs to avoid key collisions (e.g. multiple empty "" entries).
@@ -198,6 +204,16 @@ fun DataSourcesDialog(
     }
     val txUrls = remember {
         transceiversUrls.mapIndexed { i, url -> (satelliteUrls.size + i).toLong() to url }.toMutableStateList()
+    }
+    val satEnabled = remember {
+        mutableStateMapOf<Long, Boolean>().apply {
+            satUrls.forEachIndexed { i, (id, _) -> this[id] = satelliteEnabled.getOrElse(i) { true } }
+        }
+    }
+    val txEnabled = remember {
+        mutableStateMapOf<Long, Boolean>().apply {
+            txUrls.forEachIndexed { i, (id, _) -> this[id] = transceiversEnabled.getOrElse(i) { true } }
+        }
     }
     val listState = rememberLazyListState()
     val satDraggedId = remember { mutableStateOf(-1L) }
@@ -212,9 +228,19 @@ fun DataSourcesDialog(
                 (Sources.satelliteDataUrls.size + i).toLong() to url
             }
         )
+        satEnabled.clear()
+        txEnabled.clear()
         Unit
     }
-    val onAccept = { onSave(satUrls.map { it.second }, txUrls.map { it.second }); onDismiss() }
+    val onAccept = {
+        onSave(
+            satUrls.map { it.second },
+            txUrls.map { it.second },
+            satUrls.map { satEnabled[it.first] ?: true },
+            txUrls.map { txEnabled[it.first] ?: true }
+        )
+        onDismiss()
+    }
     ConfirmDialog(
         title = stringResource(id = R.string.prefs_data_sources_title),
         onCancel = onDismiss,
@@ -259,6 +285,8 @@ fun DataSourcesDialog(
                 listState = listState,
                 draggedId = satDraggedId,
                 statusCodes = statusCodes,
+                enabledMap = satEnabled,
+                onToggle = { id -> satEnabled[id] = !(satEnabled[id] ?: true) },
                 onAdd = { satUrls.add(nextId.longValue++ to "") },
                 onMove = { from, to -> satUrls.add(to, satUrls.removeAt(from)) },
                 onRemove = { i -> satUrls.removeAt(i) },
@@ -271,6 +299,8 @@ fun DataSourcesDialog(
                 listState = listState,
                 draggedId = txDraggedId,
                 statusCodes = statusCodes,
+                enabledMap = txEnabled,
+                onToggle = { id -> txEnabled[id] = !(txEnabled[id] ?: true) },
                 onAdd = { txUrls.add(nextId.longValue++ to "") },
                 onMove = { from, to -> txUrls.add(to, txUrls.removeAt(from)) },
                 onRemove = { i -> txUrls.removeAt(i) },
@@ -287,6 +317,8 @@ private fun LazyListScope.sourceSection(
     listState: LazyListState,
     draggedId: MutableState<Long>,
     statusCodes: Map<String, Int>,
+    enabledMap: Map<Long, Boolean>,
+    onToggle: (Long) -> Unit,
     onAdd: () -> Unit,
     onMove: (Int, Int) -> Unit,
     onRemove: (Int) -> Unit,
@@ -306,6 +338,7 @@ private fun LazyListScope.sourceSection(
     }
     itemsIndexed(urls, key = { _, entry -> "$sectionKey-${entry.first}" }) { index, (id, url) ->
         val enabledTint = MaterialTheme.colorScheme.onSurfaceVariant
+        val enabled = enabledMap[id] ?: true
         val offsetY = remember { mutableFloatStateOf(0f) }
         val scrollComp = remember { mutableFloatStateOf(0f) }
         val startCenterY = remember { mutableFloatStateOf(0f) }
@@ -349,7 +382,12 @@ private fun LazyListScope.sourceSection(
                     }
                 },
                 singleLine = true,
+                enabled = enabled,
                 modifier = Modifier.weight(1f)
+            )
+            Checkbox(
+                checked = enabled,
+                onCheckedChange = { onToggle(id) }
             )
         }
     }
