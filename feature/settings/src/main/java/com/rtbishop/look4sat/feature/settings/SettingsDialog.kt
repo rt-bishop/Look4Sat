@@ -17,7 +17,12 @@
  */
 package com.rtbishop.look4sat.feature.settings
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.scrollBy
@@ -51,16 +56,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -69,10 +77,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.rtbishop.look4sat.core.domain.model.RCSettings
 import com.rtbishop.look4sat.core.domain.model.RadioControlSettings
 import com.rtbishop.look4sat.core.domain.model.Constants
@@ -346,26 +357,46 @@ private fun LazyListScope.sourceSection(
     itemsIndexed(urls, key = { _, entry -> "$sectionKey-${entry.first}" }) { index, (id, url) ->
         val enabledTint = MaterialTheme.colorScheme.onSurfaceVariant
         val enabled = enabledMap[id] ?: true
-        val offsetY = remember { mutableFloatStateOf(0f) }
-        val scrollComp = remember { mutableFloatStateOf(0f) }
-        val startCenterY = remember { mutableFloatStateOf(0f) }
+        val rowState = remember { DragRowState() }
+        val scope = rememberCoroutineScope()
         val isDragging = draggedId.value == id
+        val isLifted = isDragging || rowState.isSettling.value
         LaunchedEffect(isDragging) {
             if (!isDragging) return@LaunchedEffect
-            autoScroll(listState, startCenterY, offsetY, scrollComp)
+            autoScroll(listState, rowState.startCenterY, rowState.fingerOffset, rowState.scrollComp)
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .draggedVisual(isDragging, offsetY.floatValue + scrollComp.floatValue)
-                .animateItem(fadeInSpec = spring(), fadeOutSpec = spring())
+                .draggedVisual(
+                    isLifted = isLifted,
+                    translationY = if (rowState.isSettling.value) {
+                        rowState.settleAnim.value
+                    } else {
+                        rowState.offsetY.floatValue + rowState.scrollComp.floatValue
+                    }
+                )
+                .animateItem(
+                    fadeInSpec = spring(),
+                    // The dragged row repositions instantly, while its neighbours spring
+                    // out of the way (the "squeeze" effect).
+                    placementSpec = if (isDragging) {
+                        tween<IntOffset>(durationMillis = 0)
+                    } else {
+                        spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    },
+                    fadeOutSpec = spring()
+                )
         ) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(40.dp)
-                    .dragHandle(listState, sectionKey, id, urls, draggedId, offsetY, scrollComp, startCenterY, onMove)
+                    .dragHandle(listState, sectionKey, id, urls, draggedId, rowState, scope, onMove)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_drag_handle),
@@ -401,9 +432,37 @@ private fun LazyListScope.sourceSection(
 }
 
 /**
- * Drag handle gesture that accumulates the vertical drag offset while dragging.
- * Rendering of the whole field (see [draggedVisual]) is applied on the field itself
- * so the entire row follows the finger, not just the handle icon.
+ * Per-row drag state, kept in one object to keep the drag-handle modifier signature small.
+ *
+ * [offsetY] is the compensated visual displacement during a drag (finger travel minus the
+ * heights of already-swapped neighbours), so the row stays glued to the finger. [fingerOffset]
+ * tracks the raw finger travel for edge auto-scroll and swap detection. [settleAnim] smoothly
+ * flies the lifted row back into its slot once the finger is released.
+ */
+private class DragRowState {
+    val offsetY = mutableFloatStateOf(0f)
+    val fingerOffset = mutableFloatStateOf(0f)
+    val scrollComp = mutableFloatStateOf(0f)
+    val startCenterY = mutableFloatStateOf(0f)
+    val settleAnim = Animatable(0f)
+    val isSettling = mutableStateOf(false)
+}
+
+/** Spring shared by neighbour "squeeze" and the settle-back animation: soft and slightly bouncy. */
+private val reorderSpring = spring<Float>(
+    dampingRatio = Spring.DampingRatioMediumBouncy,
+    stiffness = Spring.StiffnessMediumLow
+)
+
+/**
+ * Drag handle gesture that performs live reordering while dragging.
+ *
+ * [fingerOffset] tracks the raw finger travel, used for edge auto-scroll and for
+ * deciding when the dragged row's centre crosses a neighbour's midpoint. [offsetY]
+ * additionally subtracts the heights of already-swapped neighbours so the visual
+ * translation (see [draggedVisual]) keeps the row glued to the finger even as the
+ * layout slot moves. Rendering of the whole field is applied on the field itself so
+ * the entire row follows the finger, not just the handle icon.
  */
 @Composable
 private fun Modifier.dragHandle(
@@ -412,81 +471,129 @@ private fun Modifier.dragHandle(
     entryId: Long,
     urls: List<Pair<Long, String>>,
     draggedId: MutableState<Long>,
-    offsetY: MutableFloatState,
-    scrollComp: MutableFloatState,
-    startCenterY: MutableFloatState,
+    rowState: DragRowState,
+    scope: CoroutineScope,
     onMove: (from: Int, to: Int) -> Unit
 ): Modifier = pointerInput(entryId, sectionKey) {
-    var itemHeight = 0f
+    fun reorderLive() {
+        val myIndex = urls.indexOfFirst { it.first == entryId }
+        if (myIndex !in urls.indices) return
+        val myCenter = rowState.startCenterY.floatValue + rowState.fingerOffset.floatValue
+        val visible = listState.layoutInfo.visibleItemsInfo
+        // Dragging down: swap when the dragged centre passes the next row's midpoint.
+        if (myIndex < urls.lastIndex) {
+            val next = visible.firstOrNull { it.key == "$sectionKey-${urls[myIndex + 1].first}" }
+            if (next != null && myCenter > next.offset + next.size / 2f) {
+                onMove(myIndex, myIndex + 1)
+                rowState.offsetY.floatValue -= next.size.toFloat()
+                return
+            }
+        }
+        // Dragging up: swap when the dragged centre passes the previous row's midpoint.
+        if (myIndex > 0) {
+            val prev = visible.firstOrNull { it.key == "$sectionKey-${urls[myIndex - 1].first}" }
+            if (prev != null && myCenter < prev.offset + prev.size / 2f) {
+                onMove(myIndex, myIndex - 1)
+                rowState.offsetY.floatValue += prev.size.toFloat()
+            }
+        }
+    }
+
+    // Reset the drag bookkeeping and fly the lifted row back into its slot.
+    // All state resets happen inside the launched block so the settle animation takes
+    // over from the current visual position without a one-frame jump: isSettling is
+    // flipped to true (switching rendering to settleAnim, already snapped to the last
+    // offset) before the drag flags are cleared.
+    fun finishDrag() {
+        val lastOffset = rowState.offsetY.floatValue + rowState.scrollComp.floatValue
+        if (kotlin.math.abs(lastOffset) < 1f) {
+            rowState.fingerOffset.floatValue = 0f
+            rowState.offsetY.floatValue = 0f
+            rowState.scrollComp.floatValue = 0f
+            draggedId.value = -1L
+            return
+        }
+        scope.launch {
+            rowState.settleAnim.snapTo(lastOffset)
+            rowState.isSettling.value = true
+            rowState.fingerOffset.floatValue = 0f
+            rowState.offsetY.floatValue = 0f
+            rowState.scrollComp.floatValue = 0f
+            draggedId.value = -1L
+            rowState.settleAnim.animateTo(0f, reorderSpring)
+            rowState.isSettling.value = false
+        }
+    }
+
     detectDragGesturesAfterLongPress(
         onDragStart = {
+            rowState.isSettling.value = false
             val layout = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == "$sectionKey-$entryId" }
-            itemHeight = layout?.size?.toFloat() ?: 0f
-            startCenterY.floatValue = (layout?.offset ?: 0) + (layout?.size ?: 0) / 2f
-            offsetY.floatValue = 0f
-            scrollComp.floatValue = 0f
+            rowState.startCenterY.floatValue = (layout?.offset ?: 0) + (layout?.size ?: 0) / 2f
+            rowState.fingerOffset.floatValue = 0f
+            rowState.offsetY.floatValue = 0f
+            rowState.scrollComp.floatValue = 0f
             draggedId.value = entryId
         },
-        onDragEnd = {
-            reorderEntry(entryId, urls, offsetY.floatValue, itemHeight, onMove)
-            offsetY.floatValue = 0f
-            scrollComp.floatValue = 0f
-            draggedId.value = -1L
-        },
-        onDragCancel = {
-            offsetY.floatValue = 0f
-            scrollComp.floatValue = 0f
-            draggedId.value = -1L
-        }
+        onDragEnd = ::finishDrag,
+        onDragCancel = ::finishDrag
     ) { change, dragAmount ->
         change.consume()
-        if (draggedId.value == entryId) offsetY.floatValue += dragAmount.y
+        if (draggedId.value != entryId) return@detectDragGesturesAfterLongPress
+        rowState.fingerOffset.floatValue += dragAmount.y
+        rowState.offsetY.floatValue += dragAmount.y
+        reorderLive()
     }
 }
 
 @Composable
-private fun Modifier.draggedVisual(isDragging: Boolean, translationY: Float): Modifier =
-    then(if (isDragging) Modifier.zIndex(1f) else Modifier)
+private fun Modifier.draggedVisual(isLifted: Boolean, translationY: Float): Modifier {
+    val shape = MaterialTheme.shapes.small
+    // Smoothly scale the row up/down as the lifted card appears and disappears.
+    val scale by animateFloatAsState(
+        targetValue = if (isLifted) 1.02f else 1f,
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+        label = "dragScale"
+    )
+    return this
         .graphicsLayer {
-            if (isDragging) {
+            if (isLifted) {
                 this.translationY = translationY
-                scaleX = 1.03f
+                scaleX = scale
+                scaleY = scale
             }
         }
-
-private fun reorderEntry(
-    entryId: Long,
-    urls: List<Pair<Long, String>>,
-    offsetY: Float,
-    itemHeight: Float,
-    onMove: (Int, Int) -> Unit
-) {
-    val myIndex = urls.indexOfFirst { it.first == entryId }
-    if (myIndex !in urls.indices || itemHeight <= 0f) return
-    // Assume entries have roughly equal height: convert the accumulated finger drag into a
-    // slot delta truncated toward zero, then clamp into the section bounds.
-    val step = itemHeight.coerceAtLeast(1f)
-    val targetIndex = (myIndex + (offsetY / step).toInt()).coerceIn(0, urls.lastIndex)
-    if (targetIndex != myIndex) onMove(myIndex, targetIndex)
+        .then(
+            if (isLifted) {
+                // Solid card on top so the lifted row fully covers the row beneath it
+                // instead of showing a translucent overlap of both rows.
+                Modifier
+                    .zIndex(1f)
+                    .shadow(8.dp, shape, clip = false)
+                    .background(MaterialTheme.colorScheme.surface, shape)
+            } else {
+                Modifier
+            }
+        )
 }
 
 /**
  * Scrolls the list while dragging so the entry follows the finger past the viewport edges.
- * The visual center is tracked independently of the entry's layout slot (which can scroll out
+ * The visual centre is tracked independently of the entry's layout slot (which can scroll out
  * of [LazyListState.layoutInfo.visibleItemsInfo] during a long drag); [startCenterY] is the
- * entry's viewport center captured at drag start and [offsetY] is the raw finger delta.
+ * entry's viewport centre captured at drag start and [fingerOffset] is the raw finger delta.
  */
 private suspend fun autoScroll(
     listState: LazyListState,
     startCenterY: MutableFloatState,
-    offsetY: MutableFloatState,
+    fingerOffset: MutableFloatState,
     scrollComp: MutableFloatState
 ) {
     val threshold = 48f
     val maxSpeed = 24f
     while (true) {
         val info = listState.layoutInfo
-        val center = startCenterY.floatValue + offsetY.floatValue
+        val center = startCenterY.floatValue + fingerOffset.floatValue
         val top = info.viewportStartOffset + threshold
         val bottom = info.viewportEndOffset - threshold
         val delta = when {
