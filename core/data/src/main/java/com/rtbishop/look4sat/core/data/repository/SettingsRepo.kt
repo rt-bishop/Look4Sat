@@ -94,6 +94,8 @@ class SettingsRepo(
     private val keyRadarCompassOffsetElev = "radarCompassOffsetElev"
     private val keySatelliteUrls = "satelliteUrls"
     private val keyTransceiversUrls = "transceiversUrls"
+    private val keySatelliteEnabled = "satelliteEnabled"
+    private val keyTransceiversEnabled = "transceiversEnabled"
     private val separatorComma = ","
     private val separatorUrl = "\n"
 
@@ -373,21 +375,73 @@ class SettingsRepo(
     override val dataSourcesSettings: StateFlow<DataSourcesSettings> = _dataSourcesSettings
 
     override fun updateDataSourcesSettings(settings: DataSourcesSettings) {
+        // Normalize the enabled lists so they are positionally aligned with the URL lists.
+        // Missing entries default to enabled (true), keeping the persisted "one flag per URL"
+        // invariant intact even when a default empty list is used to construct the model.
+        val normalized = settings.copy(
+            satelliteEnabled = alignFlags(settings.satelliteUrls, settings.satelliteEnabled),
+            transceiversEnabled = alignFlags(settings.transceiversUrls, settings.transceiversEnabled)
+        )
         preferences.edit {
-            putString(keySatelliteUrls, settings.satelliteUrls.joinToString(separatorUrl))
-            putString(keyTransceiversUrls, settings.transceiversUrls.joinToString(separatorUrl))
+            putString(keySatelliteUrls, normalized.satelliteUrls.joinToString(separatorUrl))
+            putString(keyTransceiversUrls, normalized.transceiversUrls.joinToString(separatorUrl))
+            putString(keySatelliteEnabled, normalized.satelliteEnabled.joinToString(separatorComma))
+            putString(keyTransceiversEnabled, normalized.transceiversEnabled.joinToString(separatorComma))
         }
-        _dataSourcesSettings.value = settings
+        _dataSourcesSettings.value = normalized
     }
 
-    private fun getDataSourcesSettings(): DataSourcesSettings = DataSourcesSettings(
-        satelliteUrls = preferences.getString(keySatelliteUrls, null)
-            ?.split(separatorUrl)?.filter { it.isNotBlank() }
-            ?: Sources.satelliteDataUrls,
-        transceiversUrls = preferences.getString(keyTransceiversUrls, null)
-            ?.split(separatorUrl)?.filter { it.isNotBlank() }
-            ?: Sources.transceiversDataUrls
-    )
+    private fun getDataSourcesSettings(): DataSourcesSettings {
+        val (satUrls, satEnabled) = parseSources(
+            preferences.getString(keySatelliteUrls, null),
+            preferences.getString(keySatelliteEnabled, null),
+            Sources.satelliteDataUrls
+        )
+        val (txUrls, txEnabled) = parseSources(
+            preferences.getString(keyTransceiversUrls, null),
+            preferences.getString(keyTransceiversEnabled, null),
+            Sources.transceiversDataUrls
+        )
+        return DataSourcesSettings(
+            satelliteUrls = satUrls,
+            transceiversUrls = txUrls,
+            satelliteEnabled = satEnabled,
+            transceiversEnabled = txEnabled
+        )
+    }
+
+    private fun parseSources(
+        storedUrls: String?,
+        storedEnabled: String?,
+        defaults: List<String>
+    ): Pair<List<String>, List<Boolean>> {
+        if (storedUrls == null) return defaults to defaults.map { true }
+        val urls = storedUrls.split(separatorUrl)
+        val flags = if (storedEnabled.isNullOrEmpty()) emptyList() else storedEnabled.split(separatorComma)
+        val filteredUrls = mutableListOf<String>()
+        val filteredFlags = mutableListOf<Boolean>()
+        urls.forEachIndexed { index, url ->
+            if (url.isNotBlank()) {
+                filteredUrls.add(url)
+                filteredFlags.add(flags.getOrNull(index)?.toBoolean() ?: true)
+            }
+        }
+        return filteredUrls to filteredFlags
+    }
+
+    private fun alignFlags(urls: List<String>, flags: List<Boolean>): List<Boolean> {
+        if (flags.size >= urls.size) return flags.take(urls.size)
+        return flags + List(urls.size - flags.size) { true }
+    }
+    //endregion
+
+    //region # Data sources status
+    private val _dataSourcesStatus = MutableStateFlow<Map<String, Int>>(emptyMap())
+    override val dataSourcesStatus: StateFlow<Map<String, Int>> = _dataSourcesStatus
+
+    override fun updateDataSourcesStatus(status: Map<String, Int>) {
+        _dataSourcesStatus.value = status
+    }
     //endregion
 
     //region # Radio control settings

@@ -42,6 +42,7 @@ data class SettingsState(
     val rcSettings: RCSettings,
     val radioControlSettings: RadioControlSettings,
     val dataSourcesSettings: DataSourcesSettings,
+    val dataSourcesStatus: Map<String, Int> = emptyMap(),
     val pairedBluetoothDevices: List<Pair<String, String>> = emptyList()
 )
 

@@ -118,6 +118,9 @@
     <string name="prefs_data_import_transceivers_error">සම්ප්‍රේෂක ආයාත නොවීය. වලංගු SatNOGS (.json) ගොනුවක් තෝරන්න.</string>
 
     <string name="prefs_data_sources_title">අභිරුචි මූලාශ්‍ර</string>
+    <string name="prefs_data_sources_restore">පෙරනිමි මූලාශ්‍ර ප්‍රතිස්ථාපනය කරන්න</string>
+    <string name="prefs_data_sources_sat_title">චන්ද්‍රිකා දත්ත</string>
+    <string name="prefs_data_sources_transceivers_title">සම්ප්‍රේෂක දත්ත</string>
     <string name="prefs_data_sources_tle_switch">TLE URL</string>
     <string name="prefs_data_sources_transceivers_switch">Transceivers URL</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>

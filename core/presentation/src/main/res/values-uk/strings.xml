@@ -118,6 +118,9 @@
     <string name="prefs_data_import_transceivers_error">Трансивери не імпортовано. Потрібен SatNOGS (.json).</string>
 
     <string name="prefs_data_sources_title">Власні джерела</string>
+    <string name="prefs_data_sources_restore">Відновити джерела за замовчуванням</string>
+    <string name="prefs_data_sources_sat_title">Дані супутників</string>
+    <string name="prefs_data_sources_transceivers_title">Дані трансиверів</string>
     <string name="prefs_data_sources_tle_switch">URL TLE</string>
     <string name="prefs_data_sources_transceivers_switch">URL трансиверів</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>
