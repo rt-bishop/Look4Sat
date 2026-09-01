@@ -252,7 +252,7 @@ private fun TrackingBanner(state: RadioTrackingState, onClick: () -> Unit) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "Tracking: ${state.currentPass?.name ?: ""}",
+            text = stringResource(R.string.tracking_format, state.currentPass?.name ?: ""),
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
