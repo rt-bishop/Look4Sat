@@ -980,7 +980,7 @@ fun RadioControlDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Split mode (IC-705 only)",
+                    text = stringResource(R.string.settings_split_mode),
                     fontWeight = FontWeight.Medium,
                     color = splitModeLabelColor
                 )
@@ -1020,7 +1020,7 @@ fun RadioControlDialog(
 
             if (selectingFor.value.isNotBlank()) {
                 Text(
-                    text = "Paired Bluetooth Devices:",
+                    text = stringResource(R.string.settings_paired_devices),
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary
                 )
