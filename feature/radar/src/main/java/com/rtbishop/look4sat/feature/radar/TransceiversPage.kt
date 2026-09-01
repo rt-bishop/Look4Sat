@@ -403,7 +403,7 @@ private fun ExpandedRadioControl(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "TX Base: ",
+                        text = stringResource(R.string.radar_tx_base),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -460,7 +460,7 @@ private fun ExpandedRadioControl(
                         onClick = { onAction(RadarAction.SetCtcssTone(null)) },
                         label = {
                             Text(
-                                text = "Off",
+                                text = stringResource(R.string.radar_off),
                                 fontSize = 12.sp,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
@@ -492,19 +492,19 @@ private fun ExpandedRadioControl(
             if (!radioControl.txPanel.isConnected && !radioControl.rxPanel.isConnected) {
                 CardButton(
                     onClick = { onAction(RadarAction.ConnectRadios) },
-                    text = "Connect",
+                    text = stringResource(R.string.radar_connect),
                     modifier = Modifier.weight(1f)
                 )
             } else {
                 CardButton(
                     onClick = { onAction(RadarAction.DisconnectRadios) },
-                    text = "Disconnect",
+                    text = stringResource(R.string.radar_disconnect),
                     modifier = Modifier.weight(1f)
                 )
             }
             CardButton(
                 onClick = { onAction(RadarAction.ToggleTracking) },
-                text = if (radioControl.isTracking) "Stop" else "Track",
+                text = if (radioControl.isTracking) stringResource(R.string.radar_stop) else stringResource(R.string.radar_track),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -726,7 +726,7 @@ private fun DopplerFrequencyCalculator(
                         decorationBox = { innerTextField ->
                             if (offsetKHz.isEmpty()) {
                                 Text(
-                                    text = "Offset (kHz)",
+                                    text = stringResource(R.string.radar_doppler_offset_hint),
                                     fontSize = 16.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
