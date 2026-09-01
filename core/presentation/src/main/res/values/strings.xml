@@ -109,6 +109,24 @@
     <string name="radar_doppler_rx_hint">Enter RX freq (MHz)</string>
     <string name="radar_doppler_offset_hint">Offset (kHz)</string>
 
+    <!-- Radar screen (CAT control / SSTV) -->
+    <string name="radar_connect">Connect</string>
+    <string name="radar_disconnect">Disconnect</string>
+    <string name="radar_off">Off</string>
+    <string name="radar_stop">Stop</string>
+    <string name="radar_track">Track</string>
+    <string name="radar_tx_base">TX Base: </string>
+
+    <!-- SSTV screen -->
+    <string name="sstv_grant_permission">Grant permission</string>
+    <string name="sstv_listening">Listening…</string>
+    <string name="sstv_mic_permission">Microphone access needed</string>
+    <string name="sstv_mode_format">Mode: %s</string>
+    <string name="sstv_mode_title">SSTV Mode</string>
+    <string name="sstv_no_signal">No signal</string>
+    <string name="sstv_no_transceiver">No transceiver selected</string>
+    <string name="sstv_rx_format">RX: %s Hz</string>
+
     <!-- Map screen -->
     <string name="map_prev">Prev</string>
     <string name="map_next">Next</string>
@@ -140,6 +158,12 @@
     <string name="prefs_license_url" translatable="false">https://www.gnu.org/licenses/gpl-3.0.html</string>
     <string name="prefs_privacy_title">Privacy Policy</string>
     <string name="prefs_privacy_url" translatable="false">https://sites.google.com/view/look4sat-privacy-policy/home</string>
+
+    <string name="settings_paired_devices">Paired Bluetooth Devices:</string>
+    <string name="settings_split_mode">Split mode (IC-705 only)</string>
+    <string name="prefs_lat_prefix">Lat: %s°</string>
+    <string name="prefs_lon_prefix">Lon: %s°</string>
+    <string name="prefs_qth_prefix">Qth: %s</string>
 
     <string name="prefs_updated_title">Updated: %s</string>
     <string name="prefs_updated_time">d MMM yyyy - HH:mm:ss</string>
@@ -234,5 +258,8 @@
         \n* xdsopl and Robot36 contributors!
     </string>
     <string name="prefs_outro_license">The app comes with no warranty</string>
+
+    <!-- Main screen -->
+    <string name="tracking_format">Tracking: %s</string>
 
 </resources>
