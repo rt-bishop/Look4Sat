@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -78,12 +79,12 @@ internal fun SstvPage(
             ) {
                 Text(text = "🎙️", fontSize = 48.sp)
                 Text(
-                    text = "Microphone access needed",
+                    text = stringResource(R.string.sstv_mic_permission),
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Button(onClick = requestMicPermission) {
-                    Text("Grant permission")
+                    Text(stringResource(R.string.sstv_grant_permission))
                 }
             }
         }
@@ -97,7 +98,7 @@ internal fun SstvPage(
         val allModes = remember(sstv.supportedModes) { listOf("Auto") + sstv.supportedModes }
         val dismiss = { showModeDialog.value = false }
         ConfirmDialog(
-            title = "SSTV Mode",
+            title = stringResource(R.string.sstv_mode_title),
             onAccept = dismiss,
             onCancel = dismiss
         ) {
@@ -167,7 +168,7 @@ internal fun SstvPage(
             )
         } else {
             Text(
-                text = if (sstv.status == SstvStatus.Recording) "Listening…" else "No signal",
+                text = if (sstv.status == SstvStatus.Recording) stringResource(R.string.sstv_listening) else stringResource(R.string.sstv_no_signal),
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 modifier = Modifier.align(Alignment.Center)
@@ -196,7 +197,7 @@ internal fun SstvPage(
         ) {
             // Doppler-corrected downlink frequency hint
             OutlinedText(
-                text = dopplerFrequency?.let { "RX: $it Hz" } ?: "No transceiver selected",
+                text = dopplerFrequency?.let { stringResource(R.string.sstv_rx_format, it) } ?: stringResource(R.string.sstv_no_transceiver),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 fillColor = MaterialTheme.colorScheme.primary,
@@ -227,7 +228,7 @@ internal fun SstvPage(
                 ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "Mode: ${sstv.selectedMode}",
+                            text = stringResource(R.string.sstv_mode_format, sstv.selectedMode),
                             fontSize = 14.sp,
                             maxLines = 1,
                             color = MaterialTheme.colorScheme.onSurface,

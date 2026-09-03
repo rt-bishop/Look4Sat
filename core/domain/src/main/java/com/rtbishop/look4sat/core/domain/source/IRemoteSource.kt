@@ -32,4 +32,5 @@ interface IRemoteSource {
     suspend fun getNetworkStream(url: String): NetworkResult
     suspend fun getAmSatCatalog(): String?
     suspend fun getAmSatReports(hours: Int, limit: Int): String?
+    suspend fun submitAmSatReport(payloadJson: String): Pair<Int, String>?
 }

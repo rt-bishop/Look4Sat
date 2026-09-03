@@ -68,6 +68,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.domain.repository.RadioTrackingState
 import com.rtbishop.look4sat.core.presentation.DeeplinkResolver
 import com.rtbishop.look4sat.core.presentation.ElevationThresholds
@@ -252,7 +253,7 @@ private fun TrackingBanner(state: RadioTrackingState, onClick: () -> Unit) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "Tracking: ${state.currentPass?.name ?: ""}",
+            text = stringResource(R.string.tracking_format, state.currentPass?.name ?: ""),
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,

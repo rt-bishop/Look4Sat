@@ -1,5 +1,6 @@
 package com.rtbishop.look4sat.feature.status
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,9 +21,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -51,13 +57,31 @@ import com.rtbishop.look4sat.core.domain.model.SatReport
 import com.rtbishop.look4sat.core.domain.model.SatSlot
 import com.rtbishop.look4sat.core.domain.model.SatStatus
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
+import com.rtbishop.look4sat.core.presentation.CardButton
 import com.rtbishop.look4sat.core.presentation.InfoDialog
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.layoutPadding
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 /** Fixed width per day tile — tablet-safe; name column absorbs remaining space. */
 private val TILE_WIDTH: Dp = 64.dp
+
+private data class UploadOption(
+    val apiValue: String,
+    val labelResId: Int,
+    val color: Color
+)
+
+private val UPLOAD_OPTIONS = listOf(
+    UploadOption(AMSAT_REPORT_HEARD, R.string.amsat_upload_active, Color(0xFF648FFF)),
+    UploadOption(AMSAT_REPORT_TELEMETRY_ONLY, R.string.amsat_upload_tlm, Color(0xFFFFB000)),
+    UploadOption(AMSAT_REPORT_NOT_HEARD, R.string.amsat_upload_not_heard, Color(0xFFDC267F)),
+    UploadOption(AMSAT_REPORT_CREW_ACTIVE, R.string.amsat_upload_crew_active, Color(0xFFFE6100))
+)
 
 /**
  * Map AMSAT status text to Material3 colorScheme colors.
@@ -77,17 +101,52 @@ private fun statusColorOf(statusText: String): Color {
     }
 }
 
+/** Localize AMSAT API status text for the current locale; falls back to the raw text. */
+@Composable
+private fun statusTextOf(statusText: String): String {
+    if (Locale.getDefault().language != Locale.CHINESE.language) return statusText
+    return when (statusText.lowercase()) {
+        "heard" -> stringResource(R.string.amsat_status_heard)
+        "telemetry only" -> stringResource(R.string.amsat_status_tlm_only)
+        "not heard" -> stringResource(R.string.amsat_status_not_heard)
+        "crew active" -> stringResource(R.string.amsat_status_crew_active)
+        else -> statusText
+    }
+}
+
 @Composable
 fun SatStatusDestination() {
     val context = LocalContext.current
     val container = (context.applicationContext as IContainerProvider).getMainContainer()
     val viewModel: SatStatusViewModel = viewModel(factory = SatStatusViewModel.factory(container))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    SatStatusScreen(uiState) { viewModel.refresh() }
+    SatStatusScreen(
+        uiState = uiState,
+        refresh = viewModel::refresh,
+        onToggleUpload = viewModel::toggleUploadPanel,
+        onUploadReportChange = viewModel::setUploadReport,
+        onUploadCallsignChange = viewModel::setUploadCallsign,
+        onUploadGridChange = viewModel::setUploadGrid,
+        onRequestSubmitUpload = viewModel::requestSubmitConfirmation,
+        onConfirmSubmitUpload = viewModel::confirmSubmitReport,
+        onDismissSubmitConfirmation = viewModel::dismissSubmitConfirmation,
+        onDismissUpload = viewModel::collapseUploadPanel
+    )
 }
 
 @Composable
-private fun SatStatusScreen(uiState: SatStatusUiState, refresh: () -> Unit) {
+private fun SatStatusScreen(
+    uiState: SatStatusUiState,
+    refresh: () -> Unit,
+    onToggleUpload: () -> Unit,
+    onUploadReportChange: (String) -> Unit,
+    onUploadCallsignChange: (String) -> Unit,
+    onUploadGridChange: (String) -> Unit,
+    onRequestSubmitUpload: () -> Unit,
+    onConfirmSubmitUpload: (String) -> Unit,
+    onDismissSubmitConfirmation: () -> Unit,
+    onDismissUpload: () -> Unit
+) {
     var selectedDay by remember { mutableStateOf<Pair<SatStatus, SatDay>?>(null) }
     Column(modifier = Modifier.fillMaxSize().layoutPadding()) {
         StatusHeader(fetchedAtUtcMs = uiState.fetchedAtUtcMs, isRefreshing = uiState.isRefreshing, onRefresh = refresh)
@@ -122,7 +181,23 @@ private fun SatStatusScreen(uiState: SatStatusUiState, refresh: () -> Unit) {
     }
 
     selectedDay?.let { (status, day) ->
-        ReportDialog(statusName = status.name, day = day, reports = uiState.reports, onDismiss = { selectedDay = null })
+        ReportDialog(
+            statusName = status.name,
+            day = day,
+            reports = uiState.reports,
+            upload = uiState.upload,
+            onToggleUpload = onToggleUpload,
+            onReportChange = onUploadReportChange,
+            onCallsignChange = onUploadCallsignChange,
+            onGridChange = onUploadGridChange,
+            onRequestSubmitReport = onRequestSubmitUpload,
+            onConfirmSubmitReport = { onConfirmSubmitUpload(status.name) },
+            onDismissSubmitConfirmation = onDismissSubmitConfirmation,
+            onDismiss = {
+                selectedDay = null
+                onDismissUpload()
+            }
+        )
     }
 }
 
@@ -276,13 +351,57 @@ private fun DayCell(slot: SatSlot, modifier: Modifier, onClick: () -> Unit) {
     }
 }
 
-/** Report detail dialog (callsign / date / time / grid) */
+/** Report detail dialog (callsign / date / time / grid) + AMSAT report upload panel. */
 @Composable
-private fun ReportDialog(statusName: String, day: SatDay, reports: Map<String, SatReport>, onDismiss: () -> Unit) {
+private fun ReportDialog(
+    statusName: String,
+    day: SatDay,
+    reports: Map<String, SatReport>,
+    upload: AmSatUploadUiState,
+    onToggleUpload: () -> Unit,
+    onReportChange: (String) -> Unit,
+    onCallsignChange: (String) -> Unit,
+    onGridChange: (String) -> Unit,
+    onRequestSubmitReport: () -> Unit,
+    onConfirmSubmitReport: () -> Unit,
+    onDismissSubmitConfirmation: () -> Unit,
+    onDismiss: () -> Unit
+) {
     val dayReports = day.slots.flatMap { it.reportIds }.mapNotNull { reports[it] }
-    InfoDialog(title = "$statusName · ${day.dateLabel}", onDismiss = onDismiss, onAccept = onDismiss) {
+    InfoDialog(
+        title = "$statusName · ${day.dateLabel}",
+        onDismiss = onDismiss,
+        onAccept = onDismiss,
+        extraAction = {
+            CardButton(
+                onClick = onToggleUpload,
+                text = stringResource(if (upload.isExpanded) R.string.amsat_upload_back else R.string.amsat_upload)
+            )
+        }
+    ) {
+        AnimatedVisibility(visible = upload.isExpanded) {
+            AmSatUploadPanel(
+                statusName = statusName,
+                upload = upload,
+                onReportChange = onReportChange,
+                onCallsignChange = onCallsignChange,
+                onGridChange = onGridChange,
+                onRequestSubmitReport = onRequestSubmitReport
+            )
+        }
+        if (upload.isConfirmingSubmit) {
+            AmSatUploadConfirmDialog(
+                statusName = statusName,
+                upload = upload,
+                onConfirm = onConfirmSubmitReport,
+                onDismiss = onDismissSubmitConfirmation
+            )
+        }
         if (dayReports.isEmpty()) {
-            Text(stringResource(id = R.string.amsat_no_reports))
+            Text(
+                text = stringResource(id = R.string.amsat_no_reports),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
             Spacer(modifier = Modifier.height(8.dp))
         } else {
             LazyColumn(modifier = Modifier.heightIn(max = 480.dp)) {
@@ -296,7 +415,7 @@ private fun ReportDialog(statusName: String, day: SatDay, reports: Map<String, S
                                     .background(statusColorOf(report.statusText))
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = report.statusText, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text(text = statusTextOf(report.statusText), fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         }
                         Text(
                             text = "${report.call}  ${report.dateUtc}  ${report.timeUtc}" +
@@ -312,16 +431,192 @@ private fun ReportDialog(statusName: String, day: SatDay, reports: Map<String, S
     }
 }
 
+@Composable
+private fun AmSatUploadPanel(
+    statusName: String,
+    upload: AmSatUploadUiState,
+    onReportChange: (String) -> Unit,
+    onCallsignChange: (String) -> Unit,
+    onGridChange: (String) -> Unit,
+    onRequestSubmitReport: () -> Unit
+) {
+    val options = remember(statusName) {
+        if (statusName.startsWith("ISS")) UPLOAD_OPTIONS else UPLOAD_OPTIONS.filter { it.apiValue != AMSAT_REPORT_CREW_ACTIVE }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.amsat_upload_report),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = stringResource(R.string.amsat_upload_time_now, formatUtcNowForUpload(System.currentTimeMillis())),
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = stringResource(R.string.amsat_upload_status),
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            options.forEach { option ->
+                val selected = upload.selectedReport == option.apiValue
+                FilterChip(
+                    selected = selected,
+                    onClick = { onReportChange(option.apiValue) },
+                    label = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(if (selected) Color.White else option.color)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(stringResource(option.labelResId), maxLines = 1)
+                        }
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = option.color.copy(alpha = 0.10f),
+                        labelColor = MaterialTheme.colorScheme.onSurface,
+                        selectedContainerColor = option.color,
+                        selectedLabelColor = Color.White
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selected,
+                        borderColor = option.color.copy(alpha = 0.60f),
+                        selectedBorderColor = option.color
+                    )
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = upload.callsign,
+                onValueChange = onCallsignChange,
+                label = { Text(stringResource(R.string.amsat_upload_callsign)) },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedTextField(
+                value = upload.gridSquare,
+                onValueChange = onGridChange,
+                label = { Text(stringResource(R.string.amsat_upload_grid)) },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Button(
+            onClick = onRequestSubmitReport,
+            enabled = !upload.isSubmitting && upload.callsign.isNotBlank(),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (upload.isSubmitting) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+            } else {
+                Text(stringResource(R.string.amsat_upload_submit))
+            }
+        }
+        upload.message?.let { message ->
+            if (message == UPLOAD_MESSAGE_SUCCESS) {
+                Text(
+                    text = stringResource(R.string.amsat_upload_success),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        upload.error?.let { error ->
+            Text(
+                text = uploadErrorText(error),
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}
+
+@Composable
+private fun AmSatUploadConfirmDialog(
+    statusName: String,
+    upload: AmSatUploadUiState,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val option = UPLOAD_OPTIONS.firstOrNull { it.apiValue == upload.selectedReport } ?: UPLOAD_OPTIONS.first()
+    val statusLabel = stringResource(option.labelResId)
+    val grid = upload.gridSquare.ifBlank { stringResource(R.string.amsat_upload_grid_none) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.amsat_upload_confirm_title)) },
+        text = {
+            Text(
+                text = stringResource(
+                    R.string.amsat_upload_confirm_message,
+                    statusName,
+                    statusLabel,
+                    upload.callsign,
+                    grid
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm, enabled = !upload.isSubmitting) {
+                Text(stringResource(R.string.amsat_upload_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, enabled = !upload.isSubmitting) {
+                Text(stringResource(R.string.btn_cancel))
+            }
+        }
+    )
+}
+
+@Composable
+private fun uploadErrorText(error: String): String {
+    return when (error) {
+        UPLOAD_ERROR_CALLSIGN_REQUIRED -> stringResource(R.string.amsat_upload_callsign_required)
+        UPLOAD_ERROR_GRID_INVALID -> stringResource(R.string.amsat_upload_grid_invalid)
+        else -> stringResource(R.string.amsat_upload_failed, error)
+    }
+}
+
 private val MONTH_ABBR = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 
 private fun formatFetchedAt(utcMs: Long): String {
     val cal = Calendar.getInstance()
     cal.timeInMillis = utcMs
     val day = cal.get(Calendar.DAY_OF_MONTH)
-    val month = MONTH_ABBR[cal.get(Calendar.MONTH)]
+    val monthIndex = cal.get(Calendar.MONTH)
     val year = cal.get(Calendar.YEAR)
     val hh = cal.get(Calendar.HOUR_OF_DAY).toString().padStart(2, '0')
     val mm = cal.get(Calendar.MINUTE).toString().padStart(2, '0')
     val ss = cal.get(Calendar.SECOND).toString().padStart(2, '0')
-    return "$day$month $year - $hh:$mm:$ss"
+    return if (Locale.getDefault().language == Locale.CHINESE.language) {
+        "${year}年${monthIndex + 1}月${day}日 - $hh:$mm:$ss"
+    } else {
+        "$day${MONTH_ABBR[monthIndex]} $year - $hh:$mm:$ss"
+    }
+}
+
+private fun formatUtcNowForUpload(utcMs: Long): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+    return formatter.format(Date(utcMs))
 }

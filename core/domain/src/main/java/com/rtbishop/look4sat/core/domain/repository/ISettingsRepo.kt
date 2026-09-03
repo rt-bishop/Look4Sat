@@ -85,4 +85,9 @@ interface ISettingsRepo {
     fun getSatelliteOffset(catnum: Int): String
     fun setSatelliteOffset(catnum: Int, offset: String)
     //endregion
+
+    //region # AMSAT status report settings
+    fun getAmSatCallsign(): String
+    fun setAmSatCallsign(callsign: String)
+    //endregion
 }

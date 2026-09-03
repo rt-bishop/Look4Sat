@@ -175,6 +175,10 @@ class SelectionRepoTest {
         override fun getSatelliteOffset(catnum: Int): String = ""
 
         override fun setSatelliteOffset(catnum: Int, offset: String) = Unit
+
+        override fun getAmSatCallsign(): String = ""
+
+        override fun setAmSatCallsign(callsign: String) = Unit
     }
 }
 

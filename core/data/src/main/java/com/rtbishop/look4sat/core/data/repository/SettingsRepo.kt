@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import org.json.JSONObject
+import java.util.Locale
 
 class SettingsRepo(
     private val locationManager: LocationManager,
@@ -504,4 +505,16 @@ class SettingsRepo(
         }
         preferences.edit { putString(keySatelliteOffsets, updated) }
     }
+
+    //region # AMSAT status report settings
+    private val keyAmSatCallsign = "amSatCallsign"
+
+    override fun getAmSatCallsign(): String {
+        return preferences.getString(keyAmSatCallsign, "").orEmpty()
+    }
+
+    override fun setAmSatCallsign(callsign: String) {
+        preferences.edit { putString(keyAmSatCallsign, callsign.trim().uppercase(Locale.US)) }
+    }
+    //endregion
 }

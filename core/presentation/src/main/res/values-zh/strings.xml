@@ -12,6 +12,45 @@
     <string name="nav_map">地图</string>
     <string name="nav_prefs">设置</string>
 
+    <!-- AMSAT Status screen -->
+    <string name="nav_amsat">AMSAT</string>
+    <string name="amsat_title">AMSAT 卫星状态</string>
+    <string name="amsat_refresh">刷新</string>
+    <string name="amsat_retry">重试</string>
+    <string name="amsat_updated">更新于：</string>
+    <string name="amsat_active">活跃</string>
+    <string name="amsat_tlm">遥测/信标</string>
+    <string name="amsat_not_heard">未听到</string>
+    <string name="amsat_conflict">冲突</string>
+    <string name="amsat_name">名称</string>
+    <string name="amsat_load_failed">加载失败 - 检查网络后重试</string>
+    <string name="amsat_no_reports">此时间段无报告</string>
+    <string name="amsat_close">关闭</string>
+    <string name="amsat_status_heard">已听到</string>
+    <string name="amsat_status_tlm_only">仅遥测</string>
+    <string name="amsat_status_not_heard">未听到</string>
+    <string name="amsat_status_crew_active">乘组活跃</string>
+    <string name="amsat_upload">上传</string>
+    <string name="amsat_upload_back">返回</string>
+    <string name="amsat_upload_report">上传报告到 AMSAT</string>
+    <string name="amsat_upload_status">状态</string>
+    <string name="amsat_upload_callsign">呼号</string>
+    <string name="amsat_upload_grid">网格</string>
+    <string name="amsat_upload_time_now">时间：当前 UTC %s</string>
+    <string name="amsat_upload_submit">提交到 AMSAT</string>
+    <string name="amsat_upload_confirm">确认上传</string>
+    <string name="amsat_upload_confirm_title">确认上传到 AMSAT</string>
+    <string name="amsat_upload_confirm_message">这条公开报告将上传到 AMSAT。\n卫星：%1$s\n状态：%2$s\n呼号：%3$s\n网格：%4$s</string>
+    <string name="amsat_upload_grid_none">未填写</string>
+    <string name="amsat_upload_success">报告已上传</string>
+    <string name="amsat_upload_failed">上传失败：%s</string>
+    <string name="amsat_upload_callsign_required">请填写呼号</string>
+    <string name="amsat_upload_grid_invalid">网格应为 4 或 6 位 Maidenhead 定位符</string>
+    <string name="amsat_upload_active">活跃</string>
+    <string name="amsat_upload_tlm">遥测/信标</string>
+    <string name="amsat_upload_not_heard">未听到</string>
+    <string name="amsat_upload_crew_active">ISS 语音</string>
+
     <!-- Satellites screen -->
     <string name="sat_type_hint">模式：%s</string>
     <string name="sat_type_title">选择模式</string>
@@ -64,6 +103,24 @@
     <string name="radar_doppler_rx_hint">输入下行频率 (MHz)</string>
     <string name="radar_doppler_offset_hint">偏移 (kHz)</string>
 
+    <!-- Radar screen (CAT control / SSTV) -->
+    <string name="radar_connect">连接</string>
+    <string name="radar_disconnect">断开连接</string>
+    <string name="radar_off">关</string>
+    <string name="radar_stop">停止</string>
+    <string name="radar_track">跟踪</string>
+    <string name="radar_tx_base">TX 基频：</string>
+
+    <!-- SSTV screen -->
+    <string name="sstv_grant_permission">授予权限</string>
+    <string name="sstv_listening">正在监听…</string>
+    <string name="sstv_mic_permission">需要麦克风权限</string>
+    <string name="sstv_mode_format">模式：%s</string>
+    <string name="sstv_mode_title">SSTV 模式</string>
+    <string name="sstv_no_signal">无信号</string>
+    <string name="sstv_no_transceiver">未选择收发器</string>
+    <string name="sstv_rx_format">RX：%s Hz</string>
+
     <!-- Map screen -->
     <string name="map_prev">上一个</string>
     <string name="map_next">下一个</string>
@@ -83,6 +140,12 @@
     <!-- Settings screen -->
     <string name="prefs_donate_title">支持</string>
     <string name="prefs_privacy_title">隐私政策</string>
+
+    <string name="settings_paired_devices">已配对的蓝牙设备：</string>
+    <string name="settings_split_mode">分频模式（仅 IC-705）</string>
+    <string name="prefs_lat_prefix">纬度：%s°</string>
+    <string name="prefs_lon_prefix">经度：%s°</string>
+    <string name="prefs_qth_prefix">QTH：%s</string>
 
     <string name="prefs_updated_title">更新：%s</string>
     <string name="prefs_updated_time">yyyy MMM d - HH:mm:ss</string>
@@ -175,5 +238,8 @@
         \n• Dr T.S. Kelso (Celestrak)
         \n• Libre Space Foundation (SatNOGS)</string>
     <string name="prefs_outro_license">该应用程序不提供任何保修.</string>
+
+    <!-- Main screen -->
+    <string name="tracking_format">跟踪：%s</string>
 
 </resources>

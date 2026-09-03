@@ -1,5 +1,7 @@
 package com.rtbishop.look4sat.core.data.repository
 
+import com.rtbishop.look4sat.core.domain.model.AmSatReportSubmission
+import com.rtbishop.look4sat.core.domain.model.AmSatReportSubmitResult
 import com.rtbishop.look4sat.core.domain.model.SatDay
 import com.rtbishop.look4sat.core.domain.model.SatReport
 import com.rtbishop.look4sat.core.domain.model.SatSlot
@@ -12,6 +14,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
@@ -47,6 +50,46 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
         val statuses = buildStatuses(names, reports, nowSec)
         val reportMap = reports.associate { it.id to toSatReport(it) }
         SatStatusPage(System.currentTimeMillis(), statuses, reportMap)
+    }
+
+    override suspend fun submitReport(submission: AmSatReportSubmission): AmSatReportSubmitResult = withContext(Dispatchers.IO) {
+        val payload = JSONObject().apply {
+            put("name", submission.name)
+            put("report", submission.report)
+            put("callsign", submission.callsign)
+            put("reported_at", isoUtcFormat.format(Date(submission.reportedAtUtcMillis)))
+            if (submission.gridSquare.isNotBlank()) put("grid_square", submission.gridSquare)
+        }
+        val response = remoteSource.submitAmSatReport(payload.toString())
+            ?: return@withContext AmSatReportSubmitResult(success = false, message = "Network request failed")
+        val (code, body) = response
+        val errorMessage = parseSubmitError(body)
+        return@withContext if (code in 200..299 && errorMessage.isBlank()) {
+            AmSatReportSubmitResult(success = true, reportId = parseSubmitReportId(body))
+        } else {
+            AmSatReportSubmitResult(
+                success = false,
+                message = errorMessage.ifBlank { "HTTP $code" }
+            )
+        }
+    }
+
+    private fun parseSubmitError(json: String): String {
+        return try {
+            JSONObject(json).optJSONObject("error")?.optString("message").orEmpty()
+        } catch (_: Exception) {
+            ""
+        }
+    }
+
+    private fun parseSubmitReportId(json: String): String? {
+        return try {
+            val obj = JSONObject(json)
+            obj.optJSONObject("data")?.optString("id")?.takeIf { it.isNotBlank() }
+                ?: obj.optString("id").takeIf { it.isNotBlank() }
+        } catch (_: Exception) {
+            null
+        }
     }
 
     /** Parse catalog JSON to list of satellite names */
@@ -92,11 +135,10 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
     /** Build one SatStatus (5 days x 12 slots) per catalog satellite, slotting reports by age. */
     private fun buildStatuses(names: List<String>, reports: List<ApiReport>, nowSec: Long): List<SatStatus> {
         val byName = reports.groupBy { it.name }
-        val monthAbbr = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
         val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         val labels = (0 until 3).map { d ->
             utc.timeInMillis = (nowSec - d * 86400L) * 1000
-            "${monthAbbr[utc.get(Calendar.MONTH)]} ${utc.get(Calendar.DAY_OF_MONTH)}"
+            formatDayLabel(utc)
         }
         return names.map { name ->
             val slots = (0 until 36).map { slotIdx ->
@@ -118,6 +160,15 @@ class AmSatRepository(private val remoteSource: IRemoteSource) : IAmSatRepositor
                 SatDay(dateLabel = labels[d], slots = slots.subList(d * 12, (d + 1) * 12))
             }
             SatStatus(name = name, days = days)
+        }
+    }
+
+    private fun formatDayLabel(calendar: Calendar): String {
+        return if (Locale.getDefault().language == Locale.CHINESE.language) {
+            "${calendar.get(Calendar.MONTH) + 1}月${calendar.get(Calendar.DAY_OF_MONTH)}日"
+        } else {
+            val monthAbbr = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+            "${monthAbbr[calendar.get(Calendar.MONTH)]} ${calendar.get(Calendar.DAY_OF_MONTH)}"
         }
     }
 

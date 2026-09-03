@@ -305,6 +305,7 @@ fun InfoDialog(
     title: String,
     onDismiss: () -> Unit,
     onAccept: () -> Unit,
+    extraAction: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     DialogShell(onDismissRequest = onDismiss) { padding ->
@@ -323,6 +324,10 @@ fun InfoDialog(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
+            extraAction?.let {
+                it()
+                Spacer(modifier = Modifier.width(8.dp))
+            }
             CardButton(onClick = onAccept, text = stringResource(R.string.btn_accept))
         }
         content()
