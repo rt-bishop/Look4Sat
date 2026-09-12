@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface ISettingsRepo {
 
     val appVersionName: String
+    val appVersionCode: Long
 
     //region # Satellites selection settings
     val selectedIds: StateFlow<List<Int>>

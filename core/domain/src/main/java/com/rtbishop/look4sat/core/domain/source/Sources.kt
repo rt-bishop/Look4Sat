@@ -18,17 +18,19 @@
 package com.rtbishop.look4sat.core.domain.source
 
 object Sources {
+    // Ordered from the most specific to the most generic source: the first source that knows a
+    // satellite gets to name it, with the full catalog acting as the fallback.
     val satelliteDataUrls = listOf(
-        "celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
-        "db.satnogs.org/api/tle/?format=3le",
-        "amsat.org/tle/current/nasabare.txt",
-        "mmccants.org/tles/classfd.zip",
+        "live.ariss.org/iss.txt",
         "r4uab.ru/satonline.txt",
-        "live.ariss.org/iss.txt"
+        "mmccants.org/tles/classfd.zip",
+        "amsat.org/tle/current/nasabare.txt",
+        "celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=csv",
+        "db.satnogs.org/api/tle/?format=3le"
     )
     val transceiversDataUrls = listOf(
-        "db.satnogs.org/api/transmitters/?format=json&status=active",
-        "r4uab.ru/transmitters.json"
+        "r4uab.ru/transmitters.json",
+        "db.satnogs.org/api/transmitters/?format=json&status=active"
     )
     val satelliteModes = listOf(
         "4FSK", "64-QAM", "AFSK", "AFSK TUBiX10", "AHRPT", "AM", "APT", "ASK", "BPSK",

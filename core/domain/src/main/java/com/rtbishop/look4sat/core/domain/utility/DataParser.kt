@@ -33,10 +33,19 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
+    private val alpha5Alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+    private val celestrakCSVColumns = mapOf(
+        "OBJECT_NAME" to 0, "EPOCH" to 2, "MEAN_MOTION" to 3, "ECCENTRICITY" to 4,
+        "INCLINATION" to 5, "RA_OF_ASC_NODE" to 6, "ARG_OF_PERICENTER" to 7,
+        "MEAN_ANOMALY" to 8, "NORAD_CAT_ID" to 11, "BSTAR" to 14, "MEAN_MOTION_DOT" to 15
+    )
 
     suspend fun parseCSVStream(stream: InputStream): List<OrbitalData> = withContext(dispatcher) {
         stream.bufferedReader().useLines { lines ->
-            lines.drop(1).mapNotNull { parseCSV(it.split(",")) }.toList()
+            val iterator = lines.iterator()
+            if (!iterator.hasNext()) return@useLines emptyList()
+            val columns = parseCSVColumns(iterator.next())
+            iterator.asSequence().mapNotNull { line -> parseCSV(line.split(","), columns) }.toList()
         }
     }
 
@@ -58,34 +67,62 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
         }.getOrDefault(emptyList())
     }
 
-    private fun parseCSV(values: List<String>): OrbitalData? = runCatching {
-        val name = values[0]
-        val timestamp = values[2]
-        val year = timestamp.substring(0, 4)
-        val month = timestamp.substring(5, 7).toInt()
-        val dayOfMonth = timestamp.substring(8, 10).toInt()
-        val dayInt = getDayOfYear(year.toInt(), month, dayOfMonth)
-        val day = dayInt.toString().padStart(3, '0')
-        val hour = timestamp.substring(11, 13).toInt() * 3600000
-        val min = timestamp.substring(14, 16).toInt() * 60000
-        val sec = timestamp.substring(17, 19).toInt() * 1000
-        val ms = timestamp.substring(20, 26).toInt() / 1000.0
-        val frac = ((hour + min + sec + ms) / 86400000.0).toString().substring(1)
-        val epoch = "${year.substring(2)}$day$frac".toDouble()
+    private fun parseCSV(values: List<String>, columns: Map<String, Int>): OrbitalData? = runCatching {
+        fun value(column: String) = values[columns.getValue(column)].trim()
+        fun optionalValue(column: String) =
+            columns[column]?.let { index -> values.getOrNull(index) }?.trim()?.toDoubleOrNull() ?: 0.0
         OrbitalData(
-            name = name,
-            epoch = epoch,
-            meanmo = values[3].toDouble(),
-            eccn = values[4].toDouble(),
-            incl = values[5].toDouble(),
-            raan = values[6].toDouble(),
-            argper = values[7].toDouble(),
-            meanan = values[8].toDouble(),
-            catnum = values[11].toInt(),
-            bstar = values[14].toDouble(),
-            ndot = values[15].toDouble()
+            name = value("OBJECT_NAME"),
+            epoch = parseTimestamp(value("EPOCH")),
+            meanmo = value("MEAN_MOTION").toDouble(),
+            eccn = value("ECCENTRICITY").toDouble(),
+            incl = value("INCLINATION").toDouble(),
+            raan = value("RA_OF_ASC_NODE").toDouble(),
+            argper = value("ARG_OF_PERICENTER").toDouble(),
+            meanan = value("MEAN_ANOMALY").toDouble(),
+            catnum = parseCatnum(value("NORAD_CAT_ID")),
+            bstar = optionalValue("BSTAR"),
+            ndot = optionalValue("MEAN_MOTION_DOT")
         )
     }.onFailure { println("CSV parsing exception: $it") }.getOrNull()
+
+    /**
+     * OMM columns are located by name, as providers agree on the names but not on the order.
+     * Falls back to the Celestrak layout when the header is missing or unrecognized.
+     */
+    private fun parseCSVColumns(header: String): Map<String, Int> {
+        val columns = header.split(",").withIndex().associate { (index, name) ->
+            name.trim().trim('"').uppercase() to index
+        }
+        return if (columns.containsKey("NORAD_CAT_ID")) columns else celestrakCSVColumns
+    }
+
+    /**
+     * ISO 8601 timestamp as a TLE style YYDDD.ffffffff epoch. Fractional seconds are optional and
+     * a trailing timezone marker is ignored, as not every provider formats the epoch alike.
+     */
+    private fun parseTimestamp(timestamp: String): Double {
+        val year = timestamp.substring(0, 4).toInt()
+        val month = timestamp.substring(5, 7).toInt()
+        val dayOfMonth = timestamp.substring(8, 10).toInt()
+        val hours = timestamp.substring(11, 13).toInt()
+        val minutes = timestamp.substring(14, 16).toInt()
+        val seconds = timestamp.substring(17).takeWhile { it.isDigit() || it == '.' }.toDouble()
+        val dayFraction = (hours * 3600 + minutes * 60 + seconds) / 86400.0
+        return (year % 100) * 1000 + getDayOfYear(year, month, dayOfMonth) + dayFraction
+    }
+
+    /**
+     * Catalog numbers above 99999 do not fit the 5 digit TLE field, so they are encoded as Alpha-5:
+     * the leading two digits become a letter, with I and O skipped to avoid confusion with 1 and 0.
+     */
+    private fun parseCatnum(value: String): Int {
+        val catnum = value.trim()
+        if (catnum.first().isDigit()) return catnum.toInt()
+        val alphaIndex = alpha5Alphabet.indexOf(catnum.first().uppercaseChar())
+        require(alphaIndex >= 0) { "Unknown Alpha-5 catalog number: $catnum" }
+        return (alphaIndex + 10) * 10000 + catnum.drop(1).trim().toInt()
+    }
 
     private fun parseTLE(tle: List<String>): OrbitalData? = runCatching {
         val line1 = tle[1]
@@ -99,7 +136,7 @@ class DataParser(private val dispatcher: CoroutineDispatcher) {
             raan = line2.substring(17, 25).toDouble(),
             argper = line2.substring(34, 42).toDouble(),
             meanan = line2.substring(43, 51).toDouble(),
-            catnum = line1.substring(2, 7).trim().toInt(),
+            catnum = parseCatnum(line1.substring(2, 7)),
             bstar = 1e-5 * line1.substring(53, 59).toDouble() / 10.0.pow(line1.substring(60, 61).toDouble()),
             ndot = line1.substring(33, 43).trim().toDouble()
         )

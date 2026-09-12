@@ -121,6 +121,8 @@
     <string name="prefs_data_sources_restore">Відновити джерела за замовчуванням</string>
     <string name="prefs_data_sources_sat_title">Дані супутників</string>
     <string name="prefs_data_sources_transceivers_title">Дані трансиверів</string>
+    <string name="prefs_data_sources_sat_hint">Пріоритет зверху: назви супутників</string>
+    <string name="prefs_data_sources_transceivers_hint">Пріоритет зверху: дані трансиверів</string>
     <string name="prefs_data_sources_tle_switch">URL TLE</string>
     <string name="prefs_data_sources_transceivers_switch">URL трансиверів</string>
     <string name="prefs_data_sources_url_title" translatable="false">URL (HTTPS)</string>

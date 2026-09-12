@@ -45,7 +45,8 @@ import java.util.Locale
 class SettingsRepo(
     private val locationManager: LocationManager,
     private val preferences: SharedPreferences,
-    override val appVersionName: String
+    override val appVersionName: String,
+    override val appVersionCode: Long,
 ) : ISettingsRepo, LocationListenerCompat {
 
     private val keyBluetoothRotatorAddress = "bluetoothAddress"
@@ -87,18 +88,32 @@ class SettingsRepo(
     private val keyStationTimestamp = "stationTimestamp"
     private val keyUpdateTimestamp = "updateTimestamp"
     private val keyShouldSeeWarning = "shouldSeeWarning"
-    private val keyShouldSeeWhatsNew = "shouldSeeWhatsNew_v$appVersionName"
+    private val keyShouldSeeWhatsNew = "shouldSeeWhatsNew"
     private val keySstvMode = "sstvMode"
     private val keyLowElevation = "lowElevation"
     private val keyHighElevation = "highElevation"
     private val keyRadarCompassOffset = "radarCompassOffset"
     private val keyRadarCompassOffsetElev = "radarCompassOffsetElev"
-    private val keySatelliteUrls = "satelliteUrls"
+    private val keySatellitesUrls = "satellitesUrls"
     private val keyTransceiversUrls = "transceiversUrls"
-    private val keySatelliteEnabled = "satelliteEnabled"
-    private val keyTransceiversEnabled = "transceiversEnabled"
+    private val keySatellitesUrlsEnabled = "satellitesUrlsEnabled"
+    private val keyTransceiversUrlsEnabled = "transceiversUrlsEnabled"
+    private val keySettingsVersion = "settingsVersion"
     private val separatorComma = ","
     private val separatorUrl = "\n"
+
+    init {
+        // The meaning of the data source order changed, so the stored lists are dropped and the defaults
+        // are applied again. The update timestamp is cleared as well, to refresh the migrated data
+        // on the first launch instead of waiting up to 48 hours for the automatic update.
+        if (preferences.getInt(keySettingsVersion, 0) < appVersionCode) {
+            preferences.edit {
+                listOf(keyShouldSeeWhatsNew, keySatellitesUrls, keyTransceiversUrls, keyUpdateTimestamp)
+                    .forEach { key -> remove(key) }
+                putInt(keySettingsVersion, appVersionCode.toInt())
+            }
+        }
+    }
 
     //region # Satellites selection settings
     private val _satelliteSelection = MutableStateFlow(getSelectedIds())
@@ -384,23 +399,23 @@ class SettingsRepo(
             transceiversEnabled = alignFlags(settings.transceiversUrls, settings.transceiversEnabled)
         )
         preferences.edit {
-            putString(keySatelliteUrls, normalized.satelliteUrls.joinToString(separatorUrl))
+            putString(keySatellitesUrls, normalized.satelliteUrls.joinToString(separatorUrl))
             putString(keyTransceiversUrls, normalized.transceiversUrls.joinToString(separatorUrl))
-            putString(keySatelliteEnabled, normalized.satelliteEnabled.joinToString(separatorComma))
-            putString(keyTransceiversEnabled, normalized.transceiversEnabled.joinToString(separatorComma))
+            putString(keySatellitesUrlsEnabled, normalized.satelliteEnabled.joinToString(separatorComma))
+            putString(keyTransceiversUrlsEnabled, normalized.transceiversEnabled.joinToString(separatorComma))
         }
         _dataSourcesSettings.value = normalized
     }
 
     private fun getDataSourcesSettings(): DataSourcesSettings {
         val (satUrls, satEnabled) = parseSources(
-            preferences.getString(keySatelliteUrls, null),
-            preferences.getString(keySatelliteEnabled, null),
+            preferences.getString(keySatellitesUrls, null),
+            preferences.getString(keySatellitesUrlsEnabled, null),
             Sources.satelliteDataUrls
         )
         val (txUrls, txEnabled) = parseSources(
             preferences.getString(keyTransceiversUrls, null),
-            preferences.getString(keyTransceiversEnabled, null),
+            preferences.getString(keyTransceiversUrlsEnabled, null),
             Sources.transceiversDataUrls
         )
         return DataSourcesSettings(

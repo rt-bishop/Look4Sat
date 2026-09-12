@@ -209,7 +209,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
                         version = uiState.appVersionName,
                         modifier = Modifier.weight(1f)
                     )
-                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_like)
+                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_pound)
                 }
                 TopBar {
                     Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -231,7 +231,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
                 }
             } else {
                 TopBar {
-                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_like)
+                    PrimaryIconCard(onClick = { safeOpenUri(donateUrl) }, resId = R.drawable.ic_pound)
                     TopCard(
                         onClick = { dialogs.whatsNew = true },
                         version = uiState.appVersionName,

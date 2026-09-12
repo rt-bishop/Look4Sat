@@ -30,5 +30,6 @@ data class SatEntry(
     val argper: Double,
     val meanan: Double,
     val catnum: Int,
-    val bstar: Double
+    val bstar: Double,
+    val ndot: Double = 0.0
 )

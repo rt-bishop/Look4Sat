@@ -52,7 +52,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
@@ -430,11 +430,11 @@ private fun DialogShell(
 
 @Composable
 fun hasEnoughHeight(): Boolean =
-    currentWindowAdaptiveInfo().windowSizeClass.isHeightAtLeastBreakpoint(480)
+    currentWindowAdaptiveInfoV2().windowSizeClass.isHeightAtLeastBreakpoint(480)
 
 @Composable
 fun hasEnoughWidth(): Boolean =
-    currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(600)
+    currentWindowAdaptiveInfoV2().windowSizeClass.isWidthAtLeastBreakpoint(600)
 
 @Composable
 fun isVerticalLayout(): Boolean = !hasEnoughWidth()

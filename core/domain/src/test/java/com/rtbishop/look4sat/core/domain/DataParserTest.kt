@@ -23,6 +23,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import kotlin.math.abs
 
 @ExperimentalCoroutinesApi
 class DataParserTest {
@@ -61,8 +62,49 @@ class DataParserTest {
     fun `Given valid CSV stream returns valid data`() = runTest(testDispatcher) {
         val parsedList = dataParser.parseCSVStream(validCSVStream)
         assert(parsedList.size == 2)
-        assert(parsedList[0].epoch == 21320.51955234)
-        assert(parsedList[1].epoch == 24069.23963816)
+        assert(abs(parsedList[0].epoch - 21320.51955234) < 1e-8)
+        assert(abs(parsedList[1].epoch - 24069.23963816) < 1e-8)
+    }
+
+    @Test
+    fun `Given CSV stream with reordered columns returns valid data`() = runTest(testDispatcher) {
+        val csvStream = """
+            NORAD_CAT_ID,EPOCH,OBJECT_NAME,BSTAR,MEAN_MOTION_DOT,MEAN_MOTION,ECCENTRICITY,INCLINATION,RA_OF_ASC_NODE,ARG_OF_PERICENTER,MEAN_ANOMALY
+            25544,2021-11-16T12:28:09.322176,ISS (ZARYA),.31985E-4,.1288E-4,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876
+        """.trimIndent().byteInputStream()
+        val sat = dataParser.parseCSVStream(csvStream)[0]
+        assert(sat.name == "ISS (ZARYA)")
+        assert(sat.catnum == 25544)
+        assert(sat.meanmo == 15.48582035)
+        assert(sat.bstar == 0.31985E-4)
+        assert(abs(sat.epoch - 21320.51955234) < 1e-8)
+    }
+
+    @Test
+    fun `Given CSV epoch without fractional seconds returns valid data`() = runTest(testDispatcher) {
+        val csvStream = """
+            OBJECT_NAME,OBJECT_ID,EPOCH,MEAN_MOTION,ECCENTRICITY,INCLINATION,RA_OF_ASC_NODE,ARG_OF_PERICENTER,MEAN_ANOMALY,EPHEMERIS_TYPE,CLASSIFICATION_TYPE,NORAD_CAT_ID,ELEMENT_SET_NO,REV_AT_EPOCH,BSTAR,MEAN_MOTION_DOT,MEAN_MOTION_DDOT
+            ISS (ZARYA),1998-067A,2021-11-16T12:28:09Z,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876,0,U,25544,999,31220,.31985E-4,.1288E-4,0
+            ISS (ZARYA),1998-067A,2021-11-16T00:00:30,15.48582035,.0004694,51.6447,309.4881,203.6966,299.8876,0,U,25544,999,31220,.31985E-4,.1288E-4,0
+        """.trimIndent().byteInputStream()
+        val parsedList = dataParser.parseCSVStream(csvStream)
+        assert(parsedList.size == 2)
+        // the dropped microseconds are worth a few microdays, the rest of the epoch is intact
+        assert(abs(parsedList[0].epoch - 21320.51955234) < 1e-5)
+        // just past midnight: the old formatter produced a broken 21320.0E-4 style epoch here
+        assert(abs(parsedList[1].epoch - 21320.00034722) < 1e-8)
+    }
+
+    @Test
+    fun `Given TLE stream with alpha-5 catalog number returns valid data`() = runTest(testDispatcher) {
+        val tleStream = """
+            NAVSTAR 43
+            1 T0111U 98067A   21320.51955234  .00001288  00000+0  31985-4 0  9990
+            2 T0111  51.6447 309.4881 0004694 203.6966 299.8876 15.48582035312205
+        """.trimIndent().byteInputStream()
+        val sat = dataParser.parseTLEStream(tleStream)[0]
+        // A stands for 10 and I and O are skipped, so T is 27 and T0111 stands for 270111
+        assert(sat.catnum == 270111)
     }
 
     @Test

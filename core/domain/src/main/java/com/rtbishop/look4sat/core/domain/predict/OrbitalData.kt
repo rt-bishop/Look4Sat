@@ -37,30 +37,42 @@ data class OrbitalData(
     val xno: Double = meanmo * TWO_PI / MIN_PER_DAY
     val orbitalPeriod: Double = MIN_PER_DAY / meanmo
     val isDeepSpace: Boolean = orbitalPeriod >= 225.0 // NearEarth (period < 225 min) or DeepSpace (period >= 225 min)
+
+    /** Absolute age of this element set, used to pick the freshest data among several sources. */
+    val epochDaynum: Double = epochToDaynum(epoch)
+
     fun getObject(): OrbitalObject = if (isDeepSpace) DeepSpaceObject(this) else NearEarthObject(this)
 
     /** Check if satellite has likely decayed by the given time. */
     fun hasDecayed(currentTimeMillis: Long): Boolean {
         if (ndot == 0.0) return false
-        val currentDaynum = (currentTimeMillis - 315446400000L) / 86400000.0
-        val epochDaynum = epochToDaynum(epoch)
-        return CelestialComputer.hasDecayed(meanmo, ndot, epochDaynum, currentDaynum)
+        return CelestialComputer.hasDecayed(meanmo, ndot, epochDaynum, timeToDaynum(currentTimeMillis))
     }
 
-    private fun epochToDaynum(epoch: Double): Double {
-        var year = kotlin.math.floor(epoch * 1E-3)
-        val day = (epoch * 1E-3 - year) * 1000.0
-        year = if (year < 57) year + 2000 else year + 1900
-        // daynum = days since 31 Dec 1979, Julian date of 31Dec79 = 2444238.5
-        val jan1Jd = julianDateOfYear(year)
-        return jan1Jd + day - 2444238.5
-    }
+    companion object {
+        /** Days since 31 Dec 1979, the reference point every daynum in the app is based on. */
+        fun timeToDaynum(timeMillis: Long): Double = (timeMillis - 315446400000L) / 86400000.0
 
-    private fun julianDateOfYear(theYear: Double): Double {
-        val aYear = theYear - 1
-        val a = kotlin.math.floor(aYear / 100).toLong()
-        val b = 2 - a + a / 4
-        val i = kotlin.math.floor(365.25 * aYear).toLong()
-        return i + (30.6001 * 14).toLong() + 1720994.5 + b
+        /**
+         * Days since 31 Dec 1979 for a TLE style YYDDD.ffffffff epoch. Raw epochs are not
+         * comparable across decades (a 1999 epoch reads as 99xxx, a 2026 one as 26xxx), so
+         * freshness checks must always go through this conversion.
+         */
+        fun epochToDaynum(epoch: Double): Double {
+            var year = kotlin.math.floor(epoch * 1E-3)
+            val day = (epoch * 1E-3 - year) * 1000.0
+            year = if (year < 57) year + 2000 else year + 1900
+            // daynum = days since 31 Dec 1979, Julian date of 31Dec79 = 2444238.5
+            val jan1Jd = julianDateOfYear(year)
+            return jan1Jd + day - 2444238.5
+        }
+
+        private fun julianDateOfYear(theYear: Double): Double {
+            val aYear = theYear - 1
+            val a = kotlin.math.floor(aYear / 100).toLong()
+            val b = 2 - a + a / 4
+            val i = kotlin.math.floor(365.25 * aYear).toLong()
+            return i + (30.6001 * 14).toLong() + 1720994.5 + b
+        }
     }
 }
