@@ -51,7 +51,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
@@ -77,7 +76,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -95,6 +93,7 @@ import com.rtbishop.look4sat.core.presentation.LocalSpacing
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.ConfirmDialog
+import kotlin.time.Duration.Companion.milliseconds
 
 @Preview(showBackground = true)
 @Composable
@@ -227,8 +226,8 @@ fun DataSourcesDialog(
         }
     }
     val listState = rememberLazyListState()
-    val satDraggedId = remember { mutableStateOf(-1L) }
-    val txDraggedId = remember { mutableStateOf(-1L) }
+    val satDraggedId = remember { mutableLongStateOf(-1L) }
+    val txDraggedId = remember { mutableLongStateOf(-1L) }
     val onRestoreDefaults = {
         nextId.longValue = (Sources.satelliteDataUrls.size + Sources.transceiversDataUrls.size).toLong()
         satUrls.clear()
@@ -241,7 +240,6 @@ fun DataSourcesDialog(
         )
         satEnabled.clear()
         txEnabled.clear()
-        Unit
     }
     val onAccept = {
         val satFiltered = satUrls.filter { it.second.isNotBlank() }
@@ -379,10 +377,10 @@ private fun LazyListScope.sourceSection(
                 )
                 .animateItem(
                     fadeInSpec = spring(),
-                    // The dragged row repositions instantly, while its neighbours spring
+                    // The dragged row repositions instantly, while its neighbors spring
                     // out of the way (the "squeeze" effect).
                     placementSpec = if (isDragging) {
-                        tween<IntOffset>(durationMillis = 0)
+                        tween(durationMillis = 0)
                     } else {
                         spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -435,7 +433,7 @@ private fun LazyListScope.sourceSection(
  * Per-row drag state, kept in one object to keep the drag-handle modifier signature small.
  *
  * [offsetY] is the compensated visual displacement during a drag (finger travel minus the
- * heights of already-swapped neighbours), so the row stays glued to the finger. [fingerOffset]
+ * heights of already-swapped neighbors), so the row stays glued to the finger. [fingerOffset]
  * tracks the raw finger travel for edge auto-scroll and swap detection. [settleAnim] smoothly
  * flies the lifted row back into its slot once the finger is released.
  */
@@ -448,7 +446,7 @@ private class DragRowState {
     val isSettling = mutableStateOf(false)
 }
 
-/** Spring shared by neighbour "squeeze" and the settle-back animation: soft and slightly bouncy. */
+/** Spring shared by neighbor "squeeze" and the settle-back animation: soft and slightly bouncy. */
 private val reorderSpring = spring<Float>(
     dampingRatio = Spring.DampingRatioMediumBouncy,
     stiffness = Spring.StiffnessMediumLow
@@ -457,9 +455,9 @@ private val reorderSpring = spring<Float>(
 /**
  * Drag handle gesture that performs live reordering while dragging.
  *
- * [fingerOffset] tracks the raw finger travel, used for edge auto-scroll and for
- * deciding when the dragged row's centre crosses a neighbour's midpoint. [offsetY]
- * additionally subtracts the heights of already-swapped neighbours so the visual
+ * fingerOffset tracks the raw finger travel, used for edge auto-scroll and for
+ * deciding when the dragged row's center crosses a neighbor's midpoint. offsetY
+ * additionally subtracts the heights of already-swapped neighbors so the visual
  * translation (see [draggedVisual]) keeps the row glued to the finger even as the
  * layout slot moves. Rendering of the whole field is applied on the field itself so
  * the entire row follows the finger, not just the handle icon.
@@ -480,7 +478,7 @@ private fun Modifier.dragHandle(
         if (myIndex !in urls.indices) return
         val myCenter = rowState.startCenterY.floatValue + rowState.fingerOffset.floatValue
         val visible = listState.layoutInfo.visibleItemsInfo
-        // Dragging down: swap when the dragged centre passes the next row's midpoint.
+        // Dragging down: swap when the dragged center passes the next row's midpoint.
         if (myIndex < urls.lastIndex) {
             val next = visible.firstOrNull { it.key == "$sectionKey-${urls[myIndex + 1].first}" }
             if (next != null && myCenter > next.offset + next.size / 2f) {
@@ -489,7 +487,7 @@ private fun Modifier.dragHandle(
                 return
             }
         }
-        // Dragging up: swap when the dragged centre passes the previous row's midpoint.
+        // Dragging up: swap when the dragged center passes the previous row's midpoint.
         if (myIndex > 0) {
             val prev = visible.firstOrNull { it.key == "$sectionKey-${urls[myIndex - 1].first}" }
             if (prev != null && myCenter < prev.offset + prev.size / 2f) {
@@ -579,9 +577,9 @@ private fun Modifier.draggedVisual(isLifted: Boolean, translationY: Float): Modi
 
 /**
  * Scrolls the list while dragging so the entry follows the finger past the viewport edges.
- * The visual centre is tracked independently of the entry's layout slot (which can scroll out
- * of [LazyListState.layoutInfo.visibleItemsInfo] during a long drag); [startCenterY] is the
- * entry's viewport centre captured at drag start and [fingerOffset] is the raw finger delta.
+ * The visual center is tracked independently of the entry's layout slot (which can scroll out
+ * of LazyListState.layoutInfo.visibleItemsInfo during a long drag); [startCenterY] is the
+ * entry's viewport center captured at drag start and [fingerOffset] is the raw finger delta.
  */
 private suspend fun autoScroll(
     listState: LazyListState,
@@ -602,16 +600,16 @@ private suspend fun autoScroll(
             else -> 0f
         }
         if (delta != 0f) scrollComp.floatValue += listState.scrollBy(delta)
-        delay(16L)
+        delay(16L.milliseconds)
     }
 }
 
 private fun statusLabel(code: Int): String = if (code == NetworkResult.CONNECTION_ERROR) "ERR" else code.toString()
 
 @Composable
-private fun statusColor(code: Int): Color = when {
-    code == NetworkResult.CONNECTION_ERROR -> MaterialTheme.colorScheme.error
-    code in 200..299 -> Color(0xFF66BB6A)
+private fun statusColor(code: Int): Color = when (code) {
+    NetworkResult.CONNECTION_ERROR -> MaterialTheme.colorScheme.error
+    in 200..299 -> Color(0xFF66BB6A)
     else -> MaterialTheme.colorScheme.error
 }
 

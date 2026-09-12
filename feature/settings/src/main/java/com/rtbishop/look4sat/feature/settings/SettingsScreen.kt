@@ -188,7 +188,7 @@ private fun SettingsScreen(uiState: SettingsState, onAction: (SettingsAction) ->
 
     // URLs for top bar
     val uriHandler = LocalUriHandler.current
-    val appUrl = stringResource(R.string.prefs_app_url)
+//    val appUrl = stringResource(R.string.prefs_app_url)
     val donateUrl = stringResource(R.string.prefs_donate_url)
     val fdroidTitle = stringResource(R.string.prefs_fdroid_title)
     val fdroidUrl = stringResource(R.string.prefs_fdroid_url)

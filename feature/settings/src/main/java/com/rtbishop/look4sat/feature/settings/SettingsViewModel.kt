@@ -206,7 +206,6 @@ class SettingsViewModel(
         }
     }
 
-
     // endregion
 
     companion object {
