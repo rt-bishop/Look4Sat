@@ -29,6 +29,7 @@ kotlin = "2.4.20"
 kotlin-coroutines = "1.11.0"
 kotlin-serialization = "1.11.0"
 
+other-detekt = "1.23.8"
 other-okhttp = "5.5.0"
 other-osmdroid = "6.1.20"
 
@@ -73,6 +74,8 @@ kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 
 #noinspection UnusedVersionCatalogEntry
+other-detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "other-detekt" }
+#noinspection UnusedVersionCatalogEntry
 other-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "other-okhttp" }
 #noinspection UnusedVersionCatalogEntry
 other-osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "other-osmdroid" }
@@ -90,6 +93,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "google-ksp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+other-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "other-detekt" }
 # plugins defined by this project
 convention-applicationPlugin = { id = "com.rtbishop.look4sat.convention.applicationPlugin" }
 convention-coreDataPlugin = { id = "com.rtbishop.look4sat.convention.coreDataPlugin" }
