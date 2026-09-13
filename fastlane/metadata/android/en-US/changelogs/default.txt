@@ -1,7 +1,5 @@
-* Added AMSAT status tracking page by MCKero6423 (#234)
-* Tweaked Radar track on reposition by atsunatsu (#235)
-* Tweaked linear transponder calc by atsunatsu (#236)
-* Added saving per-sat doppler offset by atsunatsu (#237)
-* Added custom freq offset setting to network reporting
-* Added ability to customize data sources via import
-* Fixed star chart in README by PingouinFerreux (#240)
+* Tweaked sun calculations, added tests by atsunatsu (#241)
+* Overhauled sources import, added HTTP status by wty2019wty (#242)
+* Localized AMSAT status screen for Chinese by atsunatsu (#245)
+* Extracted hardcoded UI strings to resources by TianhengZhuang (#247)
+* Added AMSAT satellite status reports submission by atsunatsu (#248)

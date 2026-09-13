@@ -20,7 +20,6 @@ package com.rtbishop.look4sat.feature.map
 import com.rtbishop.look4sat.core.domain.predict.GeoPos
 import com.rtbishop.look4sat.core.domain.predict.OrbitalObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
-import com.rtbishop.look4sat.core.domain.predict.OrbitalPos
 
 data class MapState(
     val mapData: MapData? = null,
@@ -29,7 +28,7 @@ data class MapState(
     val stationPosition: GeoPos? = null,
     val orbitalPass: OrbitalPass,
     val track: List<List<GeoPos>>? = null,
-    val footprint: OrbitalPos? = null,
+    val footprint: List<GeoPos>? = null,
     val positions: Map<OrbitalObject, GeoPos>? = null,
     val sunLatDeg: Double = 0.0,
     val sunLonDeg: Double = 0.0,
@@ -42,6 +41,7 @@ sealed interface MapAction {
     data object SelectNext : MapAction
     data class SelectItem(val item: OrbitalObject) : MapAction
     data class SelectDefaultItem(val catnum: Int) : MapAction
+    data class SetVisible(val isVisible: Boolean) : MapAction
 }
 
 data class MapData(

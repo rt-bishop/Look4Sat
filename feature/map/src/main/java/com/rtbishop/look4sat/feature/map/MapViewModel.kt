@@ -36,6 +36,7 @@ import com.rtbishop.look4sat.core.domain.utility.toMapGeoPos
 import com.rtbishop.look4sat.core.domain.utility.toDegrees
 import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -45,10 +46,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 
 class MapViewModel(
     private val satelliteRepo: ISatelliteRepo,
@@ -69,6 +72,9 @@ class MapViewModel(
     private var dataUpdateJob: Job? = null
     private var dataUpdateRate = 1000L
     private var selectedOrbitalObject: OrbitalObject? = null
+
+    /** Gates the prediction loop so it doesn't burn CPU while the map isn't on screen */
+    private val isScreenVisible = MutableStateFlow(true)
     val uiState: StateFlow<MapState> = _uiState
 
     init {
@@ -87,6 +93,7 @@ class MapViewModel(
             MapAction.SelectNext -> scrollSelection(false)
             is MapAction.SelectItem -> selectSatellite(action.item)
             is MapAction.SelectDefaultItem -> selectDefaultSatellite(action.catnum)
+            is MapAction.SetVisible -> isScreenVisible.value = action.isVisible
         }
     }
 
@@ -124,7 +131,11 @@ class MapViewModel(
         selectedOrbitalObject = orbitalObject
         viewModelScope.launch {
             dataUpdateJob?.cancelAndJoin()
-            dataUpdateJob = launch {
+            // Default dispatcher is mandatory: viewModelScope is Main.immediate, and every
+            // satelliteRepo call internally hops to Default and resumes back on the caller's
+            // dispatcher. On Main that posts one continuation per satellite per tick, which
+            // floods the looper and ANRs for users tracking thousands of objects.
+            dataUpdateJob = launch(Dispatchers.Default) {
                 val dateNow = Date()
                 getStationPosition()
                 getSatTrack(orbitalObject, stationPos, dateNow)
@@ -135,9 +146,11 @@ class MapViewModel(
                     else -> updateFreq
                 }
                 while (isActive) {
+                    // Suspends while the map is off-screen instead of predicting into the void
+                    isScreenVisible.first { it }
                     dateNow.time = System.currentTimeMillis()
                     updateMapState(orbitalObject, allSatellites, stationPos, dateNow)
-                    delay(effectiveRate)
+                    delay(effectiveRate.milliseconds)
                 }
             }
         }
@@ -187,7 +200,8 @@ class MapViewModel(
 
         // 2. Derive footprint, info data, sun and moon position from already-computed state
         val satPos = selectedSatPos ?: satelliteRepo.getPosition(selected, pos, date.time)
-        val footprint = satPos
+        // Range circle is 721 trig-heavy points — keep it on this background dispatcher
+        val footprint = satPos.getRangeCircle()
         val mapData = buildMapData(selected, satPos, date)
         val sunPos = CelestialComputer.getSunPosition(stationPos, date.time)
         val moonPos = CelestialComputer.getMoonPosition(stationPos, date.time)
@@ -294,7 +308,7 @@ class MapViewModel(
 
     companion object {
         /** Number of parallel chunks for satellite position computation */
-        private const val PARALLEL_CHUNKS = 4
+        private val PARALLEL_CHUNKS = Runtime.getRuntime().availableProcessors().coerceIn(2, 8)
 
         fun factory(container: IMainContainer) = viewModelFactory {
             initializer {

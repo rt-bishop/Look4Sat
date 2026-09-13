@@ -56,13 +56,14 @@
         \n\nPlease update the database at least weekly to get accurate predictions.</string>
     <string name="pass_whatsnew_title" translatable="false">What\'s new in Look4Sat</string>
     <string name="pass_whatsnew_message" translatable="false">
-        * Added AMSAT status tracking page by MCKero6423 (#234)
-        \n* Tweaked Radar track on reposition by atsunatsu (#235)
-        \n* Tweaked linear transponder calc by atsunatsu (#236)
-        \n* Added saving per-sat doppler offset by atsunatsu (#237)
-        \n* Added custom freq offset setting to network reporting
-        \n* Added ability to customize data sources via import
-        \n* Fixed star chart in README by PingouinFerreux (#240)
+        * Tweaked sunrise/sunset calculations, added tests by atsunatsu (#241)
+        \n\n* Overhauled sources import, added HTTP status by wty2019wty (#242)
+        \nSources now have priority - the top ones define satellite names and transceiver data.
+        \nYou can enable/disable sources and restore defaults via the Satellite data import dialog.
+        \n\n* Localized AMSAT status screen for Chinese by atsunatsu (#245)
+        \n\n* Extracted hardcoded UI strings to resources by TianhengZhuang (#247)
+        \n\n* Added AMSAT satellite status reports submission by atsunatsu (#248)
+        \n\n* Slightly optimized map performance to reduce ANRs and memory consumption. Zoom in to see satellite labels.
     </string>
 
     <!-- AMSAT Status screen -->
