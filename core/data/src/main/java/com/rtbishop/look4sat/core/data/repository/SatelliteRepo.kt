@@ -35,6 +35,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import java.util.TimeZone
@@ -67,8 +69,9 @@ class SatelliteRepo(
     override suspend fun initRepository() = withContext(dispatcher) {
         combine(
             settingsRepo.selectedIds,
-            settingsRepo.stationPosition
-        ) { selectedIds, _ -> selectedIds }
+            settingsRepo.stationPosition,
+            settingsRepo.otherSettings.map { it.stateOfUtc }.distinctUntilChanged()
+        ) { selectedIds, _, _ -> selectedIds }
             .collect { selectedIds ->
                 _satellites.update { localStorage.getEntriesWithIds(selectedIds) }
                 val settings = settingsRepo.passesSettings.value
@@ -176,7 +179,13 @@ class SatelliteRepo(
         aosEndMinute: Int,
         invertAosTimeWindow: Boolean
     ): Boolean {
-        val offsetMillis = TimeZone.getDefault().getOffset(aosTime).toLong()
+        // Must match the timezone used to display pass times (UTC toggle vs device local)
+        val tz = if (settingsRepo.otherSettings.value.stateOfUtc) {
+            TimeZone.getTimeZone("UTC")
+        } else {
+            TimeZone.getDefault()
+        }
+        val offsetMillis = tz.getOffset(aosTime).toLong()
         val localMillis = Math.floorMod(aosTime + offsetMillis, 24L * 60L * 60L * 1000L)
         val aosMinute = (localMillis / 60_000L).toInt()
         val inRange = if (aosStartMinute <= aosEndMinute) {
