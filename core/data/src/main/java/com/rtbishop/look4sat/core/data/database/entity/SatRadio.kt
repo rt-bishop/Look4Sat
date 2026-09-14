@@ -32,5 +32,7 @@ data class SatRadio(
     val uplinkHigh: Long?,
     val uplinkMode: String?,
     val isInverted: Boolean,
-    val catnum: Int?
+    val catnum: Int?,
+    /** Set for manually imported transceivers, which remote updates must not replace. */
+    val isCustom: Boolean = false
 )

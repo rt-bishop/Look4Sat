@@ -19,19 +19,23 @@ package com.rtbishop.look4sat.core.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rtbishop.look4sat.core.data.database.entity.SatEntry
 import com.rtbishop.look4sat.core.data.database.entity.SatRadio
 
-@Database(entities = [SatEntry::class, SatRadio::class], version = 1, exportSchema = false)
+const val DATABASE_NAME = "Look4SatDBv400"
+
+@Database(entities = [SatEntry::class, SatRadio::class], version = 2, exportSchema = false)
 abstract class Look4SatDb : RoomDatabase() {
     abstract fun look4SatDao(): Look4SatDao
 }
 
-//val MIGRATION_1_2 = object : Migration(1, 2) {
-//    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("CREATE TABLE entries_backup (name TEXT NOT NULL, epoch REAL NOT NULL, meanmo REAL NOT NULL, eccn REAL NOT NULL, incl REAL NOT NULL, raan REAL NOT NULL, argper REAL NOT NULL, meanan REAL NOT NULL, catnum INTEGER NOT NULL, bstar REAL NOT NULL, xincl REAL NOT NULL, xnodeo REAL NOT NULL, omegao REAL NOT NULL, xmo REAL NOT NULL, xno REAL NOT NULL, orbitalPeriod REAL NOT NULL, isDeepSpace INTEGER NOT NULL, comment TEXT, PRIMARY KEY(catnum))")
-//        database.execSQL("INSERT INTO entries_backup (name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar, xincl, xnodeo, omegao, xmo, xno, orbitalPeriod, isDeepSpace, comment) SELECT name, epoch, meanmo, eccn, incl, raan, argper, meanan, catnum, bstar, xincl, xnodeo, omegao, xmo, xno, 1440 / meanmo, 1440 / meanmo >= 225.0, comment FROM entries")
-//        database.execSQL("DROP TABLE entries")
-//        database.execSQL("ALTER TABLE entries_backup RENAME TO entries")
-//    }
-//}
+/** Adds the mean motion derivative, needed to tell decayed satellites apart, and marks the
+ * transceivers that were imported from a file, so that remote updates leave them alone. */
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE entries ADD COLUMN ndot REAL NOT NULL DEFAULT 0.0")
+        db.execSQL("ALTER TABLE radios ADD COLUMN isCustom INTEGER NOT NULL DEFAULT 0")
+    }
+}

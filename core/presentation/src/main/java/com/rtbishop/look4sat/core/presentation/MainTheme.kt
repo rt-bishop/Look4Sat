@@ -46,7 +46,7 @@ data object Spacing {
     val extraSmall = 6.dp
     val small = 8.dp
     val medium = 12.dp
-    val large = 16.dp
+    val large = 12.dp
     val extraLarge = 24.dp
 }
 

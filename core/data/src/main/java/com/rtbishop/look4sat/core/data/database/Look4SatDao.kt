@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.core.data.database
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.MapColumn
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
@@ -38,6 +39,18 @@ interface Look4SatDao {
     @Transaction
     @Query("SELECT * FROM entries WHERE catnum IN (:selectedIds)")
     suspend fun getEntriesWithIds(selectedIds: List<Int>): List<SatEntry>
+
+    @Query("SELECT catnum, epoch FROM entries")
+    suspend fun getEntriesEpochs(): Map<@MapColumn("catnum") Int, @MapColumn("epoch") Double>
+
+    @Query("SELECT catnum, name FROM entries")
+    suspend fun getEntriesNames(): Map<@MapColumn("catnum") Int, @MapColumn("name") String>
+
+    @Query("UPDATE entries SET name = :name WHERE catnum = :catnum")
+    suspend fun renameEntry(catnum: Int, name: String)
+
+    @Query("DELETE FROM entries WHERE catnum IN (:ids)")
+    suspend fun deleteEntriesWithIds(ids: List<Int>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntries(entries: List<SatEntry>)
@@ -65,4 +78,7 @@ interface Look4SatDao {
 
     @Query("DELETE FROM radios")
     suspend fun deleteRadios()
+
+    @Query("DELETE FROM radios WHERE isCustom = 0")
+    suspend fun deleteManagedRadios()
 }

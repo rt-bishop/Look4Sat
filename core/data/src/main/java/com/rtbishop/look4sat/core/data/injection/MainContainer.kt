@@ -22,7 +22,10 @@ import android.content.Context
 import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
 import android.location.LocationManager
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.room.Room
+import com.rtbishop.look4sat.core.data.database.DATABASE_NAME
+import com.rtbishop.look4sat.core.data.database.MIGRATION_1_2
 import com.rtbishop.look4sat.core.data.database.Look4SatDb
 import com.rtbishop.look4sat.core.data.framework.BluetoothReporter
 import com.rtbishop.look4sat.core.data.framework.Ft817Controller
@@ -149,18 +152,24 @@ class MainContainer(private val context: Context) : IMainContainer {
     private fun provideDatabaseRepo(): IDatabaseRepo {
         val dbDispatcher = Dispatchers.Default
         val dataParser = DataParser(dbDispatcher)
-        val remoteSource = provideRemoteSource()
         return DatabaseRepo(dbDispatcher, dataParser, localSource, remoteSource, settingsRepo)
     }
 
     private fun provideLocalSource(): ILocalSource {
-        val builder = Room.databaseBuilder(context, Look4SatDb::class.java, "Look4SatDBv400")
-        val database = builder.fallbackToDestructiveMigration(false).build()
+        val builder = Room.databaseBuilder(context, Look4SatDb::class.java, DATABASE_NAME)
+        val database = builder.addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration(false).build()
         return LocalSource(database.look4SatDao())
     }
 
     private fun provideRemoteSource(): IRemoteSource {
-        return RemoteSource(Dispatchers.IO, context.contentResolver, OkHttpClient.Builder().build())
+        val version = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.4"
+        val userAgent = "Look4Sat/$version (+https://github.com/rt-bishop/Look4Sat)"
+        // Data providers ask clients to identify themselves, so that they can reach out to the
+        // developer instead of silently blocking every user of the app behind a misbehaving request
+        val client = OkHttpClient.Builder().addInterceptor { chain ->
+            chain.proceed(chain.request().newBuilder().header("User-Agent", userAgent).build())
+        }.build()
+        return RemoteSource(Dispatchers.IO, context.contentResolver, client)
     }
 
     private fun provideSatelliteRepo(): ISatelliteRepo {
@@ -175,7 +184,9 @@ class MainContainer(private val context: Context) : IMainContainer {
         val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val appPrefsFileName = "${context.packageName}_preferences"
         val appPreferences = context.getSharedPreferences(appPrefsFileName, Context.MODE_PRIVATE)
-        val appVersionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.0.4"
-        return SettingsRepo(manager, appPreferences, appVersionName)
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        val appVersionName = packageInfo.versionName ?: "4.0.4"
+        val appVersionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
+        return SettingsRepo(manager, appPreferences, appVersionName, appVersionCode)
     }
 }

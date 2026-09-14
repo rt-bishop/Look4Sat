@@ -20,17 +20,19 @@ package com.rtbishop.look4sat.core.domain.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/** Only the uuid is mandatory: third party sources rarely publish the full SatNOGS schema, and a
+ *  missing optional field should not cost the whole transceiver. */
 @Serializable
 data class SatRadio(
     @SerialName("uuid") val uuid: String,
-    @SerialName("description") val info: String,
-    @SerialName("alive") val isAlive: Boolean,
-    @SerialName("downlink_low") val downlinkLow: Long?,
-    @SerialName("downlink_high") val downlinkHigh: Long?,
-    @SerialName("mode") val downlinkMode: String?,
-    @SerialName("uplink_low") val uplinkLow: Long?,
-    @SerialName("uplink_high") val uplinkHigh: Long?,
-    @SerialName("uplink_mode") val uplinkMode: String?,
-    @SerialName("invert") val isInverted: Boolean,
-    @SerialName("norad_cat_id") val catnum: Int?
+    @SerialName("description") val info: String = "",
+    @SerialName("alive") val isAlive: Boolean = true,
+    @SerialName("downlink_low") val downlinkLow: Long? = null,
+    @SerialName("downlink_high") val downlinkHigh: Long? = null,
+    @SerialName("mode") val downlinkMode: String? = null,
+    @SerialName("uplink_low") val uplinkLow: Long? = null,
+    @SerialName("uplink_high") val uplinkHigh: Long? = null,
+    @SerialName("uplink_mode") val uplinkMode: String? = null,
+    @SerialName("invert") val isInverted: Boolean = false,
+    @SerialName("norad_cat_id") val catnum: Int? = null
 )

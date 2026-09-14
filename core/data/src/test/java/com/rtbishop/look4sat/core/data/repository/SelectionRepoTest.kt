@@ -93,6 +93,14 @@ class SelectionRepoTest {
 
         override suspend fun getEntriesWithIds(ids: List<Int>): List<OrbitalObject> = emptyList()
 
+        override suspend fun getEntriesEpochs(): Map<Int, Double> = emptyMap()
+
+        override suspend fun getEntriesNames(): Map<Int, String> = emptyMap()
+
+        override suspend fun renameEntries(names: Map<Int, String>) = Unit
+
+        override suspend fun deleteEntriesWithIds(ids: List<Int>) = Unit
+
         override suspend fun insertEntries(entries: List<com.rtbishop.look4sat.core.domain.predict.OrbitalData>) = Unit
 
         override suspend fun deleteEntries() = Unit
@@ -103,9 +111,11 @@ class SelectionRepoTest {
 
         override suspend fun getRadiosWithId(id: Int): List<SatRadio> = emptyList()
 
-        override suspend fun insertRadios(radios: List<SatRadio>) = Unit
+        override suspend fun insertRadios(radios: List<SatRadio>, isCustom: Boolean) = Unit
 
         override suspend fun deleteRadios() = Unit
+
+        override suspend fun deleteManagedRadios() = Unit
     }
 
     private class FakeSettingsRepo(
@@ -113,6 +123,7 @@ class SelectionRepoTest {
     ) : ISettingsRepo {
 
         override val appVersionName: String = "test"
+        override val appVersionCode: Long = 1L
 
         override val selectedIds: StateFlow<List<Int>> = MutableStateFlow(emptyList())
 
@@ -181,5 +192,3 @@ class SelectionRepoTest {
         override fun setAmSatCallsign(callsign: String) = Unit
     }
 }
-
-
