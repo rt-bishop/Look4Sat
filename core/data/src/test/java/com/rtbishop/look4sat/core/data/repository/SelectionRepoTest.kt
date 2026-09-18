@@ -84,6 +84,65 @@ class SelectionRepoTest {
         assertEquals(listOf(true, false, false), items.map { it.isSelected })
     }
 
+    @Test
+    fun `query without separators matches name with dashes spaces brackets`() = runTest(dispatcher) {
+        val repository = repoWithSearchEntries()
+        val flow = repository.getEntriesFlow()
+        repository.setQuery("ao7")
+        val items = flow.first()
+        // "ao7" is a substring of the normalized "AO-73 (FUNcube-1)" too, so a
+        // fuzzy search legitimately returns both AO-7 (first) and AO-73. The key
+        // guarantee is that AO-7 — unreachable before because of dashes/brackets
+        // — is now found.
+        assertEquals(7530, items.first().catnum)
+        assertEquals(listOf(7530, 39444), items.map { it.catnum })
+    }
+
+    @Test
+    fun `query without separators matches name with only dashes`() = runTest(dispatcher) {
+        val repository = repoWithSearchEntries()
+        val flow = repository.getEntriesFlow()
+        repository.setQuery("fo29")
+        assertEquals(listOf(99999), flow.first().map { it.catnum })
+    }
+
+    @Test
+    fun `space-separated tokens all must match in any order`() = runTest(dispatcher) {
+        val repository = repoWithSearchEntries()
+        val flow = repository.getEntriesFlow()
+        repository.setQuery("zarya iss")
+        assertEquals(listOf(25544), flow.first().map { it.catnum })
+    }
+
+    @Test
+    fun `partial token query matches substring`() = runTest(dispatcher) {
+        val repository = repoWithSearchEntries()
+        val flow = repository.getEntriesFlow()
+        repository.setQuery("funcube")
+        assertEquals(listOf(39444), flow.first().map { it.catnum })
+    }
+
+    @Test
+    fun `unmatched query returns nothing`() = runTest(dispatcher) {
+        val repository = repoWithSearchEntries()
+        val flow = repository.getEntriesFlow()
+        repository.setQuery("zzzznomatch")
+        assertEquals(emptyList<Int>(), flow.first().map { it.catnum })
+    }
+
+    private fun repoWithSearchEntries(): SelectionRepo {
+        val localSource = FakeLocalSource(
+            entries = listOf(
+                SatItem(25544, "ISS (ZARYA)", false),
+                SatItem(7530, "AO-7 (AMSAT-OSCAR 7)", false),
+                SatItem(39444, "AO-73 (FUNcube-1)", false),
+                SatItem(43803, "JO-97 (BIRDS-3)", false),
+                SatItem(99999, "FO-29", false)
+            )
+        )
+        return SelectionRepo(dispatcher, localSource, FakeSettingsRepo(selectedModes = emptyList()))
+    }
+
     private class FakeLocalSource(
         private val entries: List<SatItem>
     ) : ILocalSource {
