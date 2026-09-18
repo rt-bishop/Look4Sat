@@ -127,7 +127,10 @@ class SettingsViewModel(
             is SettingsAction.ToggleUpdate -> settingsRepo.updateOtherSettings { it.copy(stateOfAutoUpdate = action.value) }
             is SettingsAction.ToggleSweep -> settingsRepo.updateOtherSettings { it.copy(stateOfSweep = action.value) }
             is SettingsAction.ToggleSensor -> settingsRepo.updateOtherSettings { it.copy(stateOfSensors = action.value) }
-            is SettingsAction.ToggleLightTheme -> settingsRepo.updateOtherSettings { it.copy(stateOfLightTheme = action.value) }
+            is SettingsAction.ToggleLightTheme -> settingsRepo.updateOtherSettings {
+                // Night filter (red-only overlay) is incompatible with the light theme, so turn it off.
+                it.copy(stateOfLightTheme = action.value, stateOfNightMode = if (action.value) false else it.stateOfNightMode)
+            }
             is SettingsAction.ToggleNightMode -> settingsRepo.updateOtherSettings { it.copy(stateOfNightMode = action.value) }
             is SettingsAction.SetRadarCompassOffset -> settingsRepo.updateOtherSettings { it.copy(radarCompassOffset = action.value) }
             is SettingsAction.SetRadarCompassOffsetElev -> settingsRepo.updateOtherSettings { it.copy(radarCompassOffsetElev = action.value) }

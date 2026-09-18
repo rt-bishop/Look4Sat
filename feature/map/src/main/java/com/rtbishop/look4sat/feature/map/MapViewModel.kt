@@ -80,7 +80,7 @@ class MapViewModel(
     init {
         viewModelScope.launch {
             settingsRepo.otherSettings.collectLatest { settings ->
-                _uiState.update { it.copy(isUtc = settings.stateOfUtc) }
+                _uiState.update { it.copy(isUtc = settings.stateOfUtc, isLightUi = settings.stateOfLightTheme) }
             }
         }
         val (selectedCatNum, _) = satelliteRepo.selectedPass.value

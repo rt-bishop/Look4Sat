@@ -27,6 +27,8 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
@@ -48,8 +50,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         observeNightFilterState()
+        val settingsRepo = (applicationContext as IContainerProvider).getMainContainer().settingsRepo
         setContent {
-            MainTheme(isDarkTheme = true) { NavRoot() }
+            val otherSettings by settingsRepo.otherSettings.collectAsState()
+            MainTheme(isDarkTheme = !otherSettings.stateOfLightTheme) { NavRoot() }
         }
     }
 
