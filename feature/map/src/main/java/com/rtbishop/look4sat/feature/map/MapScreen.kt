@@ -122,6 +122,39 @@ private val moonIconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         android.graphics.PorterDuffColorFilter("#E0E0E0".toColorInt(), android.graphics.PorterDuff.Mode.SRC_IN)
 }
 
+/** Accent used for the station marker; recolored per theme so it stays visible on a light map. */
+private var mapAccentColor = "#FFE082".toColorInt()
+
+/** The dark-map filter (grayscale + invert) is only applied when NOT in light theme; cached to avoid rebuilds. */
+private val darkTileFilter by lazy { createColorFilter() }
+
+/**
+ * Recolor the shared overlay paints for the current theme. The light OSM tiles are white, so the
+ * dark-theme amber/grey overlays would vanish; light theme swaps them for dark, high-contrast colors.
+ * Must run before the set*() overlay builders on each frame, as several icons cache the paint color.
+ */
+private fun applyMapColors(isLightUi: Boolean) {
+    if (isLightUi) {
+        mapAccentColor = "#715C0C".toColorInt() // dark amber (matches app lightScheme primary)
+        footprintPaint.color = mapAccentColor
+        textPaint.color = "#1E1B13".toColorInt()
+        textPaint.setShadowLayer(3f, 3f, 3f, Color.WHITE)
+        sunIconPaint.colorFilter =
+            android.graphics.PorterDuffColorFilter(mapAccentColor, android.graphics.PorterDuff.Mode.SRC_IN)
+        moonIconPaint.colorFilter =
+            android.graphics.PorterDuffColorFilter("#4C4639".toColorInt(), android.graphics.PorterDuff.Mode.SRC_IN)
+    } else {
+        mapAccentColor = "#FFE082".toColorInt()
+        footprintPaint.color = mapAccentColor
+        textPaint.color = mapAccentColor
+        textPaint.setShadowLayer(3f, 3f, 3f, Color.BLACK)
+        sunIconPaint.colorFilter =
+            android.graphics.PorterDuffColorFilter(mapAccentColor, android.graphics.PorterDuff.Mode.SRC_IN)
+        moonIconPaint.colorFilter =
+            android.graphics.PorterDuffColorFilter("#E0E0E0".toColorInt(), android.graphics.PorterDuff.Mode.SRC_IN)
+    }
+}
+
 @Composable
 fun MapDestination() {
     val context = LocalContext.current
@@ -177,6 +210,8 @@ private fun MapScreen(uiState: MapState, onAction: (MapAction) -> Unit, mapView:
         ElevatedCard(modifier = Modifier.weight(1f)) {
             Box(contentAlignment = Alignment.BottomCenter) {
                 AndroidView({ mapView }) { view ->
+                    applyMapColors(uiState.isLightUi)
+                    view.overlayManager.tilesOverlay.setColorFilter(if (uiState.isLightUi) null else darkTileFilter)
                     uiState.stationPosition?.let { setStationPosition(it, view) }
                     uiState.track?.let { setSatelliteTrack(it, view) }
                     uiState.footprint?.let { setFootprint(it, view) }
@@ -288,7 +323,9 @@ private fun setStationPosition(stationPos: GeoPos, mapView: MapView) {
             mapView.overlays[OVERLAY_STATION] = Marker(mapView).apply {
                 setInfoWindow(null)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                icon = ContextCompat.getDrawable(mapView.context, R.drawable.ic_position)
+                icon = ContextCompat.getDrawable(mapView.context, R.drawable.ic_position)?.apply {
+                    setTint(mapAccentColor)
+                }
                 position = GeoPoint(stationPos.latitude, stationPos.longitude)
             }
         }
@@ -585,7 +622,7 @@ private fun rememberMapViewWithLifecycle(): MapView {
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
             overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
             overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
-            overlayManager.tilesOverlay.setColorFilter(createColorFilter())
+            // Tile color filter (dark inversion vs light) is applied per-theme in the AndroidView update block.
             setScrollableAreaLimitLatitude(maxLat, minLat, 0)
             overlays.addAll(Array(OVERLAY_COUNT) { FolderOverlay() })
         }

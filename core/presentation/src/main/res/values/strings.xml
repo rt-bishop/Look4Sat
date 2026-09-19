@@ -266,6 +266,7 @@
     <string name="prefs_other_switch_sweep">Radar sweep</string>
     <string name="prefs_other_switch_sensors">Use sensors</string>
     <string name="prefs_other_switch_night_mode">Night filter</string>
+    <string name="prefs_other_switch_light_theme">Light theme</string>
     <string name="prefs_other_compass_offset">Radar compass offset</string>
     <string name="prefs_other_compass_offset_elev">Radar compass offset (elev)</string>
 

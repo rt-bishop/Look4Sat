@@ -61,8 +61,8 @@ fun MainTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
             SideEffect {
                 val window = (view.context as ComponentActivity).window
                 val insetsController = WindowCompat.getInsetsController(window, view)
-                insetsController.isAppearanceLightStatusBars = false
-                insetsController.isAppearanceLightNavigationBars = false
+                insetsController.isAppearanceLightStatusBars = !isDarkTheme
+                insetsController.isAppearanceLightNavigationBars = !isDarkTheme
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     window.isNavigationBarContrastEnforced = false
                 }

@@ -495,12 +495,24 @@ private fun OtherCard(settings: OtherSettings, onAction: (SettingsAction) -> Uni
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(4.dp))
+            // Appearance: light theme (paired with a spacer to align with the two-column rows)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SwitchTile(R.string.prefs_other_switch_light_theme, settings.stateOfLightTheme) {
+                    onAction(SettingsAction.ToggleLightTheme(it))
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            Spacer(modifier = Modifier.height(4.dp))
             // Display preferences: UTC clock + night filter
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SwitchTile(R.string.prefs_other_switch_utc, settings.stateOfUtc) {
                     onAction(SettingsAction.ToggleUtc(it))
                 }
-                SwitchTile(R.string.prefs_other_switch_night_mode, settings.stateOfNightMode) {
+                SwitchTile(
+                    R.string.prefs_other_switch_night_mode,
+                    settings.stateOfNightMode,
+                    enabled = !settings.stateOfLightTheme
+                ) {
                     onAction(SettingsAction.ToggleNightMode(it))
                 }
             }
@@ -573,7 +585,12 @@ private fun SwitchRow(labelResId: Int, checked: Boolean, onCheckedChange: (Boole
 }
 
 @Composable
-private fun RowScope.SwitchTile(labelResId: Int, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun RowScope.SwitchTile(
+    labelResId: Int,
+    checked: Boolean,
+    enabled: Boolean = true,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -583,7 +600,7 @@ private fun RowScope.SwitchTile(labelResId: Int, checked: Boolean, onCheckedChan
             text = stringResource(id = labelResId),
             modifier = Modifier.weight(1f)
         )
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(checked = checked, enabled = enabled, onCheckedChange = onCheckedChange)
     }
 }
 
