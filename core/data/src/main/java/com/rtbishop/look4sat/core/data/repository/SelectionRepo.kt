@@ -114,12 +114,29 @@ class SelectionRepo(
     /**
      * Filters items by query. Uses toIntOrNull() instead of exception-based flow,
      * and lowercases the query once up front instead of per-item.
+     *
+     * Fuzzy search: the query is split into space-separated tokens and every
+     * token must appear in the satellite name after both sides are normalized
+     * (lowercased, non-alphanumeric separators such as dashes, spaces, brackets
+     * and dots stripped). This makes "ao7" match "AO-7 (AMSAT-OSCAR 7)" and
+     * "iss zarya" match "ISS (ZARYA)" — exact continuous-substring matching
+     * previously failed whenever the name contained a separator the query lacked.
      */
     private fun filterByQuery(items: List<SatItem>, query: String): List<SatItem> {
         if (query.isBlank()) return items
         val catnum = query.toIntOrNull()
         if (catnum != null) return items.filter { it.catnum == catnum }
-        val lowerQuery = query.lowercase()
-        return items.filter { it.name.lowercase().contains(lowerQuery) }
+        val tokens = query.split(' ')
+            .map { normalizeForSearch(it) }
+            .filter { it.isNotEmpty() }
+        if (tokens.isEmpty()) return items
+        return items.filter { item ->
+            val normalizedName = normalizeForSearch(item.name)
+            tokens.all { normalizedName.contains(it) }
+        }
     }
+
+    /** Lowercases and strips all non-alphanumeric chars for fuzzy matching. */
+    private fun normalizeForSearch(text: String): String =
+        text.lowercase().filter { it.isLetterOrDigit() }
 }
