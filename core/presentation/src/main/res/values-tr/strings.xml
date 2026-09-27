@@ -193,10 +193,13 @@
 
     <string name="prefs_other_title">Diğer</string>
     <string name="prefs_other_switch_utc">UTC saati</string>
-    <string name="prefs_other_switch_update">Veriyi otomatik güncelle</string>
+    <string name="prefs_other_switch_update">Otomatik güncelle</string>
     <string name="prefs_other_switch_sweep">Radar taraması</string>
     <string name="prefs_other_switch_sensors">Sensör</string>
     <string name="prefs_other_switch_night_mode">Gece filtresi</string>
+    <string name="prefs_other_switch_light_theme">Açık tema</string>
+    <string name="prefs_other_compass_offset_az">Pusula sapması (azimut)</string>
+    <string name="prefs_other_compass_offset_elev">Pusula sapması (yükseklik açısı)</string>
 
     <string name="prefs_highlight_title">Elevasyon vurgusu</string>
     <string name="prefs_highlight_low">Düşük &lt; %1$d°</string>

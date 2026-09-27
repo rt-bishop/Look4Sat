@@ -161,10 +161,13 @@
 
     <string name="prefs_other_title">වෙනත්</string>
     <string name="prefs_other_switch_utc">UTC වේලාව</string>
-    <string name="prefs_other_switch_update">දත්ත ස්වයං යාවත්කාලීන</string>
-    <string name="prefs_other_switch_sweep">Radar sweep</string>
+    <string name="prefs_other_switch_update">ස්වයං යාවත්කාලීන</string>
+    <string name="prefs_other_switch_sweep">රේඩාර් පරිලෝකනය</string>
     <string name="prefs_other_switch_sensors">සංවේදක</string>
     <string name="prefs_other_switch_night_mode">රාත්‍රී පෙරහන</string>
+    <string name="prefs_other_switch_light_theme">ආලෝක තේමාව</string>
+    <string name="prefs_other_compass_offset_az">මාලිමා අපගමනය (දිගංශය)</string>
+    <string name="prefs_other_compass_offset_elev">මාලිමා අපගමනය (උත්තෝලනය)</string>
 
     <string name="prefs_highlight_title">උස් උද්දීපනය</string>
     <string name="prefs_highlight_low">අඩු &lt; %1$d°</string>

@@ -116,8 +116,9 @@ class MapNightOverlay : Overlay() {
 
                 else -> {
                     // Terminator crosses this column — find the crossing pixel by binary search
-                    val crossY = findCrossingY(proj, x, 0, h - 1, sinSunLat, cosSunLat, cosLonDiff)
-                    if (dotTop < 0) {
+                    val isNightAtTop = dotTop < 0
+                    val crossY = findCrossingY(proj, x, 0, h - 1, sinSunLat, cosSunLat, cosLonDiff, isNightAtTop)
+                    if (isNightAtTop) {
                         // Night at top, day at bottom
                         rect.set(x.toFloat(), 0f, (x + stepPx).toFloat(), crossY.toFloat())
                         canvas.drawRect(rect, nightPaint)
@@ -134,7 +135,11 @@ class MapNightOverlay : Overlay() {
 
     /**
      * Binary-search for the pixel row where the day/night boundary crosses column [x].
-     * [yTop] is in day, [yBot] is in night (or vice versa).
+     *
+     * [isNightAtTop] states which side [yTop] is on. Both polarities occur: the pole nearest
+     * the sub-solar point is lit, so the terminator runs day-over-night while the sub-solar
+     * latitude is positive and night-over-day once it turns negative after the September
+     * equinox. Anchoring lo to the top pixel's side keeps the search valid either way.
      */
     private fun findCrossingY(
         proj: org.osmdroid.views.Projection,
@@ -143,7 +148,8 @@ class MapNightOverlay : Overlay() {
         yBot: Int,
         sinSunLat: Double,
         cosSunLat: Double,
-        cosLonDiff: Double
+        cosLonDiff: Double,
+        isNightAtTop: Boolean
     ): Int {
         var lo = yTop
         var hi = yBot
@@ -152,7 +158,8 @@ class MapNightOverlay : Overlay() {
             val geo = proj.fromPixels(x, mid, reusableGeoPoint) ?: return mid
             val latRad = Math.toRadians(geo.latitude)
             val dot = sin(latRad) * sinSunLat + cos(latRad) * cosSunLat * cosLonDiff
-            if (dot < 0) hi = mid else lo = mid
+            // Keep lo on the top pixel's side of the terminator and hi on the opposite side
+            if ((dot < 0) == isNightAtTop) lo = mid else hi = mid
         }
         return (lo + hi) / 2
     }

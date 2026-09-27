@@ -219,12 +219,13 @@
 
     <string name="prefs_other_title">其他</string>
     <string name="prefs_other_switch_utc">UTC 时间</string>
-    <string name="prefs_other_switch_update">自动更新数据</string>
-    <string name="prefs_other_switch_sweep">雷达扫描动画</string>
-    <string name="prefs_other_switch_sensors">传感器控制雷达</string>
+    <string name="prefs_other_switch_update">自动更新</string>
+    <string name="prefs_other_switch_sweep">雷达扫描</string>
+    <string name="prefs_other_switch_sensors">传感器</string>
     <string name="prefs_other_switch_night_mode">红色夜间模式</string>
-    <string name="prefs_other_compass_offset">雷达罗盘水平偏移量</string>
-    <string name="prefs_other_compass_offset_elev">雷达罗盘俯仰偏移量</string>
+    <string name="prefs_other_switch_light_theme">浅色主题</string>
+    <string name="prefs_other_compass_offset_az">罗盘偏移量（方位角）</string>
+    <string name="prefs_other_compass_offset_elev">罗盘偏移量（仰角）</string>
 
     <string name="prefs_highlight_title">仰角高亮</string>
     <string name="prefs_highlight_low">低 &lt; %1$d°</string>

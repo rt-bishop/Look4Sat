@@ -1,5 +1,6 @@
-* Tweaked sun calculations, added tests by atsunatsu (#241)
-* Overhauled sources import, added HTTP status by wty2019wty (#242)
-* Localized AMSAT status screen for Chinese by atsunatsu (#245)
-* Extracted hardcoded UI strings to resources by TianhengZhuang (#247)
-* Added AMSAT satellite status reports submission by atsunatsu (#248)
+* Fixed AOS window filter to follow the UTC setting by wty2019wty (#252)
+* Applied elevation color thresholds to the Radar by atsunatsu (#253)
+* Added fuzzy satellite search ignoring separators by atsunatsu (#255)
+* Added light theme suitable for e-ink devices by Ondrej Kolonicny (#256)
+* Fixed IC-705 frequency read in dual-radio mode by Michael S (#260)
+* Fixed day/night map overlay calculation and display issue by rt-bishop
