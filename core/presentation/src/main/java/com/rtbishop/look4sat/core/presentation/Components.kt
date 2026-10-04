@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,21 +47,32 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -429,6 +441,55 @@ private fun DialogShell(
 }
 
 @Composable
+fun SearchBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
+    val currentQuery = rememberSaveable { mutableStateOf("") }
+    val updateQuery = { newValue: String ->
+        currentQuery.value = newValue
+        onQueryChange(newValue)
+    }
+    ElevatedCard(modifier = modifier.height(48.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 12.dp)
+        ) {
+            Icon(painter = painterResource(id = R.drawable.ic_search), contentDescription = null)
+            BasicTextField(
+                value = currentQuery.value,
+                onValueChange = updateQuery,
+                singleLine = true,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp),
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                decorationBox = { innerTextField ->
+                    if (currentQuery.value.isEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.sat_search_hint),
+                            fontSize = 16.sp,
+                            lineHeight = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    innerTextField()
+                },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+            )
+            IconButton(onClick = { updateQuery("") }) {
+                val clearCd = stringResource(R.string.sat_search_clear)
+                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = clearCd)
+            }
+        }
+    }
+}
+
+@Composable
 fun hasEnoughHeight(): Boolean =
     currentWindowAdaptiveInfoV2().windowSizeClass.isHeightAtLeastBreakpoint(480)
 
@@ -579,4 +640,31 @@ fun formatFrequency(frequencyHz: Long): String {
     val khz = (frequencyHz % 1_000_000) / 1_000
     val hz = frequencyHz % 1_000
     return String.format(Locale.ENGLISH, "%d.%03d.%03d", mhz, khz, hz)
+}
+
+/**
+ * Strokes the [shape] outline as a track, then reveals it left to right up to the [progress]
+ * fraction of the width, so the top and bottom edges fill in sync.
+ */
+@Composable
+fun Modifier.progressOutline(
+    progress: Float,
+    shape: Shape = RoundedCornerShape(12.dp),
+    width: Dp = 0.5.dp,
+    trackColor: Color = ProgressIndicatorDefaults.linearTrackColor,
+    progressColor: Color = ProgressIndicatorDefaults.linearColor
+) = this.drawWithCache {
+    val widthPx = width.toPx()
+    val outline = shape.createOutline(Size(size.width - widthPx, size.height - widthPx), layoutDirection, this)
+    val outlinePath = Path().apply {
+        addOutline(outline)
+        translate(Offset(widthPx / 2f, widthPx / 2f))
+    }
+    val stroke = Stroke(width = widthPx)
+    val revealWidth = size.width * progress.coerceIn(0f, 1f)
+    onDrawWithContent {
+        drawContent()
+        drawPath(outlinePath, trackColor, style = stroke)
+        clipRect(right = revealWidth) { drawPath(outlinePath, progressColor, style = stroke) }
+    }
 }

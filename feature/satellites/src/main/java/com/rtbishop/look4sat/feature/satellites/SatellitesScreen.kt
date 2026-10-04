@@ -30,26 +30,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +61,7 @@ import com.rtbishop.look4sat.core.presentation.LocalSpacing
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.PrimaryIconCard
 import com.rtbishop.look4sat.core.presentation.R
+import com.rtbishop.look4sat.core.presentation.SearchBar
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
@@ -186,55 +181,6 @@ private fun SatellitesScreen(
                 else -> SatellitesCard(uiState.itemsList) { id, isTicked ->
                     onAction(SatellitesAction.SelectSingle(id, isTicked))
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SearchBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    val currentQuery = rememberSaveable { mutableStateOf("") }
-    val updateQuery = { newValue: String ->
-        currentQuery.value = newValue
-        onQueryChange(newValue)
-    }
-    ElevatedCard(modifier = modifier.height(48.dp)) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 12.dp)
-        ) {
-            Icon(painter = painterResource(id = R.drawable.ic_search), contentDescription = null)
-            BasicTextField(
-                value = currentQuery.value,
-                onValueChange = updateQuery,
-                singleLine = true,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 12.dp),
-                textStyle = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 20.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                decorationBox = { innerTextField ->
-                    if (currentQuery.value.isEmpty()) {
-                        Text(
-                            text = stringResource(id = R.string.sat_search_hint),
-                            fontSize = 16.sp,
-                            lineHeight = 20.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    innerTextField()
-                },
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-            )
-            IconButton(onClick = { updateQuery("") }) {
-                val clearCd = stringResource(R.string.sat_search_clear)
-                Icon(painter = painterResource(id = R.drawable.ic_close), contentDescription = clearCd)
             }
         }
     }
@@ -372,5 +318,3 @@ private fun SummaryHeader(selectedText: String, availableText: String) {
         )
     }
 }
-
-

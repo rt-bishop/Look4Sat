@@ -31,4 +31,15 @@ data class OrbitalPass(
     val catNum: Int = orbitalObject.data.catnum
     val name: String = if (hasDecayed) "${orbitalObject.data.name} (decayed?)" else orbitalObject.data.name
     val isDeepSpace: Boolean = orbitalObject.data.isDeepSpace
+
+    /**
+     * Fraction of the pass elapsed at [timeMillis], derived on demand so that a ticking clock
+     * never has to rewrite the pass list. A DeepSpace object is always in view, so it reads 1.
+     */
+    fun progressAt(timeMillis: Long): Float {
+        if (isDeepSpace) return 1f
+        val total = (losTime - aosTime).toFloat()
+        if (total <= 0f) return 0f
+        return ((timeMillis - aosTime) / total).coerceIn(0f, 1f)
+    }
 }

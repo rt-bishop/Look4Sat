@@ -27,8 +27,6 @@ import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.repository.IMainContainer
 import com.rtbishop.look4sat.core.domain.repository.ISatelliteRepo
 import com.rtbishop.look4sat.core.domain.repository.ISettingsRepo
-import com.rtbishop.look4sat.core.domain.utility.round
-import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +43,14 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.time.Duration.Companion.milliseconds
+
+/** Inputs that together determine the visible pass list; a change in any one regroups it. */
+private data class PassesInput(
+    val passes: List<OrbitalPass>,
+    val isUtc: Boolean,
+    val showDeepSpace: Boolean,
+    val query: String
+)
 
 class PassesViewModel(
     private val satelliteRepo: ISatelliteRepo,
@@ -69,6 +75,16 @@ class PassesViewModel(
         )
     )
     val uiState: StateFlow<PassesState> = _uiState
+
+    private val _timeNow = MutableStateFlow(System.currentTimeMillis())
+
+    private val searchQuery = MutableStateFlow("")
+
+    /**
+     * Ticks once per second, kept separate from [uiState] so that a clock update only
+     * recomposes the countdown chips and progress bars instead of the whole screen.
+     */
+    val timeNow: StateFlow<Long> = _timeNow
 
     init {
         // Refresh indicator: mirrors the repo's isCalculating state
@@ -95,36 +111,50 @@ class PassesViewModel(
                 _uiState.update { it.copy(modes = modes) }
             }
         }
-        // Tick loop: restarts on passes change, UTC/DeepSpace changes. Grouping/sun-time
-        // computations run once per restart, progress/countdown are calculated every second.
+        // Tick loop, gated on having an observer so it stops while the screen is in the
+        // background. Restarts on passes, UTC or DeepSpace changes. Sun times and grouping are
+        // computed only when the pass list itself changes; the clock alone never rebuilds them.
         viewModelScope.launch {
-            combine(
-                satelliteRepo.passes,
-                settingsRepo.otherSettings.map { it.stateOfUtc }.distinctUntilChanged(),
-                settingsRepo.passesSettings.map { it.showDeepSpace }.distinctUntilChanged()
-            ) { passes, isUtc, showDeepSpace -> Triple(passes, isUtc, showDeepSpace) }
-                .collectLatest { (allPasses, isUtc, showDeepSpace) ->
-                    val filtered = if (showDeepSpace) allPasses
-                    else allPasses.filter { !it.isDeepSpace }
-                    // Expensive: recompute sun times once per items/UTC change, not every second
-                    val sunTimes = computeSunTimes(filtered, isUtc)
-                    _uiState.update { it.copy(sunTimes = sunTimes) }
-                    while (isActive) {
-                        val timeNow = System.currentTimeMillis()
-                        val processed = computePassProgress(filtered, timeNow)
-                        val grouped = groupPasses(processed, isUtc)
-                        val (nextPass, nextTime, isAos) = resolveNextPass(processed, timeNow)
-                        _uiState.update {
-                            it.copy(
-                                itemsList = processed,
-                                groupedPasses = grouped,
-                                nextPass = nextPass,
-                                nextTime = nextTime,
-                                isNextTimeAos = isAos
-                            )
-                        }
-                        delay(1000.milliseconds)
+            _uiState.subscriptionCount
+                .map { count -> count > 0 }
+                .distinctUntilChanged()
+                .collectLatest { isObserved ->
+                    if (!isObserved) return@collectLatest
+                    combine(
+                        satelliteRepo.passes,
+                        settingsRepo.otherSettings.map { it.stateOfUtc }.distinctUntilChanged(),
+                        settingsRepo.passesSettings.map { it.showDeepSpace }.distinctUntilChanged(),
+                        searchQuery
+                    ) { passes, isUtc, showDeepSpace, query ->
+                        PassesInput(passes, isUtc, showDeepSpace, query)
                     }
+                        .collectLatest { (allPasses, isUtc, showDeepSpace, query) ->
+                            val filtered = filterByQuery(
+                                if (showDeepSpace) allPasses else allPasses.filter { !it.isDeepSpace },
+                                query
+                            )
+                            val sunTimes = computeSunTimes(filtered, isUtc)
+                            var live: List<OrbitalPass>? = null
+                            while (isActive) {
+                                val timeNow = System.currentTimeMillis()
+                                _timeNow.value = timeNow
+                                val current = filtered.filter { it.isDeepSpace || timeNow < it.losTime }
+                                // Only a pass dropping off the list warrants a regroup
+                                if (live == null || current.size != live.size) {
+                                    live = current
+                                    _uiState.update {
+                                        it.copy(
+                                            itemsList = current,
+                                            groupedPasses = groupPasses(current, isUtc),
+                                            sunTimes = sunTimes
+                                        )
+                                    }
+                                }
+                                val nextPass = resolveNextPass(current, timeNow)
+                                _uiState.update { it.copy(nextPass = nextPass) }
+                                delay(1000.milliseconds)
+                            }
+                        }
                 }
         }
     }
@@ -149,8 +179,10 @@ class PassesViewModel(
                 _uiState.update { it.copy(isPassesDialogShown = !it.isPassesDialogShown) }
             PassesAction.ToggleRadiosDialog ->
                 _uiState.update { it.copy(isRadiosDialogShown = !it.isRadiosDialogShown) }
-            is PassesAction.FocusCatNum -> _uiState.update { it.copy(focusedCatNum = action.catNum) }
-            PassesAction.ClearFocus -> _uiState.update { it.copy(focusedCatNum = null) }
+            is PassesAction.SearchFor -> {
+                searchQuery.value = action.query
+                _uiState.update { it.copy(searchQuery = action.query) }
+            }
         }
     }
 
@@ -208,42 +240,33 @@ class PassesViewModel(
         return ordered
     }
 
-    /** Computes live progress for each pass, filtering out expired ones. */
-    private fun computePassProgress(passList: List<OrbitalPass>, time: Long): List<OrbitalPass> {
-        val result = ArrayList<OrbitalPass>(passList.size)
-        for (pass in passList) {
-            if (!pass.isDeepSpace && time > pass.aosTime) {
-                val deltaNow = time.minus(pass.aosTime).toFloat()
-                val deltaTotal = pass.losTime.minus(pass.aosTime).toFloat()
-                val newProgress = (deltaNow / deltaTotal).round(2)
-                if (newProgress >= 1.0f) continue
-                if (newProgress != pass.progress) {
-                    result.add(pass.copy(progress = newProgress))
-                } else {
-                    result.add(pass)
-                }
-            } else {
-                result.add(pass)
-            }
-        }
-        return result
+    /** Resolves the next upcoming pass, falling back to the one currently in progress. */
+    private fun resolveNextPass(passes: List<OrbitalPass>, timeNow: Long): OrbitalPass {
+        val upcoming = passes.firstOrNull { it.aosTime > timeNow }
+        if (upcoming != null) return upcoming
+        return passes.lastOrNull() ?: defaultPass
     }
 
-    /** Resolves the next upcoming or active pass and its countdown timer. */
-    private fun resolveNextPass(
-        passes: List<OrbitalPass>,
-        timeNow: Long
-    ): Triple<OrbitalPass, String, Boolean> {
-        val upcoming = passes.firstOrNull { it.aosTime > timeNow }
-        if (upcoming != null) {
-            return Triple(upcoming, (upcoming.aosTime - timeNow).toTimerString(), true)
+    /**
+     * Filters passes by query, mirroring the satellite search: a numeric query matches the
+     * catalog number, otherwise every space-separated token must appear in the name once both
+     * sides are normalized, so "ao7" matches "AO-7 (AMSAT-OSCAR 7)".
+     */
+    private fun filterByQuery(passes: List<OrbitalPass>, query: String): List<OrbitalPass> {
+        if (query.isBlank()) return passes
+        val catNum = query.trim().toIntOrNull()
+        if (catNum != null) return passes.filter { it.catNum == catNum }
+        val tokens = query.split(' ').map { normalizeForSearch(it) }.filter { it.isNotEmpty() }
+        if (tokens.isEmpty()) return passes
+        return passes.filter { pass ->
+            val normalizedName = normalizeForSearch(pass.name)
+            tokens.all { normalizedName.contains(it) }
         }
-        if (passes.isNotEmpty()) {
-            val lastPass = passes.last()
-            return Triple(lastPass, (lastPass.losTime - timeNow).toTimerString(), false)
-        }
-        return Triple(defaultPass, "00:00:00", true)
     }
+
+    /** Lowercases and strips all non-alphanumeric chars for fuzzy matching. */
+    private fun normalizeForSearch(text: String): String =
+        text.lowercase().filter { it.isLetterOrDigit() }
 
     private fun applyFilter(
         hoursAhead: Int,

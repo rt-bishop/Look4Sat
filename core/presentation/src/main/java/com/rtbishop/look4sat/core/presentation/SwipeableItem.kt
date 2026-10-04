@@ -39,6 +39,7 @@ fun SwipeableItem(onSwipeRight: () -> Unit, onSwipeLeft: () -> Unit, content: @C
     val dismissThresholdPx = with(LocalDensity.current) { 120.dp.toPx() }
     val dismissState = rememberSwipeToDismissBoxState { dismissThresholdPx }
     val willTrigger by remember { derivedStateOf { dismissState.targetValue != SwipeToDismissBoxValue.Settled } }
+    val isSwiping by remember { derivedStateOf { dismissState.dismissDirection != SwipeToDismissBoxValue.Settled } }
     val hapticFeedback = LocalHapticFeedback.current
     LaunchedEffect(willTrigger) {
         val feedbackType = if (willTrigger) HapticFeedbackType.LongPress else HapticFeedbackType.SegmentTick
@@ -49,8 +50,10 @@ fun SwipeableItem(onSwipeRight: () -> Unit, onSwipeLeft: () -> Unit, content: @C
         enableDismissFromStartToEnd = true,
         enableDismissFromEndToStart = true,
         backgroundContent = {
-            val isSwipeRight = dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd
-            SwipeBackground(isSwipeRight, willTrigger, MaterialTheme.colorScheme.primary)
+            if (isSwiping) {
+                val isSwipeRight = dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd
+                SwipeBackground(isSwipeRight, willTrigger, MaterialTheme.colorScheme.primary)
+            }
         },
         content = { content() },
         onDismiss = {

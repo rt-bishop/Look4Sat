@@ -106,7 +106,7 @@ class MapViewModel(
     private fun selectDefaultSatellite(catnum: Int) {
         if (allSatellites.isNotEmpty()) {
             if (catnum == -1) {
-                allPasses.find { pass -> pass.progress < 100 && !pass.isDeepSpace }
+                allPasses.find { pass -> pass.progress < 1 && !pass.isDeepSpace }
                     ?.let { pass -> selectSatellite(pass.orbitalObject) }
             } else {
                 allSatellites.find { it.data.catnum == catnum }?.let { selectSatellite(it) }
@@ -189,8 +189,8 @@ class MapViewModel(
                 }
             }
             for ((localPositions, localSelectedPos) in deferreds.awaitAll()) {
-                for (pair in localPositions) {
-                    positionsMap[pair.first] = pair.second
+                for ((first, second) in localPositions) {
+                    positionsMap[first] = second
                 }
                 if (localSelectedPos != null) {
                     selectedSatPos = localSelectedPos
