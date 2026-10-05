@@ -268,6 +268,71 @@ class DopplerFrequencyCalculatorTest {
         val roundTripDownlink = DopplerFrequencyCalculator.computeDownlinkFromUplink(uplink!!, xpdr, orbitalPos)
         assertNotNull(roundTripDownlink)
         val error = kotlin.math.abs(roundTripDownlink!! - originalDownlink)
-        assertTrue("Round-trip error too large: $error", error < 10000)
+        // Both legs of the trip carry their own Doppler shift, so the reverse
+        // computation must undo both. A single-shift implementation leaves an
+        // error of roughly (uplink + downlink) Doppler, ~6.8 kHz at 3.5 km/s.
+        assertTrue("Round-trip error too large: $error", error < 100)
+    }
+
+    @Test
+    fun computeDownlinkFromUplink_appliesUplinkAndDownlinkDoppler() {
+        // 7 km/s range rate: the uplink is Doppler shifted before the passband
+        // mapping and the downlink after it. Both shifts must be applied - the
+        // mapping happens on the satellite-received frequency, not the ground one.
+        val xpdr = linearTransponder()
+        val orbitalPos = pos(7.0)
+        val downlink = DopplerFrequencyCalculator.computeDownlinkFromUplink(145_200_000L, xpdr, orbitalPos)
+        assertNotNull(downlink)
+        // A single-shift implementation maps the ground frequency first and
+        // yields 435_189_838 here, missing the uplink shift of 3391 Hz.
+        assertEquals(435_186_447L, downlink)
+    }
+
+    @Test
+    fun computeDownlinkFromUplink_inverted_appliesUplinkAndDownlinkDoppler() {
+        val xpdr = linearTransponder(inverted = true, downHigh = 435_500_000L)
+        val orbitalPos = pos(7.0)
+        val downlink = DopplerFrequencyCalculator.computeDownlinkFromUplink(145_200_000L, xpdr, orbitalPos)
+        assertNotNull(downlink)
+        assertEquals(435_293_226L, downlink)
+    }
+
+    @Test
+    fun computeUplinkFromDownlink_roundTripAtHighRangeRate() {
+        val xpdr = linearTransponder()
+        val orbitalPos = pos(7.0)
+        val originalUplink = 145_200_000L
+        val downlink = DopplerFrequencyCalculator.computeDownlinkFromUplink(originalUplink, xpdr, orbitalPos)
+        assertNotNull(downlink)
+        val roundTripUplink = DopplerFrequencyCalculator.computeUplinkFromDownlink(downlink!!, xpdr, orbitalPos)
+        assertNotNull(roundTripUplink)
+        val error = kotlin.math.abs(roundTripUplink!! - originalUplink)
+        // A single-shift implementation is not its own inverse: the round trip
+        // drifts by ~(uplink + downlink) Doppler, 13.5 kHz at 7 km/s.
+        assertTrue("Round-trip error too large: $error", error < 100)
+    }
+
+    @Test
+    fun computeOffsetRoundTrip_atHighRangeRate() {
+        val xpdr = linearTransponder()
+        val orbitalPos = pos(7.0)
+        val originalUplink = 145_200_000L
+        val downlink = DopplerFrequencyCalculator.computeDownlinkFromUplinkWithOffset(
+            uplinkHz = originalUplink,
+            transponder = xpdr,
+            orbitalPos = orbitalPos,
+            offsetHz = 2_500L
+        )
+        assertNotNull(downlink)
+        assertEquals(435_188_947L, downlink)
+        val roundTripUplink = DopplerFrequencyCalculator.computeUplinkFromDownlinkWithOffset(
+            downlinkHz = downlink!!,
+            transponder = xpdr,
+            orbitalPos = orbitalPos,
+            offsetHz = 2_500L
+        )
+        assertNotNull(roundTripUplink)
+        val error = kotlin.math.abs(roundTripUplink!! - originalUplink)
+        assertTrue("Round-trip error too large: $error", error < 100)
     }
 }

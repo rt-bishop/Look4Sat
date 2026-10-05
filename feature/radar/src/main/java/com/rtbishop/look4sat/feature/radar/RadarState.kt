@@ -101,4 +101,11 @@ sealed interface RadarAction {
 
     // Calculator actions
     data class ChangeCalculatorOffset(val offsetKHz: String) : RadarAction
+
+    /**
+     * The transponder currently driving the calculator (null when the satellite has
+     * no linear transponder). The per-satellite offset follows it instead of the
+     * transceiver selection, so it loads and saves even when nothing is selected.
+     */
+    data class CalculatorTransponderChanged(val catnum: Int?) : RadarAction
 }
