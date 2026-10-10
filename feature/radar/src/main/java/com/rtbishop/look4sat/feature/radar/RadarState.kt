@@ -94,7 +94,8 @@ sealed interface RadarAction {
     // SSTV actions
     data object SstvStartRecording : RadarAction
     data object SstvStopRecording : RadarAction
-    data object SstvSaveImage : RadarAction
+    data class SstvSaveImage(val successMessage: String, val failureMessage: String) : RadarAction
+    data class ShowToast(val message: String) : RadarAction
     data object SstvReset : RadarAction
     data class SstvSelectMode(val modeName: String) : RadarAction
     data class SstvPermissionResult(val granted: Boolean) : RadarAction

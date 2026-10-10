@@ -146,6 +146,9 @@
 
     <!-- SSTV screen -->
     <string name="sstv_grant_permission">Grant permission</string>
+    <string name="sstv_image_saved">Image saved</string>
+    <string name="sstv_image_save_failed">Failed to save image</string>
+    <string name="sstv_storage_permission_denied">Storage permission is required to save images. If denied permanently, enable it in app settings.</string>
     <string name="sstv_listening">Listening…</string>
     <string name="sstv_mic_permission">Microphone access needed</string>
     <string name="sstv_mode_format">Mode: %s</string>

@@ -19,6 +19,7 @@ package com.rtbishop.look4sat.core.domain.usecase
 
 /**
  * Saves a decoded SSTV image to the device gallery.
+ * The caller must obtain storage permission on Android API 24-28 before saving.
  * @return true if the image was saved successfully
  */
 interface ISaveImage {

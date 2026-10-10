@@ -20,10 +20,13 @@ package com.rtbishop.look4sat.core.data.usecase
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
+import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import com.rtbishop.look4sat.core.domain.usecase.ISaveImage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -32,23 +35,29 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-//Saves images to the device gallery using MediaStore (API 29+) or direct file write (API < 29)
+// Legacy public storage writes require WRITE_EXTERNAL_STORAGE on API 24-28.
 class SaveImage(private val context: Context) : ISaveImage {
 
     override suspend fun invoke(pixels: IntArray, width: Int, height: Int, modeName: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val bitmap = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
-                val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-                val filename = "SSTV_${modeName}_$timestamp.png"
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    saveWithMediaStore(bitmap, filename)
-                } else {
-                    saveToExternalStorage(bitmap, filename)
+                try {
+                    val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(Date())
+                    val filename = "SSTV_${modeName}_$timestamp.png"
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        saveWithMediaStore(bitmap, filename)
+                    } else {
+                        saveToExternalStorage(bitmap, filename)
+                    }
+                    true
+                } finally {
+                    bitmap.recycle()
                 }
-                bitmap.recycle()
-                true
-            } catch (_: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e("SaveImage", "Failed to save SSTV image", e)
                 false
             }
         }
@@ -64,21 +73,42 @@ class SaveImage(private val context: Context) : ISaveImage {
         val resolver = context.contentResolver
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
             ?: throw IllegalStateException("Failed to create MediaStore entry")
-        resolver.openOutputStream(uri)?.use { stream ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        var saved = false
+        try {
+            val stream = resolver.openOutputStream(uri)
+                ?: throw IllegalStateException("Failed to open MediaStore output stream")
+            stream.use {
+                check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) { "Failed to encode PNG" }
+            }
+            values.clear()
+            values.put(MediaStore.Images.Media.IS_PENDING, 0)
+            check(resolver.update(uri, values, null, null) == 1) { "Failed to publish image" }
+            saved = true
+        } finally {
+            if (!saved) {
+                check(resolver.delete(uri, null, null) == 1) { "Failed to delete incomplete image" }
+            }
         }
-        values.clear()
-        values.put(MediaStore.Images.Media.IS_PENDING, 0)
-        resolver.update(uri, values, null, null)
     }
 
     private fun saveToExternalStorage(bitmap: Bitmap, filename: String) {
         val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         val dir = File(picturesDir, "Look4Sat")
-        if (!dir.exists()) dir.mkdirs()
+        check(dir.isDirectory || dir.mkdirs()) { "Failed to create pictures directory" }
         val file = File(dir, filename)
-        FileOutputStream(file).use { stream ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        var saved = false
+        try {
+            FileOutputStream(file).use { stream ->
+                check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) { "Failed to encode PNG" }
+            }
+            MediaScannerConnection.scanFile(
+                context, arrayOf(file.absolutePath), arrayOf("image/png"), null
+            )
+            saved = true
+        } finally {
+            if (!saved && file.exists()) {
+                check(file.delete()) { "Failed to delete incomplete image" }
+            }
         }
     }
 }

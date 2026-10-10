@@ -25,7 +25,7 @@ compose-navigation3 = "1.2.0"
 
 google-ksp = "2.3.11"
 
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 kotlin-coroutines = "1.11.0"
 kotlin-serialization = "1.11.0"
 

@@ -66,7 +66,8 @@ internal fun SstvPage(
     sstv: SstvSubState,
     dopplerFrequency: String?,
     onAction: (RadarAction) -> Unit,
-    requestMicPermission: () -> Unit
+    requestMicPermission: () -> Unit,
+    requestSaveImage: () -> Unit
 ) {
     if (!sstv.hasPermission) {
         Box(
@@ -243,7 +244,7 @@ internal fun SstvPage(
                 )
                 // Save button — always visible, enabled when there are pixels
                 IconCard(
-                    action = { onAction(RadarAction.SstvSaveImage) },
+                    action = requestSaveImage,
                     resId = R.drawable.ic_save,
                     enabled = sstv.currentFrame?.imagePixels != null && !sstv.isSaving
                 )

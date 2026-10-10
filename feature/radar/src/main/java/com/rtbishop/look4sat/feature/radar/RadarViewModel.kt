@@ -297,14 +297,19 @@ class RadarViewModel(
             }
             RadarAction.SstvStartRecording -> startSstvRecording()
             RadarAction.SstvStopRecording -> stopSstvRecording()
-            RadarAction.SstvSaveImage -> {
+            is RadarAction.ShowToast -> showToast(action.message)
+            is RadarAction.SstvSaveImage -> {
+                if (_uiState.value.sstv.isSaving) return
                 val frame = _uiState.value.sstv.currentFrame ?: return
                 val pixels = frame.imagePixels ?: return
                 _uiState.update { it.copy(sstv = it.sstv.copy(isSaving = true)) }
                 viewModelScope.launch {
-                    saveImage(pixels, frame.imageWidth, frame.imageHeight, frame.modeName)
-                    _uiState.update { it.copy(sstv = it.sstv.copy(isSaving = false)) }
-                    showToast("Image saved")
+                    try {
+                        val saved = saveImage(pixels, frame.imageWidth, frame.imageHeight, frame.modeName)
+                        showToast(if (saved) action.successMessage else action.failureMessage)
+                    } finally {
+                        _uiState.update { it.copy(sstv = it.sstv.copy(isSaving = false)) }
+                    }
                 }
             }
             is RadarAction.SstvSelectMode -> {
