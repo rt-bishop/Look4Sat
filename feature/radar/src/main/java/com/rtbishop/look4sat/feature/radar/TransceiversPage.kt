@@ -140,6 +140,13 @@ fun CalculatorPage(
             ?: calculatorTransceivers.firstOrNull()
     }
 
+    // Keep the per-satellite offset in sync with the transponder driving the
+    // calculator: load the saved value on open/satellite change, and remember
+    // its catnum so editing saves even when no transceiver is selected
+    LaunchedEffect(selectedTransceiver?.uuid) {
+        onAction(RadarAction.CalculatorTransponderChanged(selectedTransceiver?.catnum))
+    }
+
     if (selectedTransceiver == null) {
         EmptyTransceiversContent(modifier)
         return
