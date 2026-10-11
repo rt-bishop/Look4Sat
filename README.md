@@ -34,6 +34,11 @@ It is now and always will be completely ad-free and open-source.
 *  Custom TLE satellite data import is available via Three Line Element .txt files
 *  Offline first: calculations are made offline. Weekly TLE data update is recommended.
 
+## Associated projects:
+
+- [Look4Sat-rPi](https://github.com/kampji/Look4Sat-rPi) - An independent Raspberry Pi OS port of Look4Sat,
+bringing satellite tracking to touchscreen devices.
+
 ## Star History
 
 <a href="https://star-history.dera.page/#rt-bishop/Look4Sat&type=timeline&legend=top-left">

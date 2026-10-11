@@ -1,6 +1,6 @@
-* Fixed AOS window filter to follow the UTC setting by wty2019wty (#252)
-* Applied elevation color thresholds to the Radar by atsunatsu (#253)
-* Added fuzzy satellite search ignoring separators by atsunatsu (#255)
-* Added light theme suitable for e-ink devices by Ondrej Kolonicny (#256)
-* Fixed IC-705 frequency read in dual-radio mode by Michael S (#260)
-* Fixed day/night map overlay calculation and display issue by rt-bishop
+* Added AOS/LOS timers to PassItem and NextPassRow components
+* Replaced Swipe-to-Filter functionality with a Search bar
+* Tweaked SSTV image saving flow, added permissions #264
+* Fixed linear Doppler calculator and offset restore #265
+* Corrected CelestialComputer moon calculations error #266
+* Added Look4Sat-rPi project ref to app Settings/README #267
