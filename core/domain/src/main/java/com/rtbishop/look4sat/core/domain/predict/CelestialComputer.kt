@@ -62,7 +62,7 @@ object CelestialComputer {
     /** Moon position as seen from a ground observer. */
     data class MoonPosition(
         val azimuth: Double,         // degrees, 0=N, 90=E
-        val elevation: Double,       // degrees
+        val elevation: Double,       // degrees, topocentric (parallax corrected)
         val rightAscension: Double,  // degrees
         val declination: Double,     // degrees
         val gha: Double,             // Greenwich Hour Angle, degrees
@@ -232,21 +232,27 @@ object CelestialComputer {
         val lm = l * DEG2RAD
         val moonDx = 3.0 / (PI * p)
 
-        // Ecliptic → equatorial
+        // Ecliptic → equatorial. atan2 keeps RA in the right quadrant for any ecliptic longitude:
+        // the periodic terms above can push l slightly outside [0, 360), and an acos based
+        // conversion then mirrors RA around 0h and throws the Moon off by up to 16° in azimuth.
         val z = (jd - 2415020.5) / 365.2422
         val ob = (23.452294 - (0.46845 * z + 5.9e-07 * z * z) / 3600.0).toRadians()
         val dec = asin(sin(bRad) * cos(ob) + cos(bRad) * sin(ob) * sin(lm))
-        var ra = acos(cos(bRad) * cos(lm) / cos(dec)); if (lm > PI) ra = TWO_PI - ra
+        val ra = mod2PI(atan2(sin(lm) * cos(ob) - tan(bRad) * sin(ob), cos(lm)))
 
         val n = observer.latitude * DEG2RAD
         t = (jd - 2451545.0) / 36525.0
-        var teg = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + (0.000387933 * t - t * t / 38710000.0) * t
-        while (teg > 360.0) teg -= 360.0
+        val teg = modulus(
+            280.46061837 + 360.98564736629 * (jd - 2451545.0) + (0.000387933 * t - t * t / 38710000.0) * t, 360.0
+        )
         // LST = GMST + east longitude (positive east convention)
         val th = mod2PI((teg + observer.longitude) * DEG2RAD)
         val h = th - ra
         val azVal = atan2(sin(h), cos(h) * sin(n) - tan(dec) * cos(n)) + PI
         val el = asin(sin(n) * sin(dec) + cos(n) * cos(dec) * cos(h))
+        // Geocentric → topocentric. Parallax is up to ~1°, two full Moon diameters, and shifts
+        // the Moon along the vertical circle only, so just the elevation needs correcting.
+        val elTopo = el / DEG2RAD - p * cos(el)
 
         // Moon radial velocity approximation (from "Amateur Radio Software", GM4ANB, RSGB 1985)
         val mm = fixAngle(1.319238 + daynum * 0.228027135)
@@ -266,7 +272,7 @@ object CelestialComputer {
 
         return MoonPosition(
             azimuth = azVal / DEG2RAD,
-            elevation = el / DEG2RAD,
+            elevation = elTopo,
             rightAscension = moonRa,
             declination = dec / DEG2RAD,
             gha = moonGha,

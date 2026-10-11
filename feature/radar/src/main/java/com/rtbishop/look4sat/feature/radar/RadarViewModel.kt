@@ -17,6 +17,7 @@
  */
 package com.rtbishop.look4sat.feature.radar
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -50,6 +51,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import kotlin.time.Duration.Companion.milliseconds
 
 class RadarViewModel(
@@ -206,9 +211,11 @@ class RadarViewModel(
 
         // Recompute celestial positions at most once per minute (they move very slowly)
         if (timeNow - lastCelestialUpdateMs >= 60_000L) {
+            val isFirstUpdate = lastCelestialUpdateMs == 0L
             cachedSunPos = CelestialComputer.getSunPosition(stationPos, timeNow)
             cachedMoonPos = CelestialComputer.getMoonPosition(stationPos, timeNow)
             lastCelestialUpdateMs = timeNow
+            if (isFirstUpdate) logCelestialPositions(timeNow)
         }
 
         val (time, isAos) = computeTimer(pass.isDeepSpace, pass.aosTime, pass.losTime, timeNow)
@@ -221,6 +228,23 @@ class RadarViewModel(
         processRadios(allRadios, pass.orbitalObject, timeNow)
         sendPassData(pos)
     }
+
+    // Logs the computed celestial positions once when the screen opens, and again whenever the
+    // station position changes, so they can be checked against an external ephemeris.
+    // Values are geometric: no atmospheric refraction is applied, unlike most online tools.
+    private fun logCelestialPositions(timeMillis: Long) {
+        val sun = cachedSunPos ?: return
+        val moon = cachedMoonPos ?: return
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT)
+            .apply { timeZone = TimeZone.getTimeZone("UTC") }
+        val tag = "RadarCelestial"
+        Log.i(tag, "Celestial check at ${formatter.format(Date(timeMillis))} UTC")
+        Log.i(tag, "Observer: ${stationPos.latitude.fmt()}, ${stationPos.longitude.fmt()}, ${stationPos.altitude.fmt()}m")
+        Log.i(tag, "Sun:  azimuth=${sun.azimuth.fmt()}° elevation=${sun.elevation.fmt()}°")
+        Log.i(tag, "Moon: azimuth=${moon.azimuth.fmt()}° elevation=${moon.elevation.fmt()}°")
+    }
+
+    private fun Double.fmt(): String = String.format(Locale.ROOT, "%.3f", this)
 
     private fun collectRadioTrackingState() {
         viewModelScope.launch {

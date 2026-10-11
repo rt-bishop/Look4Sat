@@ -71,6 +71,41 @@ class CelestialComputerTest {
 
     private fun String.toMillis(): Long = Instant.parse(this).toEpochMilli()
 
+    private data class MoonCase(
+        val latitude: Double,
+        val longitude: Double,
+        val iso: String,
+        val azimuth: Double,
+        val elevation: Double
+    )
+
+    @Test
+    fun `getMoonPosition matches reference topocentric az-el across the ecliptic longitude wrap`() {
+        // Reference values are topocentric, refraction excluded. The first three cases sit on or
+        // near the ecliptic longitude 0h crossing, where an acos based RA conversion mirrors the
+        // Moon around 0h and skews azimuth by up to 16 degrees.
+        val cases = listOf(
+            MoonCase(52.52, 13.405, "2026-01-23T12:12:00Z", 133.317, 28.418),
+            MoonCase(52.52, 13.405, "2026-09-26T02:00:00Z", 239.701, 20.508),
+            MoonCase(52.52, 13.405, "2026-09-26T05:00:00Z", 276.290, -4.496),
+            MoonCase(52.52, 13.405, "2026-10-05T19:00:00Z", 358.283, -19.612),
+            MoonCase(-33.8688, 151.2093, "2026-03-15T11:00:00Z", 184.964, -36.659),
+            MoonCase(40.7128, -74.0060, "2026-07-04T02:00:00Z", 98.385, -10.437)
+        )
+
+        cases.forEach { testCase ->
+            val observer = GeoPos(testCase.latitude, testCase.longitude)
+            val moon = CelestialComputer.getMoonPosition(observer, testCase.iso.toMillis())
+            val azimuthDelta = abs((moon.azimuth - testCase.azimuth + 540.0) % 360.0 - 180.0)
+
+            assertTrue(
+                "${testCase.iso}: azimuth ${moon.azimuth} should be within 0.5 of ${testCase.azimuth}",
+                azimuthDelta < 0.5
+            )
+            assertEquals("${testCase.iso}: elevation", testCase.elevation, moon.elevation, 0.5)
+        }
+    }
+
     private companion object {
         private const val SUNRISE_SET_THRESHOLD = -0.8333
         private const val HOUR_MILLIS = 60L * 60L * 1000L
