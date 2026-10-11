@@ -91,6 +91,9 @@ class RadarViewModel(
     )
     val uiState: StateFlow<RadarState> = _uiState
 
+    private val _timeNow = MutableStateFlow(System.currentTimeMillis())
+    val timeNow: StateFlow<Long> = _timeNow
+
     init {
         collectSettingsChanges()  // also handles initial sensor subscription
         collectStationPositionChanges()
@@ -198,6 +201,7 @@ class RadarViewModel(
 
     private suspend fun tickPass(pass: OrbitalPass, allRadios: List<SatRadio>) {
         val timeNow = System.currentTimeMillis()
+        _timeNow.value = timeNow
         val pos = satelliteRepo.getPosition(pass.orbitalObject, stationPos, timeNow)
 
         // Recompute celestial positions at most once per minute (they move very slowly)

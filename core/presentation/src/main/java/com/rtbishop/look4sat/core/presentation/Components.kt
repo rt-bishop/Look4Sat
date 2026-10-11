@@ -58,6 +58,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -90,19 +91,21 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rtbishop.look4sat.core.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalData
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
-import java.text.SimpleDateFormat
-import java.util.Date
+import com.rtbishop.look4sat.core.domain.utility.toTimerString
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
-import java.util.TimeZone
 
 @Composable
 @Preview(showBackground = true)
@@ -153,27 +156,21 @@ fun RowScope.TimerRow(timeString: String, isTimeAos: Boolean) {
 @Composable
 @Preview(showBackground = true)
 private fun NextPassRowPreview() = MainTheme {
-    TopBar { NextPassRow(pass = getDefaultPass()) }
+    TopBar { NextPassRow(pass = getDefaultPass(), timeNow = MutableStateFlow(System.currentTimeMillis())) }
 }
 
 @Composable
-fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier, isUtc: Boolean = false) {
-    val timeZone = remember(isUtc) {
-        if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault()
+fun RowScope.NextPassRow(pass: OrbitalPass, timeNow: StateFlow<Long>, modifier: Modifier = Modifier) {
+    val aosLosFormat = stringResource(id = R.string.pass_aosLos)
+    val aosLosStr = remember(pass.aosAzimuth, pass.losAzimuth, aosLosFormat) {
+        String.format(displayLocale(), aosLosFormat, pass.aosAzimuth.toInt() % 360, pass.losAzimuth.toInt() % 360)
     }
-    val sdfTime = remember(isUtc) {
-        SimpleDateFormat("HH:mm:ss", displayLocale()).also { it.timeZone = timeZone }
-    }
-    ElevatedCard(
-        modifier = modifier
-            .height(48.dp)
-            .weight(1f)
-    ) {
+    ElevatedCard(modifier = modifier.height(48.dp).weight(1f)) {
         Column(
             verticalArrangement = Arrangement.spacedBy((-2).dp),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 6.dp, top = 1.dp, end = 6.dp, bottom = 0.dp)
+                .padding(start = 6.dp, top = 2.dp, end = 6.dp, bottom = 0.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -188,41 +185,43 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier, isUtc
                         .infiniteMarquee(),
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                val elevColor = elevationColor(pass.maxElevation)
-                Icon(
-                    painter = painterResource(R.drawable.ic_elevation),
-                    contentDescription = null,
-                    tint = elevColor,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "${pass.maxElevation}°",
-                    color = elevColor
-                )
+                PassTimerChip(pass = pass, timeNow = timeNow)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = sdfTime.format(Date(pass.aosTime)),
+                    text = aosLosStr,
                     fontSize = 15.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "${pass.altitude} km", fontSize = 15.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val elevColor = elevationColor(pass.maxElevation)
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_elevation),
+                        contentDescription = null,
+                        tint = elevColor,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${pass.maxElevation}°",
+                        color = elevColor
+                    )
                 }
                 Text(
-                    text = stringResource(R.string.pass_aosLos, pass.aosAzimuth.toInt(), pass.losAzimuth.toInt()),
+                    text = "${pass.altitude} km",
                     fontSize = 15.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.End,
                     modifier = Modifier.weight(1f)
                 )
@@ -231,7 +230,50 @@ fun RowScope.NextPassRow(pass: OrbitalPass, modifier: Modifier = Modifier, isUtc
     }
 }
 
-private fun displayLocale(): Locale {
+/**
+ * Countdown to AOS while the pass is pending, then to LOS while it is active.
+ * Gray denotes a pending pass, primary an active one. Collects the clock itself so a
+ * tick recomposes only this chip.
+ */
+@Composable
+fun PassTimerChip(pass: OrbitalPass, timeNow: StateFlow<Long>) {
+    val now by timeNow.collectAsStateWithLifecycle()
+    // A DeepSpace object is permanently in view, so it gets a neutral label instead of a countdown
+    val isActive = !pass.isDeepSpace && now >= pass.aosTime
+    val text = when {
+        pass.isDeepSpace -> stringResource(R.string.pass_deep_space)
+        isActive -> stringResource(R.string.pass_timer_los, (pass.losTime - now).toTimerString())
+        else -> stringResource(R.string.pass_timer_aos, (pass.aosTime - now).toTimerString())
+    }
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = if (isActive) {
+            MaterialTheme.colorScheme.onPrimary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        }
+    ) {
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            style = LocalTextStyle.current.copy(
+                // Tabular figures stop the chip reflowing on every tick, while the trimmed
+                // line height keeps it short without shrinking the timer text
+                fontFeatureSettings = "tnum",
+                lineHeight = 16.sp,
+                lineHeightStyle = LineHeightStyle(
+                    alignment = LineHeightStyle.Alignment.Center,
+                    trim = LineHeightStyle.Trim.Both
+                )
+            ),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+        )
+    }
+}
+
+fun displayLocale(): Locale {
     val locale = Locale.getDefault()
     return if (locale.language == Locale.CHINESE.language) locale else Locale.ENGLISH
 }

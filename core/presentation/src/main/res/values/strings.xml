@@ -46,9 +46,8 @@
     <string name="pass_elevation">Elevation: %.1f°</string>
     <string name="pass_deep_space" translatable="false">DeepSpace</string>
     <string name="pass_altitude">Altitude: %d km</string>
-    <string name="pass_aosLos" translatable="false">%03d° - %03d°</string>
+    <string name="pass_aosLos" translatable="false">%03d°/%03d°</string>
     <string name="pass_azimuth" translatable="false">%03d°</string>
-    <string name="pass_duration_placeholder" translatable="false">--m --s</string>
     <string name="pass_timer_aos" translatable="false">AOS %s</string>
     <string name="pass_timer_los" translatable="false">LOS %s</string>
     <string name="pass_empty_list_message">

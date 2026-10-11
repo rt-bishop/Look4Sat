@@ -70,6 +70,7 @@ import com.rtbishop.look4sat.core.presentation.TimerRow
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
+import kotlinx.coroutines.flow.StateFlow
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -130,7 +131,7 @@ private val darkTileFilter by lazy { createColorFilter() }
 
 /**
  * Recolor the shared overlay paints for the current theme. The light OSM tiles are white, so the
- * dark-theme amber/grey overlays would vanish; light theme swaps them for dark, high-contrast colors.
+ * dark-theme amber/gray overlays would vanish; light theme swaps them for dark, high-contrast colors.
  * Must run before the set*() overlay builders on each frame, as several icons cache the paint color.
  */
 private fun applyMapColors(isLightUi: Boolean) {
@@ -177,11 +178,16 @@ fun MapDestination() {
             viewModel.onAction(MapAction.SetVisible(false))
         }
     }
-    MapScreen(uiState, viewModel::onAction, mapView)
+    MapScreen(uiState, viewModel.timeNow, viewModel::onAction, mapView)
 }
 
 @Composable
-private fun MapScreen(uiState: MapState, onAction: (MapAction) -> Unit, mapView: MapView) {
+private fun MapScreen(
+    uiState: MapState,
+    timeNow: StateFlow<Long>,
+    onAction: (MapAction) -> Unit,
+    mapView: MapView
+) {
     val rotateMod = Modifier.rotate(180f)
     val timeString = uiState.mapData?.aosTime ?: "00:00:00"
     val isTimeAos = uiState.mapData?.isTimeAos ?: true
@@ -198,12 +204,12 @@ private fun MapScreen(uiState: MapState, onAction: (MapAction) -> Unit, mapView:
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
                 IconCard(action = { onAction(MapAction.SelectNext) }, resId = R.drawable.ic_arrow)
             }
-            TopBar { NextPassRow(pass = uiState.orbitalPass, isUtc = uiState.isUtc) }
+            TopBar { NextPassRow(pass = uiState.orbitalPass, timeNow = timeNow) }
         } else {
             TopBar {
                 IconCard(action = { onAction(MapAction.SelectPrev) }, resId = R.drawable.ic_arrow, modifier = rotateMod)
                 TimerRow(timeString = timeString, isTimeAos = isTimeAos)
-                NextPassRow(pass = uiState.orbitalPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
+                NextPassRow(pass = uiState.orbitalPass, timeNow = timeNow, modifier = Modifier.weight(1f))
                 IconCard(action = { onAction(MapAction.SelectNext) }, resId = R.drawable.ic_arrow)
             }
         }
@@ -408,7 +414,7 @@ private fun setPositions(
                 if (isLonVisible) visibleSats.add(satellite to geoPos)
             }
         } else {
-            for (entry in posMap) visibleSats.add(entry.key to entry.value)
+            for ((key, value) in posMap) visibleSats.add(key to value)
         }
 
         val showLabels = visibleSats.size <= LABEL_LIMIT
@@ -507,7 +513,7 @@ private fun setFootprint(rangeCircle: List<GeoPos>, mapView: MapView) {
         var pts = footprintPoints
         if (pts == null || pts.size != rangeCircle.size) {
             pts = ArrayList(rangeCircle.size)
-            for (gp in rangeCircle) pts.add(GeoPoint(gp.latitude, gp.longitude))
+            for ((latitude, longitude) in rangeCircle) pts.add(GeoPoint(latitude, longitude))
             footprintPoints = pts
         } else {
             for (i in rangeCircle.indices) {

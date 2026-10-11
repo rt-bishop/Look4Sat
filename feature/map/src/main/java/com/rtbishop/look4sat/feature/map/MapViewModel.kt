@@ -77,6 +77,9 @@ class MapViewModel(
     private val isScreenVisible = MutableStateFlow(true)
     val uiState: StateFlow<MapState> = _uiState
 
+    private val _timeNow = MutableStateFlow(System.currentTimeMillis())
+    val timeNow: StateFlow<Long> = _timeNow
+
     init {
         viewModelScope.launch {
             settingsRepo.otherSettings.collectLatest { settings ->
@@ -148,7 +151,9 @@ class MapViewModel(
                 while (isActive) {
                     // Suspends while the map is off-screen instead of predicting into the void
                     isScreenVisible.first { it }
-                    dateNow.time = System.currentTimeMillis()
+                    val timeNow = System.currentTimeMillis()
+                    _timeNow.value = timeNow
+                    dateNow.time = timeNow
                     updateMapState(orbitalObject, allSatellites, stationPos, dateNow)
                     delay(effectiveRate.milliseconds)
                 }

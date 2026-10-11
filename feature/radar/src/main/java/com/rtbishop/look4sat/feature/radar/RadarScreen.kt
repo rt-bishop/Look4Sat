@@ -75,6 +75,7 @@ import com.rtbishop.look4sat.core.presentation.formatFrequency
 import com.rtbishop.look4sat.core.presentation.getDefaultPass
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
 import com.rtbishop.look4sat.core.presentation.layoutPadding
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 private enum class RadarPage(val title: String) {
@@ -99,7 +100,7 @@ fun RadarDestination(navigateUp: () -> Unit) {
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted -> viewModel.onAction(RadarAction.SstvPermissionResult(granted)) }
-    RadarScreen(uiState, viewModel::onAction, navigateUp, requestMicPermission = {
+    RadarScreen(uiState, viewModel.timeNow, viewModel::onAction, navigateUp, requestMicPermission = {
         permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
     })
 }
@@ -107,6 +108,7 @@ fun RadarDestination(navigateUp: () -> Unit) {
 @Composable
 private fun RadarScreen(
     uiState: RadarState,
+    timeNow: StateFlow<Long>,
     onAction: (RadarAction) -> Unit,
     navigateUp: () -> Unit,
     requestMicPermission: () -> Unit
@@ -129,12 +131,12 @@ private fun RadarScreen(
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isTimeAos)
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
-            TopBar { NextPassRow(pass = upcomingPass, isUtc = uiState.isUtc) }
+            TopBar { NextPassRow(pass = upcomingPass, timeNow = timeNow) }
         } else {
             TopBar {
                 IconCard(action = navigateUp, resId = R.drawable.ic_back)
                 TimerRow(timeString = uiState.currentTime, isTimeAos = uiState.isTimeAos)
-                NextPassRow(pass = upcomingPass, modifier = Modifier.weight(1f), isUtc = uiState.isUtc)
+                NextPassRow(pass = upcomingPass, timeNow = timeNow, modifier = Modifier.weight(1f))
                 IconCard(action = addToCalendar, resId = R.drawable.ic_calendar)
             }
         }

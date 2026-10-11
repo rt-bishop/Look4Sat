@@ -35,9 +35,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -51,7 +49,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,16 +61,17 @@ import com.rtbishop.look4sat.core.domain.predict.NearEarthObject
 import com.rtbishop.look4sat.core.domain.predict.OrbitalData
 import com.rtbishop.look4sat.core.domain.predict.OrbitalPass
 import com.rtbishop.look4sat.core.domain.repository.IContainerProvider
-import com.rtbishop.look4sat.core.domain.utility.toTimerString
 import com.rtbishop.look4sat.core.presentation.EmptyListCard
 import com.rtbishop.look4sat.core.presentation.IconCard
 import com.rtbishop.look4sat.core.presentation.MainTheme
 import com.rtbishop.look4sat.core.presentation.NextPassRow
+import com.rtbishop.look4sat.core.presentation.PassTimerChip
 import com.rtbishop.look4sat.core.presentation.R
 import com.rtbishop.look4sat.core.presentation.ScreenColumn
 import com.rtbishop.look4sat.core.presentation.SearchBar
 import com.rtbishop.look4sat.core.presentation.TopBar
 import com.rtbishop.look4sat.core.presentation.WhatsNewDialog
+import com.rtbishop.look4sat.core.presentation.displayLocale
 import com.rtbishop.look4sat.core.presentation.elevationColor
 import com.rtbishop.look4sat.core.presentation.infiniteMarquee
 import com.rtbishop.look4sat.core.presentation.isVerticalLayout
@@ -81,7 +79,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import java.util.TimeZone
 
 @Composable
@@ -153,7 +150,7 @@ private fun PassesScreen(
                     )
                 },
                 bottomInfo = {
-                    NextPassRow(pass = uiState.nextPass, isUtc = uiState.isUtc)
+                    NextPassRow(pass = uiState.nextPass, timeNow = timeNow)
                 },
                 endAction = {
                     IconCard(action = { onAction(PassesAction.TogglePassesDialog) }, resId = R.drawable.ic_filter)
@@ -274,11 +271,6 @@ private fun StickyDateHeader(label: String, sunriseTime: String, sunsetTime: Str
     }
 }
 
-internal fun displayLocale(): Locale {
-    val locale = Locale.getDefault()
-    return if (locale.language == Locale.CHINESE.language) locale else Locale.ENGLISH
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun DeepSpacePassPreview() {
@@ -306,49 +298,6 @@ private fun ActivePassPreview() {
     MainTheme { PassItem(pass = pass, { _, _ -> }, MutableStateFlow(aosTime + 280000L)) }
 }
 
-/**
- * Countdown to AOS while the pass is pending, then to LOS while it is active.
- * Gray denotes a pending pass, primary an active one. Collects the clock itself so a
- * tick recomposes only this chip.
- */
-@Composable
-private fun PassTimerChip(pass: OrbitalPass, timeNow: StateFlow<Long>) {
-    val now by timeNow.collectAsStateWithLifecycle()
-    // A DeepSpace object is permanently in view, so it gets a neutral label instead of a countdown
-    val isActive = !pass.isDeepSpace && now >= pass.aosTime
-    val text = when {
-        pass.isDeepSpace -> stringResource(R.string.pass_deep_space)
-        isActive -> stringResource(R.string.pass_timer_los, (pass.losTime - now).toTimerString())
-        else -> stringResource(R.string.pass_timer_aos, (pass.aosTime - now).toTimerString())
-    }
-    Surface(
-        shape = MaterialTheme.shapes.small,
-        color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = if (isActive) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        }
-    ) {
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            style = LocalTextStyle.current.copy(
-                // Tabular figures stop the chip reflowing on every tick, while the trimmed
-                // line height keeps it short without shrinking the timer text
-                fontFeatureSettings = "tnum",
-                lineHeight = 16.sp,
-                lineHeightStyle = LineHeightStyle(
-                    alignment = LineHeightStyle.Alignment.Center,
-                    trim = LineHeightStyle.Trim.Both
-                )
-            ),
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-        )
-    }
-}
-
 /** Elapsed fraction of the pass. Collects the clock itself to keep ticks off the text rows. */
 @Composable
 private fun PassProgressBar(pass: OrbitalPass, timeNow: StateFlow<Long>, modifier: Modifier = Modifier) {
@@ -369,7 +318,6 @@ private fun PassItem(
     isVerticalLayout: Boolean = true,
     isUtc: Boolean = false
 ) {
-    val passSatId = stringResource(id = R.string.pass_satId, pass.catNum)
     val horizontalPadding = if (isVerticalLayout) 6.dp else 12.dp
     val timeZone = remember(isUtc) {
         if (isUtc) TimeZone.getTimeZone("UTC") else TimeZone.getDefault()
@@ -377,26 +325,22 @@ private fun PassItem(
     val sdfTime = remember(isUtc) {
         SimpleDateFormat("HH:mm:ss", displayLocale()).also { it.timeZone = timeZone }
     }
-    val azimuthFormat = stringResource(id = R.string.pass_azimuth)
+    val aosLosFormat = stringResource(id = R.string.pass_aosLos)
     val aosTimeStr = remember(pass.aosTime, isUtc) { sdfTime.format(Date(pass.aosTime)) }
     val losTimeStr = remember(pass.losTime, isUtc) { sdfTime.format(Date(pass.losTime)) }
-    val aosAzStr = remember(pass.aosAzimuth, azimuthFormat) {
-        String.format(displayLocale(), azimuthFormat, pass.aosAzimuth.toInt() % 360)
+    val aosLosStr = remember(pass.aosAzimuth, pass.losAzimuth, aosLosFormat) {
+        String.format(displayLocale(), aosLosFormat, pass.aosAzimuth.toInt() % 360, pass.losAzimuth.toInt() % 360)
     }
-    val losAzStr = remember(pass.losAzimuth, azimuthFormat) {
-        String.format(displayLocale(), azimuthFormat, pass.losAzimuth.toInt() % 360)
-    }
-    val durationStr = remember(pass.aosTime, pass.losTime) {
-        val seconds = (pass.losTime - pass.aosTime) / 1000
-        "${seconds / 60}m ${seconds % 60}s"
-    }
+//    do not delete
+//    val durationStr = remember(pass.aosTime, pass.losTime) {
+//        val seconds = (pass.losTime - pass.aosTime) / 1000
+//        "${seconds / 60}m ${seconds % 60}s"
+//    }
 //    do not delete
 //    val progressTint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.08f)
 //    val progressFraction = if (pass.isDeepSpace) 0f else pass.progress.coerceIn(0f, 1f)
 
-    Column(
-        modifier = modifier.clickable { navigateToRadar(pass.catNum, pass.aosTime) }
-    ) {
+    Column(modifier = modifier.clickable { navigateToRadar(pass.catNum, pass.aosTime) }) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
@@ -408,7 +352,7 @@ private fun PassItem(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "$passSatId - ",
+                    text = "${stringResource(R.string.pass_satId, pass.catNum)} - ",
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
@@ -429,45 +373,25 @@ private fun PassItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = if (pass.isDeepSpace) {
-                        stringResource(R.string.pass_duration_placeholder)
-                    } else {
-                        durationStr
-                    },
+                    text = aosLosStr,
                     fontSize = 15.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
-                // AOS azimuth, peak elevation and LOS azimuth read as the arc of the pass
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = aosAzStr,
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val elevColor = elevationColor(pass.maxElevation)
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_elevation),
+                        contentDescription = null,
+                        tint = elevColor,
+                        modifier = Modifier.size(16.dp)
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        val elevColor = elevationColor(pass.maxElevation)
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_elevation),
-                            contentDescription = null,
-                            tint = elevColor,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${pass.maxElevation}°",
-                            color = elevColor
-                        )
-                    }
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = losAzStr,
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        text = "${pass.maxElevation}°",
+                        color = elevColor
                     )
                 }
                 Text(

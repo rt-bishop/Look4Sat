@@ -135,7 +135,7 @@ class PassesViewModel(
                             )
                             val sunTimes = computeSunTimes(filtered, isUtc)
                             var live: List<OrbitalPass>? = null
-                            while (isActive) {
+                            while (this@launch.isActive) {
                                 val timeNow = System.currentTimeMillis()
                                 _timeNow.value = timeNow
                                 val current = filtered.filter { it.isDeepSpace || timeNow < it.losTime }
